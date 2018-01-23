@@ -1,4 +1,3 @@
 ﻿export const loop = function () {
-    console.log('Pee');
-    console.log('Poo');
+    console.log('The Green Arrow is better than christian bale batman');
 }

@@ -11,42 +11,50 @@
     // Output the current date and branch.
     grunt.log.subhead('Task Start: ' + currentdate.toLocaleString());
     let gruntConfig = {};
-    gruntConfig['screeps'] = InitGruntScreeps(require('./screeps.json'));
-    gruntConfig['ts'] = InitTSTask();
-    gruntConfig['clean'] = InitCleanTask();
-    gruntConfig['copy'] = InitCopyTask();
+    gruntConfig['pkg'] = grunt.file.readJSON('package.json');
+    gruntConfig['screeps'] = InitGruntScreepsConfig();
+    gruntConfig['ts'] = InitTSConfig();
+    gruntConfig['clean'] = InitCleanConfig();
+    gruntConfig['copy'] = InitCopyConfig();
 
     grunt.initConfig(gruntConfig);
 
+    grunt.registerTask('screepsBranch', 'Sets the grunt-screeps options.branch config', function (branchID) {
+        grunt.config.set('screeps.options.branch', branchID);
+    });
+
     grunt.registerTask('default', ['clean', 'copy:default']);
     grunt.registerTask('commit', ['clean', 'ts', 'copy', 'screeps']);
+    grunt.registerTask('MAIN_COMMIT', ['clean', 'ts', 'copy', 'screepsBranch:SwarmOS_Main', 'screeps']);
 }
 
-let InitGruntScreeps = function (loginInfo) {
+let InitGruntScreepsConfig = function () {
+    let loginInfo = require('./screeps.json')
+
     let screepsTask = {};
     screepsTask['options'] = {
         email: loginInfo.email,
         password: loginInfo.password,
-        branch: 'SwarmOS_Sim',
-        ptr: false
+        ptr: false,
+        branch: 'SwarmOS_Sim'
     };
 
     screepsTask['dist'] = {
-        src: ['dist/*.js'],
+        src: ['dist/*.js']
     };
 
     return screepsTask;
 }
 
-let InitTSTask = function () {
+let InitTSConfig = function () {
     return { default: { tsconfig: true } };
 }
 
-let InitCleanTask = function() {
+let InitCleanConfig = function() {
     return { default: ['dist', 'obj'] };
 }
 
-let InitCopyTask = function () {
+let InitCopyConfig = function () {
     let copyTask = {};
 
     copyTask['default'] = {
@@ -64,10 +72,3 @@ let InitCopyTask = function () {
 
     return copyTask;
 }
-
-/*let InitConcatTask = function () {
-    let concatTask = {}
-    concatTask['options'] = {
-        separator: '\n/*************************************************************************************\n'
-    }
-}*/
