@@ -1,3 +1,5 @@
 *node_modules/
 *.tscache/
 *.vs/
+SwarmOS/screeps.json
+SwarmOS/dist/

@@ -1,0 +1,24 @@
+{
+    "compilerOptions": {
+        "allowUnreachableCode": false,
+        "module": "commonjs",
+        "outDir": "obj",
+        "baseUrl": "src",
+        "strict": true,
+        "noImplicitReturns": true,
+        "noImplicitAny": true,
+        "noImplicitThis": true,
+        "rootDir": "src",
+        "noEmitOnError": true,
+        "allowSyntheticDefaultImports": true
+    },
+    "include": [
+        "src/**/*.ts",
+        "decl/**/*.ts"
+    ],
+    "exclude": [
+        "node_modules",
+        "objs",
+        "dist"
+    ]
+}
