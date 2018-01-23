@@ -1,9 +1,10 @@
 ﻿module.exports = function (grunt) {
-    grunt.loadNpmTasks('grunt-screeps');
     grunt.loadNpmTasks('grunt-contrib-clean');
-    grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-concat');
+    grunt.loadNpmTasks('grunt-contrib-copy');
+    grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-file-append');
+    grunt.loadNpmTasks('grunt-screeps');
     grunt.loadNpmTasks("grunt-ts");
 
     let currentdate = new Date();
@@ -16,6 +17,7 @@
     gruntConfig['ts'] = InitTSConfig();
     gruntConfig['clean'] = InitCleanConfig();
     gruntConfig['copy'] = InitCopyConfig();
+    gruntConfig['uglify'] = InitUglifyConfig();
 
     grunt.initConfig(gruntConfig);
 
@@ -23,9 +25,10 @@
         grunt.config.set('screeps.options.branch', branchID);
     });
 
-    grunt.registerTask('default', ['clean', 'copy:default']);
-    grunt.registerTask('commit', ['clean', 'ts', 'copy', 'screeps']);
-    grunt.registerTask('MAIN_COMMIT', ['clean', 'ts', 'copy', 'screepsBranch:SwarmOS_Main', 'screeps']);
+    grunt.registerTask('compile', ['clean', 'ts']);
+    grunt.registerTask('default', ['commitSim']);
+    grunt.registerTask('commitSim', ['compile', 'copy', 'screepsBranch:SwarmOS_Sim', 'screeps']);
+    grunt.registerTask('commitMain', ['compile', 'copy', 'screepsBranch:SwarmOS_Main', 'screeps']);
 }
 
 let InitGruntScreepsConfig = function () {
@@ -50,8 +53,8 @@ let InitTSConfig = function () {
     return { default: { tsconfig: true } };
 }
 
-let InitCleanConfig = function() {
-    return { default: ['dist', 'obj'] };
+let InitCleanConfig = function () {
+    return { default: ['dist', 'build', '.tmp'] };
 }
 
 let InitCopyConfig = function () {
@@ -60,7 +63,7 @@ let InitCopyConfig = function () {
     copyTask['default'] = {
         files: [{
             expand: true,
-            cwd: 'obj/',
+            cwd: 'build/compiled',
             src: '**',
             dest: 'dist/',
             filter: 'isFile',
@@ -71,4 +74,25 @@ let InitCopyConfig = function () {
     }
 
     return copyTask;
+}
+
+let InitUglifyConfig = function () {
+    let uglifyConfig = {};
+
+    uglifyConfig['options'] = {
+        mangle: true,
+        nameCache: '.tmp/grunt-uglify-cache.json',
+    };
+    uglifyConfig['default'] = {
+        files: [{
+            expend: true,
+            cwd: '.',
+            src: 'build/compiled/**/*.js',
+            dest: 'dist/main.js',
+            rename: function (dest, src) {
+                return dst + '/' + src.replace('.js', '.min.js');
+            }
+        }]
+    };
+    return uglifyConfig;
 }

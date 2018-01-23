@@ -37,11 +37,9 @@
     <Content Include="tsconfig.json" />
     <Content Include="package.json" />
     <Content Include="README.md" />
-    <Content Include="screeps.json">
-      <SubType>Code</SubType>
-    </Content>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="screeps.json" />
     <Compile Include="Gruntfile.js">
       <SubType>Code</SubType>
     </Compile>
@@ -49,10 +47,13 @@
   <ItemGroup>
     <Folder Include="decl\" />
     <Folder Include="src\" />
+    <Folder Include="src\common\" />
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="decl\index.d.ts" />
     <TypeScriptCompile Include="decl\types.d.ts" />
+    <TypeScriptCompile Include="src\common\IDisposable.ts" />
+    <TypeScriptCompile Include="src\common\IMemory.ts" />
     <TypeScriptCompile Include="src\main.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>

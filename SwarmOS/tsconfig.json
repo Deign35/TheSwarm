@@ -2,7 +2,7 @@
     "compilerOptions": {
         "allowUnreachableCode": false,
         "module": "commonjs",
-        "outDir": "obj",
+        "outDir": "build/compiled",
         "baseUrl": "src",
         "strict": true,
         "noImplicitReturns": true,
@@ -19,6 +19,7 @@
     "exclude": [
         "node_modules",
         "objs",
-        "dist"
+        "dist",
+        "build"
     ]
 }

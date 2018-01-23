@@ -3,3 +3,4 @@
 *.vs/
 SwarmOS/screeps.json
 SwarmOS/dist/
+SwarmOS/build/
