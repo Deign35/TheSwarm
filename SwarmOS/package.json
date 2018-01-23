@@ -1,0 +1,9 @@
+{
+  "name": "the-swarm",
+  "version": "0.0.0",
+  "description": "TheSwarm",
+  "main": "app.js",
+  "author": {
+    "name": "Deign"
+  }
+}
