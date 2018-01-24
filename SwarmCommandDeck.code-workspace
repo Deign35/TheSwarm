@@ -1,0 +1,20 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"files.exclude": {
+			"**/.git": true,
+			"**/.svn": true,
+			"**/.tscache": true,
+			"**/.vs": true,
+			"**/.vscode": true,
+			"**/node_modules": true,
+			"**/screeps.json": true,
+			"**/*.sln": true,
+			"**/*.njsproj*": true,
+		},
+	}
+}
