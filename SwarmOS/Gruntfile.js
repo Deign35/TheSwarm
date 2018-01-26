@@ -32,39 +32,11 @@ module.exports = function (grunt) {
     grunt.registerTask('replace', 'Replaces file paths with _', function () {
         grunt.file.recurse('./build/compiled', ReplaceImports);
     });
-    /*async.forEach(files, function (file, files_done) {
-        async.forEach(file.src, function (src, src_done) {
-            console.log('file: ' + JSON.stringify(src));
-            if (!grunt.file.exists(src)) {
-                grunt.log.debug('file not found', src);
-            }
-            dest = file.dest;
-            content = grunt.file.read(src);
-            let newcontent = content;
-            if (content !== newContent || options.saveUnchanged) {
-                console.log('source changed');
-                grunt.file.write(dest, newContent);
-                counter += 1;
-            } else {
-                console.log(src + ' unchanged');
-            }
 
-            return src_done();
-        }, files_done)
-    }, function (err) {
-        if (err) {
-            grunt.log.error(err);
-            replace_done(false);
-        }
-        grunt.log.writeln('\n' + counter + ' files created');
-    });
-});*/
-
-    grunt.registerTask('commitMain', ['compile', 'copy', 'screepsBranch:SwarmOS_Main', 'screeps']);
-    grunt.registerTask('commitSim', ['compile', 'copy', 'screepsBranch:SwarmOS_Sim', 'screeps']);
+    grunt.registerTask('commitMain', ['compile', 'replace', 'copy', 'screepsBranch:SwarmOS_Main', 'screeps']);
+    grunt.registerTask('commitSim', ['compile', 'replace', 'copy', 'screepsBranch:SwarmOS_Sim', 'screeps']);
     grunt.registerTask('compile', ['clean', 'ts']);
     grunt.registerTask('default', ['commitSim']);
-    grunt.registerTask('try', ['compile', 'replace', 'copy', 'screepsBranch:SwarmOS_Sim', 'screeps']);
 }
 
 let InitGruntScreepsConfig = function () {
@@ -100,7 +72,7 @@ let InitCopyConfig = function () {
         files: [{
             expand: true,
             cwd: 'build/compiled',
-            src: '**',
+            src: '**/*.js',
             dest: 'dist/',
             filter: 'isFile',
             rename: function (dest, src) {
