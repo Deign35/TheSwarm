@@ -2,7 +2,7 @@
 
 export const loop = function () {
     console.log('The Green Arrow is better than batman and robin put together');
-    let memObj = new IMemory(Game.rooms[0].name);
+    let memObj = new IMemory(Game.rooms['sim'].name);
     memObj.Save();
     memObj.Load();
 }

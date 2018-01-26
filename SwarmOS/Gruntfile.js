@@ -1,10 +1,13 @@
-﻿module.exports = function (grunt) {
+﻿let gObj;
+module.exports = function (grunt) {
+    gObj = grunt;
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-file-append');
     grunt.loadNpmTasks('grunt-screeps');
+    grunt.loadNpmTasks('grunt-string-replace');
     grunt.loadNpmTasks("grunt-ts");
 
     let currentdate = new Date();
@@ -18,6 +21,7 @@
     gruntConfig['clean'] = InitCleanConfig();
     gruntConfig['copy'] = InitCopyConfig();
     gruntConfig['uglify'] = InitUglifyConfig();
+    gruntConfig['string-replace'] = InitStringReplaceConfig();
 
     grunt.initConfig(gruntConfig);
 
@@ -25,10 +29,42 @@
         grunt.config.set('screeps.options.branch', branchID);
     });
 
+    grunt.registerTask('replace', 'Replaces file paths with _', function () {
+        grunt.file.recurse('./build/compiled', ReplaceImports);
+    });
+    /*async.forEach(files, function (file, files_done) {
+        async.forEach(file.src, function (src, src_done) {
+            console.log('file: ' + JSON.stringify(src));
+            if (!grunt.file.exists(src)) {
+                grunt.log.debug('file not found', src);
+            }
+            dest = file.dest;
+            content = grunt.file.read(src);
+            let newcontent = content;
+            if (content !== newContent || options.saveUnchanged) {
+                console.log('source changed');
+                grunt.file.write(dest, newContent);
+                counter += 1;
+            } else {
+                console.log(src + ' unchanged');
+            }
+
+            return src_done();
+        }, files_done)
+    }, function (err) {
+        if (err) {
+            grunt.log.error(err);
+            replace_done(false);
+        }
+        grunt.log.writeln('\n' + counter + ' files created');
+    });
+});*/
+
+    grunt.registerTask('commitMain', ['compile', 'copy', 'screepsBranch:SwarmOS_Main', 'screeps']);
+    grunt.registerTask('commitSim', ['compile', 'copy', 'screepsBranch:SwarmOS_Sim', 'screeps']);
     grunt.registerTask('compile', ['clean', 'ts']);
     grunt.registerTask('default', ['commitSim']);
-    grunt.registerTask('commitSim', ['compile', 'copy', 'screepsBranch:SwarmOS_Sim', 'screeps']);
-    grunt.registerTask('commitMain', ['compile', 'copy', 'screepsBranch:SwarmOS_Main', 'screeps']);
+    grunt.registerTask('try', ['compile', 'replace', 'copy', 'screepsBranch:SwarmOS_Sim', 'screeps']);
 }
 
 let InitGruntScreepsConfig = function () {
@@ -85,7 +121,7 @@ let InitUglifyConfig = function () {
     };
     uglifyConfig['default'] = {
         files: [{
-            expend: true,
+            expand: true,
             cwd: '.',
             src: 'build/compiled/**/*.js',
             dest: 'dist/main.js',
@@ -95,4 +131,59 @@ let InitUglifyConfig = function () {
         }]
     };
     return uglifyConfig;
+}
+
+let InitStringReplaceConfig = function () {
+    let stringReplaceConfig = {};
+    stringReplaceConfig['files'] = {
+        cwd: '.',
+        src: './build/compiled/main.js',
+        dest: './build/compiled2/main.js',
+    };
+    stringReplaceConfig['options'] = {
+        replacements: [{
+            pattern: /((?:require\(")[.|/]*([^"]*))"\);/,
+            replacement: '$1',
+        }]
+    };
+
+    return stringReplaceConfig;
+}
+
+let ReplaceImports = function (abspath, rootdir, subdir, filename) {
+    if (abspath.match(/.js$/) == null) { return; }
+    console.log('abspath[' + abspath + '] -- rootdir[' + rootdir + '] -- subdir[' + subdir + ']');
+    let file = gObj.file.read(abspath);
+    let updatedFile = '';
+
+    //let path = subdir ? subdir.split('/') : [];
+    let lines = file.split('\n');
+    for (let line of lines) {
+        let reqStr = line.match(/(?:require\(")([^_a-zA-Z0-9]*)([^"]*)/);
+        if (reqStr && reqStr != "") {
+            let reqPath = subdir ? subdir.split('/') : [];
+            let upPaths = line.match(/\.\.\//gi);
+            console.log('path before ------ ' + reqPath);
+            if (upPaths) {
+                for (let i in upPaths) {
+                    reqPath.splice(reqPath.length - 1);
+                }
+            }
+
+            console.log(JSON.stringify(reqPath));
+            let rePathed = "";
+            if (reqPath && reqPath.length > 0) {
+                for (let folder of reqPath) {
+                    rePathed = folder + "_";
+                }
+            }
+            console.log('repathed: ' + rePathed);
+            //line = line.replace(/(require\(")([^_a-zA-Z0-9]*)([^"]*)/, "$1" + rePathed + "$3").replace(/\//gi, '_');
+            line = line.replace(/require\("([\.\/]*)([^"]*)/, "require\(\"" + rePathed + "$2").replace(/\//gi, '_');
+        }
+
+        updatedFile += (line + '\n');
+    }
+
+    gObj.file.write((rootdir + '/' + (subdir ? subdir + '/' : '') + filename), updatedFile);
 }
