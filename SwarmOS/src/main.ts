@@ -1,7 +1,4 @@
 ﻿import { IMemory } from './common/IMemory';
-
-import { ScreepsPlusData } from './graphana';
-let Data = ScreepsPlusData;
 const TASK = 'task';
 export const loop = function () {
     let creepCount = 0;
