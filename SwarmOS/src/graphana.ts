@@ -1,5 +1,5 @@
 export function Data() {
-    return {
+    return JSON.parse(JSON.stringify({
         "__inputs": [
             {
                 "name": "DS_SCREEPSPL.US",
@@ -2133,5 +2133,6 @@ export function Data() {
         "version": 23,
         "links": [],
         "gnetId": null
-    }
+    
+    }))
 }

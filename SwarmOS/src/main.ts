@@ -1,6 +1,7 @@
 ﻿import { IMemory } from './common/IMemory';
 
-import { Data } from './graphana';
+import { ScreepsPlusData } from './graphana';
+let Data = ScreepsPlusData;
 const TASK = 'task';
 export const loop = function () {
     let creepCount = 0;
@@ -19,6 +20,5 @@ export const loop = function () {
             Game.spawns['Spawn1'].spawnCreep([WORK, MOVE, CARRY], "" + Game.time, { memory: { task: false } });
         }
     }
-    console.log(Data.);
-    console.log(j)
+    console.log(JSON.parse(Data()));
 }
