@@ -12,10 +12,14 @@
 			"**/.vs": true,
 			"**/.vscode": true,
 			"**/node_modules": true,
-			"**/screeps.json": false,
+			"**/screeps.json": true,
 			"**/*.sln": true,
 			"**/*.njsproj*": true,
 			"**/npm*/": true,
+			"**/build/": true,
+			"**/dist/": true,
+			"**/package*.json": true,
+			"**/tsconfig.json": true,
 		},
 	}
 }
