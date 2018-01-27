@@ -7,7 +7,6 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-file-append');
     grunt.loadNpmTasks('grunt-screeps');
-    grunt.loadNpmTasks('grunt-string-replace');
     grunt.loadNpmTasks("grunt-ts");
 
     let currentdate = new Date();
@@ -51,7 +50,7 @@ let InitGruntScreepsConfig = function () {
     };
 
     screepsTask['dist'] = {
-        src: ['dist/*.js']
+        src: ['dist/*.js', 'dist/*.json']
     };
 
     return screepsTask;
@@ -77,6 +76,19 @@ let InitCopyConfig = function () {
             filter: 'isFile',
             rename: function (dest, src) {
                 return dest + src.replace(/\//g, '_');
+            }
+        }]
+    }
+
+    copyTask['json'] = {
+        files: [{
+            expand: true,
+            cwd: './src/',
+            src: '**/*.json',
+            dest: 'dist/',
+            filter: 'isFile',
+            rename: function (dest, src) {
+                return dest + src.substring(0, src.length - 4).replace(/\//g, '_') + 'js';
             }
         }]
     }
