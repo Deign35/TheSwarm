@@ -1,9 +1,10 @@
 import { RoomResources } from '../classes/RoomResources';
 import { Delegate } from '../common/Delegate';
 
+declare type ScreepsPlusDelegate = (stats: any) => void;
 export class ScreepsPlus {
 	private _spDelegate = new Delegate();
-	AddStatsCallback(id: string, callback: (...args: any[]) => void) {
+	AddStatsCallback(id: string, callback: ScreepsPlusDelegate) {
 		this._spDelegate.subscribe(id, callback);
 	}
 	CollectStats() {

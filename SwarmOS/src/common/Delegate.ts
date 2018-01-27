@@ -1,5 +1,4 @@
-type CallbackFunction = (...args: any[]) => void;
-export class Delegate {
+export class Delegate<T extends CallbackFunction> {
     callbackFunctions: { [id: string]: CallbackFunction } = {};
     subscribe(id: string, callback: CallbackFunction) {
         this.callbackFunctions[id] = callback;
