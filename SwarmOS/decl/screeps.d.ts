@@ -80,21 +80,21 @@ declare const CREEP_CLAIM_LIFE_TIME: 500;
 declare const CREEP_CORPSE_RATE: 0.2;
 
 declare const OBSTACLE_OBJECT_TYPES: [
-  "spawn",
-  "creep",
-  "wall",
-  "source",
-  "constructedWall",
-  "extension",
-  "link",
-  "storage",
-  "tower",
-  "observer",
-  "powerSpawn",
-  "powerBank",
-  "lab",
-  "terminal",
-  "nuker"
+    "spawn",
+    "creep",
+    "wall",
+    "source",
+    "constructedWall",
+    "extension",
+    "link",
+    "storage",
+    "tower",
+    "observer",
+    "powerSpawn",
+    "powerBank",
+    "lab",
+    "terminal",
+    "nuker"
 ];
 
 declare const ENERGY_REGEN_TIME: 300;
@@ -250,10 +250,10 @@ declare const RESOURCES_ALL: ResourceConstant[];
 
 declare const SUBSCRIPTION_TOKEN: string;
 
-declare const CONTROLLER_LEVELS: {[level: number]: number};
-declare const CONTROLLER_STRUCTURES: Record<BuildableStructureConstant, {[level: number]: number}>;
+declare const CONTROLLER_LEVELS: { [level: number]: number };
+declare const CONTROLLER_STRUCTURES: Record<BuildableStructureConstant, { [level: number]: number }>;
 
-declare const CONTROLLER_DOWNGRADE: {[level: number]: number};
+declare const CONTROLLER_DOWNGRADE: { [level: number]: number };
 declare const CONTROLLER_CLAIM_DOWNGRADE: number;
 declare const CONTROLLER_RESERVE: number;
 declare const CONTROLLER_RESERVE_MAX: number;
@@ -316,17 +316,17 @@ declare const MINERAL_MIN_AMOUNT: Record<MineralConstant, number>;
 declare const MINERAL_RANDOM_FACTOR: number;
 
 declare const MINERAL_DENSITY: {
-        1: number,
-        2: number,
-        3: number,
-        4: number
+    1: number,
+    2: number,
+    3: number,
+    4: number
 };
 
 declare const MINERAL_DENSITY_PROBABILITY: {
-        1: number,
-        2: number,
-        3: number,
-        4: number
+    1: number,
+    2: number,
+    3: number,
+    4: number
 };
 
 declare const MINERAL_DENSITY_CHANGE: number;
@@ -360,252 +360,252 @@ declare const NUKE_DAMAGE: {
 };
 
 declare const REACTIONS: {
-  H: {
-      O: "OH",
-      L: "LH",
-      K: "KH",
-      U: "UH",
-      Z: "ZH",
-      G: "GH"
-  },
-  O: {
-      H: "OH",
-      L: "LO",
-      K: "KO",
-      U: "UO",
-      Z: "ZO",
-      G: "GO"
-  },
-  Z: {
-      K: "ZK",
-      H: "ZH",
-      O: "ZO"
-  },
-  L: {
-      U: "UL",
-      H: "LH",
-      O: "LO"
-  },
-  K: {
-      Z: "ZK",
-      H: "KH",
-      O: "KO"
-  },
-  G: {
-      H: "GH",
-      O: "GO"
-  },
-  U: {
-      L: "UL",
-      H: "UH",
-      O: "UO"
-  },
-  OH: {
-      UH: "UH2O",
-      UO: "UHO2",
-      ZH: "ZH2O",
-      ZO: "ZHO2",
-      KH: "KH2O",
-      KO: "KHO2",
-      LH: "LH2O",
-      LO: "LHO2",
-      GH: "GH2O",
-      GO: "GHO2"
-  },
-  X: {
-      UH2O: "XUH2O",
-      UHO2: "XUHO2",
-      LH2O: "XLH2O",
-      LHO2: "XLHO2",
-      KH2O: "XKH2O",
-      KHO2: "XKHO2",
-      ZH2O: "XZH2O",
-      ZHO2: "XZHO2",
-      GH2O: "XGH2O",
-      GHO2: "XGHO2"
-  },
-  ZK: {
-      UL: "G"
-  },
-  UL: {
-      ZK: "G"
-  },
-  LH: {
-      OH: "LH2O"
-  },
-  ZH: {
-      OH: "ZH2O"
-  },
-  GH: {
-      OH: "GH2O"
-  },
-  KH: {
-      OH: "KH2O"
-  },
-  UH: {
-      OH: "UH2O"
-  },
-  LO: {
-      OH: "LHO2"
-  },
-  ZO: {
-      OH: "ZHO2"
-  },
-  KO: {
-      OH: "KHO2"
-  },
-  UO: {
-      OH: "UHO2"
-  },
-  GO: {
-      OH: "GHO2"
-  },
-  LH2O: {
-      X: "XLH2O"
-  },
-  KH2O: {
-      X: "XKH2O"
-  },
-  ZH2O: {
-      X: "XZH2O"
-  },
-  UH2O: {
-      X: "XUH2O"
-  },
-  GH2O: {
-      X: "XGH2O"
-  },
-  LHO2: {
-      X: "XLHO2"
-  },
-  UHO2: {
-      X: "XUHO2"
-  },
-  KHO2: {
-      X: "XKHO2"
-  },
-  ZHO2: {
-      X: "XZHO2"
-  },
-  GHO2: {
-      X: "XGHO2"
-  }
+    H: {
+        O: "OH",
+        L: "LH",
+        K: "KH",
+        U: "UH",
+        Z: "ZH",
+        G: "GH"
+    },
+    O: {
+        H: "OH",
+        L: "LO",
+        K: "KO",
+        U: "UO",
+        Z: "ZO",
+        G: "GO"
+    },
+    Z: {
+        K: "ZK",
+        H: "ZH",
+        O: "ZO"
+    },
+    L: {
+        U: "UL",
+        H: "LH",
+        O: "LO"
+    },
+    K: {
+        Z: "ZK",
+        H: "KH",
+        O: "KO"
+    },
+    G: {
+        H: "GH",
+        O: "GO"
+    },
+    U: {
+        L: "UL",
+        H: "UH",
+        O: "UO"
+    },
+    OH: {
+        UH: "UH2O",
+        UO: "UHO2",
+        ZH: "ZH2O",
+        ZO: "ZHO2",
+        KH: "KH2O",
+        KO: "KHO2",
+        LH: "LH2O",
+        LO: "LHO2",
+        GH: "GH2O",
+        GO: "GHO2"
+    },
+    X: {
+        UH2O: "XUH2O",
+        UHO2: "XUHO2",
+        LH2O: "XLH2O",
+        LHO2: "XLHO2",
+        KH2O: "XKH2O",
+        KHO2: "XKHO2",
+        ZH2O: "XZH2O",
+        ZHO2: "XZHO2",
+        GH2O: "XGH2O",
+        GHO2: "XGHO2"
+    },
+    ZK: {
+        UL: "G"
+    },
+    UL: {
+        ZK: "G"
+    },
+    LH: {
+        OH: "LH2O"
+    },
+    ZH: {
+        OH: "ZH2O"
+    },
+    GH: {
+        OH: "GH2O"
+    },
+    KH: {
+        OH: "KH2O"
+    },
+    UH: {
+        OH: "UH2O"
+    },
+    LO: {
+        OH: "LHO2"
+    },
+    ZO: {
+        OH: "ZHO2"
+    },
+    KO: {
+        OH: "KHO2"
+    },
+    UO: {
+        OH: "UHO2"
+    },
+    GO: {
+        OH: "GHO2"
+    },
+    LH2O: {
+        X: "XLH2O"
+    },
+    KH2O: {
+        X: "XKH2O"
+    },
+    ZH2O: {
+        X: "XZH2O"
+    },
+    UH2O: {
+        X: "XUH2O"
+    },
+    GH2O: {
+        X: "XGH2O"
+    },
+    LHO2: {
+        X: "XLHO2"
+    },
+    UHO2: {
+        X: "XUHO2"
+    },
+    KHO2: {
+        X: "XKHO2"
+    },
+    ZHO2: {
+        X: "XZHO2"
+    },
+    GHO2: {
+        X: "XGHO2"
+    }
 };
 
 declare const BOOSTS: {
-  work: {
-      UO: {
-          harvest: 3
-      },
-      UHO2: {
-          harvest: 5
-      },
-      XUHO2: {
-          harvest: 7
-      },
-      LH: {
-          build: 1.5,
-          repair: 1.5
-      },
-      LH2O: {
-          build: 1.8,
-          repair: 1.8
-      },
-      XLH2O: {
-          build: 2,
-          repair: 2
-      },
-      ZH: {
-          dismantle: 2
-      },
-      ZH2O: {
-          dismantle: 3
-      },
-      XZH2O: {
-          dismantle: 4
-      },
-      GH: {
-          upgradeController: 1.5
-      },
-      GH2O: {
-          upgradeController: 1.8
-      },
-      XGH2O: {
-          upgradeController: 2
-      }
-  },
-  attack: {
-      UH: {
-          attack: 2
-      },
-      UH2O: {
-          attack: 3
-      },
-      XUH2O: {
-          attack: 4
-      }
-  },
-  ranged_attack: {
-      KO: {
-          rangedAttack: 2,
-          rangedMassAttack: 2
-      },
-      KHO2: {
-          rangedAttack: 3,
-          rangedMassAttack: 3
-      },
-      XKHO2: {
-          rangedAttack: 4,
-          rangedMassAttack: 4
-      }
-  },
-  heal: {
-      LO: {
-          heal: 2,
-          rangedHeal: 2
-      },
-      LHO2: {
-          heal: 3,
-          rangedHeal: 3
-      },
-      XLHO2: {
-          heal: 4,
-          rangedHeal: 4
-      }
-  },
-  carry: {
-      KH: {
-          capacity: 2
-      },
-      KH2O: {
-          capacity: 3
-      },
-      XKH2O: {
-          capacity: 4
-      }
-  },
-  move: {
-      ZO: {
-          fatigue: 2
-      },
-      ZHO2: {
-          fatigue: 3
-      },
-      XZHO2: {
-          fatigue: 4
-      }
-  },
-  tough: {
-      GO: {
-          damage: .7
-      },
-      GHO2: {
-          damage: .5
-      },
-      XGHO2: {
-          damage: .3
-      }
-  }
+    work: {
+        UO: {
+            harvest: 3
+        },
+        UHO2: {
+            harvest: 5
+        },
+        XUHO2: {
+            harvest: 7
+        },
+        LH: {
+            build: 1.5,
+            repair: 1.5
+        },
+        LH2O: {
+            build: 1.8,
+            repair: 1.8
+        },
+        XLH2O: {
+            build: 2,
+            repair: 2
+        },
+        ZH: {
+            dismantle: 2
+        },
+        ZH2O: {
+            dismantle: 3
+        },
+        XZH2O: {
+            dismantle: 4
+        },
+        GH: {
+            upgradeController: 1.5
+        },
+        GH2O: {
+            upgradeController: 1.8
+        },
+        XGH2O: {
+            upgradeController: 2
+        }
+    },
+    attack: {
+        UH: {
+            attack: 2
+        },
+        UH2O: {
+            attack: 3
+        },
+        XUH2O: {
+            attack: 4
+        }
+    },
+    ranged_attack: {
+        KO: {
+            rangedAttack: 2,
+            rangedMassAttack: 2
+        },
+        KHO2: {
+            rangedAttack: 3,
+            rangedMassAttack: 3
+        },
+        XKHO2: {
+            rangedAttack: 4,
+            rangedMassAttack: 4
+        }
+    },
+    heal: {
+        LO: {
+            heal: 2,
+            rangedHeal: 2
+        },
+        LHO2: {
+            heal: 3,
+            rangedHeal: 3
+        },
+        XLHO2: {
+            heal: 4,
+            rangedHeal: 4
+        }
+    },
+    carry: {
+        KH: {
+            capacity: 2
+        },
+        KH2O: {
+            capacity: 3
+        },
+        XKH2O: {
+            capacity: 4
+        }
+    },
+    move: {
+        ZO: {
+            fatigue: 2
+        },
+        ZHO2: {
+            fatigue: 3
+        },
+        XZHO2: {
+            fatigue: 4
+        }
+    },
+    tough: {
+        GO: {
+            damage: .7
+        },
+        GHO2: {
+            damage: .5
+        },
+        XGHO2: {
+            damage: .3
+        }
+    }
 };
 
 declare const LOOK_CREEPS: "creep";
@@ -740,7 +740,7 @@ interface Creep extends RoomObject {
      *
      * @returns Result Code: OK, ERR_NOT_OWNER, ERR_BUSY, ERR_INVALID_TARGET, ERR_NOT_IN_RANGE, ERR_NO_BODYPART
      */
-    attack(target: Creep|Structure): CreepActionReturnCode;
+    attack(target: Creep | Structure): CreepActionReturnCode;
     /**
      * Decreases the controller's downgrade or reservation timer for 1 tick per
      * every 5 `CLAIM` body parts (so the creep must have at least 5x`CLAIM`).
@@ -854,7 +854,7 @@ interface Creep extends RoomObject {
      * @param target Can be a RoomPosition object or any object containing RoomPosition.
      * @param opts An object containing pathfinding options flags (see Room.findPath for more info) or one of the following: reusePath, serializeMemory, noPathFinding
      */
-    moveTo(target: RoomPosition|{pos: RoomPosition}, opts?: MoveToOpts): CreepMoveReturnCode | ERR_NO_PATH | ERR_INVALID_TARGET | ERR_NOT_FOUND;
+    moveTo(target: RoomPosition | { pos: RoomPosition }, opts?: MoveToOpts): CreepMoveReturnCode | ERR_NO_PATH | ERR_INVALID_TARGET | ERR_NOT_FOUND;
     /**
      * Toggle auto notification when the creep is under attack. The notification will be sent to your account email. Turned on by default.
      * @param enabled Whether to enable notification or disable.
@@ -873,7 +873,7 @@ interface Creep extends RoomObject {
      * The target has to be within 3 squares range of the creep.
      * @param target The target object to be attacked.
      */
-    rangedAttack(target: Creep|Structure): CreepActionReturnCode;
+    rangedAttack(target: Creep | Structure): CreepActionReturnCode;
     /**
      * Heal another creep at a distance.
      *
@@ -936,7 +936,7 @@ interface Creep extends RoomObject {
      * @param resourceType One of the RESOURCE_* constants
      * @param amount The amount of resources to be transferred. If omitted, all the available carried amount is used.
      */
-    transfer(target: Creep|Structure, resourceType: ResourceConstant, amount?: number): ScreepsReturnCode;
+    transfer(target: Creep | Structure, resourceType: ResourceConstant, amount?: number): ScreepsReturnCode;
     /**
      * Upgrade your controller to the next level using carried energy.
      *
@@ -1021,11 +1021,11 @@ interface Flag extends RoomObject {
      * @param pos Can be a RoomPosition object or any object containing RoomPosition.
      * @returns Result Code: OK, ERR_INVALID_TARGET
      */
-    setPosition(pos: RoomPosition|{pos: RoomPosition}): OK | ERR_INVALID_ARGS;
+    setPosition(pos: RoomPosition | { pos: RoomPosition }): OK | ERR_INVALID_ARGS;
 }
 
 interface FlagConstructor extends _Constructor<Flag> {
-    new (name: string, color: ColorConstant, secondaryColor: ColorConstant, roomName: string, x: number, y: number): Flag;
+    new(name: string, color: ColorConstant, secondaryColor: ColorConstant, roomName: string, x: number, y: number): Flag;
     (name: string, color: ColorConstant, secondaryColor: ColorConstant, roomName: string, x: number, y: number): Flag;
 }
 
@@ -1041,11 +1041,11 @@ interface Game {
     /**
      * A hash containing all your creeps with creep names as hash keys.
      */
-    creeps: {[creepName: string]: Creep};
+    creeps: { [creepName: string]: Creep };
     /**
      * A hash containing all your flags with flag names as hash keys.
      */
-    flags: {[flagName: string]: Flag};
+    flags: { [flagName: string]: Flag };
     /**
      * Your Global Control Level.
      */
@@ -1061,25 +1061,25 @@ interface Game {
     /**
      * An object with your global resources that are bound to the account, like subscription tokens. Each object key is a resource constant, values are resources amounts.
      */
-    resources: {[key: string]: any};
+    resources: { [key: string]: any };
     /**
      * A hash containing all the rooms available to you with room names as hash keys.
      * A room is visible if you have a creep or an owned structure in it.
      */
-    rooms: {[roomName: string]: Room};
+    rooms: { [roomName: string]: Room };
     /**
      * A hash containing all your spawns with spawn names as hash keys.
      */
-    spawns: {[spawnName: string]: StructureSpawn};
+    spawns: { [spawnName: string]: StructureSpawn };
     /**
      * A hash containing all your structures with structure id as hash keys.
      */
-    structures: {[structureId: string]: Structure};
+    structures: { [structureId: string]: Structure };
 
     /**
      * A hash containing all your construction sites with their id as hash keys.
      */
-    constructionSites: {[constructionSiteId: string]: ConstructionSite};
+    constructionSites: { [constructionSiteId: string]: ConstructionSite };
 
     /**
      * An object describing the world shard where your script is currently being executed in.
@@ -1242,8 +1242,8 @@ interface LookAtTypes {
 type LookAtResult<K extends LookConstant = LookConstant> = Pick<LookAtTypes, K> & { type: K };
 
 type LookAtResultWithPos<K extends LookConstant = LookConstant> = LookAtResult<K> & {
-  x: number,
-  y: number,
+    x: number,
+    y: number,
 };
 
 interface LookAtResultMatrix<K extends LookConstant = LookConstant> {
@@ -1251,44 +1251,44 @@ interface LookAtResultMatrix<K extends LookConstant = LookConstant> {
 }
 
 interface LookForAtAreaResultMatrix<T, K extends keyof LookAtTypes = keyof LookAtTypes> {
-  [x: number]: {
-    [y: number]: Array<LookForAtAreaResult<T, K>>;
-  };
+    [x: number]: {
+        [y: number]: Array<LookForAtAreaResult<T, K>>;
+    };
 }
 
-type LookForAtAreaResult<T, K extends keyof LookAtTypes = keyof LookAtTypes> = {type: K} & {
-  [P in K]: T;
+type LookForAtAreaResult<T, K extends keyof LookAtTypes = keyof LookAtTypes> = { type: K } & {
+    [P in K]: T;
 };
 
-type LookForAtAreaResultWithPos<T, K extends keyof LookAtTypes = keyof LookAtTypes> = LookForAtAreaResult<T, K> & {x: number, y: number};
+type LookForAtAreaResultWithPos<T, K extends keyof LookAtTypes = keyof LookAtTypes> = LookForAtAreaResult<T, K> & { x: number, y: number };
 
 type LookForAtAreaResultArray<T, K extends keyof LookAtTypes = keyof LookAtTypes> = Array<LookForAtAreaResultWithPos<T, K>>;
 
 interface FindTypes {
-  [key: number]: RoomPosition | Creep | Source | Resource | Structure | Flag | ConstructionSite | Mineral | Nuke;
-  1: RoomPosition; // FIND_EXIT_TOP
-  3: RoomPosition; // FIND_EXIT_RIGHT
-  5: RoomPosition; // FIND_EXIT_BOTTOM
-  7: RoomPosition; // FIND_EXIT_LEFT
-  10: RoomPosition; // FIND_EXIT
-  101: Creep; // FIND_CREEPS
-  102: Creep; // FIND_MY_CREEPS
-  103: Creep; // FIND_HOSTILE_CREEPS
-  104: Source; // FIND_SOURCES_ACTIVE
-  105: Source; // FIND_SOURCES
-  "-106": Resource<RESOURCE_ENERGY>; // FIND_DROPPED_ENERGY
-  106: Resource; // FIND_DROPPED_RESOURCES
-  107: AnyStructure; // FIND_STRUCTURES
-  108: AnyOwnedStructure; // FIND_MY_STRUCTURES
-  109: AnyOwnedStructure; // FIND_HOSTILE_STRUCTURES
-  110: Flag; // FIND_FLAGS
-  111: ConstructionSite; // FIND_CONSTRUCTION_SITES
-  112: StructureSpawn; // FIND_MY_SPAWNS
-  113: StructureSpawn; // FIND_HOSTILE_SPAWNS
-  114: ConstructionSite; // FIND_MY_CONSTRUCTION_SITES
-  115: ConstructionSite; // FIND_HOSTILE_CONSTRUCTION_SITES
-  116: Mineral; // FIND_MINERALS
-  117: Nuke; // FIND_NUKES
+    [key: number]: RoomPosition | Creep | Source | Resource | Structure | Flag | ConstructionSite | Mineral | Nuke;
+    1: RoomPosition; // FIND_EXIT_TOP
+    3: RoomPosition; // FIND_EXIT_RIGHT
+    5: RoomPosition; // FIND_EXIT_BOTTOM
+    7: RoomPosition; // FIND_EXIT_LEFT
+    10: RoomPosition; // FIND_EXIT
+    101: Creep; // FIND_CREEPS
+    102: Creep; // FIND_MY_CREEPS
+    103: Creep; // FIND_HOSTILE_CREEPS
+    104: Source; // FIND_SOURCES_ACTIVE
+    105: Source; // FIND_SOURCES
+    "-106": Resource<RESOURCE_ENERGY>; // FIND_DROPPED_ENERGY
+    106: Resource; // FIND_DROPPED_RESOURCES
+    107: AnyStructure; // FIND_STRUCTURES
+    108: AnyOwnedStructure; // FIND_MY_STRUCTURES
+    109: AnyOwnedStructure; // FIND_HOSTILE_STRUCTURES
+    110: Flag; // FIND_FLAGS
+    111: ConstructionSite; // FIND_CONSTRUCTION_SITES
+    112: StructureSpawn; // FIND_MY_SPAWNS
+    113: StructureSpawn; // FIND_HOSTILE_SPAWNS
+    114: ConstructionSite; // FIND_MY_CONSTRUCTION_SITES
+    115: ConstructionSite; // FIND_HOSTILE_CONSTRUCTION_SITES
+    116: Mineral; // FIND_MINERALS
+    117: Nuke; // FIND_NUKES
 }
 
 interface FindPathOpts {
@@ -1420,7 +1420,7 @@ interface _Constructor<T> {
 }
 
 interface _ConstructorById<T> extends _Constructor<T> {
-    new (id: string): T;
+    new(id: string): T;
     (id: string): T;
 }
 /*
@@ -1435,22 +1435,22 @@ type Terrain = "plain" | "swamp" | "wall";
 // Return Codes
 
 type ScreepsReturnCode =
-  OK |
-  ERR_NOT_OWNER |
-  ERR_NO_PATH |
-  ERR_BUSY |
-  ERR_NOT_FOUND |
-  ERR_NOT_ENOUGH_RESOURCES |
-  ERR_NOT_ENOUGH_ENERGY |
-  ERR_INVALID_TARGET |
-  ERR_FULL |
-  ERR_NOT_IN_RANGE |
-  ERR_INVALID_ARGS |
-  ERR_TIRED |
-  ERR_NO_BODYPART |
-  ERR_NOT_ENOUGH_EXTENSIONS |
-  ERR_RCL_NOT_ENOUGH |
-  ERR_GCL_NOT_ENOUGH;
+    OK |
+    ERR_NOT_OWNER |
+    ERR_NO_PATH |
+    ERR_BUSY |
+    ERR_NOT_FOUND |
+    ERR_NOT_ENOUGH_RESOURCES |
+    ERR_NOT_ENOUGH_ENERGY |
+    ERR_INVALID_TARGET |
+    ERR_FULL |
+    ERR_NOT_IN_RANGE |
+    ERR_INVALID_ARGS |
+    ERR_TIRED |
+    ERR_NO_BODYPART |
+    ERR_NOT_ENOUGH_EXTENSIONS |
+    ERR_RCL_NOT_ENOUGH |
+    ERR_GCL_NOT_ENOUGH;
 
 type OK = 0;
 type ERR_NOT_OWNER = -1;
@@ -1471,52 +1471,52 @@ type ERR_RCL_NOT_ENOUGH = -14;
 type ERR_GCL_NOT_ENOUGH = -15;
 
 type CreepActionReturnCode =
-  OK |
-  ERR_NOT_OWNER |
-  ERR_BUSY |
-  ERR_INVALID_TARGET |
-  ERR_NOT_IN_RANGE |
-  ERR_NO_BODYPART;
+    OK |
+    ERR_NOT_OWNER |
+    ERR_BUSY |
+    ERR_INVALID_TARGET |
+    ERR_NOT_IN_RANGE |
+    ERR_NO_BODYPART;
 
 type CreepMoveReturnCode =
-  OK |
-  ERR_NOT_OWNER |
-  ERR_BUSY |
-  ERR_TIRED |
-  ERR_NO_BODYPART;
+    OK |
+    ERR_NOT_OWNER |
+    ERR_BUSY |
+    ERR_TIRED |
+    ERR_NO_BODYPART;
 
 // Find Constants
 
 type ExitConstant =
-  FIND_EXIT_TOP |
-  FIND_EXIT_RIGHT |
-  FIND_EXIT_BOTTOM |
-  FIND_EXIT_LEFT;
+    FIND_EXIT_TOP |
+    FIND_EXIT_RIGHT |
+    FIND_EXIT_BOTTOM |
+    FIND_EXIT_LEFT;
 
 type FindConstant =
-  FIND_EXIT_TOP |
-  FIND_EXIT_RIGHT |
-  FIND_EXIT_BOTTOM |
-  FIND_EXIT_LEFT |
-  FIND_EXIT |
-  FIND_CREEPS |
-  FIND_MY_CREEPS |
-  FIND_HOSTILE_CREEPS |
-  FIND_SOURCES_ACTIVE |
-  FIND_SOURCES |
-  FIND_DROPPED_ENERGY |
-  FIND_DROPPED_RESOURCES |
-  FIND_STRUCTURES |
-  FIND_MY_STRUCTURES |
-  FIND_HOSTILE_STRUCTURES |
-  FIND_FLAGS |
-  FIND_CONSTRUCTION_SITES |
-  FIND_MY_SPAWNS |
-  FIND_HOSTILE_SPAWNS |
-  FIND_MY_CONSTRUCTION_SITES |
-  FIND_HOSTILE_CONSTRUCTION_SITES |
-  FIND_MINERALS |
-  FIND_NUKES;
+    FIND_EXIT_TOP |
+    FIND_EXIT_RIGHT |
+    FIND_EXIT_BOTTOM |
+    FIND_EXIT_LEFT |
+    FIND_EXIT |
+    FIND_CREEPS |
+    FIND_MY_CREEPS |
+    FIND_HOSTILE_CREEPS |
+    FIND_SOURCES_ACTIVE |
+    FIND_SOURCES |
+    FIND_DROPPED_ENERGY |
+    FIND_DROPPED_RESOURCES |
+    FIND_STRUCTURES |
+    FIND_MY_STRUCTURES |
+    FIND_HOSTILE_STRUCTURES |
+    FIND_FLAGS |
+    FIND_CONSTRUCTION_SITES |
+    FIND_MY_SPAWNS |
+    FIND_HOSTILE_SPAWNS |
+    FIND_MY_CONSTRUCTION_SITES |
+    FIND_HOSTILE_CONSTRUCTION_SITES |
+    FIND_MINERALS |
+    FIND_NUKES;
 
 type FIND_EXIT_TOP = 1;
 type FIND_EXIT_RIGHT = 3;
@@ -1549,14 +1549,14 @@ type FilterFunction<T extends FindConstant> = (object: FindTypes[T]) => boolean;
 // Body Part Constants
 
 type BodyPartConstant =
-  MOVE |
-  WORK |
-  CARRY |
-  ATTACK |
-  RANGED_ATTACK |
-  TOUGH |
-  HEAL |
-  CLAIM;
+    MOVE |
+    WORK |
+    CARRY |
+    ATTACK |
+    RANGED_ATTACK |
+    TOUGH |
+    HEAL |
+    CLAIM;
 
 type MOVE = "move";
 type WORK = "work";
@@ -1570,16 +1570,16 @@ type CLAIM = "claim";
 // Look Constants
 
 type LookConstant =
-  LOOK_CREEPS |
-  LOOK_ENERGY |
-  LOOK_RESOURCES |
-  LOOK_SOURCES |
-  LOOK_MINERALS |
-  LOOK_STRUCTURES |
-  LOOK_FLAGS |
-  LOOK_CONSTRUCTION_SITES |
-  LOOK_NUKES |
-  LOOK_TERRAIN;
+    LOOK_CREEPS |
+    LOOK_ENERGY |
+    LOOK_RESOURCES |
+    LOOK_SOURCES |
+    LOOK_MINERALS |
+    LOOK_STRUCTURES |
+    LOOK_FLAGS |
+    LOOK_CONSTRUCTION_SITES |
+    LOOK_NUKES |
+    LOOK_TERRAIN;
 
 type LOOK_CONSTRUCTION_SITES = "constructionSite";
 type LOOK_CREEPS = "creep";
@@ -1595,14 +1595,14 @@ type LOOK_TERRAIN = "terrain";
 // Direction Constants
 
 type DirectionConstant =
-  TOP |
-  TOP_RIGHT |
-  RIGHT |
-  BOTTOM_RIGHT |
-  BOTTOM |
-  BOTTOM_LEFT |
-  LEFT |
-  TOP_LEFT;
+    TOP |
+    TOP_RIGHT |
+    RIGHT |
+    BOTTOM_RIGHT |
+    BOTTOM |
+    BOTTOM_LEFT |
+    LEFT |
+    TOP_LEFT;
 
 type TOP = 1;
 type TOP_RIGHT = 2;
@@ -1616,16 +1616,16 @@ type TOP_LEFT = 8;
 // Color Constants
 
 type ColorConstant =
-  COLOR_RED |
-  COLOR_PURPLE |
-  COLOR_BLUE |
-  COLOR_CYAN |
-  COLOR_GREEN |
-  COLOR_YELLOW |
-  COLOR_ORANGE |
-  COLOR_BROWN |
-  COLOR_GREY |
-  COLOR_WHITE;
+    COLOR_RED |
+    COLOR_PURPLE |
+    COLOR_BLUE |
+    COLOR_CYAN |
+    COLOR_GREEN |
+    COLOR_YELLOW |
+    COLOR_ORANGE |
+    COLOR_BROWN |
+    COLOR_GREY |
+    COLOR_WHITE;
 
 type COLOR_RED = 1;
 type COLOR_PURPLE = 2;
@@ -1641,28 +1641,28 @@ type COLOR_WHITE = 10;
 // Structure Constants
 
 type BuildableStructureConstant =
-  STRUCTURE_EXTENSION |
-  STRUCTURE_RAMPART |
-  STRUCTURE_ROAD |
-  STRUCTURE_SPAWN |
-  STRUCTURE_LINK |
-  STRUCTURE_WALL |
-  STRUCTURE_STORAGE |
-  STRUCTURE_TOWER |
-  STRUCTURE_OBSERVER |
-  STRUCTURE_POWER_SPAWN |
-  STRUCTURE_EXTRACTOR |
-  STRUCTURE_LAB |
-  STRUCTURE_TERMINAL |
-  STRUCTURE_CONTAINER |
-  STRUCTURE_NUKER;
+    STRUCTURE_EXTENSION |
+    STRUCTURE_RAMPART |
+    STRUCTURE_ROAD |
+    STRUCTURE_SPAWN |
+    STRUCTURE_LINK |
+    STRUCTURE_WALL |
+    STRUCTURE_STORAGE |
+    STRUCTURE_TOWER |
+    STRUCTURE_OBSERVER |
+    STRUCTURE_POWER_SPAWN |
+    STRUCTURE_EXTRACTOR |
+    STRUCTURE_LAB |
+    STRUCTURE_TERMINAL |
+    STRUCTURE_CONTAINER |
+    STRUCTURE_NUKER;
 
 type StructureConstant =
-  BuildableStructureConstant |
-  STRUCTURE_KEEPER_LAIR |
-  STRUCTURE_CONTROLLER |
-  STRUCTURE_POWER_BANK |
-  STRUCTURE_PORTAL;
+    BuildableStructureConstant |
+    STRUCTURE_KEEPER_LAIR |
+    STRUCTURE_CONTROLLER |
+    STRUCTURE_POWER_BANK |
+    STRUCTURE_PORTAL;
 
 type STRUCTURE_EXTENSION = "extension";
 type STRUCTURE_RAMPART = "rampart";
@@ -1687,103 +1687,103 @@ type STRUCTURE_PORTAL = "portal";
 // Resource Constants
 
 type ResourceConstant =
-  RESOURCE_ENERGY |
-  RESOURCE_POWER |
-  RESOURCE_UTRIUM |
-  RESOURCE_LEMERGIUM |
-  RESOURCE_KEANIUM |
-  RESOURCE_GHODIUM |
-  RESOURCE_ZYNTHIUM |
-  RESOURCE_OXYGEN |
-  RESOURCE_HYDROGEN |
-  RESOURCE_CATALYST |
-  RESOURCE_HYDROXIDE |
-  RESOURCE_ZYNTHIUM_KEANITE |
-  RESOURCE_UTRIUM_LEMERGITE |
-  RESOURCE_UTRIUM_HYDRIDE |
-  RESOURCE_UTRIUM_OXIDE |
-  RESOURCE_KEANIUM_HYDRIDE |
-  RESOURCE_KEANIUM_OXIDE |
-  RESOURCE_LEMERGIUM_HYDRIDE |
-  RESOURCE_LEMERGIUM_OXIDE |
-  RESOURCE_ZYNTHIUM_HYDRIDE |
-  RESOURCE_ZYNTHIUM_OXIDE |
-  RESOURCE_GHODIUM_HYDRIDE |
-  RESOURCE_GHODIUM_OXIDE |
-  RESOURCE_UTRIUM_ACID |
-  RESOURCE_UTRIUM_ALKALIDE |
-  RESOURCE_KEANIUM_ACID |
-  RESOURCE_KEANIUM_ALKALIDE |
-  RESOURCE_LEMERGIUM_ACID |
-  RESOURCE_LEMERGIUM_ALKALIDE |
-  RESOURCE_ZYNTHIUM_ACID |
-  RESOURCE_ZYNTHIUM_ALKALIDE |
-  RESOURCE_GHODIUM_ACID |
-  RESOURCE_GHODIUM_ALKALIDE |
-  RESOURCE_CATALYZED_UTRIUM_ACID |
-  RESOURCE_CATALYZED_UTRIUM_ALKALIDE |
-  RESOURCE_CATALYZED_KEANIUM_ACID |
-  RESOURCE_CATALYZED_KEANIUM_ALKALIDE |
-  RESOURCE_CATALYZED_LEMERGIUM_ACID |
-  RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE |
-  RESOURCE_CATALYZED_ZYNTHIUM_ACID |
-  RESOURCE_CATALYZED_ZYNTHIUM_ALKALIDE |
-  RESOURCE_CATALYZED_GHODIUM_ACID |
-  RESOURCE_CATALYZED_GHODIUM_ALKALIDE;
+    RESOURCE_ENERGY |
+    RESOURCE_POWER |
+    RESOURCE_UTRIUM |
+    RESOURCE_LEMERGIUM |
+    RESOURCE_KEANIUM |
+    RESOURCE_GHODIUM |
+    RESOURCE_ZYNTHIUM |
+    RESOURCE_OXYGEN |
+    RESOURCE_HYDROGEN |
+    RESOURCE_CATALYST |
+    RESOURCE_HYDROXIDE |
+    RESOURCE_ZYNTHIUM_KEANITE |
+    RESOURCE_UTRIUM_LEMERGITE |
+    RESOURCE_UTRIUM_HYDRIDE |
+    RESOURCE_UTRIUM_OXIDE |
+    RESOURCE_KEANIUM_HYDRIDE |
+    RESOURCE_KEANIUM_OXIDE |
+    RESOURCE_LEMERGIUM_HYDRIDE |
+    RESOURCE_LEMERGIUM_OXIDE |
+    RESOURCE_ZYNTHIUM_HYDRIDE |
+    RESOURCE_ZYNTHIUM_OXIDE |
+    RESOURCE_GHODIUM_HYDRIDE |
+    RESOURCE_GHODIUM_OXIDE |
+    RESOURCE_UTRIUM_ACID |
+    RESOURCE_UTRIUM_ALKALIDE |
+    RESOURCE_KEANIUM_ACID |
+    RESOURCE_KEANIUM_ALKALIDE |
+    RESOURCE_LEMERGIUM_ACID |
+    RESOURCE_LEMERGIUM_ALKALIDE |
+    RESOURCE_ZYNTHIUM_ACID |
+    RESOURCE_ZYNTHIUM_ALKALIDE |
+    RESOURCE_GHODIUM_ACID |
+    RESOURCE_GHODIUM_ALKALIDE |
+    RESOURCE_CATALYZED_UTRIUM_ACID |
+    RESOURCE_CATALYZED_UTRIUM_ALKALIDE |
+    RESOURCE_CATALYZED_KEANIUM_ACID |
+    RESOURCE_CATALYZED_KEANIUM_ALKALIDE |
+    RESOURCE_CATALYZED_LEMERGIUM_ACID |
+    RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE |
+    RESOURCE_CATALYZED_ZYNTHIUM_ACID |
+    RESOURCE_CATALYZED_ZYNTHIUM_ALKALIDE |
+    RESOURCE_CATALYZED_GHODIUM_ACID |
+    RESOURCE_CATALYZED_GHODIUM_ALKALIDE;
 
 type _ResourceConstantSansEnergy =
-  RESOURCE_POWER |
-  RESOURCE_UTRIUM |
-  RESOURCE_LEMERGIUM |
-  RESOURCE_KEANIUM |
-  RESOURCE_GHODIUM |
-  RESOURCE_ZYNTHIUM |
-  RESOURCE_OXYGEN |
-  RESOURCE_HYDROGEN |
-  RESOURCE_CATALYST |
-  RESOURCE_HYDROXIDE |
-  RESOURCE_ZYNTHIUM_KEANITE |
-  RESOURCE_UTRIUM_LEMERGITE |
-  RESOURCE_UTRIUM_HYDRIDE |
-  RESOURCE_UTRIUM_OXIDE |
-  RESOURCE_KEANIUM_HYDRIDE |
-  RESOURCE_KEANIUM_OXIDE |
-  RESOURCE_LEMERGIUM_HYDRIDE |
-  RESOURCE_LEMERGIUM_OXIDE |
-  RESOURCE_ZYNTHIUM_HYDRIDE |
-  RESOURCE_ZYNTHIUM_OXIDE |
-  RESOURCE_GHODIUM_HYDRIDE |
-  RESOURCE_GHODIUM_OXIDE |
-  RESOURCE_UTRIUM_ACID |
-  RESOURCE_UTRIUM_ALKALIDE |
-  RESOURCE_KEANIUM_ACID |
-  RESOURCE_KEANIUM_ALKALIDE |
-  RESOURCE_LEMERGIUM_ACID |
-  RESOURCE_LEMERGIUM_ALKALIDE |
-  RESOURCE_ZYNTHIUM_ACID |
-  RESOURCE_ZYNTHIUM_ALKALIDE |
-  RESOURCE_GHODIUM_ACID |
-  RESOURCE_GHODIUM_ALKALIDE |
-  RESOURCE_CATALYZED_UTRIUM_ACID |
-  RESOURCE_CATALYZED_UTRIUM_ALKALIDE |
-  RESOURCE_CATALYZED_KEANIUM_ACID |
-  RESOURCE_CATALYZED_KEANIUM_ALKALIDE |
-  RESOURCE_CATALYZED_LEMERGIUM_ACID |
-  RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE |
-  RESOURCE_CATALYZED_ZYNTHIUM_ACID |
-  RESOURCE_CATALYZED_ZYNTHIUM_ALKALIDE |
-  RESOURCE_CATALYZED_GHODIUM_ACID |
-  RESOURCE_CATALYZED_GHODIUM_ALKALIDE;
+    RESOURCE_POWER |
+    RESOURCE_UTRIUM |
+    RESOURCE_LEMERGIUM |
+    RESOURCE_KEANIUM |
+    RESOURCE_GHODIUM |
+    RESOURCE_ZYNTHIUM |
+    RESOURCE_OXYGEN |
+    RESOURCE_HYDROGEN |
+    RESOURCE_CATALYST |
+    RESOURCE_HYDROXIDE |
+    RESOURCE_ZYNTHIUM_KEANITE |
+    RESOURCE_UTRIUM_LEMERGITE |
+    RESOURCE_UTRIUM_HYDRIDE |
+    RESOURCE_UTRIUM_OXIDE |
+    RESOURCE_KEANIUM_HYDRIDE |
+    RESOURCE_KEANIUM_OXIDE |
+    RESOURCE_LEMERGIUM_HYDRIDE |
+    RESOURCE_LEMERGIUM_OXIDE |
+    RESOURCE_ZYNTHIUM_HYDRIDE |
+    RESOURCE_ZYNTHIUM_OXIDE |
+    RESOURCE_GHODIUM_HYDRIDE |
+    RESOURCE_GHODIUM_OXIDE |
+    RESOURCE_UTRIUM_ACID |
+    RESOURCE_UTRIUM_ALKALIDE |
+    RESOURCE_KEANIUM_ACID |
+    RESOURCE_KEANIUM_ALKALIDE |
+    RESOURCE_LEMERGIUM_ACID |
+    RESOURCE_LEMERGIUM_ALKALIDE |
+    RESOURCE_ZYNTHIUM_ACID |
+    RESOURCE_ZYNTHIUM_ALKALIDE |
+    RESOURCE_GHODIUM_ACID |
+    RESOURCE_GHODIUM_ALKALIDE |
+    RESOURCE_CATALYZED_UTRIUM_ACID |
+    RESOURCE_CATALYZED_UTRIUM_ALKALIDE |
+    RESOURCE_CATALYZED_KEANIUM_ACID |
+    RESOURCE_CATALYZED_KEANIUM_ALKALIDE |
+    RESOURCE_CATALYZED_LEMERGIUM_ACID |
+    RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE |
+    RESOURCE_CATALYZED_ZYNTHIUM_ACID |
+    RESOURCE_CATALYZED_ZYNTHIUM_ALKALIDE |
+    RESOURCE_CATALYZED_GHODIUM_ACID |
+    RESOURCE_CATALYZED_GHODIUM_ALKALIDE;
 
 type MineralConstant =
-  RESOURCE_UTRIUM |
-  RESOURCE_LEMERGIUM |
-  RESOURCE_KEANIUM |
-  RESOURCE_GHODIUM |
-  RESOURCE_ZYNTHIUM |
-  RESOURCE_OXYGEN |
-  RESOURCE_HYDROGEN |
-  RESOURCE_CATALYST;
+    RESOURCE_UTRIUM |
+    RESOURCE_LEMERGIUM |
+    RESOURCE_KEANIUM |
+    RESOURCE_GHODIUM |
+    RESOURCE_ZYNTHIUM |
+    RESOURCE_OXYGEN |
+    RESOURCE_HYDROGEN |
+    RESOURCE_CATALYST;
 
 type RESOURCE_ENERGY = "energy";
 type RESOURCE_POWER = "power";
@@ -1848,7 +1848,7 @@ interface GameMap {
      * @param roomName The room name.
      * @returns The exits information or null if the room not found.
      */
-    describeExits(roomName: string): {"1"?: string, "3"?: string, "5"?: string, "7"?: string};
+    describeExits(roomName: string): { "1"?: string, "3"?: string, "5"?: string, "7"?: string };
     /**
      * Find the exit direction from the given room en route to another room.
      * @param fromRoom Start room name or room object.
@@ -1859,7 +1859,7 @@ interface GameMap {
      * Or one of the following Result codes:
      * ERR_NO_PATH, ERR_INVALID_ARGS
      */
-    findExit(fromRoom: string|Room, toRoom: string|Room, opts?: RouteOptions): ScreepsReturnCode;
+    findExit(fromRoom: string | Room, toRoom: string | Room, opts?: RouteOptions): ScreepsReturnCode;
     /**
      * Find route from the given room to another room.
      * @param fromRoom Start room name or room object.
@@ -2037,16 +2037,16 @@ interface OrderFilter {
 }
 interface Memory {
     [name: string]: any;
-    creeps: {[name: string]: CreepMemory};
-    flags: {[name: string]: FlagMemory};
-    rooms: {[name: string]: RoomMemory};
-    spawns: {[name: string]: SpawnMemory};
+    creeps: { [name: string]: CreepMemory };
+    flags: { [name: string]: FlagMemory };
+    rooms: { [name: string]: RoomMemory };
+    spawns: { [name: string]: SpawnMemory };
 }
 
-interface CreepMemory {}
-interface FlagMemory {}
-interface RoomMemory {}
-interface SpawnMemory {}
+interface CreepMemory { [name: string]: {} }
+interface FlagMemory { [name: string]: {} }
+interface RoomMemory { [name: string]: {} }
+interface SpawnMemory { [name: string]: {} }
 
 declare const Memory: Memory;
 /**
@@ -2105,7 +2105,7 @@ interface Nuke extends RoomObject {
 }
 
 interface NukeConstructor {
-    new (id: string): Nuke;
+    new(id: string): Nuke;
 }
 
 declare const Nuke: NukeConstructor;
@@ -2259,70 +2259,70 @@ declare const PathFinder: PathFinder;
  * RawMemory object allows to implement your own memory stringifier instead of built-in serializer based on JSON.stringify.
  */
 interface RawMemory {
-  /**
-   * An object with asynchronous memory segments available on this tick. Each object key is the segment ID with data in string values.
-   * Use RawMemory.setActiveSegments to fetch segments on the next tick. Segments data is saved automatically in the end of the tick.
-   */
-  segments: string[];
+    /**
+     * An object with asynchronous memory segments available on this tick. Each object key is the segment ID with data in string values.
+     * Use RawMemory.setActiveSegments to fetch segments on the next tick. Segments data is saved automatically in the end of the tick.
+     */
+    segments: string[];
 
-  /**
-   * An object with a memory segment of another player available on this tick. Use `setActiveForeignSegment` to fetch segments on the next tick.
-   */
-  foreignSegment: {
-    username: string,
-    id: number,
-    data: string,
-  };
+    /**
+     * An object with a memory segment of another player available on this tick. Use `setActiveForeignSegment` to fetch segments on the next tick.
+     */
+    foreignSegment: {
+        username: string,
+        id: number,
+        data: string,
+    };
 
-  /**
-   * A string with a shared memory segment available on every world shard. Maximum string length is 100 KB.
-   *
-   * **Warning:** this segment is not safe for concurrent usage! All shards have shared access to the same instance of
-   * data. When the segment contents is changed by two shards simultaneously, you may lose some data, since the segment
-   * string value is written all at once atomically. You must implement your own system to determine when each shard is
-   * allowed to rewrite the inter-shard memory, e.g. based on mutual exclusions.
-   */
-  interShardSegment: string;
+    /**
+     * A string with a shared memory segment available on every world shard. Maximum string length is 100 KB.
+     *
+     * **Warning:** this segment is not safe for concurrent usage! All shards have shared access to the same instance of
+     * data. When the segment contents is changed by two shards simultaneously, you may lose some data, since the segment
+     * string value is written all at once atomically. You must implement your own system to determine when each shard is
+     * allowed to rewrite the inter-shard memory, e.g. based on mutual exclusions.
+     */
+    interShardSegment: string;
 
-  /**
-   * Get a raw string representation of the Memory object.
-   */
-  get(): string;
-  /**
-   * Set new memory value.
-   * @param value New memory value as a string.
-   */
-  set(value: string): undefined;
-  /**
-   * Request memory segments using the list of their IDs. Memory segments will become available on the next tick in RawMemory.segments object.
-   * @param ids An array of segment IDs. Each ID should be a number from 0 to 99. Maximum 10 segments can be active at the same time. Subsequent calls of setActiveSegments override previous ones.
-   */
-  setActiveSegments(ids: number[]): undefined;
-  /**
-   * Request a memory segment of another user.
-   *
-   * The segment should be marked by its owner as public using `setPublicSegments`.
-   *
-   * The segment data will become available on the next tick in `foreignSegment` object.
-   *
-   * You can only have access to one foreign segment at the same time.
-   *
-   * @param username The name of another user. Pass `null` to clear the foreign segment.
-   * @param id The ID of the requested segment from 0 to 99. If undefined, the user's default public segment is requested as set by `setDefaultPublicSegment`.
-   */
-  setActiveForeignSegment(username: string | null, id?: number): undefined;
-  /**
-   * Set the specified segment as your default public segment. It will be returned if no id parameter is passed to `setActiveForeignSegment` by another user.
-   *
-   * @param id The ID of the requested segment from 0 to 99. Pass `null` to clear the foreign segment.
-   */
-  setDefaultPublicSegment(id: number | null): undefined;
-  /**
-   * Set specified segments as public. Other users will be able to request access to them using `setActiveForeignSegment`.
-   *
-   * @param ids An array of segment IDs. Each ID should be a number from 0 to 99. Subsequent calls of `setPublicSegments` override previous ones.
-   */
-  setPublicSegments(ids: number[]): undefined;
+    /**
+     * Get a raw string representation of the Memory object.
+     */
+    get(): string;
+    /**
+     * Set new memory value.
+     * @param value New memory value as a string.
+     */
+    set(value: string): undefined;
+    /**
+     * Request memory segments using the list of their IDs. Memory segments will become available on the next tick in RawMemory.segments object.
+     * @param ids An array of segment IDs. Each ID should be a number from 0 to 99. Maximum 10 segments can be active at the same time. Subsequent calls of setActiveSegments override previous ones.
+     */
+    setActiveSegments(ids: number[]): undefined;
+    /**
+     * Request a memory segment of another user.
+     *
+     * The segment should be marked by its owner as public using `setPublicSegments`.
+     *
+     * The segment data will become available on the next tick in `foreignSegment` object.
+     *
+     * You can only have access to one foreign segment at the same time.
+     *
+     * @param username The name of another user. Pass `null` to clear the foreign segment.
+     * @param id The ID of the requested segment from 0 to 99. If undefined, the user's default public segment is requested as set by `setDefaultPublicSegment`.
+     */
+    setActiveForeignSegment(username: string | null, id?: number): undefined;
+    /**
+     * Set the specified segment as your default public segment. It will be returned if no id parameter is passed to `setActiveForeignSegment` by another user.
+     *
+     * @param id The ID of the requested segment from 0 to 99. Pass `null` to clear the foreign segment.
+     */
+    setDefaultPublicSegment(id: number | null): undefined;
+    /**
+     * Set specified segments as public. Other users will be able to request access to them using `setActiveForeignSegment`.
+     *
+     * @param ids An array of segment IDs. Each ID should be a number from 0 to 99. Subsequent calls of `setPublicSegments` override previous ones.
+     */
+    setPublicSegments(ids: number[]): undefined;
 }
 
 declare const RawMemory: RawMemory;
@@ -2348,7 +2348,7 @@ interface Resource<T extends ResourceConstant = ResourceConstant> extends RoomOb
 }
 
 interface ResourceConstructor {
-    new (id: string): Resource;
+    new(id: string): Resource;
 }
 
 declare const Resource: ResourceConstructor;
@@ -2372,7 +2372,7 @@ interface RoomObject {
 }
 
 interface RoomObjectConstructor extends _Constructor<RoomObject> {
-    new (x: number, y: number, roomName: string): RoomObject;
+    new(x: number, y: number, roomName: string): RoomObject;
     (x: number, y: number, roomName: string): RoomObject;
 }
 
@@ -2428,7 +2428,7 @@ interface RoomPosition {
     findClosestByPath<K extends FindConstant>(type: K, opts?: FindPathOpts & { filter?: FilterFunction<K>, algorithm?: string }): FindTypes[K];
     findClosestByPath<T extends Structure>(
         type: FIND_STRUCTURES | FIND_MY_STRUCTURES | FIND_HOSTILE_STRUCTURES,
-        opts?: FindPathOpts & { filter?: FilterFunction<FIND_STRUCTURES>, algorithm?: string}
+        opts?: FindPathOpts & { filter?: FilterFunction<FIND_STRUCTURES>, algorithm?: string }
     ): T;
     /**
      * Find the object with the shortest path from the given position. Uses A* search algorithm and Dijkstra's algorithm.
@@ -2436,28 +2436,28 @@ interface RoomPosition {
      * @param opts An object containing pathfinding options (see Room.findPath), or one of the following: filter, algorithm
      * @returns One of the supplied objects
      */
-    findClosestByPath<T extends _HasRoomPosition | RoomPosition>(objects: T[], opts?: FindPathOpts & {filter?: any | string, algorithm?: string}): T;
+    findClosestByPath<T extends _HasRoomPosition | RoomPosition>(objects: T[], opts?: FindPathOpts & { filter?: any | string, algorithm?: string }): T;
     /**
      * Find the object with the shortest linear distance from the given position.
      * @param type Any of the FIND_* constants.
      * @param opts An object containing pathfinding options (see Room.findPath), or one of the following: filter, algorithm
      */
-    findClosestByRange<K extends FindConstant>(type: K, opts?: {filter: FilterFunction<K>}): FindTypes[K];
-    findClosestByRange<T extends Structure>(type: FIND_STRUCTURES | FIND_MY_STRUCTURES | FIND_HOSTILE_STRUCTURES, opts?: {filter: FilterFunction<FIND_STRUCTURES>}): T;
+    findClosestByRange<K extends FindConstant>(type: K, opts?: { filter: FilterFunction<K> }): FindTypes[K];
+    findClosestByRange<T extends Structure>(type: FIND_STRUCTURES | FIND_MY_STRUCTURES | FIND_HOSTILE_STRUCTURES, opts?: { filter: FilterFunction<FIND_STRUCTURES> }): T;
     /**
      * Find the object with the shortest linear distance from the given position.
      * @param objects An array of RoomPositions or objects with a RoomPosition.
      * @param opts An object containing pathfinding options (see Room.findPath), or one of the following: filter, algorithm
      */
-    findClosestByRange<T extends _HasRoomPosition | RoomPosition>(objects: T[], opts?: {filter: any | string}): T;
+    findClosestByRange<T extends _HasRoomPosition | RoomPosition>(objects: T[], opts?: { filter: any | string }): T;
     /**
      * Find all objects in the specified linear range.
      * @param type Any of the FIND_* constants.
      * @param range The range distance.
      * @param opts See Room.find.
      */
-    findInRange<K extends FindConstant>(type: K, range: number, opts?: {filter: any| string}): Array<FindTypes[K]>;
-    findInRange<T extends Structure>(type: FIND_STRUCTURES | FIND_MY_STRUCTURES | FIND_HOSTILE_STRUCTURES, range: number, opts?: {filter: FilterFunction<FIND_STRUCTURES>}): T[];
+    findInRange<K extends FindConstant>(type: K, range: number, opts?: { filter: any | string }): Array<FindTypes[K]>;
+    findInRange<T extends Structure>(type: FIND_STRUCTURES | FIND_MY_STRUCTURES | FIND_HOSTILE_STRUCTURES, range: number, opts?: { filter: FilterFunction<FIND_STRUCTURES> }): T[];
     /**
      * Find all objects in the specified linear range.
      * @param objects An array of room's objects or RoomPosition objects that the search should be executed against.
@@ -2509,7 +2509,7 @@ interface RoomPosition {
      * @param toPos The target position.
      * @param range The range distance.
      */
-    inRangeTo(target: RoomPosition|{pos: RoomPosition}, range: number): boolean;
+    inRangeTo(target: RoomPosition | { pos: RoomPosition }, range: number): boolean;
     /**
      * Check whether this position is the same as the specified position.
      * @param x X position in the room.
@@ -2550,7 +2550,7 @@ interface RoomPositionConstructor extends _Constructor<RoomPosition> {
      * @param y Y position in the room.
      * @param roomName The room name.
      */
-    new (x: number, y: number, roomName: string): RoomPosition;
+    new(x: number, y: number, roomName: string): RoomPosition;
     (x: number, y: number, roomName: string): RoomPosition;
 }
 
@@ -2934,12 +2934,12 @@ interface Room {
      * @returns An object with the sstructure object[X coord][y coord] as an array of found objects.
      */
     lookForAtArea<T extends keyof LookAtTypes>(
-      type: T,
-      top: number,
-      left: number,
-      bottom: number,
-      right: number,
-      asArray?: false
+        type: T,
+        top: number,
+        left: number,
+        bottom: number,
+        right: number,
+        asArray?: false
     ): LookForAtAreaResultMatrix<LookAtTypes[T], T>;
     /**
      * Get the given objets in the supplied area.
@@ -2952,12 +2952,12 @@ interface Room {
      * @returns An array of found objects with an x & y property for their position
      */
     lookForAtArea<T extends keyof LookAtTypes>(
-      type: T,
-      top: number,
-      left: number,
-      bottom: number,
-      right: number,
-      asArray: true
+        type: T,
+        top: number,
+        left: number,
+        bottom: number,
+        right: number,
+        asArray: true
     ): LookForAtAreaResultArray<LookAtTypes[T], T>;
 
     /**
@@ -2974,7 +2974,7 @@ interface Room {
 }
 
 interface RoomConstructor {
-    new (id: string): Room;
+    new(id: string): Room;
     /**
      * Serialize a path array into a short string representation, which is suitable to store in memory.
      * @param path A path array retrieved from `Room.findPath`.

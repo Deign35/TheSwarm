@@ -1,4 +1,4 @@
-import { RoomResources } from '../../classes/RoomResources';
+import { RoomResources } from './RoomResources';
 export function summarize_rooms() {
     const now = Game.time;
 
@@ -7,7 +7,7 @@ export function summarize_rooms() {
         return global.summarized_rooms;
     }
 
-    let retval = { } as any;
+    let retval = {} as any;
 
     for (let r in Game.rooms) {
         let summary = new RoomResources(Game.rooms[r]);
