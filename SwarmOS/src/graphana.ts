@@ -1,4 +1,4 @@
-export function Data() {
+export function ScreepsPlusData() {
     return JSON.parse(JSON.stringify({
         "__inputs": [
             {

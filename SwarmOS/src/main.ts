@@ -20,5 +20,4 @@ export const loop = function () {
             Game.spawns['Spawn1'].spawnCreep([WORK, MOVE, CARRY], "" + Game.time, { memory: { task: false } });
         }
     }
-    console.log(JSON.parse(Data()));
 }

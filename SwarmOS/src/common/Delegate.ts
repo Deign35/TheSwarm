@@ -3,6 +3,10 @@ export class Delegate {
 
     }
 }
+
+let delFunction = function fn(x: () => void) {
+    console.log('boop');
+}
 // Delegate and callback...need to have both somehow.
 
 export class FrameDelegate extends Delegate {
@@ -19,5 +23,9 @@ export class FrameDelegate extends Delegate {
             item.call(thisObj, o);
         });
     }
+
+}
+
+export class Del<T> {
 
 }
