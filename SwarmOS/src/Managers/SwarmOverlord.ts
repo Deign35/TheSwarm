@@ -1,11 +1,13 @@
-/// <reference path='../common/IMemory' />
+import { MemoryBase } from '../common/MemoryBase';
+
 export class SwarmOverlord {
-    static SaveData(dataObj: IMemory) {
+    static SaveData(dataObj: MemoryBase) {
         Memory.OverlordMemory[dataObj.MemoryId] = dataObj;
     }
     static LoadData(id: string) {
         return Memory.OverlordMemory[id];
     }
+
     private static InitOverlord() {
         console.log('InitOverlord');
         Memory.RESET = true;
