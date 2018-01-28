@@ -27,16 +27,15 @@ export class Role {
 
     static run(creep: Creep) {
         if(!Memory['Roles']) Memory['Roles'] = {} as {[name: string]: any};
+        let roleResult = 0;
         try {
-            /*for(let i = 0, length = this.Roles.length; i < length; i++) {
-                let role = this.Roles[i];
-                if(creep.memory['role'] == role.role) {
-                    role.run(creep);
-                }
-            }*/
-            this.Roles[creep.memory['role']].run(creep);
+            roleResult = this.Roles[creep.memory['role']].run(creep);
         } catch(e) {
-            this.Roles[RoleSweeper.roleId].run(creep);
+            roleResult = ERR_INVALID_ARGS;
+        }
+
+        if(roleResult != OK && roleResult != ERR_NOT_IN_RANGE) {
+            this.Roles[RoleBuilder.roleId].run(creep);
         }
     }
 

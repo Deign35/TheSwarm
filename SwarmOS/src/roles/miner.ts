@@ -5,7 +5,7 @@ export class RoleMiner {
         WORK, WORK, WORK, WORK, WORK,
         WORK, WORK, WORK, WORK, WORK, //20
         WORK, WORK, WORK, WORK, WORK,
-        WORK, WORK, WORK, WORK, WORK, // 30w + 1c + 10m =
+        WORK, WORK, WORK, WORK, WORK, // 30w + 1c + 1m =
         WORK, WORK, WORK, WORK, WORK,
         WORK, WORK, MOVE, MOVE, MOVE]; // 40w
     static minBody = RoleMiner.desiredBody;

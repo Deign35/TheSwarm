@@ -1,5 +1,31 @@
 ﻿import { Role } from './roles/roles';
 
+let creepPrototype: any = Creep.prototype;
+if(!creepPrototype['_moveTo']) {
+    creepPrototype['_moveTo'] = creepPrototype.moveTo;
+
+    creepPrototype.moveTo = function(...args: any[]) {
+        let pos: RoomPosition;
+        let optsPos = 1;
+        if(args.length == 3) {
+            pos = new RoomPosition(args[0], args[1], this.room.name);
+            optsPos = 2;
+        } else {
+            pos = args[0];
+        }
+
+        let options = args[optsPos];
+
+        options['visualizePathStyle'] = {
+            fill: 'transparent',
+            stroke: '#fff',
+            lineStyle: 'dashed',
+            strokeWidth: .15,
+            opacity: .1
+        }
+        this._moveTo(pos, options);
+    }
+}
 const MainRoom = Game.rooms[Memory.MainRoom];
 export const loop = function () {
     for(let name in Memory.creeps) {

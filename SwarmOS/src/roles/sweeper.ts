@@ -1,5 +1,6 @@
 import * as _ from "lodash";
 import { RoleDeliverer } from './deliverer';
+import { RoleRepairer } from './repairer';
 
 export class RoleSweeper {
     static roleId = "sweeper";
@@ -13,7 +14,7 @@ export class RoleSweeper {
     }
     static run(creep: Creep) {
         let hr = 0;
-        let creepCarryAmount = creep.carry.energy || 0;
+        let creepCarryAmount = 0;
         for(let rType in creep.carry) {
             creepCarryAmount += (creep.carry as { [resourceType: string]: any})[rType];
         }
@@ -29,11 +30,10 @@ export class RoleSweeper {
             let target = Game.getObjectById(creep.memory['DRTarget']);
             if(!target) {
                 let allDroppedResources = creep.room.find(FIND_DROPPED_RESOURCES);
-                if(!target) {
+                if(allDroppedResources.length == 0) {
                     if(creepCarryAmount > 0) { delete creep.memory['pickingUp']};
-                    if (!(creep.pos.x == 19 && creep.pos.y == 18)) {
-                        return creep.moveTo(19, 18);
-                    }
+                    creep.memory['role'] = RoleRepairer.roleId;
+                    return RoleRepairer.run(creep);
                 } if(allDroppedResources.length == 1) {
                     target = allDroppedResources[0];
                 } else if(allDroppedResources.length > 1) {

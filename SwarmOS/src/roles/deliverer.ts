@@ -13,7 +13,15 @@ export class RoleDeliverer {
 
     static run(creep: Creep) {
         let hr = 0;
-        if (creep.carry.energy == 0) {
+        let creepCarryAmount = creep.carry.energy || 0;
+        let deliveryType: ResourceConstant = RESOURCE_ENERGY;
+        for(let rType in creep.carry) {
+            if(rType != RESOURCE_ENERGY) {
+                creepCarryAmount += (creep.carry as { [resourceType: string]: any})[rType];
+                deliveryType = rType as ResourceConstant;
+            }
+        }
+        if (creepCarryAmount == 0) {
             hr = creep.withdraw(this.link, RESOURCE_ENERGY);
             if (hr == ERR_NOT_IN_RANGE) {
                 hr = creep.moveTo(this.link);
@@ -21,11 +29,9 @@ export class RoleDeliverer {
                 console.log('Withdraw failed with error: ' + hr);
             }
         } else {
+
             let target = this.storage as Structure;
-            if (this.terminal.store[RESOURCE_ENERGY] < 100000) {
-                target = this.terminal;
-            }
-            hr = creep.transfer(target, RESOURCE_ENERGY);
+            hr = creep.transfer(target, deliveryType);
             if (hr == ERR_NOT_IN_RANGE) {
                 hr = creep.moveTo(target);
             } else if (hr != OK) {

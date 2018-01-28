@@ -1,4 +1,5 @@
 import * as _ from "lodash"; // Compiler: IgnoreLinedfefwvg
+import { RoleSweeper } from './sweeper';
 
 export class RoleBuilder {
     static roleId: string = "builder";
@@ -36,9 +37,8 @@ export class RoleBuilder {
             if (!targetCS) {
                 targetCS = creep.pos.findClosestByRange(FIND_MY_CONSTRUCTION_SITES);
                 if (!targetCS) {
-                    hr = creep.moveTo(Game.spawns['Spawn1']);
-                    Game.spawns['Spawn1'].recycleCreep(creep);
-                    return hr;
+                    creep.memory['role'] = RoleSweeper.roleId;
+                    return RoleSweeper.run(creep);
                 }
                 creep.memory['RDTarget'] = targetCS.id;
             }
