@@ -1,4 +1,4 @@
-import { IDisposable } from './IDisposable';
+/// <reference path='./IDisposable.ts' />
 export class IMemory extends IDisposable {
     readonly MemoryId: string;
     constructor(memId: string) {
@@ -7,4 +7,4 @@ export class IMemory extends IDisposable {
     };
     Load() { console.log('Load'); };
     Save() { console.log('Save'); };
-}
+} global['IMemory'] = IMemory;

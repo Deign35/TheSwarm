@@ -1,0 +1,19 @@
+// Legislation
+SwarmQueen: Commands the entire swarm
+Swarm: A collection of Hives
+Hive: A Tumor where the controller is mine
+Tumors: are Rooms under my general control
+HiveQueen: Direct commands for an entire hive
+Command: Is a list of tasks given to Hivelords by the HiveQueen
+Hivelord: Created to manage and carry out to completion a list of tasks
+Task: Describes a desired action to be completed
+A Task can include other tasks and is described by a decision network
+The Hivelord gives tasks to SlaveGroups with the purpose of completing the main task
+SlaveGroup: Group of one or more creeps
+Tasks can be open ended and may never complete
+
+// Military
+SwarmCommander(NNN): Commands the armies of the swarm
+HiveCaptain (NNN): Commands a single Hive's Army
+The HiveCommander (NNN) is a type of Hivelord for HiveSquadrons (NNN)
+HiveSquadrons (NNN): Group of one or more military creeps.

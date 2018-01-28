@@ -1,8 +1,7 @@
 export class IDisposable {
     constructor() { }
     dispose(): void { }
-}
-declare type DisposeDelegate<T> = (disposableObject: T) => void;
+} global['IDisposable'] = IDisposable;
 /* Proper use of this function:
 using(new SomeObj(), (myObj: SomeObj) => {
     myObj.DoStuff();
@@ -14,4 +13,4 @@ export function using<T extends IDisposable>(disposableObject: T, disposableActi
     } finally {
         disposableObject.dispose();
     }
-}
+} global['using'] = using;
