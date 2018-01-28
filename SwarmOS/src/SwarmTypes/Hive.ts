@@ -27,6 +27,6 @@ export class Hive extends HiveNode {
     ControlledNodes: HiveNode[];
 
     CommandHive() {
-        
+
     }
 }

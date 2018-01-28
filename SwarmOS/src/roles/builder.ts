@@ -24,9 +24,11 @@ export class RoleBuilder {
             if (!targetCS) {
                 targetCS = creep.pos.findClosestByRange(FIND_MY_CONSTRUCTION_SITES);
                 if (!targetCS) {
-                    creep.moveTo(Game.spawns['Spawn1']);
+                    hr = creep.moveTo(Game.spawns['Spawn1']);
                     Game.spawns['Spawn1'].recycleCreep(creep);
+                    return hr;
                 }
+                creep.memory['RDTarget'] = targetCS.id;
             }
 
             hr = creep.build(targetCS);
