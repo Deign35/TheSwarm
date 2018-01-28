@@ -10,7 +10,8 @@
         "noImplicitThis": true,
         "rootDir": "src",
         "noEmitOnError": true,
-        "allowSyntheticDefaultImports": true
+        "allowSyntheticDefaultImports": true,
+        "removeComments": false
     },
     "include": [
         "src/**/*.ts",

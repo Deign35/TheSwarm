@@ -1,13 +1,17 @@
-import { Role } from './roles';
+export class RoleHarvester {
+    static minBody = [WORK, MOVE, CARRY];
+    static desiredBody = [WORK, MOVE, CARRY, MOVE, CARRY, //W + 2M + 2C -- 100
+        MOVE, WORK, WORK, MOVE, WORK, // 3W + 2M
+        CARRY, MOVE, WORK, WORK, MOVE, // 2W + 2M + 1C -- 150
+        WORK, CARRY, MOVE, CARRY, CARRY, // 1W + 1M + 3C -- 300
+        CARRY, CARRY, MOVE, CARRY, CARRY]; // 1M + 4C -- 500
 
-export class RoleHarvester implements Role {
-    desiredBody = [WORK, WORK, WORK, WORK, WORK, WORK, MOVE, CARRY];
-    maxWorkers = 2;
-    run(creep: Creep) {
+    static maxWorkers = 1;
+    static source = Game.getObjectById('5982ff46b097071b4adc2586') as Source;
+    static run(creep: Creep) {
         let hr = 0;
-        let targetSource = Game.getObjectById(creep.memory['targetSource']) as Source;
         if (creep.memory['harvesting'] &&
-            (targetSource.energy == 0 || creep.carry.energy == creep.carryCapacity)) {
+            (this.source.energy == 0 || creep.carry.energy == creep.carryCapacity)) {
             delete creep.memory['harvesting'];
         }
         if (!creep.memory['harvesting'] && creep.carry.energy == 0) {
@@ -15,14 +19,14 @@ export class RoleHarvester implements Role {
         }
 
         if (creep.memory['harvesting']) {
-            hr = this.harvest(creep, targetSource);
+            hr = this.harvest(creep, this.source);
         } else {
             hr = this.deliver(creep);
         }
         return hr;
     }
 
-    private harvest(creep: Creep, source: Source) {
+    private static harvest(creep: Creep, source: Source) {
         let hr = 0;
 
         hr = creep.harvest(source);
@@ -31,9 +35,10 @@ export class RoleHarvester implements Role {
         } else if (hr != OK) {
             console.log('Harvest failed with error: ' + hr);
         }
+
         return hr;
     }
-    private deliver(creep: Creep) {
+    private static deliver(creep: Creep) {
         let hr = 0;
 
         let deliveryTarget: any = Game.getObjectById(creep.memory['delTar']);
@@ -53,7 +58,7 @@ export class RoleHarvester implements Role {
         return hr;
     }
 
-    private findDeliveryTarget(creep: Creep) {
+    private static findDeliveryTarget(creep: Creep) {
         let possibleTargets = creep.room.find(FIND_STRUCTURES, {
             filter(structure) {
                 return (structure.structureType == STRUCTURE_EXTENSION ||

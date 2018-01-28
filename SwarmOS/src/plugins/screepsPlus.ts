@@ -1,4 +1,4 @@
-import { RoomResources } from '../classes/RoomResources';
+import { RoomResources } from './screepsPlus/RoomResources';
 import { Delegate } from '../common/Delegate';
 
 declare type ScreepsPlusDelegate = (stats: any) => void;
