@@ -1,11 +1,12 @@
 declare const require: (module: string) => any;
-declare var global: {[name: string]: any};
+declare var global: { [name: string]: any };
 
 declare type CallbackFunction = (...args: any[]) => void;
 declare class IDisposable {
     dispose(): void;
 }
 
+declare type DisposeCallback<T extends IDisposable> = (disposableObject: T) => void;
 declare type DisposeDelegate<T> = (disposableObject: T) => void;
 declare function using<T extends IDisposable>(disposableObject: T, disposableAction: DisposeDelegate<T>): void;
 declare class IMemory {
@@ -15,4 +16,5 @@ declare class IMemory {
 }
 declare class SwarmOverlord {
     static SaveData(dataObj: IMemory): void;
+    static LoadData(id: string): IMemory;
 }
