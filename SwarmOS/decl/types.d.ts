@@ -23,3 +23,7 @@ declare class SwarmOverlord {
     static SaveData(dataObj: IMemory): void;
     static LoadData(id: string): IMemory;
 }
+
+declare interface ICommand {
+    CommandId: string,
+}

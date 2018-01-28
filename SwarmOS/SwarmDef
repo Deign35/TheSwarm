@@ -4,13 +4,13 @@ Swarm: A collection of Hives
 Hive: A Tumor where the controller is mine
 Tumors: are Rooms under my general control
 HiveQueen: Direct commands for an entire hive
-Command: Is a list of tasks given to Hivelords by the HiveQueen
-Hivelord: Created to manage and carry out to completion a list of tasks
-Task: Describes a desired action to be completed
-A Task can include other tasks and is described by a decision network
-The Hivelord gives tasks to SlaveGroups with the purpose of completing the main task
+Command: Is a list of commands given to Hivelords by the HiveQueen
+Hivelord: Created to manage and carry out to completion a list of commands
+Command: Describes a desired action to be completed
+A Command can include other commands and is described by a decision network
+The Hivelord gives commands to SlaveGroups with the purpose of completing the main command
 SlaveGroup: Group of one or more creeps
-Tasks can be open ended and may never complete
+Commands can be open ended and may never complete
 
 // Military
 SwarmCommander(NNN): Commands the armies of the swarm

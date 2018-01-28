@@ -17,3 +17,7 @@ export enum t_Target {
     Fi, // Find Target
     AP, // At Position
 }
+
+export enum e_SimpleCommand {
+
+}
