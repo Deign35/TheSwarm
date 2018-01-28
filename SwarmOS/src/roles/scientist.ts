@@ -1,4 +1,5 @@
-export class roleScientist {
+export class RoleScientist {
+    static roleId = "scientist";
     private static terminal = Game.getObjectById('5a4b9b45a26e0858b28160a8') as StructureTerminal;
 
     static run(creep: Creep) {

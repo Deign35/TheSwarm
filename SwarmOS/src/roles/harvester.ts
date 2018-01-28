@@ -1,4 +1,5 @@
 export class RoleHarvester {
+    static roleId = "harvester";
     static minBody = [WORK, MOVE, CARRY];
     static desiredBody = [WORK, MOVE, CARRY, MOVE, CARRY, //W + 2M + 2C -- 100
         MOVE, WORK, WORK, MOVE, WORK, // 3W + 2M
@@ -8,6 +9,11 @@ export class RoleHarvester {
 
     static maxWorkers = 1;
     static source = Game.getObjectById('5982ff46b097071b4adc2586') as Source;
+
+    static GetSpawner() {
+        return 'Spawn1';
+    }
+
     static run(creep: Creep) {
         let hr = 0;
         if (creep.memory['harvesting'] &&

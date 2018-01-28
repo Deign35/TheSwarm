@@ -1,6 +1,7 @@
 import * as _ from "lodash"; // Compiler: IgnoreLinedfefwvg
 
-export class RoleBuilder {
+export class RoleRepairer {
+    static roleId = "repairer";
     static desiredBody = [WORK, CARRY, MOVE];
     static maxWorkers = 1;
     static storage = Game.getObjectById('5a4a2a803c7a852985513260') as StructureStorage;

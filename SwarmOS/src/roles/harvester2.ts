@@ -1,4 +1,5 @@
 export class RoleHarvester2 {
+    static roleId = "harvester3";
     static minBody = [WORK, MOVE, CARRY];
     static desiredBody = [WORK, MOVE, CARRY, WORK, WORK, WORK, WORK, WORK];
     static maxWorkers = 1;

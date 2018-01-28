@@ -136,7 +136,6 @@ let InitStringReplaceConfig = function () {
 
 let ReplaceImports = function (abspath, rootdir, subdir, filename) {
     if (abspath.match(/.js$/) == null) { return; }
-    console.log('abspath[' + abspath + '] -- rootdir[' + rootdir + '] -- subdir[' + subdir + ']');
     let file = gObj.file.read(abspath);
     let updatedFile = '';
 
@@ -146,26 +145,26 @@ let ReplaceImports = function (abspath, rootdir, subdir, filename) {
         if ((line).match(/[.]*\/\/ Compiler: IgnoreLine[.]*/)) {
             continue;
         }
+        if ((line).match(/[.]*var _ = require\("lodash"\);[.]*/)) {
+            console.log(line);
+            continue;
+        }
         let reqStr = line.match(/(?:require\(")([^_a-zA-Z0-9]*)([^"]*)/);
         if (reqStr && reqStr != "") {
             let reqPath = subdir ? subdir.split('/') : [];
             let upPaths = line.match(/\.\.\//gi);
-            console.log('path before ------ ' + reqPath);
             if (upPaths) {
                 for (let i in upPaths) {
                     reqPath.splice(reqPath.length - 1);
                 }
             }
 
-            console.log(JSON.stringify(reqPath));
             let rePathed = "";
             if (reqPath && reqPath.length > 0) {
                 for (let folder of reqPath) {
                     rePathed = folder + "_";
                 }
             }
-            console.log('repathed: ' + rePathed);
-            //line = line.replace(/(require\(")([^_a-zA-Z0-9]*)([^"]*)/, "$1" + rePathed + "$3").replace(/\//gi, '_');
             line = line.replace(/require\("([\.\/]*)([^"]*)/, "require\(\"" + rePathed + "$2").replace(/\//gi, '_');
         }
 

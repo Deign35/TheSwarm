@@ -1,15 +1,27 @@
 import * as _ from "lodash"; // Compiler: IgnoreLinedfefwvg
 
 export class RoleBuilder {
-    static desiredBody = [WORK, WORK, WORK, WORK,
+    static roleId: string = "builder";
+    static minBody = [WORK, MOVE, CARRY];
+    static desiredBody: BodyPartConstant[] = [WORK, WORK, WORK, WORK, // need to reorg desired body
         CARRY, CARRY, CARRY, CARRY, CARRY,
         CARRY, CARRY, CARRY, CARRY, CARRY,
         MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
     static maxWorkers = 3;
     static storage = Game.getObjectById('5a4a2a803c7a852985513260') as StructureStorage;
-    static NeedsMoreWorkers() {
-        return _.filter(Game.creeps, (creep) => creep.memory['roleId'] == 'builder');
+
+    static GetSpawner(maxEnergy: number) {
+        if(Memory['Roles']['buildTick'] > 10) {
+            let sites = Game.rooms['E22N32'].find(FIND_MY_CONSTRUCTION_SITES);
+            if(sites.length > 0) { // if any sites.
+                Memory['Roles']['buildTick'] = 0;
+                return 'Spawn2';
+            }
+        }
+        Memory['Roles']['buildTick']++;
+        return undefined;
     }
+
     static run(creep: Creep) {
         let hr = 0;
         if (creep.carry.energy == 0) {

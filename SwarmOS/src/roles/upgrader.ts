@@ -1,4 +1,5 @@
-export class RoleHarvester2 {
+export class RoleUpgrader {
+    static roleId = "upgrader";
     static minBody = [WORK, MOVE, CARRY];
     static desiredBody = [WORK, MOVE, CARRY];
     static maxWorkers = 1;
