@@ -28,6 +28,7 @@ declare const ERR_NO_BODYPART: -12;
 declare const ERR_NOT_ENOUGH_EXTENSIONS: -6;
 declare const ERR_RCL_NOT_ENOUGH: -14;
 declare const ERR_GCL_NOT_ENOUGH: -15;
+declare const ERR_MY_ERROR: -16;
 
 declare const FIND_EXIT_TOP: 1;
 declare const FIND_EXIT_RIGHT: 3;

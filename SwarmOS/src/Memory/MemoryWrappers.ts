@@ -42,7 +42,7 @@ export class SimpleMemory extends MemoryWrapper {
     Load() {
         this._load();
     }
-    GetData(id: string) {
+    GetData(id: string): any {
         this._getData(id);
     }
     SetData(id: string, data: any) {

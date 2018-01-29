@@ -28,7 +28,6 @@ declare type CommandFunc = (...args: any[]) => ScreepsReturnCode;
 declare interface ICommand extends IMemory {
     Execute(): any;
     CommandLoop: CommandFunc;
-    ConstructCommandArgs(): any[];
 }
 declare interface CommandBase extends ICommand {
 

@@ -1,4 +1,4 @@
-import { SimpleMemory } from "Memory/MemoryBase";
+import { SimpleMemory } from "Memory/MemoryWrappers";
 
 export class SwarmOverlord extends SimpleMemory {
     private static _instance = new SwarmOverlord();

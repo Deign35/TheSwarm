@@ -1,4 +1,4 @@
-﻿import { DisposalDelegate } from './common/DisposableBase';
+﻿import { DisposalDelegate } from './common/Disposable';
 export const loop = function () {
     console.log('Main');
     try {
