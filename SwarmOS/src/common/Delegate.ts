@@ -1,4 +1,4 @@
-export class DelegateBase<T extends CallbackFunction> implements Delegate<T> {
+export class Delegate<T extends CallbackFunction> implements IDelegate<T> {
     private _callbackFunctions: { [id: string]: T } = {};
     Subscribe(id: string, callback: T) {
         this._callbackFunctions[id] = callback;

@@ -1,4 +1,4 @@
-import { SimpleMemory } from "./MemoryBase";
+import { SimpleMemory } from "./MemoryWrappers";
 
 export class QueenMemory extends SimpleMemory {
 

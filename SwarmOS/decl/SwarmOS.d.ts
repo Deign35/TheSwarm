@@ -2,7 +2,7 @@ declare const require: (module: string) => any;
 declare var global: { [name: string]: any };
 
 declare type CallbackFunction = (...args: any[]) => any;
-declare interface Delegate<T extends CallbackFunction> {
+declare interface IDelegate<T extends CallbackFunction> {
     Subscribe(id: string, callback: T): void;
     Unsubscribe(id: string): void;
     Notify(...args: any[]): void;

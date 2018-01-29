@@ -1,12 +1,12 @@
 import { RoomResources } from './screepsPlus/RoomResources';
-import { DelegateBase } from '../common/Delegate';
+import { Delegate } from '../common/Delegate';
 
 declare interface ScreepsPlusDelegate {
 	(stats: any): void;
 }
 
 export class ScreepsPlus {
-	private _spDelegate = new DelegateBase();
+	private _spDelegate = new Delegate();
 	AddStatsCallback(id: string, callback: ScreepsPlusDelegate) {
 		this._spDelegate.Subscribe(id, callback);
 	}

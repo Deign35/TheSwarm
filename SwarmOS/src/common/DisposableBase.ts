@@ -1,5 +1,5 @@
-import { DelegateBase } from './Delegate';
-export class DisposableBase implements IDisposable {
+import { Delegate } from './Delegate';
+export abstract class Disposable implements IDisposable {
     constructor(public id: string) {
         DisposalDelegate.subscribe(id, this);
     }
@@ -8,7 +8,7 @@ export class DisposableBase implements IDisposable {
         delete this.dispose;
     }
 }
-export class DisposalDelegate extends DelegateBase<DisposableCallback<DisposableBase>> {
+export class DisposalDelegate extends Delegate<DisposableCallback<IDisposable>> {
     constructor() {
         super();
         if (!DisposalDelegate._instance) {
@@ -17,7 +17,7 @@ export class DisposalDelegate extends DelegateBase<DisposableCallback<Disposable
     }
 
     private static _instance: DisposalDelegate;
-    static subscribe(id: string, disposableObject: DisposableBase) {
+    static subscribe(id: string, disposableObject: IDisposable) {
         this._instance.Subscribe(id, disposableObject.dispose);
     }
     static unsubscribe(id: string) {
@@ -28,7 +28,7 @@ export class DisposalDelegate extends DelegateBase<DisposableCallback<Disposable
     }
 } global['DisposeAll'] = new DisposalDelegate() && DisposalDelegate;
 
-export function using<T extends DisposableBase>(disposableObject: T, disposableAction: DisposableCallback<T>) {
+export function using<T extends IDisposable>(disposableObject: T, disposableAction: DisposableCallback<T>) {
     try {
         disposableAction(disposableObject);
     } finally {
