@@ -25,7 +25,7 @@ declare class SwarmOverlord {
 }
 
 declare type CommandFunc = (...args: any[]) => ScreepsReturnCode;
-declare interface ICommand extends IMemory {
+declare interface ICommand {
     Execute(): any;
     CommandLoop: CommandFunc;
 }
