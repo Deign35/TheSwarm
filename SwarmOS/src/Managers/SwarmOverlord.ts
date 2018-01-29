@@ -1,14 +1,15 @@
-import { MemoryBase } from '../common/MemoryBase';
+import { SimpleMemory } from "Memory/MemoryBase";
 
-export class SwarmOverlord {
-    static SaveData(dataObj: MemoryBase) {
-        Memory.OverlordMemory[dataObj.MemoryId] = dataObj;
+export class SwarmOverlord extends SimpleMemory {
+    private static _instance = new SwarmOverlord();
+    static SaveData(id: string, dataObj: IMemory) {
+        this._instance.SetData(id, dataObj);
     }
     static LoadData(id: string) {
-        return Memory.OverlordMemory[id];
+        return this._instance.GetData(id);
     }
 
-    private static InitOverlord() {
+    private InitOverlord() {
         console.log('InitOverlord');
         Memory.RESET = true;
         let initResult = OK;
@@ -19,7 +20,7 @@ export class SwarmOverlord {
 
         // Load managers here
 
-        if(initResult != OK) {
+        if (initResult != OK) {
             Memory.RESET = true;
             delete Memory.OverlordMemory;
         }
@@ -27,9 +28,10 @@ export class SwarmOverlord {
         console.log('Reset Overmind Completed[' + initResult + '] in ' + (Game.cpu.getUsed() - startInit) + ' ticks.');
         return initResult;
     }
-    constructor () {
-        if(!Memory.OverlordMemory || Memory.RESET) {
-            SwarmOverlord.InitOverlord();
+    constructor() { // Memory needs to be reorged a bit in here to utilize the base functionality.
+        super('SwarmOverlord'); // There should be no other place where Memory is referenced, except in MemoryBase.
+        if (!Memory.OverlordMemory || Memory.RESET) {
+            this.InitOverlord();
         }
     }
 } global['SwarmOverlord'] = new SwarmOverlord() && SwarmOverlord;

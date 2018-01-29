@@ -1450,7 +1450,8 @@ type ScreepsReturnCode =
     ERR_NO_BODYPART |
     ERR_NOT_ENOUGH_EXTENSIONS |
     ERR_RCL_NOT_ENOUGH |
-    ERR_GCL_NOT_ENOUGH;
+    ERR_GCL_NOT_ENOUGH |
+    ERR_MY_ERROR;
 
 type OK = 0;
 type ERR_NOT_OWNER = -1;
@@ -1469,6 +1470,7 @@ type ERR_NO_BODYPART = -12;
 type ERR_NOT_ENOUGH_EXTENSIONS = -6;
 type ERR_RCL_NOT_ENOUGH = -14;
 type ERR_GCL_NOT_ENOUGH = -15;
+type ERR_MY_ERROR = -16;
 
 type CreepActionReturnCode =
     OK |

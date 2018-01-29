@@ -8,7 +8,7 @@ export class DelegateBase<T extends CallbackFunction> implements Delegate<T> {
     }
     Notify(...args: any[]) {
         for (let name in this._callbackFunctions) {
-            this._callbackFunctions[name](args);
+            this._callbackFunctions[name](args); // Need a delegate that allows me to return and process after each return.
         }
     }
 }

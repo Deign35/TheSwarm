@@ -1,4 +1,4 @@
-export enum e_CResponse {
+declare enum e_CResponse {
     Cn, // Continue
     Mv, // Move
     AC, // Action Complete
@@ -10,7 +10,7 @@ export enum e_CResponse {
     CM, // Complete
 }
 
-export enum t_Target {
+declare enum t_Target {
     FT, // Fixed Target
     CB, // Callback
     NS, // Nearest Structure
@@ -18,6 +18,26 @@ export enum t_Target {
     AP, // At Position
 }
 
-export enum e_SimpleCommand {
+declare enum c_SimpleCreep { // Reduce the amount of memory taken up by shortening the string and mapping by CPU.
+    Attack = 'attack',
+    Build = 'build',
+    Dismantle = 'dismantle',
+    Drop = 'drop',
+    Harvest = 'harvest',
+    Heal = 'heal',
+    Pickup = 'pickup',
+    RangedAttack = 'rangedAttack',
+    RangedHeal = 'rangedHeal',
+    Repair = 'repair',
+    Say = 'say',
+    Suicide = 'suicide',
+    Transfer = 'transfer',
+    Upgrade = 'upgradeController',
+    Withdraw = 'withdraw',
+}
+
+declare enum c_SimpleRoom {
 
 }
+
+declare type SimpleCommands = c_SimpleCreep | c_SimpleRoom;

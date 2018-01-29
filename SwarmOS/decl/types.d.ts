@@ -1,7 +1,7 @@
 declare const require: (module: string) => any;
 declare var global: { [name: string]: any };
 
-declare type CallbackFunction = (...args: any[]) => void;
+declare type CallbackFunction = (...args: any[]) => any;
 declare interface Delegate<T extends CallbackFunction> {
     Subscribe(id: string, callback: T): void;
     Unsubscribe(id: string): void;
@@ -15,15 +15,21 @@ declare type DisposableCallback<T extends IDisposable> = (disposableObject: T) =
 declare function using<T extends IDisposable>(disposableObject: T, disposableAction: DisposableCallback<T>): void;
 
 declare interface IMemory extends IDisposable {
-    readonly MemoryId: string;
+    readonly id: string;
     Save(lock: boolean): void;
     Load(): void;
 }
 declare class SwarmOverlord {
-    static SaveData(dataObj: IMemory): void;
+    static SaveData(id: string, dataObj: IMemory): void;
     static LoadData(id: string): IMemory;
 }
 
-declare interface ICommand {
-    CommandId: string,
+declare type CommandFunc = (...args: any[]) => ScreepsReturnCode;
+declare interface ICommand extends IMemory {
+    Execute(): any;
+    CommandLoop: CommandFunc;
+    ConstructCommandArgs(): any[];
+}
+declare interface CommandBase extends ICommand {
+
 }
