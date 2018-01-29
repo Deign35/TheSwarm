@@ -18,24 +18,6 @@ declare enum t_Target {
     AP, // At Position
 }
 
-declare enum c_SimpleCreep { // Reduce the amount of memory taken up by shortening the string and mapping by CPU.
-    Attack = 'attack',
-    Build = 'build',
-    Dismantle = 'dismantle',
-    Drop = 'drop',
-    Harvest = 'harvest',
-    Heal = 'heal',
-    Pickup = 'pickup',
-    RangedAttack = 'rangedAttack',
-    RangedHeal = 'rangedHeal',
-    Repair = 'repair',
-    Say = 'say',
-    Suicide = 'suicide',
-    Transfer = 'transfer',
-    Upgrade = 'upgradeController',
-    Withdraw = 'withdraw',
-}
-
 declare enum c_SimpleRoom {
 
 }
