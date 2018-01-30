@@ -34,11 +34,12 @@ declare enum c_SimpleCreep {
     Wi = 'withdraw',
 }
 
-declare type BasicCreepCommandTypes = C_Attack | C_Build | C_Dismantle | C_Drop |
+declare type BasicCreepCommandType = C_Attack | C_Build | C_Dismantle | C_Drop |
     C_Harvest | C_Heal | C_MoveTo | C_Pickup | C_RangedAttack |
     C_RangedHeal | C_Repair | C_Say | C_Suicide |
     C_Transfer | C_Upgrade | C_Withdraw;
 
+declare type CreepCommandType = BasicCreepCommandType;
 declare enum e_CResponse {
     Cn, // Continue
     Mv, // Move
@@ -63,4 +64,6 @@ declare enum c_SimpleRoom {
 
 }
 
-declare type SimpleCommands = BasicCreepCommandTypes | c_SimpleRoom;
+declare type SimpleCommandType = BasicCreepCommandType | c_SimpleRoom;
+
+declare type CommandType = SimpleCommandType;

@@ -26,9 +26,12 @@ declare class SwarmOverlord {
 
 declare type CommandFunc = (...args: any[]) => ScreepsReturnCode;
 declare interface ICommand {
-    Execute(): any;
+    Execute(): ScreepsReturnCode;
     CommandLoop: CommandFunc;
 }
-declare interface CommandBase extends ICommand {
+declare interface ICreepCommand<T extends BasicCreepCommandType> extends ICommand, CommandBase<T> {
+    ExecuteCreep(creep: Creep): ScreepsReturnCode;
+}
+declare interface CommandBase<CommandType> extends IMemory, ICommand {
 
 }

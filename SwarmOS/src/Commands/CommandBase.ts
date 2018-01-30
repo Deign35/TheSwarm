@@ -1,8 +1,12 @@
 import { SimpleMemory } from "Memory/MemoryWrappers";
 
+var NotImplemented = true;
 export class FrameCommand implements ICommand {
     Execute() {
-        throw new Error("Method not implemented.");
+        if (NotImplemented) {
+            throw new Error("Method not implemented.");
+        }
+        return ERR_INVALID_ARGS;
     }
     CommandLoop: CommandFunc;
 }
@@ -20,10 +24,12 @@ export abstract class CommandBase extends SimpleMemory implements ICommand {
         } catch (e) {
             console.log('Command Failed: ' + e);
         }
+
+        return ERR_INVALID_ARGS;
     }
 }
 
-export abstract class SimpleCommand<T extends SimpleCommands> extends CommandBase {
+export abstract class SimpleCommand<T extends SimpleCommandType> extends CommandBase {
     // Simple command is a single action that completes and goes away forever.
 }
 

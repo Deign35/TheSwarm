@@ -1,6 +1,6 @@
-import { SimpleCommand } from "Commands/CommandBase";
+import { SimpleCommand, FrameCommand } from "Commands/CommandBase";
 
-export function CreateBasicCreepCommand(id: string, commandType: BasicCreepCommandTypes) {
+export function CreateBasicCreepCommand(id: string, commandType: BasicCreepCommandType) {
     if (commandType == C_Harvest) { // Instead of this, do an index retrieval on commandType
         return new HarvestCreepCommand(id);
     }
@@ -8,18 +8,24 @@ export function CreateBasicCreepCommand(id: string, commandType: BasicCreepComma
     return undefined;
 }
 
-export abstract class BasicCreepCommand<T extends BasicCreepCommandTypes> extends SimpleCommand<T> {
+export abstract class CreepCard<T extends CreepCommandType> extends FrameCommand {
+
+}
+
+export abstract class BasicCreepCommand<T extends BasicCreepCommandType> extends SimpleCommand<T> {
     constructor(commandId: string) {
         super(commandId, BasicCreepCommand.Loop);
     }
-    protected static ConvertToCreepControlCommand(inVal: BasicCreepCommandTypes) {
+    protected static ConvertToCreepControlCommand(inVal: BasicCreepCommandType) {
         return c_SimpleCreep[inVal];
     }
-    private static Loop<T extends BasicCreepCommandTypes>(obj: BasicCreepCommand<T>, ...args: any[]) {
+    private static Loop<T extends BasicCreepCommandType>(obj: BasicCreepCommand<T>, ...args: any[]) {
         return obj.CreepReactionToCommandCompletion(obj.ExecuteCreepCommand(args));
     }
 
-    protected abstract ExecuteCreepCommand(...args: any[]): ScreepsReturnCode;
+    protected ExecuteCreepCommand(...args: any[]): ScreepsReturnCode {
+        return OK;
+    }
     protected abstract CreepReactionToCommandCompletion(commandResult: ScreepsReturnCode): ScreepsReturnCode;/*{
         // Do defaults here.
 
