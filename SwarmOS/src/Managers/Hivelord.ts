@@ -1,5 +1,16 @@
-export class Hivelord { // Manages a decision network for resolving directives
+import { SimpleMemory } from "Memory/MemoryWrappers";
+import { ComplexCommand } from "Commands/ComplexCommand";
 
+export class Hivelord extends SimpleMemory {
+    HiveCommand: ComplexCommand[];
+
+    constructor(id: string) {
+        super(id);
+    }
+
+    Evaluate() {
+
+    }
 }
 /*const Command = function Command() {
     this.commandArguments = {}; // Change the name of commandArgs to ensure no one is attempting to access it directly.
@@ -84,7 +95,7 @@ Command.prototype.Evaluate = function () {
         /*if (moveResult == ERR_NO_PATH) {
             response = CreepCommandResponse_Enum.Next;
         }
-commandResult = CommandResults_Enum.Incomplete;
+        commandResult = CommandResults_Enum.Incomplete;
     }
 if (response == CreepCommandResponse_Enum.ReqTarget) {
     delete this.Cache[CommandMemory_Enum.TargetId];

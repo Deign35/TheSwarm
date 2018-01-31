@@ -1,4 +1,5 @@
 import { Swarmling } from "SwarmTypes/Swarmling";
+import { ShortCommand } from "Commands/CommandBase";
 
 let DefaultCreepReactions: { [key: number]: e_CreepResponse } = {};
 DefaultCreepReactions[OK] = e_CreepResponse.Continue;
@@ -16,23 +17,20 @@ DefaultCreepReactions[ERR_NO_BODYPART] = e_CreepResponse.CancelCommands;
 DefaultCreepReactions[ERR_RCL_NOT_ENOUGH] = e_CreepResponse.CancelCommands;
 DefaultCreepReactions[ERR_GCL_NOT_ENOUGH] = e_CreepResponse.Throw;
 
-export class BasicCreepCommand implements CreepCommand {
-    CreepReactions = DefaultCreepReactions;
-    constructor(public CommandType: CommandType, public CommandLoop: CommandFunc = BasicCreepCommand.Loop) { }
-    Execute(creep: Swarmling, ...inArgs: any[]) {
-        let result = ERR_INVALID_ARGS as ScreepsReturnCode;
-        try {
-            result = this.CommandLoop(this, creep, inArgs);
-        } catch (e) {
-            console.log('Command Failed: ' + e);
+export class BasicCreepCommand extends ShortCommand {
+    protected static _instance: BasicCreepCommand = new BasicCreepCommand(C_Harvest);
+    static CreepReactions = DefaultCreepReactions;
+    static Execute(ling: Swarmling, ...inArgs: any[]) {
+        BasicCreepCommand._instance.Execute();
+    }
+
+    static CreepReactionToCommandCompletion(commandResult: ScreepsReturnCode, commandReactions?: { [key: number]: e_CreepResponse }): SwarmReturnCode {
+        let reactionType = BasicCreepCommand.CreepReactions[commandResult];
+        if (commandReactions && commandReactions[commandResult]) {
+            reactionType = commandReactions[commandResult];
         }
 
-        return result;
-    }
-    public CreepReactionToCommandCompletion(commandResult: ScreepsReturnCode): ScreepsReturnCode {
-        let reactionType = this.CreepReactions[commandResult];
-
-        let reactionResult = ERR_INVALID_ARGS as ScreepsReturnCode;
+        let reactionResult = ERR_INVALID_ARGS as SwarmReturnCode;
         switch (reactionType) {
             case (e_CreepResponse.CancelCommands): {
                 // Cancel Commands -- Action is cancelled, can do no more.
@@ -79,9 +77,9 @@ export class BasicCreepCommand implements CreepCommand {
         return reactionResult;
     }
 
-    public ConstructCommandArgs(...args: any[]): { [name: string]: any } {
+    static ConstructCommandArgs(commandType: CommandType, ...args: any[]): { [name: string]: any } {
         let constructedArgs: { [name: string]: any } = { argsCount: args.length };
-        switch (this.CommandType) {
+        switch (commandType) {
             case (C_Suicide): break;
             case (C_Say):
                 constructedArgs['message'] = args[0];
@@ -105,29 +103,29 @@ export class BasicCreepCommand implements CreepCommand {
         return args;
     }
 
-    private static Loop<T extends BasicCreepCommandType>(obj: BasicCreepCommand, creep: Creep, args: { [name: string]: any }) {
-        let constructedArgs = obj.ConstructCommandArgs(args);
-        let executeResult = BasicCreepCommand.ExecuteCreepCommand(obj.CommandType, creep, constructedArgs);
-        return obj.CreepReactionToCommandCompletion(executeResult);
+    private static Loop<T extends BasicCreepCommandType>(obj: BasicCreepCommand, ling: Swarmling, args: { [name: string]: any }) {
+        let constructedArgs = this.ConstructCommandArgs(obj.CommandType, args);
+        let executeResult = BasicCreepCommand.ExecuteCreepCommand(obj.CommandType, ling, constructedArgs);
+        return this.CreepReactionToCommandCompletion(executeResult);
     }
 
-    private static ExecuteCreepCommand(commandType: CommandType, creep: Creep, args: { [name: string]: any }): ScreepsReturnCode {
+    private static ExecuteCreepCommand(commandType: CommandType, ling: Swarmling, args: { [name: string]: any }): ScreepsReturnCode {
         switch (commandType) {
-            case (C_Attack): return creep.attack(args['target']);
-            case (C_Build): return creep.build(args['target']);
-            case (C_Dismantle): return creep.dismantle(args['target']);
-            case (C_Drop): return creep.drop(args['resourceType']);
-            case (C_Harvest): return creep.harvest(args['target']);
-            case (C_Heal): return creep.heal(args['target']);
-            case (C_Pickup): return creep.pickup(args['target']);
-            case (C_RangedAttack): return creep.rangedAttack(args['target']);
-            case (C_RangedHeal): return creep.rangedHeal(args['target']);
-            case (C_Repair): return creep.repair(args['target']);
-            case (C_Suicide): return creep.suicide();
-            case (C_Say): return creep.say(args['target']);
-            case (C_Transfer): return creep.transfer(args['target'], args['resourceType'], args['amount'] ? args['amount'] : undefined);
-            case (C_Upgrade): return creep.upgradeController(args['target']);
-            case (C_Withdraw): return creep.withdraw(args['target'], args['resourceType'], args['amount'] ? args['amount'] : undefined);
+            case (C_Attack): return ling.attack(args['target']);
+            case (C_Build): return ling.build(args['target']);
+            case (C_Dismantle): return ling.dismantle(args['target']);
+            case (C_Drop): return ling.drop(args['resourceType']);
+            case (C_Harvest): return ling.harvest(args['target']);
+            case (C_Heal): return ling.heal(args['target']);
+            case (C_Pickup): return ling.pickup(args['target']);
+            case (C_RangedAttack): return ling.rangedAttack(args['target']);
+            case (C_RangedHeal): return ling.rangedHeal(args['target']);
+            case (C_Repair): return ling.repair(args['target']);
+            case (C_Suicide): return ling.suicide();
+            case (C_Say): return ling.say(args['target']);
+            case (C_Transfer): return ling.transfer(args['target'], args['resourceType'], args['amount'] ? args['amount'] : undefined);
+            case (C_Upgrade): return ling.upgradeController(args['target']);
+            case (C_Withdraw): return ling.withdraw(args['target'], args['resourceType'], args['amount'] ? args['amount'] : undefined);
         }
         return OK;
     }

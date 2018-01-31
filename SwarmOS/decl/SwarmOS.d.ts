@@ -24,20 +24,18 @@ declare class SwarmOverlord {
     static LoadData(id: string): IMemory;
 }
 
-declare type CommandFunc = (...args: any[]) => ScreepsReturnCode;
+declare type CommandFunc = (...args: any[]) => SwarmReturnCode;
 declare interface ICommand {
     CommandLoop: CommandFunc;
     CommandType: CommandType;
-    Execute(...inArgs: any[]): ScreepsReturnCode;
+    Execute(...inArgs: any[]): SwarmReturnCode;
 }
-
+/*
 declare interface CreepCommand extends ICommand {
-    Execute(creep: Creep, ...inArgs: any[]): ScreepsReturnCode;
-    CreepReactionToCommandCompletion(commandResult: ScreepsReturnCode): ScreepsReturnCode
+    Execute(creep: Creep, ...inArgs: any[]): SwarmReturnCode;
+    CreepReactionToCommandCompletion(commandResult: ScreepsReturnCode): SwarmReturnCode
     ConstructCommandArgs(...args: any[]): { [name: string]: any };
 }
-
-/*
 declare interface ICreepCommand<T extends BasicCreepCommandType> extends ICommand, CommandBase<T> {
     ExecuteCreep(creep: Creep): ScreepsReturnCode;
 }

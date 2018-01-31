@@ -1,5 +1,5 @@
 export abstract class Swarmling extends Creep {
-    
+
 }
 
 export class Drone extends Swarmling {
