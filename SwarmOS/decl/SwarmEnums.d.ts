@@ -4,7 +4,6 @@ declare type C_Dismantle = 'Di'; declare const C_Dismantle = 'Di';
 declare type C_Drop = 'Dr'; declare const C_Drop = 'Dr';
 declare type C_Harvest = 'Ha'; declare const C_Harvest = 'Ha';
 declare type C_Heal = 'He'; declare const C_Heal = 'He';
-declare type C_MoveTo = 'MT'; declare const C_MoveTo = 'MT';
 declare type C_Pickup = 'Pi'; declare const C_Pickup = 'Pi';
 declare type C_RangedAttack = 'RA'; declare const C_RangedAttack = 'RA';
 declare type C_RangedHeal = 'RH'; declare const C_RangedHeal = 'RH';
@@ -22,7 +21,6 @@ declare enum c_SimpleCreep {
     Dr = 'drop',
     Ha = 'harvest',
     He = 'heal',
-    MT = 'moveTo',
     Pi = 'pickup',
     RA = 'rangedAttack',
     RH = 'rangedHeal',
@@ -35,35 +33,38 @@ declare enum c_SimpleCreep {
 }
 
 declare type BasicCreepCommandType = C_Attack | C_Build | C_Dismantle | C_Drop |
-    C_Harvest | C_Heal | C_MoveTo | C_Pickup | C_RangedAttack |
+    C_Harvest | C_Heal | C_Pickup | C_RangedAttack |
     C_RangedHeal | C_Repair | C_Say | C_Suicide |
     C_Transfer | C_Upgrade | C_Withdraw;
 
 declare type CreepCommandType = BasicCreepCommandType;
-declare enum e_CResponse {
-    CC, // Cancel Commands
-    Cm, // Complete
-    Cn, // Continue
-    CP, // CheckPosition
-    Mv, // Move
-    Re, // Retry
-    RS, // Reset
-    RT, // Requires a Target
-    Tr, // Throw
+declare enum e_CreepResponse {
+    CancelCommands = 'CC', // Cancel Commands
+    Complete = 'Cm', // Complete
+    Continue = 'Cn', // Continue
+    CheckPosition = 'CP', // CheckPosition
+    Move = 'Mv', // Move
+    Retry = 'Re', // Retry
+    Reset = 'Rs', // Reset
+    RequireTarget = 'RT', // Requires a Target
+    Throw = 'Tr', // Throw
 }
 
 declare enum t_Target {
-    FT, // Fixed Target
-    CB, // Callback
-    NS, // Nearest Structure
-    Fi, // Find Target
-    AP, // At Position
+    FixedTarget = 'FT', // Fixed Target
+    Callback = 'CB', // Callback
+    NearestStructure = 'NS', // Nearest Structure
+    FindTarget = 'FT', // Find Target
+    AtPosition = 'AP', // At Position
 }
 
-declare enum c_SimpleRoom {
-
+declare enum c_ComplexCommandResponse {
+    Failed = 'Fa',
+    Next = 'Nx',
+    Quit = 'Qu',
+    Undo = 'Un'
 }
 
-declare type SimpleCommandType = BasicCreepCommandType | c_SimpleRoom;
+declare type SimpleCommandType = BasicCreepCommandType //| c_SimpleRoom;
 
 declare type CommandType = SimpleCommandType;

@@ -1,23 +1,25 @@
-let DefaultCreepReactions: { [key: number]: e_CResponse } = {};
-DefaultCreepReactions[OK] = e_CResponse.Cn;
-DefaultCreepReactions[ERR_NOT_OWNER] = e_CResponse.Tr;
-DefaultCreepReactions[ERR_NAME_EXISTS] = e_CResponse.Tr;
-DefaultCreepReactions[ERR_BUSY] = e_CResponse.Cn;
-DefaultCreepReactions[ERR_NOT_FOUND] = e_CResponse.RT;
-DefaultCreepReactions[ERR_NOT_ENOUGH_RESOURCES] = e_CResponse.Cm;
-DefaultCreepReactions[ERR_INVALID_TARGET] = e_CResponse.RT;
-DefaultCreepReactions[ERR_FULL] = e_CResponse.Cm;
-DefaultCreepReactions[ERR_NOT_IN_RANGE] = e_CResponse.Mv;
-DefaultCreepReactions[ERR_INVALID_ARGS] = e_CResponse.Tr;
-DefaultCreepReactions[ERR_TIRED] = e_CResponse.Cn;
-DefaultCreepReactions[ERR_NO_BODYPART] = e_CResponse.CC;
-DefaultCreepReactions[ERR_RCL_NOT_ENOUGH] = e_CResponse.CC;
-DefaultCreepReactions[ERR_GCL_NOT_ENOUGH] = e_CResponse.Tr;
+import { Swarmling } from "SwarmTypes/Swarmling";
+
+let DefaultCreepReactions: { [key: number]: e_CreepResponse } = {};
+DefaultCreepReactions[OK] = e_CreepResponse.Continue;
+DefaultCreepReactions[ERR_NOT_OWNER] = e_CreepResponse.Throw;
+DefaultCreepReactions[ERR_NAME_EXISTS] = e_CreepResponse.Throw;
+DefaultCreepReactions[ERR_BUSY] = e_CreepResponse.Continue;
+DefaultCreepReactions[ERR_NOT_FOUND] = e_CreepResponse.RequireTarget;
+DefaultCreepReactions[ERR_NOT_ENOUGH_RESOURCES] = e_CreepResponse.Complete;
+DefaultCreepReactions[ERR_INVALID_TARGET] = e_CreepResponse.RequireTarget;
+DefaultCreepReactions[ERR_FULL] = e_CreepResponse.Complete;
+DefaultCreepReactions[ERR_NOT_IN_RANGE] = e_CreepResponse.Move;
+DefaultCreepReactions[ERR_INVALID_ARGS] = e_CreepResponse.Throw;
+DefaultCreepReactions[ERR_TIRED] = e_CreepResponse.Continue;
+DefaultCreepReactions[ERR_NO_BODYPART] = e_CreepResponse.CancelCommands;
+DefaultCreepReactions[ERR_RCL_NOT_ENOUGH] = e_CreepResponse.CancelCommands;
+DefaultCreepReactions[ERR_GCL_NOT_ENOUGH] = e_CreepResponse.Throw;
 
 export class BasicCreepCommand implements CreepCommand {
     CreepReactions = DefaultCreepReactions;
     constructor(public CommandType: CommandType, public CommandLoop: CommandFunc = BasicCreepCommand.Loop) { }
-    Execute(creep: Creep, ...inArgs: any[]) {
+    Execute(creep: Swarmling, ...inArgs: any[]) {
         let result = ERR_INVALID_ARGS as ScreepsReturnCode;
         try {
             result = this.CommandLoop(this, creep, inArgs);
@@ -30,41 +32,44 @@ export class BasicCreepCommand implements CreepCommand {
     public CreepReactionToCommandCompletion(commandResult: ScreepsReturnCode): ScreepsReturnCode {
         let reactionType = this.CreepReactions[commandResult];
 
-        let reactionResult = ERR_INVALID_ARGS;
+        let reactionResult = ERR_INVALID_ARGS as ScreepsReturnCode;
         switch (reactionType) {
-            case (e_CResponse.CC): {
+            case (e_CreepResponse.CancelCommands): {
                 // Cancel Commands -- Action is cancelled, can do no more.
                 break;
             }
-            case (e_CResponse.Cm): {
+            case (e_CreepResponse.Complete): {
                 // Action completed -- Action type is complete and can do no more
+                reactionResult = ERR_FULL;
                 break;
             }
-            case (e_CResponse.Cn): {
+            case (e_CreepResponse.Continue): {
                 // Continue -- Action has not completed and will need to be executed again.
+                reactionResult = OK;
                 break;
             }
-            case (e_CResponse.CP): {
+            case (e_CreepResponse.CheckPosition): {
                 // Check Position -- Means the action requires a position or something // not sure yet.
                 break;
             }
-            case (e_CResponse.Mv): {
+            case (e_CreepResponse.Move): {
                 // Move -- Move
                 break;
             }
-            case (e_CResponse.Re): {
+            case (e_CreepResponse.Retry): {
                 // Retry -- Retry
+                reactionResult = OK;
                 break;
             }
-            case (e_CResponse.RS): {
+            case (e_CreepResponse.Reset): {
                 // Reset -- No Need?
                 break;
             }
-            case (e_CResponse.RT): {
+            case (e_CreepResponse.RequireTarget): {
                 // Require Target -- Should this have already been validated?
                 break;
             }
-            case (e_CResponse.Tr):
+            case (e_CreepResponse.Throw):
             // Throw -- thros an error.
             default: {
                 throw 'errored';
@@ -114,7 +119,6 @@ export class BasicCreepCommand implements CreepCommand {
             case (C_Drop): return creep.drop(args['resourceType']);
             case (C_Harvest): return creep.harvest(args['target']);
             case (C_Heal): return creep.heal(args['target']);
-
             case (C_Pickup): return creep.pickup(args['target']);
             case (C_RangedAttack): return creep.rangedAttack(args['target']);
             case (C_RangedHeal): return creep.rangedHeal(args['target']);

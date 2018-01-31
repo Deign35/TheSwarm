@@ -1,8 +1,11 @@
-export abstract class MemoryWrapper implements IMemory {
+import { Disposable } from "common/Disposable";
+
+export abstract class MemoryWrapper extends Disposable implements IMemory {
     id: string;
     private _cache: { [id: string]: any } = {}; // Need to make a container class for this, just call it a dictionary
 
     constructor(memId: string) {
+        super(memId);
         this.id = memId;
         this.Load();
     }
@@ -16,7 +19,7 @@ export abstract class MemoryWrapper implements IMemory {
 
     protected _save(toMemory: boolean = false): void {
         let thisId = this.id;
-        delete this.id;
+        delete this.id; // Because it's already the key.
         SwarmOverlord.SaveData(thisId, this);
         if (toMemory) {
             Memory[thisId] = this._cache;
@@ -24,7 +27,7 @@ export abstract class MemoryWrapper implements IMemory {
         this.id = thisId;
     }
     protected _load(): void {
-        this._cache = SwarmOverlord.LoadData(this.id);
+        this._cache = Memory[this.id];
     }
     protected _getData(id: string) {
         return this._cache[id] || undefined;

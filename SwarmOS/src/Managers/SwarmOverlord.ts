@@ -11,26 +11,24 @@ export class SwarmOverlord extends SimpleMemory {
 
     private InitOverlord() {
         console.log('InitOverlord');
-        Memory.RESET = true;
+        Memory.INIT = false;
         let initResult = OK;
         let startInit = Game.cpu.getUsed();
 
         Memory.DataDump = [];
-        Memory.OverlordMemory = {};
 
         // Load managers here
 
-        if (initResult != OK) {
-            Memory.RESET = true;
-            delete Memory.OverlordMemory;
+        if (initResult == OK) {
+            Memory.INIT = true;
         }
 
-        console.log('Reset Overmind Completed[' + initResult + '] in ' + (Game.cpu.getUsed() - startInit) + ' ticks.');
+        console.log('Reset Overmind Completed[' + initResult + '] in ' + (Game.cpu.getUsed() - startInit) + ' cpu cycles.');
         return initResult;
     }
     constructor() { // Memory needs to be reorged a bit in here to utilize the base functionality.
         super('SwarmOverlord'); // There should be no other place where Memory is referenced, except in MemoryBase.
-        if (!Memory.OverlordMemory || Memory.RESET) {
+        if (!Memory.INIT) {
             this.InitOverlord();
         }
     }

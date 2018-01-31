@@ -1,5 +1,5 @@
-import { CommandBase } from './CommandBase';
+import { ComplexCommand } from './CommandBase';
 
-export abstract class CommandWeb extends CommandBase {
+export abstract class CommandWeb extends ComplexCommand {
 
 }
