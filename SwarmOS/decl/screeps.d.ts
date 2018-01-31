@@ -1452,7 +1452,7 @@ type ScreepsReturnCode =
     ERR_NOT_ENOUGH_EXTENSIONS |
     ERR_RCL_NOT_ENOUGH |
     ERR_GCL_NOT_ENOUGH |
-    ERR_MY_ERROR;
+    number;
 
 type OK = 0;
 type ERR_NOT_OWNER = -1;

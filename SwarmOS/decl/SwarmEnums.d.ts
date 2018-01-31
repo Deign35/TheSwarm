@@ -1,4 +1,4 @@
-declare type C_Attack = 'At'; declare const C_Attack = 'At'; // Not implemented
+declare type C_Attack = 'At'; declare const C_Attack = 'At';
 declare type C_Build = 'Bu'; declare const C_Build = 'Bu';
 declare type C_Dismantle = 'Di'; declare const C_Dismantle = 'Di';
 declare type C_Drop = 'Dr'; declare const C_Drop = 'Dr';
@@ -41,15 +41,15 @@ declare type BasicCreepCommandType = C_Attack | C_Build | C_Dismantle | C_Drop |
 
 declare type CreepCommandType = BasicCreepCommandType;
 declare enum e_CResponse {
-    Cn, // Continue
-    Mv, // Move
-    AC, // Action Complete
-    Re, // Retry
-    CP, // CheckPosition
-    RS, // Reset
     CC, // Cancel Commands
+    Cm, // Complete
+    Cn, // Continue
+    CP, // CheckPosition
+    Mv, // Move
+    Re, // Retry
+    RS, // Reset
     RT, // Requires a Target
-    CM, // Complete
+    Tr, // Throw
 }
 
 declare enum t_Target {

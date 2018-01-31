@@ -25,5 +25,18 @@ Unused Words:
 Nueral
 Node -- iffy
 Ravager
+Defiler
+Devourer
+NueroProphet - Healer
+
 
 Need pathfinding at some point.
+
+CommandTypes?
+BasicCreepCommands
+AdvancedCreepCommands
+HiveCommands
+SwarmCommands
+Military?
+MarketCommands?
+ResourceCommands?

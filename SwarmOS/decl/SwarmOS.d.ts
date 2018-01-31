@@ -26,12 +26,40 @@ declare class SwarmOverlord {
 
 declare type CommandFunc = (...args: any[]) => ScreepsReturnCode;
 declare interface ICommand {
-    Execute(): ScreepsReturnCode;
     CommandLoop: CommandFunc;
+    CommandType: CommandType;
+    Execute(...inArgs: any[]): ScreepsReturnCode;
 }
+
+declare interface CreepCommand extends ICommand {
+    Execute(creep: Creep, ...inArgs: any[]): ScreepsReturnCode;
+    CreepReactionToCommandCompletion(commandResult: ScreepsReturnCode): ScreepsReturnCode
+    ConstructCommandArgs(...args: any[]): { [name: string]: any };
+}
+
+/*
 declare interface ICreepCommand<T extends BasicCreepCommandType> extends ICommand, CommandBase<T> {
     ExecuteCreep(creep: Creep): ScreepsReturnCode;
 }
 declare interface CommandBase<CommandType> extends IMemory, ICommand {
 
 }
+declare class Swarmling extends Creep {
+
+    /*Attack(): ScreepsReturnCode;
+    Build(): ScreepsReturnCode;
+    Dismantle(): ScreepsReturnCode;
+    Drop(): ScreepsReturnCode;
+    Harvest(): ScreepsReturnCode;
+    Heal(): ScreepsReturnCode;
+    Move(): ScreepsReturnCode;
+    Pickup(): ScreepsReturnCode;
+    RangedAttack(): ScreepsReturnCode;
+    RangedHeal(): ScreepsReturnCode;
+    Repair(): ScreepsReturnCode;
+    Say(): ScreepsReturnCode;
+    Suicide(): ScreepsReturnCode;
+    Transfer(): ScreepsReturnCode;
+    UpgradeController(): ScreepsReturnCode;
+    Withdraw(): ScreepsReturnCode;
+}*/

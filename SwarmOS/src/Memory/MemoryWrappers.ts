@@ -36,8 +36,8 @@ export abstract class MemoryWrapper implements IMemory {
 }
 
 export class SimpleMemory extends MemoryWrapper {
-    Save(force: boolean = false) {
-        this._save(force);
+    Save(push: boolean = false) {
+        this._save(push);
     }
     Load() {
         this._load();
