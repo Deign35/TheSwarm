@@ -6,7 +6,7 @@ export class ShortCommand implements ICommand {
     }
     constructor(public CommandType: CommandType, public CommandLoop: CommandFunc = ImplementationMissing) { }
 
-    Execute(...inArgs: any[]) {
+    Execute(...inArgs: any[]): ScreepsReturnCode {
         let result = ERR_INVALID_ARGS as SwarmReturnCode;
         try {
             result = this.CommandLoop(inArgs);

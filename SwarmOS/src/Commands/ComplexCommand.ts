@@ -1,6 +1,7 @@
 import { LongCommand } from './CommandBase';
 
-export abstract class ComplexCommand extends LongCommand {
+export class CommandLink {
+    constructor(public CurrentCommand: ICommand) { }
     CommandMap: { commandResult: c_ComplexCommandResponse, followUp: ICommand }[];
     SetFollowUpCommand(condition: c_ComplexCommandResponse, followUp: ICommand) {
         this.CommandMap.push({ commandResult: condition, followUp: followUp });
@@ -8,4 +9,8 @@ export abstract class ComplexCommand extends LongCommand {
     Execute(...inArgs: any[]): SwarmReturnCode {
         return OK;
     }
+}
+
+export class CommandWeb extends LongCommand {
+
 }
