@@ -17,12 +17,8 @@ DefaultCreepReactions[ERR_NO_BODYPART] = e_CreepResponse.CancelCommands;
 DefaultCreepReactions[ERR_RCL_NOT_ENOUGH] = e_CreepResponse.CancelCommands;
 DefaultCreepReactions[ERR_GCL_NOT_ENOUGH] = e_CreepResponse.Throw;
 
-export class BasicCreepCommand extends ShortCommand {
-    protected static _instance: BasicCreepCommand = new BasicCreepCommand(C_Harvest);
-    static CreepReactions = DefaultCreepReactions;
-    static Execute(ling: Swarmling, ...inArgs: any[]) {
-        BasicCreepCommand._instance.Execute();
-    }
+export class BasicCreepCommand {
+    /*private static readonly CreepReactions = DefaultCreepReactions;
 
     static CreepReactionToCommandCompletion(commandResult: ScreepsReturnCode, commandReactions?: { [key: number]: e_CreepResponse }): SwarmReturnCode {
         let reactionType = BasicCreepCommand.CreepReactions[commandResult];
@@ -52,6 +48,7 @@ export class BasicCreepCommand extends ShortCommand {
             }
             case (e_CreepResponse.Move): {
                 // Move -- Move
+                // Put in a repair and a renew
                 break;
             }
             case (e_CreepResponse.Retry): {
@@ -75,7 +72,7 @@ export class BasicCreepCommand extends ShortCommand {
         }
 
         return reactionResult;
-    }
+    }*/
 
     static ConstructCommandArgs(commandType: CommandType, ...args: any[]): { [name: string]: any } {
         let constructedArgs: { [name: string]: any } = { argsCount: args.length };
@@ -103,13 +100,7 @@ export class BasicCreepCommand extends ShortCommand {
         return args;
     }
 
-    private static Loop<T extends BasicCreepCommandType>(obj: BasicCreepCommand, ling: Swarmling, args: { [name: string]: any }) {
-        let constructedArgs = this.ConstructCommandArgs(obj.CommandType, args);
-        let executeResult = BasicCreepCommand.ExecuteCreepCommand(obj.CommandType, ling, constructedArgs);
-        return this.CreepReactionToCommandCompletion(executeResult);
-    }
-
-    private static ExecuteCreepCommand(commandType: CommandType, ling: Swarmling, args: { [name: string]: any }): ScreepsReturnCode {
+    static ExecuteCreepCommand(commandType: CommandType, ling: Swarmling, args: { [name: string]: any }): ScreepsReturnCode {
         switch (commandType) {
             case (C_Attack): return ling.attack(args['target']);
             case (C_Build): return ling.build(args['target']);
@@ -122,7 +113,7 @@ export class BasicCreepCommand extends ShortCommand {
             case (C_RangedHeal): return ling.rangedHeal(args['target']);
             case (C_Repair): return ling.repair(args['target']);
             case (C_Suicide): return ling.suicide();
-            case (C_Say): return ling.say(args['target']);
+            case (C_Say): return ling.say(args['message']);
             case (C_Transfer): return ling.transfer(args['target'], args['resourceType'], args['amount'] ? args['amount'] : undefined);
             case (C_Upgrade): return ling.upgradeController(args['target']);
             case (C_Withdraw): return ling.withdraw(args['target'], args['resourceType'], args['amount'] ? args['amount'] : undefined);

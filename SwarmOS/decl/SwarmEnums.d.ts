@@ -14,23 +14,6 @@ declare type C_Transfer = 'Tr'; declare const C_Transfer = 'Tr';
 declare type C_Upgrade = 'Up'; declare const C_Upgrade = 'Up';
 declare type C_Withdraw = 'Wi'; declare const C_Withdraw = 'Wi';
 // AttackController, ClaimController, GenerateSafeMode, RangedMassAttack, SignController, ReserveController
-declare enum c_SimpleCreep {
-    At = 'attack',
-    Bu = 'build',
-    Di = 'dismantle',
-    Dr = 'drop',
-    Ha = 'harvest',
-    He = 'heal',
-    Pi = 'pickup',
-    RA = 'rangedAttack',
-    RH = 'rangedHeal',
-    Re = 'repair',
-    Sa = 'say',
-    Su = 'suicide',
-    Tr = 'transfer',
-    Up = 'upgradeController',
-    Wi = 'withdraw',
-}
 
 declare enum c_AdvancedCreep {
     RemoteMining = 'RM',
@@ -42,7 +25,12 @@ declare type BasicCreepCommandType =
     C_RangedHeal | C_Repair | C_Say | C_Suicide |
     C_Transfer | C_Upgrade | C_Withdraw;
 
-declare type CreepCommandType = BasicCreepCommandType | c_AdvancedCreep;
+
+declare type A_NewJob = 'NJ'; declare const A_NewJob = 'NJ';
+
+declare type AdvancedCreepCommandType = A_NewJob;
+
+declare type CreepCommandType = BasicCreepCommandType | AdvancedCreepCommandType;
 
 declare enum e_CreepResponse {
     CancelCommands = 'CC', // Cancel Commands
@@ -73,7 +61,7 @@ declare enum c_ComplexCommandResponse {
 
 declare type SimpleCommandType = BasicCreepCommandType //| c_SimpleRoom;
 
-declare type CommandType = SimpleCommandType;
+declare type CommandType = CreepCommandType;
 
 declare type SwarmReturnCode = ScreepsReturnCode | E_CATASTROPHIC;
 declare type E_CATASTROPHIC = -16; declare const E_CATASTROPHIC = -16;

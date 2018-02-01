@@ -18,6 +18,8 @@ declare interface IMemory extends IDisposable {
     readonly id: string;
     Save(lock: boolean): void;
     Load(): void;
+    GetData(id: string): any;
+    SetData(id: string, data: any): void;
 }
 declare class SwarmOverlord {
     static SaveData(id: string, dataObj: IMemory): void;
