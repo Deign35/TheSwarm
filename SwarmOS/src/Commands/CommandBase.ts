@@ -1,4 +1,4 @@
-import { SimpleMemory } from "Memory/MemoryWrappers";
+import { SwarmMemory } from "Memory/SwarmMemory";
 
 export class ShortCommand implements ICommand {
     constructor(public CommandLoop: CommandFunc = ImplementationMissing) { }
@@ -15,7 +15,7 @@ export class ShortCommand implements ICommand {
     }
 }
 
-export abstract class LongCommand extends SimpleMemory implements ICommand {
+export abstract class LongCommand extends SwarmMemory implements ICommand {
     constructor(id: string, public CommandLoop: CommandFunc = ImplementationMissing) {
         super(id);
     }

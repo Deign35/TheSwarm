@@ -1,4 +1,4 @@
-declare const SwarmMemoryName = 'SwarmOverlord'; // Maybe change this class to Swarmlord?
+const SwarmMemoryName = 'SwarmOverlord'; // Maybe change this class to Swarmlord?
 export class SwarmOverlord {
     private static _cache: Dictionary = {};
     static SaveData(id: string, dataObj: any) {
@@ -14,7 +14,7 @@ export class SwarmOverlord {
 
     static InitOverlord() {
         let initResult = OK;
-        if(!Memory.INIT) {
+        if (!Memory.INIT) {
             console.log('InitOverlord');
             Memory.INIT = false; // There should be no other place where Memory is referenced
             let startInit = Game.cpu.getUsed();
@@ -30,11 +30,10 @@ export class SwarmOverlord {
 
             console.log('Reset Overmind Completed[' + initResult + '] in ' + (Game.cpu.getUsed() - startInit) + ' cpu cycles.');
         } else {
-            if(this._cache['LastTick'] && this._cache['LastTick'] + 1 != Game.time) {
+            if (!this._cache || this._cache['LastTick'] + 1 != Game.time) {
                 this._cache = Memory[SwarmMemoryName];
             }
         }
-        Memory['LastTick'] = Game.time;
         this._cache['LastTick'] = Game.time;
         return initResult;
     }

@@ -1,5 +1,5 @@
 declare const require: (module: string) => any;
-declare type Dictionary = {[id: string]: any};
+declare type Dictionary = { [id: string]: any };
 declare var global: Dictionary;
 
 declare type CallbackFunction = (...args: any[]) => any;
@@ -8,9 +8,13 @@ declare interface IDelegate<T extends CallbackFunction> {
     Unsubscribe(id: string): void;
     Notify(...args: any[]): void;
 }
-
 declare interface IDisposable {
     dispose(): void;
+}
+declare var DisposeAll: {
+    subscribe(id: string, disposableObject: IDisposable): any,
+    unsubscribe(id: string): any,
+    DisposeAll(): any
 }
 declare type DisposableCallback<T extends IDisposable> = (disposableObject: T) => void;
 declare function using<T extends IDisposable>(disposableObject: T, disposableAction: DisposableCallback<T>): void;
@@ -35,6 +39,21 @@ declare type CommandFunc = (...args: any[]) => SwarmReturnCode;
 declare interface ICommand {
     CommandLoop: CommandFunc;
     Execute(...inArgs: any[]): SwarmReturnCode;
+}
+declare class BasicCreepCommand {
+    Name: string;
+    Type: CommandType;
+    CreepCommandData: { [id: string]: string | number };
+    AssignedCreep: Creep;
+    Execute(): ScreepsReturnCode;
+    static SaveCommand(MemoryObj: IMemory, command: BasicCreepCommand): void;
+    static LoadCommand(MemoryObj: IMemory, commandName: string): BasicCreepCommand;
+    static ExecuteCreepCommand(commandType: CommandType, ling: Creep, args: { [name: string]: any }): ScreepsReturnCode
+}
+declare interface IJob {
+    JobID: string;
+    JobCommands: { [cmdId: string]: BasicCreepCommand };
+
 }
 /*
 declare interface CreepCommand extends ICommand {

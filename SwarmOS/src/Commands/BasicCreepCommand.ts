@@ -1,106 +1,54 @@
 import { Swarmling } from "SwarmTypes/Swarmling";
 import { ShortCommand } from "Commands/CommandBase";
 
-let DefaultCreepReactions: { [key: number]: e_CreepResponse } = {};
-DefaultCreepReactions[OK] = e_CreepResponse.Continue;
-DefaultCreepReactions[ERR_NOT_OWNER] = e_CreepResponse.Throw;
-DefaultCreepReactions[ERR_NAME_EXISTS] = e_CreepResponse.Throw;
-DefaultCreepReactions[ERR_BUSY] = e_CreepResponse.Continue;
-DefaultCreepReactions[ERR_NOT_FOUND] = e_CreepResponse.RequireTarget;
-DefaultCreepReactions[ERR_NOT_ENOUGH_RESOURCES] = e_CreepResponse.Complete;
-DefaultCreepReactions[ERR_INVALID_TARGET] = e_CreepResponse.RequireTarget;
-DefaultCreepReactions[ERR_FULL] = e_CreepResponse.Complete;
-DefaultCreepReactions[ERR_NOT_IN_RANGE] = e_CreepResponse.Move;
-DefaultCreepReactions[ERR_INVALID_ARGS] = e_CreepResponse.Throw;
-DefaultCreepReactions[ERR_TIRED] = e_CreepResponse.Continue;
-DefaultCreepReactions[ERR_NO_BODYPART] = e_CreepResponse.CancelCommands;
-DefaultCreepReactions[ERR_RCL_NOT_ENOUGH] = e_CreepResponse.CancelCommands;
-DefaultCreepReactions[ERR_GCL_NOT_ENOUGH] = e_CreepResponse.Throw;
-
 export class BasicCreepCommand {
-    /*private static readonly CreepReactions = DefaultCreepReactions;
-
-    static CreepReactionToCommandCompletion(commandResult: ScreepsReturnCode, commandReactions?: { [key: number]: e_CreepResponse }): SwarmReturnCode {
-        let reactionType = BasicCreepCommand.CreepReactions[commandResult];
-        if (commandReactions && commandReactions[commandResult]) {
-            reactionType = commandReactions[commandResult];
-        }
-
-        let reactionResult = ERR_INVALID_ARGS as SwarmReturnCode;
-        switch (reactionType) {
-            case (e_CreepResponse.CancelCommands): {
-                // Cancel Commands -- Action is cancelled, can do no more.
-                break;
-            }
-            case (e_CreepResponse.Complete): {
-                // Action completed -- Action type is complete and can do no more
-                reactionResult = ERR_FULL;
-                break;
-            }
-            case (e_CreepResponse.Continue): {
-                // Continue -- Action has not completed and will need to be executed again.
-                reactionResult = OK;
-                break;
-            }
-            case (e_CreepResponse.CheckPosition): {
-                // Check Position -- Means the action requires a position or something // not sure yet.
-                break;
-            }
-            case (e_CreepResponse.Move): {
-                // Move -- Move
-                // Put in a repair and a renew
-                break;
-            }
-            case (e_CreepResponse.Retry): {
-                // Retry -- Retry
-                reactionResult = OK;
-                break;
-            }
-            case (e_CreepResponse.Reset): {
-                // Reset -- No Need?
-                break;
-            }
-            case (e_CreepResponse.RequireTarget): {
-                // Require Target -- Should this have already been validated?
-                break;
-            }
-            case (e_CreepResponse.Throw):
-            // Throw -- thros an error.
-            default: {
-                throw 'errored';
-            }
-        }
-
-        return reactionResult;
-    }*/
-
-    static ConstructCommandArgs(commandType: CommandType, ...args: any[]): { [name: string]: any } {
-        let constructedArgs: { [name: string]: any } = { argsCount: args.length };
+    constructor(public Name: string, public Type: CommandType) { }
+    CreepCommandData: { [id: string]: string | number };
+    AssignedCreep: Creep;
+    Execute() {
+        return BasicCreepCommand.ExecuteCreepCommand(this.Type, this.AssignedCreep, this.CreepCommandData);
+    }
+    static SaveCommand(MemoryObj: IMemory, command: BasicCreepCommand) {
+        let commandMemory = {} as Dictionary;
+        commandMemory['commandType'] = command.Type;
+        commandMemory['commandData'] = command.CreepCommandData;
+        commandMemory['assignedCreepId'] = command.AssignedCreep.id;
+        MemoryObj.SetData(command.Name, commandMemory)
+    }
+    static LoadCommand(MemoryObj: IMemory, commandName: string) {
+        let commandMemory = MemoryObj.GetData(commandName);
+        let newCommand = new BasicCreepCommand(commandName, commandMemory['commandType']);
+        newCommand.CreepCommandData = commandMemory['commandData'];
+        newCommand.AssignedCreep = Game.getObjectById(commandMemory['assignedCreepId']) as Creep;
+        // Creep doesn't have memory right now...
+    }
+    /*static ConstructCommandArgs(commandType: CommandType, command: BasicCreepCommand): { [name: string]: any } {
+        let constructedArgs: { [name: string]: any } = {};//; = { argsCount: args.length };//
         switch (commandType) {
             case (C_Suicide): break;
             case (C_Say):
-                constructedArgs['message'] = args[0];
+                constructedArgs['message'] = command.CreepCommandData['message'];
                 break;
             case (C_Drop):
-                constructedArgs['resourceType'] = args[0];
-                if (args[1]) {
-                    constructedArgs['amount'] = args[1];
+                constructedArgs['resourceType'] = command.CreepCommandData['resourceType'];
+                if (command.CreepCommandData.Amount) {
+                    constructedArgs['amount'] = command.CreepCommandData['amount'];
                 }
                 break;
             case (C_Transfer):
             case (C_Withdraw):
-                constructedArgs['resourceType'] = args[1];
-                if (args[2]) {
-                    constructedArgs['amount'] = args[2];
+                constructedArgs['resourceType'] = command.CreepCommandData.ResourceType;
+                if (command.CreepCommandData.Amount) {
+                    constructedArgs['amount'] = command.CreepCommandData.Amount;
                 }
             default:
-                constructedArgs['target'] = args[0];
+                constructedArgs['target'] = Game.getObjectById(command.CreepCommandData.Target as string);
                 break;
         }
-        return args;
-    }
+        return constructedArgs;
+    }*/
 
-    static ExecuteCreepCommand(commandType: CommandType, ling: Swarmling, args: { [name: string]: any }): ScreepsReturnCode {
+    static ExecuteCreepCommand(commandType: CommandType, ling: Creep, args: { [name: string]: any }): ScreepsReturnCode {
         switch (commandType) {
             case (C_Attack): return ling.attack(args['target']);
             case (C_Build): return ling.build(args['target']);
