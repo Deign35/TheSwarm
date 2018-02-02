@@ -31,6 +31,9 @@ declare type A_NewJob = 'NJ'; declare const A_NewJob = 'NJ';
 declare type AdvancedCreepCommandType = A_NewJob;
 
 declare type CreepCommandType = BasicCreepCommandType | AdvancedCreepCommandType;
+declare type CreepCommandRequiresTarget = C_Attack | C_Build | C_Dismantle | C_Harvest |
+        C_Heal | C_Pickup | C_RangedAttack | C_RangedHeal |
+        C_Repair | C_Transfer | C_Upgrade | C_Withdraw;
 
 declare enum e_CreepResponse {
     CancelCommands = 'CC', // Cancel Commands
@@ -61,7 +64,8 @@ declare enum c_ComplexCommandResponse {
 
 declare type SimpleCommandType = BasicCreepCommandType //| c_SimpleRoom;
 
-declare type CommandType = CreepCommandType;
+declare type CommandComplete = 'CmdC'; declare const CommandComplete = 'CmdC';
+declare type CommandType = CreepCommandType | CommandComplete;
 
 declare type SwarmReturnCode = ScreepsReturnCode | E_CATASTROPHIC;
 declare type E_CATASTROPHIC = -16; declare const E_CATASTROPHIC = -16;

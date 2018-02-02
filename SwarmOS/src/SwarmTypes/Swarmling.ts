@@ -1,5 +1,5 @@
 export abstract class Swarmling extends Creep {
-
+    Brain: IMemory;
 }
 
 export class Drone extends Swarmling {

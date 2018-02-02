@@ -118,6 +118,6 @@ export class BasicCreepCommand {
             case (C_Upgrade): return ling.upgradeController(args['target']);
             case (C_Withdraw): return ling.withdraw(args['target'], args['resourceType'], args['amount'] ? args['amount'] : undefined);
         }
-        return OK;
+        return ERR_INVALID_ARGS;
     }
 }

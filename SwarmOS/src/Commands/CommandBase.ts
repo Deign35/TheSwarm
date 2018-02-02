@@ -1,10 +1,7 @@
 import { SimpleMemory } from "Memory/MemoryWrappers";
 
 export class ShortCommand implements ICommand {
-    protected ConstructCommandArgs(args: { [name: string]: any }): { [name: string]: any } {
-        return args;
-    }
-    constructor(public CommandType: CommandType, public CommandLoop: CommandFunc = ImplementationMissing) { }
+    constructor(public CommandLoop: CommandFunc = ImplementationMissing) { }
 
     Execute(...inArgs: any[]): ScreepsReturnCode {
         let result = ERR_INVALID_ARGS as SwarmReturnCode;
@@ -19,14 +16,14 @@ export class ShortCommand implements ICommand {
 }
 
 export abstract class LongCommand extends SimpleMemory implements ICommand {
-    constructor(id: string, public CommandType: CommandType, public CommandLoop: CommandFunc = ImplementationMissing) {
+    constructor(id: string, public CommandLoop: CommandFunc = ImplementationMissing) {
         super(id);
     }
 
     Execute(...inArgs: any[]): SwarmReturnCode {
         let result = ERR_INVALID_ARGS as SwarmReturnCode;
         try {
-            result = this.CommandLoop();
+            result = this.CommandLoop(inArgs);
         } catch (e) {
             console.log('Command Failed: ' + e);
         }

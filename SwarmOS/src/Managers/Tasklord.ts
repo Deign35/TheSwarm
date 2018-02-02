@@ -1,9 +1,9 @@
 import { SimpleMemory } from "Memory/MemoryWrappers";
-import { ComplexCommand } from "Commands/ComplexCommand";
+//import { ComplexCommand } from "Commands/ComplexCommand";
 import { Hivelord } from "Managers/Hivelord";
 
 export class Tasklord extends Hivelord {
-    HiveCommand: ComplexCommand[];
+    //HiveCommand: ComplexCommand[];
 
     constructor(id: string) {
         super(id);

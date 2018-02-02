@@ -1,8 +1,8 @@
 import { SimpleMemory } from "Memory/MemoryWrappers";
-import { ComplexCommand } from "Commands/ComplexCommand";
+//import { ComplexCommand } from "Commands/ComplexCommand";
 
 export class Hivelord extends SimpleMemory {
-    HiveCommand: ComplexCommand[];
+    //HiveCommand: ComplexCommand[];
 
     constructor(id: string) {
         super(id);

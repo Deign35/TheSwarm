@@ -29,7 +29,6 @@ declare class SwarmOverlord {
 declare type CommandFunc = (...args: any[]) => SwarmReturnCode;
 declare interface ICommand {
     CommandLoop: CommandFunc;
-    CommandType: CommandType;
     Execute(...inArgs: any[]): SwarmReturnCode;
 }
 /*
