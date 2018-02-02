@@ -1,5 +1,6 @@
 declare const require: (module: string) => any;
-declare var global: { [name: string]: any };
+declare type Dictionary = {[id: string]: any};
+declare var global: Dictionary;
 
 declare type CallbackFunction = (...args: any[]) => any;
 declare interface IDelegate<T extends CallbackFunction> {
@@ -14,16 +15,20 @@ declare interface IDisposable {
 declare type DisposableCallback<T extends IDisposable> = (disposableObject: T) => void;
 declare function using<T extends IDisposable>(disposableObject: T, disposableAction: DisposableCallback<T>): void;
 
-declare interface IMemory extends IDisposable {
-    readonly id: string;
-    Save(lock: boolean): void;
-    Load(): void;
+declare type MemoryFunc = (commandID: string) => any;
+declare interface IMemory {
+    readonly MemoryID: string;
     GetData(id: string): any;
     SetData(id: string, data: any): void;
+    Save(): void;
+    Load(): void;
 }
+
 declare class SwarmOverlord {
-    static SaveData(id: string, dataObj: IMemory): void;
-    static LoadData(id: string): IMemory;
+    static SaveData(id: string, dataObj: any): void;
+    static LoadData(id: string): any;
+    static SaveSwarmOverlordData(): void;
+    static InitOverlord(): void;
 }
 
 declare type CommandFunc = (...args: any[]) => SwarmReturnCode;

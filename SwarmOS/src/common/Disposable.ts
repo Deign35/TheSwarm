@@ -5,7 +5,7 @@ export abstract class Disposable implements IDisposable {
     }
     dispose(): void {
         DisposalDelegate.unsubscribe(this.id);
-        delete this.dispose;
+        delete this.dispose; // Will cause an error if dispose is called again.
     }
 }
 export class DisposalDelegate extends Delegate<DisposableCallback<IDisposable>> {

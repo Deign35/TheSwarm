@@ -1,6 +1,6 @@
-import { SimpleMemory } from "Memory/MemoryWrappers";
+import { SwarmMemory } from "Memory/SwarmMemory";
 
-export class HiveQueen extends SimpleMemory { // Controls a group of HiveNodes.
+export class HiveQueen extends SwarmMemory { // Controls a group of HiveNodes.
     RequestSpawnSwarmling(...args: any[]) {
 
     }
