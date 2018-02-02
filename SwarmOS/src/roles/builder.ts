@@ -1,5 +1,4 @@
-import * as _ from "lodash"; // Compiler: IgnoreLinedfefwvg
-import { RoleSweeper } from './sweeper';
+import * as _ from "lodash"; // Compiler: IgnoreLine
 
 export class RoleBuilder {
     static roleId: string = "builder";
@@ -12,7 +11,7 @@ export class RoleBuilder {
     static storage = Game.getObjectById('5a4a2a803c7a852985513260') as StructureStorage;
 
     static GetSpawner(maxEnergy: number) {
-        if(Memory['Roles']['buildTick'] > 10) {
+        if(Memory['Roles']['buildTick'] > 15) { // Check every few ticks
             let sites = Game.rooms['E22N32'].find(FIND_MY_CONSTRUCTION_SITES);
             if(sites.length > 0) { // if any sites.
                 Memory['Roles']['buildTick'] = 0;
@@ -23,34 +22,44 @@ export class RoleBuilder {
         return undefined;
     }
 
-    static run(creep: Creep) {
-        let hr = 0;
-        if (creep.carry.energy == 0) {
-            hr = creep.withdraw(this.storage, RESOURCE_ENERGY);
-            if (hr == ERR_NOT_IN_RANGE) {
-                hr = creep.moveTo(this.storage);
-            } else if (hr != OK) {
-                console.log('Withdraw failed with error: ' + hr);
-            }
-        } else {
+    static GetTarget(creep: Creep): RoomObject | undefined {
+        if (creep.memory['building'] && creep.carry.energy == 0) {
+            delete creep.memory['building'];
+            delete creep.memory['movePath'];
+        }
+        let target: RoomObject = this.storage;
+        if(creep.carry.energy != 0) {
             let targetCS = Game.getObjectById(creep.memory['CSTarget']) as ConstructionSite;
             if (!targetCS) {
                 targetCS = creep.pos.findClosestByRange(FIND_MY_CONSTRUCTION_SITES);
-                if (!targetCS) {
-                    creep.memory['role'] = RoleSweeper.roleId;
-                    return RoleSweeper.run(creep);
+                if (!target) {
+                    return undefined;
                 }
-                creep.memory['RDTarget'] = targetCS.id;
-            }
-
-            hr = creep.build(targetCS);
-            if (hr == ERR_NOT_IN_RANGE) {
-                hr = creep.moveTo(targetCS);
-            } else if (hr != OK) {
-                console.log('Build failed with error: ' + hr);
+                creep.memory['CSTarget'] = targetCS.id;
             }
         }
 
+        return target;
+    }
+
+    static run(creep: Creep) {
+        let hr = 0;
+        let target = this.GetTarget(creep);
+        if (!creep.memory['building']) {
+            hr = creep.withdraw(target, RESOURCE_ENERGY);
+            if(hr == OK) {
+                creep.memory['building'] = true;
+                delete creep.memory['movePath'];
+            }
+        } else if(target) {
+            hr = creep.build(target);
+        } else {
+            delete creep.memory['building'];
+            delete creep.memory['movePath'];
+            delete creep.memory['CSTarget'];
+            creep.memory['role'] = RoleDeliverer.roleId;
+            hr = OK;
+        }
         return hr;
     }
 }

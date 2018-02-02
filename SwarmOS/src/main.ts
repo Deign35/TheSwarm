@@ -1,32 +1,6 @@
 ﻿import { Role } from './roles/roles';
-
-let creepPrototype: any = Creep.prototype;
-if(!creepPrototype['_moveTo']) {
-    creepPrototype['_moveTo'] = creepPrototype.moveTo;
-
-    creepPrototype.moveTo = function(...args: any[]) {
-        let pos: RoomPosition;
-        let optsPos = 1;
-        if(args.length == 3) {
-            pos = new RoomPosition(args[0], args[1], this.room.name);
-            optsPos = 2;
-        } else {
-            pos = args[0];
-        }
-
-        let options = args[optsPos];
-
-        options['visualizePathStyle'] = {
-            fill: 'transparent',
-            stroke: '#fff',
-            lineStyle: 'dashed',
-            strokeWidth: .15,
-            opacity: .1
-        }
-        this._moveTo(pos, options);
-    }
-}
 const MainRoom = Game.rooms[Memory.MainRoom];
+
 export const loop = function () {
     for(let name in Memory.creeps) {
         if(!Game.creeps[name]) {
@@ -53,12 +27,22 @@ export const loop = function () {
 }
 
 const towersAttack = function(hostile: Creep) {
-    let towers = MainRoom.find(FIND_STRUCTURES, {
-        filter: function(structure) {
-            return structure.structureType == STRUCTURE_TOWER;
+    let towerIDs = Memory.towers;
+    let towers = [] as StructureTower[];
+    if(!towerIDs) {
+        towers = MainRoom.find(FIND_STRUCTURES, {
+            filter: function(structure) {
+                return structure.structureType == STRUCTURE_TOWER;
+            }
+        }) as StructureTower[];
+        for(let i = 0, length = towers.length; i < length; i++) {
+            towerIDs.push(towers[i].id);
         }
-    }) as StructureTower[];
-
+    } else {
+        for(let i = 0, length = towerIDs.length; i < length; i++) {
+            towers.push(Game.getObjectById(towerIDs[i]) as StructureTower);
+        }
+    }
     for(let tower of towers) {
         tower.attack(hostile);
     }

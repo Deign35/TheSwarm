@@ -13,17 +13,22 @@ export class RoleMiner {
     static extractor = Game.getObjectById('5a48e5c68d2a69512003ff0a') as StructureExtractor;
     static mineral = Game.getObjectById('598342f7641acf05735788d1') as Mineral;
     static storage = Game.getObjectById('5a4a2a803c7a852985513260') as StructureStorage;
-    static terminal = Game.getObjectById('5a4b9b45a26e0858b28160a8') as StructureStorage;
+    static terminal = Game.getObjectById('5a4b9b45a26e0858b28160a8') as StructureTerminal;
     static GetSpawner() {
         return this.mineral.mineralAmount > 0 ? 'Spawn2' : undefined;
     }
     static run(creep: Creep) {
-        let hr = 0;
         if (!(creep.pos.x == 46 && creep.pos.y == 43)) {
             creep.moveTo(46, 43);
+        } else {
+            if(creep.carry[RESOURCE_OXYGEN]) {
+                creep.transfer(this.terminal, RESOURCE_OXYGEN);
+            } else {
+                if(this.extractor.cooldown == 0) {
+                    creep.harvest(this.mineral);
+                }
+            }
         }
-        hr = creep.harvest(this.mineral);
-        hr = creep.transfer(this.terminal, RESOURCE_OXYGEN);
-        return hr;
+        return OK;
     }
 }

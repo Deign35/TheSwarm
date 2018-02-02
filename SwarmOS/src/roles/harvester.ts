@@ -16,52 +16,44 @@ export class RoleHarvester {
 
     static run(creep: Creep) {
         let hr = 0;
+        let target = this.GetTarget(creep);
+
+        if(!target) { return ERR_NOT_FOUND; }
+        if (creep.memory['harvesting']) {
+            hr = creep.harvest(target);
+        } else {
+            hr = creep.transfer(target, RESOURCE_ENERGY);
+        }
+        return hr;
+    }
+
+    static GetTarget(creep: Creep) {
         if (creep.memory['harvesting'] &&
             (this.source.energy == 0 || creep.carry.energy == creep.carryCapacity)) {
             delete creep.memory['harvesting'];
+            delete creep.memory['movePath'];
+            delete creep.memory['delTar'];
         }
         if (!creep.memory['harvesting'] && creep.carry.energy == 0) {
             creep.memory['harvesting'] = true;
+            delete creep.memory['movePath'];
+            delete creep.memory['delTar'];
         }
 
-        if (creep.memory['harvesting']) {
-            hr = this.harvest(creep, this.source);
+        if(creep.memory['harvesting']) {
+            return this.source;
         } else {
-            hr = this.deliver(creep);
-        }
-        return hr;
-    }
-
-    private static harvest(creep: Creep, source: Source) {
-        let hr = 0;
-
-        hr = creep.harvest(source);
-        if (hr == ERR_NOT_IN_RANGE) {
-            hr = creep.moveTo(source);
-        } else if (hr != OK) {
-            console.log('Harvest failed with error: ' + hr);
-        }
-
-        return hr;
-    }
-    private static deliver(creep: Creep) {
-        let hr = 0;
-
-        let deliveryTarget: any = Game.getObjectById(creep.memory['delTar']);
-        if (!deliveryTarget) {
-            deliveryTarget = this.findDeliveryTarget(creep);
+            let deliveryTarget: any = Game.getObjectById(creep.memory['delTar']);
             if (!deliveryTarget) {
-                return ERR_NOT_FOUND;
+                deliveryTarget = this.findDeliveryTarget(creep);
+                if (!deliveryTarget) {
+                    creep.say('Nowhere To Deliver');
+                    return undefined;
+                }
+                creep.memory['delTar'] = deliveryTarget.id;
             }
+            return deliveryTarget;
         }
-
-        hr = creep.transfer(deliveryTarget, RESOURCE_ENERGY);
-        if (hr == ERR_NOT_IN_RANGE) {
-            creep.moveTo(deliveryTarget);
-        } else if (hr != OK) {
-            console.log('Delivery failed with error: ' + hr);
-        }
-        return hr;
     }
 
     private static findDeliveryTarget(creep: Creep) {

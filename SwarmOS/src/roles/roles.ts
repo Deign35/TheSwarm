@@ -26,16 +26,30 @@ export class Role {
     static Roles: {[name: string]: any } = {};
 
     static run(creep: Creep) {
+        let hr = 0;
         if(!Memory['Roles']) Memory['Roles'] = {} as {[name: string]: any};
-        let roleResult = 0;
         try {
-            roleResult = this.Roles[creep.memory['role']].run(creep);
+            hr = this.Roles[creep.memory['role']].run(creep);
         } catch(e) {
-            roleResult = ERR_INVALID_ARGS;
+            hr = ERR_INVALID_ARGS;
         }
 
-        if(roleResult != OK && roleResult != ERR_NOT_IN_RANGE) {
-            this.Roles[RoleBuilder.roleId].run(creep);
+        if(hr == ERR_NOT_IN_RANGE) {
+            hr = creep.moveByPath(creep.memory['movePath']);
+            if(hr == ERR_NOT_FOUND || hr == ERR_INVALID_ARGS) {
+                creep.memory['movePath'] = creep.pos.findPathTo(this.Roles[creep.memory['role']].GetTarget(creep), {
+                    ignoreCreeps: true,
+                    maxRooms: 1,
+                    serialize: true,
+                 });
+                 hr = creep.moveByPath(creep.memory['movePath']);
+            }
+        }
+
+        if(hr != OK && hr != ERR_NOT_IN_RANGE) {
+            //this.Roles[RoleBuilder.roleId].run(creep);
+
+            console.log('Role failed with error: ' + hr);
         }
     }
 
