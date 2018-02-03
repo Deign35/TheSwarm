@@ -152,14 +152,14 @@ let ReplaceImports = function (abspath, rootdir, subdir, filename) {
         }
         let reqStr = line.match(/(?:require\(")([^_a-zA-Z0-9]*)([^"]*)/);
         if (reqStr && reqStr != "") {
-            let reqPath = subdir ? subdir.split('/') : [];
+            let reqPath = subdir ? subdir.split('/') : []; // relative path
             let upPaths = line.match(/\.\.\//gi);
             if (upPaths) {
                 for (let i in upPaths) {
                     reqPath.splice(reqPath.length - 1);
                 }
             } else {
-                if(!line.match(/\.\//gi)) {
+                if (!line.match(/\.\//gi)) {
                     // absolute path
                     reqPath = [];
                 }

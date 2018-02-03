@@ -7,7 +7,7 @@ export class HiveQueen extends SwarmMemory { // Controls a group of HiveNodes.
     HiveLords: Hivelord[];
     //Tumors: {[name: string]: SwarmMemory} = {};
     Save() {
-        for(let name in this.HiveLords) {
+        for (let name in this.HiveLords) {
             this.HiveLords[name].Save();
         }
         /*for(let name in this.Tumors) {
@@ -17,8 +17,9 @@ export class HiveQueen extends SwarmMemory { // Controls a group of HiveNodes.
     }
     Load() {
         super.Load();
+        this.HiveLords = [];
         let HiveLordData = this.GetData('HiveLordData') || [] as string[];
-        for(let i = 0, length = HiveLordData.length; i < length; i++) {
+        for (let i = 0, length = HiveLordData.length; i < length; i++) {
             this.HiveLords[HiveLordData[i]] = new Hivelord(HiveLordData[i], this);
         }
         /*let TumorData = this.GetData('TumorData') || [] as string[]; // No tumors yet
@@ -28,7 +29,7 @@ export class HiveQueen extends SwarmMemory { // Controls a group of HiveNodes.
     }
 
     Activate() {
-        for(let i = 0, length = this.HiveLords.length; i < length; i++) {
+        for (let i = 0, length = this.HiveLords.length; i < length; i++) {
             this.HiveLords[i].Activate();
         }
     }
@@ -37,9 +38,9 @@ export class HiveQueen extends SwarmMemory { // Controls a group of HiveNodes.
         let hive = Game.rooms[this.MemoryID];
         let sources = hive.find(FIND_SOURCES);
         let ids = [] as string[];
-        if(sources.length > 0) {
+        if (sources.length > 0) {
             ids.push(sources[0].id);
-            if(sources.length > 1) {
+            if (sources.length > 1) {
                 ids.push(sources[1].id);
                 // ASSUMPTION: Currently only 2 sources per room are allowed.
             }

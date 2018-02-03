@@ -3,12 +3,9 @@ import { SwarmQueen } from 'Managers/SwarmQueen';
 
 export const loop = function () {
     console.log('Main');
-    //try {
-        Swarmlord.InitSwarmlord();
-        let swarmQueen = new SwarmQueen('SwarmQueen');
-        swarmQueen.Activate();
-        swarmQueen.Save();
-    //} finally {
-        Swarmlord.SaveSwarmlord();
-    //}
+    Swarmlord.InitSwarmlord();
+    let swarmQueen = SwarmQueen.LoadSwarmData();
+    swarmQueen.Activate();
+    swarmQueen.Save();
+    Swarmlord.SaveSwarmlord();
 }
