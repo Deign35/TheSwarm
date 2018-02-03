@@ -13,7 +13,7 @@ export class AdvancedCreepCommand extends LongCommand {
         let curCommand = ling.Brain.GetData('curCmdID');
         let commandType = this.DecisionNetwork.GetCommandType(curCommand);
         if(!ling.Brain.GetData('CmdArgs')) {
-            BasicCreepCommand.ConstructCommandArgs(commandType, this.ConstructBasicCommandArgs(ling, curCommand, commandType));
+            //BasicCreepCommand.ConstructCommandArgs(commandType, this.ConstructBasicCommandArgs(ling, curCommand, commandType));
         }
         return OK;
     }

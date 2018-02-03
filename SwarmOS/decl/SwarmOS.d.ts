@@ -34,6 +34,12 @@ declare class SwarmOverlord {
     static SaveSwarmOverlordData(): void;
     static InitOverlord(): void;
 }
+declare class Swarmlord {
+    static SaveData(data: IMemory): void;
+    static LoadData(name: string): IMemory;
+    static InitSwarmlord(): void;
+
+}
 
 declare type CommandFunc = (...args: any[]) => SwarmReturnCode;
 declare interface ICommand {

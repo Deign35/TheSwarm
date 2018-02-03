@@ -3,7 +3,7 @@ import { Delegate } from "common/Delegate";
 export class SwarmMemory implements IMemory {
     protected _cache: Dictionary = {};
     constructor(public MemoryID: string, public Parent?: SwarmMemory) { this.Load(); }
-    GetData(id: string) { return this._cache[id] || {}; }
+    GetData(id: string) { return this._cache[id] || undefined; }
     SetData(id: string, data: any) { this._cache[id] = data; }
 
     Save() {
@@ -20,10 +20,6 @@ export class SwarmMemory implements IMemory {
         } else {
             this._cache = SwarmOverlord.LoadData(this.MemoryID);
         }
-    }
-
-    MakeChildMemory(id: string) {
-        return new SwarmMemory(id, this);
     }
 }
 

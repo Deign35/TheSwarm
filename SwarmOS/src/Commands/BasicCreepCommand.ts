@@ -12,7 +12,7 @@ export class CreepCommandData extends SwarmMemory {
     }
     Load() {
         super.Load();
-        this.CommandArgs = this.GetData('CommandArgs');
+        this.CommandArgs = this.GetData('CommandArgs') || {};
         let brain = new SwarmMemory('Ling', this);
         this.AssignedCreep = Game.creeps[brain.GetData('name')] as Swarmling;
         this.AssignedCreep.Brain = brain;

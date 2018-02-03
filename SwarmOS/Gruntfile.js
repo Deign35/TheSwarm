@@ -142,6 +142,7 @@ let ReplaceImports = function (abspath, rootdir, subdir, filename) {
     //let path = subdir ? subdir.split('/') : [];
     let lines = file.split('\n');
     for (let line of lines) {
+        // Compiler: IgnoreLine
         if ((line).match(/[.]*\/\/ Compiler: IgnoreLine[.]*/)) {
             continue;
         }

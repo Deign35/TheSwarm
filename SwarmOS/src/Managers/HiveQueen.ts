@@ -3,82 +3,54 @@ import { DisposalDelegate } from "common/Disposable";
 import * as _ from "lodash";
 import { BasicCreepCommand } from "Commands/BasicCreepCommand";
 import { HarvesterJob } from "JobRoles/HarvesterJob";
+import { Hivelord } from "Managers/Hivelord";
 
-export class HiveQueen extends SwarmMemory implements IDisposable { // Controls a group of HiveNodes.
-    dispose(): void {
-        DisposeAll.unsubscribe(this.MemoryID);
-        delete this.dispose; // Will cause an error if dispose is called again.
-        // Save my memory, save children first.
+export class HiveQueen extends SwarmMemory { // Controls a group of HiveNodes.
+    HiveLords: Hivelord[];
+    //Tumors: {[name: string]: SwarmMemory} = {};
+    Save() {
+        for(let name in this.HiveLords) {
+            this.HiveLords[name].Save();
+        }
+        /*for(let name in this.Tumors) {
+            this.Tumors[name].Save();
+        }*/
+        super.Save();
     }
-    constructor(hive: Room) {
-        super(hive.name);
-
-        if (!hive.controller) {
-            throw 'THIS CANNOT HAPPEN!!!';
+    Load() {
+        super.Load();
+        let HiveLordData = this.GetData('HiveLordData') || [] as string[];
+        for(let i = 0, length = HiveLordData.length; i < length; i++) {
+            this.HiveLords[HiveLordData[i]] = new Hivelord(HiveLordData[i], this);
         }
-        DisposeAll.subscribe(this.MemoryID, this);
-        if (!this.GetData('RoomId')) {
-            this.SetData('RoomId', hive.name);
-            let sources: string[] = [];
-            _.forEach(hive.find(FIND_SOURCES), function (source: Source) {
-                sources.push(source.id);
-            });
-            this.SetData('Sources', sources);
-
-            let mineral = hive.find(FIND_MINERALS);
-            if (mineral) {
-                this.SetData('Mineral', mineral[0].id);
-            }
-            // Set up required jobs
-            for (let i = 0; i < hive.controller.level; i++) {
-                this.GetNewRequiredJobs(i + 1);
-            }
-        }
-
-        this.CurJobs = this.GetData('Jobs');
+        /*let TumorData = this.GetData('TumorData') || [] as string[]; // No tumors yet
+        for(let i = 0, length = TumorData.length; i < length; i++) {
+            this.Tumors[TumorData[i]] = new SwarmMemory(TumorData[i], this);
+        }*/
     }
 
-    private CurJobs: { [jobName: string]: any } = {};
-    GetNewRequiredJobs(level: number) {
-        let jobs = this.CurJobs;
-        if (level == 1) {
-            let sourceIds = this.GetData('Sources');
-            for (let i = 0, length = sourceIds.length; i < length; i++) {
-                //jobs['S' + i] = new HarvesterJob('S' + i, sourceIds[i], true);
-            }
-            jobs['U1'] = CreepRole.Upgrader;
-        } else /*if (level == 2) {
-            // add more jobs.
-        } else */ {
-            throw 'Job level[' + level + '] is not configured';
+    Activate() {
+        for(let i = 0, length = this.HiveLords.length; i < length; i++) {
+            this.HiveLords[i].Activate();
         }
     }
 
-    private HiveJobs = {
-        1: [
-            CreepRole.Harvester,
-            CreepRole.Upgrader
-        ],
-        2: {
+    InitHiveQueen() {
+        let hive = Game.rooms[this.MemoryID];
+        let sources = hive.find(FIND_SOURCES);
+        let ids = [] as string[];
+        if(sources.length > 0) {
+            ids.push(sources[0].id);
+            if(sources.length > 1) {
+                ids.push(sources[1].id);
+                // ASSUMPTION: Currently only 2 sources per room are allowed.
+            }
+        }
+        this.SetData('Sources', ids);
 
-        },
-        3: {
-
-        },
-        4: {
-
-        },
-        5: {
-
-        },
-        6: {
-
-        },
-        7: {
-
-        },
-        8: {
-
-        },
+        let mineral = hive.find(FIND_MINERALS);
+        if (mineral) {
+            this.SetData('Mineral', mineral[0].id);
+        }
     }
 }

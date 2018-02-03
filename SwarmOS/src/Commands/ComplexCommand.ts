@@ -23,7 +23,7 @@ export class CommandWeb extends SwarmMemory {
     static readonly EndCommandID = 'END';
     static EndCommand: CommandLink = new CommandLink(CommandWeb.EndCommandID, CommandComplete);
 
-    protected LinksList: { [id: string]: CommandLink } = {};
+    protected LinksList: { [id: string]: CommandLink };
     public DefaultCommand: string;
 
     SetCommands(linksList: { [commandID: string]: CommandType }, defaultCommand: string) {
@@ -42,8 +42,8 @@ export class CommandWeb extends SwarmMemory {
 
     Load() {
         super.Load();
-        this.LinksList = this.GetData('linksList');
-        this.DefaultCommand = this.GetData('DefaultCommand');
+        this.LinksList = this.GetData('linksList') || {};
+        this.DefaultCommand = this.GetData('DefaultCommand') || CommandWeb.EndCommand;
     }
 
     SetCommandComplete(fromID: string, results: SwarmReturnCode[]) {

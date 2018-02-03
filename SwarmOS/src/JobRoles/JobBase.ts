@@ -3,7 +3,7 @@ import { BasicCreepCommand } from "Commands/BasicCreepCommand";
 import { CommandWeb } from "Commands/ComplexCommand";
 import { Swarmling } from "SwarmTypes/Swarmling";
 
-export abstract class JobBase extends SwarmMemory implements IJob {
+export class JobBase extends SwarmMemory implements IJob {
     JobCommands: CommandWeb;
     JobArgs: IMemory;
 
