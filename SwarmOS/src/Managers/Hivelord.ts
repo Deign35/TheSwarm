@@ -17,8 +17,11 @@ export class Hivelord extends SwarmMemory {
             }
 
             let commandData = this.CommandData[job.MemoryID] as CommandMemory;
-            let validationResult = commandData.Validate();
+            if (commandData.Validate() == JobResults.RequiresCreep) {
+                // Get a creep for this job.
+            }
 
+            job.ProcessJob(commandData);
         }
     }
 

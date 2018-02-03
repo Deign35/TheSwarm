@@ -30,7 +30,8 @@ declare type CommandType = CommandAny | CommandEnd | CreepCommandType;
 declare const J_REQUIRE_CREEP = -16; declare type J_REQUIRE_CREEP = -16;
 declare enum JobResults {
     RequiresCreep = 'RC',
-    Retry = 'Re'
+    Retry = 'Re',
+    Continue = 'Cn',
     //
 }
 
