@@ -20,7 +20,7 @@
 			"**/dist/": true,
 			"**/package*.json": true,
 			"**/tsconfig.json": true,
-			"**/Gruntfile.js": true,
+			"**/Gruntfile.js": false,
 			"**/README.md": true
 		},
 	}

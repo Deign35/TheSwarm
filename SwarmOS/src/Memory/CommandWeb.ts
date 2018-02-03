@@ -16,10 +16,12 @@ class CommandLink {
     }
 }
 
+const CommandAny = 'AnyC';
+const CommandDone = 'CmdC';
 export class CommandWeb extends SwarmMemory implements ICommandWeb {
     static readonly AnyCommandID = 'ANY';
     static readonly EndCommandID = 'END';
-    protected static EndCommand: CommandLink = new CommandLink(CommandWeb.EndCommandID, CommandComplete);
+    protected static EndCommand: CommandLink = new CommandLink(CommandWeb.EndCommandID, CommandDone);
 
     protected LinksList: { [id: string]: CommandLink };
     DefaultCommand: string;

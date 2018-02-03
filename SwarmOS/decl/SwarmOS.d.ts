@@ -8,7 +8,6 @@ declare interface IDelegate<T extends CallbackFunction> {
     Unsubscribe(id: string): void;
     Notify(...args: any[]): void;
 }
-
 declare interface IMemory {
     readonly MemoryID: string;
     GetData(id: string): any;
@@ -16,8 +15,33 @@ declare interface IMemory {
     Save(): void;
     Load(): void;
 }
+declare interface IJob extends IMemory {
+    JobCommands: ICommandWeb;
+    JobArgs: IMemory;
+    ProcessJob(JobMemory: IMemory): SwarmReturnCode;
+}
+declare interface ICommandWeb extends IMemory {
+    SetCommands(linksList: { [commandID: string]: CommandType }, defaultCommand: string): void;
+    SetCommandComplete(fromID: string, results: SwarmReturnCode[]): void;
+    SetCommandResponse(fromID: string, toID: string, results: SwarmReturnCode[]): void;
+    SetDefaultCommandResponse(toID: string, results: SwarmReturnCode[]): void;
+    SetForceEnd(results: SwarmReturnCode[]): void;
+    GetCommandResult(fromID: string, result: SwarmReturnCode): string;
+    GetCommandType(commandID: string): CommandType;
+}
+
+declare var Swarmlord: {
+    GetData(name: string): IMemory,
+    SetData(data: IMemory): void,
+    SaveSwarmlord(): void,
+    InitSwarmlord(): void,
+}
+/*
+
+
 
 declare class SwarmMemory implements IMemory {
+    constructor(id: string, parent?: SwarmMemory);
     readonly MemoryID: string;
     Parent?: SwarmMemory;
     GetData(id: string): any;
@@ -47,10 +71,4 @@ declare interface ICommandWeb extends SwarmMemory {
     SetForceEnd(results: SwarmReturnCode[]): void;
     GetCommandResult(fromID: string, result: SwarmReturnCode): string;
     GetCommandType(commandID: string): CommandType;
-}
-
-declare interface IJob extends IMemory {
-    JobCommands: ICommandWeb;
-    JobArgs: IMemory;
-    ProcessJob(JobMemory: IMemory): SwarmReturnCode;
-}
+}*/

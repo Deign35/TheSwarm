@@ -2051,7 +2051,7 @@ interface FlagMemory { [name: string]: any }
 interface RoomMemory { [name: string]: any }
 interface SpawnMemory { [name: string]: any }
 
-declare const Memory: Memory;
+declare var Memory: {[name: string]: any;};
 /**
  * A mineral deposit object. Can be harvested by creeps with a WORK body part using the extractor structure.
  * @see http://docs.screeps.com/api/#Mineral

@@ -1,14 +1,14 @@
-﻿import { Swarmlord } from 'Managers/Swarmlord';
+﻿import 'Managers/Swarmlord';
 import { SwarmQueen } from 'Managers/SwarmQueen';
 
 export const loop = function () {
     console.log('Main');
-    try {
+    //try {
         Swarmlord.InitSwarmlord();
         let swarmQueen = new SwarmQueen('SwarmQueen');
         swarmQueen.Activate();
         swarmQueen.Save();
-    } finally {
+    //} finally {
         Swarmlord.SaveSwarmlord();
-    }
+    //}
 }

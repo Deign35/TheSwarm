@@ -1,10 +1,9 @@
 import { SwarmMemory } from "Memory/SwarmMemory";
-import { SwarmlingMemory } from "Memory/SwarmlingMemory";
 import * as _ from "lodash"; // Compiler: IgnoreLine
 import { JobBase } from "JobRoles/JobBase";
 
 export class Hivelord extends SwarmMemory {
-    SwarmlingMinds: {[name: string]: SwarmlingMemory};
+    SwarmlingMinds: {[name: string]: SwarmMemory};
     TaskJobs: {[name: string]: JobBase};
 
     Activate() {
@@ -24,7 +23,7 @@ export class Hivelord extends SwarmMemory {
         super.Load();
         let SwarmlingMindData = this.GetData('mindData') || [] as string[];
         for(let i = 0, length = SwarmlingMindData.length; i < length; i++) {
-            this.SwarmlingMinds[SwarmlingMindData[i]] = new SwarmlingMemory(SwarmlingMindData[i], this);
+            this.SwarmlingMinds[SwarmlingMindData[i]] = new SwarmMemory(SwarmlingMindData[i], this);
         }
         let TaskJobData = this.GetData('jobData') || [] as string[];
         for(let i = 0, length = TaskJobData.length; i < length; i++) {

@@ -27,8 +27,8 @@ declare type AdvancedCreepCommandType = A_FindTarget;
 declare type CreepCommandType = BasicCreepCommandType | AdvancedCreepCommandType;
 
 declare type CommandAny = 'AnyC'; declare const CommandAny = 'AnyC';
-declare type CommandComplete = 'CmdC'; declare const CommandComplete = 'CmdC';
-declare type CommandType = CreepCommandType | CommandComplete | CommandAny;
+declare type CommandDone = 'CmdC'; declare const CommandDone = 'CmdC';
+declare type CommandType = CreepCommandType | CommandDone | CommandAny;
 
 declare type SwarmReturnCode = ScreepsReturnCode | E_CATASTROPHIC;
 declare type E_CATASTROPHIC = -16; declare const E_CATASTROPHIC = -16;

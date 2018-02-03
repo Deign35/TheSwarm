@@ -46,9 +46,12 @@ export class HiveQueen extends SwarmMemory { // Controls a group of HiveNodes.
         }
         this.SetData('Sources', ids);
 
-        let mineral = hive.find(FIND_MINERALS);
-        if (mineral) {
-            this.SetData('Mineral', mineral[0].id);
+        let minerals = hive.find(FIND_MINERALS);
+        if (minerals.length > 0) {
+            this.SetData('Mineral', minerals[0].id);
+            // ASSUMPTION: Currently only 1 mineral per room is allowed.
         }
+
+        // Be sure to save the hivelord data before trying to use it.
     }
 }

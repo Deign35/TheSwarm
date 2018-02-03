@@ -158,6 +158,11 @@ let ReplaceImports = function (abspath, rootdir, subdir, filename) {
                 for (let i in upPaths) {
                     reqPath.splice(reqPath.length - 1);
                 }
+            } else {
+                if(!line.match(/\.\//gi)) {
+                    // absolute path
+                    reqPath = [];
+                }
             }
 
             let rePathed = "";

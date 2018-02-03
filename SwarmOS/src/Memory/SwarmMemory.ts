@@ -5,18 +5,20 @@ export class SwarmMemory implements IMemory {
     SetData(id: string, data: any) { this._cache[id] = data; }
 
     Save() {
-        if (this.Parent) {
-            this.Parent.SetData(this.MemoryID, this._cache);
-        } else {
-            Memory[this.MemoryID] = this._cache;
+        if(this._cache) {
+            if (this.Parent) {
+                this.Parent.SetData(this.MemoryID, this._cache);
+            } else {
+                Memory[this.MemoryID] = this._cache;
+            }
         }
     }
 
     Load() {
         if (this.Parent) {
-            this._cache = this.Parent.GetData(this.MemoryID);
+            this._cache = this.Parent.GetData(this.MemoryID) || {};
         } else {
-            this._cache = Memory[this.MemoryID];
+            this._cache = Memory[this.MemoryID] || {};
         }
     }
 }

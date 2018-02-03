@@ -4,7 +4,7 @@ import { SwarmQueen } from "Managers/SwarmQueen";
 const MEMORY_ID = 'Swarmlord';
 export class Swarmlord extends SwarmMemory {
     private static _instance: Swarmlord;
-    private SavedMemory: {[name: string]: IMemory};
+    private SavedMemory: {[name: string]: IMemory} = {};
 
     Save() {
         let memoryIDs = [];
@@ -19,6 +19,7 @@ export class Swarmlord extends SwarmMemory {
     Load() {
         super.Load();
         let memoryIDs = this.GetData('MemoryIDs') || [] as string[];
+        this.SavedMemory = {};
         for(let i = 0, length = memoryIDs.length; i < length; i++) {
             this.SavedMemory[memoryIDs[i]] = new SwarmMemory(memoryIDs[i]);
         }
@@ -41,7 +42,9 @@ export class Swarmlord extends SwarmMemory {
         if (!Memory.INIT) { // I want these gone at some point.
             console.log('InitSwarmlord');
             initResult = ERR_NOT_FOUND;
-            Memory.INIT = false;
+            this._instance.Save();
+            this._instance.Load();
+            this._instance.SetData('MemoryIDs', [])
             let startInit = Game.cpu.getUsed();
             Memory.DataDump = [];
 
@@ -52,10 +55,11 @@ export class Swarmlord extends SwarmMemory {
                 Memory.INIT = true;
             }
 
+            this._instance.Save();
+            this._instance.Load();
             console.log('Reset Swarmlord Completed[' + initResult + '] in ' + (Game.cpu.getUsed() - startInit) + ' cpu cycles.');
         }
         return initResult;
     }
 }
-Swarmlord.InitSwarmlord();
 global[MEMORY_ID] = Swarmlord;
