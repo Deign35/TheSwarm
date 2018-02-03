@@ -1,21 +1,6 @@
-import { SwarmMemory } from "Memory/SwarmMemory";
 import { BasicCreepCommandType, AdvancedCreepCommandType, CreepCommandType, SwarmReturnCode } from "SwarmEnums";
 
-export class BasicCreepCommand extends SwarmMemory {
-    /*Execute() {
-        let creep = Game.creeps[this.GetData('AssignedCreep')]; // Get this creep from somewhere else IMO;
-        return BasicCreepCommand.ExecuteCreepCommand(this.GetData('CommandType'), creep, this.GetCommandArgs());
-    }*/
-
-    GetCommandArgs() {
-        return this.GetData('CommandArgs');
-    }
-    SetCommandArgs(cmdArgs: Dictionary) {
-        this.SetData('CommandArgs', cmdArgs);
-    }
-    AssignCreep(creep: Creep) {
-        this.SetData('AssignedCreep', creep.name);
-    }
+export class BasicCreepCommand {
 
     static ExecuteCreepCommand(commandType: CreepCommandType, ling: Creep, args: { [name: string]: any }): SwarmReturnCode {
         switch (commandType) {

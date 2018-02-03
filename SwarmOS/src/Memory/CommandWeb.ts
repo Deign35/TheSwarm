@@ -3,7 +3,7 @@ import * as SwarmEnums from 'SwarmEnums';
 
 class CommandLink {
     private Links: { [result: number]: string } = {};
-    constructor(public CommandID: string, public CommandType: SwarmEnums.CommandType) { }
+    constructor(public CommandType: SwarmEnums.CommandType) { }
 
     SetNextCommand(commandResult: SwarmEnums.SwarmReturnCode, commandID: string) {
         this.Links[commandResult] = commandID;
@@ -17,21 +17,18 @@ class CommandLink {
     }
 }
 
-const CommandAny = 'AnyC';
-const CommandDone = 'CmdC';
 export class CommandWeb extends SwarmMemory implements ICommandWeb {
     static readonly AnyCommandID = 'ANY';
     static readonly EndCommandID = 'END';
-    protected static EndCommand: CommandLink = new CommandLink(CommandWeb.EndCommandID, CommandDone);
+    protected static EndCommand: CommandLink = new CommandLink(SwarmEnums.CommandEnd);
 
     protected LinksList: { [id: string]: CommandLink };
     DefaultCommand: string;
 
     SetCommands(linksList: { [commandID: string]: SwarmEnums.CommandType }, defaultCommand: string) {
         for (let commandId in linksList) {
-            this.LinksList[commandId] = new CommandLink(commandId, linksList[commandId]);
+            this.LinksList[commandId] = new CommandLink(linksList[commandId]);
         }
-        this.LinksList[CommandWeb.AnyCommandID] = new CommandLink(CommandWeb.AnyCommandID, CommandAny);
         this.DefaultCommand = defaultCommand;
     }
 
@@ -58,19 +55,29 @@ export class CommandWeb extends SwarmMemory implements ICommandWeb {
     }
 
     SetDefaultCommandResponse(toID: string, results: SwarmEnums.SwarmReturnCode[]) {
+        if (!this.LinksList[CommandWeb.AnyCommandID]) {
+            this.LinksList[CommandWeb.AnyCommandID] = new CommandLink(SwarmEnums.CommandAny);
+        }
         this.SetCommandResponse(CommandWeb.AnyCommandID, toID, results);
     }
 
     SetForceEnd(results: SwarmEnums.SwarmReturnCode[]) {
+        if (!this.LinksList[CommandWeb.AnyCommandID]) {
+            this.LinksList[CommandWeb.AnyCommandID] = new CommandLink(SwarmEnums.CommandAny);
+        }
         this.SetCommandResponse(CommandWeb.AnyCommandID, CommandWeb.EndCommandID, results);
     }
 
     GetCommandResult(fromID: string, result: SwarmEnums.SwarmReturnCode) {
         let toID = this.LinksList[fromID].ProcessCommandResult(result); // specific
         if (!toID) {
-            toID = this.LinksList[CommandWeb.AnyCommandID].ProcessCommandResult(result); // general
-            if (!toID) {
+            if (!this.LinksList[CommandWeb.AnyCommandID]) {
                 toID = this.DefaultCommand;
+            } else {
+                toID = this.LinksList[CommandWeb.AnyCommandID].ProcessCommandResult(result); // general
+                if (!toID) {
+                    toID = this.DefaultCommand;
+                }
             }
         }
         return toID;
@@ -79,15 +86,4 @@ export class CommandWeb extends SwarmMemory implements ICommandWeb {
     GetCommandType(commandID: string) {
         return this.LinksList[commandID].CommandType;
     }
-
-    /*
-    ProcessSwarmling(ling: Swarmling, commandMemory: IMemory) {
-        let curID = commandMemory.GetData('CmdID');
-        let args = BasicCreepCommand.ConstructCommandArgs(commandMemory.GetData('CmdArgs')); // FIX THIS!!!
-        let commandResult = BasicCreepCommand.ExecuteCreepCommand(this.LinksList[curID].CommandType, ling, args);
-        let nextCommand = this.LinksList[curID].ProcessCommandResult(commandResult);
-        if (nextCommand)
-            commandMemory.SetData('CmdID', nextCommand);
-    }
-    */
 }

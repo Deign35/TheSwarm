@@ -44,4 +44,6 @@ export type CommandType = CommandAny | CommandEnd | CreepCommandType;
 
 export const HL_REQUIRE_CREEP = -16; declare type HL_REQUIRE_CREEP = -16;
 export const HL_RETRY = -17; declare type HL_RETRY = -17;
-export type SwarmReturnCode = ScreepsReturnCode | HL_REQUIRE_CREEP | HL_RETRY;
+export const HL_REQUIRE_ARGS = -18; declare type HL_REQUIRE_ARGS = -18;
+export const HL_NEXT_COMMAND = -19; declare type HL_NEXT_COMMAND = -19;
+export type SwarmReturnCode = ScreepsReturnCode | HL_REQUIRE_CREEP | HL_RETRY | HL_REQUIRE_ARGS | HL_NEXT_COMMAND;

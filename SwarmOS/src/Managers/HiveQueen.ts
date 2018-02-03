@@ -5,32 +5,36 @@ import { Hivelord } from "Managers/Hivelord";
 import { SwarmReturnCode } from "SwarmEnums";
 
 export class HiveQueen extends SwarmMemory { // Controls a group of HiveNodes.
-    HiveLords: Hivelord[];
+    Hivelords: Hivelord[];
     Save() {
-        for (let name in this.HiveLords) {
-            this.HiveLords[name].Save();
+        let _hivelordIDs = [];
+        for (let name in this.Hivelords) {
+            this.Hivelords[name].Save();
+            _hivelordIDs.push(name);
         }
+
+        this.SetData('HiveLordData', _hivelordIDs);
         super.Save();
     }
     Load() {
         super.Load();
-        this.HiveLords = [];
+        this.Hivelords = [];
         let HiveLordData = this.GetData('HiveLordData') || [] as string[];
         for (let i = 0, length = HiveLordData.length; i < length; i++) {
-            this.HiveLords[HiveLordData[i]] = new Hivelord(HiveLordData[i], this);
+            this.Hivelords[HiveLordData[i]] = new Hivelord(HiveLordData[i], this);
         }
     }
 
     Activate() {
-        for (let i = 0, length = this.HiveLords.length; i < length; i++) {
+        for (let i = 0, length = this.Hivelords.length; i < length; i++) {
             let hiveLordResult;
             let retryCount = 0;
             do {
-                hiveLordResult = this.HiveLords[i].Activate();
+                hiveLordResult = this.Hivelords[i].Activate();
             } while (hiveLordResult != OK && retryCount++ < 10);
 
             if (hiveLordResult != OK) {
-                throw 'HIVELORD HAS FAILED: ' + JSON.stringify(this);
+                throw 'HIVELORD HAS FAILED: ' + hiveLordResult;
             }
         }
     }
@@ -39,14 +43,14 @@ export class HiveQueen extends SwarmMemory { // Controls a group of HiveNodes.
         let hive = Game.rooms[this.MemoryID];
         let sources = hive.find(FIND_SOURCES);
         // Create jobs
-        let newHiveLord = new Hivelord('HL_S', this);
+        let newHivelord = new Hivelord('HL_S', this);
         for (let i = 0, length = sources.length; i < length; i++) {
-            let newHarvesterJob = new HarvesterJob('' + i, newHiveLord);
+            let newHarvesterJob = new HarvesterJob('' + i, newHivelord);
             newHarvesterJob.InitJob(sources[i].id, true);
-            newHiveLord.AddNewJob(newHarvesterJob);
+            newHivelord.AddNewJob(newHarvesterJob);
         }
-        newHiveLord.Save();
-        this.HiveLords.push(newHiveLord);
+        newHivelord.Save();
+        this.Hivelords.push(newHivelord);
 
         // Be sure to save the hivelord data before trying to use it.
     }
