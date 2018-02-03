@@ -16,4 +16,8 @@ export class CommandMemory extends SwarmMemory {
     get CreepName() {
         return this.GetData(ASSIGNED_CREEP);
     }
+
+    Validate(): JobResults {
+        return JobResults.RequiresCreep;
+    }
 }

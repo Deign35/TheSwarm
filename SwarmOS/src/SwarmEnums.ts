@@ -1,4 +1,4 @@
-declare enum BasicCreepCommandType {
+export enum BasicCreepCommandType {
     C_Attack = 'At',
     C_Build = 'Bu',
     C_Dismantle = 'Di',
@@ -16,19 +16,19 @@ declare enum BasicCreepCommandType {
     C_Withdraw = 'Wi'
 }
 
-declare enum AdvancedCreepCommandType {
+export enum AdvancedCreepCommandType {
     A_FindTarget = 'FT',
 }
 
 declare type CreepCommandType = BasicCreepCommandType | AdvancedCreepCommandType;
 
-declare const CommandAny = 'AnyC'; declare type CommandAny = 'AnyC';
-declare const CommandEnd = 'CmdC'; declare type CommandEnd = 'CmdC';
+export const CommandAny = 'AnyC'; declare type CommandAny = 'AnyC';
+export const CommandEnd = 'CmdC'; declare type CommandEnd = 'CmdC';
 
 declare type CommandType = CommandAny | CommandEnd | CreepCommandType;
 
-declare const J_REQUIRE_CREEP = -16; declare type J_REQUIRE_CREEP = -16;
-declare enum JobResults {
+export const J_REQUIRE_CREEP = -16; declare type J_REQUIRE_CREEP = -16;
+export enum JobResults {
     RequiresCreep = 'RC',
     Retry = 'Re'
     //
