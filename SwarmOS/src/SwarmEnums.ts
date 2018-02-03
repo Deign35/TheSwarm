@@ -42,12 +42,6 @@ export const CommandAny = 'AnyC'; declare type CommandAny = 'AnyC';
 export const CommandEnd = 'CmdC'; declare type CommandEnd = 'CmdC';
 export type CommandType = CommandAny | CommandEnd | CreepCommandType;
 
-export const J_REQUIRE_CREEP = -16; declare type J_REQUIRE_CREEP = -16;
-export enum JobResults {
-    RequiresCreep = 'RC',
-    Retry = 'Re',
-    Continue = 'Cn',
-    //
-}
-
-export type SwarmReturnCode = ScreepsReturnCode | J_REQUIRE_CREEP;
+export const HL_REQUIRE_CREEP = -16; declare type HL_REQUIRE_CREEP = -16;
+export const HL_RETRY = -17; declare type HL_RETRY = -17;
+export type SwarmReturnCode = ScreepsReturnCode | HL_REQUIRE_CREEP | HL_RETRY;

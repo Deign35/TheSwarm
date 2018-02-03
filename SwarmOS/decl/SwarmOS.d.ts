@@ -17,7 +17,7 @@ declare interface IMemory {
 }
 declare interface IJob extends IMemory {
     JobCommands: ICommandWeb;
-    JobArgs: IMemory;
+    JobData: IMemory;
     ProcessJob(JobMemory: IMemory): number;
 }
 declare interface ICommandWeb extends IMemory {

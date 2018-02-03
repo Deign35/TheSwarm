@@ -1,5 +1,6 @@
 import { SwarmMemory } from "Memory/SwarmMemory";
-import { JobResults } from "SwarmEnums";
+import { SwarmReturnCode, HL_REQUIRE_CREEP } from "SwarmEnums";
+import { JobBase } from "JobRoles/JobBase";
 
 const ASSIGNED_CREEP = 'AC';
 const COMMAND_ARGS = 'CA';
@@ -27,12 +28,5 @@ export class CommandMemory extends SwarmMemory {
     }
     set CreepName(name: string) {
         this.SetData(ASSIGNED_CREEP, name);
-    }
-
-    Validate(): JobResults {
-        if (!this.CreepName || !Game.creeps[this.CreepName]) {
-            return JobResults.RequiresCreep;
-        }
-        return JobResults.Continue;
     }
 }

@@ -1,12 +1,21 @@
 import { JobBase } from "JobRoles/JobBase";
 import { CommandWeb } from "Memory/CommandWeb";
-import { BasicCreepCommandType, AdvancedCreepCommandType, CommandType } from "SwarmEnums";
+import { BasicCreepCommandType, AdvancedCreepCommandType, CommandType, SwarmReturnCode, HL_REQUIRE_CREEP } from "SwarmEnums";
 
 
 const HARVEST_COMMAND = 'HC';
 const TRANSFER_COMMAND = 'TC';
 const FIND_TARGET = 'FT';
 export class HarvesterJob extends JobBase {
+    ValidateArgs(): SwarmReturnCode {
+        if (!this.JobData.CreepName || !Game.creeps[this.JobData.CreepName]) {
+            return HL_REQUIRE_CREEP;
+        }
+
+        
+
+        return OK;
+    }
     SourceTarget: Source;
     Load() {
         super.Load();

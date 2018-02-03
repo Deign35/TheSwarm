@@ -2,6 +2,7 @@ import { SwarmMemory } from "Memory/SwarmMemory";
 import * as _ from "lodash";
 import { HarvesterJob } from "JobRoles/HarvesterJob";
 import { Hivelord } from "Managers/Hivelord";
+import { SwarmReturnCode } from "SwarmEnums";
 
 export class HiveQueen extends SwarmMemory { // Controls a group of HiveNodes.
     HiveLords: Hivelord[];
@@ -22,7 +23,15 @@ export class HiveQueen extends SwarmMemory { // Controls a group of HiveNodes.
 
     Activate() {
         for (let i = 0, length = this.HiveLords.length; i < length; i++) {
-            this.HiveLords[i].Activate();
+            let hiveLordResult;
+            let retryCount = 0;
+            do {
+                hiveLordResult = this.HiveLords[i].Activate();
+            } while (hiveLordResult != OK && retryCount++ < 10);
+
+            if (hiveLordResult != OK) {
+                throw 'HIVELORD HAS FAILED: ' + JSON.stringify(this);
+            }
         }
     }
 
@@ -32,10 +41,11 @@ export class HiveQueen extends SwarmMemory { // Controls a group of HiveNodes.
         // Create jobs
         let newHiveLord = new Hivelord('HL_S', this);
         for (let i = 0, length = sources.length; i < length; i++) {
-            let newHarvesterJob = new HarvesterJob('S' + i, newHiveLord);
+            let newHarvesterJob = new HarvesterJob('' + i, newHiveLord);
             newHarvesterJob.InitJob(sources[i].id, true);
             newHiveLord.AddNewJob(newHarvesterJob);
         }
+        newHiveLord.Save();
         this.HiveLords.push(newHiveLord);
 
         // Be sure to save the hivelord data before trying to use it.
