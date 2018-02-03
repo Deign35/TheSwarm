@@ -1,3 +1,23 @@
+declare type C_Attack = 'At'; export const C_Attack = 'At';
+declare type C_Build = 'Bu'; export const C_Build = 'Bu';
+declare type C_Dismantle = 'Di'; export const C_Dismantle = 'Di';
+declare type C_Drop = 'Dr'; export const C_Drop = 'Dr';
+declare type C_Harvest = 'Ha'; export const C_Harvest = 'Ha';
+declare type C_Heal = 'He'; export const C_Heal = 'He';
+declare type C_Pickup = 'Pi'; export const C_Pickup = 'Pi';
+declare type C_RangedAttack = 'RA'; export const C_RangedAttack = 'RA';
+declare type C_RangedHeal = 'RH'; export const C_RangedHeal = 'RH';
+declare type C_Repair = 'Re'; export const C_Repair = 'Re';
+declare type C_Say = 'Sa'; export const C_Say = 'Sa';
+declare type C_Suicide = 'Su'; export const C_Suicide = 'Su';
+declare type C_Transfer = 'Tr'; export const C_Transfer = 'Tr';
+declare type C_Upgrade = 'Up'; export const C_Upgrade = 'Up';
+declare type C_Withdraw = 'Wi'; export const C_Withdraw = 'Wi';
+
+export enum AdvancedCreepCommandType {
+    A_FindTarget = 'FT',
+}
+
 export enum BasicCreepCommandType {
     C_Attack = 'At',
     C_Build = 'Bu',
@@ -16,16 +36,11 @@ export enum BasicCreepCommandType {
     C_Withdraw = 'Wi'
 }
 
-export enum AdvancedCreepCommandType {
-    A_FindTarget = 'FT',
-}
-
-declare type CreepCommandType = BasicCreepCommandType | AdvancedCreepCommandType;
+export type CreepCommandType = BasicCreepCommandType | AdvancedCreepCommandType;
 
 export const CommandAny = 'AnyC'; declare type CommandAny = 'AnyC';
 export const CommandEnd = 'CmdC'; declare type CommandEnd = 'CmdC';
-
-declare type CommandType = CommandAny | CommandEnd | CreepCommandType;
+export type CommandType = CommandAny | CommandEnd | CreepCommandType;
 
 export const J_REQUIRE_CREEP = -16; declare type J_REQUIRE_CREEP = -16;
 export enum JobResults {
@@ -35,4 +50,4 @@ export enum JobResults {
     //
 }
 
-declare type SwarmReturnCode = ScreepsReturnCode | J_REQUIRE_CREEP;
+export type SwarmReturnCode = ScreepsReturnCode | J_REQUIRE_CREEP;

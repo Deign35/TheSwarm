@@ -1,5 +1,6 @@
 import { SwarmMemory } from "Memory/SwarmMemory";
 import { SwarmQueen } from "Managers/SwarmQueen";
+import { SwarmReturnCode } from "SwarmEnums";
 
 const MEMORY_ID = 'Swarmlord';
 export class Swarmlord extends SwarmMemory {

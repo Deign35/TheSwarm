@@ -1,5 +1,6 @@
 import { JobBase } from "JobRoles/JobBase";
 import { CommandWeb } from "Memory/CommandWeb";
+import { BasicCreepCommandType, AdvancedCreepCommandType, CommandType } from "SwarmEnums";
 
 
 const HARVEST_COMMAND = 'HC';
@@ -11,13 +12,13 @@ export class HarvesterJob extends JobBase {
         super.Load();
         this.SourceTarget = Game.getObjectById(this.GetData('ST')) as Source;
     }
-    InitJob(id: string, sourceID: string, repeat: boolean) {
+    InitJob(sourceID: string, repeat: boolean) {
         this.SetData('ST', sourceID);
         this.SourceTarget = Game.getObjectById(this.GetData('ST')) as Source;
         let commandTypes: { [commandID: string]: CommandType } = {};
-        commandTypes[HARVEST_COMMAND] = C_Harvest;
-        commandTypes[TRANSFER_COMMAND] = C_Transfer;
-        commandTypes[FIND_TARGET] = A_FindTarget; // Make a new action for finding.
+        commandTypes[HARVEST_COMMAND] = BasicCreepCommandType.C_Harvest;
+        commandTypes[TRANSFER_COMMAND] = BasicCreepCommandType.C_Transfer;
+        commandTypes[FIND_TARGET] = AdvancedCreepCommandType.A_FindTarget; // Make a new action for finding.
 
         this.JobCommands.SetCommands(commandTypes, repeat ? HARVEST_COMMAND : CommandWeb.EndCommandID);
         this.JobCommands.SetCommandResponse(HARVEST_COMMAND, FIND_TARGET, [

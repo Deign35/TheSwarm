@@ -2,11 +2,13 @@ import { SwarmMemory } from "Memory/SwarmMemory";
 import { CommandWeb } from "Memory/CommandWeb";
 import { CommandMemory } from "Memory/CommandMemory";
 import { BasicCreepCommand } from "Commands/BasicCreepCommand";
+import { CreepCommandType } from "SwarmEnums";
 
-export class JobBase extends SwarmMemory implements IJob {
+export abstract class JobBase extends SwarmMemory implements IJob {
     JobCommands: CommandWeb;
     JobArgs: CommandMemory;
 
+    abstract InitJob(...inArgs: any[]): void;
     Save() {
         this.JobCommands.Save();
         this.JobArgs.Save();
@@ -30,7 +32,8 @@ export class JobBase extends SwarmMemory implements IJob {
         let JobArgs = JobMemory.CommandArgs;
         let creep = Game.creeps[JobMemory.CreepName];
 
-        let commandResult = BasicCreepCommand.ExecuteCreepCommand(this.JobCommands.GetCommandType(JobID), creep, JobArgs);
+        let commandType = this.JobCommands.GetCommandType(JobID) as CreepCommandType;
+        let commandResult = BasicCreepCommand.ExecuteCreepCommand(commandType, creep, JobArgs);
 
         // Process the commandResult against the CommandWeb.
         return OK;

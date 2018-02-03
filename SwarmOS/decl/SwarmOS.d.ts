@@ -18,16 +18,16 @@ declare interface IMemory {
 declare interface IJob extends IMemory {
     JobCommands: ICommandWeb;
     JobArgs: IMemory;
-    ProcessJob(JobMemory: IMemory): SwarmReturnCode;
+    ProcessJob(JobMemory: IMemory): number;
 }
 declare interface ICommandWeb extends IMemory {
-    SetCommands(linksList: { [commandID: string]: CommandType }, defaultCommand: string): void;
-    SetCommandComplete(fromID: string, results: SwarmReturnCode[]): void;
-    SetCommandResponse(fromID: string, toID: string, results: SwarmReturnCode[]): void;
-    SetDefaultCommandResponse(toID: string, results: SwarmReturnCode[]): void;
-    SetForceEnd(results: SwarmReturnCode[]): void;
-    GetCommandResult(fromID: string, result: SwarmReturnCode): string;
-    GetCommandType(commandID: string): CommandType;
+    SetCommands(linksList: { [commandID: string]: string }, defaultCommand: string): void;
+    SetCommandComplete(fromID: string, results: number[]): void;
+    SetCommandResponse(fromID: string, toID: string, results: number[]): void;
+    SetDefaultCommandResponse(toID: string, results: number[]): void;
+    SetForceEnd(results: number[]): void;
+    GetCommandResult(fromID: string, result: number): string;
+    GetCommandType(commandID: string): string;
 }
 
 declare var Swarmlord: {

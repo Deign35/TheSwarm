@@ -1,14 +1,15 @@
 import { SwarmMemory } from 'Memory/SwarmMemory';
+import * as SwarmEnums from 'SwarmEnums';
 
 class CommandLink {
-    private Links: { [result: number]: string };
-    constructor(public CommandID: string, public CommandType: CommandType) { }
+    private Links: { [result: number]: string } = {};
+    constructor(public CommandID: string, public CommandType: SwarmEnums.CommandType) { }
 
-    SetNextCommand(commandResult: SwarmReturnCode, commandID: string) {
+    SetNextCommand(commandResult: SwarmEnums.SwarmReturnCode, commandID: string) {
         this.Links[commandResult] = commandID;
     }
 
-    ProcessCommandResult(commandResult: SwarmReturnCode) {
+    ProcessCommandResult(commandResult: SwarmEnums.SwarmReturnCode) {
         if (this.Links[commandResult]) {
             return this.Links[commandResult];
         }
@@ -26,7 +27,7 @@ export class CommandWeb extends SwarmMemory implements ICommandWeb {
     protected LinksList: { [id: string]: CommandLink };
     DefaultCommand: string;
 
-    SetCommands(linksList: { [commandID: string]: CommandType }, defaultCommand: string) {
+    SetCommands(linksList: { [commandID: string]: SwarmEnums.CommandType }, defaultCommand: string) {
         for (let commandId in linksList) {
             this.LinksList[commandId] = new CommandLink(commandId, linksList[commandId]);
         }
@@ -46,25 +47,25 @@ export class CommandWeb extends SwarmMemory implements ICommandWeb {
         this.DefaultCommand = this.GetData('DefaultCommand') || CommandWeb.EndCommand;
     }
 
-    SetCommandComplete(fromID: string, results: SwarmReturnCode[]) {
+    SetCommandComplete(fromID: string, results: SwarmEnums.SwarmReturnCode[]) {
         this.SetCommandResponse(fromID, CommandWeb.EndCommandID, results);
     }
 
-    SetCommandResponse(fromID: string, toID: string, results: SwarmReturnCode[]) {
+    SetCommandResponse(fromID: string, toID: string, results: SwarmEnums.SwarmReturnCode[]) {
         for (let result of results) {
             this.LinksList[fromID].SetNextCommand(result, toID);
         }
     }
 
-    SetDefaultCommandResponse(toID: string, results: SwarmReturnCode[]) {
+    SetDefaultCommandResponse(toID: string, results: SwarmEnums.SwarmReturnCode[]) {
         this.SetCommandResponse(CommandWeb.AnyCommandID, toID, results);
     }
 
-    SetForceEnd(results: SwarmReturnCode[]) {
+    SetForceEnd(results: SwarmEnums.SwarmReturnCode[]) {
         this.SetCommandResponse(CommandWeb.AnyCommandID, CommandWeb.EndCommandID, results);
     }
 
-    GetCommandResult(fromID: string, result: SwarmReturnCode) {
+    GetCommandResult(fromID: string, result: SwarmEnums.SwarmReturnCode) {
         let toID = this.LinksList[fromID].ProcessCommandResult(result); // specific
         if (!toID) {
             toID = this.LinksList[CommandWeb.AnyCommandID].ProcessCommandResult(result); // general

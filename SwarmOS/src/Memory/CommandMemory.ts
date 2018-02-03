@@ -1,4 +1,5 @@
 import { SwarmMemory } from "Memory/SwarmMemory";
+import { JobResults } from "SwarmEnums";
 
 const ASSIGNED_CREEP = 'AC';
 const COMMAND_ARGS = 'CA';

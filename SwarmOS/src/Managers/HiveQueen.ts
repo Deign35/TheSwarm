@@ -5,14 +5,10 @@ import { Hivelord } from "Managers/Hivelord";
 
 export class HiveQueen extends SwarmMemory { // Controls a group of HiveNodes.
     HiveLords: Hivelord[];
-    //Tumors: {[name: string]: SwarmMemory} = {};
     Save() {
         for (let name in this.HiveLords) {
             this.HiveLords[name].Save();
         }
-        /*for(let name in this.Tumors) {
-            this.Tumors[name].Save();
-        }*/
         super.Save();
     }
     Load() {
@@ -22,10 +18,6 @@ export class HiveQueen extends SwarmMemory { // Controls a group of HiveNodes.
         for (let i = 0, length = HiveLordData.length; i < length; i++) {
             this.HiveLords[HiveLordData[i]] = new Hivelord(HiveLordData[i], this);
         }
-        /*let TumorData = this.GetData('TumorData') || [] as string[]; // No tumors yet
-        for(let i = 0, length = TumorData.length; i < length; i++) {
-            this.Tumors[TumorData[i]] = new SwarmMemory(TumorData[i], this);
-        }*/
     }
 
     Activate() {
@@ -37,21 +29,14 @@ export class HiveQueen extends SwarmMemory { // Controls a group of HiveNodes.
     InitHiveQueen() {
         let hive = Game.rooms[this.MemoryID];
         let sources = hive.find(FIND_SOURCES);
-        let ids = [] as string[];
-        if (sources.length > 0) {
-            ids.push(sources[0].id);
-            if (sources.length > 1) {
-                ids.push(sources[1].id);
-                // ASSUMPTION: Currently only 2 sources per room are allowed.
-            }
+        // Create jobs
+        let newHiveLord = new Hivelord('HL_S', this);
+        for (let i = 0, length = sources.length; i < length; i++) {
+            let newHarvesterJob = new HarvesterJob('S' + i, newHiveLord);
+            newHarvesterJob.InitJob(sources[i].id, true);
+            newHiveLord.AddNewJob(newHarvesterJob);
         }
-        this.SetData('Sources', ids);
-
-        let minerals = hive.find(FIND_MINERALS);
-        if (minerals.length > 0) {
-            this.SetData('Mineral', minerals[0].id);
-            // ASSUMPTION: Currently only 1 mineral per room is allowed.
-        }
+        this.HiveLords.push(newHiveLord);
 
         // Be sure to save the hivelord data before trying to use it.
     }
