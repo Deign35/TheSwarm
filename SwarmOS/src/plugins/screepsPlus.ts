@@ -1,5 +1,5 @@
 import { RoomResources } from './screepsPlus/RoomResources';
-import { Delegate } from '../common/Delegate';
+import { Delegate } from 'Delegate';
 
 declare interface ScreepsPlusDelegate {
 	(stats: any): void;

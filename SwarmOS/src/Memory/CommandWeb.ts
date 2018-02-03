@@ -1,4 +1,3 @@
-import { Swarmling } from 'SwarmTypes/Swarmling';
 import { SwarmMemory } from 'Memory/SwarmMemory';
 
 class CommandLink {

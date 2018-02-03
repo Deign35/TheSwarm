@@ -38,7 +38,7 @@ export class Swarmlord extends SwarmMemory {
     static InitSwarmlord() {
         let initResult = OK as SwarmReturnCode;
         this._instance = new Swarmlord(MEMORY_ID);
-        if (!Memory.INIT) {
+        if (!Memory.INIT) { // I want these gone at some point.
             console.log('InitSwarmlord');
             initResult = ERR_NOT_FOUND;
             Memory.INIT = false;

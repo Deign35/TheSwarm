@@ -1,5 +1,5 @@
 import { JobBase } from "JobRoles/JobBase";
-import { CommandWeb } from "Commands/CommandWeb";
+import { CommandWeb } from "Memory/CommandWeb";
 
 
 const HARVEST_COMMAND = 'HC';

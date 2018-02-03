@@ -1,21 +1,17 @@
 import { SwarmMemory } from "Memory/SwarmMemory";
 
 export class BasicCreepCommand extends SwarmMemory {
-    CommandArgs: { [id: string]: string | number };
-    Save() {
-        this.SetData('CommandArgs', this.CommandArgs);
-        super.Save();
-    }
-    Load() {
-        super.Load();
-        this.CommandArgs = this.GetData('CommandArgs') || {};
-    }
-
-    Execute() {
+    /*Execute() {
         let creep = Game.creeps[this.GetData('AssignedCreep')]; // Get this creep from somewhere else IMO;
-        return BasicCreepCommand.ExecuteCreepCommand(this.GetData('CommandType'), creep, this.CommandArgs);
-    }
+        return BasicCreepCommand.ExecuteCreepCommand(this.GetData('CommandType'), creep, this.GetCommandArgs());
+    }*/
 
+    GetCommandArgs() {
+        return this.GetData('CommandArgs');
+    }
+    SetCommandArgs(cmdArgs: Dictionary) {
+        this.SetData('CommandArgs', cmdArgs);
+    }
     AssignCreep(creep: Creep) {
         this.SetData('AssignedCreep', creep.name);
     }

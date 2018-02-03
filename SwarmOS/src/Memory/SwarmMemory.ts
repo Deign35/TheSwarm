@@ -1,5 +1,3 @@
-import { Delegate } from "common/Delegate";
-
 export class SwarmMemory implements IMemory {
     protected _cache: Dictionary = {};
     constructor(public MemoryID: string, public Parent?: SwarmMemory) { this.Load(); }
@@ -10,7 +8,7 @@ export class SwarmMemory implements IMemory {
         if (this.Parent) {
             this.Parent.SetData(this.MemoryID, this._cache);
         } else {
-            SwarmOverlord.SaveData(this.MemoryID, this._cache);
+            Memory[this.MemoryID] = this._cache;
         }
     }
 
@@ -18,7 +16,7 @@ export class SwarmMemory implements IMemory {
         if (this.Parent) {
             this._cache = this.Parent.GetData(this.MemoryID);
         } else {
-            this._cache = SwarmOverlord.LoadData(this.MemoryID);
+            this._cache = Memory[this.MemoryID];
         }
     }
 }

@@ -8,18 +8,7 @@ declare interface IDelegate<T extends CallbackFunction> {
     Unsubscribe(id: string): void;
     Notify(...args: any[]): void;
 }
-declare interface IDisposable {
-    dispose(): void;
-}
-declare var DisposeAll: {
-    subscribe(id: string, disposableObject: IDisposable): any,
-    unsubscribe(id: string): any,
-    DisposeAll(): any
-}
-declare type DisposableCallback<T extends IDisposable> = (disposableObject: T) => void;
-declare function using<T extends IDisposable>(disposableObject: T, disposableAction: DisposableCallback<T>): void;
 
-declare type MemoryFunc = (commandID: string) => any;
 declare interface IMemory {
     readonly MemoryID: string;
     GetData(id: string): any;
@@ -27,6 +16,7 @@ declare interface IMemory {
     Save(): void;
     Load(): void;
 }
+
 declare class SwarmMemory implements IMemory {
     readonly MemoryID: string;
     Parent?: SwarmMemory;
@@ -35,36 +25,21 @@ declare class SwarmMemory implements IMemory {
     Save(): void;
     Load(): void;
 }
-
-declare class SwarmOverlord {
-    static SaveData(id: string, dataObj: any): void;
-    static LoadData(id: string): any;
-    static SaveSwarmOverlordData(): void;
-    static InitOverlord(): void;
-}
-declare class Swarmlord {
-    static SaveData(data: IMemory): void;
-    static LoadData(name: string): IMemory;
+declare class Swarmlord extends SwarmMemory {
+    static SetData(data: IMemory): void;
+    static GetData(name: string): IMemory;
+    static SaveSwarmlord(): void;
     static InitSwarmlord(): void;
-
-}
-
-declare type CommandFunc = (...args: any[]) => SwarmReturnCode;
-declare interface ICommand {
-    CommandLoop: CommandFunc;
-    Execute(...inArgs: any[]): SwarmReturnCode;
 }
 
 declare class BasicCreepCommand extends SwarmMemory {
     CommandArgs: { [id: string]: string | number };
-    Save(): void;
-    Load(): void;
     Execute(): void;
     AssignCreep(creep: Creep): void;
     static ExecuteCreepCommand(commandType: CommandType, ling: Creep, args: { [name: string]: any }): SwarmReturnCode;
 }
 
-declare interface ICommandWeb extends SwarmMemory  {
+declare interface ICommandWeb extends SwarmMemory {
     SetCommands(linksList: { [commandID: string]: CommandType }, defaultCommand: string): void;
     SetCommandComplete(fromID: string, results: SwarmReturnCode[]): void;
     SetCommandResponse(fromID: string, toID: string, results: SwarmReturnCode[]): void;
@@ -73,6 +48,9 @@ declare interface ICommandWeb extends SwarmMemory  {
     GetCommandResult(fromID: string, result: SwarmReturnCode): string;
     GetCommandType(commandID: string): CommandType;
 }
+
 declare interface IJob extends IMemory {
     JobCommands: ICommandWeb;
+    JobArgs: IMemory;
+    ProcessJob(JobMemory: IMemory): SwarmReturnCode;
 }
