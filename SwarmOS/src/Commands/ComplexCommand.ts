@@ -1,5 +1,6 @@
 import { LongCommand } from './CommandBase';
 import { Swarmling } from 'SwarmTypes/Swarmling';
+import { SwarmMemory } from 'Memory/SwarmMemory';
 
 export class CommandLink {
     private Links: { [result: number]: string };
@@ -13,46 +14,80 @@ export class CommandLink {
         if (this.Links[commandResult]) {
             return this.Links[commandResult];
         }
-        return this.CommandID;
+        return undefined;
     }
-
 }
 
-export class CommandWeb {
+export class CommandWeb extends SwarmMemory {
+    static readonly AnyCommandID = 'ANY';
     static readonly EndCommandID = 'END';
     static EndCommand: CommandLink = new CommandLink(CommandWeb.EndCommandID, CommandComplete);
 
     protected LinksList: { [id: string]: CommandLink } = {};
-    constructor(public WebID: string, linksList: { [commandID: string]: CommandType }) {
+    public DefaultCommand: string;
+
+    SetCommands(linksList: { [commandID: string]: CommandType }, defaultCommand: string) {
         for (let commandId in linksList) {
             this.LinksList[commandId] = new CommandLink(commandId, linksList[commandId]);
         }
+        this.LinksList[CommandWeb.AnyCommandID] = new CommandLink(CommandWeb.AnyCommandID, CommandAny);
+        this.DefaultCommand = defaultCommand;
+    }
+
+    Save() {
+        this.SetData('linksList', this.LinksList);
+        this.SetData('DefaultCommand', this.DefaultCommand);
+        super.Save();
+    }
+
+    Load() {
+        super.Load();
+        this.LinksList = this.GetData('linksList');
+        this.DefaultCommand = this.GetData('DefaultCommand');
     }
 
     SetCommandComplete(fromID: string, results: SwarmReturnCode[]) {
-        this.SetCommandResult(fromID, CommandWeb.EndCommandID, results);
+        this.SetCommandResponse(fromID, CommandWeb.EndCommandID, results);
     }
 
-    SetCommandResult(fromID: string, toID: string, results: SwarmReturnCode[]) {
+    SetCommandResponse(fromID: string, toID: string, results: SwarmReturnCode[]) {
         for (let result of results) {
             this.LinksList[fromID].SetNextCommand(result, toID);
         }
     }
 
+    SetDefaultCommandResponse(toID: string, results: SwarmReturnCode[]) {
+        this.SetCommandResponse(CommandWeb.AnyCommandID, toID, results);
+    }
+
+    SetForceEnd(results: SwarmReturnCode[]) {
+        this.SetCommandResponse(CommandWeb.AnyCommandID, CommandWeb.EndCommandID, results);
+    }
+
     GetCommandResult(fromID: string, result: SwarmReturnCode) {
-        return this.LinksList[fromID].ProcessCommandResult(result);
+        let toID = this.LinksList[fromID].ProcessCommandResult(result); // specific
+        if (!toID) {
+            toID = this.LinksList[CommandWeb.AnyCommandID].ProcessCommandResult(result); // general
+            if (!toID) {
+                // what to do if no ID?
+                toID = this.GetData('DefaultCommand');
+            }
+        }
+        return toID;
     }
 
     GetCommandType(commandID: string) {
         return this.LinksList[commandID].CommandType;
     }
 
-    /*ProcessSwarmling(ling: Swarmling, commandMemory: IMemory) {
+    /*
+    ProcessSwarmling(ling: Swarmling, commandMemory: IMemory) {
         let curID = commandMemory.GetData('CmdID');
         let args = BasicCreepCommand.ConstructCommandArgs(commandMemory.GetData('CmdArgs')); // FIX THIS!!!
         let commandResult = BasicCreepCommand.ExecuteCreepCommand(this.LinksList[curID].CommandType, ling, args);
         let nextCommand = this.LinksList[curID].ProcessCommandResult(commandResult);
         if (nextCommand)
             commandMemory.SetData('CmdID', nextCommand);
-    }*/
+    }
+    */
 }

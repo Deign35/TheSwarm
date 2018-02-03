@@ -1,22 +1,27 @@
 import { SwarmMemory } from "Memory/SwarmMemory";
 import { BasicCreepCommand } from "Commands/BasicCreepCommand";
+import { CommandWeb } from "Commands/ComplexCommand";
+import { Swarmling } from "SwarmTypes/Swarmling";
 
-export abstract class JobBase implements IJob {
-    constructor(public JobID: string) {
+export abstract class JobBase extends SwarmMemory implements IJob {
+    JobCommands: CommandWeb;
+    JobArgs: IMemory;
 
+    Save() {
+        this.JobCommands.Save();
+        this.JobArgs.Save();
+        super.Save();
     }
-    JobCommands: { [cmdId: string]: BasicCreepCommand; };
-    MemoryID: string;
 
-    static SaveJob(MemoryObj: IMemory, job: JobBase) {
-        let jobMemory = {} as Dictionary;
-        MemoryObj.SetData(job.JobID, jobMemory)
+    Load() {
+        super.Load();
+        this.JobCommands = new CommandWeb('jobCommands', this);
+        this.JobArgs = new SwarmMemory('jobArgs', this);
     }
-    static LoadCommand(MemoryObj: IMemory, commandName: string) {
-        let commandMemory = MemoryObj.GetData(commandName);
-        let newCommand = new BasicCreepCommand(commandName, commandMemory['commandType']);
-        newCommand.CreepCommandData = commandMemory['commandData'];
-        newCommand.AssignedCreep = Game.getObjectById(commandMemory['assignedCreepId']) as Creep;
-        // Creep doesn't have memory right now...
+
+    ProcessJob(creep: Swarmling) {
+        let creepData = creep.Brain;
+        let JobData = creepData.GetData('JobData');
+        let curCmd = JobData['cmd'] as BasicCreepCommandType;
     }
 }

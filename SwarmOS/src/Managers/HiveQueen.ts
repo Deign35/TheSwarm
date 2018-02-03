@@ -2,6 +2,7 @@ import { SwarmMemory } from "Memory/SwarmMemory";
 import { DisposalDelegate } from "common/Disposable";
 import * as _ from "lodash";
 import { BasicCreepCommand } from "Commands/BasicCreepCommand";
+import { HarvesterJob } from "JobRoles/HarvesterJob";
 
 export class HiveQueen extends SwarmMemory implements IDisposable { // Controls a group of HiveNodes.
     dispose(): void {
@@ -43,12 +44,12 @@ export class HiveQueen extends SwarmMemory implements IDisposable { // Controls 
         if (level == 1) {
             let sourceIds = this.GetData('Sources');
             for (let i = 0, length = sourceIds.length; i < length; i++) {
-                jobs['S' + i] = CreepRole.Harvester;
+                //jobs['S' + i] = new HarvesterJob('S' + i, sourceIds[i], true);
             }
-            jobs['U'] = CreepRole.Upgrader;
+            jobs['U1'] = CreepRole.Upgrader;
         } else /*if (level == 2) {
             // add more jobs.
-        } else */{
+        } else */ {
             throw 'Job level[' + level + '] is not configured';
         }
     }

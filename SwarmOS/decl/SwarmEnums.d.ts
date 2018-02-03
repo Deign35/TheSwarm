@@ -12,6 +12,7 @@ declare type C_Say = 'Sa'; declare const C_Say = 'Sa';
 declare type C_Suicide = 'Su'; declare const C_Suicide = 'Su';
 declare type C_Transfer = 'Tr'; declare const C_Transfer = 'Tr';
 declare type C_Upgrade = 'Up'; declare const C_Upgrade = 'Up';
+declare type C_Wait = 'Wa'; declare const C_Wait = 'Wa';
 declare type C_Withdraw = 'Wi'; declare const C_Withdraw = 'Wi';
 // AttackController, ClaimController, GenerateSafeMode, RangedMassAttack, SignController, ReserveController
 
@@ -23,12 +24,13 @@ declare type BasicCreepCommandType =
     C_Attack | C_Build | C_Dismantle | C_Drop |
     C_Harvest | C_Heal | C_Pickup | C_RangedAttack |
     C_RangedHeal | C_Repair | C_Say | C_Suicide |
-    C_Transfer | C_Upgrade | C_Withdraw;
+    C_Transfer | C_Upgrade | C_Wait | C_Withdraw;
 
 
 declare type A_NewJob = 'NJ'; declare const A_NewJob = 'NJ';
+declare type A_FindTarget = 'FT'; declare const A_FindTarget = 'FT';
 
-declare type AdvancedCreepCommandType = A_NewJob;
+declare type AdvancedCreepCommandType = A_NewJob | A_FindTarget;
 
 declare type CreepCommandType = BasicCreepCommandType | AdvancedCreepCommandType;
 declare type CreepCommandRequiresTarget = C_Attack | C_Build | C_Dismantle | C_Harvest |
@@ -64,8 +66,9 @@ declare enum c_ComplexCommandResponse {
 
 declare type SimpleCommandType = BasicCreepCommandType //| c_SimpleRoom;
 
+declare type CommandAny = 'AnyC'; declare const CommandAny = 'AnyC';
 declare type CommandComplete = 'CmdC'; declare const CommandComplete = 'CmdC';
-declare type CommandType = CreepCommandType | CommandComplete;
+declare type CommandType = CreepCommandType | CommandComplete | CommandAny;
 
 declare type SwarmReturnCode = ScreepsReturnCode | E_CATASTROPHIC;
 declare type E_CATASTROPHIC = -16; declare const E_CATASTROPHIC = -16;

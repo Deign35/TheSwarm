@@ -1,5 +1,23 @@
 import { Swarmling } from "SwarmTypes/Swarmling";
 import { ShortCommand } from "Commands/CommandBase";
+import { SwarmMemory } from "Memory/SwarmMemory";
+
+export class CreepCommandData extends SwarmMemory {
+    CommandArgs: { [id: string]: string | number };
+    AssignedCreep: Swarmling;
+    Save() {
+        this.SetData('CommandArgs', this.CommandArgs);
+        this.AssignedCreep.Brain.Save();
+        super.Save();
+    }
+    Load() {
+        super.Load();
+        this.CommandArgs = this.GetData('CommandArgs');
+        let brain = new SwarmMemory('Ling', this);
+        this.AssignedCreep = Game.creeps[brain.GetData('name')] as Swarmling;
+        this.AssignedCreep.Brain = brain;
+    }
+}
 
 export class BasicCreepCommand {
     constructor(public Name: string, public Type: CommandType) { }
@@ -22,32 +40,6 @@ export class BasicCreepCommand {
         newCommand.AssignedCreep = Game.getObjectById(commandMemory['assignedCreepId']) as Creep;
         // Creep doesn't have memory right now...
     }
-    /*static ConstructCommandArgs(commandType: CommandType, command: BasicCreepCommand): { [name: string]: any } {
-        let constructedArgs: { [name: string]: any } = {};//; = { argsCount: args.length };//
-        switch (commandType) {
-            case (C_Suicide): break;
-            case (C_Say):
-                constructedArgs['message'] = command.CreepCommandData['message'];
-                break;
-            case (C_Drop):
-                constructedArgs['resourceType'] = command.CreepCommandData['resourceType'];
-                if (command.CreepCommandData.Amount) {
-                    constructedArgs['amount'] = command.CreepCommandData['amount'];
-                }
-                break;
-            case (C_Transfer):
-            case (C_Withdraw):
-                constructedArgs['resourceType'] = command.CreepCommandData.ResourceType;
-                if (command.CreepCommandData.Amount) {
-                    constructedArgs['amount'] = command.CreepCommandData.Amount;
-                }
-            default:
-                constructedArgs['target'] = Game.getObjectById(command.CreepCommandData.Target as string);
-                break;
-        }
-        return constructedArgs;
-    }*/
-
     static ExecuteCreepCommand(commandType: CommandType, ling: Creep, args: { [name: string]: any }): ScreepsReturnCode {
         switch (commandType) {
             case (C_Attack): return ling.attack(args['target']);

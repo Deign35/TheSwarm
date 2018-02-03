@@ -50,10 +50,11 @@ declare class BasicCreepCommand {
     static LoadCommand(MemoryObj: IMemory, commandName: string): BasicCreepCommand;
     static ExecuteCreepCommand(commandType: CommandType, ling: Creep, args: { [name: string]: any }): ScreepsReturnCode
 }
-declare interface IJob {
-    JobID: string;
-    JobCommands: { [cmdId: string]: BasicCreepCommand };
+declare interface ICommandWeb {
 
+}
+declare interface IJob extends IMemory {
+    JobCommands: ICommandWeb;
 }
 /*
 declare interface CreepCommand extends ICommand {
