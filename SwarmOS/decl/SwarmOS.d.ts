@@ -27,6 +27,14 @@ declare interface IMemory {
     Save(): void;
     Load(): void;
 }
+declare class SwarmMemory implements IMemory {
+    readonly MemoryID: string;
+    Parent?: SwarmMemory;
+    GetData(id: string): any;
+    SetData(id: string, data: any): void;
+    Save(): void;
+    Load(): void;
+}
 
 declare class SwarmOverlord {
     static SaveData(id: string, dataObj: any): void;
@@ -46,50 +54,25 @@ declare interface ICommand {
     CommandLoop: CommandFunc;
     Execute(...inArgs: any[]): SwarmReturnCode;
 }
-declare class BasicCreepCommand {
-    Name: string;
-    Type: CommandType;
-    CreepCommandData: { [id: string]: string | number };
-    AssignedCreep: Creep;
-    Execute(): ScreepsReturnCode;
-    static SaveCommand(MemoryObj: IMemory, command: BasicCreepCommand): void;
-    static LoadCommand(MemoryObj: IMemory, commandName: string): BasicCreepCommand;
-    static ExecuteCreepCommand(commandType: CommandType, ling: Creep, args: { [name: string]: any }): ScreepsReturnCode
-}
-declare interface ICommandWeb {
 
+declare class BasicCreepCommand extends SwarmMemory {
+    CommandArgs: { [id: string]: string | number };
+    Save(): void;
+    Load(): void;
+    Execute(): void;
+    AssignCreep(creep: Creep): void;
+    static ExecuteCreepCommand(commandType: CommandType, ling: Creep, args: { [name: string]: any }): SwarmReturnCode;
+}
+
+declare interface ICommandWeb extends SwarmMemory  {
+    SetCommands(linksList: { [commandID: string]: CommandType }, defaultCommand: string): void;
+    SetCommandComplete(fromID: string, results: SwarmReturnCode[]): void;
+    SetCommandResponse(fromID: string, toID: string, results: SwarmReturnCode[]): void;
+    SetDefaultCommandResponse(toID: string, results: SwarmReturnCode[]): void;
+    SetForceEnd(results: SwarmReturnCode[]): void;
+    GetCommandResult(fromID: string, result: SwarmReturnCode): string;
+    GetCommandType(commandID: string): CommandType;
 }
 declare interface IJob extends IMemory {
     JobCommands: ICommandWeb;
 }
-/*
-declare interface CreepCommand extends ICommand {
-    Execute(creep: Creep, ...inArgs: any[]): SwarmReturnCode;
-    CreepReactionToCommandCompletion(commandResult: ScreepsReturnCode): SwarmReturnCode
-    ConstructCommandArgs(...args: any[]): { [name: string]: any };
-}
-declare interface ICreepCommand<T extends BasicCreepCommandType> extends ICommand, CommandBase<T> {
-    ExecuteCreep(creep: Creep): ScreepsReturnCode;
-}
-declare interface CommandBase<CommandType> extends IMemory, ICommand {
-
-}
-declare class Swarmling extends Creep {
-
-    /*Attack(): ScreepsReturnCode;
-    Build(): ScreepsReturnCode;
-    Dismantle(): ScreepsReturnCode;
-    Drop(): ScreepsReturnCode;
-    Harvest(): ScreepsReturnCode;
-    Heal(): ScreepsReturnCode;
-    Move(): ScreepsReturnCode;
-    Pickup(): ScreepsReturnCode;
-    RangedAttack(): ScreepsReturnCode;
-    RangedHeal(): ScreepsReturnCode;
-    Repair(): ScreepsReturnCode;
-    Say(): ScreepsReturnCode;
-    Suicide(): ScreepsReturnCode;
-    Transfer(): ScreepsReturnCode;
-    UpgradeController(): ScreepsReturnCode;
-    Withdraw(): ScreepsReturnCode;
-}*/

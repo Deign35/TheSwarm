@@ -1,46 +1,26 @@
-import { Swarmling } from "SwarmTypes/Swarmling";
-import { ShortCommand } from "Commands/CommandBase";
 import { SwarmMemory } from "Memory/SwarmMemory";
 
-export class CreepCommandData extends SwarmMemory {
+export class BasicCreepCommand extends SwarmMemory {
     CommandArgs: { [id: string]: string | number };
-    AssignedCreep: Swarmling;
     Save() {
         this.SetData('CommandArgs', this.CommandArgs);
-        this.AssignedCreep.Brain.Save();
         super.Save();
     }
     Load() {
         super.Load();
         this.CommandArgs = this.GetData('CommandArgs') || {};
-        let brain = new SwarmMemory('Ling', this);
-        this.AssignedCreep = Game.creeps[brain.GetData('name')] as Swarmling;
-        this.AssignedCreep.Brain = brain;
     }
-}
 
-export class BasicCreepCommand {
-    constructor(public Name: string, public Type: CommandType) { }
-    CreepCommandData: { [id: string]: string | number };
-    AssignedCreep: Creep;
     Execute() {
-        return BasicCreepCommand.ExecuteCreepCommand(this.Type, this.AssignedCreep, this.CreepCommandData);
+        let creep = Game.creeps[this.GetData('AssignedCreep')]; // Get this creep from somewhere else IMO;
+        return BasicCreepCommand.ExecuteCreepCommand(this.GetData('CommandType'), creep, this.CommandArgs);
     }
-    static SaveCommand(MemoryObj: IMemory, command: BasicCreepCommand) {
-        let commandMemory = {} as Dictionary;
-        commandMemory['commandType'] = command.Type;
-        commandMemory['commandData'] = command.CreepCommandData;
-        commandMemory['assignedCreepId'] = command.AssignedCreep.id;
-        MemoryObj.SetData(command.Name, commandMemory)
+
+    AssignCreep(creep: Creep) {
+        this.SetData('AssignedCreep', creep.name);
     }
-    static LoadCommand(MemoryObj: IMemory, commandName: string) {
-        let commandMemory = MemoryObj.GetData(commandName);
-        let newCommand = new BasicCreepCommand(commandName, commandMemory['commandType']);
-        newCommand.CreepCommandData = commandMemory['commandData'];
-        newCommand.AssignedCreep = Game.getObjectById(commandMemory['assignedCreepId']) as Creep;
-        // Creep doesn't have memory right now...
-    }
-    static ExecuteCreepCommand(commandType: CommandType, ling: Creep, args: { [name: string]: any }): ScreepsReturnCode {
+
+    static ExecuteCreepCommand(commandType: CommandType, ling: Creep, args: { [name: string]: any }): SwarmReturnCode {
         switch (commandType) {
             case (C_Attack): return ling.attack(args['target']);
             case (C_Build): return ling.build(args['target']);

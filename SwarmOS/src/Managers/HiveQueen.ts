@@ -1,7 +1,5 @@
 import { SwarmMemory } from "Memory/SwarmMemory";
-import { DisposalDelegate } from "common/Disposable";
 import * as _ from "lodash";
-import { BasicCreepCommand } from "Commands/BasicCreepCommand";
 import { HarvesterJob } from "JobRoles/HarvesterJob";
 import { Hivelord } from "Managers/Hivelord";
 

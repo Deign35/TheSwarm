@@ -1,8 +1,7 @@
-import { LongCommand } from './CommandBase';
 import { Swarmling } from 'SwarmTypes/Swarmling';
 import { SwarmMemory } from 'Memory/SwarmMemory';
 
-export class CommandLink {
+class CommandLink {
     private Links: { [result: number]: string };
     constructor(public CommandID: string, public CommandType: CommandType) { }
 
@@ -18,13 +17,13 @@ export class CommandLink {
     }
 }
 
-export class CommandWeb extends SwarmMemory {
+export class CommandWeb extends SwarmMemory implements ICommandWeb {
     static readonly AnyCommandID = 'ANY';
     static readonly EndCommandID = 'END';
-    static EndCommand: CommandLink = new CommandLink(CommandWeb.EndCommandID, CommandComplete);
+    protected static EndCommand: CommandLink = new CommandLink(CommandWeb.EndCommandID, CommandComplete);
 
     protected LinksList: { [id: string]: CommandLink };
-    public DefaultCommand: string;
+    DefaultCommand: string;
 
     SetCommands(linksList: { [commandID: string]: CommandType }, defaultCommand: string) {
         for (let commandId in linksList) {
@@ -69,8 +68,7 @@ export class CommandWeb extends SwarmMemory {
         if (!toID) {
             toID = this.LinksList[CommandWeb.AnyCommandID].ProcessCommandResult(result); // general
             if (!toID) {
-                // what to do if no ID?
-                toID = this.GetData('DefaultCommand');
+                toID = this.DefaultCommand;
             }
         }
         return toID;

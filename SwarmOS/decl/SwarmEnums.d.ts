@@ -12,59 +12,19 @@ declare type C_Say = 'Sa'; declare const C_Say = 'Sa';
 declare type C_Suicide = 'Su'; declare const C_Suicide = 'Su';
 declare type C_Transfer = 'Tr'; declare const C_Transfer = 'Tr';
 declare type C_Upgrade = 'Up'; declare const C_Upgrade = 'Up';
-declare type C_Wait = 'Wa'; declare const C_Wait = 'Wa';
 declare type C_Withdraw = 'Wi'; declare const C_Withdraw = 'Wi';
-// AttackController, ClaimController, GenerateSafeMode, RangedMassAttack, SignController, ReserveController
-
-declare enum c_AdvancedCreep {
-    RemoteMining = 'RM',
-}
 
 declare type BasicCreepCommandType =
     C_Attack | C_Build | C_Dismantle | C_Drop |
     C_Harvest | C_Heal | C_Pickup | C_RangedAttack |
     C_RangedHeal | C_Repair | C_Say | C_Suicide |
-    C_Transfer | C_Upgrade | C_Wait | C_Withdraw;
+    C_Transfer | C_Upgrade | C_Withdraw;
 
-
-declare type A_NewJob = 'NJ'; declare const A_NewJob = 'NJ';
 declare type A_FindTarget = 'FT'; declare const A_FindTarget = 'FT';
 
-declare type AdvancedCreepCommandType = A_NewJob | A_FindTarget;
+declare type AdvancedCreepCommandType = A_FindTarget;
 
 declare type CreepCommandType = BasicCreepCommandType | AdvancedCreepCommandType;
-declare type CreepCommandRequiresTarget = C_Attack | C_Build | C_Dismantle | C_Harvest |
-    C_Heal | C_Pickup | C_RangedAttack | C_RangedHeal |
-    C_Repair | C_Transfer | C_Upgrade | C_Withdraw;
-
-declare enum e_CreepResponse {
-    CancelCommands = 'CC', // Cancel Commands
-    Complete = 'Cm', // Complete
-    Continue = 'Cn', // Continue
-    CheckPosition = 'CP', // CheckPosition
-    Move = 'Mv', // Move
-    Retry = 'Re', // Retry
-    Reset = 'Rs', // Reset
-    RequireTarget = 'RT', // Requires a Target
-    Throw = 'Tr', // Throw
-}
-
-declare enum t_Target {
-    FixedTarget = 'FT', // Fixed Target
-    Callback = 'CB', // Callback
-    NearestStructure = 'NS', // Nearest Structure
-    FindTarget = 'FT', // Find Target
-    AtPosition = 'AP', // At Position
-}
-
-declare enum c_ComplexCommandResponse {
-    Failed = 'Fa',
-    Next = 'Nx',
-    Quit = 'Qu',
-    Undo = 'Un'
-}
-
-declare type SimpleCommandType = BasicCreepCommandType //| c_SimpleRoom;
 
 declare type CommandAny = 'AnyC'; declare const CommandAny = 'AnyC';
 declare type CommandComplete = 'CmdC'; declare const CommandComplete = 'CmdC';
@@ -72,13 +32,3 @@ declare type CommandType = CreepCommandType | CommandComplete | CommandAny;
 
 declare type SwarmReturnCode = ScreepsReturnCode | E_CATASTROPHIC;
 declare type E_CATASTROPHIC = -16; declare const E_CATASTROPHIC = -16;
-
-declare enum CreepRole {
-    Harvester = 'Ha',
-    Transporter = 'Tr',
-    Miner = 'Mi',
-    Scientist = 'Si',
-    Repairer = 'Re',
-    Upgrader = 'Up',
-    Sweeper = 'Sw'
-}

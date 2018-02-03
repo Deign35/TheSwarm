@@ -1,6 +1,6 @@
-﻿import { DisposalDelegate } from './common/Disposable';
-import { Swarmlord } from 'Managers/Swarmlord';
+﻿import { Swarmlord } from 'Managers/Swarmlord';
 import { SwarmQueen } from 'Managers/SwarmQueen';
+
 export const loop = function () {
     console.log('Main');
     try {
@@ -10,6 +10,5 @@ export const loop = function () {
         swarmQueen.Save();
     } finally {
         Swarmlord.SaveSwarmlord();
-        DisposalDelegate.DiposeAll(); // NEVER DONT CALL THIS!!!!!!
     }
 }

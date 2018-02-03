@@ -22,17 +22,3 @@ export class SwarmMemory implements IMemory {
         }
     }
 }
-
-declare type MemFunc = (mem: SwarmMemory, name: string) => any;
-const MemFunc = (mem: SwarmMemory, name: string) => {
-    return mem.GetData(name);
-}
-export class CreepMemory extends SwarmMemory {
-    CT: MemFunc = () => MemFunc(this, 'CommandTarget');
-    GetCommandTarget() {
-        return this.GetData('CommandTarget');
-    }
-    SetCommandTarget(target: RoomObject | RoomPosition) {
-        this.SetData('CommandTarget', target);
-    }
-}

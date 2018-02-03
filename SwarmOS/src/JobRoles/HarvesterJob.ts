@@ -1,5 +1,6 @@
 import { JobBase } from "JobRoles/JobBase";
-import { CommandWeb } from "Commands/ComplexCommand";
+import { CommandWeb } from "Commands/CommandWeb";
+
 
 const HARVEST_COMMAND = 'HC';
 const TRANSFER_COMMAND = 'TC';

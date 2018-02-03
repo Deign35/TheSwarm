@@ -1,7 +1,5 @@
 import { SwarmMemory } from "Memory/SwarmMemory";
-import { BasicCreepCommand } from "Commands/BasicCreepCommand";
-import { CommandWeb } from "Commands/ComplexCommand";
-import { Swarmling } from "SwarmTypes/Swarmling";
+import { CommandWeb } from "Commands/CommandWeb";
 
 export class JobBase extends SwarmMemory implements IJob {
     JobCommands: CommandWeb;
@@ -19,9 +17,8 @@ export class JobBase extends SwarmMemory implements IJob {
         this.JobArgs = new SwarmMemory('jobArgs', this);
     }
 
-    ProcessJob(creep: Swarmling) {
-        let creepData = creep.Brain;
-        let JobData = creepData.GetData('JobData');
+    ProcessJob(JobMemory: IMemory) {
+        let JobData = JobMemory.GetData('JobData');
         let curCmd = JobData['cmd'] as BasicCreepCommandType;
     }
 }
