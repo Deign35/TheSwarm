@@ -4,14 +4,14 @@ import { CommandMemory } from "Memory/CommandMemory";
 import { HarvesterJob } from "JobRoles/HarvesterJob";
 import { HL_REQUIRE_CREEP, SwarmReturnCode, HL_RETRY, HL_NEXT_COMMAND } from "SwarmEnums";
 
-export abstract class Hivelord extends SwarmMemory {
-    protected TaskJobs: { [name: string]: JobBase };
+export class Hivelord extends SwarmMemory {
+    TaskJobs: { [name: string]: JobBase };
     AddNewJob(job: JobBase) {
         this.TaskJobs[job.MemoryID] = job;
     }
 
     Activate(room: Room) {
-        for(let name in this.TaskJobs) {
+        for (let name in this.TaskJobs) {
             this.TaskJobs[name].Activate(room);
         }
     }

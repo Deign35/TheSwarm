@@ -36,12 +36,12 @@ export class HiveQueen extends SwarmMemory { // Controls a group of HiveNodes.
     }
 
     InitHiveQueen() {
-        let hive = Game.rooms[this.MemoryID];
+        /*let hive = Game.rooms[this.MemoryID];
         let sources = hive.find(FIND_SOURCES);
         // Should have one harvester per source, then RCL1_HLs until RCL2, then RCL2s
         let newHivelord = new RCL1_Hivelord('RCL1_HL', this);
         newHivelord.Save();
         this.Hivelords[newHivelord.MemoryID] = (newHivelord);
-        // Be sure to save the hivelord data before trying to use it.
+        // Be sure to save the hivelord data before trying to use it.*/
     }
 }

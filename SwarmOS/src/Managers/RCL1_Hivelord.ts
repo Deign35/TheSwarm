@@ -13,12 +13,12 @@ export class RCL1_Hivelord extends Hivelord {
 
     Activate(room: Room) {
         let allOk = true;
-        for(let name in this.TaskJobs) {
-            if(this.TaskJobs[name].Activate(room) != OK) {
+        for (let name in this.TaskJobs) {
+            if (this.TaskJobs[name].Activate(room) != OK) {
                 allOk = false;
             }
         }
-        if(allOk) {
+        if (allOk) {
             let newWorker = new RCL1_Worker(('' + Game.time).slice(-4), this);
             newWorker.InitJob();
             this.AddNewJob(newWorker);

@@ -1,13 +1,14 @@
 ﻿import { SwarmQueen } from 'Managers/SwarmQueen';
 import { SwarmReturnCode } from 'SwarmEnums';
+import './Commands/ConsoleCommands';
 
 export const loop = function () {
-    if(initSwarm() != OK) {
+    if (initSwarm() != OK) {
         console.log('CATASTROPHIC END!!!!!!');
         return;
     }
-    for(let name in Memory.creeps) {
-        if(!Game.creeps[name]) {
+    for (let name in Memory.creeps) {
+        if (!Game.creeps[name]) {
             delete Memory.creeps[name];
         }
     } // Temp solution
@@ -16,7 +17,7 @@ export const loop = function () {
     swarmQueen.Save();
 }
 
-const initSwarm = function() {
+const initSwarm = function () {
     let initResult = OK as SwarmReturnCode;
     if (!Memory.INIT) { // I want these gone at some point.
         console.log('InitSwarmlord');
