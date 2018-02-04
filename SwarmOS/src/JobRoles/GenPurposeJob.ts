@@ -19,9 +19,11 @@ export class GenPurposeJob extends JobBase {
     }
 
     ValidateJob() {
-        let result = super.ValidateJob();
-        if (!result && !this.GetData('active')) {
+        let result = ERR_INVALID_ARGS as SwarmReturnCode;
+        if (!this.GetData('active')) {
             result = ERR_BUSY;
+        } else {
+            result = super.ValidateJob();
         }
         return result;
     }

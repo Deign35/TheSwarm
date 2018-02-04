@@ -1,8 +1,8 @@
 import { SwarmMemory } from "Memory/SwarmMemory";
 import { JobBase } from "JobRoles/JobBase";
 import { CommandMemory } from "Memory/CommandMemory";
-import { HarvesterJob } from "JobRoles/HarvesterJob";
 import { HL_REQUIRE_CREEP, SwarmReturnCode, HL_RETRY, HL_NEXT_COMMAND } from "SwarmEnums";
+import { GenPurposeJob } from "JobRoles/GenPurposeJob";
 
 export class Hivelord extends SwarmMemory {
     TaskJobs: { [name: string]: JobBase };
@@ -32,7 +32,7 @@ export class Hivelord extends SwarmMemory {
         let TaskJobData = this.GetData('jobData') || [] as string[];
         this.TaskJobs = {};
         for (let i = 0, length = TaskJobData.length; i < length; i++) {
-            this.TaskJobs[TaskJobData[i]] = new HarvesterJob(TaskJobData[i], this);
+            this.TaskJobs[TaskJobData[i]] = new GenPurposeJob(TaskJobData[i], this);
         }
     }
 }

@@ -99,8 +99,6 @@ export abstract class JobBase extends SwarmMemory implements IJob {
         if (retryCount > 5) {
             console.log('Job HAS FAILED: ' + result)
         }
-
-        console.log('R: ' + result);
         return result;
     }
 }

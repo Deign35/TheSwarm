@@ -21,7 +21,7 @@ export class ConsoleCommands {
         }
         return new Hivelord(hivelordName, queen);
     }
-    static CreateNewHivelord(hiveName: string, hivelordName: string) {
+    static AddLord(hiveName: string, hivelordName: string) {
         let queen = this.GetHive(hiveName);
         if (queen.Hivelords[hivelordName]) {
             throw 'Hivelord[' + hivelordName + '] already exists.';
@@ -45,7 +45,7 @@ export class ConsoleCommands {
         }
         return new GenPurposeJob(jobID, hivelord);
     }
-    static CreateNewJob(hiveName: string, hivelordName: string, jobID: string) {
+    static AddJob(hiveName: string, hivelordName: string, jobID: string) {
         let targetLord = this.GetHivelord(hiveName, hivelordName);
         targetLord.AddNewJob(new GenPurposeJob(jobID, targetLord));
         targetLord.Save();
@@ -65,10 +65,10 @@ export class ConsoleCommands {
         console.log('-Reset - Hard reset for the entire OS')
         console.log('-GetHive - (roomName)');
         console.log('-GetHivelord - (roomName, hivelordName)');
-        console.log('-CreateNewHivelord - (roomName, hivelordName)');
+        console.log('-AddLord - (roomName, hivelordName)');
         console.log('-DeleteHivelord - (roomName, hivelordName)');
         console.log('-GetJob - (roomName, hivelordName, jobID)\n---AddCommand - (commandType, target?)');
-        console.log('-CreateNewJob - (hiveName, hivelordName, jobID)');
+        console.log('-AddJob - (hiveName, hivelordName, jobID)');
         console.log('-DeleteJob - (roomName, hivelordName, jobID)');
         return OK;
     }

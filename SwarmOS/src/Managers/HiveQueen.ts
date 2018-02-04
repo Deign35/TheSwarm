@@ -1,8 +1,6 @@
 import { SwarmMemory } from "Memory/SwarmMemory";
-import { HarvesterJob } from "JobRoles/HarvesterJob";
 import { Hivelord } from "Managers/Hivelord";
 import { SwarmReturnCode, HL_REQUIRE_CREEP } from "SwarmEnums";
-import { RCL1_Hivelord } from "Managers/RCL1_Hivelord";
 
 export class HiveQueen extends SwarmMemory { // Controls a group of HiveNodes.
     // Should change this to be an interface and different levels or configurations can have different kinds of HiveQueens
@@ -25,7 +23,7 @@ export class HiveQueen extends SwarmMemory { // Controls a group of HiveNodes.
         let HiveLordData = this.GetData('HiveLordData') || [] as string[];
         for (let i = 0, length = HiveLordData.length; i < length; i++) {
             let hiveData = this.GetData(HiveLordData[i]);
-            this.Hivelords[HiveLordData[i]] = new RCL1_Hivelord(HiveLordData[i], this);
+            this.Hivelords[HiveLordData[i]] = new Hivelord(HiveLordData[i], this);
         }
     }
 
