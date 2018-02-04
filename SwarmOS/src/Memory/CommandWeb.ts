@@ -68,22 +68,23 @@ export class CommandWeb extends SwarmMemory implements ICommandWeb {
         this.SetCommandResponse(CommandWeb.AnyCommandID, CommandWeb.EndCommandID, results);
     }
 
-    GetCommandResult(fromID: string, result: SwarmEnums.SwarmReturnCode) {
-        let toID = this.LinksList[fromID].ProcessCommandResult(result); // specific
-        if (!toID) {
-            if (!this.LinksList[CommandWeb.AnyCommandID]) {
+    Comand result is broken here
+GetCommandResult(fromID: string, result: SwarmEnums.SwarmReturnCode) {
+    let toID = this.LinksList[fromID].ProcessCommandResult(result); // specific
+    if (!toID) {
+        if (!this.LinksList[CommandWeb.AnyCommandID]) {
+            toID = this.DefaultCommand;
+        } else {
+            toID = this.LinksList[CommandWeb.AnyCommandID].ProcessCommandResult(result); // general
+            if (!toID) {
                 toID = this.DefaultCommand;
-            } else {
-                toID = this.LinksList[CommandWeb.AnyCommandID].ProcessCommandResult(result); // general
-                if (!toID) {
-                    toID = this.DefaultCommand;
-                }
             }
         }
-        return toID;
     }
+    return toID;
+}
 
-    GetCommandType(commandID: string) {
-        return this.LinksList[commandID].CommandType;
-    }
+GetCommandType(commandID: string) {
+    return this.LinksList[commandID].CommandType;
+}
 }

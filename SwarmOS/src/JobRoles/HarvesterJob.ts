@@ -6,14 +6,12 @@ const HARVEST_COMMAND = 'HC';
 const TRANSFER_COMMAND = 'TC';
 const FIND_TARGET = 'FT';
 export class HarvesterJob extends JobBase {
-    SourceTarget: Source;
-
     ConstructArgs(): SwarmReturnCode {
         let result = OK as SwarmReturnCode;
         let args: Dictionary = this.JobData;
         switch (this.JobData.CurCommandID) {
             case (HARVEST_COMMAND): {
-                args['target'] = this.SourceTarget;
+                args['target'] = Game.getObjectById(this.GetData('ST'));
                 break;
             }
             case (TRANSFER_COMMAND): {
@@ -43,21 +41,25 @@ export class HarvesterJob extends JobBase {
         this.ConstructedArgs = args;
         return result;
     }
-    ValidateJob(): SwarmReturnCode {
-        if (!this.JobData.CreepName || !Game.creeps[this.JobData.CreepName]) {
-            return HL_REQUIRE_CREEP;
-        }
 
-        return OK;
+    SpawnCreep(): string {
+        let newName = '';
+        let spawn = Game.spawns[this.JobData.Spawner];
+        if (spawn.lastSpawnTick && spawn.lastSpawnTick == Game.time) { return newName; }
+        if (spawn.spawnCreep([MOVE, CARRY, WORK], 'TestWorker', { dryRun: true }) == OK) {
+            newName = spawn.room.name + '_';
+            newName += this.MemoryID.slice(-3) + '_';
+            newName += ('' + Game.time).slice(-4);
+            spawn.spawnCreep([MOVE, CARRY, WORK], newName);
+            Game.spawns[this.JobData.Spawner].lastSpawnTick = Game.time;
+        }
+        return newName;
     }
-    Load() {
-        super.Load();
-        this.SourceTarget = Game.getObjectById(this.GetData('ST')) as Source;
-    }
-    InitJob(sourceID: string, repeat: boolean) {
+
+    InitJob(spawn: StructureSpawn, sourceID: string, repeat: boolean) {
         this.JobData.CurCommandID = HARVEST_COMMAND;
+        this.JobData.Spawner = spawn.name;
         this.SetData('ST', sourceID);
-        this.SourceTarget = Game.getObjectById(sourceID) as Source;
         let commandTypes: { [commandID: string]: CommandType } = {};
         commandTypes[HARVEST_COMMAND] = BasicCreepCommandType.C_Harvest;
         commandTypes[TRANSFER_COMMAND] = BasicCreepCommandType.C_Transfer;

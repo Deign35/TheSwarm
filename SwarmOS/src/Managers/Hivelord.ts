@@ -1,13 +1,11 @@
 import { SwarmMemory } from "Memory/SwarmMemory";
-import * as _ from "lodash"; // Compiler: IgnoreLine
 import { JobBase } from "JobRoles/JobBase";
 import { CommandMemory } from "Memory/CommandMemory";
 import { HarvesterJob } from "JobRoles/HarvesterJob";
-import { HL_REQUIRE_CREEP, SwarmReturnCode } from "SwarmEnums";
+import { HL_REQUIRE_CREEP, SwarmReturnCode, HL_RETRY } from "SwarmEnums";
 
 export class Hivelord extends SwarmMemory {
     protected TaskJobs: { [name: string]: JobBase };
-
     AddNewJob(job: JobBase) {
         this.TaskJobs[job.MemoryID] = job;
     }
@@ -24,6 +22,14 @@ export class Hivelord extends SwarmMemory {
             if (result == HL_REQUIRE_CREEP) {
                 // Spawn a creep or find an available one.
                 console.log('I need a creep');
+                let name = job.SpawnCreep();
+                if (name != '') {
+                    result = OK;
+                    job.JobData.CreepName = name;
+                    if (job.ValidateJob()) {
+                        result = HL_RETRY;
+                    }
+                }
             }
 
             job.LastResult = result;
@@ -33,11 +39,16 @@ export class Hivelord extends SwarmMemory {
     }
 
     Save() {
+        let _jobIDs = [];
         for (let name in this.TaskJobs) {
             this.TaskJobs[name].Save();
+            _jobIDs.push(this.TaskJobs[name].MemoryID)
         }
+
+        this.SetData('jobData', _jobIDs);
         super.Save();
     }
+
     Load() {
         super.Load();
         let TaskJobData = this.GetData('jobData') || [] as string[];

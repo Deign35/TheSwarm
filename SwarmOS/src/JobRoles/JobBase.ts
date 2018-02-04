@@ -10,10 +10,17 @@ export abstract class JobBase extends SwarmMemory implements IJob {
 
     ConstructedArgs: Dictionary;
     LastResult: SwarmReturnCode = ERR_INVALID_ARGS;
-    abstract InitJob(...inArgs: any[]): void;
-
-    abstract ValidateJob(): SwarmReturnCode;
+    abstract InitJob(spawn: StructureSpawn, ...inArgs: any[]): void;
     abstract ConstructArgs(): SwarmReturnCode;
+    abstract SpawnCreep(): string;
+
+    ValidateJob(): SwarmReturnCode {
+        if (!this.JobData.CreepName || !Game.creeps[this.JobData.CreepName]) {
+            return HL_REQUIRE_CREEP;
+        }
+
+        return OK;
+    }
     Save() {
         this.JobCommands.Save();
         this.JobData.Save();

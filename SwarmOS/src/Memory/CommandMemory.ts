@@ -3,6 +3,7 @@ import { SwarmReturnCode, HL_REQUIRE_CREEP } from "SwarmEnums";
 import { JobBase } from "JobRoles/JobBase";
 
 const ASSIGNED_CREEP = 'AC';
+const ASSIGNED_SPAWNER = 'AS';
 const COMMAND_ARGS = 'CA';
 const COMMAND_ID = 'CI';
 
@@ -28,5 +29,11 @@ export class CommandMemory extends SwarmMemory {
     }
     set CreepName(name: string) {
         this.SetData(ASSIGNED_CREEP, name);
+    }
+    get Spawner() {
+        return this.GetData(ASSIGNED_SPAWNER);
+    }
+    set Spawner(spawnID: string) {
+        this.SetData(ASSIGNED_SPAWNER, spawnID);
     }
 }
