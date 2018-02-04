@@ -42,7 +42,6 @@ export class HiveQueen extends SwarmMemory { // Controls a group of HiveNodes.
         let newHivelord = new RCL1_Hivelord('RCL1_HL', this);
         newHivelord.Save();
         this.Hivelords[newHivelord.MemoryID] = (newHivelord);
-
         // Be sure to save the hivelord data before trying to use it.
     }
 }

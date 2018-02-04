@@ -1,5 +1,6 @@
 declare const require: (module: string) => any;
-declare type Dictionary = { [id: string]: any };
+declare type IDictionary<T> = { [id: string]: T };
+declare type Dictionary = IDictionary<any>
 declare var global: Dictionary;
 
 declare type CallbackFunction = (...args: any[]) => any;
@@ -18,7 +19,7 @@ declare interface IMemory {
 declare interface IJob extends IMemory {
     JobCommands: ICommandWeb;
     JobData: IMemory;
-    ProcessJob(JobMemory: IMemory): number;
+    Activate(room: Room): number;
 }
 declare interface ICommandWeb extends IMemory {
     SetCommands(linksList: { [commandID: string]: string }, defaultCommand: string): void;
@@ -28,6 +29,10 @@ declare interface ICommandWeb extends IMemory {
     SetForceEnd(results: number[]): void;
     GetCommandResult(fromID: string, result: number): string | undefined;
     GetCommandType(commandID: string): string;
+}
+
+declare class ConsoleCommands {
+
 }
 /*
 

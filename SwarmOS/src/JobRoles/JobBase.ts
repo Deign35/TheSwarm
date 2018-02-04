@@ -54,12 +54,12 @@ export abstract class JobBase extends SwarmMemory implements IJob {
         let retryCount = 0;
         do {
             result = this.ProcessJob();
-            if(result == ERR_BUSY ) { break; }
-            if(result == HL_REQUIRE_CREEP) { // Look for an existing creep that is unassigned
+            if (result == ERR_BUSY) { break; }
+            if (result == HL_REQUIRE_CREEP) { // Look for an existing creep that is unassigned
                 let name = this.SpawnCreep(room);
-                if(name != '') {
+                if (name != '') {
                     this.JobData.CreepName = name;
-                    if(!this.ValidateJob()) {
+                    if (!this.ValidateJob()) {
                         break;
                     }
                     result = OK;
@@ -67,10 +67,10 @@ export abstract class JobBase extends SwarmMemory implements IJob {
             }
             let JobID = this.JobData.CurCommandID;
             let nextID = this.JobCommands.GetCommandResult(JobID, result);
-            if(nextID) { // undefined means no custom response, just return the current job.
+            if (nextID) { // undefined means no custom response, just return the current job.
                 if (nextID != JobID) {  // This command is done, move to next
                     //console.log('Job[' + this.MemoryID + ']: Updating job from (' + JobID + ') to (' + nextID + ') @ ' + Game.time);
-                    if(result != HL_NEXT_COMMAND) {
+                    if (result != HL_NEXT_COMMAND) {
                         this.JobData.CommandArgs = {}; // Clear args
                     }
                     this.JobData.CurCommandID = nextID; // Set next command
@@ -81,22 +81,22 @@ export abstract class JobBase extends SwarmMemory implements IJob {
                 }
             } else {
                 // Predefined results:
-                if(result == ERR_NOT_IN_RANGE) {
+                if (result == ERR_NOT_IN_RANGE) {
                     let creep = Game.creeps[this.JobData.CreepName]
                     result = creep.moveTo(this.ConstructedArgs['target']);
-                    if(result == ERR_TIRED) {
+                    if (result == ERR_TIRED) {
                         result = OK;
                     }
                 }
             }
-            if(lastResult == result && result != HL_NEXT_COMMAND) {
+            if (lastResult == result && result != HL_NEXT_COMMAND) {
                 break;
             }
 
             lastResult = result;
-        }while(result != OK && retryCount++ < 5);
+        } while (result != OK && retryCount++ < 5);
 
-        if(retryCount > 5) {
+        if (retryCount > 5) {
             console.log('Job HAS FAILED: ' + result)
         }
 

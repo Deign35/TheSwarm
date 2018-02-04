@@ -46,10 +46,14 @@ export class CommandWeb extends SwarmMemory implements ICommandWeb {
         }
         this.DefaultCommand = defaultCommand;
     }
+    AddCommand(commandID: string, commandType: SwarmEnums.CommandType) {
+        this.LinksList[commandID] = new CommandLink(commandID, this.LinkMemory);
+        this.LinksList[commandID].LinkCommandType = commandType;
+    }
 
     Save() {
         let linkIDs = [];
-        for(let name in this.LinksList) {
+        for (let name in this.LinksList) {
             this.LinksList[name].Save();
             linkIDs.push(name);
         }
@@ -64,7 +68,7 @@ export class CommandWeb extends SwarmMemory implements ICommandWeb {
         this.LinkMemory = new SwarmMemory('LinkData', this);
         this.LinksList = {};
         let linkIDs = this.GetData('linkIDs') || [];
-        for(let i = 0, length = linkIDs.length; i < length; i++) {
+        for (let i = 0, length = linkIDs.length; i < length; i++) {
             this.LinksList[linkIDs[i]] = new CommandLink(linkIDs[i], this.LinkMemory);
         }
         this.DefaultCommand = this.GetData('DefaultCommand') || CommandWeb.EndCommand;

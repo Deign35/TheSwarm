@@ -11,7 +11,7 @@ const SOURCE_TARGET = 'ST';
 export class HarvesterJob extends JobBase {
     ValidateJob(): SwarmReturnCode {
         let validationResult = super.ValidateJob();
-        if(this.JobData.CurCommandID == HARVEST_COMMAND && validationResult == OK) {
+        if (this.JobData.CurCommandID == HARVEST_COMMAND && validationResult == OK) {
             const creep = Game.creeps[this.JobData.CreepName];
             validationResult = creep.carry.energy < creep.carryCapacity ? OK : ERR_FULL;
         }
@@ -34,17 +34,17 @@ export class HarvesterJob extends JobBase {
             case (FIND_TARGET): {
                 let creep = Game.creeps[this.JobData.CreepName];
                 let targets = creep.room.find(FIND_STRUCTURES, {
-                    filter: function(structure) {
-                    return (structure.structureType == STRUCTURE_EXTENSION ||
-                        structure.structureType == STRUCTURE_SPAWN ||
-                        structure.structureType == STRUCTURE_LINK ||
-                        structure.structureType == STRUCTURE_TOWER) &&
-                        structure.energy < structure.energyCapacity;
-                }});
+                    filter: function (structure) {
+                        return (structure.structureType == STRUCTURE_EXTENSION ||
+                            structure.structureType == STRUCTURE_SPAWN ||
+                            structure.structureType == STRUCTURE_LINK ||
+                            structure.structureType == STRUCTURE_TOWER) &&
+                            structure.energy < structure.energyCapacity;
+                    }
+                });
 
                 // Sort targets
-                let newArgs: Dictionary = {};
-                if(targets.length == 0) {
+                if (targets.length == 0) {
                     result = ERR_NOT_FOUND;
                 } else {
                     this.JobData.SetData(TRANSFER_TARGET, targets[0].id);

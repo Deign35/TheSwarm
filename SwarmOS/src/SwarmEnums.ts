@@ -54,3 +54,29 @@ export enum RoleNames {
     RCL2_Builder,
     RCL3_Harvester,
 }
+
+export enum CommandResponseType {
+    Next,
+    Self,
+    Terminate,
+    Restart
+}
+let responses: { [code: number]: CommandResponseType } = {};
+responses[OK] = CommandResponseType.Self;
+responses[ERR_NOT_OWNER] = CommandResponseType.Terminate;
+responses[ERR_NO_PATH] = CommandResponseType.Terminate;
+responses[ERR_NAME_EXISTS] = CommandResponseType.Restart;
+responses[ERR_BUSY] = CommandResponseType.Self;
+responses[ERR_NOT_FOUND] = CommandResponseType.Next;
+responses[ERR_NOT_ENOUGH_RESOURCES] = CommandResponseType.Restart;
+responses[ERR_INVALID_TARGET] = CommandResponseType.Next;
+responses[ERR_INVALID_ARGS] = CommandResponseType.Next;
+responses[ERR_FULL] = CommandResponseType.Next;
+responses[ERR_NOT_IN_RANGE] = CommandResponseType.Self;
+responses[ERR_INVALID_ARGS] = CommandResponseType.Next;
+responses[ERR_TIRED] = CommandResponseType.Self;
+responses[ERR_NO_BODYPART] = CommandResponseType.Terminate;
+responses[ERR_RCL_NOT_ENOUGH] = CommandResponseType.Terminate;
+responses[ERR_GCL_NOT_ENOUGH] = CommandResponseType.Terminate;
+export const GenericResponses = responses;
+
