@@ -18,7 +18,7 @@ export class HarvesterJob extends JobBase {
 
         return validationResult;
     }
-    ConstructArgs(): SwarmReturnCode {
+    ConstructArgs(creep: Creep): SwarmReturnCode {
         let result = OK as SwarmReturnCode;
         let args: Dictionary = {};
         switch (this.JobData.CurCommandID) {
@@ -58,23 +58,23 @@ export class HarvesterJob extends JobBase {
         return result;
     }
 
-    SpawnCreep(): string {
+    SpawnCreep(room: Room): string {
         let newName = '';
-        let spawn = Game.spawns[this.JobData.Spawner];
+        let spawnName = room.find(FIND_MY_SPAWNS)[0].name;
+        let spawn = Game.spawns[spawnName];
         if (spawn.lastSpawnTick && spawn.lastSpawnTick == Game.time) { return newName; }
         if (spawn.spawnCreep([MOVE, CARRY, WORK], 'TestWorker', { dryRun: true }) == OK) {
             newName = spawn.room.name + '_';
             newName += this.MemoryID.slice(-3) + '_';
             newName += ('' + Game.time).slice(-4);
             spawn.spawnCreep([MOVE, CARRY, WORK], newName);
-            Game.spawns[this.JobData.Spawner].lastSpawnTick = Game.time;
+            Game.spawns[spawnName].lastSpawnTick = Game.time;
         }
         return newName;
     }
 
-    InitJob(spawn: StructureSpawn, sourceID: string, repeat: boolean) {
+    InitJob(sourceID: string, repeat: boolean) {
         this.JobData.CurCommandID = HARVEST_COMMAND;
-        this.JobData.Spawner = spawn.name;
         this.SetData(SOURCE_TARGET, sourceID);
         let commandTypes: { [commandID: string]: CommandType } = {};
         commandTypes[HARVEST_COMMAND] = BasicCreepCommandType.C_Harvest;

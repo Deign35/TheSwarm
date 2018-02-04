@@ -29,13 +29,6 @@ declare interface ICommandWeb extends IMemory {
     GetCommandResult(fromID: string, result: number): string | undefined;
     GetCommandType(commandID: string): string;
 }
-
-declare var Swarmlord: {
-    GetData(name: string): IMemory,
-    SetData(data: IMemory): void,
-    SaveSwarmlord(): void,
-    InitSwarmlord(): void,
-}
 /*
 
 

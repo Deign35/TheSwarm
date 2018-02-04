@@ -6,6 +6,11 @@ export const loop = function () {
         console.log('CATASTROPHIC END!!!!!!');
         return;
     }
+    for(let name in Memory.creeps) {
+        if(!Game.creeps[name]) {
+            delete Memory.creeps[name];
+        }
+    } // Temp solution
     let swarmQueen = SwarmQueen.LoadSwarmData();
     swarmQueen.Activate();
     swarmQueen.Save();

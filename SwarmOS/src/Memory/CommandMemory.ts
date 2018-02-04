@@ -26,10 +26,4 @@ export class CommandMemory extends SwarmMemory {
     set CreepName(name: string) {
         this.SetData(ASSIGNED_CREEP, name);
     }
-    get Spawner() {
-        return this.GetData(ASSIGNED_SPAWNER);
-    }
-    set Spawner(spawnID: string) {
-        this.SetData(ASSIGNED_SPAWNER, spawnID);
-    }
 }
