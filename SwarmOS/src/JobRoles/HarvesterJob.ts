@@ -5,35 +5,51 @@ import { CommandType, SwarmReturnCode, HL_REQUIRE_CREEP, BasicCreepCommandType, 
 const HARVEST_COMMAND = 'HC';
 const TRANSFER_COMMAND = 'TC';
 const FIND_TARGET = 'FT';
+
+const TRANSFER_TARGET = 'TT';
+const SOURCE_TARGET = 'ST';
 export class HarvesterJob extends JobBase {
+    ValidateJob(): SwarmReturnCode {
+        let validationResult = super.ValidateJob();
+        if(this.JobData.CurCommandID == HARVEST_COMMAND && validationResult == OK) {
+            const creep = Game.creeps[this.JobData.CreepName];
+            validationResult = creep.carry.energy < creep.carryCapacity ? OK : ERR_FULL;
+        }
+
+        return validationResult;
+    }
     ConstructArgs(): SwarmReturnCode {
         let result = OK as SwarmReturnCode;
-        let args: Dictionary = this.JobData;
+        let args: Dictionary = {};
         switch (this.JobData.CurCommandID) {
             case (HARVEST_COMMAND): {
-                args['target'] = Game.getObjectById(this.GetData('ST'));
+                args['target'] = Game.getObjectById(this.GetData(SOURCE_TARGET));
                 break;
             }
             case (TRANSFER_COMMAND): {
-                args['target'] = Game.getObjectById(args['target']);
+                args['target'] = Game.getObjectById(this.JobData.GetData(TRANSFER_TARGET));
+                args['resourceType'] = RESOURCE_ENERGY;
                 break;
             }
             case (FIND_TARGET): {
                 let creep = Game.creeps[this.JobData.CreepName];
-                let targets = creep.room.find(FIND_STRUCTURES, (structure) => {
+                let targets = creep.room.find(FIND_STRUCTURES, {
+                    filter: function(structure) {
                     return (structure.structureType == STRUCTURE_EXTENSION ||
                         structure.structureType == STRUCTURE_SPAWN ||
                         structure.structureType == STRUCTURE_LINK ||
                         structure.structureType == STRUCTURE_TOWER) &&
                         structure.energy < structure.energyCapacity;
-                })
+                }});
 
                 // Sort targets
                 let newArgs: Dictionary = {};
-                newArgs['target'] = targets[0];
-                newArgs['resourceType'] = RESOURCE_ENERGY;
-                this.JobData.CommandArgs = newArgs;
-                result = HL_NEXT_COMMAND;
+                if(targets.length == 0) {
+                    result = ERR_NOT_FOUND;
+                } else {
+                    this.JobData.SetData(TRANSFER_TARGET, targets[0].id);
+                    result = HL_NEXT_COMMAND;
+                }
                 break;
             }
         }
@@ -59,7 +75,7 @@ export class HarvesterJob extends JobBase {
     InitJob(spawn: StructureSpawn, sourceID: string, repeat: boolean) {
         this.JobData.CurCommandID = HARVEST_COMMAND;
         this.JobData.Spawner = spawn.name;
-        this.SetData('ST', sourceID);
+        this.SetData(SOURCE_TARGET, sourceID);
         let commandTypes: { [commandID: string]: CommandType } = {};
         commandTypes[HARVEST_COMMAND] = BasicCreepCommandType.C_Harvest;
         commandTypes[TRANSFER_COMMAND] = BasicCreepCommandType.C_Transfer;

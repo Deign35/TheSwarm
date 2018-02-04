@@ -8,10 +8,6 @@ const COMMAND_ARGS = 'CA';
 const COMMAND_ID = 'CI';
 
 export class CommandMemory extends SwarmMemory {
-    SetNextCommand(nextID: string) {
-        this.CommandArgs = {};
-        this.CurCommandID = nextID;
-    }
     get CommandArgs() {
         return this.GetData(COMMAND_ARGS);
     }

@@ -51,7 +51,6 @@ export class SwarmQueen extends SwarmMemory {
 
         // Initialize each HiveQueen
         newSwarm.Save();
-        Swarmlord.SetData(newSwarm);
         return OK;
     }
 }

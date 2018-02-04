@@ -34,32 +34,44 @@ export abstract class JobBase extends SwarmMemory implements IJob {
     }
 
     ProcessJob(): SwarmReturnCode {
+        let JobID = this.JobCommands.DefaultCommand;
         let jobResult = this.ValidateJob();
         if (jobResult == OK) {
+            JobID = this.JobData.CurCommandID;
             jobResult = this.ConstructArgs();
             if (jobResult == OK) {
                 let creep = Game.creeps[this.JobData.CreepName];
-                let JobID = this.JobData.CurCommandID;
-
                 let commandType = this.JobCommands.GetCommandType(JobID) as CreepCommandType
-                jobResult = BasicCreepCommand.ExecuteCreepCommand(commandType, creep, this.ConstructArgs);
-
-                let nextID = this.JobCommands.GetCommandResult(JobID, jobResult);
-                // Compare nextID with JobID;
-                if (nextID != JobID) {
-                    this.JobData.CommandArgs = {};
-                    this.JobData.CurCommandID = nextID;
-                    jobResult = HL_RETRY;
-                }
-                if (nextID == JobID) {
-                    jobResult = OK;
-                }
+                jobResult = BasicCreepCommand.ExecuteCreepCommand(commandType, creep, this.ConstructedArgs);
             }
-        } else if (this.LastResult == HL_REQUIRE_CREEP && jobResult == HL_REQUIRE_CREEP) {
+        }
+
+        let nextID = this.JobCommands.GetCommandResult(JobID, jobResult);
+        if(nextID) { // undefined means no custom response, just return the current job.
+            if (nextID != JobID) {  // This command is done, move to next
+                //console.log('Job[' + this.MemoryID + ']: Updating job from (' + JobID + ') to (' + nextID + ') @ ' + Game.time);
+                if(jobResult != HL_NEXT_COMMAND) {
+                    this.JobData.CommandArgs = {}; // Clear args
+                }
+                this.JobData.CurCommandID = nextID; // Set next command
+                jobResult = HL_RETRY;   // Run again
+            }
+            if (nextID == JobID) {
+                jobResult = OK; // Same command, OK is fine.
+            }
+        } else {
+            // Predefined results:
+            if(jobResult == ERR_NOT_IN_RANGE) {
+                let creep = Game.creeps[this.JobData.CreepName]
+                jobResult = creep.moveTo(this.ConstructedArgs['target']);
+            }
+        }
+        if(this.LastResult == jobResult && jobResult != HL_NEXT_COMMAND) {
+
+        //if (this.LastResult == HL_REQUIRE_CREEP && jobResult == HL_REQUIRE_CREEP) {
             // We did not aquire a creep.
             jobResult = OK;
         }
-
         return jobResult;
     }
 }

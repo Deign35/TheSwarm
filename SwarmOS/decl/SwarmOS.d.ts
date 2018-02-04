@@ -26,7 +26,7 @@ declare interface ICommandWeb extends IMemory {
     SetCommandResponse(fromID: string, toID: string, results: number[]): void;
     SetDefaultCommandResponse(toID: string, results: number[]): void;
     SetForceEnd(results: number[]): void;
-    GetCommandResult(fromID: string, result: number): string;
+    GetCommandResult(fromID: string, result: number): string | undefined;
     GetCommandType(commandID: string): string;
 }
 

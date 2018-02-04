@@ -21,7 +21,6 @@ export class Hivelord extends SwarmMemory {
             // Update the job based on the result.
             if (result == HL_REQUIRE_CREEP) {
                 // Spawn a creep or find an available one.
-                console.log('I need a creep');
                 let name = job.SpawnCreep();
                 if (name != '') {
                     result = OK;
@@ -33,6 +32,9 @@ export class Hivelord extends SwarmMemory {
             }
 
             job.LastResult = result;
+            if(result != OK) {
+                return result;
+            }
         }
 
         return result;

@@ -3,6 +3,7 @@ export class SwarmMemory implements IMemory {
     constructor(public MemoryID: string, public Parent?: SwarmMemory) { this.Load(); }
     GetData(id: string) { return this._cache[id] || undefined; }
     SetData(id: string, data: any) { this._cache[id] = data; }
+    DeleteData(id: string) { delete this._cache[id]; }
 
     Save() {
         if(this._cache) {

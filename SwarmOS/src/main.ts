@@ -1,11 +1,33 @@
-﻿import 'Managers/Swarmlord';
-import { SwarmQueen } from 'Managers/SwarmQueen';
+﻿import { SwarmQueen } from 'Managers/SwarmQueen';
+import { SwarmReturnCode } from 'SwarmEnums';
 
 export const loop = function () {
-    console.log('Main');
-    Swarmlord.InitSwarmlord();
+    if(initSwarm() != OK) {
+        console.log('CATASTROPHIC END!!!!!!');
+        return;
+    }
     let swarmQueen = SwarmQueen.LoadSwarmData();
     swarmQueen.Activate();
     swarmQueen.Save();
-    Swarmlord.SaveSwarmlord();
+}
+
+const initSwarm = function() {
+    let initResult = OK as SwarmReturnCode;
+    if (!Memory.INIT) { // I want these gone at some point.
+        console.log('InitSwarmlord');
+        for (let name in Memory) {
+            delete Memory[name];
+        }
+        initResult = ERR_NOT_FOUND;
+        let startInit = Game.cpu.getUsed();
+
+        // Load managers here
+        initResult = SwarmQueen.InitializeSwarm();
+
+        if (initResult == OK) {
+            Memory.INIT = true;
+        }
+        console.log('Reset Swarmlord Completed[' + initResult + '] in ' + (Game.cpu.getUsed() - startInit) + ' cpu cycles.');
+    }
+    return initResult;
 }
