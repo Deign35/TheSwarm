@@ -12,6 +12,7 @@ export abstract class JobBase extends SwarmMemory implements IJob {
     abstract InitJob(...inArgs: any[]): void;
     abstract ConstructArgs(creep: Creep): SwarmReturnCode;
     abstract SpawnCreep(room: Room): string;
+    abstract DeactivateJob(): void;
 
     ValidateJob(): SwarmReturnCode {
         if (!this.JobData.CreepName || !Game.creeps[this.JobData.CreepName]) {
@@ -84,7 +85,7 @@ export abstract class JobBase extends SwarmMemory implements IJob {
                     break;
                 }
                 if (nextID == CommandEnd) {
-                    this.DeleteData('active');
+                    this.DeactivateJob();
                 }
             } else {
                 // Predefined results:

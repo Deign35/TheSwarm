@@ -78,25 +78,52 @@ export class BasicCreepCommand {
     static NOT_FOUND_ID = 'NFI';
     // Load balancing targets here.
     static FindCommandTarget(creep: Creep, commandType: CreepCommandType) {
-        let target: RoomObject | undefined;
+        let target: RoomObject | ERR_NOT_FOUND = ERR_NOT_FOUND;
         switch (commandType) {
             case (BasicCreepCommandType.C_Attack): {
                 throw 'Not Configured';
             }
             case (BasicCreepCommandType.C_Build): {
                 target = creep.pos.findClosestByRange(FIND_CONSTRUCTION_SITES);
+                break;
             }
             case (BasicCreepCommandType.C_Harvest): {
                 target = creep.pos.findClosestByRange(FIND_SOURCES);
+                break;
             }
             case (BasicCreepCommandType.C_Heal): {
                 throw 'Not Configured';
             }
             case (BasicCreepCommandType.C_Pickup): {
-                target = creep.pos.findClosestByRange(FIND_DROPPED_ENERGY);
+                target = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES, {
+                    filter: function(dropped) {
+                        return dropped.resourceType == RESOURCE_ENERGY;
+                    }
+                });
+                break;
             }
             case (BasicCreepCommandType.C_Repair): {
-                throw 'Not Configured';
+                let targets = creep.room.find(FIND_STRUCTURES, {
+                    filter: function(structure) {
+                        if(structure.hits == structure.hitsMax){
+                            return false;
+                        }
+                        if(structure.structureType == STRUCTURE_WALL ||
+                            structure.structureType == STRUCTURE_ROAD ||
+                            structure.structureType == STRUCTURE_CONTAINER ||
+                            structure.structureType == STRUCTURE_RAMPART) {
+                                return false;
+                        } else if(!(structure as OwnedStructure).my) {
+                            return false;
+                        }
+                        return true;
+                    }
+                });
+
+                if(targets.length > 0) {
+                    target = creep.pos.findClosestByRange(targets);
+                }
+                break;
             }
             case (BasicCreepCommandType.C_Transfer): {
                 let targets = creep.room.find(FIND_STRUCTURES, {
@@ -125,7 +152,7 @@ export class BasicCreepCommand {
                 break;
             }
             case (BasicCreepCommandType.C_Upgrade): {
-                target = creep.room.controller;
+                target = creep.room.controller ? creep.room.controller : ERR_NOT_FOUND;
                 break;
             }
             case (BasicCreepCommandType.C_Withdraw): {

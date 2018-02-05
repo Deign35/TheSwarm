@@ -1,6 +1,6 @@
 import { JobBase } from "JobRoles/JobBase";
 import { CommandWeb } from "Memory/CommandWeb";
-import { CommandType, SwarmReturnCode, HL_REQUIRE_CREEP, AdvancedCreepCommandType, HL_NEXT_COMMAND, CommandResponseType, CommandEnd, C_Transfer, C_Pickup, C_Drop, C_Withdraw, CreepCommandType } from "SwarmEnums";
+import { CommandType, SwarmReturnCode, HL_REQUIRE_CREEP, AdvancedCreepCommandType, HL_NEXT_COMMAND, CommandResponseType, CommandEnd, C_Transfer, C_Pickup, C_Drop, C_Withdraw, CreepCommandType, GenericResponses, BasicCreepCommandType } from "SwarmEnums";
 import { BasicCreepCommand } from "Commands/BasicCreepCommand";
 import { SwarmMemory } from "Memory/SwarmMemory";
 
@@ -34,17 +34,31 @@ export class GenPurposeJob extends JobBase {
         let cmdType = this.JobCommands.GetCommandType(cmdID) as CreepCommandType;
         let cmdTarget = this.TargetData.GetData(cmdID);
         if (cmdTarget) {
-            let target: RoomObject | ERR_NOT_FOUND = creep;
-            if (cmdTarget == COMMAND_FIND_TARGET) {
-                target = BasicCreepCommand.FindCommandTarget(creep, cmdType);
-                if (target == ERR_NOT_FOUND) {
-                    result = ERR_NOT_FOUND;
-                } else {
-                    args['target'] = target;
+            let targetID: string | ERR_NOT_FOUND = cmdTarget;
+            let target: RoomObject | ERR_NOT_FOUND = ERR_NOT_FOUND;
+            if (targetID == COMMAND_FIND_TARGET) {
+                targetID = this.JobData.CommandArgs['target'] || ERR_NOT_FOUND;
+                if(targetID == ERR_NOT_FOUND) {
+                    // Find a new one.
+                    target = BasicCreepCommand.FindCommandTarget(creep, cmdType);
+                    if((<Structure>target).id) {
+                        args['target'] = target;
+                        targetID = (<Structure>target).id;
+                    }
                 }
+            }
+
+            if(targetID == ERR_NOT_FOUND) {
+                result = ERR_NOT_FOUND;
             } else {
-                target = Game.getObjectById(cmdTarget) as RoomObject;
-                args['target'] = target;
+                if(!args['target']) {
+                    args['target'] = Game.getObjectById(targetID);
+                }
+
+                let newArgs = this.JobData.CommandArgs;
+                newArgs['target'] = targetID;
+                this.JobData.CommandArgs = newArgs;
+                this.JobData.Save();
             }
         }
         if (cmdType == C_Transfer ||
@@ -116,6 +130,9 @@ export class GenPurposeJob extends JobBase {
     }
 
     InitJob(repeat: boolean) {
+        if(!repeat) {
+            this.AddCommand(BasicCreepCommandType.C_Suicide);
+        }
         this.SetData('active', true);
         let lastCmdData = this.JobCommands.GetData(LAST_COMMAND);
         let responseList = BasicCreepCommand.CreateGenericResponseList(lastCmdData[1]);
@@ -126,5 +143,13 @@ export class GenPurposeJob extends JobBase {
         this.JobCommands.SetCommandComplete(lastCmdData[0], this.GetResponsesForType(CommandResponseType.Terminate, responseList));
         this.JobCommands.SetCommandResponse(lastCmdData[0], lastCommnd, this.GetResponsesForType(CommandResponseType.Restart, responseList));
         this.JobCommands.DeleteData(LAST_COMMAND);
+
+        let defaultResponses = GenericResponses;
+        this.JobCommands.SetCommandResponse(lastCmdData[0], lastCommnd, this.GetResponsesForType(CommandResponseType.Next, defaultResponses));
+        this.JobCommands.SetCommandResponse(lastCmdData[0], lastCommnd, this.GetResponsesForType(CommandResponseType.Restart, defaultResponses));
+    }
+
+    DeactivateJob() {
+        this.DeleteData('active');
     }
 }

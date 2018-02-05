@@ -6,7 +6,6 @@ import { GenPurposeJob } from "JobRoles/GenPurposeJob";
 
 export class Hivelord extends SwarmMemory {
     Jobs: { [name: string]: JobBase };
-    JobMemory: SwarmMemory;
     AddNewJob(job: JobBase) {
         this.Jobs[job.MemoryID] = job;
     }

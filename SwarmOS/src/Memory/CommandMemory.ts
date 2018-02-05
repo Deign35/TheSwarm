@@ -9,7 +9,7 @@ const COMMAND_ID = 'CI';
 
 export class CommandMemory extends SwarmMemory {
     get CommandArgs() {
-        return this.GetData(COMMAND_ARGS);
+        return this.GetData(COMMAND_ARGS) || {};
     }
     set CommandArgs(cmdArgs: Dictionary) {
         this.SetData(COMMAND_ARGS, cmdArgs);
