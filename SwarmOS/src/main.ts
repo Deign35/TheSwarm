@@ -1,6 +1,7 @@
 ﻿import { SwarmQueen } from 'Managers/SwarmQueen';
 import { SwarmReturnCode } from 'SwarmEnums';
 import './Commands/ConsoleCommands';
+import './Commands/CreateJobCommands';
 
 export const loop = function () {
     if (initSwarm() != OK) {

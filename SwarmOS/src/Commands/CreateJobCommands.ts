@@ -1,12 +1,9 @@
 import { Hivelord } from "Managers/Hivelord";
-import { ConsoleCommands } from "Commands/ConsoleCommands"
+import { ConsoleCommands } from "./ConsoleCommands"
 import { BasicCreepCommandType } from "SwarmEnums";
 
 export class GenericRoles {
-    AllRoles = [] as any[]; // Create roles after getting body sizes implemented
-
-    //Create
-    CreatePrimeHarvesterJob(hiveName: string) {
+    static CreatePrimeHarvesterJob(hiveName: string) {
         let newLordName = hiveName + ('' + Game.time).slice(-5);
         ConsoleCommands.AddLord(hiveName, newLordName)
         ConsoleCommands.AddJob(hiveName, newLordName, 'EZJob');
@@ -19,7 +16,7 @@ export class GenericRoles {
         return OK;
     }
 
-    CreateBasicHarvesterJob(hiveName: string, bodyParts?: {[partName: string]: number}) {
+    static CreateBasicHarvesterJob(hiveName: string, bodyParts: {[partName: string]: number} = {move: 2, carry: 1, work: 1}) {
         let newLordName = hiveName + ('' + Game.time).slice(-5);
         ConsoleCommands.AddLord(hiveName, newLordName)
         ConsoleCommands.AddJob(hiveName, newLordName, 'EZJob');
@@ -27,14 +24,12 @@ export class GenericRoles {
         ConsoleCommands.AddCommand(BasicCreepCommandType.C_Transfer);
         ConsoleCommands.AddCommand(BasicCreepCommandType.C_Build);
         ConsoleCommands.AddCommand(BasicCreepCommandType.C_Upgrade);
-        if(bodyParts) {
-            ConsoleCommands.SetJobBody(bodyParts);
-        }
+        ConsoleCommands.SetJobBody(bodyParts);
         ConsoleCommands.InitJob(true);
         return OK;
     }
 
-    CreateGenPurposeJob(hiveName: string, bodyParts?: {[partName: string]: number}) {
+    static CreateGenPurposeJob(hiveName: string, bodyParts: {[partName: string]: number} = {move: 2, carry: 1, work: 1}) {
         let newLordName = hiveName + ('' + Game.time).slice(-5);
         ConsoleCommands.AddLord(hiveName, newLordName)
         ConsoleCommands.AddJob(hiveName, newLordName, 'EZJob');
@@ -51,7 +46,7 @@ export class GenericRoles {
         return OK;
     }
 
-    CreateUpgraderJob(hiveName: string, bodyParts?: {[partName: string]: number}) {
+    static CreateUpgraderJob(hiveName: string, bodyParts?: {[partName: string]: number}) {
         let newLordName = hiveName + ('' + Game.time).slice(-5);
         ConsoleCommands.AddLord(hiveName, newLordName)
         ConsoleCommands.AddJob(hiveName, newLordName, 'EZJob');
@@ -64,4 +59,14 @@ export class GenericRoles {
         ConsoleCommands.InitJob(true);
         return OK;
     }
-}
+
+    static Help() {
+        let helpStr = 'TheSwarmOS Console Commands -----';
+        helpStr += '\n' + ('-CreatePrimeHarvesterJob')
+        helpStr += '\n' + ('-CreateBasicHarvesterJob');
+        helpStr += '\n' + ('-CreateGenPurposeJob');
+        helpStr += '\n' + ('-CreateUpgraderJob');
+        console.log(helpStr);
+        return OK;
+    }
+}global['CCCreateJob'] = GenericRoles;

@@ -40,6 +40,13 @@ export class GenPurposeJob extends JobBase {
                 targetID = this.JobData.CommandArgs['target'] || ERR_NOT_FOUND;
                 if(targetID == ERR_NOT_FOUND) {
                     // Find a new one.
+                    // unset the old id.
+
+                    // Possible way to do targets (for now)
+                    // Change JobData to accept a target, and have
+                    // that jobdata handle marking/unmarking targets
+                    // Check where command args get wiped to ensure we change the target;
+                    // Add to find, a sort based on the number of targeters.
                     target = BasicCreepCommand.FindCommandTarget(creep, cmdType);
                     if((<Structure>target).id) {
                         args['target'] = target;
@@ -87,8 +94,6 @@ export class GenPurposeJob extends JobBase {
             newName += ('' + Game.time).slice(-4);
             spawn.spawnCreep(creepBody, newName);
             Game.spawns[spawnName].lastSpawnTick = Game.time;
-        } else {
-            console.log(testSpawn);
         }
         return newName;
     }
@@ -154,8 +159,8 @@ export class GenPurposeJob extends JobBase {
 
         if(!this.JobData.GetData('BODY')) {
             this.SetSpawnBody({
-                MOVE: 1,
-                CARRY: 1
+                move: 1,
+                carry: 1
             })
         }
     }
@@ -164,8 +169,9 @@ export class GenPurposeJob extends JobBase {
         let parts = [];
         for(let partType in bodyParts) {
             let count = bodyParts[partType];
+            let partName = partType.toLowerCase();
             for(let i = 0; i < count; i++) {
-                parts.push(partType);
+                parts.push(partName);
             }
         }
 
