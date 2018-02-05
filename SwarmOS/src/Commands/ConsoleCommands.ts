@@ -79,7 +79,7 @@ export class ConsoleCommands {
         return OK;
     }
 
-    static EZJob(hiveName: string) {
+    static EZJob(hiveName: string, bodyType: {[part:  string]: number} = {move: 2, carry: 1, work: 1}) {
         let newLordName = hiveName + ('' + Game.time).slice(-5);
         this.AddLord(hiveName, newLordName)
         this.AddJob(hiveName, newLordName, 'EZJob');
@@ -89,6 +89,7 @@ export class ConsoleCommands {
         this.AddCommand(BasicCreepCommandType.C_Transfer);
         this.AddCommand(BasicCreepCommandType.C_Repair);
         this.AddCommand(BasicCreepCommandType.C_Upgrade);
+        this.SetJobBody(bodyType);
         this.InitJob(true);
         return OK;
     }
@@ -100,6 +101,14 @@ export class ConsoleCommands {
         job.InitJob(repeat)
         hive.Save();
         return OK;
+    }
+
+    static SetJobBody(bodyParts: {[partType: string]: number }) {
+        let mem = new SwarmMemory('ConsoleCommands');
+        let hive = this.GetHive(mem.GetData('hive'));
+        let job = hive.Hivelords[mem.GetData('lord')].Jobs[mem.GetData('job')] as GenPurposeJob;
+        job.SetSpawnBody(bodyParts);
+        hive.Save();
     }
 
     static Help() {

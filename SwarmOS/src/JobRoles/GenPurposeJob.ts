@@ -79,12 +79,16 @@ export class GenPurposeJob extends JobBase {
         let spawnName = room.find(FIND_MY_SPAWNS)[0].name;
         let spawn = Game.spawns[spawnName];
         if (spawn.lastSpawnTick && spawn.lastSpawnTick == Game.time) { return newName; }
-        if (spawn.spawnCreep([MOVE, CARRY, WORK], 'TestWorker', { dryRun: true }) == OK) {
+        let creepBody = this.JobData.GetData('BODY');
+        let testSpawn = spawn.spawnCreep(creepBody, 'TESTSpawn', {dryRun: true});
+        if (testSpawn == OK) {
             newName = spawn.room.name + '_';
             newName += this.MemoryID.slice(-3) + '_';
             newName += ('' + Game.time).slice(-4);
-            spawn.spawnCreep([MOVE, CARRY, WORK], newName);
+            spawn.spawnCreep(creepBody, newName);
             Game.spawns[spawnName].lastSpawnTick = Game.time;
+        } else {
+            console.log(testSpawn);
         }
         return newName;
     }
@@ -147,6 +151,25 @@ export class GenPurposeJob extends JobBase {
         let defaultResponses = GenericResponses;
         this.JobCommands.SetCommandResponse(lastCmdData[0], lastCommnd, this.GetResponsesForType(CommandResponseType.Next, defaultResponses));
         this.JobCommands.SetCommandResponse(lastCmdData[0], lastCommnd, this.GetResponsesForType(CommandResponseType.Restart, defaultResponses));
+
+        if(!this.JobData.GetData('BODY')) {
+            this.SetSpawnBody({
+                MOVE: 1,
+                CARRY: 1
+            })
+        }
+    }
+
+    SetSpawnBody(bodyParts: {[partType: string]: number }) {
+        let parts = [];
+        for(let partType in bodyParts) {
+            let count = bodyParts[partType];
+            for(let i = 0; i < count; i++) {
+                parts.push(partType);
+            }
+        }
+
+        this.JobData.SetData('BODY', parts);
     }
 
     DeactivateJob() {
