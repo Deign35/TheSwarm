@@ -35,7 +35,7 @@ export class CommandMemory extends SwarmMemory {
         let oldTarget = this.CommandTarget;
         if(oldTarget) {
             Memory.TargetData[oldTarget]--;
-            if(Memory.TargetData[oldTarget] == 0) {
+            if(Memory.TargetData[oldTarget] == 1) {
                 delete Memory.TargetData[oldTarget];
             }
         }
@@ -44,7 +44,7 @@ export class CommandMemory extends SwarmMemory {
         if(Memory.TargetData[id]) {
             Memory.TargetData[id]++;
         } else {
-            Memory.TargetData[id] = 1;
+            Memory.TargetData[id] = 2;
         }
     }
 }

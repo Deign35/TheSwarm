@@ -20,6 +20,10 @@ export abstract class JobBase extends SwarmMemory implements IJob {
             return HL_REQUIRE_CREEP;
         }
 
+        if(Game.creeps[this.JobData.CreepName].spawning) {
+            return ERR_BUSY;
+        }
+
         return OK;
     }
     Save() {

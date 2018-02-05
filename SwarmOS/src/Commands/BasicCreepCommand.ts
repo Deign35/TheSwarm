@@ -80,8 +80,20 @@ export class BasicCreepCommand {
     static FindCommandTarget(creep: Creep, commandType: CreepCommandType) {
         let possibleTargets: any[] = [];
         let sortFunc = (a: any, b: any) => {
-            let countA = Memory.TargetData[a.id] || 0;
-            let countB = Memory.TargetData[b.id] || 0;
+            let countA = Memory.TargetData[a.id] || 1;
+            if(Memory.TargetMax[a.id] && countA > Memory.TargetMax[a.id]) {
+                return 1;
+            }
+            if(Memory.TargetFactor[a.id]) {
+                countA *= Memory.TargetFactor[a.id];
+            }
+            let countB = Memory.TargetData[b.id] || 1;
+            if(Memory.TargetMax[b.id] && countB > Memory.TargetMax[b.id]) {
+                return -1;
+            }
+            if(Memory.TargetFactor[b.id]) {
+                countB *= Memory.TargetFactor[b.id];
+            }
             if(countA > countB) {
                 return 1
             } else if(countA < countB) {
@@ -89,7 +101,7 @@ export class BasicCreepCommand {
             }
             let distA = creep.pos.getRangeTo(a);
             let distB = creep.pos.getRangeTo(b);
-            return distA < distB ? 1 : (distA > distB ? -1 : 0);
+            return distA < distB ? -1 : (distA > distB ? 1 : 0);
         }
         switch (commandType) {
             case (BasicCreepCommandType.C_Attack): {
@@ -120,6 +132,7 @@ export class BasicCreepCommand {
                         if(structure.hits == structure.hitsMax){
                             return false;
                         }
+                        // Returning true on road = stops working...
                         if(structure.structureType == STRUCTURE_WALL ||
                             structure.structureType == STRUCTURE_ROAD ||
                             structure.structureType == STRUCTURE_CONTAINER ||
@@ -146,7 +159,7 @@ export class BasicCreepCommand {
                 sortFunc = (a: any, b: any) => {
                     if (a.structureType == STRUCTURE_TOWER || b.structureType == STRUCTURE_TOWER) {
                         if (a.structureType != b.structureType) {
-                            return a.structureType == STRUCTURE_TOWER ? -1 : 1;
+                            return a.structureType == STRUCTURE_TOWER ? 1 : -1;
                         }
                     }
                     let countA = Memory.TargetData[a.id] || 0;
@@ -158,7 +171,7 @@ export class BasicCreepCommand {
                     }
                     let distA = creep.pos.getRangeTo(a);
                     let distB = creep.pos.getRangeTo(b);
-                    return distA < distB ? 1 : (distA > distB ? -1 : 0);
+                    return distA < distB ? -1 : (distA > distB ? 1 : 0);
                 }
                 break;
             }

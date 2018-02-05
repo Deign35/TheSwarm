@@ -1,3 +1,5 @@
+
+
 declare const require: (module: string) => any;
 declare type IDictionary<T> = { [id: string]: T };
 declare type Dictionary = IDictionary<any>
@@ -31,9 +33,8 @@ declare interface ICommandWeb extends IMemory {
     GetCommandType(commandID: string): string;
 }
 
-declare class ConsoleCommands {
-
-}
+declare var CC: any;
+declare var GR: any;
 /*
 
 

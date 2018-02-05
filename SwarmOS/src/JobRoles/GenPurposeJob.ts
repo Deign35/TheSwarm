@@ -39,11 +39,6 @@ export class GenPurposeJob extends JobBase {
             }
             if (cmdTarget == COMMAND_FIND_TARGET) {
                 cmdTarget = ERR_NOT_FOUND;
-                // Possible way to do targets (for now)
-                // Change JobData to accept a target, and have
-                // that jobdata handle marking/unmarking targets
-                // Check where command args get wiped to ensure we change the target;
-                // Add to find, a sort based on the number of targeters.
                 let target = BasicCreepCommand.FindCommandTarget(creep, cmdType);
                 if((<Structure>target).id) {
                     cmdTarget = (<Structure>target).id;

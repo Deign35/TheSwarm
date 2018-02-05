@@ -127,7 +127,7 @@ export class CommandWeb extends SwarmMemory implements ICommandWeb {
             }
         }
         if (toID) {
-            console.log('Result[' + result + '] - from[' + fromID + '] - To[' + toID + ']');
+            console.log(Game.time + ': Result[' + result + '] - from[' + fromID + '] - To[' + toID + ']');
         }
         return toID;
     }

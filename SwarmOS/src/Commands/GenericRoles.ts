@@ -3,8 +3,11 @@ import { ConsoleCommands } from "./ConsoleCommands"
 import { BasicCreepCommandType } from "SwarmEnums";
 
 export class GenericRoles {
+    static GetNewName(hiveName: string) {
+        return hiveName + Memory['lordCount']++;
+    }
     static CreatePrimeHarvesterJob(hiveName: string) {
-        let newLordName = hiveName + ('' + Game.time).slice(-5);
+        let newLordName = this.GetNewName(hiveName);
         ConsoleCommands.AddLord(hiveName, newLordName)
         ConsoleCommands.AddJob(hiveName, newLordName, 'EZJob');
         ConsoleCommands.AddCommand(BasicCreepCommandType.C_Harvest);
@@ -17,7 +20,7 @@ export class GenericRoles {
     }
 
     static CreateBasicHarvesterJob(hiveName: string, bodyParts: {[partName: string]: number} = {move: 2, carry: 1, work: 1}) {
-        let newLordName = hiveName + ('' + Game.time).slice(-5);
+        let newLordName = this.GetNewName(hiveName);
         ConsoleCommands.AddLord(hiveName, newLordName)
         ConsoleCommands.AddJob(hiveName, newLordName, 'EZJob');
         ConsoleCommands.AddCommand(BasicCreepCommandType.C_Harvest);
@@ -30,7 +33,7 @@ export class GenericRoles {
     }
 
     static CreateGenPurposeJob(hiveName: string, bodyParts: {[partName: string]: number} = {move: 2, carry: 1, work: 1}) {
-        let newLordName = hiveName + ('' + Game.time).slice(-5);
+        let newLordName = this.GetNewName(hiveName);
         ConsoleCommands.AddLord(hiveName, newLordName)
         ConsoleCommands.AddJob(hiveName, newLordName, 'EZJob');
         ConsoleCommands.AddCommand(BasicCreepCommandType.C_Pickup);
@@ -39,23 +42,19 @@ export class GenericRoles {
         ConsoleCommands.AddCommand(BasicCreepCommandType.C_Transfer);
         ConsoleCommands.AddCommand(BasicCreepCommandType.C_Repair);
         ConsoleCommands.AddCommand(BasicCreepCommandType.C_Upgrade);
-        if(bodyParts) {
             ConsoleCommands.SetJobBody(bodyParts);
-        }
         ConsoleCommands.InitJob(true);
         return OK;
     }
 
-    static CreateUpgraderJob(hiveName: string, bodyParts?: {[partName: string]: number}) {
-        let newLordName = hiveName + ('' + Game.time).slice(-5);
+    static CreateUpgraderJob(hiveName: string, bodyParts: {[partName: string]: number} = {move: 2, carry: 1, work: 1}) {
+        let newLordName = this.GetNewName(hiveName);
         ConsoleCommands.AddLord(hiveName, newLordName)
         ConsoleCommands.AddJob(hiveName, newLordName, 'EZJob');
-        ConsoleCommands.AddCommand(BasicCreepCommandType.C_Pickup);
+        ConsoleCommands.AddCommand(BasicCreepCommandType.C_Withdraw);
         ConsoleCommands.AddCommand(BasicCreepCommandType.C_Harvest);
         ConsoleCommands.AddCommand(BasicCreepCommandType.C_Upgrade);
-        if(bodyParts) {
-            ConsoleCommands.SetJobBody(bodyParts);
-        }
+        ConsoleCommands.SetJobBody(bodyParts);
         ConsoleCommands.InitJob(true);
         return OK;
     }
@@ -69,4 +68,4 @@ export class GenericRoles {
         console.log(helpStr);
         return OK;
     }
-}global['CCCreateJob'] = GenericRoles;
+}global['GR'] = GenericRoles;

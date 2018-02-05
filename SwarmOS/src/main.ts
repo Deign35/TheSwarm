@@ -1,7 +1,7 @@
 ﻿import { SwarmQueen } from 'Managers/SwarmQueen';
 import { SwarmReturnCode } from 'SwarmEnums';
 import './Commands/ConsoleCommands';
-import './Commands/CreateJobCommands';
+import './Commands/GenericRoles';
 
 export const loop = function () {
     if (initSwarm() != OK) {
@@ -31,6 +31,9 @@ const initSwarm = function () {
         // Load managers here
         initResult = SwarmQueen.InitializeSwarm();
         Memory.TargetData = {};
+        Memory.TargetFactor = {};
+        Memory.TargetMax = {};
+        Memory['lordCount'] = 0;
 
         if (initResult == OK) {
             Memory.INIT = true;
