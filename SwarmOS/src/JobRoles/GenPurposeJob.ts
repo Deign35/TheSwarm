@@ -1,6 +1,6 @@
 import { JobBase } from "JobRoles/JobBase";
 import { CommandWeb } from "Memory/CommandWeb";
-import { CommandType, SwarmReturnCode, HL_REQUIRE_CREEP, AdvancedCreepCommandType, HL_NEXT_COMMAND, CommandResponseType, CommandEnd, C_Transfer, C_Pickup, C_Drop, C_Withdraw, CreepCommandType, GenericResponses, BasicCreepCommandType } from "SwarmEnums";
+import { CommandType, SwarmReturnCode, HL_REQUIRE_CREEP, AdvancedCreepCommandType, HL_NEXT_COMMAND, CommandResponseType, CommandEnd, C_Transfer, C_Pickup, C_Drop, C_Withdraw, CreepCommandType, GenericResponses, BasicCreepCommandType, HL_RETRY } from "SwarmEnums";
 import { BasicCreepCommand } from "Commands/BasicCreepCommand";
 import { SwarmMemory } from "Memory/SwarmMemory";
 
@@ -32,40 +32,36 @@ export class GenPurposeJob extends JobBase {
         let args: Dictionary = {};
         let cmdID = this.JobData.CurCommandID;
         let cmdType = this.JobCommands.GetCommandType(cmdID) as CreepCommandType;
-        let cmdTarget = this.TargetData.GetData(cmdID);
-        if (cmdTarget) {
-            let targetID: string | ERR_NOT_FOUND = cmdTarget;
-            let target: RoomObject | ERR_NOT_FOUND = ERR_NOT_FOUND;
-            if (targetID == COMMAND_FIND_TARGET) {
-                targetID = this.JobData.CommandArgs['target'] || ERR_NOT_FOUND;
-                if(targetID == ERR_NOT_FOUND) {
-                    // Find a new one.
-                    // unset the old id.
-
-                    // Possible way to do targets (for now)
-                    // Change JobData to accept a target, and have
-                    // that jobdata handle marking/unmarking targets
-                    // Check where command args get wiped to ensure we change the target;
-                    // Add to find, a sort based on the number of targeters.
-                    target = BasicCreepCommand.FindCommandTarget(creep, cmdType);
-                    if((<Structure>target).id) {
-                        args['target'] = target;
-                        targetID = (<Structure>target).id;
-                    }
+        if(BasicCreepCommand.RequiresTarget(cmdType)) {
+            let cmdTarget: any = this.TargetData.GetData(cmdID);  // I HATE ANY
+            if(!cmdTarget) {
+                cmdTarget = this.JobData.CommandTarget;
+            }
+            if (cmdTarget == COMMAND_FIND_TARGET) {
+                cmdTarget = ERR_NOT_FOUND;
+                // Possible way to do targets (for now)
+                // Change JobData to accept a target, and have
+                // that jobdata handle marking/unmarking targets
+                // Check where command args get wiped to ensure we change the target;
+                // Add to find, a sort based on the number of targeters.
+                let target = BasicCreepCommand.FindCommandTarget(creep, cmdType);
+                if((<Structure>target).id) {
+                    cmdTarget = (<Structure>target).id;
+                    this.JobData.CommandTarget = cmdTarget;
                 }
             }
 
-            if(targetID == ERR_NOT_FOUND) {
-                result = ERR_NOT_FOUND;
-            } else {
-                if(!args['target']) {
-                    args['target'] = Game.getObjectById(targetID);
+            if(cmdTarget != ERR_NOT_FOUND) {
+                let target = Game.getObjectById(cmdTarget);
+                if(!target) {
+                    this.TargetData.DeleteData(cmdID);
+                    this.JobData.CommandTarget = COMMAND_FIND_TARGET;
+                    result = HL_RETRY;
+                } else {
+                    args['target'] = target;
                 }
-
-                let newArgs = this.JobData.CommandArgs;
-                newArgs['target'] = targetID;
-                this.JobData.CommandArgs = newArgs;
-                this.JobData.Save();
+            } else {
+                result = ERR_NOT_FOUND;
             }
         }
         if (cmdType == C_Transfer ||
@@ -104,15 +100,12 @@ export class GenPurposeJob extends JobBase {
         let newCommand = '#' + count;
         if (target) {
             this.TargetData.SetData(newCommand, target);
-        } else {
-            if (BasicCreepCommand.RequiresTarget(commandType)) {
-                this.TargetData.SetData(newCommand, COMMAND_FIND_TARGET);
-            }
         }
         if (count == 0) {
             let newLinksList = {} as { [id: string]: CreepCommandType };
             newLinksList[newCommand] = commandType;
             this.JobData.CurCommandID = newCommand;
+            this.JobData.CommandTarget = target ? target : COMMAND_FIND_TARGET;
             this.JobCommands.SetCommands(newLinksList, newCommand);
             this.JobCommands.SetData(LAST_COMMAND, [newCommand, commandType, count + 1]);
             return;

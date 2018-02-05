@@ -49,7 +49,7 @@ export class ConsoleCommands {
     }
     static DeleteJob(hiveName: string, hivelordName: string, jobID: string) {
         let hive = this.GetHive(hiveName);
-        if(!hive.Hivelords[hivelordName]) {//.Jobs[mem.GetData('job')] as GenPurposeJob;
+        if(!hive.Hivelords[hivelordName]) {
             throw 'Hivelord[' + hivelordName + '] does not exist.';
         }
         if(!hive.Hivelords[hivelordName].Jobs[jobID]) {
@@ -94,6 +94,20 @@ export class ConsoleCommands {
         return OK;
     }
 
+    static SetTarget(hiveName: string, hivelordName: string, jobID: string, cmdID: string, target: string) {
+        let mem = new SwarmMemory('ConsoleCommands');
+        let hive = this.GetHive(mem.GetData('hive'));
+        if(!hive.Hivelords[hivelordName]) {
+            throw 'Hivelord[' + hivelordName + '] does not exist.';
+        }
+        if(!hive.Hivelords[hivelordName].Jobs[jobID]) {
+            throw 'Job[' + jobID + '] does not exist.';
+        }
+        let job = hive.Hivelords[mem.GetData('lord')].Jobs[mem.GetData('job')] as GenPurposeJob;
+        job.TargetData.SetData(cmdID, target);
+        hive.Save();
+    }
+
     static InitJob(repeat: boolean) {
         let mem = new SwarmMemory('ConsoleCommands');
         let hive = this.GetHive(mem.GetData('hive'));
@@ -122,7 +136,9 @@ export class ConsoleCommands {
         helpStr += '\n' + ('-SetQuickJob - (hiveName, hivelordName, jobID)');
         helpStr += '\n' + ('-AddCommand - (commandType, target?)');
         helpStr += '\n' + ('-EZJob - (hiveName)');
+        helpStr += '\n' + ('-SetTarget - (hiveName, hivelordName, jobID, cmdID, targetID)');
         helpStr += '\n' + ('-InitJob - (repeatJob)');
+        helpStr += '\n' + ('- SetJobBody - (bodyParts = {move: 2, work: 1, carry: 1})');
         console.log(helpStr);
         return OK;
     }

@@ -78,24 +78,36 @@ export class BasicCreepCommand {
     static NOT_FOUND_ID = 'NFI';
     // Load balancing targets here.
     static FindCommandTarget(creep: Creep, commandType: CreepCommandType) {
-        let target: RoomObject | ERR_NOT_FOUND = ERR_NOT_FOUND;
+        let possibleTargets: any[] = [];
+        let sortFunc = (a: any, b: any) => {
+            let countA = Memory.TargetData[a.id] || 0;
+            let countB = Memory.TargetData[b.id] || 0;
+            if(countA > countB) {
+                return 1
+            } else if(countA < countB) {
+                return -1;
+            }
+            let distA = creep.pos.getRangeTo(a);
+            let distB = creep.pos.getRangeTo(b);
+            return distA < distB ? 1 : (distA > distB ? -1 : 0);
+        }
         switch (commandType) {
             case (BasicCreepCommandType.C_Attack): {
                 throw 'Not Configured';
             }
             case (BasicCreepCommandType.C_Build): {
-                target = creep.pos.findClosestByRange(FIND_CONSTRUCTION_SITES);
+                possibleTargets = creep.room.find(FIND_MY_CONSTRUCTION_SITES);
                 break;
             }
             case (BasicCreepCommandType.C_Harvest): {
-                target = creep.pos.findClosestByRange(FIND_SOURCES);
+                possibleTargets = creep.room.find(FIND_SOURCES);
                 break;
             }
             case (BasicCreepCommandType.C_Heal): {
                 throw 'Not Configured';
             }
             case (BasicCreepCommandType.C_Pickup): {
-                target = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES, {
+                possibleTargets = creep.room.find(FIND_DROPPED_RESOURCES, {
                     filter: function(dropped) {
                         return dropped.resourceType == RESOURCE_ENERGY;
                     }
@@ -103,7 +115,7 @@ export class BasicCreepCommand {
                 break;
             }
             case (BasicCreepCommandType.C_Repair): {
-                let targets = creep.room.find(FIND_STRUCTURES, {
+                possibleTargets = creep.room.find(FIND_STRUCTURES, {
                     filter: function(structure) {
                         if(structure.hits == structure.hitsMax){
                             return false;
@@ -119,14 +131,10 @@ export class BasicCreepCommand {
                         return true;
                     }
                 });
-
-                if(targets.length > 0) {
-                    target = creep.pos.findClosestByRange(targets);
-                }
                 break;
             }
             case (BasicCreepCommandType.C_Transfer): {
-                let targets = creep.room.find(FIND_STRUCTURES, {
+                possibleTargets = creep.room.find(FIND_STRUCTURES, {
                     filter: function (structure) {
                         return (structure.structureType == STRUCTURE_EXTENSION ||
                             structure.structureType == STRUCTURE_SPAWN ||
@@ -135,31 +143,40 @@ export class BasicCreepCommand {
                             structure.energy < structure.energyCapacity;
                     }
                 });
-                if (targets.length > 0) {
-                    targets.sort((a, b) => {
-                        if (a.structureType == STRUCTURE_TOWER || b.structureType == STRUCTURE_TOWER) {
-                            if (a.structureType != b.structureType) {
-                                return a.structureType == STRUCTURE_TOWER ? -1 : 1;
-                            }
+                sortFunc = (a: any, b: any) => {
+                    if (a.structureType == STRUCTURE_TOWER || b.structureType == STRUCTURE_TOWER) {
+                        if (a.structureType != b.structureType) {
+                            return a.structureType == STRUCTURE_TOWER ? -1 : 1;
                         }
-
-                        let distA = creep.pos.getRangeTo(a);
-                        let distB = creep.pos.getRangeTo(b);
-                        return distA < distB ? 1 : (distA > distB ? -1 : 0);
-                    });
-                    target = targets[0];
+                    }
+                    let countA = Memory.TargetData[a.id] || 0;
+                    let countB = Memory.TargetData[b.id] || 0;
+                    if(countA > countB) {
+                        return 1
+                    } else if(countA < countB) {
+                        return -1;
+                    }
+                    let distA = creep.pos.getRangeTo(a);
+                    let distB = creep.pos.getRangeTo(b);
+                    return distA < distB ? 1 : (distA > distB ? -1 : 0);
                 }
                 break;
             }
-            case (BasicCreepCommandType.C_Upgrade): {
-                target = creep.room.controller ? creep.room.controller : ERR_NOT_FOUND;
+            case (BasicCreepCommandType.C_Upgrade):
+                if(creep.room.controller) {
+                    possibleTargets.push(creep.room.controller);
+                }
                 break;
-            }
             case (BasicCreepCommandType.C_Withdraw): {
                 throw 'Not Configured';
             }
         }
 
+        let target: RoomObject | ERR_NOT_FOUND = ERR_NOT_FOUND;
+        if(possibleTargets.length > 0) {
+            possibleTargets.sort(sortFunc);
+            target = possibleTargets[0];
+        }
         return target ? target : ERR_NOT_FOUND;
     }
 }

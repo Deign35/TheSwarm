@@ -4,6 +4,7 @@ import { CommandMemory } from "Memory/CommandMemory";
 import { BasicCreepCommand } from "Commands/BasicCreepCommand";
 import { CreepCommandType, SwarmReturnCode, HL_REQUIRE_CREEP, HL_NEXT_COMMAND, HL_RETRY, CommandEnd } from "SwarmEnums";
 
+const COMMAND_FIND_TARGET = 'CFT';
 export abstract class JobBase extends SwarmMemory implements IJob {
     JobCommands: CommandWeb;
     JobData: CommandMemory;
@@ -60,8 +61,19 @@ export abstract class JobBase extends SwarmMemory implements IJob {
         do {
             result = this.ProcessJob();
             if (result == ERR_BUSY) { break; }
-            if (result == HL_REQUIRE_CREEP) { // Look for an existing creep that is unassigned
-                let name = this.SpawnCreep(room);
+            if (result == HL_REQUIRE_CREEP) {
+                let unAssignedCreeps = room.find(FIND_MY_CREEPS, {
+                    filter: (creep) => {
+                        return !creep.memory.Assigned;
+                    }
+                });
+                let name = '';
+                if(unAssignedCreeps.length > 0) {
+                    name = unAssignedCreeps[0].name;
+                } else {
+                    name = this.SpawnCreep(room);
+                }
+
                 if (name != '') {
                     this.JobData.CreepName = name;
                     if (!this.ValidateJob()) {
@@ -74,11 +86,8 @@ export abstract class JobBase extends SwarmMemory implements IJob {
             let nextID = this.JobCommands.GetCommandResult(JobID, result);
             if (nextID) { // undefined means no custom response, just return the current job.
                 if (nextID != JobID) {  // This command is done, move to next
-                    //console.log('Job[' + this.MemoryID + ']: Updating job from (' + JobID + ') to (' + nextID + ') @ ' + Game.time);
-                    if (result != HL_NEXT_COMMAND) {
-                        this.JobData.CommandArgs = {}; // Clear args
-                    }
                     this.JobData.CurCommandID = nextID; // Set next command
+                    this.JobData.CommandTarget = COMMAND_FIND_TARGET;
                     result = HL_RETRY;   // Run again
                 }
                 if (nextID == JobID) {

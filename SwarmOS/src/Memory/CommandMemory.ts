@@ -6,24 +6,45 @@ const ASSIGNED_CREEP = 'AC';
 const ASSIGNED_SPAWNER = 'AS';
 const COMMAND_ARGS = 'CA';
 const COMMAND_ID = 'CI';
+const COMMAND_TARGET = 'CT';
 
 export class CommandMemory extends SwarmMemory {
-    get CommandArgs() {
-        return this.GetData(COMMAND_ARGS) || {};
-    }
-    set CommandArgs(cmdArgs: Dictionary) {
-        this.SetData(COMMAND_ARGS, cmdArgs);
-    }
-    get CurCommandID() {
+    get CurCommandID(): string {
         return this.GetData(COMMAND_ID);
     }
     set CurCommandID(name: string) {
         this.SetData(COMMAND_ID, name);
     }
-    get CreepName() {
+    get CreepName(): string {
         return this.GetData(ASSIGNED_CREEP);
     }
     set CreepName(name: string) {
+        let oldCreep = this.CreepName;
+        if(Memory.creeps[oldCreep]) {
+            Memory.creeps[oldCreep].Assigned = false;
+        }
+
+        Memory.creeps[name].Assigned = true;
         this.SetData(ASSIGNED_CREEP, name);
+    }
+    get CommandTarget(): string {
+        return this.GetData(COMMAND_TARGET);
+    }
+
+    set CommandTarget(id: string) {
+        let oldTarget = this.CommandTarget;
+        if(oldTarget) {
+            Memory.TargetData[oldTarget]--;
+            if(Memory.TargetData[oldTarget] == 0) {
+                delete Memory.TargetData[oldTarget];
+            }
+        }
+        //Memory.TargetData[id] = true;
+        this.SetData(COMMAND_TARGET, id);
+        if(Memory.TargetData[id]) {
+            Memory.TargetData[id]++;
+        } else {
+            Memory.TargetData[id] = 1;
+        }
     }
 }
