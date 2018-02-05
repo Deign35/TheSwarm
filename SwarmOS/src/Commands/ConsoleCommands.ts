@@ -1,7 +1,9 @@
 import { HiveQueen } from "Managers/HiveQueen";
-import { CreepCommandType } from "SwarmEnums";
+import { CreepCommandType, BasicCreepCommandType } from "SwarmEnums";
 import { Hivelord } from "Managers/Hivelord";
 import { GenPurposeJob } from "JobRoles/GenPurposeJob";
+import { SwarmMemory } from "Memory/SwarmMemory";
+import { BasicCreepCommand } from "Commands/BasicCreepCommand";
 
 export class ConsoleCommands {
     static Reset() {
@@ -14,45 +16,44 @@ export class ConsoleCommands {
         }
         return queen;
     }
-    static GetHivelord(hiveName: string, hivelordName: string) {
-        let queen = this.GetHive(hiveName);
-        if (!queen.Hivelords[hivelordName]) {
+    static GetHivelord(hive: HiveQueen, hivelordName: string) {
+        if (!hive.Hivelords[hivelordName]) {
             throw 'Hivelord[' + hivelordName + '] does not exist.';
         }
-        return new Hivelord(hivelordName, queen);
+        return hive.Hivelords[hivelordName];
     }
-    static AddLord(hiveName: string, hivelordName: string) {
-        let queen = this.GetHive(hiveName);
-        if (queen.Hivelords[hivelordName]) {
+    static AddLord(hiveName: string, hivelordName: string) { // Failing because it does not use the same memory object
+        // as the one already created by the hive.  Get the existing hivelord instead of new memory.
+        // I believe this has something to do with the chain of Saving.  The saved hivelord on the object
+        // doesn't have the same jobs list on it.  Ergo, memory can only be checked out once at a time.
+        let hive = this.GetHive(hiveName);
+        if (hive.Hivelords[hivelordName]) {
             throw 'Hivelord[' + hivelordName + '] already exists.';
         }
-        queen.Hivelords[hivelordName] = new Hivelord(hivelordName, queen);
-        queen.Save();
+        hive.Hivelords[hivelordName] = new Hivelord(hivelordName, hive);
+        hive.Save();
     }
-    static DeleteHivelord(hiveName: string, hivelordName: string) {
-        let queen = this.GetHive(hiveName);
-        if (!queen.Hivelords[hivelordName]) {
+    static DeleteHivelord(hive: HiveQueen, hivelordName: string) {
+        if (!hive.Hivelords[hivelordName]) {
             console.log('Error, hivelord doesnt exist by that name');
             return;
         }
-        queen.DeleteData(hivelordName);
-        queen.Save();
+        hive.DeleteData(hivelordName);
+        hive.Save();
     }
-    static GetJob(hiveName: string, hivelordName: string, jobID: string) {
-        let hivelord = this.GetHivelord(hiveName, hivelordName);
-        if (!hivelord.TaskJobs[jobID]) {
-            throw 'Job[' + jobID + '] does not exist';
-        }
-        return new GenPurposeJob(jobID, hivelord);
+    static GetJob(hivelord: Hivelord, jobID: string) {
+        return hivelord.Jobs[jobID];
     }
-    static AddJob(hiveName: string, hivelordName: string, jobID: string) {
-        let targetLord = this.GetHivelord(hiveName, hivelordName);
-        targetLord.AddNewJob(new GenPurposeJob(jobID, targetLord));
-        targetLord.Save();
+    static AddJob(hiveName: string, hivelordID: string, jobID: string) {
+        let hive = this.GetHive(hiveName);
+        let hivelord = this.GetHivelord(hive, hivelordID);
+        let newJob = new GenPurposeJob(jobID, hivelord);
+        hivelord.AddNewJob(newJob);
+        hive.Save();
+        this.SetQuickJob(hiveName, hivelordID, jobID);
     }
-    static DeleteJob(hiveName: string, hivelordName: string, jobID: string) {
-        let hivelord = this.GetHivelord(hiveName, hivelordName);
-        if (!hivelord.TaskJobs[jobID]) {
+    static DeleteJob(hivelord: Hivelord, jobID: string) {
+        if (!hivelord.JobMemory.GetData(jobID)) {
             console.log('Error, hivelord doesnt exist by that name');
             return;
         }
@@ -60,16 +61,52 @@ export class ConsoleCommands {
         hivelord.Save();
     }
 
+    static SetQuickJob(hiveName: string, hivelordID: string, jobID: string) {
+        let mem = new SwarmMemory('ConsoleCommands');
+        mem.SetData('hive', hiveName);
+        mem.SetData('lord', hivelordID);
+        mem.SetData('job', jobID);
+        mem.Save();
+    }
+
+    static AddCommand(commandType: CreepCommandType, target?: string) {
+        let mem = new SwarmMemory('ConsoleCommands');
+        let hive = this.GetHive(mem.GetData('hive'));
+        let job = hive.Hivelords[mem.GetData('lord')].Jobs[mem.GetData('job')] as GenPurposeJob;
+        job.AddCommand(commandType, target);
+        hive.Save();
+    }
+
+    static EZSetup() {
+        this.AddLord('sim', 'Lord1');
+        this.AddJob('sim', 'Lord1', 'Job1');
+        this.AddCommand(BasicCreepCommandType.C_Harvest);
+        this.AddCommand(BasicCreepCommandType.C_Upgrade);
+        this.InitJob(false);
+    }
+
+    static InitJob(repeat: boolean) {
+        let mem = new SwarmMemory('ConsoleCommands');
+        let hive = this.GetHive(mem.GetData('hive'));
+        let job = hive.Hivelords[mem.GetData('lord')].Jobs[mem.GetData('job')] as GenPurposeJob;
+        job.InitJob(repeat)
+        hive.Save();
+    }
+
     static Help() {
-        console.log('TheSwarmOS Console Commandes -----');
+        console.log('TheSwarmOS Console Commands -----');
         console.log('-Reset - Hard reset for the entire OS')
-        console.log('-GetHive - (roomName)');
-        console.log('-GetHivelord - (roomName, hivelordName)');
-        console.log('-AddLord - (roomName, hivelordName)');
-        console.log('-DeleteHivelord - (roomName, hivelordName)');
-        console.log('-GetJob - (roomName, hivelordName, jobID)\n---AddCommand - (commandType, target?)');
+        console.log('-GetHive - (hiveName)');
+        console.log('-GetHivelord - (hive, hivelordName)');
+        console.log('-AddLord - (hive, hivelordName)');
+        console.log('-DeleteHivelord - (hive, hivelordName)');
+        console.log('-GetJob - (hivelord, jobID)\n---AddCommand - (commandType, target?)');
         console.log('-AddJob - (hiveName, hivelordName, jobID)');
-        console.log('-DeleteJob - (roomName, hivelordName, jobID)');
+        console.log('-DeleteJob - (hivelord, jobID)');
+        console.log('-SetQuickJob - (hiveName, hivelordName, jobID)');
+        console.log('-GetQJ - QuickJob');
+        console.log('-AddCommand - (commandType, target?)');
+        console.log('-EZSetup');
         return OK;
     }
 } global['CC'] = ConsoleCommands;

@@ -2,7 +2,7 @@ import { SwarmMemory } from "Memory/SwarmMemory";
 import { CommandWeb } from "Memory/CommandWeb";
 import { CommandMemory } from "Memory/CommandMemory";
 import { BasicCreepCommand } from "Commands/BasicCreepCommand";
-import { CreepCommandType, SwarmReturnCode, HL_REQUIRE_CREEP, HL_NEXT_COMMAND, HL_RETRY } from "SwarmEnums";
+import { CreepCommandType, SwarmReturnCode, HL_REQUIRE_CREEP, HL_NEXT_COMMAND, HL_RETRY, CommandEnd } from "SwarmEnums";
 
 export abstract class JobBase extends SwarmMemory implements IJob {
     JobCommands: CommandWeb;
@@ -38,6 +38,10 @@ export abstract class JobBase extends SwarmMemory implements IJob {
         if (jobResult == OK) {
             let creep = Game.creeps[this.JobData.CreepName];
             JobID = this.JobData.CurCommandID;
+            if (JobID == CommandEnd) {
+                console.log('Job has completed');
+                return OK;
+            }
             jobResult = this.ConstructArgs(creep);
             if (jobResult == OK) {
                 let commandType = this.JobCommands.GetCommandType(JobID) as CreepCommandType
@@ -78,6 +82,9 @@ export abstract class JobBase extends SwarmMemory implements IJob {
                 }
                 if (nextID == JobID) {
                     break;
+                }
+                if (nextID == CommandEnd) {
+                    this.DeleteData('active');
                 }
             } else {
                 // Predefined results:

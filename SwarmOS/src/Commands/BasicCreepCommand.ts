@@ -44,6 +44,7 @@ export class BasicCreepCommand {
         switch (commandType) {
             case (BasicCreepCommandType.C_Harvest): {
                 responses[ERR_NOT_ENOUGH_RESOURCES] = CommandResponseType.Next;
+                responses[ERR_FULL]
                 break;
             }
             case (BasicCreepCommandType.C_Dismantle): {
@@ -85,6 +86,9 @@ export class BasicCreepCommand {
             case (BasicCreepCommandType.C_Build): {
                 target = creep.pos.findClosestByRange(FIND_CONSTRUCTION_SITES);
             }
+            case (BasicCreepCommandType.C_Harvest): {
+                target = creep.pos.findClosestByRange(FIND_SOURCES);
+            }
             case (BasicCreepCommandType.C_Heal): {
                 throw 'Not Configured';
             }
@@ -118,10 +122,11 @@ export class BasicCreepCommand {
                     });
                     target = targets[0];
                 }
-
+                break;
             }
             case (BasicCreepCommandType.C_Upgrade): {
                 target = creep.room.controller;
+                break;
             }
             case (BasicCreepCommandType.C_Withdraw): {
                 throw 'Not Configured';

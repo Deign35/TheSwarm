@@ -79,10 +79,20 @@ export class GenPurposeJob extends JobBase {
         let lastCommand = this.JobCommands.GetData(LAST_COMMAND) || [];
         let count = (lastCommand && lastCommand[2]) || 0;
         let newCommand = '#' + count;
+        if (target) {
+            this.TargetData.SetData(newCommand, target);
+        } else {
+            if (BasicCreepCommand.RequiresTarget(commandType)) {
+                this.TargetData.SetData(newCommand, COMMAND_FIND_TARGET);
+            }
+        }
         if (count == 0) {
             let newLinksList = {} as { [id: string]: CreepCommandType };
             newLinksList[newCommand] = commandType;
+            this.JobData.CurCommandID = newCommand;
             this.JobCommands.SetCommands(newLinksList, newCommand);
+            this.JobCommands.SetData(LAST_COMMAND, [newCommand, commandType, count + 1]);
+            return;
         }
         this.JobCommands.AddCommand(newCommand, commandType);
 
@@ -91,16 +101,8 @@ export class GenPurposeJob extends JobBase {
         this.JobCommands.SetCommandResponse(lastCommand[0], newCommand, this.GetResponsesForType(CommandResponseType.Next, responseList));
         this.JobCommands.SetCommandResponse(lastCommand[0], lastCommand[0], this.GetResponsesForType(CommandResponseType.Self, responseList));
         this.JobCommands.SetCommandComplete(lastCommand[0], this.GetResponsesForType(CommandResponseType.Terminate, responseList));
-        this.JobCommands.SetCommandResponse(lastCommand[0], this.JobCommands.DefaultCommand, this.GetResponsesForType(CommandResponseType.Restart, responseList));
+        this.JobCommands.SetCommandResponse(lastCommand[0], newCommand, this.GetResponsesForType(CommandResponseType.Restart, responseList));
         this.JobCommands.SetData(LAST_COMMAND, [newCommand, commandType, count + 1]);
-
-        if (target) {
-            this.TargetData.SetData(newCommand, target);
-        } else {
-            if (BasicCreepCommand.RequiresTarget(commandType)) {
-                this.TargetData.SetData(newCommand, COMMAND_FIND_TARGET);
-            }
-        }
     }
 
     GetResponsesForType(responseType: CommandResponseType, responseList: { [id: number]: CommandResponseType }): number[] {
@@ -118,10 +120,11 @@ export class GenPurposeJob extends JobBase {
         let lastCmdData = this.JobCommands.GetData(LAST_COMMAND);
         let responseList = BasicCreepCommand.CreateGenericResponseList(lastCmdData[1]);
         //Hook em up!
-        this.JobCommands.SetCommandResponse(lastCmdData[0], this.JobCommands.DefaultCommand, this.GetResponsesForType(CommandResponseType.Next, responseList));
+        let lastCommnd = repeat ? this.JobCommands.DefaultCommand : CommandEnd;
+        this.JobCommands.SetCommandResponse(lastCmdData[0], lastCommnd, this.GetResponsesForType(CommandResponseType.Next, responseList));
         this.JobCommands.SetCommandResponse(lastCmdData[0], lastCmdData[0], this.GetResponsesForType(CommandResponseType.Self, responseList));
         this.JobCommands.SetCommandComplete(lastCmdData[0], this.GetResponsesForType(CommandResponseType.Terminate, responseList));
-        this.JobCommands.SetCommandResponse(lastCmdData[0], this.JobCommands.DefaultCommand, this.GetResponsesForType(CommandResponseType.Restart, responseList));
+        this.JobCommands.SetCommandResponse(lastCmdData[0], lastCommnd, this.GetResponsesForType(CommandResponseType.Restart, responseList));
         this.JobCommands.DeleteData(LAST_COMMAND);
     }
 }

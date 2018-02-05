@@ -22,7 +22,7 @@ export class HiveQueen extends SwarmMemory { // Controls a group of HiveNodes.
         this.Hivelords = {};
         let HiveLordData = this.GetData('HiveLordData') || [] as string[];
         for (let i = 0, length = HiveLordData.length; i < length; i++) {
-            let hiveData = this.GetData(HiveLordData[i]);
+            //let hiveData = this.GetData(HiveLordData[i]);
             this.Hivelords[HiveLordData[i]] = new Hivelord(HiveLordData[i], this);
         }
     }

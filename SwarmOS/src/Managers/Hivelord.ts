@@ -5,34 +5,34 @@ import { HL_REQUIRE_CREEP, SwarmReturnCode, HL_RETRY, HL_NEXT_COMMAND } from "Sw
 import { GenPurposeJob } from "JobRoles/GenPurposeJob";
 
 export class Hivelord extends SwarmMemory {
-    TaskJobs: { [name: string]: JobBase };
+    Jobs: { [name: string]: JobBase };
+    JobMemory: SwarmMemory;
     AddNewJob(job: JobBase) {
-        this.TaskJobs[job.MemoryID] = job;
+        this.Jobs[job.MemoryID] = job;
     }
 
     Activate(room: Room) {
-        for (let name in this.TaskJobs) {
-            this.TaskJobs[name].Activate(room);
+        for (let name in this.Jobs) {
+            this.Jobs[name].Activate(room);
         }
     }
 
     Save() {
-        let _jobIDs = [];
-        for (let name in this.TaskJobs) {
-            this.TaskJobs[name].Save();
-            _jobIDs.push(this.TaskJobs[name].MemoryID)
+        let jobIDs = [];
+        for (let name in this.Jobs) {
+            this.Jobs[name].Save();
+            jobIDs.push(name);
         }
-
-        this.SetData('jobData', _jobIDs);
+        this.SetData('jobIDs', jobIDs);
         super.Save();
     }
 
     Load() {
         super.Load();
-        let TaskJobData = this.GetData('jobData') || [] as string[];
-        this.TaskJobs = {};
-        for (let i = 0, length = TaskJobData.length; i < length; i++) {
-            this.TaskJobs[TaskJobData[i]] = new GenPurposeJob(TaskJobData[i], this);
+        this.Jobs = {};
+        let jobData = this.GetData('jobIDs') || [] as string[];
+        for (let i = 0, length = jobData.length; i < length; i++) {
+            this.Jobs[jobData[i]] = new GenPurposeJob(jobData[i], this);
         }
     }
 }

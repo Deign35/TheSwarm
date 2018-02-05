@@ -1,6 +1,6 @@
 import { SwarmMemory } from 'Memory/SwarmMemory';
 import * as SwarmEnums from 'SwarmEnums';
-import { CommandType } from 'SwarmEnums';
+import { CommandType, GenericResponses, CommandResponseType, CommandEnd } from 'SwarmEnums';
 
 const LINK_DATA = 'LD';
 const LINK_TYPE = 'LT';
@@ -57,7 +57,7 @@ export class CommandWeb extends SwarmMemory implements ICommandWeb {
             this.LinksList[name].Save();
             linkIDs.push(name);
         }
-        this.SetData('linkIDs', linkIDs);
+        this.LinkMemory.SetData('linkIDs', linkIDs);
         this.SetData('DefaultCommand', this.DefaultCommand);
         this.LinkMemory.Save();
         super.Save();
@@ -67,11 +67,11 @@ export class CommandWeb extends SwarmMemory implements ICommandWeb {
         super.Load();
         this.LinkMemory = new SwarmMemory('LinkData', this);
         this.LinksList = {};
-        let linkIDs = this.GetData('linkIDs') || [];
+        let linkIDs = this.LinkMemory.GetData('linkIDs') || [];
         for (let i = 0, length = linkIDs.length; i < length; i++) {
             this.LinksList[linkIDs[i]] = new CommandLink(linkIDs[i], this.LinkMemory);
         }
-        this.DefaultCommand = this.GetData('DefaultCommand') || CommandWeb.EndCommand;
+        this.DefaultCommand = this.GetData('DefaultCommand') || CommandWeb.EndCommandID;
     }
 
     SetCommandComplete(fromID: string, results: SwarmEnums.SwarmReturnCode[]) {
@@ -108,6 +108,26 @@ export class CommandWeb extends SwarmMemory implements ICommandWeb {
                     toID = undefined;
                 }
             }
+        }
+
+        if (!toID) {
+            let defaultResponse = GenericResponses[result];
+            if (defaultResponse != CommandResponseType.Self) {
+                if (defaultResponse == CommandResponseType.Next) {
+                    let commandID = 1 + (+fromID.slice(1));
+                    toID = '#' + commandID;
+                    if (!this.LinksList[toID]) {
+                        toID = CommandEnd;
+                    }
+                } else if (defaultResponse == CommandResponseType.Restart) {
+                    toID = this.DefaultCommand;
+                } else if (defaultResponse == CommandResponseType.Terminate) {
+                    toID = CommandEnd;
+                }
+            }
+        }
+        if (toID) {
+            console.log('Result[' + result + '] - from[' + fromID + '] - To[' + toID + ']');
         }
         return toID;
     }
