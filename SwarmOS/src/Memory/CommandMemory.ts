@@ -7,7 +7,7 @@ const ASSIGNED_SPAWNER = 'AS';
 const COMMAND_ARGS = 'CA';
 const COMMAND_ID = 'CI';
 const COMMAND_TARGET = 'CT';
-
+// This doesn't work.  New strategy @ JobMemory
 export class CommandMemory extends SwarmMemory {
     get CurCommandID(): string {
         return this.GetData(COMMAND_ID);
@@ -20,7 +20,7 @@ export class CommandMemory extends SwarmMemory {
     }
     set CreepName(name: string) {
         let oldCreep = this.CreepName;
-        if(Memory.creeps[oldCreep]) {
+        if (Memory.creeps[oldCreep]) {
             Memory.creeps[oldCreep].Assigned = false;
         }
 
@@ -33,15 +33,15 @@ export class CommandMemory extends SwarmMemory {
 
     set CommandTarget(id: string) {
         let oldTarget = this.CommandTarget;
-        if(oldTarget) {
+        if (oldTarget) {
             Memory.TargetData[oldTarget]--;
-            if(Memory.TargetData[oldTarget] == 1) {
+            if (Memory.TargetData[oldTarget] == 1) {
                 delete Memory.TargetData[oldTarget];
             }
         }
         //Memory.TargetData[id] = true;
         this.SetData(COMMAND_TARGET, id);
-        if(Memory.TargetData[id]) {
+        if (Memory.TargetData[id]) {
             Memory.TargetData[id]++;
         } else {
             Memory.TargetData[id] = 2;

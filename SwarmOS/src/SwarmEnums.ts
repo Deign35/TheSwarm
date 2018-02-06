@@ -55,6 +55,10 @@ export enum RoleNames {
     RCL3_Harvester,
 }
 
+export enum CmdNodeType {
+    SimpleCmdNode,
+    CustomCmdNode
+}
 export enum CommandResponseType {
     Next,
     Self,

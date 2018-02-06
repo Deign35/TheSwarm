@@ -6,7 +6,7 @@ export class SwarmMemory implements IMemory {
     DeleteData(id: string) { delete this._cache[id]; }
 
     Save() {
-        if(this._cache) {
+        if (this._cache) {
             if (this.Parent) {
                 this.Parent.SetData(this.MemoryID, this._cache);
             } else {
@@ -20,6 +20,15 @@ export class SwarmMemory implements IMemory {
             this._cache = this.Parent.GetData(this.MemoryID) || {};
         } else {
             this._cache = Memory[this.MemoryID] || {};
+        }
+    }
+}
+
+declare type SwarmLedgerCallback = (name: string, item: IMemory) => void;
+export class SwarmLedger extends SwarmMemory {
+    ForEach(inFunc: SwarmLedgerCallback) {
+        for (let name in this._cache) {
+            inFunc(name, this._cache[name]);
         }
     }
 }
