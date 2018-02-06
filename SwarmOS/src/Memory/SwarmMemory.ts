@@ -22,13 +22,10 @@ export class SwarmMemory implements IMemory {
             this._cache = Memory[this.MemoryID] || {};
         }
     }
-}
-
-declare type SwarmLedgerCallback = (name: string, item: IMemory) => void;
-export class SwarmLedger extends SwarmMemory {
-    ForEach(inFunc: SwarmLedgerCallback) {
+    ForEach(inFunc: SwarmMemoryCallback) {
         for (let name in this._cache) {
             inFunc(name, this._cache[name]);
         }
     }
 }
+declare type SwarmMemoryCallback = (name: string, item: any) => void;
