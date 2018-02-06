@@ -40,6 +40,37 @@ export class HiveQueen extends SwarmMemory { // Controls a group of HiveNodes.
         let newHivelord = new RCL1_Hivelord('RCL1_HL', this);
         newHivelord.Save();
         this.Hivelords[newHivelord.MemoryID] = (newHivelord);
-        // Be sure to save the hivelord data before trying to use it.*/
+        // Be sure to save the hivelord data before trying to use it.
+
+
+    let room = Game.rooms['W2N5'];
+    if(room.energyCapacityAvailable >= 1300 && !Memory['Triggered']) {
+        Memory['Triggered'] = true;
+        CC.EZUpdate('W2N5', {work:8, carry:4, move:6});
+    }
+    if(room.energyCapacityAvailable >= 2000 && !Memory['Triggered2']) {
+        Memory['Triggered2'] = true;
+        CC.EZUpdate('W2N5', {work:5, carry:2, move:3});
+        GR.CreateGenPurposeJob('W2N5', {work:10, carry:6, move:8});
+        GR.CreateGenPurposeJob('W2N5', {work:5, carry:3, move:4});
+        GR.CreateGenPurposeJob('W2N5', {work:5, carry:3, move:4});
+    }
+    if(room.controller.progress < 100) {
+        if(Memory['CurRCL'] != room.controller.level && !Memory['Triggered']) {
+            if(room.controller.level == 3) {
+                CC.EZUpdate('W2N5', {move:2, carry:1, work:3})
+            } else if(room.controller.level == 4) {
+                CC.EZUpdate('W2N5', {move:4, carry:2, work:4})
+            }
+
+            Memory['CurRCL'] = room.controller.level;
+        }
+        let flags = room.find(FIND_FLAGS);
+        for(let i = 0; i < flags.length; i++) {
+            room.createConstructionSite(flags[i].pos, STRUCTURE_EXTENSION);
+            flags[i].remove();
+        }
+    }
+        */
     }
 }
