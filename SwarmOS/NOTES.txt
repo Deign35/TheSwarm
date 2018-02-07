@@ -1,0 +1,1 @@
+StoreDefinition is currently set to any, which means no intellisense on it.  This should be fixed soon.

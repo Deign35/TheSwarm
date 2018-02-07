@@ -19,9 +19,9 @@ declare interface IMemory {
     Load(): void;
 }
 declare interface IJob extends IMemory {
-    JobCommands: ICommandWeb;
-    JobData: IMemory;
     Activate(room: Room): number;
+}
+declare interface ICreepJob extends IJob {
 }
 declare interface ICommandWeb extends IMemory {
     SetCommands(linksList: { [commandID: string]: string }, defaultCommand: string): void;

@@ -30,27 +30,27 @@ export class GenPurposeJob extends JobBase {
     ConstructArgs(creep: Creep): SwarmReturnCode {
         let result = OK as SwarmReturnCode;
         let args: Dictionary = {};
-        let cmdID = this.JobData.CurCommandID;
-        let cmdType = this.JobCommands.GetCommandType(cmdID) as CreepCommandType;
-        if(BasicCreepCommand.RequiresTarget(cmdType)) {
+        let cmdID = this.jobMemory.CurNodeID;
+        let cmdType = this.jobMemory.GetCurCmdType();
+        if (BasicCreepCommand.RequiresTarget(cmdType)) {
             let cmdTarget: any = this.TargetData.GetData(cmdID);  // I HATE ANY
-            if(!cmdTarget) {
-                cmdTarget = this.JobData.CommandTarget;
+            if (!cmdTarget) {
+                cmdTarget = this.jobMemory.AssignedTarget;
             }
             if (cmdTarget == COMMAND_FIND_TARGET) {
                 cmdTarget = ERR_NOT_FOUND;
                 let target = BasicCreepCommand.FindCommandTarget(creep, cmdType);
-                if((<Structure>target).id) {
+                if ((<Structure>target).id) {
                     cmdTarget = (<Structure>target).id;
-                    this.JobData.CommandTarget = cmdTarget;
+                    this.jobMemory.AssignedTarget = cmdTarget;
                 }
             }
 
-            if(cmdTarget != ERR_NOT_FOUND) {
+            if (cmdTarget != ERR_NOT_FOUND) {
                 let target = Game.getObjectById(cmdTarget);
-                if(!target) {
+                if (!target) {
                     this.TargetData.DeleteData(cmdID);
-                    this.JobData.CommandTarget = COMMAND_FIND_TARGET;
+                    this.jobMemory.AssignedTarget = COMMAND_FIND_TARGET;
                     result = HL_RETRY;
                 } else {
                     args['target'] = target;
@@ -77,8 +77,8 @@ export class GenPurposeJob extends JobBase {
         let spawnName = room.find(FIND_MY_SPAWNS)[0].name;
         let spawn = Game.spawns[spawnName];
         if (spawn.lastSpawnTick && spawn.lastSpawnTick == Game.time) { return newName; }
-        let creepBody = this.JobData.GetData('BODY');
-        let testSpawn = spawn.spawnCreep(creepBody, 'TESTSpawn', {dryRun: true});
+        let creepBody = [MOVE, CARRY, WORK];//this.JobData.GetData('BODY');
+        let testSpawn = spawn.spawnCreep(creepBody, 'TESTSpawn', { dryRun: true });
         if (testSpawn == OK) {
             newName = spawn.room.name + '_';
             newName += this.MemoryID.slice(-3) + '_';
@@ -127,7 +127,7 @@ export class GenPurposeJob extends JobBase {
     }
 
     InitJob(repeat: boolean) {
-        if(!repeat) {
+        if (!repeat) {
             this.AddCommand(BasicCreepCommandType.C_Suicide);
         }
         this.SetData('active', true);
@@ -145,7 +145,7 @@ export class GenPurposeJob extends JobBase {
         this.JobCommands.SetCommandResponse(lastCmdData[0], lastCommnd, this.GetResponsesForType(CommandResponseType.Next, defaultResponses));
         this.JobCommands.SetCommandResponse(lastCmdData[0], lastCommnd, this.GetResponsesForType(CommandResponseType.Restart, defaultResponses));
 
-        if(!this.JobData.GetData('BODY')) {
+        if (!this.JobData.GetData('BODY')) {
             this.SetSpawnBody({
                 move: 1,
                 carry: 1
@@ -153,12 +153,12 @@ export class GenPurposeJob extends JobBase {
         }
     }
 
-    SetSpawnBody(bodyParts: {[partType: string]: number }) {
+    SetSpawnBody(bodyParts: { [partType: string]: number }) {
         let parts = [];
-        for(let partType in bodyParts) {
+        for (let partType in bodyParts) {
             let count = bodyParts[partType];
             let partName = partType.toLowerCase();
-            for(let i = 0; i < count; i++) {
+            for (let i = 0; i < count; i++) {
                 parts.push(partName);
             }
         }

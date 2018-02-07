@@ -39,41 +39,41 @@ export class BasicCreepCommand {
             commandType == BasicCreepCommandType.C_Withdraw;
     }
 
-    static CreateGenericResponseList(commandType: CreepCommandType): { [code: number]: CommandResponseType } {
-        let responses: { [code: number]: CommandResponseType } = {};
-        switch (commandType) {
-            case (BasicCreepCommandType.C_Harvest): {
-                responses[ERR_NOT_ENOUGH_RESOURCES] = CommandResponseType.Next;
-                responses[ERR_FULL]
-                break;
-            }
-            case (BasicCreepCommandType.C_Dismantle): {
-                throw 'Not Configured';
-            }
-            case (BasicCreepCommandType.C_Heal): {
-                throw 'Not Configured';
-            }
-            case (BasicCreepCommandType.C_RangedAttack): {
-                throw 'Not Configured';
-            };
-            case (BasicCreepCommandType.C_RangedHeal): {
-                throw 'Not Configured';
-            }
-            case (BasicCreepCommandType.C_Suicide): {
-                responses[OK] = CommandResponseType.Next;
-                break;
-            }
-            case (BasicCreepCommandType.C_Say): {
-                responses[OK] = CommandResponseType.Next;
-                break;
-            }
-            case (BasicCreepCommandType.C_Withdraw): {
-                responses[OK] = CommandResponseType.Next;
-                break;
-            }
-        }
-        return responses;
-    }
+    /*static CreateGenericResponseList(commandType: CreepCommandType): { [code: number]: CommandResponseType } {
+         let responses: { [code: number]: CommandResponseType } = {};
+         switch (commandType) {
+             case (BasicCreepCommandType.C_Harvest): {
+                 responses[ERR_NOT_ENOUGH_RESOURCES] = CommandResponseType.Next;
+                 responses[ERR_FULL]
+                 break;
+             }
+             case (BasicCreepCommandType.C_Dismantle): {
+                 throw 'Not Configured';
+             }
+             case (BasicCreepCommandType.C_Heal): {
+                 throw 'Not Configured';
+             }
+             case (BasicCreepCommandType.C_RangedAttack): {
+                 throw 'Not Configured';
+             };
+             case (BasicCreepCommandType.C_RangedHeal): {
+                 throw 'Not Configured';
+             }
+             case (BasicCreepCommandType.C_Suicide): {
+                 responses[OK] = CommandResponseType.Next;
+                 break;
+             }
+             case (BasicCreepCommandType.C_Say): {
+                 responses[OK] = CommandResponseType.Next;
+                 break;
+             }
+             case (BasicCreepCommandType.C_Withdraw): {
+                 responses[OK] = CommandResponseType.Next;
+                 break;
+             }
+         }
+         return responses;
+     }*/
 
     static NOT_FOUND_ID = 'NFI';
     // Load balancing targets here.
@@ -81,22 +81,22 @@ export class BasicCreepCommand {
         let possibleTargets: any[] = [];
         let sortFunc = (a: any, b: any) => {
             let countA = Memory.TargetData[a.id] || 1;
-            if(Memory.TargetMax[a.id] && countA > Memory.TargetMax[a.id]) {
+            if (Memory.TargetMax[a.id] && countA > Memory.TargetMax[a.id]) {
                 return 1;
             }
-            if(Memory.TargetFactor[a.id]) {
+            if (Memory.TargetFactor[a.id]) {
                 countA *= Memory.TargetFactor[a.id];
             }
             let countB = Memory.TargetData[b.id] || 1;
-            if(Memory.TargetMax[b.id] && countB > Memory.TargetMax[b.id]) {
+            if (Memory.TargetMax[b.id] && countB > Memory.TargetMax[b.id]) {
                 return -1;
             }
-            if(Memory.TargetFactor[b.id]) {
+            if (Memory.TargetFactor[b.id]) {
                 countB *= Memory.TargetFactor[b.id];
             }
-            if(countA > countB) {
+            if (countA > countB) {
                 return 1
-            } else if(countA < countB) {
+            } else if (countA < countB) {
                 return -1;
             }
             let distA = creep.pos.getRangeTo(a);
@@ -120,7 +120,7 @@ export class BasicCreepCommand {
             }
             case (BasicCreepCommandType.C_Pickup): {
                 possibleTargets = creep.room.find(FIND_DROPPED_RESOURCES, {
-                    filter: function(dropped) {
+                    filter: function (dropped) {
                         return dropped.resourceType == RESOURCE_ENERGY;
                     }
                 });
@@ -128,17 +128,17 @@ export class BasicCreepCommand {
             }
             case (BasicCreepCommandType.C_Repair): {
                 possibleTargets = creep.room.find(FIND_STRUCTURES, {
-                    filter: function(structure) {
-                        if(structure.hits == structure.hitsMax){
+                    filter: function (structure) {
+                        if (structure.hits == structure.hitsMax) {
                             return false;
                         }
                         // Returning true on road = stops working...
-                        if(structure.structureType == STRUCTURE_WALL ||
+                        if (structure.structureType == STRUCTURE_WALL ||
                             structure.structureType == STRUCTURE_ROAD ||
                             structure.structureType == STRUCTURE_CONTAINER ||
                             structure.structureType == STRUCTURE_RAMPART) {
-                                return false;
-                        } else if(!(structure as OwnedStructure).my) {
+                            return false;
+                        } else if (!(structure as OwnedStructure).my) {
                             return false;
                         }
                         return true;
@@ -164,9 +164,9 @@ export class BasicCreepCommand {
                     }
                     let countA = Memory.TargetData[a.id] || 0;
                     let countB = Memory.TargetData[b.id] || 0;
-                    if(countA > countB) {
+                    if (countA > countB) {
                         return 1
-                    } else if(countA < countB) {
+                    } else if (countA < countB) {
                         return -1;
                     }
                     let distA = creep.pos.getRangeTo(a);
@@ -176,7 +176,7 @@ export class BasicCreepCommand {
                 break;
             }
             case (BasicCreepCommandType.C_Upgrade):
-                if(creep.room.controller) {
+                if (creep.room.controller) {
                     possibleTargets.push(creep.room.controller);
                 }
                 break;
@@ -186,7 +186,7 @@ export class BasicCreepCommand {
         }
 
         let target: RoomObject | ERR_NOT_FOUND = ERR_NOT_FOUND;
-        if(possibleTargets.length > 0) {
+        if (possibleTargets.length > 0) {
             possibleTargets.sort(sortFunc);
             target = possibleTargets[0];
         }

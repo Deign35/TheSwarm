@@ -1220,7 +1220,7 @@ interface CPUShardLimits {
     [shard: string]: number;
 }
 
-type StoreDefinition = Partial<Record<_ResourceConstantSansEnergy, number>> & { energy: number };
+type StoreDefinition = any;//Partial<Record<_ResourceConstantSansEnergy, number>>;// & { energy: number, length: number };
 // type SD<K extends ResourceConstant> = {
 //   [P in K]: number;
 //   energy: number;
