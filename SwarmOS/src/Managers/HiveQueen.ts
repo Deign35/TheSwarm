@@ -2,6 +2,7 @@ import { SwarmMemory } from "Memory/SwarmMemory";
 import { Hivelord } from "Managers/Hivelord";
 import { SwarmReturnCode, HL_REQUIRE_CREEP } from "SwarmEnums";
 
+const HIVELORD_DATA = 'HD';
 export class HiveQueen extends SwarmMemory { // Controls a group of HiveNodes.
     // Should change this to be an interface and different levels or configurations can have different kinds of HiveQueens
     // Each hive queen can have it's own objective.
@@ -13,14 +14,14 @@ export class HiveQueen extends SwarmMemory { // Controls a group of HiveNodes.
             _hivelordIDs.push(this.Hivelords[name].MemoryID);
         }
 
-        this.SetData('HiveLordData', _hivelordIDs);
+        this.SetData(HIVELORD_DATA, _hivelordIDs);
         super.Save();
     }
 
     Load() {
         super.Load();
         this.Hivelords = {};
-        let HiveLordData = this.GetData('HiveLordData') || [] as string[];
+        let HiveLordData = this.GetData(HIVELORD_DATA) || [] as string[];
         for (let i = 0, length = HiveLordData.length; i < length; i++) {
             //let hiveData = this.GetData(HiveLordData[i]);
             this.Hivelords[HiveLordData[i]] = new Hivelord(HiveLordData[i], this);
@@ -29,8 +30,13 @@ export class HiveQueen extends SwarmMemory { // Controls a group of HiveNodes.
 
     Activate() {
         for (let name in this.Hivelords) {
-            this.Hivelords[name].Activate(Game.rooms[this.MemoryID]);
+            this.Hivelords[name].ProcessHivelord();
         }
+    }
+
+    AddNewHivelord(hivelord: Hivelord) {
+        hivelord.QueenName = this.MemoryID;
+        this.Hivelords[hivelord.MemoryID] = hivelord;
     }
 
     InitHiveQueen() {

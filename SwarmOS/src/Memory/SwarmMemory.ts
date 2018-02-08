@@ -1,3 +1,4 @@
+const LOCK = 'LK';
 export class SwarmMemory implements IMemory {
     protected _cache: Dictionary = {};
     constructor(public MemoryID: string, public Parent?: SwarmMemory) { this.Load(); }
@@ -6,6 +7,7 @@ export class SwarmMemory implements IMemory {
     DeleteData(id: string) { delete this._cache[id]; }
 
     Save() {
+        this.DeleteData(LOCK);
         if (this._cache) {
             if (this.Parent) {
                 this.Parent.SetData(this.MemoryID, this._cache);
@@ -13,6 +15,8 @@ export class SwarmMemory implements IMemory {
                 Memory[this.MemoryID] = this._cache;
             }
         }
+
+        delete this._cache; // Ensure I don't try reusing data from a memory that isn't checked out.
     }
 
     Load() {
@@ -21,6 +25,12 @@ export class SwarmMemory implements IMemory {
         } else {
             this._cache = Memory[this.MemoryID] || {};
         }
+
+        if (this.GetData(LOCK)) {
+            console.log('MEMORY ACCESS ERROR');
+            throw new Error('MEMORY ACCESS ERROR');
+        }
+        this.SetData(LOCK, true);
     }
 
     Copy(copyID: string) {

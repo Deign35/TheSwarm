@@ -3,17 +3,35 @@ import { CommandMemory } from "Memory/CommandMemory";
 import * as SwarmEnums from "SwarmEnums";
 import { SwarmJob } from "Hivelords/SwarmJob";
 import { BasicCreepCommand } from "Commands/BasicCreepCommand";
+import { HiveQueen } from "Managers/HiveQueen";
 
+const JOB_IDS = 'JI';
+const QUEEN_NAME = 'QN';
 export class Hivelord extends SwarmMemory {
     Jobs: { [name: string]: SwarmJob };
-    AddNewJob(job: SwarmJob) {
-        this.Jobs[job.MemoryID] = job;
+    Body: BodyPartConstant[];
+
+    Save() {
+        let jobIDs = [];
+        for (let name in this.Jobs) {
+            this.Jobs[name].Save();
+            jobIDs.push(name);
+        }
+        this.SetData(JOB_IDS, jobIDs);
+        super.Save();
     }
 
-    Activate(room: Room) {
-        for (let name in this.Jobs) {
-            this.Jobs[name].Activate();
+    Load() {
+        super.Load();
+        this.Jobs = {};
+        let jobData = this.GetData(JOB_IDS) || [] as string[];
+        for (let i = 0, length = jobData.length; i < length; i++) {
+            this.Jobs[jobData[i]] = new SwarmJob(jobData[i], this);
         }
+    }
+    InitHivelord(job: SwarmJob, body: BodyPartConstant[]) {
+        this.Jobs[job.MemoryID] = job;
+        this.Body = body;
     }
 
     ProcessHivelord() {
@@ -29,25 +47,6 @@ export class Hivelord extends SwarmMemory {
                     console.log('Failed action: ' + JSON.stringify(this));
                 }
             }
-        }
-    }
-
-    Save() {
-        let jobIDs = [];
-        for (let name in this.Jobs) {
-            this.Jobs[name].Save();
-            jobIDs.push(name);
-        }
-        this.SetData('jobIDs', jobIDs);
-        super.Save();
-    }
-
-    Load() {
-        super.Load();
-        this.Jobs = {};
-        let jobData = this.GetData('jobIDs') || [] as string[];
-        for (let i = 0, length = jobData.length; i < length; i++) {
-            this.Jobs[jobData[i]] = new SwarmJob(jobData[i], this);
         }
     }
 }

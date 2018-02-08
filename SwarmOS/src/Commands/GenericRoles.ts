@@ -1,71 +1,21 @@
+import { HiveQueen } from "Managers/HiveQueen";
 import { Hivelord } from "Managers/Hivelord";
-import { ConsoleCommands } from "./ConsoleCommands"
-import { BasicCreepCommandType } from "SwarmEnums";
+import { SwarmJob } from "Hivelords/SwarmJob";
+import * as SwarmEnums from "SwarmEnums";
 
-export class GenericRoles {
-    static GetNewName(hiveName: string) {
-        return hiveName + Memory['lordCount']++;
+export class SwarmJobCreator {
+    private static AttachToHiveQueen(hiveQueen: HiveQueen, newJob: SwarmJob) {
+        let newHivelord 
     }
-    static CreatePrimeHarvesterJob(hiveName: string) {
-        let newLordName = this.GetNewName(hiveName);
-        ConsoleCommands.AddLord(hiveName, newLordName)
-        ConsoleCommands.AddJob(hiveName, newLordName, 'EZJob');
-        ConsoleCommands.AddCommand(BasicCreepCommandType.C_Harvest);
-        ConsoleCommands.AddCommand(BasicCreepCommandType.C_Transfer);
-        ConsoleCommands.AddCommand(BasicCreepCommandType.C_Build);
-        ConsoleCommands.AddCommand(BasicCreepCommandType.C_Upgrade);
-        ConsoleCommands.SetJobBody({work: 8, move: 6, carry: 4});
-        ConsoleCommands.InitJob(true);
-        return OK;
+    static CreateHarvester(hiveQueen: HiveQueen, body: BodyPartConstant[], targetSource?: string) {
+        let newHivelord = new Hivelord(('' + Game.time).slice(-3), hiveQueen);
+        let newJob = new SwarmJob('HA', newHivelord);
+        newJob.AddCommand(SwarmEnums.BasicCreepCommandType.C_Harvest, targetSource);
+        newJob.AddCommand(SwarmEnums.BasicCreepCommandType.C_Transfer);
+        newJob.AddCommand(SwarmEnums.BasicCreepCommandType.C_Build);
+        newJob.AddCommand(SwarmEnums.BasicCreepCommandType.C_Upgrade);
+        newJob.ActivateJob();
+        newHivelord.InitHivelord(newJob, body);
+        hiveQueen.AddNewHivelord(newHivelord);
     }
-
-    static CreateBasicHarvesterJob(hiveName: string, bodyParts: {[partName: string]: number} = {move: 2, carry: 1, work: 1}) {
-        let newLordName = this.GetNewName(hiveName);
-        ConsoleCommands.AddLord(hiveName, newLordName)
-        ConsoleCommands.AddJob(hiveName, newLordName, 'EZJob');
-        ConsoleCommands.AddCommand(BasicCreepCommandType.C_Harvest);
-        ConsoleCommands.AddCommand(BasicCreepCommandType.C_Transfer);
-        ConsoleCommands.AddCommand(BasicCreepCommandType.C_Build);
-        ConsoleCommands.AddCommand(BasicCreepCommandType.C_Upgrade);
-        ConsoleCommands.SetJobBody(bodyParts);
-        ConsoleCommands.InitJob(true);
-        return OK;
-    }
-
-    static CreateGenPurposeJob(hiveName: string, bodyParts: {[partName: string]: number} = {move: 2, carry: 1, work: 1}) {
-        let newLordName = this.GetNewName(hiveName);
-        ConsoleCommands.AddLord(hiveName, newLordName)
-        ConsoleCommands.AddJob(hiveName, newLordName, 'EZJob');
-        ConsoleCommands.AddCommand(BasicCreepCommandType.C_Pickup);
-        ConsoleCommands.AddCommand(BasicCreepCommandType.C_Harvest);
-        ConsoleCommands.AddCommand(BasicCreepCommandType.C_Build);
-        ConsoleCommands.AddCommand(BasicCreepCommandType.C_Transfer);
-        ConsoleCommands.AddCommand(BasicCreepCommandType.C_Repair);
-        ConsoleCommands.AddCommand(BasicCreepCommandType.C_Upgrade);
-            ConsoleCommands.SetJobBody(bodyParts);
-        ConsoleCommands.InitJob(true);
-        return OK;
-    }
-
-    static CreateUpgraderJob(hiveName: string, bodyParts: {[partName: string]: number} = {move: 2, carry: 1, work: 1}) {
-        let newLordName = this.GetNewName(hiveName);
-        ConsoleCommands.AddLord(hiveName, newLordName)
-        ConsoleCommands.AddJob(hiveName, newLordName, 'EZJob');
-        ConsoleCommands.AddCommand(BasicCreepCommandType.C_Withdraw);
-        ConsoleCommands.AddCommand(BasicCreepCommandType.C_Harvest);
-        ConsoleCommands.AddCommand(BasicCreepCommandType.C_Upgrade);
-        ConsoleCommands.SetJobBody(bodyParts);
-        ConsoleCommands.InitJob(true);
-        return OK;
-    }
-
-    static Help() {
-        let helpStr = 'TheSwarmOS Console Commands -----';
-        helpStr += '\n' + ('-CreatePrimeHarvesterJob')
-        helpStr += '\n' + ('-CreateBasicHarvesterJob');
-        helpStr += '\n' + ('-CreateGenPurposeJob');
-        helpStr += '\n' + ('-CreateUpgraderJob');
-        console.log(helpStr);
-        return OK;
-    }
-}global['GR'] = GenericRoles;
+}
