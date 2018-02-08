@@ -140,11 +140,6 @@ export class SwarmJob extends SwarmMemory {
             }
 
             if(jobResponse == SwarmEnums.CRT_Next) {
-                this.CommandIndex++;
-                jobResult = SwarmEnums.CRT_Retry;
-                if (this.CommandIndex >= this.CommandList.length) {
-                    this.CommandIndex = 0;
-                }
                 let prevTarget = this.SavedTargets[this.CommandIndex];
                 if(prevTarget != COMMAND_FIND_TARGET) {
                     Memory.TargetData[prevTarget]--;
@@ -152,6 +147,11 @@ export class SwarmJob extends SwarmMemory {
                         delete Memory.TargetData[prevTarget];
                     }
                     this.SavedTargets[this.CommandIndex] = COMMAND_FIND_TARGET;
+                }
+                this.CommandIndex++;
+                jobResult = SwarmEnums.CRT_Retry;
+                if (this.CommandIndex >= this.CommandList.length) {
+                    this.CommandIndex = 0;
                 }
             }
         } while (jobResult == SwarmEnums.CRT_Retry && retryCount++ < this.CommandList.length * 2);

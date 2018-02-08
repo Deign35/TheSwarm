@@ -43,7 +43,7 @@ export class HiveQueen extends SwarmMemory { // Controls a group of HiveNodes.
                     let foundExisting = false;
                     for (let name in Memory.creeps) {
                         if (!Memory.creeps[name]['Assigned']) {
-                            this.Jobs[index].SetCreep(Memory.creeps[name]);
+                            this.Jobs[index].SetCreep(name);
                             foundExisting = true;
                             break;
                         }

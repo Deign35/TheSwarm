@@ -120,14 +120,14 @@ export class BasicCreepCommand {
     static FindCommandTarget(creep: Creep, commandType: SwarmEnums.BasicCreepCommandType) {
         let possibleTargets: any[] = [];
         let sortFunc = (a: any, b: any) => {
-            let countA = Memory.TargetData[a.id] || 1;
+            let countA = Memory.TargetData[a.id] || 0;
             if (Memory.TargetMax[a.id] && countA > Memory.TargetMax[a.id]) {
                 return 1;
             }
             if (Memory.TargetFactor[a.id]) {
                 countA *= Memory.TargetFactor[a.id];
             }
-            let countB = Memory.TargetData[b.id] || 1;
+            let countB = Memory.TargetData[b.id] || 0;
             if (Memory.TargetMax[b.id] && countB > Memory.TargetMax[b.id]) {
                 return -1;
             }
