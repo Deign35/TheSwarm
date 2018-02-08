@@ -22,6 +22,14 @@ export class SwarmMemory implements IMemory {
             this._cache = Memory[this.MemoryID] || {};
         }
     }
+
+    Copy(copyID: string) {
+        if (this.Parent) {
+            this.Parent.SetData(copyID, this._cache);
+        } else {
+            Memory[copyID] = this._cache;
+        }
+    }
     ForEach(inFunc: SwarmMemoryCallback) {
         for (let name in this._cache) {
             inFunc(name, this._cache[name]);

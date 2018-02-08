@@ -74,6 +74,7 @@ export class SwarmJob extends SwarmMemory {
         let jobResult = this.ConstructArgs(creep);
         let lastRetry = -1;
         let retryCount = 0;
+        // Use CommandArgs here to save cpu.
         do {
             if (jobResult == OK) {
                 jobResult = BasicCreepCommand.ExecuteCreepCommand(
@@ -83,9 +84,13 @@ export class SwarmJob extends SwarmMemory {
             }
 
             let jobResponse = BasicCreepCommand.GetResponse(this.CommandList[this.CommandIndex], jobResult);
-
-            let curIndex = this.CommandIndex;
             switch (jobResponse) {
+                case (SwarmEnums.CRT_Retry):
+                    if (lastRetry != this.CommandIndex) {
+                        lastRetry = this.CommandIndex;
+                        break;
+                    }
+                // Fall into Next
                 case (SwarmEnums.CRT_Next):
                     this.CommandIndex++;
                     jobResult = SwarmEnums.CRT_Retry;
@@ -117,12 +122,6 @@ export class SwarmJob extends SwarmMemory {
                         jobResult = OK;
                     }
                     break;
-            }
-            if (jobResult == SwarmEnums.CRT_Retry) {
-                if (lastRetry == this.CommandIndex) {
-                    jobResponse = SwarmEnums.CRT_Next;
-                }
-                lastRetry = curIndex;
             }
         } while (jobResult == SwarmEnums.CRT_Retry && retryCount++ < this.CommandList.length * 2);
 

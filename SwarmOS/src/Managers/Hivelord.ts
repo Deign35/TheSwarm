@@ -17,18 +17,19 @@ export class Hivelord extends SwarmMemory {
     }
 
     ProcessHivelord() {
-        let finalResult = ERR_INVALID_ARGS as SwarmEnums.SwarmReturnCode;
         for (let index in this.Jobs) {
             let result = this.Jobs[index].ValidateJob();
             if (result != OK) {
-                // respond and fix the problems.
+                // respond and fix the problems.  Like spawning
             }
 
             if (result == OK) {
                 result = this.Jobs[index].Activate();
+                if (result != OK) {
+                    console.log('Failed action: ' + JSON.stringify(this));
+                }
             }
         }
-        return finalResult;
     }
 
     Save() {
