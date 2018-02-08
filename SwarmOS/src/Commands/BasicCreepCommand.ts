@@ -61,6 +61,7 @@ export class BasicCreepCommand {
         }
         switch (result) {
             case (ERR_NOT_IN_RANGE):/* -9 */ return SwarmEnums.CRT_Move;
+            case (OK):/* 0 */
             case (ERR_NO_PATH):/* -2 */
             case (ERR_NOT_FOUND):/* -5 */
             case (ERR_INVALID_TARGET):/* -7 */ return SwarmEnums.CRT_Next;
@@ -71,13 +72,8 @@ export class BasicCreepCommand {
             case (ERR_RCL_NOT_ENOUGH):/* -14 */
             case (ERR_GCL_NOT_ENOUGH):/* -15 */ return SwarmEnums.CRT_Terminate;
 
-            case (OK):/* 0 */
             case (ERR_NOT_ENOUGH_RESOURCES):/* -6 */
-            case (ERR_FULL):/* -8 */
-                if (DefaultOverrides[commandType]) { // This is only possible because current commands that need overrides all fit this pattern.
-                    return DefaultOverrides[commandType][result];
-                }
-                break;
+            case (ERR_FULL):/* -8 */ return SwarmEnums.CRT_Retry;
             //case(ERR_NAME_EXISTS):/* -3 */ break;
             //case(ERR_BUSY):/* -4 */ break;
             //case(ERR_TIRED):/* -11 */ break;

@@ -10,6 +10,7 @@ export class ConsoleCommands {
         let swarmQueen = SwarmQueen.LoadSwarmData();
         let hiveQueen = swarmQueen.HiveQueens['sim'];
         SwarmJobCreator.CreateHarvester(hiveQueen, body, target);
+        swarmQueen.Save();
     }
     static Help() {
         let helpStr = 'TheSwarmOS Console Commands -----';

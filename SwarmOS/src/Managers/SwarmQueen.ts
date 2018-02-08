@@ -43,7 +43,6 @@ export class SwarmQueen extends SwarmMemory {
             if (!room.controller || !room.controller.my) { continue; }
 
             newSwarm.HiveQueens[name] = new HiveQueen(name);
-            newSwarm.HiveQueens[name].InitHiveQueen();
             newSwarm.HiveQueens[name].Save();
             newSwarm.HiveQueens[name].Load();
         }

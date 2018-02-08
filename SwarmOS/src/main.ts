@@ -33,7 +33,6 @@ const initSwarm = function () {
         Memory.TargetData = {};
         Memory.TargetFactor = {};
         Memory.TargetMax = {};
-        Memory['lordCount'] = 0;
 
         if (initResult == OK) {
             Memory.INIT = true;

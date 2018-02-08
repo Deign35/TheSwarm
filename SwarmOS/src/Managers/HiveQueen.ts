@@ -1,82 +1,71 @@
 import { SwarmMemory } from "Memory/SwarmMemory";
-import { Hivelord } from "Managers/Hivelord";
-import { SwarmReturnCode, HL_REQUIRE_CREEP } from "SwarmEnums";
+import * as SwarmEnums from "SwarmEnums";
+import { SwarmJob } from "Hivelords/SwarmJob";
 
-const HIVELORD_DATA = 'HD';
+const JOB_IDS = 'JI';
 export class HiveQueen extends SwarmMemory { // Controls a group of HiveNodes.
+    Hive: Room;
     // Should change this to be an interface and different levels or configurations can have different kinds of HiveQueens
     // Each hive queen can have it's own objective.
-    Hivelords: { [name: string]: Hivelord };
+    Jobs: { [name: string]: SwarmJob };
     Save() {
-        let _hivelordIDs = [];
-        for (let name in this.Hivelords) {
-            this.Hivelords[name].Save();
-            _hivelordIDs.push(this.Hivelords[name].MemoryID);
+        let jobIDs = [];
+        for (let name in this.Jobs) {
+            this.Jobs[name].Save();
+            jobIDs.push(name);
         }
-
-        this.SetData(HIVELORD_DATA, _hivelordIDs);
+        this.SetData(JOB_IDS, jobIDs);
         super.Save();
     }
 
     Load() {
         super.Load();
-        this.Hivelords = {};
-        let HiveLordData = this.GetData(HIVELORD_DATA) || [] as string[];
-        for (let i = 0, length = HiveLordData.length; i < length; i++) {
-            //let hiveData = this.GetData(HiveLordData[i]);
-            this.Hivelords[HiveLordData[i]] = new Hivelord(HiveLordData[i], this);
+        this.Hive = Game.rooms[this.MemoryID];
+        this.Jobs = {};
+        let jobData = this.GetData(JOB_IDS) || [] as string[];
+        for (let i = 0, length = jobData.length; i < length; i++) {
+            this.Jobs[jobData[i]] = new SwarmJob(jobData[i], this);
         }
     }
 
     Activate() {
-        for (let name in this.Hivelords) {
-            this.Hivelords[name].ProcessHivelord();
-        }
-    }
-
-    AddNewHivelord(hivelord: Hivelord) {
-        hivelord.QueenName = this.MemoryID;
-        this.Hivelords[hivelord.MemoryID] = hivelord;
-    }
-
-    InitHiveQueen() {
-        /*let hive = Game.rooms[this.MemoryID];
-        let sources = hive.find(FIND_SOURCES);
-        // Should have one harvester per source, then RCL1_HLs until RCL2, then RCL2s
-        let newHivelord = new RCL1_Hivelord('RCL1_HL', this);
-        newHivelord.Save();
-        this.Hivelords[newHivelord.MemoryID] = (newHivelord);
-        // Be sure to save the hivelord data before trying to use it.
-
-
-    let room = Game.rooms['W2N5'];
-    if(room.energyCapacityAvailable >= 1300 && !Memory['Triggered']) {
-        Memory['Triggered'] = true;
-        CC.EZUpdate('W2N5', {work:8, carry:4, move:6});
-    }
-    if(room.energyCapacityAvailable >= 2000 && !Memory['Triggered2']) {
-        Memory['Triggered2'] = true;
-        CC.EZUpdate('W2N5', {work:5, carry:2, move:3});
-        GR.CreateGenPurposeJob('W2N5', {work:10, carry:6, move:8});
-        GR.CreateGenPurposeJob('W2N5', {work:5, carry:3, move:4});
-        GR.CreateGenPurposeJob('W2N5', {work:5, carry:3, move:4});
-    }
-    if(room.controller.progress < 100) {
-        if(Memory['CurRCL'] != room.controller.level && !Memory['Triggered']) {
-            if(room.controller.level == 3) {
-                CC.EZUpdate('W2N5', {move:2, carry:1, work:3})
-            } else if(room.controller.level == 4) {
-                CC.EZUpdate('W2N5', {move:4, carry:2, work:4})
+        for (let index in this.Jobs) {
+            let result = this.Jobs[index].ValidateJob();
+            if (result != OK) {
+                // respond and fix the problems.  Like spawning
+                if (result == SwarmEnums.HL_REQUIRE_CREEP) {
+                    let foundExisting = false;
+                    for (let name in Memory.creeps) {
+                        if (!Memory.creeps[name]['Assigned']) {
+                            this.Jobs[index].SetCreep(Memory.creeps[name]);
+                            foundExisting = true;
+                            break;
+                        }
+                    }
+                    if (!foundExisting) {
+                        //Spawn a new creep.
+                        if (this.Hive.controller) {
+                            let spawn = this.Hive.controller.pos.findClosestByRange(FIND_MY_SPAWNS);
+                            if (spawn.spawnCreep(this.Jobs[index].BodyDefinition, 'TestWorker', { dryRun: true }) == OK) {
+                                let newName = this.MemoryID + '_' + this.Jobs[index].MemoryID;
+                                spawn.spawnCreep(this.Jobs[index].BodyDefinition, newName, { memory: { Assigned: index } });
+                                this.Jobs[index].SetCreep(newName);
+                            }
+                        }
+                    }
+                }
             }
 
-            Memory['CurRCL'] = room.controller.level;
-        }
-        let flags = room.find(FIND_FLAGS);
-        for(let i = 0; i < flags.length; i++) {
-            room.createConstructionSite(flags[i].pos, STRUCTURE_EXTENSION);
-            flags[i].remove();
+            if (result == OK) {
+                result = this.Jobs[index].Activate();
+                if (result != OK) {
+                    console.log('Failed action');
+                }
+            }
         }
     }
-        */
+
+    AddNewJob(job: SwarmJob) {
+        this.Jobs[job.MemoryID] = job;
     }
 }

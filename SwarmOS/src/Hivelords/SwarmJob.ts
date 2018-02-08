@@ -1,44 +1,47 @@
 import { SwarmMemory } from "Memory/SwarmMemory";
 import { BasicCreepCommand } from "Commands/BasicCreepCommand";
-import * as SwarmEnums from "SwarmEnums";
-import { JobMemory } from "Memory/JobMemory";
+import * as SwarmEnums from "SwarmEnums";;
 import * as _ from "lodash";
 
 const ACTIVE = 'ZZ';
 const ASSIGNED_CREEP = 'AC';
+const BODY_DEFINITION = 'BD';
 const COMMAND_ARGS = 'CA';
 const COMMAND_INDEX = 'CI';
 const COMMAND_LIST = 'CL';
-const COMMAND_FIND_TARGET = 'CFT';
+const COMMAND_FIND_TARGET = 'FT';
+const SAVED_TARGETS = 'ST';
 export class SwarmJob extends SwarmMemory {
     protected Active: boolean;
     protected CommandArgs: { [id: string]: any } = {};
     protected CommandList: SwarmEnums.BasicCreepCommandType[];
-    protected PresetTargets: string[];
+    protected SavedTargets: string[];
     protected CommandIndex: number;
     protected CreepName: string;
+    BodyDefinition: BodyPartConstant[];
 
     protected ConstructedArgs: Dictionary;
     Save() {
         this.SetData(ACTIVE, this.Active);
+        this.SetData(ASSIGNED_CREEP, this.CreepName);
+        this.SetData(BODY_DEFINITION, this.BodyDefinition);
         this.SetData(COMMAND_ARGS, this.CommandArgs);
         this.SetData(COMMAND_INDEX, this.CommandIndex);
         this.SetData(COMMAND_LIST, this.CommandList);
-        this.SetData(ASSIGNED_CREEP, this.CreepName);
+        this.SetData(SAVED_TARGETS, this.SavedTargets);
 
         super.Save();
     }
 
     Load() {
         super.Load();
-        this.CommandArgs = {};
-        this.CommandList = [];
-
         this.Active = this.GetData(ACTIVE);
-        this.CommandArgs = this.GetData(COMMAND_ARGS);
-        this.CommandIndex = this.GetData(COMMAND_INDEX);
-        this.CommandList = this.GetData(COMMAND_LIST);
         this.CreepName = this.GetData(ASSIGNED_CREEP);
+        this.BodyDefinition = this.GetData(BODY_DEFINITION);
+        this.CommandArgs = this.GetData(COMMAND_ARGS) || {};
+        this.CommandIndex = this.GetData(COMMAND_INDEX) || [];
+        this.CommandList = this.GetData(COMMAND_LIST) || [];
+        this.SavedTargets = this.GetData(SAVED_TARGETS) || [];
     }
 
     ActivateJob() {
@@ -63,19 +66,35 @@ export class SwarmJob extends SwarmMemory {
         return result;
     }
 
+    SetCreep(creepName: string) {
+        let oldCreep = this.CreepName || '';
+        if (Memory.creeps[oldCreep] && Memory.creeps[oldCreep].Assigned) {
+            delete Memory.creeps[oldCreep].Assigned;
+        }
+
+        if (Game.creeps[creepName]) { // Has it already spawned?
+            Memory.creeps[creepName].Assigned = this.MemoryID;
+        }
+        this.CreepName = creepName;
+    }
+
+    AddBodyDefinition(body: BodyPartConstant[]) {
+        this.BodyDefinition = body;
+    }
+
     AddCommand(commandType: SwarmEnums.BasicCreepCommandType, target?: string) {
         this.CommandList.push(commandType);
-        this.PresetTargets.push(target ? target : COMMAND_FIND_TARGET);
+        this.SavedTargets.push(target ? target : COMMAND_FIND_TARGET);
     }
 
     Activate(): SwarmEnums.SwarmReturnCode {
-        let JobID = undefined;
+        let jobResult = undefined;
         let creep = Game.creeps[this.CreepName];
-        let jobResult = this.ConstructArgs(creep);
         let lastRetry = -1;
         let retryCount = 0;
         // Use CommandArgs here to save cpu.
         do {
+            jobResult = this.ConstructArgs(creep);
             if (jobResult == OK) {
                 jobResult = BasicCreepCommand.ExecuteCreepCommand(
                     this.CommandList[this.CommandIndex],
@@ -88,6 +107,7 @@ export class SwarmJob extends SwarmMemory {
                 case (SwarmEnums.CRT_Retry):
                     if (lastRetry != this.CommandIndex) {
                         lastRetry = this.CommandIndex;
+                        jobResult = SwarmEnums.CRT_Retry;
                         break;
                     }
                 // Fall into Next
@@ -140,20 +160,20 @@ export class SwarmJob extends SwarmMemory {
         let args: Dictionary = {};
         let cmdType = this.CommandList[this.CommandIndex];
         if (BasicCreepCommand.RequiresTarget(cmdType)) {
-            let cmdTarget: string | SwarmEnums.SwarmReturnCode = this.PresetTargets[this.CommandIndex];
+            let cmdTarget: string | SwarmEnums.SwarmReturnCode = this.SavedTargets[this.CommandIndex];
             if (cmdTarget == COMMAND_FIND_TARGET) {
                 cmdTarget = ERR_NOT_FOUND;
                 let target = BasicCreepCommand.FindCommandTarget(creep, cmdType);
                 if (target != ERR_NOT_FOUND) {
                     cmdTarget = target;
-                    this.PresetTargets[this.CommandIndex];
+                    this.SavedTargets[this.CommandIndex];
                 }
             }
 
             if (cmdTarget != ERR_NOT_FOUND) {
                 let target = Game.getObjectById(cmdTarget as string);
                 if (!target) {
-                    this.PresetTargets[this.CommandIndex] = COMMAND_FIND_TARGET;
+                    this.SavedTargets[this.CommandIndex] = COMMAND_FIND_TARGET;
                     return ERR_NOT_FOUND;
                 } else {
                     args['target'] = target;
