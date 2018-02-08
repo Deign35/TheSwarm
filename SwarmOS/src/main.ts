@@ -30,6 +30,7 @@ const initSwarm = function () {
 
         // Load managers here
         initResult = SwarmQueen.InitializeSwarm();
+        Memory.DataDump = [];
         Memory.TargetData = {};
         Memory.TargetFactor = {};
         Memory.TargetMax = {};

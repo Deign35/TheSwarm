@@ -1,9 +1,25 @@
-import { BasicCreepCommandType, AdvancedCreepCommandType, CreepCommandType, SwarmReturnCode, CommandResponseType, C_Attack } from "SwarmEnums";
+import * as SwarmEnums from "SwarmEnums";
 import * as _ from "lodash";
 
+let BasicCreepCommandType = SwarmEnums.BasicCreepCommandType;
+let DefaultOverrides: { [commandType: string]: { [result: number]: SwarmEnums.CommandResponseType } } = {};
+DefaultOverrides[BasicCreepCommandType.C_Harvest] = {};
+DefaultOverrides[BasicCreepCommandType.C_Harvest][OK] = SwarmEnums.CRT_Condition_Full;
+DefaultOverrides[BasicCreepCommandType.C_Harvest][ERR_NOT_ENOUGH_RESOURCES] = SwarmEnums.CRT_Retry;
+DefaultOverrides[BasicCreepCommandType.C_Harvest][ERR_FULL] = SwarmEnums.CRT_Next;
+
+DefaultOverrides[BasicCreepCommandType.C_Withdraw] = {};
+DefaultOverrides[BasicCreepCommandType.C_Withdraw][OK] = SwarmEnums.CRT_Condition_Full;
+DefaultOverrides[BasicCreepCommandType.C_Withdraw][ERR_NOT_ENOUGH_RESOURCES] = SwarmEnums.CRT_Retry;
+DefaultOverrides[BasicCreepCommandType.C_Withdraw][ERR_FULL] = SwarmEnums.CRT_Next;
+
+DefaultOverrides[BasicCreepCommandType.C_Transfer] = {};
+DefaultOverrides[BasicCreepCommandType.C_Transfer][OK] = SwarmEnums.CRT_Condition_Empty;
+DefaultOverrides[BasicCreepCommandType.C_Transfer][ERR_NOT_ENOUGH_RESOURCES] = SwarmEnums.CRT_Next;
+DefaultOverrides[BasicCreepCommandType.C_Transfer][ERR_FULL] = SwarmEnums.CRT_Retry;
 export class BasicCreepCommand {
 
-    static ExecuteCreepCommand(commandType: CreepCommandType, ling: Creep, args: { [name: string]: any }): SwarmReturnCode {
+    static ExecuteCreepCommand(commandType: SwarmEnums.BasicCreepCommandType, ling: Creep, args: { [name: string]: any }): SwarmEnums.SwarmReturnCode {
         switch (commandType) {
             case (BasicCreepCommandType.C_Attack): return ling.attack(args['target']);
             case (BasicCreepCommandType.C_Build): return ling.build(args['target']);
@@ -27,7 +43,7 @@ export class BasicCreepCommand {
         return ERR_INVALID_ARGS;
     }
 
-    static RequiresTarget(commandType: CreepCommandType) {
+    static RequiresTarget(commandType: SwarmEnums.BasicCreepCommandType) {
         return commandType == BasicCreepCommandType.C_Attack ||
             commandType == BasicCreepCommandType.C_Build ||
             commandType == BasicCreepCommandType.C_Harvest ||
@@ -39,6 +55,36 @@ export class BasicCreepCommand {
             commandType == BasicCreepCommandType.C_Withdraw;
     }
 
+    static GetResponse(commandType: SwarmEnums.BasicCreepCommandType, result: SwarmEnums.SwarmReturnCode) {
+        if (DefaultOverrides[commandType] && DefaultOverrides[commandType][result]) {
+            return DefaultOverrides[commandType][result];
+        }
+        switch (result) {
+            case (ERR_NOT_IN_RANGE):/* -9 */ return SwarmEnums.CRT_Move;
+            case (ERR_NO_PATH):/* -2 */
+            case (ERR_NOT_FOUND):/* -5 */
+            case (ERR_INVALID_TARGET):/* -7 */ return SwarmEnums.CRT_Next;
+            case (ERR_INVALID_ARGS):/* -10 */ return SwarmEnums.CRT_Restart;
+
+            case (ERR_NO_BODYPART):/* -12 */
+            case (ERR_NOT_OWNER):/* -1 */
+            case (ERR_RCL_NOT_ENOUGH):/* -14 */
+            case (ERR_GCL_NOT_ENOUGH):/* -15 */ return SwarmEnums.CRT_Terminate;
+
+            case (OK):/* 0 */
+            case (ERR_NOT_ENOUGH_RESOURCES):/* -6 */
+            case (ERR_FULL):/* -8 */
+                if (DefaultOverrides[commandType]) { // This is only possible because current commands that need overrides all fit this pattern.
+                    return DefaultOverrides[commandType][result];
+                }
+                break;
+            //case(ERR_NAME_EXISTS):/* -3 */ break;
+            //case(ERR_BUSY):/* -4 */ break;
+            //case(ERR_TIRED):/* -11 */ break;
+        }
+
+        return SwarmEnums.CRT_None;
+    }
     /*static CreateGenericResponseList(commandType: CreepCommandType): { [code: number]: CommandResponseType } {
          let responses: { [code: number]: CommandResponseType } = {};
          switch (commandType) {
@@ -76,7 +122,7 @@ export class BasicCreepCommand {
      }*/
 
     // Load balancing targets here.
-    static FindCommandTarget(creep: Creep, commandType: CreepCommandType) {
+    static FindCommandTarget(creep: Creep, commandType: SwarmEnums.BasicCreepCommandType) {
         let possibleTargets: any[] = [];
         let sortFunc = (a: any, b: any) => {
             let countA = Memory.TargetData[a.id] || 1;

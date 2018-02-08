@@ -57,10 +57,10 @@ export const CRT_UNEXPECTED = -1010; declare type CRT_UNEXPECTED = -1010;
 export type BasicCommandResponseType = CRT_None | CRT_Next | CRT_Terminate | CRT_Restart | CRT_Move | CRT_UNEXPECTED;
 
 export const CRT_Retry = -1100; declare type CRT_Retry = -1100;
-export const CRT_Retry_NewTarget = -1101; declare type CRT_Retry_NewTarget = -1101;
+/*export const CRT_Retry_NewTarget = -1101; declare type CRT_Retry_NewTarget = -1101;
 export const CRT_Retry_Path = -1102; declare type CRT_Retry_Path = -1102;
-export const CRT_Retry_Slave = -1103; declare type CRT_Retry_Slave = -1103;
-export type RetryCommandResponseType = CRT_Retry | CRT_Retry_NewTarget | CRT_Retry_Path | CRT_Retry_Slave;
+export const CRT_Retry_Slave = -1103; declare type CRT_Retry_Slave = -1103;*/
+export type RetryCommandResponseType = CRT_Retry// | CRT_Retry_NewTarget | CRT_Retry_Path | CRT_Retry_Slave;
 
 export const CRT_Condition = -1200; declare type CRT_Condition = -1200;
 export const CRT_Condition_Self = -1201; declare type CRT_Condition_Self = -1201;

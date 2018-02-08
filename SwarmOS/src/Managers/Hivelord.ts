@@ -1,19 +1,34 @@
 import { SwarmMemory } from "Memory/SwarmMemory";
-import { JobBase } from "JobRoles/JobBase";
 import { CommandMemory } from "Memory/CommandMemory";
-import { HL_REQUIRE_CREEP, SwarmReturnCode, HL_RETRY, HL_NEXT_COMMAND } from "SwarmEnums";
-import { GenPurposeJob } from "JobRoles/GenPurposeJob";
+import * as SwarmEnums from "SwarmEnums";
+import { SwarmJob } from "Hivelords/SwarmJob";
+import { BasicCreepCommand } from "Commands/BasicCreepCommand";
 
 export class Hivelord extends SwarmMemory {
-    Jobs: { [name: string]: JobBase };
-    AddNewJob(job: JobBase) {
+    Jobs: { [name: string]: SwarmJob };
+    AddNewJob(job: SwarmJob) {
         this.Jobs[job.MemoryID] = job;
     }
 
     Activate(room: Room) {
         for (let name in this.Jobs) {
-            this.Jobs[name].Activate(room);
+            this.Jobs[name].Activate();
         }
+    }
+
+    ProcessHivelord() {
+        let finalResult = ERR_INVALID_ARGS as SwarmEnums.SwarmReturnCode;
+        for (let index in this.Jobs) {
+            let result = this.Jobs[index].ValidateJob();
+            if (result != OK) {
+                // respond and fix the problems.
+            }
+
+            if (result == OK) {
+                result = this.Jobs[index].Activate();
+            }
+        }
+        return finalResult;
     }
 
     Save() {
@@ -31,7 +46,7 @@ export class Hivelord extends SwarmMemory {
         this.Jobs = {};
         let jobData = this.GetData('jobIDs') || [] as string[];
         for (let i = 0, length = jobData.length; i < length; i++) {
-            this.Jobs[jobData[i]] = new GenPurposeJob(jobData[i], this);
+            this.Jobs[jobData[i]] = new SwarmJob(jobData[i], this);
         }
     }
 }
