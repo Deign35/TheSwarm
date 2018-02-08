@@ -48,7 +48,7 @@ export const HL_REQUIRE_ARGS = -18; declare type HL_REQUIRE_ARGS = -18;
 export const HL_NEXT_COMMAND = -19; declare type HL_NEXT_COMMAND = -19;
 export type SwarmReturnCode = ScreepsReturnCode | HL_REQUIRE_CREEP | HL_RETRY | HL_REQUIRE_ARGS | HL_NEXT_COMMAND;
 
-export const CRT_None = -1000;  declare type CRT_None = -1000;
+export const CRT_None = -1000; declare type CRT_None = -1000;
 export const CRT_Next = -1001; declare type CRT_Next = -1001;
 export const CRT_Terminate = -1002; declare type CRT_Terminate = -1002;
 export const CRT_Restart = -1003; declare type CRT_Restart = -1003;
@@ -70,7 +70,7 @@ export const CRT_Condition_Not_Empty = -1204; declare type CRT_Condition_Not_Emp
 export const CRT_Condition_Full = -1205; declare type CRT_Condition_Full = -1205;
 export const CRT_Condition_Not_Full = -1206; declare type CRT_Condition_Not_Full = -1206;
 export type ConditionCommandResponseType = CRT_Condition | CRT_Condition_Self | CRT_Condition_Target | CRT_Condition_Empty | CRT_Condition_Full |
-CRT_Condition_Not_Empty | CRT_Condition_Not_Full;
+    CRT_Condition_Not_Empty | CRT_Condition_Not_Full;
 
 
 export type CommandResponseType = BasicCommandResponseType | RetryCommandResponseType | ConditionCommandResponseType;
@@ -86,3 +86,5 @@ export enum CmdNodeType {
     SimpleCmdNode,
     CustomCmdNode
 }
+
+declare type Targetable = RoomObject | StructureController;

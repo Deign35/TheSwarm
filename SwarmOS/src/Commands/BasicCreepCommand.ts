@@ -75,7 +75,6 @@ export class BasicCreepCommand {
          return responses;
      }*/
 
-    static NOT_FOUND_ID = 'NFI';
     // Load balancing targets here.
     static FindCommandTarget(creep: Creep, commandType: CreepCommandType) {
         let possibleTargets: any[] = [];
@@ -185,11 +184,12 @@ export class BasicCreepCommand {
             }
         }
 
-        let target: RoomObject | ERR_NOT_FOUND = ERR_NOT_FOUND;
+        let target: Structure | ERR_NOT_FOUND = ERR_NOT_FOUND; // This is hacky.  It could be all sorts of other things
+        // lucky that I am only using the ID.  If I use something else, this will need to be fixed.
         if (possibleTargets.length > 0) {
             possibleTargets.sort(sortFunc);
             target = possibleTargets[0];
         }
-        return target ? target : ERR_NOT_FOUND;
+        return target != ERR_NOT_FOUND ? target.id : ERR_NOT_FOUND;
     }
 }
