@@ -11,9 +11,10 @@ const COMMAND_INDEX = 'CI';
 const COMMAND_LIST = 'CL';
 const COMMAND_FIND_TARGET = 'FT';
 const SAVED_TARGETS = 'ST';
+
 export class SwarmJob extends SwarmMemory {
     protected Active: boolean;
-    protected CommandArgs: { [id: string]: any } = {};
+    protected CommandArgs: { [id: string]: any };
     protected CommandList: SwarmEnums.BasicCreepCommandType[];
     protected SavedTargets: string[];
     protected CommandIndex: number;
@@ -39,7 +40,7 @@ export class SwarmJob extends SwarmMemory {
         this.CreepName = this.GetData(ASSIGNED_CREEP);
         this.BodyDefinition = this.GetData(BODY_DEFINITION);
         this.CommandArgs = this.GetData(COMMAND_ARGS) || {};
-        this.CommandIndex = this.GetData(COMMAND_INDEX) || [];
+        this.CommandIndex = this.GetData(COMMAND_INDEX) || 0;
         this.CommandList = this.GetData(COMMAND_LIST) || [];
         this.SavedTargets = this.GetData(SAVED_TARGETS) || [];
     }
@@ -110,13 +111,7 @@ export class SwarmJob extends SwarmMemory {
                         jobResult = SwarmEnums.CRT_Retry;
                         break;
                     }
-                // Fall into Next
-                case (SwarmEnums.CRT_Next):
-                    this.CommandIndex++;
-                    jobResult = SwarmEnums.CRT_Retry;
-                    if (this.CommandIndex >= this.CommandList.length) {
-                        this.CommandIndex = 0;
-                    }
+                    jobResponse = SwarmEnums.CRT_Next;
                     break;
                 case (SwarmEnums.CRT_Move):
                     jobResult = creep.moveTo(this.ConstructedArgs['target']);
@@ -134,14 +129,30 @@ export class SwarmJob extends SwarmMemory {
                     break;
                 case (SwarmEnums.CRT_Condition_Empty):
                     if (_.sum(creep.carry) == 0) {
-                        jobResult = OK;
+                        jobResponse = SwarmEnums.CRT_Next;
                     }
                     break;
                 case (SwarmEnums.CRT_Condition_Full):
                     if (_.sum(creep.carry) == creep.carryCapacity) {
-                        jobResult = OK;
+                        jobResponse = SwarmEnums.CRT_Next;
                     }
                     break;
+            }
+
+            if(jobResponse == SwarmEnums.CRT_Next) {
+                this.CommandIndex++;
+                jobResult = SwarmEnums.CRT_Retry;
+                if (this.CommandIndex >= this.CommandList.length) {
+                    this.CommandIndex = 0;
+                }
+                let prevTarget = this.SavedTargets[this.CommandIndex];
+                if(prevTarget != COMMAND_FIND_TARGET) {
+                    Memory.TargetData[prevTarget]--;
+                    if(Memory.TargetData[prevTarget] <= 0) {
+                        delete Memory.TargetData[prevTarget];
+                    }
+                    this.SavedTargets[this.CommandIndex] = COMMAND_FIND_TARGET;
+                }
             }
         } while (jobResult == SwarmEnums.CRT_Retry && retryCount++ < this.CommandList.length * 2);
 
@@ -150,7 +161,9 @@ export class SwarmJob extends SwarmMemory {
             if (retryCount >= this.CommandList.length * 2) {
                 console.log('Retry maxxed out.');
             }
-            Memory['DataDump'].push(this);
+            Memory['DataDump'].push(this._cache);
+        } else {
+            console.log(retryCount);
         }
         return jobResult;
     }
@@ -166,7 +179,13 @@ export class SwarmJob extends SwarmMemory {
                 let target = BasicCreepCommand.FindCommandTarget(creep, cmdType);
                 if (target != ERR_NOT_FOUND) {
                     cmdTarget = target;
-                    this.SavedTargets[this.CommandIndex];
+                    this.SavedTargets[this.CommandIndex] = target;
+                    if (Memory.TargetData[target]) {
+                        Memory.TargetData[target]++;
+                    }
+                    else {
+                        Memory.TargetData[target] = 1;
+                    }
                 }
             }
 

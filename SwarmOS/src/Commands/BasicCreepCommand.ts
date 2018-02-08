@@ -61,7 +61,6 @@ export class BasicCreepCommand {
         }
         switch (result) {
             case (ERR_NOT_IN_RANGE):/* -9 */ return SwarmEnums.CRT_Move;
-            case (OK):/* 0 */
             case (ERR_NO_PATH):/* -2 */
             case (ERR_NOT_FOUND):/* -5 */
             case (ERR_INVALID_TARGET):/* -7 */ return SwarmEnums.CRT_Next;
