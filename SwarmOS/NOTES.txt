@@ -1,1 +1,5 @@
 StoreDefinition is currently set to any, which means no intellisense on it.  This should be fixed soon.
+
+Multiple transfer targets still doesn't work.  Transfer get's OK and moves to next.
+Because after a successful transfer, it still has 50/50 energy.
+But this should mean that it keeps looking for a new target the next tick...

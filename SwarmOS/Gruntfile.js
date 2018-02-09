@@ -33,14 +33,14 @@ module.exports = function (grunt) {
     });
     grunt.registerTask('help', 'Help info', function () {
         let output = 'Grunt Help Menu *******************';
-        output += '\ncommitMain: Commits to SwarmOS_Main';
-        output += '\ncommitSim: Commits to SwarmOS_Sim';
-        output += '\ncompile: Compiles the Typescript';
-        output += '\n----------------------------------';
         output += '\nclean: Cleans the build and dist directories';
         output += '\ncopy: Copies the final files into the dist folder for staging';
         output += '\nts: Compiles the TypeScript';
         output += '\nreplace: Replaces marked lines with appropriate replacements.';
+        output += '\n----------------------------------';
+        output += '\ncommitMain: Commits to SwarmOS_Main';
+        output += '\ncommitSim: Commits to SwarmOS_Sim';
+        output += '\ncompile: Compiles the Typescript';
         console.log(output);
     });
 
