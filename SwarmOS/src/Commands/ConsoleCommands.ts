@@ -8,22 +8,31 @@ export class ConsoleCommands {
     }
     static CreateHarvester(body: BodyPartConstant[], target?: string) {
         let swarmQueen = SwarmQueen.LoadSwarmData();
-        let hiveQueen = swarmQueen.HiveQueens['W1N7'];
+        let hiveQueen = swarmQueen.HiveQueens['E9N35'];
         SwarmJobCreator.CreateHarvester(hiveQueen, body, target);
         swarmQueen.Save();
     }
 
     static CreateUpgrade(body: BodyPartConstant[]) {
         let swarmQueen = SwarmQueen.LoadSwarmData();
-        let hiveQueen = swarmQueen.HiveQueens['W1N7'];
+        let hiveQueen = swarmQueen.HiveQueens['E9N35'];
         SwarmJobCreator.CreateJob(hiveQueen, ['Ha', 'Up'], body);
         swarmQueen.Save();
     }
 
     static CreateJob(actions: string[], body: BodyPartConstant[]) {
         let swarmQueen = SwarmQueen.LoadSwarmData();
-        let hiveQueen = swarmQueen.HiveQueens['sim'];
+        let hiveQueen = swarmQueen.HiveQueens['E9N35'];
         SwarmJobCreator.CreateJob(hiveQueen, actions, body);
+        swarmQueen.Save();
+    }
+
+    static UpgradeBodies(body: BodyPartConstant[]) {
+        let swarmQueen = SwarmQueen.LoadSwarmData();
+        let hiveQueen = swarmQueen.HiveQueens['E9N35'];
+        for (let index in hiveQueen.Jobs) {
+            hiveQueen.Jobs[index].BodyDefinition = body;
+        }
         swarmQueen.Save();
     }
     static Help() {

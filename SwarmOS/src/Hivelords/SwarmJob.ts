@@ -139,11 +139,11 @@ export class SwarmJob extends SwarmMemory {
                     break;
             }
 
-            if(jobResponse == SwarmEnums.CRT_Next) {
+            if (jobResponse == SwarmEnums.CRT_Next) {
                 let prevTarget = this.SavedTargets[this.CommandIndex];
-                if(prevTarget != COMMAND_FIND_TARGET) {
+                if (prevTarget != COMMAND_FIND_TARGET) {
                     Memory.TargetData[prevTarget]--;
-                    if(Memory.TargetData[prevTarget] <= 0) {
+                    if (Memory.TargetData[prevTarget] <= 0) {
                         delete Memory.TargetData[prevTarget];
                     }
                     this.SavedTargets[this.CommandIndex] = COMMAND_FIND_TARGET;
@@ -156,14 +156,8 @@ export class SwarmJob extends SwarmMemory {
             }
         } while (jobResult == SwarmEnums.CRT_Retry && retryCount++ < this.CommandList.length * 2);
 
-        if (retryCount > this.CommandList.length) {
-            console.log('RetryCount greater than the number of commands');
-            if (retryCount >= this.CommandList.length * 2) {
-                console.log('Retry maxxed out.');
-            }
-            Memory['DataDump'].push(this._cache);
-        } else {
-            console.log(retryCount);
+        if (retryCount >= this.CommandList.length * 2) {
+            console.log('Retry maxxed out.');
         }
         return jobResult;
     }

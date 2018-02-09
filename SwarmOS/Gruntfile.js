@@ -31,11 +31,23 @@ module.exports = function (grunt) {
     grunt.registerTask('replace', 'Replaces file paths with _', function () {
         grunt.file.recurse('./build/compiled', ReplaceImports);
     });
+    grunt.registerTask('help', 'Help info', function () {
+        let output = 'Grunt Help Menu *******************';
+        output += '\ncommitMain: Commits to SwarmOS_Main';
+        output += '\ncommitSim: Commits to SwarmOS_Sim';
+        output += '\ncompile: Compiles the Typescript';
+        output += '\n----------------------------------';
+        output += '\nclean: Cleans the build and dist directories';
+        output += '\ncopy: Copies the final files into the dist folder for staging';
+        output += '\nts: Compiles the TypeScript';
+        output += '\nreplace: Replaces marked lines with appropriate replacements.';
+        console.log(output);
+    });
 
     grunt.registerTask('commitMain', ['compile', 'replace', 'copy', 'screepsBranch:SwarmOS_Main', 'screeps']);
     grunt.registerTask('commitSim', ['compile', 'replace', 'copy', 'screepsBranch:SwarmOS_Sim', 'screeps']);
     grunt.registerTask('compile', ['clean', 'ts']);
-    grunt.registerTask('default', ['commitSim']);
+    grunt.registerTask('default', ['help']);
 }
 
 let InitGruntScreepsConfig = function () {
@@ -57,11 +69,17 @@ let InitGruntScreepsConfig = function () {
 }
 
 let InitTSConfig = function () {
-    return { default: { tsconfig: true } };
+    return {
+        default: {
+            tsconfig: true
+        }
+    };
 }
 
 let InitCleanConfig = function () {
-    return { default: ['dist', 'build', '.tmp'] };
+    return {
+        default: ['dist', 'build', '.tmp']
+    };
 }
 
 let InitCopyConfig = function () {
@@ -135,7 +153,9 @@ let InitStringReplaceConfig = function () {
 }
 
 let ReplaceImports = function (abspath, rootdir, subdir, filename) {
-    if (abspath.match(/.js$/) == null) { return; }
+    if (abspath.match(/.js$/) == null) {
+        return;
+    }
     let file = gObj.file.read(abspath);
     let updatedFile = '';
 

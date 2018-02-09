@@ -126,6 +126,8 @@ export class BasicCreepCommand {
             }
             if (Memory.TargetFactor[a.id]) {
                 countA *= Memory.TargetFactor[a.id];
+                countA += Memory.TargetFactor[a.id];
+
             }
             let countB = Memory.TargetData[b.id] || 0;
             if (Memory.TargetMax[b.id] && countB > Memory.TargetMax[b.id]) {
@@ -133,6 +135,7 @@ export class BasicCreepCommand {
             }
             if (Memory.TargetFactor[b.id]) {
                 countB *= Memory.TargetFactor[b.id];
+                countB += Memory.TargetFactor[b.id];
             }
             if (countA > countB) {
                 return 1
@@ -145,7 +148,7 @@ export class BasicCreepCommand {
         }
         switch (commandType) {
             case (BasicCreepCommandType.C_Attack): {
-                throw 'Not Configured';
+                possibleTargets = creep.room.find(FIND_HOSTILE_CREEPS);
             }
             case (BasicCreepCommandType.C_Build): {
                 possibleTargets = creep.room.find(FIND_MY_CONSTRUCTION_SITES);
