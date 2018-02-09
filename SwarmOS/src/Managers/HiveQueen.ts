@@ -49,6 +49,7 @@ export class HiveQueen extends SwarmMemory { // Controls a group of HiveNodes.
                         }
                     }
                     if (!foundExisting) {
+                        // Move this down to the hivelord.
                         //Spawn a new creep.
                         if (this.Hive.controller) {
                             let spawn = this.Hive.controller.pos.findClosestByRange(FIND_MY_SPAWNS);
@@ -62,6 +63,7 @@ export class HiveQueen extends SwarmMemory { // Controls a group of HiveNodes.
                 }
             }
 
+            // Insert calculated target here
             if (result == OK) {
                 result = this.Jobs[index].Activate();
                 if (result != OK) {
@@ -69,38 +71,6 @@ export class HiveQueen extends SwarmMemory { // Controls a group of HiveNodes.
                 }
             }
         }
-        /*if(this.RCL < (this.Hive.controller as StructureController).level) {
-            this.RCL = (this.Hive.controller as StructureController).level;
-            delete this.Jobs;
-            switch(this.RCL) {
-                case(1): {
-                    let newJobName = SwarmJobCreator.CreateJob(this, [BasicCreepCommandType.C_Harvest, BasicCreepCommandType.C_Transfer, BasicCreepCommandType.C_Upgrade], [MOVE, WORK, CARRY]);
-                    this.Jobs[newJobName].Copy(newJobName + '_1');
-                    this.Jobs[newJobName].Copy(newJobName + '_2');
-                    this.Jobs[newJobName].Copy(newJobName + '_3');
-                    break;
-                }
-                case(2):{
-                    let newJobName = SwarmJobCreator.CreateJob(this, [BasicCreepCommandType.C_Harvest, BasicCreepCommandType.C_Transfer, BasicCreepCommandType.C_Upgrade], [MOVE, WORK, CARRY]);
-                    this.Jobs[newJobName].Copy(newJobName + '_1');
-                    newJobName = SwarmJobCreator.CreateJob(this, [BasicCreepCommandType.C_Harvest, BasicCreepCommandType.C_Transfer, BasicCreepCommandType.C_Build, BasicCreepCommandType.C_Upgrade], [MOVE, WORK, CARRY]);
-                    this.Jobs[newJobName].Copy(newJobName + '_1');
-                    this.Jobs[newJobName].Copy(newJobName + '_2');
-                    this.Jobs[newJobName].Copy(newJobName + '_3');
-                    newJobName = SwarmJobCreator.CreateJob(this, [BasicCreepCommandType.C_Harvest, BasicCreepCommandType.C_Transfer, BasicCreepCommandType.C_Upgrade], [MOVE, MOVE, WORK, WORK, CARRY]);
-                    this.Jobs[newJobName].Copy(newJobName + '_1');
-                    this.Jobs[newJobName].Copy(newJobName + '_2');
-                    this.Jobs[newJobName].Copy(newJobName + '_3');
-                    break;
-                }
-                case(3): {
-                    let newJobName = SwarmJobCreator.CreateJob(this, [BasicCreepCommandType.C_Harvest, BasicCreepCommandType.C_Transfer, BasicCreepCommandType.C_Upgrade], [MOVE, MOVE, WORK, WORK, CARRY]);
-                    this.Jobs[newJobName].Copy(newJobName + '_1');
-                    this.Jobs[newJobName].Copy(newJobName + '_2');
-                    this.Jobs[newJobName].Copy(newJobName + '_3');
-                }
-            }
-        }*/
     }
 
     AddNewJob(job: SwarmJob) {

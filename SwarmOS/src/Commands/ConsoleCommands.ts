@@ -37,15 +37,10 @@ export class ConsoleCommands {
     }
     static Help() {
         let helpStr = 'TheSwarmOS Console Commands -----';
-        helpStr += '\n' + ('-Reset - Hard reset for the entire OS')
-        helpStr += '\n' + ('-DeleteLord - (hiveName, hivelordName)');
-        helpStr += '\n' + ('-DeleteJob - (hiveName, hivelordName, jobID)');
-        helpStr += '\n' + ('-SetCurrentJob - (hiveName, hivelordName, jobID)');
-        helpStr += '\n' + ('-AddCommand - (commandType, target?)');
-        helpStr += '\n' + ('-SetTarget - (hiveName, hivelordName, jobID, cmdID, targetID)');
-        helpStr += '\n' + ('-InitJob - (repeatJob)');
-        helpStr += '\n' + ('-SetJobBody - (bodyParts = {move: 2, work: 1, carry: 1})');
+        helpStr += '\n' + ('-CreateJob - (actions: string[], bodypartConstant[])')
+        helpStr += '\n' + ('-UpgradeBodies - (bodypartConstant[])');
         console.log(helpStr);
         return OK;
     }
 } global['CC'] = ConsoleCommands;
+global['help'] = CC.Help();

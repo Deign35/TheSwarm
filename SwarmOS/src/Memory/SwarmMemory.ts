@@ -1,7 +1,8 @@
 const LOCK = 'LK';
 export class SwarmMemory implements IMemory {
     protected _cache: Dictionary = {};
-    constructor(public MemoryID: string, public Parent?: SwarmMemory) { this.Load(); }
+    ParentMemoryID: string;
+    constructor(public MemoryID: string, public Parent?: SwarmMemory) { this.Load(); this.ParentMemoryID = Parent ? Parent.MemoryID : ''; }
     GetData(id: string) { return this._cache[id] || undefined; }
     SetData(id: string, data: any) { this._cache[id] = data; }
     DeleteData(id: string) { delete this._cache[id]; }
@@ -28,7 +29,7 @@ export class SwarmMemory implements IMemory {
 
         if (this.GetData(LOCK)) {
             console.log('MEMORY ACCESS ERROR');
-            throw new Error('MEMORY ACCESS ERROR');
+            //throw new Error('MEMORY ACCESS ERROR');
         }
         this.SetData(LOCK, true);
     }

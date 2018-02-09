@@ -80,42 +80,6 @@ export class BasicCreepCommand {
 
         return SwarmEnums.CRT_None;
     }
-    /*static CreateGenericResponseList(commandType: CreepCommandType): { [code: number]: CommandResponseType } {
-         let responses: { [code: number]: CommandResponseType } = {};
-         switch (commandType) {
-             case (BasicCreepCommandType.C_Harvest): {
-                 responses[ERR_NOT_ENOUGH_RESOURCES] = CommandResponseType.Next;
-                 responses[ERR_FULL]
-                 break;
-             }
-             case (BasicCreepCommandType.C_Dismantle): {
-                 throw 'Not Configured';
-             }
-             case (BasicCreepCommandType.C_Heal): {
-                 throw 'Not Configured';
-             }
-             case (BasicCreepCommandType.C_RangedAttack): {
-                 throw 'Not Configured';
-             };
-             case (BasicCreepCommandType.C_RangedHeal): {
-                 throw 'Not Configured';
-             }
-             case (BasicCreepCommandType.C_Suicide): {
-                 responses[OK] = CommandResponseType.Next;
-                 break;
-             }
-             case (BasicCreepCommandType.C_Say): {
-                 responses[OK] = CommandResponseType.Next;
-                 break;
-             }
-             case (BasicCreepCommandType.C_Withdraw): {
-                 responses[OK] = CommandResponseType.Next;
-                 break;
-             }
-         }
-         return responses;
-     }*/
-
     // Load balancing targets here.
     static FindCommandTarget(creep: Creep, commandType: SwarmEnums.BasicCreepCommandType) {
         let possibleTargets: any[] = [];
