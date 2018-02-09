@@ -130,11 +130,15 @@ export class SwarmJob extends SwarmMemory {
                 case (SwarmEnums.CRT_Condition_Empty):
                     if (_.sum(creep.carry) == 0) {
                         jobResponse = SwarmEnums.CRT_Next;
+                    } else { // This still doesn't work, because it doesn't take into account the change that would have occured in this frame.
+                        this.SavedTargets[this.CommandIndex] = COMMAND_FIND_TARGET;
                     }
                     break;
                 case (SwarmEnums.CRT_Condition_Full):
                     if (_.sum(creep.carry) == creep.carryCapacity) {
                         jobResponse = SwarmEnums.CRT_Next;
+                    } else if(this.CommandList[this.CommandIndex] != SwarmEnums.C_Harvest) {
+                        this.SavedTargets[this.CommandIndex] = COMMAND_FIND_TARGET;
                     }
                     break;
             }

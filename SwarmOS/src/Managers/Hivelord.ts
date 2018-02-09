@@ -18,13 +18,17 @@ const HITS_MAX = 'HM';
 const MINERAL_TYPE = 'MT';
 const RESOURCE_THROUGHPUT = 'RT';
 const RESOURCE_THROUGHPUT_RATE = 'RR';
-const TICKS_TO_DECAY = 'TD';
 const SPAWNING = 'Sp';
+const TARGET_FACTOR = 'TF';
+const TARGET_MAX = 'TM';
+const TARGET_TOTAL = 'TT';
+const TICKS_TO_DECAY = 'TD';
 
+declare var Array: any;
 export class Hivelord extends SwarmMemory { // One per room.
     // Targetting
     HiveTargets: { [id: number]: { [id: string]: any } };
-    TargetCounts: { [id: string]: number };
+    TargetCounts: { [id: string]: any };
 
     Save() {
         this.SetData(HIVE_TARGETS, this.HiveTargets);
@@ -42,6 +46,13 @@ export class Hivelord extends SwarmMemory { // One per room.
         for (let i = 0, length = foundTargets.length; i < length; i++) {
             foundIDs.push(foundTargets[i].id);
             this.UpdateTarget(foundTargets[i], findID);
+            if(!this.TargetCounts[foundTargets[i].id]) {
+                let newTargetCounts: {[name: string]: any} = {};
+                newTargetCounts[TARGET_TOTAL] = 0;
+                newTargetCounts[TARGET_MAX] = 99;
+                newTargetCounts[TARGET_FACTOR] = 1;
+                this.TargetCounts[foundTargets[i].id] = newTargetCounts;
+            }
         }
     }
 
@@ -51,7 +62,9 @@ export class Hivelord extends SwarmMemory { // One per room.
         switch (findID) {
             case (FIND_CREEPS):  // FIND_CREEPS should split save to FIND_MY and FIND_HOSTILE.  Or error for this?
             case (FIND_MY_CREEPS):
-            case (FIND_HOSTILE_CREEPS): console.log('NOT SETUP YET'); break;
+            case (FIND_HOSTILE_CREEPS):
+                targetData[TICKS_TO_DECAY] = (target as Creep).ticksToLive;
+                break;
             case (FIND_SOURCES):
                 targetData[HELD_ENERGY] = (target as Source).energy;
                 targetData[RESOURCE_THROUGHPUT].push((target as Source).energy / (target as Source).ticksToRegeneration * 10);
@@ -137,20 +150,52 @@ export class Hivelord extends SwarmMemory { // One per room.
         if (!this.HiveTargets[findID] || (this.HiveTargets[findID][LAST_UPDATE] - Game.time < -5)) { // Updates at most once every 6 ticks.  CAREFUL WHEN CHANGING
             this.HiveTargets[findID][LAST_UPDATE] = Game.time;
             let foundTargets = Game.rooms[this.ParentMemoryID].find(findID);
+            if(foundTargets.length == 0) {
+                return undefined;
+            }
             this.UpdateTargets(foundTargets, findID);
         }
 
+        let sortFunc = (a: any, b: any) => {
+            let aData = this.TargetCounts[a.id] ;
+            let countA = aData[TARGET_TOTAL];
+            if (countA >= aData[TARGET_MAX]) {
+                return 1;
+            }
+            if (aData[TARGET_FACTOR]) {
+                countA *= aData[TARGET_FACTOR];
+                countA += aData[TARGET_FACTOR];
+            }
+            let bData = this.TargetCounts[b.id]
+            let countB = bData[TARGET_TOTAL];
+            if (countB >= bData[TARGET_MAX]) {
+                return 1;
+            }
+            if (bData[TARGET_FACTOR]) {
+                countB *= bData[TARGET_FACTOR];
+                countB += bData[TARGET_FACTOR];
+            }
+            if (countA > countB) {
+                return 1
+            } else if (countA < countB) {
+                return -1;
+            }
+            let distA = forPos.getRangeTo(a);
+            let distB = forPos.getRangeTo(b);
+            return distA < distB ? -1 : (distA > distB ? 1 : 0);
+        }
         let targets;
         if ((findID == FIND_STRUCTURES || findID == FIND_MY_STRUCTURES || findID == FIND_HOSTILE_STRUCTURES) && structureType) {
             targets = this.HiveTargets[findID][structureType];
         } else {
             targets = this.HiveTargets[findID];
         }
+        let possibleTargets: any[] = Array.from(targets);
         switch (findID) {
             case (FIND_CREEPS):
             case (FIND_MY_CREEPS):
-            case (FIND_HOSTILE_CREEPS): console.log('NOT SETUP YET'); break;
-            case (FIND_SOURCES): console.log('NOT SETUP YET'); break;
+            case (FIND_HOSTILE_CREEPS): break;
+            case (FIND_SOURCES): console.log('Better load balancing required'); break;
             case (FIND_DROPPED_RESOURCES): console.log('NOT SETUP YET'); break;
             case (FIND_STRUCTURES):
             case (FIND_MY_STRUCTURES):
@@ -160,7 +205,10 @@ export class Hivelord extends SwarmMemory { // One per room.
             case (FIND_HOSTILE_CONSTRUCTION_SITES): console.log('NOT SETUP YET'); break;
             case (FIND_MY_SPAWNS):
             case (FIND_HOSTILE_SPAWNS): console.log('NOT SETUP YET'); break;
-            case (FIND_MINERALS): return targets[0] ? targets[0] : undefined;
+            case (FIND_MINERALS): break;
         }
+
+        possibleTargets.sort(sortFunc);
+        return possibleTargets[0];
     }
 }

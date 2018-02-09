@@ -1,22 +1,26 @@
 import * as SwarmEnums from "SwarmEnums";
 import * as _ from "lodash";
 
-let BasicCreepCommandType = SwarmEnums.BasicCreepCommandType;
-let DefaultOverrides: { [commandType: string]: { [result: number]: SwarmEnums.CommandResponseType } } = {};
+const BasicCreepCommandType = SwarmEnums.BasicCreepCommandType;
+const DefaultOverrides: { [commandType: string]: { [result: number]: SwarmEnums.CommandResponseType } } = {};
 DefaultOverrides[BasicCreepCommandType.C_Harvest] = {};
 DefaultOverrides[BasicCreepCommandType.C_Harvest][OK] = SwarmEnums.CRT_Condition_Full;
 DefaultOverrides[BasicCreepCommandType.C_Harvest][ERR_NOT_ENOUGH_RESOURCES] = SwarmEnums.CRT_Retry;
 DefaultOverrides[BasicCreepCommandType.C_Harvest][ERR_FULL] = SwarmEnums.CRT_Next;
+
+DefaultOverrides[BasicCreepCommandType.C_Pickup] = {};
+DefaultOverrides[BasicCreepCommandType.C_Pickup][OK] = SwarmEnums.CRT_Condition_Full;
+
+DefaultOverrides[BasicCreepCommandType.C_Transfer] = {};
+DefaultOverrides[BasicCreepCommandType.C_Transfer][OK] = SwarmEnums.CRT_Condition_Empty;
+DefaultOverrides[BasicCreepCommandType.C_Transfer][ERR_NOT_ENOUGH_RESOURCES] = SwarmEnums.CRT_Next;
+DefaultOverrides[BasicCreepCommandType.C_Transfer][ERR_FULL] = SwarmEnums.CRT_Retry;
 
 DefaultOverrides[BasicCreepCommandType.C_Withdraw] = {};
 DefaultOverrides[BasicCreepCommandType.C_Withdraw][OK] = SwarmEnums.CRT_Condition_Full;
 DefaultOverrides[BasicCreepCommandType.C_Withdraw][ERR_NOT_ENOUGH_RESOURCES] = SwarmEnums.CRT_Retry;
 DefaultOverrides[BasicCreepCommandType.C_Withdraw][ERR_FULL] = SwarmEnums.CRT_Next;
 
-DefaultOverrides[BasicCreepCommandType.C_Transfer] = {};
-DefaultOverrides[BasicCreepCommandType.C_Transfer][OK] = SwarmEnums.CRT_Condition_Empty;
-DefaultOverrides[BasicCreepCommandType.C_Transfer][ERR_NOT_ENOUGH_RESOURCES] = SwarmEnums.CRT_Next;
-DefaultOverrides[BasicCreepCommandType.C_Transfer][ERR_FULL] = SwarmEnums.CRT_Retry;
 export class BasicCreepCommand {
 
     static ExecuteCreepCommand(commandType: SwarmEnums.BasicCreepCommandType, ling: Creep, args: { [name: string]: any }): SwarmEnums.SwarmReturnCode {

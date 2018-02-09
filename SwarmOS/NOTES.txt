@@ -3,3 +3,4 @@ StoreDefinition is currently set to any, which means no intellisense on it.  Thi
 Multiple transfer targets still doesn't work.  Transfer get's OK and moves to next.
 Because after a successful transfer, it still has 50/50 energy.
 But this should mean that it keeps looking for a new target the next tick...
+Because the creep is still trying to fill the old target and it needs to erase its target after transfer.
