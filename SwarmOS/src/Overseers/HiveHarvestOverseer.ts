@@ -40,7 +40,16 @@ export class HiveHarvestOverseer extends OverseerBase {
         let registry = OverseerBase.CreateEmptyOverseerRegistry();
         for (let i = 0, length = this.NodeObjects.length; i < length; i++) {
             if (!this.NodeObjects[i].creep) {
-                registry.Requirements.Creeps.push({ time: 0, creepBodyType: SwarmEnums.CreepBodyType.PrimeHarvester });
+                registry.Requirements.Creeps.push({
+                    time: 0,
+                    creepBody: {
+                        min: [WORK, CARRY, MOVE],
+                        mid: [WORK, CARRY, MOVE, WORK, MOVE],
+                        best: this.NodeObjects[i].container ?
+                            [WORK, WORK, WORK, WORK, WORK, WORK, MOVE] :
+                            [WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE]
+                    }
+                });
             }
             if (this.NodeObjects[i].container != undefined) {
                 registry.Available.Resources.push({ location: (this.NodeObjects[i].container as StructureContainer), amount: (this.NodeObjects[i].container as StructureContainer).store.energy })
@@ -61,10 +70,9 @@ export class HiveHarvestOverseer extends OverseerBase {
         return false;
     }
 
-    ValidateOverseer(): SwarmEnums.CommandResponseType {
-        let result: SwarmEnums.CommandResponseType = SwarmEnums.CRT_None;
+    ValidateOverseer() {
         if (!this.Hive.controller || !this.Hive.controller.my || !(this.Hive.controller.level >= 3)) {
-            result = SwarmEnums.CRT_None; // Do not engage!
+            // do boot strapper instead.
         } else {
             for (let index in this.SourceNodes) {
                 let newNodeObj: { creep?: Creep, source: Source, container?: StructureContainer, constructionSite?: ConstructionSite };
@@ -74,7 +82,7 @@ export class HiveHarvestOverseer extends OverseerBase {
                     newNodeObj.creep = Game.getObjectById(this.SourceNodes[index].creepID) as Creep;
                 }
                 if (!newNodeObj.creep) {
-                    result = SwarmEnums.CRT_Requires_Creep;
+                    this.ReleaseCreep(this.SourceNodes[index].creepID, 'Dead creep');
                 }
                 if (!this.SourceNodes[index].containerID) {
                     this.SourceNodes[index] = this.UpdateNodeData(this.SourceNodes[index]);
@@ -95,70 +103,78 @@ export class HiveHarvestOverseer extends OverseerBase {
                 this.NodeObjects.push(newNodeObj);
             }
         }
-
-        return result;
     }
-    ActivateOverseer(): SwarmEnums.CommandResponseType {
+    ActivateOverseer() {
         for (let index in this.SourceNodes) {
             if (!this.NodeObjects[index].creep) {
                 continue;
             }
+            let creep = this.NodeObjects[index].creep as Creep;
+            let constructionSite = this.NodeObjects[index].constructionSite as ConstructionSite;
+            let container = this.NodeObjects[index].container as StructureContainer;
 
-            let primaryAction: ActionBase | undefined;
-            if ((this.NodeObjects[index].creep as Creep).carry.energy > 0) {
-                if (this.NodeObjects[index].constructionSite) {
+            let action: ActionBase | undefined;
+            if (creep.carry.energy > 0) {
+                if (constructionSite) {
                     // Build it
-                    primaryAction = new BuildAction(this.NodeObjects[index].creep as Creep, this.NodeObjects[index].constructionSite as ConstructionSite);
-                } else if (this.NodeObjects[index].container) {
-                    if ((this.NodeObjects[index].container as StructureContainer).hits < (this.NodeObjects[index].container as StructureContainer).hitsMax) {
+                    action = new BuildAction(creep, constructionSite);
+                } else if (container) {
+                    if (container.hits < container.hitsMax) {
                         // Repair it
-                        primaryAction = new RepairAction(this.NodeObjects[index].creep as Creep, this.NodeObjects[index].container as StructureContainer);
+                        action = new RepairAction(creep, container);
                     } else {
-                        primaryAction = new DropAction(this.NodeObjects[index].creep as Creep, (this.NodeObjects[index].container as StructureContainer).pos, RESOURCE_ENERGY);
+                        action = new DropAction(creep, container.pos, RESOURCE_ENERGY);
                     }
                 }
             }
 
             let primaryResponse: SwarmEnums.CommandResponseType = SwarmEnums.CRT_None;
-            if (primaryAction && primaryAction.ValidateAction() == SwarmEnums.CRT_None) {
-                primaryResponse = primaryAction.Run();
+            if (action && action.ValidateAction() == SwarmEnums.CRT_None) {
+                primaryResponse = action.Run();
             }
 
             if (primaryResponse == SwarmEnums.CRT_Next || primaryResponse == SwarmEnums.CRT_None) {
-                primaryAction = new HarvestAction(this.NodeObjects[index].creep as Creep, this.NodeObjects[index].source);
+                action = new HarvestAction(this.NodeObjects[index].creep as Creep, this.NodeObjects[index].source);
             } else {
                 // Means we had to do some other action, and it was not a completed task.
-                return primaryResponse;
+                return;
             }
-            let validation = primaryAction.ValidateAction();
-            primaryResponse = SwarmEnums.CRT_None;
+            let validation = action.ValidateAction();
+            let harvestResult = SwarmEnums.CRT_None;
             switch (validation) {
                 case (SwarmEnums.CRT_Next): break; // We're full
                 case (SwarmEnums.CRT_NewTarget): break; // Source is empty
                 case (SwarmEnums.CRT_None): // Good to harvest.
-                    primaryResponse = primaryAction.Run(false);
+                    harvestResult = action.Run(false);
             }
             // Check if harvest worked
-            switch (primaryResponse) {
+            switch (harvestResult) {
                 case (SwarmEnums.CRT_None): console.log("THIS IS NOT POSSIBLE"); break; // Unless we haven't fixed Next/NewTarget above.
-                case (SwarmEnums.CRT_Condition_Full): break; //Means we successfully harvested.
+                case (SwarmEnums.CRT_Condition_Full):
+                    if (creep) {
+
+                    };
+                    break; //Means we successfully harvested.
                 case (SwarmEnums.CRT_NewTarget): break; // The source is empty.  Just wait.
                 case (SwarmEnums.CRT_Move):
-                    let targetPos = this.NodeObjects[index].container ? (this.NodeObjects[index].container as Structure).pos : this.NodeObjects[index].source.pos;
-                    let moveAction = new MoveToPositionAction(this.NodeObjects[index].creep as Creep, targetPos);
+                    let targetPos = this.NodeObjects[index].source.pos;
+                    if (container) {
+                        targetPos = container.pos;
+                    }
+                    if (constructionSite) {
+                        targetPos = constructionSite.pos;
+                    }
+                    let moveAction = new MoveToPositionAction(creep, targetPos);
                     if (moveAction.Run() == SwarmEnums.CRT_Next) {
-                        // we've made it to the desired position.
+                        // we've made it to the desired position.  Won't happen unless there's a container
                     }
                     break; // Did not harvest, needed to move.
             }
 
             // Do something with primaryResponse?
         }
-        return SwarmEnums.CRT_None;
     }
-    ReleaseCreep(releaseReason: number) {
-        throw new Error("Method not implemented.");
-    }
+    ReleaseCreep(name: string, releaseReason: string) { }
 
     private UpdateNodeData(nodeInfo: { creepID: string, sourceID: string, containerID?: string, constructionSiteID?: string }, source?: Source) {
         if (!source) {

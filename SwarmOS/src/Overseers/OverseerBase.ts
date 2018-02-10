@@ -61,7 +61,7 @@ export abstract class OverseerBase extends SwarmMemory implements IOverseer {
     AssignCreep(creep: Creep) {
         this.AssignedCreeps[creep.id] = creep;
     }
-    abstract ValidateOverseer(): SwarmEnums.CommandResponseType;
-    abstract ActivateOverseer(): SwarmEnums.CommandResponseType;
-    abstract ReleaseCreep(releaseReason: number): void;
+    abstract ValidateOverseer(): void;
+    abstract ActivateOverseer(): void;
+    abstract ReleaseCreep(name: string, releaseReason: string): void;
 }

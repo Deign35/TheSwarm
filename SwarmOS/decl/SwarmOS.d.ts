@@ -21,7 +21,7 @@ declare var GR: any;
 
 declare interface IOverseerRequirements_Creep {
     time: number,
-    creepBodyType: number
+    creepBody: { min: BodyPartConstant[], mid: BodyPartConstant[], best: BodyPartConstant[] }
 }
 declare interface IOverseerData_Resource {
     location: RoomPosition | RoomObject,
@@ -47,7 +47,7 @@ declare interface IOverseer extends IMemory {
     GetAvailableResources(): IOverseerData_Resource[];
     GetRequirements(): IOverseerRequirements;
     AssignCreep(creep: Creep): void;
-    ValidateOverseer(): number;
-    ActivateOverseer(): number;
-    ReleaseCreep(releaseReason: number): void;
+    ValidateOverseer(): void;
+    ActivateOverseer(): void;
+    ReleaseCreep(name: string, releaseReason: string): void;
 }

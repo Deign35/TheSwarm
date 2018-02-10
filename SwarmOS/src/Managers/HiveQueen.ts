@@ -1,12 +1,20 @@
 import { SwarmMemory } from "Memory/SwarmMemory";
 import * as SwarmEnums from "SwarmEnums";
+import { HiveHarvestOverseer } from "Overseers/HiveHarvestOverseer";
+import { Hivelord } from "Overseers/Hivelord";
 
 const RCL_VAL = 'RV';
+const HIVE_HARVESTER = 'HH';
+const HIVELORD = 'HL';
 export class HiveQueen extends SwarmMemory {
     Hive: Room;
     RCL: number;
-    Overseers: IOverseer;
+    HiveHarvester: HiveHarvestOverseer;
+    Overseers: IOverseer[];
+    hivelord: Hivelord;
     Save() {
+        this.HiveHarvester.Save();
+        this.hivelord.Save();
         this.SetData(RCL_VAL, this.RCL);
         super.Save();
     }
@@ -15,9 +23,29 @@ export class HiveQueen extends SwarmMemory {
         super.Load();
         this.Hive = Game.rooms[this.MemoryID];
         this.RCL = this.GetData(RCL_VAL) || 0;
+        this.hivelord = new Hivelord(HIVELORD, this);
+        this.Overseers = [];
+
+        this.HiveHarvester = new HiveHarvestOverseer(HIVE_HARVESTER, this);
+        this.Overseers.push(this.HiveHarvester);
     }
 
     Activate() {
-
+        for (let i = 0, length = this.Overseers.length; i < length; i++) {
+            this.Overseers[i].ValidateOverseer();
+            if (this.Overseers[i].HasRequirements()) {
+                let requirements = this.Overseers[i].GetRequirements();
+                if (requirements.Creeps.length > 0) {
+                    // Try to spawn here.
+                    let spawn = this.hivelord.FindTarget((this.Hive.controller as StructureController).pos, FIND_MY_SPAWNS);
+                    if (spawn) {
+                        let bodyType = requirements.Creeps[i].creepBodyType;
+                    }
+                }
+            }
+            this.Overseers[i].ActivateOverseer();
+        }
     }
+
+    
 }
