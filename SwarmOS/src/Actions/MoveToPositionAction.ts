@@ -8,6 +8,7 @@ export class MoveToPositionAction extends ActionWithPosition {
             result = OK;
         }
         let actionResponse: SwarmEnums.CommandResponseType = SwarmEnums.CRT_None;
+        result = this.AssignedCreep.moveTo(this.TargetPos);
         switch(result) {
             case(OK): actionResponse = SwarmEnums.CRT_Next; break;
             case(ERR_NOT_IN_RANGE): actionResponse = SwarmEnums.CRT_Move; break;

@@ -23,7 +23,6 @@ const TARGET_MAX = 'TM';
 const TARGET_TOTAL = 'TT';
 const TICKS_TO_DECAY = 'TD';
 
-declare var Array: any;
 export class Hivelord extends SwarmMemory { // One per room.
     // Targetting
     HiveTargets: { [id: number]: { [id: string]: any } };
@@ -146,15 +145,42 @@ export class Hivelord extends SwarmMemory { // One per room.
     }
 
     FindTarget(forPos: RoomPosition, findID: FindConstant, structureType?: StructureConstant) {
-        if (!this.HiveTargets[findID] || (this.HiveTargets[findID][LAST_UPDATE] - Game.time < -5)) { // Updates at most once every 6 ticks.  CAREFUL WHEN CHANGING
+        if(!this.HiveTargets[findID]) { this.HiveTargets[findID] = {} }
+        if(findID == FIND_STRUCTURES || findID == FIND_MY_STRUCTURES || findID == FIND_HOSTILE_STRUCTURES && structureType) {
+            if(!this.HiveTargets[findID][structureType as StructureConstant]) {
+                this.HiveTargets[findID][structureType as StructureConstant] = {};
+                this.HiveTargets[findID][structureType as StructureConstant][LAST_UPDATE] = 0;;
+            }
+        }else {
+            this.HiveTargets[findID][LAST_UPDATE] = 0;
+        }
+
+        if (this.HiveTargets[findID][LAST_UPDATE] - Game.time < -5) { // Updates at most once every 6 ticks.  CAREFUL WHEN CHANGING
             this.HiveTargets[findID][LAST_UPDATE] = Game.time;
             let foundTargets = Game.rooms[this.ParentMemoryID].find(findID);
             if (foundTargets.length == 0) {
+                this.HiveTargets[findID] = {};
                 return undefined;
             }
             this.UpdateTargets(foundTargets, findID);
+            this.Save();
+            this.Load();
         }
 
+        let findData;
+        if ((findID == FIND_STRUCTURES || findID == FIND_MY_STRUCTURES || findID == FIND_HOSTILE_STRUCTURES) && structureType) {
+            findData = this.HiveTargets[findID][structureType];
+        } else {
+            findData = this.HiveTargets[findID];
+        }
+
+        let targets = [];
+        for(let id in findData) {
+            let target = Game.getObjectById(id);
+            if(target) {
+                targets.push(target);
+            }
+        }
         let sortFunc = (a: any, b: any) => {
             let aData = this.TargetCounts[a.id];
             let countA = aData[TARGET_TOTAL];
@@ -189,16 +215,7 @@ export class Hivelord extends SwarmMemory { // One per room.
             }
             return distA < distB ? -1 : (distA > distB ? 1 : 0);
         }
-
-        let targets;
-        if ((findID == FIND_STRUCTURES || findID == FIND_MY_STRUCTURES || findID == FIND_HOSTILE_STRUCTURES) && structureType) {
-            targets = this.HiveTargets[findID][structureType];
-        } else {
-            targets = this.HiveTargets[findID];
-        }
-
-        let possibleTargets: any[] = Array.from(targets);
-        switch (findID) {
+        /*switch (findID) {
             case (FIND_CREEPS):
             case (FIND_MY_CREEPS):
             case (FIND_HOSTILE_CREEPS): break;
@@ -213,9 +230,9 @@ export class Hivelord extends SwarmMemory { // One per room.
             case (FIND_MY_SPAWNS):
             case (FIND_HOSTILE_SPAWNS): console.log('NOT SETUP YET'); break;
             case (FIND_MINERALS): break;
-        }
+        }*/
 
-        possibleTargets.sort(sortFunc);
-        return possibleTargets[0];
+        targets.sort(sortFunc);
+        return targets[0];
     }
 }
