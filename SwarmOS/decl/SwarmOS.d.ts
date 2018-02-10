@@ -21,7 +21,7 @@ declare var GR: any;
 
 declare interface IOverseerRequirements_Creep {
     time: number,
-    creepBody: { min: BodyPartConstant[], mid: BodyPartConstant[], best: BodyPartConstant[] }
+    creepBody: BodyPartConstant[]
 }
 declare interface IOverseerData_Resource {
     location: RoomPosition | RoomObject,

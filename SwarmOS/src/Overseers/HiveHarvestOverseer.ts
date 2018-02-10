@@ -42,13 +42,9 @@ export class HiveHarvestOverseer extends OverseerBase {
             if (!this.NodeObjects[i].creep) {
                 registry.Requirements.Creeps.push({
                     time: 0,
-                    creepBody: {
-                        min: [WORK, CARRY, MOVE],
-                        mid: [WORK, CARRY, MOVE, WORK, MOVE],
-                        best: this.NodeObjects[i].container ?
-                            [WORK, WORK, WORK, WORK, WORK, WORK, MOVE] :
-                            [WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE]
-                    }
+                    creepBody: this.NodeObjects[i].container ?
+                        [WORK, WORK, WORK, WORK, WORK, WORK, MOVE] :
+                        [WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE]
                 });
             }
             if (this.NodeObjects[i].container != undefined) {
