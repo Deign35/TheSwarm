@@ -14,39 +14,9 @@ declare type C_Transfer = 'Tr'; export const C_Transfer = 'Tr';
 declare type C_Upgrade = 'Up'; export const C_Upgrade = 'Up';
 declare type C_Withdraw = 'Wi'; export const C_Withdraw = 'Wi';
 
-export enum AdvancedCreepCommandType {
-    A_FindTarget = 'FT',
-}
-
-export enum BasicCreepCommandType {
-    C_Attack = 'At',
-    C_Build = 'Bu',
-    C_Dismantle = 'Di',
-    C_Drop = 'Dr',
-    C_Harvest = 'Ha',
-    C_Heal = 'He',
-    C_Pickup = 'Pi',
-    C_RangedAttack = 'RA',
-    C_RangedHeal = 'RH',
-    C_Repair = 'Re',
-    C_Say = 'Sa',
-    C_Suicide = 'Su',
-    C_Transfer = 'Tr',
-    C_Upgrade = 'Up',
-    C_Withdraw = 'Wi'
-}
-
-export type CreepCommandType = BasicCreepCommandType | AdvancedCreepCommandType;
-
-export const CommandAny = 'AnyC'; declare type CommandAny = 'AnyC';
-export const CommandEnd = 'CmdC'; declare type CommandEnd = 'CmdC';
-export type CommandType = CommandAny | CommandEnd | CreepCommandType;
-
-export const HL_REQUIRE_CREEP = -16; declare type HL_REQUIRE_CREEP = -16;
-export const HL_RETRY = -17; declare type HL_RETRY = -17;
-export const HL_REQUIRE_ARGS = -18; declare type HL_REQUIRE_ARGS = -18;
-export const HL_NEXT_COMMAND = -19; declare type HL_NEXT_COMMAND = -19;
-export type SwarmReturnCode = ScreepsReturnCode | HL_REQUIRE_CREEP | HL_RETRY | HL_REQUIRE_ARGS | HL_NEXT_COMMAND;
+declare type CreepActionType = C_Attack | C_Build | C_Dismantle | C_Harvest | C_Heal | C_Pickup | C_RangedAttack |
+    C_RangedHeal | C_Repair | C_Say | C_Suicide | C_Transfer | C_Upgrade | C_Withdraw;
+export type SwarmReturnCode = ScreepsReturnCode;
 
 export const CRT_None = -1000; declare type CRT_None = -1000;
 export const CRT_Next = -1001; declare type CRT_Next = -1001;
@@ -60,21 +30,8 @@ export type ConditionCommandResponseType = CRT_Condition_Empty | CRT_Condition_F
 
 export const CRT_Requires_Creep = -1301; declare type CRT_Requires_Creep = -1301;
 export type RequiresConditionCommandResponseType = CRT_Requires_Creep;
+
 export type CommandResponseType = BasicCommandResponseType | ConditionCommandResponseType | RequiresConditionCommandResponseType;
-
-export enum RoleNames {
-    RCL1_Harvest,
-    RCL1_Upgrader,
-    RCL2_Builder,
-    RCL3_Harvester,
-}
-
-export enum CmdNodeType {
-    SimpleCmdNode,
-    CustomCmdNode
-}
-
-declare type Targetable = RoomObject | StructureController;
 
 export enum CreepBodyType {
     Custom,

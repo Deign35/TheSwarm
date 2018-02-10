@@ -1,5 +1,4 @@
 import { SwarmMemory } from "Memory/SwarmMemory";
-import { BasicCreepCommandType } from "SwarmEnums";
 import * as _ from "lodash";
 
 const HIVE_TARGETS = 'HT';
@@ -46,8 +45,8 @@ export class Hivelord extends SwarmMemory { // One per room.
         for (let i = 0, length = foundTargets.length; i < length; i++) {
             foundIDs.push(foundTargets[i].id);
             this.UpdateTarget(foundTargets[i], findID);
-            if(!this.TargetCounts[foundTargets[i].id]) {
-                let newTargetCounts: {[name: string]: any} = {};
+            if (!this.TargetCounts[foundTargets[i].id]) {
+                let newTargetCounts: { [name: string]: any } = {};
                 newTargetCounts[TARGET_TOTAL] = 0;
                 newTargetCounts[TARGET_MAX] = 99;
                 newTargetCounts[TARGET_FACTOR] = 1;
@@ -150,14 +149,14 @@ export class Hivelord extends SwarmMemory { // One per room.
         if (!this.HiveTargets[findID] || (this.HiveTargets[findID][LAST_UPDATE] - Game.time < -5)) { // Updates at most once every 6 ticks.  CAREFUL WHEN CHANGING
             this.HiveTargets[findID][LAST_UPDATE] = Game.time;
             let foundTargets = Game.rooms[this.ParentMemoryID].find(findID);
-            if(foundTargets.length == 0) {
+            if (foundTargets.length == 0) {
                 return undefined;
             }
             this.UpdateTargets(foundTargets, findID);
         }
 
         let sortFunc = (a: any, b: any) => {
-            let aData = this.TargetCounts[a.id] ;
+            let aData = this.TargetCounts[a.id];
             let countA = aData[TARGET_TOTAL];
             if (countA >= aData[TARGET_MAX]) {
                 return 1;
@@ -182,10 +181,10 @@ export class Hivelord extends SwarmMemory { // One per room.
             }
             var distA = forPos.findPathTo(a).length;
             var distB = forPos.findPathTo(b).length;
-            if(distA == 0) {
+            if (distA == 0) {
                 return 1;
             }
-            if(distB == 0) {
+            if (distB == 0) {
                 return -1;
             }
             return distA < distB ? -1 : (distA > distB ? 1 : 0);

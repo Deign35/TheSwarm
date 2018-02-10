@@ -4,7 +4,7 @@ import * as _ from "lodash";
 /**
         this.ValidateOverseer(); */
 const ASSIGNED_CREEPS = 'AC';
-export abstract class OverseerBase extends SwarmMemory {
+export abstract class OverseerBase extends SwarmMemory implements IOverseer {
     protected AssignedCreeps: { [name: string]: Creep }
     protected _registry: IOverseer_Registry;
     protected get Registry(): IOverseer_Registry {
@@ -49,7 +49,7 @@ export abstract class OverseerBase extends SwarmMemory {
     };
     protected abstract InitOverseerRegistry(): IOverseer_Registry;
 
-    abstract HasResources(): IOverseerAvailable[];
+    abstract HasResources(): boolean;
     GetAvailableResources(): IOverseerData_Resource[] {
         return this.Registry.Available.Resources;
     }
@@ -61,23 +61,7 @@ export abstract class OverseerBase extends SwarmMemory {
     AssignCreep(creep: Creep) {
         this.AssignedCreeps[creep.id] = creep;
     }
-    GenericActionResponse(response: SwarmEnums.CommandResponseType, creep: Creep, targetPos: RoomPosition): SwarmEnums.CommandResponseType {
-        let result = SwarmEnums.CRT_None as SwarmEnums.CommandResponseType;
-
-        switch (response) {
-            case (SwarmEnums.CRT_Condition_Full): result = (_.sum(creep.carry) == creep.carryCapacity) ? SwarmEnums.CRT_Next : SwarmEnums.CRT_None;
-            case (SwarmEnums.CRT_Condition_Empty): result = (_.sum(creep.carry) == 0) ? SwarmEnums.CRT_Next : SwarmEnums.CRT_None;
-            case (SwarmEnums.CRT_Move): creep.moveTo(targetPos); break;
-            case (SwarmEnums.CRT_NewTarget):
-            case (SwarmEnums.CRT_Next):
-            case (SwarmEnums.CRT_None):
-            default:
-                result = response; break;
-
-        }
-        return result;
-    }
     abstract ValidateOverseer(): SwarmEnums.CommandResponseType;
     abstract ActivateOverseer(): SwarmEnums.CommandResponseType;
-    abstract ReleaseCreep(releaseReason: string): any;
+    abstract ReleaseCreep(releaseReason: number): void;
 }

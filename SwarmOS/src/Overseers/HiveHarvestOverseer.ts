@@ -156,7 +156,7 @@ export class HiveHarvestOverseer extends OverseerBase {
         }
         return SwarmEnums.CRT_None;
     }
-    ReleaseCreep(releaseReason: string) {
+    ReleaseCreep(releaseReason: number) {
         throw new Error("Method not implemented.");
     }
 
