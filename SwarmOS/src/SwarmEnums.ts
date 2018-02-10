@@ -75,3 +75,9 @@ export enum CmdNodeType {
 }
 
 declare type Targetable = RoomObject | StructureController;
+
+export enum CreepBodyType {
+    Custom,
+    LittleHarvester,
+    PrimeHarvester,
+}

@@ -32,9 +32,35 @@ declare interface ICommandWeb extends IMemory {
     GetCommandResult(fromID: string, result: number): string | undefined;
     GetCommandType(commandID: string): string;
 }
-
 declare var CC: any;
 declare var GR: any;
+
+declare interface IOverseerRequirements_Creep {
+    time: number,
+    creepBodyType: number
+}
+declare interface IOverseerData_Resource {
+    location: RoomPosition | RoomObject,
+    amount: number,
+}
+declare interface IOverseerRequirements {
+    Creeps: IOverseerRequirements_Creep[],
+    Resources: IOverseerData_Resource[],
+}
+
+declare interface IOverseerAvailable {
+    Resources: IOverseerData_Resource[],
+}
+
+declare interface IOverseer_Registry {
+    Available: IOverseerAvailable,
+    Requirements: IOverseerRequirements
+}
+
+
+
+
+
 /*
 
 
