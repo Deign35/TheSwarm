@@ -39,9 +39,9 @@ export class HiveQueen extends SwarmMemory {
                     // Look for existing??
                     // Try to spawn here...Add multiple spawns when I get there.
                     let spawn = this.hivelord.FindTarget((this.Hive.controller as StructureController).pos, FIND_MY_SPAWNS) as StructureSpawn;
-                    if (spawn && !spawn.spawning && spawn.spawnCreep(requirements.Creeps[0].creepBody, 'TEST_SPAWN', {dryRun: true}) == OK) {
+                    if (spawn && !spawn.spawning && spawn.spawnCreep(requirements.Creeps[0].creepBody, 'TEST_SPAWN', { dryRun: true }) == OK) {
                         let newSpawnName = this.MemoryID + '_' + ('' + Game.time).slice(-4);
-                        spawn.spawnCreep(requirements.Creeps[0].creepBody, newSpawnName, {memory: { Assigned: 'HiveHarvestOverseer'}})
+                        spawn.spawnCreep(requirements.Creeps[0].creepBody, newSpawnName, { memory: { Assigned: 'HiveHarvestOverseer' } })
                         this.Overseers[i].AssignCreep(newSpawnName);
                     }
                 }
@@ -49,6 +49,4 @@ export class HiveQueen extends SwarmMemory {
             this.Overseers[i].ActivateOverseer();
         }
     }
-
-
 }

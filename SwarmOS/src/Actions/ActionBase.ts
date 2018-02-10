@@ -3,10 +3,10 @@ import * as _ from "lodash";
 
 export abstract class ActionBase {
     constructor(public AssignedCreep: Creep) { }
-    Run(autoMove: boolean = false): SwarmEnums.CommandResponseType {
+    Run(autoMove: boolean = true): SwarmEnums.CommandResponseType {
         let jobResult = this.ActionImplemented();
 
-        if(autoMove && jobResult == SwarmEnums.CRT_Move) {
+        if (autoMove && jobResult == SwarmEnums.CRT_Move) {
             this.Move(this.GetMovePosition());
         }
 
