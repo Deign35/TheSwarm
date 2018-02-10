@@ -24,6 +24,7 @@ declare interface IOverseerRequirements_Creep {
 declare interface IOverseerData_Resource {
     location: RoomPosition | RoomObject,
     amount: number,
+    type: ResourceConstant
 }
 declare interface IOverseerRequirements {
     Creeps: IOverseerRequirements_Creep[],
@@ -41,11 +42,9 @@ declare interface IOverseer_Registry {
 
 declare interface IOverseer extends IMemory {
     HasResources(): boolean;
-    HasRequirements(): boolean;
     GetAvailableResources(): IOverseerData_Resource[];
     GetRequirements(): IOverseerRequirements;
     AssignCreep(creepName: string): void;
-    ValidateOverseer(): void;
     ActivateOverseer(): void;
     ReleaseCreep(name: string, releaseReason: string): void;
 }

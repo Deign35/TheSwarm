@@ -23,7 +23,7 @@ const TARGET_MAX = 'TM';
 const TARGET_TOTAL = 'TT';
 const TICKS_TO_DECAY = 'TD';
 
-export class Hivelord extends SwarmMemory { // One per room.
+export class SwarmLinkOverseer extends SwarmMemory { // One per room.
     // Targetting
     HiveTargets: { [id: number]: { [id: string]: any } };
     TargetCounts: { [id: string]: any };

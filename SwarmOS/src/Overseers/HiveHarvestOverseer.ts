@@ -1,31 +1,19 @@
+import * as SwarmEnums from "SwarmEnums";
+import * as _ from "lodash";
 import { OverseerBase } from "Overseers/OverseerBase";
 import { HiveQueen } from "Managers/HiveQueen";
-import * as SwarmEnums from "SwarmEnums";
-import { HarvestAction } from "Actions/HarvestAction";
-import { MoveToPositionAction } from "Actions/MoveToPositionAction";
 import { ActionBase } from "Actions/ActionBase";
 import { BuildAction } from "Actions/BuildAction";
 import { RepairAction } from "Actions/RepairAction";
 import { DropAction } from "Actions/DropAction";
-import * as _ from "lodash";
+import { HarvestAction } from "Actions/HarvestAction";
+import { MoveToPositionAction } from "Actions/MoveToPositionAction";
 
 const NODE_DATA = 'ND';
 export class HiveHarvestOverseer extends OverseerBase {
     Hive: Room;
     protected SourceNodes: { creepID?: string, sourceID: string, containerID?: string, constructionSiteID?: string }[];
     protected NodeObjects: { creep?: Creep, source: Source, container?: StructureContainer, constructionSite?: ConstructionSite }[];
-    constructor(id: string, parent: HiveQueen) {
-        super(id, parent);
-        if (this.SourceNodes.length == 0) {
-            // Probably better to put this where the overseer is created instead of the constructor;
-            let foundSources = this.Hive.find(FIND_SOURCES);
-            for (let index in foundSources) {
-                let foundSource = foundSources[index];
-                let newNode = { creepID: undefined as string | undefined, sourceID: foundSource.id, containerID: undefined as string | undefined, constructionSiteID: undefined as string | undefined };
-                this.SourceNodes.push(this.UpdateNodeData(newNode, foundSource));
-            }
-        }
-    }
 
     Save() {
         this.SetData(NODE_DATA, this.SourceNodes);
@@ -39,24 +27,6 @@ export class HiveHarvestOverseer extends OverseerBase {
         this.NodeObjects = [];
     }
 
-    InitOverseerRegistry() {
-        let registry = OverseerBase.CreateEmptyOverseerRegistry();
-        for (let i = 0, length = this.NodeObjects.length; i < length; i++) {
-            if (!this.NodeObjects[i].creep) {
-                registry.Requirements.Creeps.push({
-                    time: 0,
-                    creepBody: this.NodeObjects[i].container ?
-                        [WORK, MOVE, MOVE, CARRY] :
-                        [WORK, CARRY, MOVE]
-                });
-            }
-            if (this.NodeObjects[i].container != undefined) {
-                registry.Available.Resources.push({ location: (this.NodeObjects[i].container as StructureContainer), amount: (this.NodeObjects[i].container as StructureContainer).store.energy })
-            }
-        }
-
-        return registry;
-    }
     HasResources(): boolean { return true; } // It's just easier for now...
 
     HasRequirements(): boolean {
@@ -73,36 +43,61 @@ export class HiveHarvestOverseer extends OverseerBase {
     }
 
     ValidateOverseer() {
+        let registry = OverseerBase.CreateEmptyOverseerRegistry();
+        if (this.SourceNodes.length == 0) {
+            // Probably better to put this where the overseer is created instead of the constructor;
+            let foundSources = this.Hive.find(FIND_SOURCES);
+            for (let index in foundSources) {
+                let foundSource = foundSources[index];
+                let newNode = { creepID: undefined as string | undefined, sourceID: foundSource.id, containerID: undefined as string | undefined, constructionSiteID: undefined as string | undefined };
+                this.SourceNodes.push(this.UpdateNodeData(newNode, foundSource));
+            }
+        }
+        let hasRequirements = false;
         if (!this.Hive.controller || !this.Hive.controller.my || !(this.Hive.controller.level >= 3)) {
             // do boot strapper instead.
         } else {
-            for (let index in this.SourceNodes) {
+            for (let i = 0, length = this.SourceNodes.length; i < length; i++) {
                 let newNodeObj: { creep?: Creep, source: Source, container?: StructureContainer, constructionSite?: ConstructionSite };
-                newNodeObj = { creep: undefined, source: Game.getObjectById(this.SourceNodes[index].sourceID) as Source, container: undefined, constructionSite: undefined }
+                newNodeObj = { creep: undefined, source: Game.getObjectById(this.SourceNodes[i].sourceID) as Source, container: undefined, constructionSite: undefined }
 
-                if (this.SourceNodes[index].creepID) {
-                    newNodeObj.creep = Game.creeps[this.SourceNodes[index].creepID as string];
-                    if (!newNodeObj.creep) {
-                        this.ReleaseCreep((this.SourceNodes[index].creepID as string), 'Dead creep');
+                let creep = this.SourceNodes[i].creepID ? Game.creeps[this.SourceNodes[i].creepID as string] : undefined;
+
+                if(!creep) {
+                    if(this.SourceNodes[i].creepID) {
+                        this.ReleaseCreep((this.SourceNodes[i].creepID as string), 'Dead creep');
+                    }
+                    registry.Requirements.Creeps.push({
+                        time: 0, // Use this to request ahead of time.
+                        creepBody: this.NodeObjects[i].container ?
+                            [WORK, MOVE, MOVE, CARRY] :
+                            [WORK, CARRY, MOVE]
+                    });
+                }
+                this.NodeObjects[i].creep = creep;
+
+                if (!this.SourceNodes[i].containerID) {
+                    this.SourceNodes[i] = this.UpdateNodeData(this.SourceNodes[i]);
+                }
+                if (this.SourceNodes[i].containerID) {
+                    newNodeObj.container = Game.getObjectById(this.SourceNodes[i].containerID) as StructureContainer;
+                    if (!newNodeObj.container) {
+                        delete this.SourceNodes[i].containerID;
+                    } else {
+                        registry.Available.Resources.push({ location: (this.NodeObjects[i].container as StructureContainer),
+                                                            amount: (this.NodeObjects[i].container as StructureContainer).store.energy,
+                                                            type: RESOURCE_ENERGY })
                     }
                 }
-                if (!this.SourceNodes[index].containerID) {
-                    this.SourceNodes[index] = this.UpdateNodeData(this.SourceNodes[index]);
+                if (this.SourceNodes[i].constructionSiteID) {
+                    newNodeObj.constructionSite = Game.getObjectById(this.SourceNodes[i].constructionSiteID) as ConstructionSite;
+                    if (!newNodeObj.constructionSite) { delete this.SourceNodes[i].constructionSiteID; }
                 }
-
-                if (this.SourceNodes[index].constructionSiteID) {
-                    newNodeObj.constructionSite = Game.getObjectById(this.SourceNodes[index].constructionSiteID) as ConstructionSite;
-                    if (!newNodeObj.constructionSite) { delete this.SourceNodes[index].constructionSiteID; }
-                }
-
-                if (this.SourceNodes[index].containerID) {
-                    newNodeObj.container = Game.getObjectById(this.SourceNodes[index].containerID) as StructureContainer;
-                    if (!newNodeObj.container) { delete this.SourceNodes[index].containerID; }
-                }
-
                 this.NodeObjects.push(newNodeObj);
             }
         }
+
+        this.Registry = registry;
     }
 
     ActivateOverseer() {
@@ -115,7 +110,7 @@ export class HiveHarvestOverseer extends OverseerBase {
             let container = this.NodeObjects[index].container as StructureContainer;
 
             let action: ActionBase | undefined;
-            if (creep.carry.energy > 10) {
+            if (creep.carry.energy > creep.carryCapacity / 2) {
                 if (constructionSite) {
                     // Build it
                     action = new BuildAction(creep, constructionSite);
@@ -131,17 +126,27 @@ export class HiveHarvestOverseer extends OverseerBase {
 
             let primaryResponse: SwarmEnums.CommandResponseType = SwarmEnums.CRT_None;
             if (action && action.ValidateAction() == SwarmEnums.CRT_None) {
-                primaryResponse = action.Run();
+                primaryResponse = action.Run(false);
             }
-
             if (primaryResponse == SwarmEnums.CRT_Next || primaryResponse == SwarmEnums.CRT_None) {
-                action = new HarvestAction(this.NodeObjects[index].creep as Creep, this.NodeObjects[index].source);
+                let targetPos = this.NodeObjects[index].source.pos;
+                if (container) {
+                    targetPos = container.pos;
+                } else if (constructionSite) {
+                    targetPos = constructionSite.pos;
+                }
+
+                if(creep.pos.isEqualTo(targetPos)) {
+                    action = new HarvestAction(this.NodeObjects[index].creep as Creep, this.NodeObjects[index].source);
+                } else {
+                    action = new MoveToPositionAction(creep, targetPos);
+                }
             } else {
                 // Means we had to do some other action, and it was not a completed task.
                 return;
             }
             action.ValidateAction();
-            let harvestResult = action.Run(false);
+            let harvestResult = action.Run(true);
             // Check if harvest worked
             switch (harvestResult) {
                 case (SwarmEnums.CRT_None): console.log("THIS IS NOT POSSIBLE"); break; // Unless we haven't fixed Next/NewTarget above.
@@ -153,21 +158,7 @@ export class HiveHarvestOverseer extends OverseerBase {
                     }
                     break; //Means we successfully harvested.
                 case (SwarmEnums.CRT_NewTarget): break; // The source is empty.  Just wait.
-                case (SwarmEnums.CRT_Move):
-                    let targetPos = this.NodeObjects[index].source.pos;
-                    if (container) {
-                        targetPos = container.pos;
-                    }
-                    if (constructionSite) {
-                        targetPos = constructionSite.pos;
-                    }
-                    let moveAction = new MoveToPositionAction(creep, targetPos);
-                    let moveResult = moveAction.Run();
-                    console.log(moveResult);
-                    break; // Did not harvest, needed to move.
             }
-
-            // Do something with primaryResponse?
         }
     }
 
@@ -193,14 +184,15 @@ export class HiveHarvestOverseer extends OverseerBase {
         if (!source) {
             source = Game.getObjectById(nodeInfo.sourceID) as Source;
         }
-        let foundStructures = this.Hive.lookForAtArea(LOOK_STRUCTURES, source.pos.x - 1, source.pos.y - 1, source.pos.x + 1, source.pos.y + 1, true);
+        let foundStructures = this.Hive.lookForAtArea(LOOK_STRUCTURES, source.pos.y - 1, source.pos.x - 1, source.pos.y + 1, source.pos.x + 1, true);
         if (foundStructures.length > 0) {
             for (let i in foundStructures) {
                 if ((foundStructures[i].structure as Structure).structureType == STRUCTURE_CONTAINER) {
                     nodeInfo.containerID = (foundStructures[i].structure as Structure).id;
                 }
             }
-        } else {
+        }
+        if(!nodeInfo.containerID) {
             let foundCSites = this.Hive.lookForAtArea(LOOK_CONSTRUCTION_SITES, source.pos.y - 1, source.pos.x - 1, source.pos.y + 1, source.pos.x + 1, true);
             if (foundCSites.length > 0) {
                 for (let i in foundCSites) {
