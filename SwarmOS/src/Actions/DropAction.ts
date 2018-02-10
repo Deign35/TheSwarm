@@ -25,7 +25,7 @@ export class DropAction extends ActionWithPosition {
 
         return actionResponse;
     }
-    protected ValidateAction(): SwarmEnums.CommandResponseType {
+    ValidateAction(): SwarmEnums.CommandResponseType {
         // Sum!
         if(this.AssignedCreep.carry[this.ResourceType] == 0) {
             return SwarmEnums.CRT_Next as SwarmEnums.CommandResponseType;

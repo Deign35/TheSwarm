@@ -25,7 +25,7 @@ export class WithdrawAction extends ActionWithTarget<Structure> {
 
         return actionResponse;
     }
-    protected ValidateAction(): SwarmEnums.CommandResponseType {
+    ValidateAction(): SwarmEnums.CommandResponseType {
         let validationResult = SwarmEnums.CRT_None;
         if(_.sum(this.AssignedCreep.carry) == this.AssignedCreep.carryCapacity) {
             validationResult = SwarmEnums.CRT_Next;

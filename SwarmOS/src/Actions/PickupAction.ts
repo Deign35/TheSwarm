@@ -17,7 +17,7 @@ export class PickupAction extends ActionWithTarget<Resource> {
 
         return actionResponse;
     }
-    protected ValidateAction(): SwarmEnums.CommandResponseType {
+    ValidateAction(): SwarmEnums.CommandResponseType {
         if(_.sum(this.AssignedCreep.carry) == this.AssignedCreep.carryCapacity) {
             return SwarmEnums.CRT_Next;
         }

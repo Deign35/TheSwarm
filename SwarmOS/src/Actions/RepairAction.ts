@@ -17,7 +17,7 @@ export class RepairAction extends ActionWithTarget<Structure> {
 
         return actionResponse;
     }
-    protected ValidateAction(): SwarmEnums.CommandResponseType {
+    ValidateAction(): SwarmEnums.CommandResponseType {
         // Sum!
         if(this.AssignedCreep.carry.energy == 0) {
             return SwarmEnums.CRT_Next as SwarmEnums.CommandResponseType;

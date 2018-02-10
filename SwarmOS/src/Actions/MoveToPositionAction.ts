@@ -15,7 +15,7 @@ export class MoveToPositionAction extends ActionWithPosition {
 
         return actionResponse;
     }
-    protected ValidateAction(): SwarmEnums.CommandResponseType {
+    ValidateAction(): SwarmEnums.CommandResponseType {
         return SwarmEnums.CRT_None; // Except ensuring there's a path from A to B.
     }
 }

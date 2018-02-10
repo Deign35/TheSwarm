@@ -16,5 +16,5 @@ export class AttackAction extends ActionWithTarget<Creep | Structure> {
 
         return actionResponse;
     }
-    protected ValidateAction(): SwarmEnums.CommandResponseType { return SwarmEnums.CRT_None; }
+    ValidateAction(): SwarmEnums.CommandResponseType { return SwarmEnums.CRT_None; }
 }

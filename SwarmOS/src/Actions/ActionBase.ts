@@ -3,14 +3,13 @@ import * as _ from "lodash";
 
 export abstract class ActionBase {
     constructor(public AssignedCreep: Creep) { }
-    Run(): SwarmEnums.CommandResponseType {
+    Run(autoMove: boolean = false): SwarmEnums.CommandResponseType {
         let jobResult = this.ActionImplemented();
 
-        switch(jobResult) {
-            case(SwarmEnums.CRT_Condition_Full): jobResult = (_.sum(this.AssignedCreep.carry) == this.AssignedCreep.carryCapacity) ? SwarmEnums.CRT_Next : SwarmEnums.CRT_None;
-            case(SwarmEnums.CRT_Move): jobResult = this.Move(this.GetMovePosition()); break;
-            case(SwarmEnums.CRT_NewTarget): break;
+        if(autoMove && jobResult == SwarmEnums.CRT_Move) {
+            this.Move(this.GetMovePosition());
         }
+
         return jobResult;
     }
     Move(pos: RoomPosition): SwarmEnums.CommandResponseType {
@@ -20,7 +19,7 @@ export abstract class ActionBase {
 
     protected abstract ActionImplemented(): SwarmEnums.CommandResponseType;
     protected abstract GetMovePosition(): RoomPosition;
-    protected abstract ValidateAction(): SwarmEnums.CommandResponseType;
+    abstract ValidateAction(): SwarmEnums.CommandResponseType;
 }
 export abstract class ActionWithPosition extends ActionBase {
     constructor(creep: Creep, protected TargetPos: RoomPosition) {
