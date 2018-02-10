@@ -16,8 +16,6 @@ declare interface IMemory {
     Save(): void;
     Load(): void;
 }
-declare var CC: any;
-declare var GR: any;
 
 declare interface IOverseerRequirements_Creep {
     time: number,
@@ -46,8 +44,7 @@ declare interface IOverseer extends IMemory {
     HasRequirements(): boolean;
     GetAvailableResources(): IOverseerData_Resource[];
     GetRequirements(): IOverseerRequirements;
-    AssignCreep(creep: Creep): void;
-    AssignSpawn(creepName: string): void;
+    AssignCreep(creepName: string): void;
     ValidateOverseer(): void;
     ActivateOverseer(): void;
     ReleaseCreep(name: string, releaseReason: string): void;

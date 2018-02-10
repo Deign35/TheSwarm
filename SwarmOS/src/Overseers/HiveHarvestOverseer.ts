@@ -11,7 +11,7 @@ import { DropAction } from "Actions/DropAction";
 const NODE_DATA = 'ND';
 export class HiveHarvestOverseer extends OverseerBase {
     Hive: Room;
-    protected SourceNodes: { creepID: string, sourceID: string, containerID?: string, constructionSiteID?: string }[];
+    protected SourceNodes: { creepID?: string, sourceID: string, containerID?: string, constructionSiteID?: string }[];
     protected NodeObjects: { creep?: Creep, source: Source, container?: StructureContainer, constructionSite?: ConstructionSite }[];
     constructor(id: string, parent: HiveQueen) {
         super(id, parent);
@@ -20,7 +20,7 @@ export class HiveHarvestOverseer extends OverseerBase {
             let foundSources = this.Hive.find(FIND_SOURCES);
             for (let index in foundSources) {
                 let foundSource = foundSources[index];
-                let newNode = { creepID: '', sourceID: foundSource.id, containerID: undefined as string | undefined, constructionSiteID: undefined as string | undefined };
+                let newNode = { creepID: undefined as string | undefined, sourceID: foundSource.id, containerID: undefined as string | undefined, constructionSiteID: undefined as string | undefined };
                 this.SourceNodes.push(this.UpdateNodeData(newNode, foundSource));
             }
         }
@@ -30,6 +30,7 @@ export class HiveHarvestOverseer extends OverseerBase {
         this.SetData(NODE_DATA, this.SourceNodes);
         super.Save();
     }
+
     Load() {
         super.Load();
         this.Hive = Game.rooms[this.ParentMemoryID];
@@ -80,30 +81,29 @@ export class HiveHarvestOverseer extends OverseerBase {
 
                 if (this.SourceNodes[index].creepID) {
                     newNodeObj.creep = Game.getObjectById(this.SourceNodes[index].creepID) as Creep;
-                }
-                if (!newNodeObj.creep) {
-                    this.ReleaseCreep(this.SourceNodes[index].creepID, 'Dead creep');
+                    if (!newNodeObj.creep) {
+                        this.ReleaseCreep((this.SourceNodes[index].creepID as string), 'Dead creep');
+                    }
                 }
                 if (!this.SourceNodes[index].containerID) {
                     this.SourceNodes[index] = this.UpdateNodeData(this.SourceNodes[index]);
                 }
+
                 if (this.SourceNodes[index].constructionSiteID) {
                     newNodeObj.constructionSite = Game.getObjectById(this.SourceNodes[index].constructionSiteID) as ConstructionSite;
                     if (!newNodeObj.constructionSite) { delete this.SourceNodes[index].constructionSiteID; }
                 }
+
                 if (this.SourceNodes[index].containerID) {
                     newNodeObj.container = Game.getObjectById(this.SourceNodes[index].containerID) as StructureContainer;
                     if (!newNodeObj.container) { delete this.SourceNodes[index].containerID; }
                 }
 
-                /*if(this.SourceNodes[index].containerID && !newNodeObj.container) {
-                    // The container disappeared.
-                }*/
-
                 this.NodeObjects.push(newNodeObj);
             }
         }
     }
+
     ActivateOverseer() {
         for (let index in this.SourceNodes) {
             if (!this.NodeObjects[index].creep) {
@@ -174,9 +174,26 @@ export class HiveHarvestOverseer extends OverseerBase {
             // Do something with primaryResponse?
         }
     }
-    ReleaseCreep(name: string, releaseReason: string) { }
 
-    private UpdateNodeData(nodeInfo: { creepID: string, sourceID: string, containerID?: string, constructionSiteID?: string }, source?: Source) {
+    AssignCreep(creepName: string): void {
+        for(let i = 0, length = this.NodeObjects.length; i < length; i++) {
+            if(!this.NodeObjects[i].creep) {
+                this.SourceNodes[i].creepID = creepName;
+                break;
+            }
+        }
+    }
+
+    ReleaseCreep(creepName: string, releaseReason: string) {
+        for(let i = 0, length = this.SourceNodes.length; i < length; i++) {
+            if(this.SourceNodes[i].creepID == creepName) {
+                delete this.SourceNodes[i].creepID;
+                break;
+            }
+        }
+    }
+
+    private UpdateNodeData(nodeInfo: { creepID?: string, sourceID: string, containerID?: string, constructionSiteID?: string }, source?: Source) {
         if (!source) {
             source = Game.getObjectById(nodeInfo.sourceID) as Source;
         }

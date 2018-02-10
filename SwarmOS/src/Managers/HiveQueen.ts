@@ -49,7 +49,7 @@ export class HiveQueen extends SwarmMemory {
                             }
                             let spawnName = this.MemoryID + '_' + ('' + Game.time).slice(-4);
                             spawn.spawnCreep(bodyToSpawn, spawnName, { memory: { Assigned: true } });
-                            this.Overseers[i].AssignCreep(spawnname);
+                            this.Overseers[i].AssignCreep(spawnName);
                         }
                     }
                 }
