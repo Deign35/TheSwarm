@@ -15,6 +15,15 @@ export const loop = function () {
     let swarmQueen = SwarmQueen.LoadSwarmData();
     swarmQueen.Activate();
     swarmQueen.Save();
+
+    let targets = Game.rooms['E9N35'].find(FIND_HOSTILE_CREEPS);
+    if(targets.length > 0) {
+        let tower = Game.getObjectById(Memory['TowerID']) as StructureTower;
+        tower.attack(targets[0]);
+    }
+    Game.rooms['E9N35'].visual.text(("CPU: " + Game.cpu.getUsed()).slice(0, 10), 21, 20.5, {color:'black', backgroundColor: 'white', font: 0.8})
+    Game.rooms['E9N35'].visual.text(("MEM: " + RawMemory.get().length).slice(0, 10), 21, 21.5, {color:'black', backgroundColor: 'white', font: 0.8})
+    Game.rooms['E9N35'].visual.text(("B: " + Game.cpu.bucket), 21, 22.5, {color:'black', backgroundColor: 'white', font: 0.8})
 }
 
 const initSwarm = function () {
@@ -41,35 +50,3 @@ const initSwarm = function () {
     }
     return initResult;
 }
-
-/*
-
-    let room = Game.rooms['W2N5'];
-    if(room.energyCapacityAvailable >= 1300 && !Memory['Triggered']) {
-        Memory['Triggered'] = true;
-        CC.EZUpdate('W2N5', {work:8, carry:4, move:6});
-    }
-    if(room.energyCapacityAvailable >= 2000 && !Memory['Triggered2']) {
-        Memory['Triggered2'] = true;
-        CC.EZUpdate('W2N5', {work:5, carry:2, move:3});
-        GR.CreateGenPurposeJob('W2N5', {work:10, carry:6, move:8});
-        GR.CreateGenPurposeJob('W2N5', {work:5, carry:3, move:4});
-        GR.CreateGenPurposeJob('W2N5', {work:5, carry:3, move:4});
-    }
-    if(room.controller.progress < 100) {
-        if(Memory['CurRCL'] != room.controller.level && !Memory['Triggered']) {
-            if(room.controller.level == 3) {
-                CC.EZUpdate('W2N5', {move:2, carry:1, work:3})
-            } else if(room.controller.level == 4) {
-                CC.EZUpdate('W2N5', {move:4, carry:2, work:4})
-            }
-
-            Memory['CurRCL'] = room.controller.level;
-        }
-        let flags = room.find(FIND_FLAGS);
-        for(let i = 0; i < flags.length; i++) {
-            room.createConstructionSite(flags[i].pos, STRUCTURE_EXTENSION);
-            flags[i].remove();
-        }
-    }
-*/

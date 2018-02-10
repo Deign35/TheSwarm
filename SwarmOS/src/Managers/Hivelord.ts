@@ -180,16 +180,24 @@ export class Hivelord extends SwarmMemory { // One per room.
             } else if (countA < countB) {
                 return -1;
             }
-            let distA = forPos.getRangeTo(a);
-            let distB = forPos.getRangeTo(b);
+            var distA = forPos.findPathTo(a).length;
+            var distB = forPos.findPathTo(b).length;
+            if(distA == 0) {
+                return 1;
+            }
+            if(distB == 0) {
+                return -1;
+            }
             return distA < distB ? -1 : (distA > distB ? 1 : 0);
         }
+
         let targets;
         if ((findID == FIND_STRUCTURES || findID == FIND_MY_STRUCTURES || findID == FIND_HOSTILE_STRUCTURES) && structureType) {
             targets = this.HiveTargets[findID][structureType];
         } else {
             targets = this.HiveTargets[findID];
         }
+
         let possibleTargets: any[] = Array.from(targets);
         switch (findID) {
             case (FIND_CREEPS):

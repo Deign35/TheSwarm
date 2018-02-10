@@ -105,7 +105,7 @@ export class SwarmJob extends SwarmMemory {
 
             let jobResponse = BasicCreepCommand.GetResponse(this.CommandList[this.CommandIndex], jobResult);
             switch (jobResponse) {
-                case (SwarmEnums.CRT_Retry):
+                /*case (SwarmEnums.CRT_Retry):
                     if (lastRetry != this.CommandIndex) {
                         lastRetry = this.CommandIndex;
                         jobResult = SwarmEnums.CRT_Retry;
@@ -130,15 +130,17 @@ export class SwarmJob extends SwarmMemory {
                 case (SwarmEnums.CRT_Condition_Empty):
                     if (_.sum(creep.carry) == 0) {
                         jobResponse = SwarmEnums.CRT_Next;
-                    } else { // This still doesn't work, because it doesn't take into account the change that would have occured in this frame.
-                        this.SavedTargets[this.CommandIndex] = COMMAND_FIND_TARGET;
+                    } else {
+                        this.CommandIndex++;
+                        jobResult = SwarmEnums.CRT_None;
+                        if (this.CommandIndex >= this.CommandList.length) {
+                            this.CommandIndex = 0;
+                        }
                     }
                     break;
                 case (SwarmEnums.CRT_Condition_Full):
                     if (_.sum(creep.carry) == creep.carryCapacity) {
                         jobResponse = SwarmEnums.CRT_Next;
-                    } else if(this.CommandList[this.CommandIndex] != SwarmEnums.C_Harvest) {
-                        this.SavedTargets[this.CommandIndex] = COMMAND_FIND_TARGET;
                     }
                     break;
             }
@@ -150,15 +152,14 @@ export class SwarmJob extends SwarmMemory {
                     if (Memory.TargetData[prevTarget] <= 0) {
                         delete Memory.TargetData[prevTarget];
                     }
-                    this.SavedTargets[this.CommandIndex] = COMMAND_FIND_TARGET;
                 }
                 this.CommandIndex++;
                 jobResult = SwarmEnums.CRT_Retry;
                 if (this.CommandIndex >= this.CommandList.length) {
                     this.CommandIndex = 0;
-                }
+                }*/
             }
-        } while (jobResult == SwarmEnums.CRT_Retry && retryCount++ < this.CommandList.length * 2);
+        } while (false);//(jobResult == SwarmEnums.CRT_Retry && retryCount++ < this.CommandList.length * 2);
 
         if (retryCount >= this.CommandList.length * 2) {
             console.log('Retry maxxed out.');
@@ -171,33 +172,8 @@ export class SwarmJob extends SwarmMemory {
         let args: Dictionary = {};
         let cmdType = this.CommandList[this.CommandIndex];
         if (BasicCreepCommand.RequiresTarget(cmdType)) {
-            let cmdTarget: string | SwarmEnums.SwarmReturnCode = this.SavedTargets[this.CommandIndex];
-            if (cmdTarget == COMMAND_FIND_TARGET) {
-                cmdTarget = ERR_NOT_FOUND;
-                let target = BasicCreepCommand.FindCommandTarget(creep, cmdType);
-                if (target != ERR_NOT_FOUND) {
-                    cmdTarget = target;
-                    this.SavedTargets[this.CommandIndex] = target;
-                    if (Memory.TargetData[target]) {
-                        Memory.TargetData[target]++;
-                    }
-                    else {
-                        Memory.TargetData[target] = 1;
-                    }
-                }
-            }
-
-            if (cmdTarget != ERR_NOT_FOUND) {
-                let target = Game.getObjectById(cmdTarget as string);
-                if (!target) {
-                    this.SavedTargets[this.CommandIndex] = COMMAND_FIND_TARGET;
-                    return ERR_NOT_FOUND;
-                } else {
-                    args['target'] = target;
-                }
-            } else {
-                return ERR_NOT_FOUND;
-            }
+            let cmdTarget: string = this.SavedTargets[this.CommandIndex];
+            args['target'] = Game.getObjectById(cmdTarget);
         }
 
         if (cmdType == SwarmEnums.BasicCreepCommandType.C_Transfer ||

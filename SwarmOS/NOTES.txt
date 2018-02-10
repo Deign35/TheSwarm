@@ -4,3 +4,6 @@ Multiple transfer targets still doesn't work.  Transfer get's OK and moves to ne
 Because after a successful transfer, it still has 50/50 energy.
 But this should mean that it keeps looking for a new target the next tick...
 Because the creep is still trying to fill the old target and it needs to erase its target after transfer.
+
+Flag values:
+Red/Green -- Container for harvesters

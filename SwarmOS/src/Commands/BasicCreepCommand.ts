@@ -5,7 +5,7 @@ const BasicCreepCommandType = SwarmEnums.BasicCreepCommandType;
 const DefaultOverrides: { [commandType: string]: { [result: number]: SwarmEnums.CommandResponseType } } = {};
 DefaultOverrides[BasicCreepCommandType.C_Harvest] = {};
 DefaultOverrides[BasicCreepCommandType.C_Harvest][OK] = SwarmEnums.CRT_Condition_Full;
-DefaultOverrides[BasicCreepCommandType.C_Harvest][ERR_NOT_ENOUGH_RESOURCES] = SwarmEnums.CRT_Retry;
+//DefaultOverrides[BasicCreepCommandType.C_Harvest][ERR_NOT_ENOUGH_RESOURCES] = SwarmEnums.CRT_Retry;
 DefaultOverrides[BasicCreepCommandType.C_Harvest][ERR_FULL] = SwarmEnums.CRT_Next;
 
 DefaultOverrides[BasicCreepCommandType.C_Pickup] = {};
@@ -14,11 +14,11 @@ DefaultOverrides[BasicCreepCommandType.C_Pickup][OK] = SwarmEnums.CRT_Condition_
 DefaultOverrides[BasicCreepCommandType.C_Transfer] = {};
 DefaultOverrides[BasicCreepCommandType.C_Transfer][OK] = SwarmEnums.CRT_Condition_Empty;
 DefaultOverrides[BasicCreepCommandType.C_Transfer][ERR_NOT_ENOUGH_RESOURCES] = SwarmEnums.CRT_Next;
-DefaultOverrides[BasicCreepCommandType.C_Transfer][ERR_FULL] = SwarmEnums.CRT_Retry;
+//DefaultOverrides[BasicCreepCommandType.C_Transfer][ERR_FULL] = SwarmEnums.CRT_Retry;
 
 DefaultOverrides[BasicCreepCommandType.C_Withdraw] = {};
 DefaultOverrides[BasicCreepCommandType.C_Withdraw][OK] = SwarmEnums.CRT_Condition_Full;
-DefaultOverrides[BasicCreepCommandType.C_Withdraw][ERR_NOT_ENOUGH_RESOURCES] = SwarmEnums.CRT_Retry;
+//DefaultOverrides[BasicCreepCommandType.C_Withdraw][ERR_NOT_ENOUGH_RESOURCES] = SwarmEnums.CRT_Retry;
 DefaultOverrides[BasicCreepCommandType.C_Withdraw][ERR_FULL] = SwarmEnums.CRT_Next;
 
 export class BasicCreepCommand {
@@ -40,7 +40,9 @@ export class BasicCreepCommand {
             case (BasicCreepCommandType.C_Repair): return ling.repair(args['target']);
             case (BasicCreepCommandType.C_Suicide): return ling.suicide();
             case (BasicCreepCommandType.C_Say): return ling.say(args['message']);
-            case (BasicCreepCommandType.C_Transfer): return ling.transfer(args['target'], args['resourceType'], args['amount'] ? args['amount'] : undefined);
+            case (BasicCreepCommandType.C_Transfer):
+                if(ling.carry.energy == 0) { return ERR_NOT_ENOUGH_RESOURCES; }
+            return ling.transfer(args['target'], args['resourceType'], args['amount'] ? args['amount'] : undefined);
             case (BasicCreepCommandType.C_Upgrade): return ling.upgradeController(args['target']);
             case (BasicCreepCommandType.C_Withdraw): return ling.withdraw(args['target'], args['resourceType'], args['amount'] ? args['amount'] : undefined);
         }
@@ -64,19 +66,19 @@ export class BasicCreepCommand {
             return DefaultOverrides[commandType][result];
         }
         switch (result) {
-            case (ERR_NOT_IN_RANGE):/* -9 */ return SwarmEnums.CRT_Move;
+            //case (ERR_NOT_IN_RANGE):/* -9 */ return SwarmEnums.CRT_Move;
             case (ERR_NO_PATH):/* -2 */
             case (ERR_NOT_FOUND):/* -5 */
             case (ERR_INVALID_TARGET):/* -7 */ return SwarmEnums.CRT_Next;
-            case (ERR_INVALID_ARGS):/* -10 */ return SwarmEnums.CRT_Restart;
+            //case (ERR_INVALID_ARGS):/* -10 */ return SwarmEnums.CRT_Restart;
 
             case (ERR_NO_BODYPART):/* -12 */
             case (ERR_NOT_OWNER):/* -1 */
             case (ERR_RCL_NOT_ENOUGH):/* -14 */
-            case (ERR_GCL_NOT_ENOUGH):/* -15 */ return SwarmEnums.CRT_Terminate;
+            //case (ERR_GCL_NOT_ENOUGH):/* -15 */ return SwarmEnums.CRT_Terminate;
 
             case (ERR_NOT_ENOUGH_RESOURCES):/* -6 */
-            case (ERR_FULL):/* -8 */ return SwarmEnums.CRT_Retry;
+            //case (ERR_FULL):/* -8 */ return SwarmEnums.CRT_Retry;
             //case(ERR_NAME_EXISTS):/* -3 */ break;
             //case(ERR_BUSY):/* -4 */ break;
             //case(ERR_TIRED):/* -11 */ break;
@@ -85,8 +87,9 @@ export class BasicCreepCommand {
         return SwarmEnums.CRT_None;
     }
     // Load balancing targets here.
-    static FindCommandTarget(creep: Creep, commandType: SwarmEnums.BasicCreepCommandType) {
-        let possibleTargets: any[] = [];
+    //static FindCommandTarget(creep: Creep, commandType: SwarmEnums.BasicCreepCommandType) {
+
+        /*let possibleTargets: any[] = [];
         let sortFunc = (a: any, b: any) => {
             let countA = Memory.TargetData[a.id] || 0;
             if (Memory.TargetMax[a.id] && countA > Memory.TargetMax[a.id]) {
@@ -110,8 +113,14 @@ export class BasicCreepCommand {
             } else if (countA < countB) {
                 return -1;
             }
-            let distA = creep.pos.getRangeTo(a);
-            let distB = creep.pos.getRangeTo(b);
+            var distA = creep.pos.findPathTo(a).length;
+            var distB = creep.pos.findPathTo(b).length;
+            if(distA == 0) {
+                return 1;
+            }
+            if(distB == 0) {
+                return -1;
+            }
             return distA < distB ? -1 : (distA > distB ? 1 : 0);
         }
         switch (commandType) {
@@ -145,10 +154,12 @@ export class BasicCreepCommand {
                         }
                         // Returning true on road = stops working...
                         if (structure.structureType == STRUCTURE_WALL ||
-                            structure.structureType == STRUCTURE_ROAD ||
-                            structure.structureType == STRUCTURE_CONTAINER ||
                             structure.structureType == STRUCTURE_RAMPART) {
                             return false;
+                        } else if(structure.structureType == STRUCTURE_ROAD ||
+                                structure.structureType == STRUCTURE_CONTAINER) {
+                            return true;
+
                         } else if (!(structure as OwnedStructure).my) {
                             return false;
                         }
@@ -202,6 +213,6 @@ export class BasicCreepCommand {
             possibleTargets.sort(sortFunc);
             target = possibleTargets[0];
         }
-        return target != ERR_NOT_FOUND ? target.id : ERR_NOT_FOUND;
-    }
+        return target != ERR_NOT_FOUND ? target.id : ERR_NOT_FOUND;*/
+    //}
 }
