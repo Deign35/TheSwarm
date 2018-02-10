@@ -40,14 +40,14 @@ module.exports = function (grunt) {
         output += '\n----------------------------------';
         output += '\ncommitMain: Commits to SwarmOS_Main';
         output += '\ncommitSim: Commits to SwarmOS_Sim';
-        output += '\ncompile: Compiles the Typescript';
+        output += '\ncompile(default): Compiles the Typescript';
         console.log(output);
     });
 
     grunt.registerTask('commitMain', ['compile', 'replace', 'copy', 'screepsBranch:SwarmOS_Main', 'screeps']);
     grunt.registerTask('commitSim', ['compile', 'replace', 'copy', 'screepsBranch:SwarmOS_Sim', 'screeps']);
     grunt.registerTask('compile', ['clean', 'ts']);
-    grunt.registerTask('default', ['help']);
+    grunt.registerTask('default', ['compile']);
 }
 
 let InitGruntScreepsConfig = function () {

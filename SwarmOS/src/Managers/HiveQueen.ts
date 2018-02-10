@@ -36,7 +36,7 @@ export class HiveQueen extends SwarmMemory {
             if (this.Overseers[i].HasRequirements()) {
                 let requirements = this.Overseers[i].GetRequirements();
                 if (requirements.Creeps.length > 0) {
-                    // Try to spawn here.
+                    // Try to spawn here...Add multiple spawns when I get there.
                     let spawn = this.hivelord.FindTarget((this.Hive.controller as StructureController).pos, FIND_MY_SPAWNS) as StructureSpawn;
                     if (spawn && !spawn.spawning && spawn.spawnCreep(requirements.Creeps[0].creepBody, 'TEST_SPAWN') == OK) {
                         let newSpawnName = this.MemoryID + '_' + ('' + Game.time).slice(-4);

@@ -1,11 +1,8 @@
 import { SwarmMemory } from "Memory/SwarmMemory";
 import * as SwarmEnums from "SwarmEnums";
 import * as _ from "lodash";
-/**
-        this.ValidateOverseer(); */
-const ASSIGNED_CREEPS = 'AC';
+
 export abstract class OverseerBase extends SwarmMemory implements IOverseer {
-    protected AssignedCreeps: { [name: string]: Creep }
     protected _registry: IOverseer_Registry;
     protected get Registry(): IOverseer_Registry {
         if (!this.registryInit) {
@@ -15,27 +12,6 @@ export abstract class OverseerBase extends SwarmMemory implements IOverseer {
         return this._registry;
     }
     private registryInit = false;
-
-    Save() {
-        let AssignedCreeps = [];
-        for (let index in this.AssignedCreeps) {
-            AssignedCreeps.push(this.AssignedCreeps[index].id);
-        }
-        this.SetData(ASSIGNED_CREEPS, AssignedCreeps);
-        super.Save();
-    }
-    Load() {
-        super.Load();
-        let AssignedCreeps = this.GetData(ASSIGNED_CREEPS) || [];
-        for (let index in AssignedCreeps) {
-            let foundCreep = Game.getObjectById(AssignedCreeps[index]);
-            if (foundCreep) {
-                this.AssignCreep(foundCreep as Creep);
-            } else {
-                this.ReleaseCreep(AssignedCreeps[index]);
-            }
-        }
-    }
     static CreateEmptyOverseerRegistry(): IOverseer_Registry {
         return {
             Available: {
@@ -57,10 +33,7 @@ export abstract class OverseerBase extends SwarmMemory implements IOverseer {
     GetRequirements(): IOverseerRequirements {
         return this.Registry.Requirements;
     }
-
-    AssignCreep(creep: Creep) {
-        this.AssignedCreeps[creep.id] = creep;
-    }
+    abstract AssignCreep(creepName: string): void;
     abstract ValidateOverseer(): void;
     abstract ActivateOverseer(): void;
     abstract ReleaseCreep(name: string, releaseReason: string): void;
