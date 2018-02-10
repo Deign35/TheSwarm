@@ -47,6 +47,7 @@ declare interface IOverseer extends IMemory {
     GetAvailableResources(): IOverseerData_Resource[];
     GetRequirements(): IOverseerRequirements;
     AssignCreep(creep: Creep): void;
+    AssignSpawn(creepName: string): void;
     ValidateOverseer(): void;
     ActivateOverseer(): void;
     ReleaseCreep(name: string, releaseReason: string): void;
