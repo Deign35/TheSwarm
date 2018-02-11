@@ -2,7 +2,7 @@ import { SwarmMemory } from "Memory/SwarmMemory";
 import { HiveQueen } from "Managers/HiveQueen";
 
 export class SwarmQueen extends SwarmMemory {
-    HiveQueens: { [name: string]: HiveQueen };
+    HiveQueens!: { [name: string]: HiveQueen };
 
     Activate() {
         //Activate each job or request for resources.

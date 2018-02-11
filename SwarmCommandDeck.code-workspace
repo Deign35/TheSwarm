@@ -19,7 +19,7 @@
 			"**/build/": true,
 			"**/dist/": false,
 			"**/package*.json": true,
-			"**/tsconfig.json": true,
+			"**/tsconfig.json": false,
 			"**/Gruntfile.js": true,
 			"**/README.md": true
 		},

@@ -10,12 +10,12 @@ const HIVE_HARVESTER = 'HH';
 const ARCHITECTURE = 'Ar';
 const HIVELORD = 'HL';
 export class HiveQueen extends SwarmMemory {
-    Hive: Room;
-    Overseers: IOverseer[];
-    Distribution: DistributionOverseer;
-    HiveHarvester: HiveHarvestOverseer;
-    hivelord: SwarmLinkOverseer;
-    architectureOverseer: ArchitectureOverseer;
+    Hive!: Room;
+    Overseers!: IOverseer[];
+    Distribution!: DistributionOverseer;
+    HiveHarvester!: HiveHarvestOverseer;
+    hivelord!: SwarmLinkOverseer;
+    architectureOverseer!: ArchitectureOverseer;
 
     Save() {
         this.architectureOverseer.Save();
@@ -69,10 +69,12 @@ export class HiveQueen extends SwarmMemory {
             for (let j = 0, length = requirements.Resources.length; j < length; j++) {
                 let resourceRequest = requirements.Resources[j];
                 let newOrder = this.Distribution.CreateNewDistributionOrder(resourceRequest.location as Structure, resourceRequest.type, resourceRequest.amount);
+                console.log('NewORder: ' + JSON.stringify(newOrder));
                 if (newOrder) {
                     if (!this.Overseers[i].AssignOrder(newOrder)) {
+                        console.log('what?');
                         // Order didn't acquire correctly.
-                        this.Distribution.CancelOrder(newOrder.orderID);
+                        this.Distribution.CancelOrder(newOrder);
                     }
                 }
             }

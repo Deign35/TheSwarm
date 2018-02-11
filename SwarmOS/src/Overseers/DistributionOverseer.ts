@@ -6,140 +6,183 @@ import { WithdrawAction } from "Actions/WithdrawAction";
 import * as _ from "lodash";
 
 const CURRENT_ORDERS = 'CO';
-const IDLE_CREEPS = 'IC';
+const CREEP_DATA = 'CD';
+
+const ORDER_STATE_WAIT = 'WAIT';
+const ORDER_STATE_WITHDRAW = 'OSW';
+const ORDER_STATE_DELIVER = 'OSD';
+
 export class DistributionOverseer extends OverseerBase {
-    AssignOrder(order: DistributionOrder): boolean {
+    AssignOrder(orderID: string): boolean {
         throw new Error("Method not implemented.");
     }
-    Hive: Room;
-    protected CurrentOrders: DistributionOrder[];
-    protected idleCreeps: string[];
+    Hive!: Room;
+    protected CurrentOrders!: {[orderID: string]:DistributionOrder};
+    protected AssignedCreeps!: {[creepName: string]: {orderID?: string, fromTarget?: string }}
+    protected _orderData: {[orderID: string]: { toTarget: Structure | Creep, fromTarget?: StructureContainer, creep?: Creep }} = {};
     private readonly MaxDeliverers = 3;
 
     CreateNewDistributionOrder(requestor: Structure | Creep, resourceType: ResourceConstant, amount: number) {
         let orderID = ('' + Game.time).slice(-4) + '_' + ('' + Math.random() * 1000).slice(-3);
-        let newOrder = { orderID: orderID, toTarget: requestor.id, resourceType: resourceType, amount: amount }
-        this.CurrentOrders.push(newOrder);
-
-        return newOrder;
+        console.log(orderID);
+        if(this.CurrentOrders[orderID]) {
+            console.log('what are the odds...');
+            orderID = Game.time + '' + Math.random;
+        }
+        let newOrder = { toTarget: requestor.id, resourceType: resourceType, amount: amount, distributionStatus: ORDER_STATE_WAIT }
+        this.CurrentOrders[orderID] = newOrder;
+        return orderID;
     }
 
     Save() {
         this.SetData(CURRENT_ORDERS, this.CurrentOrders);
-        this.SetData(IDLE_CREEPS, this.idleCreeps);
+        this.SetData(CREEP_DATA, this.AssignedCreeps);
         super.Save();
     }
 
     Load() {
         super.Load();
         this.Hive = Game.rooms[this.ParentMemoryID];
-        this.CurrentOrders = this.GetData(CURRENT_ORDERS) || [];
-        this.idleCreeps = this.GetData(IDLE_CREEPS) || [];
+        this.CurrentOrders = this.GetData(CURRENT_ORDERS) || {};
+        this.AssignedCreeps = this.GetData(CREEP_DATA) || {};
     }
 
     HasResources(): boolean { return false; } // It's just easier for now...
 
     ValidateOverseer() {
         let registry = OverseerBase.CreateEmptyOverseerRegistry();
-        let creepCount = 0;
-        for (let i = 0, length = this.CurrentOrders.length; i < length; i++) {
-            if (!this.CurrentOrders[i].creepName || !(Game.creeps[this.CurrentOrders[i].creepName as string]) && i >= creepCount * 3) {
-                if (this.CurrentOrders[i].creepName) { delete this.CurrentOrders[i].creepName; }
-                if (this.idleCreeps.length > 0) {
-                    this.CurrentOrders[i].creepName = this.idleCreeps.splice(0, 1)[0];
-                } else {
-                    registry.Requirements.Creeps.push({
-                        time: 0,
-                        creepBody: [CARRY, MOVE, CARRY, MOVE]
-                    });
-                }
-                continue;
-            }
-            if (!Game.getObjectById(this.CurrentOrders[i].toTarget)) {
+        let orderCount = 0;
+        for(let orderID in this.CurrentOrders) { // Cancel expired orders.
+            let order = this.CurrentOrders[orderID];
+            this._orderData[orderID] = {
+                toTarget: Game.getObjectById(order.toTarget) as Structure | Creep
+            };
+            if(!this._orderData[orderID].toTarget) {
+                console.log('could not find the order target: ' + order.toTarget);
                 // Delivery Target is gone, end
-                this.CancelOrder(this.CurrentOrders[i--].orderID);
+                this.CancelOrder(orderID);
                 continue;
             }
-            if (!this.CurrentOrders[i].fromTarget) {
-                let toTarget = Game.getObjectById(this.CurrentOrders[i].toTarget as string) as Structure | Creep;
-                let possibleTargets = this.Queen.hivelord.FindTargets<STRUCTURE_CONTAINER>(FIND_STRUCTURES, STRUCTURE_CONTAINER);
-                if (possibleTargets.length > 0) {
-                    (possibleTargets as StructureContainer[]).sort((a: StructureContainer, b: StructureContainer) => {
-                        if (!a.store[this.CurrentOrders[i].resourceType]) {
-                            return 1;
-                        }
-                        if (!b.store[this.CurrentOrders[i].resourceType]) {
-                            return -1;
-                        }
-                        let aAmount = a.store[this.CurrentOrders[i].resourceType];
-                        let bAmount = b.store[this.CurrentOrders[i].resourceType]
+            this.CurrentOrders[orderID].distributionStatus = ORDER_STATE_WAIT;
+            orderCount++;
+        }
 
-                        if (aAmount < this.CurrentOrders[i].amount &&
-                            bAmount < this.CurrentOrders[i].amount) {
-                            return aAmount < bAmount ? -1 : (aAmount > bAmount ? 1 : 0);
-                        }
-                        var distA = toTarget.pos.findPathTo(a).length;
-                        var distB = toTarget.pos.findPathTo(b).length;
-                        if (distA == 0) {
-                            return 1;
-                        }
-                        if (distB == 0) {
-                            return -1;
-                        }
-                        return distA < distB ? -1 : (distA > distB ? 1 : 0);
-                    });
-                    let unverifiedTarget = possibleTargets[0] as StructureContainer;
-                    if (unverifiedTarget.store && unverifiedTarget.store[this.CurrentOrders[i].resourceType] &&
-                        unverifiedTarget.store[this.CurrentOrders[i].resourceType] > this.CurrentOrders[i].amount) {
-                        this.CurrentOrders[i].fromTarget = unverifiedTarget.id;
-                    }
-                }
+        let unassignedCreeps: Creep[] = [];
+        let unassignedOrders = JSON.parse(JSON.stringify(this.CurrentOrders)) as {[orderID: string]:DistributionOrder};
+        for(let name in this.AssignedCreeps) {
+            if(!Game.creeps[name]) {
+                // Creep is gone.
+                console.log('assigned creep died');
+                delete this.AssignedCreeps[name];
+                continue;
             }
-            if (++creepCount >= this.MaxDeliverers) {
-                //registry = OverseerBase.CreateEmptyOverseerRegistry();
-                break;
+            let creep = Game.creeps[name];
+
+            let orderID = (this.AssignedCreeps[name].orderID && this.AssignedCreeps[name].orderID) as string || undefined;
+            let validOrder = orderID && this.CheckOrderIDIsValid(orderID);
+            if(!validOrder) {
+                console.log('creep[' + creep.name + '] has no assignment.');
+                this.AssignedCreeps[name] = {};
+                unassignedCreeps.push(creep);
+                continue;
+            }
+            orderID = orderID as string;
+            let order = this.CurrentOrders[orderID];
+            console.log('creep[' + creep.name + '] has order['+ orderID + '].');
+
+
+            delete unassignedOrders[orderID];
+            this._orderData[orderID].creep = creep;
+
+            if(creep.carry[order.resourceType] >= order.amount || _.sum(creep.carry) == creep.carryCapacity) {
+                this.CurrentOrders[orderID].distributionStatus = ORDER_STATE_DELIVER
+            } else {
+                let fromContainer = this.AssignedCreeps[name].fromTarget && Game.getObjectById(this.AssignedCreeps[name].fromTarget) as StructureContainer;
+                if(!fromContainer) {
+                    fromContainer = this.FindContainerForCreep(creep.pos, order.resourceType, order.amount);
+                }
+                if(fromContainer) {
+                    this.AssignedCreeps[creep.name].fromTarget =  fromContainer.id;
+                    this.CurrentOrders[orderID].distributionStatus = ORDER_STATE_WITHDRAW
+                }
+                else {
+                    console.log('Could not find a container');
+                }
             }
         }
 
+        while(unassignedCreeps.length > 0 && Object.keys(unassignedOrders).length > 0) {
+            let orderID = Object.keys(unassignedOrders)[0];
+            console.log('looking for a creep for order: ' + orderID);
+            let order = this.CurrentOrders[orderID];
+            if(order.distributionStatus != ORDER_STATE_WAIT) {
+                console.log('THIS IS NOT POSSIBLE { DistributionOverseer.unassignedCreeps } -- Didnt remove order thats ready');
+            }
+            unassignedCreeps.sort((creepA: Creep, creepB: Creep) => {
+                let aHasEnough = creepA.carry[order.resourceType] && creepA.carry[order.resourceType] > order.amount;
+                let bHasEnough = creepB.carry[order.resourceType] && creepB.carry[order.resourceType] > order.amount;
+
+                if(aHasEnough && !bHasEnough) {
+                    return -1;
+                } else if(bHasEnough && !aHasEnough) {
+                    return 1;
+                } else if(!aHasEnough && !bHasEnough) {
+                    if(creepA.carryCapacity >= order.amount && creepB.carryCapacity < order.amount) {
+                        return -1;
+                    }
+                    if(creepB.carryCapacity >= order.amount && creepA.carryCapacity < order.amount) {
+                        return 1;
+                    }
+                }
+
+                // Yes or no on both, so check for an available path and the distance along that path.
+                var distA = creepA.pos.findPathTo(Game.getObjectById(order.toTarget) as RoomObject).length;
+                var distB = creepB.pos.findPathTo(Game.getObjectById(order.toTarget) as RoomObject).length; // little repeat on getObj here.
+                // REALLY WANT TO CACHE THIS!!!!!!!
+                if (distA == 0) {
+                    return 1;
+                }
+                if (distB == 0) {
+                    return -1;
+                }
+
+                // Path found to both locations, check distance
+                if(distA < distB) {
+                    return -1;
+                }
+                if(distB < distA) {
+                    return 1;
+                }
+                // No more ways to compare at this time.
+                return 0;
+            });
+
+            this.AssignedCreeps[unassignedCreeps[0].name].orderID = orderID;
+            delete unassignedOrders[orderID];
+        }
+        let orderRatio = (Object.keys(unassignedOrders).length) > (Object.keys(this.AssignedCreeps).length) * 3; // meaning 3 unassigned orders per creep or 1 creep per for 4orders
+        if(unassignedCreeps.length == 0 && orderRatio) {
+            this.Registry.Requirements.Creeps.push({time: 0, creepBody:[CARRY, MOVE]});
+        }
         this.Registry = registry;
     }
 
     ActivateOverseer() {
         let completedOrders: number[] = [];
-        for (let index = 0, length = this.CurrentOrders.length; index < length; index++) {
-            let order = this.CurrentOrders[index];
-            if (!order.creepName || !order.fromTarget) { continue; }
-            let creep = Game.creeps[order.creepName as string];
-            if (!creep || creep.spawning) {
+        for(let orderID in this._orderData) {
+            if(this.CurrentOrders[orderID].distributionStatus  == ORDER_STATE_WAIT) {
                 continue;
             }
+            let resourceType = this.CurrentOrders[orderID].resourceType;
+            let amount = this.CurrentOrders[orderID].amount;
 
-            let resourceType = order.resourceType;
-            let amount = order.amount;
-
-            let action: ActionBase | undefined;
-            let target;
-            if (creep.carry.energy >= amount || _.sum(creep.carry) == creep.carryCapacity) {
-                // Then we are delivering
-                target = Game.getObjectById(order.toTarget) as Structure | Creep;
-                if (!target) {
-                    // This job is complete, end it.
-                    this.ReassignCreep(creep.name);
-                    continue;
-                }
-                action = new TransferAction(creep, target, resourceType)
-            } else {
-                // Then we are withdrawing
-                target = Game.getObjectById(order.fromTarget) as Structure;
-                if (!target) {
-                    // The withdraw target has been destroyed.  Need to find a new one.
-                    delete this.CurrentOrders[index].fromTarget;
-                    delete this.CurrentOrders[index].creepName;
-                    this.ReassignCreep(creep.name);
-                    continue;
-                }
-                action = new WithdrawAction(creep, target, resourceType);
-            }
+            let creep = this._orderData[orderID].creep as Creep;
+            let target = this.CurrentOrders[orderID].distributionStatus == ORDER_STATE_DELIVER ?
+                            this._orderData[orderID].toTarget as Structure | Creep :
+                            this._orderData[orderID].fromTarget as StructureContainer;
+            let action: ActionBase = this.CurrentOrders[orderID].distributionStatus == ORDER_STATE_DELIVER ?
+                                        new TransferAction(creep, target, resourceType, amount) :
+                                        new WithdrawAction(creep, target as StructureContainer, resourceType, amount);
 
             let actionValidation = action.ValidateAction();
             if (actionValidation != SwarmEnums.CRT_None) {
@@ -151,83 +194,86 @@ export class DistributionOverseer extends OverseerBase {
             switch (actionResponse) {
                 case (SwarmEnums.CRT_None): console.log('THIS IS NOT POSSIBLE { DistributionOverseer.CRT_None }'); break;
                 case (SwarmEnums.CRT_Condition_Empty):
-                    this.ReassignCreep(creep.name);
-                    completedOrders.push(index);
+                    console.log('order canceled because it was successful?')
+                    this.CancelOrder(orderID);
                     break; //Means we successfully Delivered.
                 case (SwarmEnums.CRT_Condition_Full):
                     break; // Means we successfully Withdrew
                 case (SwarmEnums.CRT_Next): console.log('THIS IS NOT POSSIBLE { DistributionOverseer.CRT_Next }'); break;
                 case (SwarmEnums.CRT_NewTarget):
                     console.log('THIS IS NOT POSSIBLE { DistributionOverseer.CRT_NewTarget }');
-                    // This appears to occur when the creep is unable to give over the resources.
-                    // There also appears to be an issue with trying to push x resources to something with space for less.
                     break;
 
             }
         }
-        for (let i = completedOrders.length; i > 0; i--) {
-            let cutOrder = this.CurrentOrders.splice(completedOrders[i], 1);
-            this.ReassignCreep(cutOrder[0].creepName as string);
-        }
+    }
+    RetreiveOrderDetails(id: string): DistributionOrder {
+        return this.CurrentOrders[id];
     }
 
     CheckOrderIDIsValid(id: string): boolean {
-        for (let i = 0, length = this.CurrentOrders.length; i < length; i++) {
-            if (id == this.CurrentOrders[i].orderID) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    UpdateOrderAmount(orderID: string, newAmount: number) {
-        for (let i = 0, length = this.CurrentOrders.length; i < length; i++) {
-            if (orderID == this.CurrentOrders[i].orderID) {
-                this.CurrentOrders[i].amount = newAmount;
-                break;
-            }
-        }
+        return this.CurrentOrders[id] ? true : false;
     }
 
     CancelOrder(id: string) {
-        for (let i = 0, length = this.CurrentOrders.length; i < length; i++) {
-            if (id == this.CurrentOrders[i].orderID) {
-                let cancelledOrder = this.CurrentOrders.splice(i, 1)[0];
-                if (cancelledOrder.creepName) {
-                    this.ReassignCreep(cancelledOrder.creepName)
-                }
-                return;
+        delete this.CurrentOrders[id];
+        delete this._orderData[id];
+        for(let creepName in this.AssignedCreeps) {
+            if(this.AssignedCreeps[creepName].orderID == id) {
+                this.AssignCreep(creepName);
             }
         }
     }
 
     AssignCreep(creepName: string): void {
-        let orderFound = false;
-        // Make sure the creep can carry enough for the job before assigning it an order.
-        for (let i = 0, length = this.CurrentOrders.length; i < length; i++) {
-            if (!this.CurrentOrders[i].creepName) {
-                this.CurrentOrders[i].creepName = creepName;
-                orderFound = true;
-                break;
-            }
-        }
-
-        if (!orderFound) {
-            this.idleCreeps.push(creepName);
-        }
+        this.AssignedCreeps[creepName] = {};
     }
 
     ReleaseCreep(creepName: string, releaseReason: string) {
-        for (let i = 0, length = this.CurrentOrders.length; i < length; i++) {
-            if (this.CurrentOrders[i].creepName == creepName) {
-                delete this.CurrentOrders[i].creepName;
-                break;
-            }
-        }
+        delete this.AssignedCreeps[creepName];
     }
 
-    protected ReassignCreep(creepName: string): void {
-        this.ReleaseCreep(creepName, 'Reassignment');
-        this.AssignCreep(creepName);
+    protected FindContainerForCreep(fromPos: RoomPosition, resourceType: ResourceConstant, amount: number): StructureContainer | undefined {
+        let containers = this.Queen.hivelord.FindTargets<STRUCTURE_CONTAINER>(FIND_STRUCTURES, STRUCTURE_CONTAINER) as StructureContainer[];
+        if(containers.length == 0) { return; }
+        containers.sort((a: StructureContainer, b: StructureContainer) => {
+            // Contains the resource?
+            if(!a.store[resourceType]) {
+                return 1;
+            }
+            if(!b.store[resourceType]) {
+                return -1;
+            }
+
+            // Yes, do they have enough?
+            if(a.store[resourceType] >= amount && b.store[resourceType] < amount) {
+                return -1;
+            }
+            if(b.store[resourceType] >= amount && a.store[resourceType] < amount) {
+                return 1;
+            }
+
+            // Yes or no on both, so check for an available path and the distance along that path.
+            var distA = fromPos.findPathTo(a).length;
+            var distB = fromPos.findPathTo(b).length;
+            // REALLY WANT TO CACHE THIS!!!!!!!
+            if (distA == 0) {
+                return 1;
+            }
+            if (distB == 0) {
+                return -1;
+            }
+
+            // Path found to both locations, check distance
+            if(distA < distB) {
+                return -1;
+            }
+            if(distB < distA) {
+                return 1;
+            }
+            // No more ways to compare at this time.
+            return 0;
+        });
+        return containers[0];
     }
 }

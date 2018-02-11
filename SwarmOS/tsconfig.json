@@ -7,12 +7,13 @@
         "baseUrl": "src",
         "strict": true,
         "noImplicitReturns": true,
-        "noImplicitAny": true,
         "noImplicitThis": true,
         "rootDir": "src",
         "noEmitOnError": true,
         "allowSyntheticDefaultImports": true,
-        "removeComments": false
+        "removeComments": false,
+        "noImplicitAny": true,
+        "suppressImplicitAnyIndexErrors": true
     },
     "include": [
         "src/**/*.ts",

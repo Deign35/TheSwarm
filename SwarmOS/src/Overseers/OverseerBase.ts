@@ -9,7 +9,7 @@ export abstract class OverseerBase extends SwarmMemory implements IOverseer {
     }
 
     protected abstract ValidateOverseer(): void;
-    protected Registry: IOverseer_Registry;
+    protected Registry!: IOverseer_Registry;
     static CreateEmptyOverseerRegistry(): IOverseer_Registry {
         return {
             Available: {
@@ -32,5 +32,5 @@ export abstract class OverseerBase extends SwarmMemory implements IOverseer {
     abstract AssignCreep(creepName: string): void;
     abstract ActivateOverseer(): void;
     abstract ReleaseCreep(name: string, releaseReason: string): void;
-    abstract AssignOrder(order: DistributionOrder): boolean;
+    abstract AssignOrder(orderID: string): boolean;
 }

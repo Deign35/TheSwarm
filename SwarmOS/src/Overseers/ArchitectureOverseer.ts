@@ -10,15 +10,15 @@ const LAST_UPDATE = 'LD';
 const ORDER_IDS = 'OI';
 const RCL_DATA = 'RCL';
 export class ArchitectureOverseer extends OverseerBase {
-    Hive: Room;
-    protected _lastUpdate: number;
-    protected ControllerData: {
+    Hive!: Room;
+    protected _lastUpdate!: number;
+    protected ControllerData!: {
         upgradeCreeps: { creepName: string, carryCapacity: number }[],
         spawnStorage: string[],
         level: number,
     };
 
-    protected OrderIDs: { [requestorID: string]: string };
+    protected OrderIDs!: { [requestorID: string]: string };
 
     Save() {
         this.SetData(LAST_UPDATE, this._lastUpdate);
@@ -83,8 +83,10 @@ export class ArchitectureOverseer extends OverseerBase {
 
         for (let i = 0, length = this.ControllerData.spawnStorage.length; i < length; i++) {
             let spawnStorageObj = Game.getObjectById(this.ControllerData.spawnStorage[i]) as StructureSpawn | StructureExtension;
-            if (spawnStorageObj.energy < spawnStorageObj.energyCapacity && !this.OrderIDs[spawnStorageObj.id]) {
-                registry.Requirements.Resources.push({ amount: spawnStorageObj.energyCapacity - spawnStorageObj.energy, location: spawnStorageObj, type: RESOURCE_ENERGY });
+            if (spawnStorageObj.energy < spawnStorageObj.energyCapacity) {
+                if(!this.OrderIDs[spawnStorageObj.id] || this.Queen.Distribution.CheckOrderIDIsValid(this.OrderIDs[spawnStorageObj.id])) {
+                    registry.Requirements.Resources.push({ amount: spawnStorageObj.energyCapacity - spawnStorageObj.energy, location: spawnStorageObj, type: RESOURCE_ENERGY });
+                }
             }
         }
         this.ControllerData = upgradeData;
@@ -111,27 +113,6 @@ export class ArchitectureOverseer extends OverseerBase {
             }
 
             if (!action) {
-                /*if (creep.carry.energy == 0) {
-                    // Check on my order
-                    //(this.Parent as HiveQueen).Distribution.CreateNewDistributionOrder(creep, RESOURCE_ENERGY, creep.carryCapacity);
-                    if (this.ControllerData.upgradeCreeps[i].orderID) {
-                        if (!(this.Parent as HiveQueen).Distribution.CheckOrderIDIsValid(this.ControllerData.upgradeCreeps[i].orderID as string)) {
-                            (this.Parent as HiveQueen).Distribution.CancelOrder(this.ControllerData.upgradeCreeps[i].orderID as string);
-                            delete this.ControllerData.upgradeCreeps[i].orderID;
-                        }
-                    } else {
-                        // No resources, but has yet to receive an orderID for more.
-                        console.log('Upgrader unable to request resources');
-                    }
-                } else {
-                    // Just upgrade the controller.
-                    action = new UpgradeAction(creep, this.Hive.controller as StructureController);
-                    if(creep.carry.energy > creep.carryCapacity * 0.75 && this.ControllerData.upgradeCreeps[i].orderID) {
-                        console.log('delete');
-                        (this.Parent as HiveQueen).Distribution.CancelOrder(this.ControllerData.upgradeCreeps[i].orderID as string);
-                        delete this.ControllerData.upgradeCreeps[i].orderID;
-                    }
-                }*/
 
                 if (creep.carry.energy == 0) {
                     // Check to make sure I have an order
@@ -167,7 +148,6 @@ export class ArchitectureOverseer extends OverseerBase {
     }
 
     AssignCreep(creepName: string): void {
-        console.log('Assign to AO');
         // Make sure the creep can carry enough for the job before assigning it an order.
         for (let i = 0, length = this.ControllerData.upgradeCreeps.length; i < length; i++) {
             if (!this.ControllerData.upgradeCreeps[i].creepName) {
@@ -189,23 +169,14 @@ export class ArchitectureOverseer extends OverseerBase {
         }
     }
 
-    AssignOrder(order: DistributionOrder) {
-        if (this.OrderIDs[order.toTarget]) {
+    AssignOrder(orderID: string): boolean {
+        let orderDetails = this.Queen.Distribution.RetreiveOrderDetails(orderID);
+        this.OrderIDs[orderDetails.toTarget]
+        if(this.OrderIDs[orderDetails.toTarget] && this.Queen.Distribution.CheckOrderIDIsValid(this.OrderIDs[orderDetails.toTarget])) {
             console.log('THIS IS NOT POSSIBLE { ArchitectureOverseer.AssignOrder } -- Multiple order requests');
             return false;
         }
-
-        this.OrderIDs[order.toTarget] = order.orderID;
+        this.OrderIDs[orderDetails.toTarget] = orderID;
         return true;
-        /*for (let i = 0, length = this.ControllerData.upgradeCreeps.length; i < length; i++) {
-            if (!this.ControllerData.upgradeCreeps[i].orderID) {
-                if (this.ControllerData.upgradeCreeps[i].carryCapacity >= order.amount) {
-                    this.ControllerData.upgradeCreeps[i].orderID = order.orderID;
-                    return true;
-                }
-            }
-        }
-
-        return false;*/
     }
 }

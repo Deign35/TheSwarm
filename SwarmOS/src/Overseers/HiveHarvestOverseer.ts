@@ -10,12 +10,12 @@ import { MoveToPositionAction } from "Actions/MoveToPositionAction";
 
 const NODE_DATA = 'ND';
 export class HiveHarvestOverseer extends OverseerBase {
-    AssignOrder(order: DistributionOrder): boolean {
+    AssignOrder(orderID: string): boolean {
         throw new Error("Method not implemented.");
     }
-    Hive: Room;
-    protected SourceNodes: { creepName?: string, sourceID: string, containerID?: string, constructionSiteID?: string }[];
-    protected NodeObjects: { creep?: Creep, source: Source, container?: StructureContainer, constructionSite?: ConstructionSite }[];
+    Hive!: Room;
+    protected SourceNodes!: { creepName?: string, sourceID: string, containerID?: string, constructionSiteID?: string }[];
+    protected NodeObjects!: { creep?: Creep, source: Source, container?: StructureContainer, constructionSite?: ConstructionSite }[];
 
     Save() {
         this.SetData(NODE_DATA, this.SourceNodes);

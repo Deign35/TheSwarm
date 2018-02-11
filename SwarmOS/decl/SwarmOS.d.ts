@@ -47,14 +47,12 @@ declare interface IOverseer extends IMemory {
     AssignCreep(creepName: string): void;
     ActivateOverseer(): void;
     ReleaseCreep(name: string, releaseReason: string): void;
-    AssignOrder(order: DistributionOrder): boolean;
+    AssignOrder(orderID: string): boolean;
 }
 
 declare interface DistributionOrder {
     amount: number
-    creepName?: string,
-    fromTarget?: string,
-    orderID: string,
     resourceType: ResourceConstant,
     toTarget: string,
+    distributionStatus: string,
 }

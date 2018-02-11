@@ -25,8 +25,8 @@ const TICKS_TO_DECAY = 'TD';
 
 export class SwarmLinkOverseer extends SwarmMemory { // One per room.
     // Targetting
-    HiveTargets: { [id: number]: { [id: string]: any } };
-    TargetCounts: { [id: string]: any };
+    HiveTargets!: { [id: number]: { [id: string]: any } };
+    TargetCounts!: { [id: string]: any };
 
     Save() {
         this.SetData(HIVE_TARGETS, this.HiveTargets);
@@ -174,8 +174,6 @@ export class SwarmLinkOverseer extends SwarmMemory { // One per room.
                 this.HiveTargets[findID] = {};
             } else {
                 this.UpdateTargets(foundTargets, findID);
-                this.Save();
-                this.Load();
             }
         }
 
