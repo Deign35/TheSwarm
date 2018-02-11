@@ -145,18 +145,30 @@ export class SwarmLinkOverseer extends SwarmMemory { // One per room.
     }
 
     FindTargets<T extends StructureConstant>(findID: FindConstant, structureType?: T) {
-        if (!this.HiveTargets[findID]) { this.HiveTargets[findID] = {} }
+        let isStructureFind = false;
+        if (!this.HiveTargets[findID]) {
+            this.HiveTargets[findID] = {}
+        }
         if (findID == FIND_STRUCTURES || findID == FIND_MY_STRUCTURES || findID == FIND_HOSTILE_STRUCTURES && structureType) {
+            isStructureFind = true;
             if (!this.HiveTargets[findID][structureType as T]) {
                 this.HiveTargets[findID][structureType as T] = {};
-                this.HiveTargets[findID][structureType as T][LAST_UPDATE] = 0;
             }
+        }
+        let lastUpdate = 0;
+        if(isStructureFind) {
+            lastUpdate = this.HiveTargets[findID][structureType as T][LAST_UPDATE] || 0;
         } else {
-            this.HiveTargets[findID][LAST_UPDATE] = 0;
+            lastUpdate = this.HiveTargets[findID][LAST_UPDATE] || 0;
         }
 
-        if (this.HiveTargets[findID][LAST_UPDATE] - Game.time < -5) { // Updates at most once every 6 ticks.  CAREFUL WHEN CHANGING
-            this.HiveTargets[findID][LAST_UPDATE] = Game.time;
+        if (lastUpdate - Game.time < -5) { // Updates at most once every 6 ticks.  CAREFUL WHEN CHANGING
+            if(isStructureFind) {
+                this.HiveTargets[findID][structureType as T][LAST_UPDATE] = Game.time;
+            } else {
+                this.HiveTargets[findID][LAST_UPDATE] = Game.time;
+            }
+
             let foundTargets = Game.rooms[this.ParentMemoryID].find(findID);
             if (foundTargets.length == 0) {
                 this.HiveTargets[findID] = {};

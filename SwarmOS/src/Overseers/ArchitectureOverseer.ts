@@ -35,7 +35,7 @@ export class ArchitectureOverseer extends OverseerBase {
         let numUpgraders = 1;
         switch (upgradeData.level) {
             case (8): break;
-            default: numUpgraders = 5;
+            default: numUpgraders = 3;
         }
 
         for (let i = 0; i < numUpgraders; i++) {
@@ -50,6 +50,12 @@ export class ArchitectureOverseer extends OverseerBase {
             }
         }
 
+        let spawns = this.Hive.find(FIND_MY_SPAWNS);
+        for(let index in spawns) {
+            if(spawns[index].energy < spawns[index].energyCapacity) {
+
+            }
+        }
         this.ControllerData = upgradeData;
         this.Registry = registry;
     }
@@ -59,6 +65,9 @@ export class ArchitectureOverseer extends OverseerBase {
             let creepData = this.ControllerData.upgradeCreeps[i];
             let creep = Game.creeps[creepData.creepName];
             if (creep.spawning) { continue; }
+            if(!this.ControllerData.upgradeCreeps[i].carryCapacity) {
+                this.ControllerData.upgradeCreeps[i].carryCapacity = creep.getActiveBodyparts(CARRY) * 50;
+            }
             let action;
             if (i == 0 && (!((this.Hive.controller as StructureController).sign) ||
                 ((this.Hive.controller as StructureController).sign as SignDefinition).username != SwarmConsts.MY_USERNAME)) {
@@ -115,7 +124,7 @@ export class ArchitectureOverseer extends OverseerBase {
             }
         }
 
-        this.ControllerData.upgradeCreeps.push({ creepName: creepName, carryCapacity: 0, });
+        this.ControllerData.upgradeCreeps.push({ creepName: creepName, carryCapacity: 0 });
     }
 
     ReleaseCreep(creepName: string, releaseReason: string) {

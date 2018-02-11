@@ -49,7 +49,7 @@ export class HiveQueen extends SwarmMemory {
                     spawns = this.hivelord.FindTargets(FIND_MY_SPAWNS) as StructureSpawn[];
                     spawnIndex = spawns.length - 1;
                 }
-                let spawn: StructureSpawn | undefined;
+                let spawn: StructureSpawn | undefined = spawns ? spawns[spawnIndex] : undefined;
                 while (!spawn && spawnIndex >= 0) {
                     if (!spawns[spawnIndex] || spawns[spawnIndex].spawning) {
                         spawnIndex--;
@@ -75,6 +75,8 @@ export class HiveQueen extends SwarmMemory {
                 }
             }
             this.Overseers[i].ActivateOverseer();
+            this.Overseers[i].Save();
+            this.Overseers[i].Load();
         }
     }
 

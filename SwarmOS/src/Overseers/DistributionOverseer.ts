@@ -44,26 +44,50 @@ export class DistributionOverseer extends OverseerBase {
         let creepCount = 0;
         for (let i = 0, length = this.CurrentOrders.length; i < length; i++) {
             if (!this.CurrentOrders[i].creepName || !(Game.creeps[this.CurrentOrders[i].creepName as string]) && i >= creepCount * 3) {
-                registry.Requirements.Creeps.push({
-                    time: 0,
-                    creepBody: [CARRY, MOVE, CARRY, MOVE]
-                });
+                if(this.CurrentOrders[i].creepName) {delete this.CurrentOrders[i].creepName; }
+                if(this.idleCreeps.length > 0) {
+                    this.CurrentOrders[i].creepName = this.idleCreeps.splice(0, 1)[0];
+                } else {
+                    registry.Requirements.Creeps.push({
+                        time: 0,
+                        creepBody: [CARRY, MOVE, CARRY, MOVE]
+                    });
+                }
+                continue;
+            }
+            if(!Game.getObjectById(this.CurrentOrders[i].toTarget)) {
+                // Delivery Target is gone, end
+                this.CancelOrder(this.CurrentOrders[i--].orderID);
                 continue;
             }
             if (!this.CurrentOrders[i].fromTarget) {
                 let toTarget = Game.getObjectById(this.CurrentOrders[i].toTarget as string) as Structure | Creep;
                 let possibleTargets = (this.Parent as HiveQueen).hivelord.FindTargets<STRUCTURE_CONTAINER>(FIND_STRUCTURES, STRUCTURE_CONTAINER);
-                (possibleTargets as StructureContainer[]).sort((a: StructureContainer, b: StructureContainer) => {
-                    if (!a.store[this.CurrentOrders[i].resourceType] || a.store[this.CurrentOrders[i].resourceType] < this.CurrentOrders[i].amount) {
-                        return -1;
-                    }
-                    if (!b.store[this.CurrentOrders[i].resourceType] || b.store[this.CurrentOrders[i].resourceType] < this.CurrentOrders[i].amount) {
-                        return 1;
-                    }
+                if(possibleTargets.length > 0) {
+                    (possibleTargets as StructureContainer[]).sort((a: StructureContainer, b: StructureContainer) => {
+                        if (!a.store[this.CurrentOrders[i].resourceType] || a.store[this.CurrentOrders[i].resourceType] < this.CurrentOrders[i].amount) {
+                            return -1;
+                        }
+                        if (!b.store[this.CurrentOrders[i].resourceType] || b.store[this.CurrentOrders[i].resourceType] < this.CurrentOrders[i].amount) {
+                            return 1;
+                        }
+                        var distA = toTarget.pos.findPathTo(a).length;
+                        var distB = toTarget.pos.findPathTo(b).length;
+                        if (distA == 0) {
+                            return 1;
+                        }
+                        if (distB == 0) {
+                            return -1;
+                        }
+                        return distA < distB ? -1 : (distA > distB ? 1 : 0);
+                    });
+                    let unverifiedTarget = possibleTargets[0] as StructureContainer;
+                    if(unverifiedTarget.store && unverifiedTarget.store[this.CurrentOrders[i].resourceType] &&
+                        unverifiedTarget.store[this.CurrentOrders[i].resourceType] > this.CurrentOrders[i].amount) {
 
-
-                    return 0;
-                })
+                            this.CurrentOrders[i].fromTarget = unverifiedTarget.id;
+                    }
+                }
             }
             if (++creepCount >= this.MaxDeliverers) {
                 //registry = OverseerBase.CreateEmptyOverseerRegistry();
@@ -78,8 +102,8 @@ export class DistributionOverseer extends OverseerBase {
         let completedOrders: number[] = [];
         for (let index = 0, length = this.CurrentOrders.length; index < length; index++) {
             if (!this.CurrentOrders[index].creepName || !this.CurrentOrders[index].fromTarget) { continue; }
-            let creep = Game.getObjectById(this.CurrentOrders[index].creepName) as Creep;
-            if (creep.spawning) {
+            let creep = Game.creeps[this.CurrentOrders[index].creepName as string];
+            if (!creep || creep.spawning) {
                 continue;
             }
 
@@ -126,11 +150,17 @@ export class DistributionOverseer extends OverseerBase {
                 case (SwarmEnums.CRT_Condition_Full):
                     break; // Means we successfully Withdrew
                 case (SwarmEnums.CRT_Next): console.log('THIS IS NOT POSSIBLE { DistributionOverseer.CRT_Next }'); break;
-                case (SwarmEnums.CRT_NewTarget): console.log('THIS IS NOT POSSIBLE { DistributionOverseer.CRT_NewTarget }'); break;
+                case (SwarmEnums.CRT_NewTarget):
+                    console.log('THIS IS NOT POSSIBLE { DistributionOverseer.CRT_NewTarget }');
+                    // This appears to occur when the creep is unable to give over the resources.
+                    // There also appears to be an issue with trying to push x resources to something with space for less.
+                    break;
+
             }
         }
-        for (let i = completedOrders.length; i > 1; i--) {
-            this.CurrentOrders.splice(completedOrders[i], 1);
+        for (let i = completedOrders.length; i > 0; i--) {
+            let cutOrder = this.CurrentOrders.splice(completedOrders[i], 1);
+            this.ReassignCreep(cutOrder[0].creepName as string);
         }
     }
 
@@ -156,7 +186,6 @@ export class DistributionOverseer extends OverseerBase {
     }
 
     AssignCreep(creepName: string): void {
-        console.log('Assign to DO');
         let orderFound = false;
         // Make sure the creep can carry enough for the job before assigning it an order.
         for (let i = 0, length = this.CurrentOrders.length; i < length; i++) {
