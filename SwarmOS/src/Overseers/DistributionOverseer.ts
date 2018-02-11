@@ -4,6 +4,7 @@ import { ActionBase } from "Actions/ActionBase";
 import { TransferAction } from "Actions/TransferAction";
 import { WithdrawAction } from "Actions/WithdrawAction";
 import { HiveQueen } from "Managers/HiveQueen";
+import * as _ from "lodash";
 
 const CURRENT_ORDERS = 'CO';
 const IDLE_CREEPS = 'IC';
@@ -65,12 +66,19 @@ export class DistributionOverseer extends OverseerBase {
                 let possibleTargets = (this.Parent as HiveQueen).hivelord.FindTargets<STRUCTURE_CONTAINER>(FIND_STRUCTURES, STRUCTURE_CONTAINER);
                 if(possibleTargets.length > 0) {
                     (possibleTargets as StructureContainer[]).sort((a: StructureContainer, b: StructureContainer) => {
-                        if (!a.store[this.CurrentOrders[i].resourceType] || a.store[this.CurrentOrders[i].resourceType] < this.CurrentOrders[i].amount) {
-                            return -1;
-                        }
-                        if (!b.store[this.CurrentOrders[i].resourceType] || b.store[this.CurrentOrders[i].resourceType] < this.CurrentOrders[i].amount) {
+                        if (!a.store[this.CurrentOrders[i].resourceType]) {
                             return 1;
                         }
+                        if (!b.store[this.CurrentOrders[i].resourceType]) {
+                            return -1;
+                        }
+                        let aAmount = a.store[this.CurrentOrders[i].resourceType];
+                        let bAmount =  b.store[this.CurrentOrders[i].resourceType]
+
+                        if(aAmount < this.CurrentOrders[i].amount &&
+                            bAmount < this.CurrentOrders[i].amount) {
+                                return aAmount < bAmount ? -1 : (aAmount > bAmount ? 1 : 0);
+                            }
                         var distA = toTarget.pos.findPathTo(a).length;
                         var distB = toTarget.pos.findPathTo(b).length;
                         if (distA == 0) {
@@ -84,7 +92,6 @@ export class DistributionOverseer extends OverseerBase {
                     let unverifiedTarget = possibleTargets[0] as StructureContainer;
                     if(unverifiedTarget.store && unverifiedTarget.store[this.CurrentOrders[i].resourceType] &&
                         unverifiedTarget.store[this.CurrentOrders[i].resourceType] > this.CurrentOrders[i].amount) {
-
                             this.CurrentOrders[i].fromTarget = unverifiedTarget.id;
                     }
                 }
@@ -101,29 +108,30 @@ export class DistributionOverseer extends OverseerBase {
     ActivateOverseer() {
         let completedOrders: number[] = [];
         for (let index = 0, length = this.CurrentOrders.length; index < length; index++) {
-            if (!this.CurrentOrders[index].creepName || !this.CurrentOrders[index].fromTarget) { continue; }
-            let creep = Game.creeps[this.CurrentOrders[index].creepName as string];
+            let order = this.CurrentOrders[index];
+            if (!order.creepName || !order.fromTarget) { continue; }
+            let creep = Game.creeps[order.creepName as string];
             if (!creep || creep.spawning) {
                 continue;
             }
 
-            let resourceType = this.CurrentOrders[index].resourceType;
-            let amount = this.CurrentOrders[index].amount;
+            let resourceType = order.resourceType;
+            let amount = order.amount;
 
             let action: ActionBase | undefined;
             let target;
-            if (creep.carry.energy >= amount) {
+            if (creep.carry.energy >= amount || _.sum(creep.carry) == creep.carryCapacity) {
                 // Then we are delivering
-                target = Game.getObjectById(this.CurrentOrders[index].toTarget) as Structure | Creep;
+                target = Game.getObjectById(order.toTarget) as Structure | Creep;
                 if (!target) {
                     // This job is complete, end it.
                     this.ReassignCreep(creep.name);
                     continue;
                 }
-                action = new TransferAction(creep, target, resourceType, amount)
+                action = new TransferAction(creep, target, resourceType)
             } else {
                 // Then we are withdrawing
-                target = Game.getObjectById(this.CurrentOrders[index].fromTarget) as Structure;
+                target = Game.getObjectById(order.fromTarget) as Structure;
                 if (!target) {
                     // The withdraw target has been destroyed.  Need to find a new one.
                     delete this.CurrentOrders[index].fromTarget;
@@ -131,13 +139,13 @@ export class DistributionOverseer extends OverseerBase {
                     this.ReassignCreep(creep.name);
                     continue;
                 }
-                action = new WithdrawAction(creep, target, resourceType, amount);
+                action = new WithdrawAction(creep, target, resourceType);
             }
 
             let actionValidation = action.ValidateAction();
             if (actionValidation != SwarmEnums.CRT_None) {
                 // NewTarget and Next
-                console.log('THIS IS NOT POSSIBLE { DistributionOverseer.actionValidation }');
+                console.log('THIS IS NOT POSSIBLE { DistributionOverseer.actionValidation } -- Couldnt find a delivery target');
             }
 
             let actionResponse = action.Run();
@@ -171,6 +179,15 @@ export class DistributionOverseer extends OverseerBase {
             }
         }
         return false;
+    }
+
+    UpdateOrderAmount(orderID: string, newAmount: number) {
+        for (let i = 0, length = this.CurrentOrders.length; i < length; i++) {
+            if (orderID == this.CurrentOrders[i].orderID) {
+                this.CurrentOrders[i].amount = newAmount;
+                break;
+            }
+        }
     }
 
     CancelOrder(id: string) {

@@ -42,9 +42,10 @@ export class HiveQueen extends SwarmMemory {
     Activate() {
         let spawns: StructureSpawn[] | undefined;
         let spawnIndex = -1;
+        let spawned = false;
         for (let i = 0, length = this.Overseers.length; i < length; i++) {
             let requirements = this.Overseers[i].GetRequirements();
-            if (requirements.Creeps.length > 0) {
+            if (!spawned && requirements.Creeps.length > 0) {
                 if (!spawns) {
                     spawns = this.hivelord.FindTargets(FIND_MY_SPAWNS) as StructureSpawn[];
                     spawnIndex = spawns.length - 1;
@@ -62,6 +63,7 @@ export class HiveQueen extends SwarmMemory {
                     spawn.spawnCreep(requirements.Creeps[0].creepBody, newSpawnName, { memory: { Assigned: 'HiveHarvestOverseer' } });
                     this.Overseers[i].AssignCreep(newSpawnName);
                     spawnIndex--;
+                    spawned = true;
                 }
             }
             for (let j = 0, length = requirements.Resources.length; j < length; j++) {

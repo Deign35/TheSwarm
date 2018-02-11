@@ -3,8 +3,8 @@ import * as SwarmEnums from "SwarmEnums";
 import { HiveQueen } from "Managers/HiveQueen";
 
 export abstract class OverseerBase extends SwarmMemory implements IOverseer {
-    constructor(memID: string, parent: HiveQueen) {
-        super(memID, parent);
+    constructor(memID: string, protected Queen: HiveQueen) {
+        super(memID, Queen);
         this.ValidateOverseer();
     }
 

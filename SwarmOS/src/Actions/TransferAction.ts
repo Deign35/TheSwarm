@@ -3,11 +3,8 @@ import * as _ from "lodash";
 import { ActionWithTarget } from "Actions/ActionBase";
 
 export class TransferAction extends ActionWithTarget<Creep | Structure> {
-    constructor(creep: Creep, target: Creep | Structure, protected ResourceType: ResourceConstant = RESOURCE_ENERGY, protected Amount: number = 0) {
+    constructor(creep: Creep, target: Creep | Structure, protected ResourceType: ResourceConstant = RESOURCE_ENERGY, protected Amount?: number) {
         super(creep, target);
-        if(Amount == 0) {
-            Amount = creep.carry[ResourceType];
-        }
     }
     ActionImplemented() {
         let result = this.AssignedCreep.transfer(this.Target, this.ResourceType, this.Amount);
