@@ -30,10 +30,10 @@ export class HiveQueen extends SwarmMemory {
         this.Hive = Game.rooms[this.MemoryID];
         this.hivelord = new SwarmLinkOverseer(HIVELORD, this); // Special overseer.  does not request/require things.
         this.Overseers = [];
+        this.Distribution = new DistributionOverseer(DISTRIBUTION, this); // Special.  Must be init before all other overseers.
 
         this.HiveHarvester = new HiveHarvestOverseer(HIVE_HARVESTER, this);
         this.Overseers.push(this.HiveHarvester);
-        this.Distribution = new DistributionOverseer(DISTRIBUTION, this);
         this.Overseers.push(this.Distribution);
         this.architectureOverseer = new ArchitectureOverseer(ARCHITECTURE, this);
         this.Overseers.push(this.architectureOverseer);

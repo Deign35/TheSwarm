@@ -1,6 +1,5 @@
 import * as _ from "lodash";
 import { OverseerBase } from "Overseers/OverseerBase";
-import { HiveQueen } from "Managers/HiveQueen";
 import { MoveToPositionAction } from "Actions/MoveToPositionAction";
 import * as SwarmConsts from "SwarmConsts";
 import * as SwarmEnums from "SwarmEnums";
@@ -14,12 +13,12 @@ export class ArchitectureOverseer extends OverseerBase {
     Hive: Room;
     protected _lastUpdate: number;
     protected ControllerData: {
-        upgradeCreeps: { creepName: string, carryCapacity: number}[],
+        upgradeCreeps: { creepName: string, carryCapacity: number }[],
         spawnStorage: string[],
         level: number,
     };
 
-    protected OrderIDs: {[requestorID: string]: string};
+    protected OrderIDs: { [requestorID: string]: string };
 
     Save() {
         this.SetData(LAST_UPDATE, this._lastUpdate);
@@ -43,8 +42,8 @@ export class ArchitectureOverseer extends OverseerBase {
         let upgradeData = this.ControllerData;
         upgradeData.level = (this.Hive.controller as StructureController).level;
 
-        for(let name in this.OrderIDs) {
-            if(!this.Queen.Distribution.CheckOrderIDIsValid(this.OrderIDs[name])) {
+        for (let name in this.OrderIDs) {
+            if (!this.Queen.Distribution.CheckOrderIDIsValid(this.OrderIDs[name])) {
                 delete this.OrderIDs[name];
             }
         }
@@ -61,31 +60,31 @@ export class ArchitectureOverseer extends OverseerBase {
                 if (upgradeData.upgradeCreeps[i]) { upgradeData.upgradeCreeps.splice(i--, 1); }
                 registry.Requirements.Creeps.push({ time: 0, creepBody: [WORK, WORK, CARRY, MOVE] });
             } else {
-                if(creep.carry.energy < creep.carryCapacity / 4) {
-                    if(!this.OrderIDs[creep.id]) {
+                if (creep.carry.energy < creep.carryCapacity / 4) {
+                    if (!this.OrderIDs[creep.id]) {
                         registry.Requirements.Resources.push({ amount: creep.carryCapacity, location: creep, type: RESOURCE_ENERGY })
                     }
                 }
             }
         }
 
-        if(this._lastUpdate - Game.time < 100) {
+        if (this._lastUpdate - Game.time < 100) {
             this._lastUpdate = Game.time;
             this.ControllerData.spawnStorage = [];
-            let spawns = (this.Parent as HiveQueen).hivelord.FindTargets(FIND_MY_SPAWNS) as StructureSpawn[];
-            for(let index in spawns) {
+            let spawns = this.Queen.hivelord.FindTargets(FIND_MY_SPAWNS) as StructureSpawn[];
+            for (let index in spawns) {
                 this.ControllerData.spawnStorage.push(spawns[index].id);
             }
-            let extensions = (this.Parent as HiveQueen).hivelord.FindTargets<STRUCTURE_EXTENSION>(FIND_STRUCTURES, STRUCTURE_EXTENSION) as StructureExtension[];
-            for(let index in extensions) {
+            let extensions = this.Queen.hivelord.FindTargets<STRUCTURE_EXTENSION>(FIND_STRUCTURES, STRUCTURE_EXTENSION) as StructureExtension[];
+            for (let index in extensions) {
                 this.ControllerData.spawnStorage.push(extensions[index].id);
             }
         }
 
-        for(let i = 0, length = this.ControllerData.spawnStorage.length; i < length; i++) {
+        for (let i = 0, length = this.ControllerData.spawnStorage.length; i < length; i++) {
             let spawnStorageObj = Game.getObjectById(this.ControllerData.spawnStorage[i]) as StructureSpawn | StructureExtension;
-            if(spawnStorageObj.energy < spawnStorageObj.energyCapacity && !this.OrderIDs[spawnStorageObj.id]) {
-                registry.Requirements.Resources.push({ amount: spawnStorageObj.energyCapacity - spawnStorageObj.energy, location: spawnStorageObj, type: RESOURCE_ENERGY});
+            if (spawnStorageObj.energy < spawnStorageObj.energyCapacity && !this.OrderIDs[spawnStorageObj.id]) {
+                registry.Requirements.Resources.push({ amount: spawnStorageObj.energyCapacity - spawnStorageObj.energy, location: spawnStorageObj, type: RESOURCE_ENERGY });
             }
         }
         this.ControllerData = upgradeData;
@@ -97,7 +96,7 @@ export class ArchitectureOverseer extends OverseerBase {
             let creepData = this.ControllerData.upgradeCreeps[i];
             let creep = Game.creeps[creepData.creepName];
             if (creep.spawning) { continue; }
-            if(!this.ControllerData.upgradeCreeps[i].carryCapacity) {
+            if (!this.ControllerData.upgradeCreeps[i].carryCapacity) {
                 this.ControllerData.upgradeCreeps[i].carryCapacity = creep.getActiveBodyparts(CARRY) * 50;
             }
             let action;
@@ -134,17 +133,17 @@ export class ArchitectureOverseer extends OverseerBase {
                     }
                 }*/
 
-                if(creep.carry.energy == 0) {
+                if (creep.carry.energy == 0) {
                     // Check to make sure I have an order
-                    if(!this.OrderIDs[creep.id]) {
+                    if (!this.OrderIDs[creep.id]) {
                         console.log('Awaiting acceptance of resource request.');
-                    } else if(!this.Queen.Distribution.CheckOrderIDIsValid(this.OrderIDs[creep.id])) {
+                    } else if (!this.Queen.Distribution.CheckOrderIDIsValid(this.OrderIDs[creep.id])) {
                         this.Queen.Distribution.CancelOrder(this.OrderIDs[creep.id]);
                         delete this.OrderIDs[creep.id];
                     }
                 } else {
                     action = new UpgradeAction(creep, this.Hive.controller as StructureController);
-                    if(creep.carry.energy > creep.carryCapacity * 0.75 && this.OrderIDs[creep.id]) {
+                    if (creep.carry.energy > creep.carryCapacity * 0.75 && this.OrderIDs[creep.id]) {
                         //console.log('THIS IS NOT POSSIBLE { ArchitectureOverseer.CreepCarry }');
                         this.Queen.Distribution.CancelOrder(this.OrderIDs[creep.id]);
                     }
@@ -191,7 +190,7 @@ export class ArchitectureOverseer extends OverseerBase {
     }
 
     AssignOrder(order: DistributionOrder) {
-        if(this.OrderIDs[order.toTarget]) {
+        if (this.OrderIDs[order.toTarget]) {
             console.log('THIS IS NOT POSSIBLE { ArchitectureOverseer.AssignOrder } -- Multiple order requests');
             return false;
         }

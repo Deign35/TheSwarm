@@ -1,7 +1,6 @@
 import * as SwarmEnums from "SwarmEnums";
 import * as _ from "lodash";
 import { OverseerBase } from "Overseers/OverseerBase";
-import { HiveQueen } from "Managers/HiveQueen";
 import { ActionBase } from "Actions/ActionBase";
 import { BuildAction } from "Actions/BuildAction";
 import { RepairAction } from "Actions/RepairAction";

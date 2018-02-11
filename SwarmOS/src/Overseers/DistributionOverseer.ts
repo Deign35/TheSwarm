@@ -3,7 +3,6 @@ import { OverseerBase } from "Overseers/OverseerBase";
 import { ActionBase } from "Actions/ActionBase";
 import { TransferAction } from "Actions/TransferAction";
 import { WithdrawAction } from "Actions/WithdrawAction";
-import { HiveQueen } from "Managers/HiveQueen";
 import * as _ from "lodash";
 
 const CURRENT_ORDERS = 'CO';
@@ -45,8 +44,8 @@ export class DistributionOverseer extends OverseerBase {
         let creepCount = 0;
         for (let i = 0, length = this.CurrentOrders.length; i < length; i++) {
             if (!this.CurrentOrders[i].creepName || !(Game.creeps[this.CurrentOrders[i].creepName as string]) && i >= creepCount * 3) {
-                if(this.CurrentOrders[i].creepName) {delete this.CurrentOrders[i].creepName; }
-                if(this.idleCreeps.length > 0) {
+                if (this.CurrentOrders[i].creepName) { delete this.CurrentOrders[i].creepName; }
+                if (this.idleCreeps.length > 0) {
                     this.CurrentOrders[i].creepName = this.idleCreeps.splice(0, 1)[0];
                 } else {
                     registry.Requirements.Creeps.push({
@@ -56,15 +55,15 @@ export class DistributionOverseer extends OverseerBase {
                 }
                 continue;
             }
-            if(!Game.getObjectById(this.CurrentOrders[i].toTarget)) {
+            if (!Game.getObjectById(this.CurrentOrders[i].toTarget)) {
                 // Delivery Target is gone, end
                 this.CancelOrder(this.CurrentOrders[i--].orderID);
                 continue;
             }
             if (!this.CurrentOrders[i].fromTarget) {
                 let toTarget = Game.getObjectById(this.CurrentOrders[i].toTarget as string) as Structure | Creep;
-                let possibleTargets = (this.Parent as HiveQueen).hivelord.FindTargets<STRUCTURE_CONTAINER>(FIND_STRUCTURES, STRUCTURE_CONTAINER);
-                if(possibleTargets.length > 0) {
+                let possibleTargets = this.Queen.hivelord.FindTargets<STRUCTURE_CONTAINER>(FIND_STRUCTURES, STRUCTURE_CONTAINER);
+                if (possibleTargets.length > 0) {
                     (possibleTargets as StructureContainer[]).sort((a: StructureContainer, b: StructureContainer) => {
                         if (!a.store[this.CurrentOrders[i].resourceType]) {
                             return 1;
@@ -73,12 +72,12 @@ export class DistributionOverseer extends OverseerBase {
                             return -1;
                         }
                         let aAmount = a.store[this.CurrentOrders[i].resourceType];
-                        let bAmount =  b.store[this.CurrentOrders[i].resourceType]
+                        let bAmount = b.store[this.CurrentOrders[i].resourceType]
 
-                        if(aAmount < this.CurrentOrders[i].amount &&
+                        if (aAmount < this.CurrentOrders[i].amount &&
                             bAmount < this.CurrentOrders[i].amount) {
-                                return aAmount < bAmount ? -1 : (aAmount > bAmount ? 1 : 0);
-                            }
+                            return aAmount < bAmount ? -1 : (aAmount > bAmount ? 1 : 0);
+                        }
                         var distA = toTarget.pos.findPathTo(a).length;
                         var distB = toTarget.pos.findPathTo(b).length;
                         if (distA == 0) {
@@ -90,9 +89,9 @@ export class DistributionOverseer extends OverseerBase {
                         return distA < distB ? -1 : (distA > distB ? 1 : 0);
                     });
                     let unverifiedTarget = possibleTargets[0] as StructureContainer;
-                    if(unverifiedTarget.store && unverifiedTarget.store[this.CurrentOrders[i].resourceType] &&
+                    if (unverifiedTarget.store && unverifiedTarget.store[this.CurrentOrders[i].resourceType] &&
                         unverifiedTarget.store[this.CurrentOrders[i].resourceType] > this.CurrentOrders[i].amount) {
-                            this.CurrentOrders[i].fromTarget = unverifiedTarget.id;
+                        this.CurrentOrders[i].fromTarget = unverifiedTarget.id;
                     }
                 }
             }
