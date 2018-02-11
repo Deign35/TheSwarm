@@ -144,14 +144,14 @@ export class SwarmLinkOverseer extends SwarmMemory { // One per room.
         return targetData;
     }
 
-    FindTarget(forPos: RoomPosition, findID: FindConstant, structureType?: StructureConstant) {
-        if(!this.HiveTargets[findID]) { this.HiveTargets[findID] = {} }
-        if(findID == FIND_STRUCTURES || findID == FIND_MY_STRUCTURES || findID == FIND_HOSTILE_STRUCTURES && structureType) {
-            if(!this.HiveTargets[findID][structureType as StructureConstant]) {
-                this.HiveTargets[findID][structureType as StructureConstant] = {};
-                this.HiveTargets[findID][structureType as StructureConstant][LAST_UPDATE] = 0;;
+    FindTargets<T extends StructureConstant>(findID: FindConstant, structureType?: T) {
+        if (!this.HiveTargets[findID]) { this.HiveTargets[findID] = {} }
+        if (findID == FIND_STRUCTURES || findID == FIND_MY_STRUCTURES || findID == FIND_HOSTILE_STRUCTURES && structureType) {
+            if (!this.HiveTargets[findID][structureType as T]) {
+                this.HiveTargets[findID][structureType as T] = {};
+                this.HiveTargets[findID][structureType as T][LAST_UPDATE] = 0;
             }
-        }else {
+        } else {
             this.HiveTargets[findID][LAST_UPDATE] = 0;
         }
 
@@ -160,11 +160,11 @@ export class SwarmLinkOverseer extends SwarmMemory { // One per room.
             let foundTargets = Game.rooms[this.ParentMemoryID].find(findID);
             if (foundTargets.length == 0) {
                 this.HiveTargets[findID] = {};
-                return undefined;
+            } else {
+                this.UpdateTargets(foundTargets, findID);
+                this.Save();
+                this.Load();
             }
-            this.UpdateTargets(foundTargets, findID);
-            this.Save();
-            this.Load();
         }
 
         let findData;
@@ -175,12 +175,17 @@ export class SwarmLinkOverseer extends SwarmMemory { // One per room.
         }
 
         let targets = [];
-        for(let id in findData) {
+        for (let id in findData) {
             let target = Game.getObjectById(id);
-            if(target) {
+            if (target) {
                 targets.push(target);
             }
         }
+
+        return targets;
+    }
+
+    FindTarget(forPos: RoomPosition, findID: FindConstant, structureType?: StructureConstant) {
         let sortFunc = (a: any, b: any) => {
             let aData = this.TargetCounts[a.id];
             let countA = aData[TARGET_TOTAL];
@@ -215,24 +220,8 @@ export class SwarmLinkOverseer extends SwarmMemory { // One per room.
             }
             return distA < distB ? -1 : (distA > distB ? 1 : 0);
         }
-        /*switch (findID) {
-            case (FIND_CREEPS):
-            case (FIND_MY_CREEPS):
-            case (FIND_HOSTILE_CREEPS): break;
-            case (FIND_SOURCES): console.log('Better load balancing required'); break;
-            case (FIND_DROPPED_RESOURCES): console.log('NOT SETUP YET'); break;
-            case (FIND_STRUCTURES):
-            case (FIND_MY_STRUCTURES):
-            case (FIND_HOSTILE_STRUCTURES): console.log('NOT SETUP YET'); break;
-            case (FIND_CONSTRUCTION_SITES): // Same as FIND_CREEPS
-            case (FIND_MY_CONSTRUCTION_SITES):
-            case (FIND_HOSTILE_CONSTRUCTION_SITES): console.log('NOT SETUP YET'); break;
-            case (FIND_MY_SPAWNS):
-            case (FIND_HOSTILE_SPAWNS): console.log('NOT SETUP YET'); break;
-            case (FIND_MINERALS): break;
-        }*/
 
-        targets.sort(sortFunc);
+        let targets = this.FindTargets(findID).sort(sortFunc);
         return targets[0];
     }
 }

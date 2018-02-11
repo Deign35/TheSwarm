@@ -32,4 +32,5 @@ export abstract class OverseerBase extends SwarmMemory implements IOverseer {
     abstract AssignCreep(creepName: string): void;
     abstract ActivateOverseer(): void;
     abstract ReleaseCreep(name: string, releaseReason: string): void;
+    abstract AssignOrder(order: DistributionOrder): boolean;
 }

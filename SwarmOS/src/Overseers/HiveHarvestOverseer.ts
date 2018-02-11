@@ -11,8 +11,11 @@ import { MoveToPositionAction } from "Actions/MoveToPositionAction";
 
 const NODE_DATA = 'ND';
 export class HiveHarvestOverseer extends OverseerBase {
+    AssignOrder(order: DistributionOrder): boolean {
+        throw new Error("Method not implemented.");
+    }
     Hive: Room;
-    protected SourceNodes: { creepID?: string, sourceID: string, containerID?: string, constructionSiteID?: string }[];
+    protected SourceNodes: { creepName?: string, sourceID: string, containerID?: string, constructionSiteID?: string }[];
     protected NodeObjects: { creep?: Creep, source: Source, container?: StructureContainer, constructionSite?: ConstructionSite }[];
 
     Save() {
@@ -29,19 +32,6 @@ export class HiveHarvestOverseer extends OverseerBase {
 
     HasResources(): boolean { return true; } // It's just easier for now...
 
-    HasRequirements(): boolean {
-        if (!this.Hive.controller || !this.Hive.controller.my || !(this.Hive.controller.level >= 3)) {
-            return false;
-        }
-        for (let i = 0, length = this.NodeObjects.length; i < length; i++) {
-            if (!this.NodeObjects[i].creep) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     ValidateOverseer() {
         let registry = OverseerBase.CreateEmptyOverseerRegistry();
         if (this.SourceNodes.length == 0) {
@@ -53,45 +43,49 @@ export class HiveHarvestOverseer extends OverseerBase {
                 this.SourceNodes.push(this.UpdateNodeData(newNode, foundSource));
             }
         }
-        let hasRequirements = false;
+
         if (!this.Hive.controller || !this.Hive.controller.my || !(this.Hive.controller.level >= 3)) {
             // do boot strapper instead.
+            console.log('Controller isnt level 3');
         } else {
             for (let i = 0, length = this.SourceNodes.length; i < length; i++) {
                 let newNodeObj: { creep?: Creep, source: Source, container?: StructureContainer, constructionSite?: ConstructionSite };
-                newNodeObj = { creep: undefined, source: Game.getObjectById(this.SourceNodes[i].sourceID) as Source, container: undefined, constructionSite: undefined }
-
-                let creep = this.SourceNodes[i].creepID ? Game.creeps[this.SourceNodes[i].creepID as string] : undefined;
-
-                if(!creep) {
-                    if(this.SourceNodes[i].creepID) {
-                        this.ReleaseCreep((this.SourceNodes[i].creepID as string), 'Dead creep');
-                    }
-                    registry.Requirements.Creeps.push({
-                        time: 0, // Use this to request ahead of time.
-                        creepBody: this.NodeObjects[i].container ?
-                            [WORK, MOVE, MOVE, CARRY] :
-                            [WORK, CARRY, MOVE]
-                    });
-                }
-                this.NodeObjects[i].creep = creep;
+                newNodeObj = { source: Game.getObjectById(this.SourceNodes[i].sourceID) as Source }
 
                 if (!this.SourceNodes[i].containerID) {
                     this.SourceNodes[i] = this.UpdateNodeData(this.SourceNodes[i]);
                 }
+
                 if (this.SourceNodes[i].containerID) {
-                    newNodeObj.container = Game.getObjectById(this.SourceNodes[i].containerID) as StructureContainer;
+                    newNodeObj.container = Game.getObjectById(this.SourceNodes[i].containerID as string) as StructureContainer;
                     if (!newNodeObj.container) {
                         delete this.SourceNodes[i].containerID;
                     } else {
-                        registry.Available.Resources.push({ location: (this.NodeObjects[i].container as StructureContainer),
-                                                            amount: (this.NodeObjects[i].container as StructureContainer).store.energy,
-                                                            type: RESOURCE_ENERGY })
+                        registry.Available.Resources.push({ amount: newNodeObj.container.store.energy, type: RESOURCE_ENERGY, location: newNodeObj.container.pos });
                     }
                 }
+
+                if (this.SourceNodes[i].creepName) {
+                    newNodeObj.creep = Game.creeps[this.SourceNodes[i].creepName as string];
+                    if (!newNodeObj.creep) {
+                        // creep has died.
+                        this.ReleaseCreep((this.SourceNodes[i].creepName as string), 'Dead creep');
+                    }
+                }
+
+                if (!newNodeObj.creep) { // || newNodeObj.creep.ticksToLive < SomeCalculatedValue) { // 100 to start with?
+                    registry.Requirements.Creeps.push({
+                        time: 0, // Use this to request ahead of time.
+                        creepBody: newNodeObj.container ?
+                            [WORK, MOVE, MOVE, CARRY] :
+                            [WORK, CARRY, MOVE]
+                    });
+                }
                 if (this.SourceNodes[i].constructionSiteID) {
-                    newNodeObj.constructionSite = Game.getObjectById(this.SourceNodes[i].constructionSiteID) as ConstructionSite;
-                    if (!newNodeObj.constructionSite) { delete this.SourceNodes[i].constructionSiteID; }
+                    newNodeObj.constructionSite = Game.constructionSites[this.SourceNodes[i].constructionSiteID as string];
+                    if (!newNodeObj.constructionSite) {
+                        delete this.SourceNodes[i].constructionSiteID;
+                    }
                 }
                 this.NodeObjects.push(newNodeObj);
             }
@@ -136,8 +130,10 @@ export class HiveHarvestOverseer extends OverseerBase {
                     targetPos = constructionSite.pos;
                 }
 
-                if(creep.pos.isEqualTo(targetPos)) {
-                    action = new HarvestAction(this.NodeObjects[index].creep as Creep, this.NodeObjects[index].source);
+                if ((container && creep.pos.isEqualTo(targetPos)) ||
+                    (!container && creep.pos.getRangeTo(targetPos) <= 1)) {
+                    action = new HarvestAction(
+                        this.NodeObjects[index].creep as Creep, this.NodeObjects[index].source);
                 } else {
                     action = new MoveToPositionAction(creep, targetPos);
                 }
@@ -145,14 +141,15 @@ export class HiveHarvestOverseer extends OverseerBase {
                 // Means we had to do some other action, and it was not a completed task.
                 return;
             }
+
             action.ValidateAction();
             let harvestResult = action.Run(true);
             // Check if harvest worked
             switch (harvestResult) {
                 case (SwarmEnums.CRT_None): console.log("THIS IS NOT POSSIBLE"); break; // Unless we haven't fixed Next/NewTarget above.
                 case (SwarmEnums.CRT_Condition_Full):
-                    if(!constructionSite && !container) {
-                        if(creep.pos.lookFor(LOOK_CONSTRUCTION_SITES).length == 0) {
+                    if (!constructionSite && !container) {
+                        if (creep.pos.lookFor(LOOK_CONSTRUCTION_SITES).length == 0) {
                             creep.room.createConstructionSite(creep.pos, STRUCTURE_CONTAINER);
                         }
                     }
@@ -163,18 +160,18 @@ export class HiveHarvestOverseer extends OverseerBase {
     }
 
     AssignCreep(creepName: string): void {
-        for(let i = 0, length = this.NodeObjects.length; i < length; i++) {
-            if(!this.NodeObjects[i].creep) {
-                this.SourceNodes[i].creepID = creepName;
+        for (let i = 0, length = this.NodeObjects.length; i < length; i++) {
+            if (!this.NodeObjects[i].creep) {
+                this.SourceNodes[i].creepName = creepName;
                 break;
             }
         }
     }
 
     ReleaseCreep(creepName: string, releaseReason: string) {
-        for(let i = 0, length = this.SourceNodes.length; i < length; i++) {
-            if(this.SourceNodes[i].creepID == creepName) {
-                delete this.SourceNodes[i].creepID;
+        for (let i = 0, length = this.SourceNodes.length; i < length; i++) {
+            if (this.SourceNodes[i].creepName == creepName) {
+                delete this.SourceNodes[i].creepName;
                 break;
             }
         }
@@ -192,7 +189,7 @@ export class HiveHarvestOverseer extends OverseerBase {
                 }
             }
         }
-        if(!nodeInfo.containerID) {
+        if (!nodeInfo.containerID) {
             let foundCSites = this.Hive.lookForAtArea(LOOK_CONSTRUCTION_SITES, source.pos.y - 1, source.pos.x - 1, source.pos.y + 1, source.pos.x + 1, true);
             if (foundCSites.length > 0) {
                 for (let i in foundCSites) {

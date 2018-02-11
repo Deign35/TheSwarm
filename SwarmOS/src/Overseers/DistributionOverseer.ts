@@ -3,24 +3,27 @@ import { OverseerBase } from "Overseers/OverseerBase";
 import { ActionBase } from "Actions/ActionBase";
 import { TransferAction } from "Actions/TransferAction";
 import { WithdrawAction } from "Actions/WithdrawAction";
+import { HiveQueen } from "Managers/HiveQueen";
 
 const CURRENT_ORDERS = 'CO';
 const IDLE_CREEPS = 'IC';
 export class DistributionOverseer extends OverseerBase {
+    AssignOrder(order: DistributionOrder): boolean {
+        throw new Error("Method not implemented.");
+    }
     Hive: Room;
-    protected CurrentOrders: {
-        creepID?: string,
-        fromTarget?: string,
-        toTarget: string,
-        resourceType: ResourceConstant,
-        amount: number
-    }[];
+    protected CurrentOrders: DistributionOrder[];
     protected idleCreeps: string[];
     private readonly MaxDeliverers = 3;
 
     CreateNewDistributionOrder(requestor: Structure | Creep, resourceType: ResourceConstant, amount: number) {
-        this.CurrentOrders.push({toTarget: requestor.id, resourceType: resourceType, amount: amount});
+        let orderID = ('' + Game.time).slice(-4) + '_' + ('' + Math.random() * 1000).slice(-3);
+        let newOrder = { orderID: orderID, toTarget: requestor.id, resourceType: resourceType, amount: amount }
+        this.CurrentOrders.push(newOrder);
+
+        return newOrder;
     }
+
     Save() {
         this.SetData(CURRENT_ORDERS, this.CurrentOrders);
         this.SetData(IDLE_CREEPS, this.idleCreeps);
@@ -40,18 +43,29 @@ export class DistributionOverseer extends OverseerBase {
         let registry = OverseerBase.CreateEmptyOverseerRegistry();
         let creepCount = 0;
         for (let i = 0, length = this.CurrentOrders.length; i < length; i++) {
-            if (!this.CurrentOrders[i].creepID || !(Game.creeps[this.CurrentOrders[i].creepID as string]) && i >= creepCount * 3) {
+            if (!this.CurrentOrders[i].creepName || !(Game.creeps[this.CurrentOrders[i].creepName as string]) && i >= creepCount * 3) {
                 registry.Requirements.Creeps.push({
                     time: 0,
                     creepBody: [CARRY, MOVE, CARRY, MOVE]
                 });
                 continue;
             }
-            if(!this.CurrentOrders[i].fromTarget) {
-                let toTarget: RoomObject = Game.getObjectById(this.CurrentOrders[i].toTarget) as RoomObject;
-                registry.Requirements.Resources.push({ location: toTarget, amount: this.CurrentOrders[i].amount, type: this.CurrentOrders[i].resourceType})
+            if (!this.CurrentOrders[i].fromTarget) {
+                let toTarget = Game.getObjectById(this.CurrentOrders[i].toTarget as string) as Structure | Creep;
+                let possibleTargets = (this.Parent as HiveQueen).hivelord.FindTargets<STRUCTURE_CONTAINER>(FIND_STRUCTURES, STRUCTURE_CONTAINER);
+                (possibleTargets as StructureContainer[]).sort((a: StructureContainer, b: StructureContainer) => {
+                    if (!a.store[this.CurrentOrders[i].resourceType] || a.store[this.CurrentOrders[i].resourceType] < this.CurrentOrders[i].amount) {
+                        return -1;
+                    }
+                    if (!b.store[this.CurrentOrders[i].resourceType] || b.store[this.CurrentOrders[i].resourceType] < this.CurrentOrders[i].amount) {
+                        return 1;
+                    }
+
+
+                    return 0;
+                })
             }
-            if(++creepCount >= this.MaxDeliverers) {
+            if (++creepCount >= this.MaxDeliverers) {
                 //registry = OverseerBase.CreateEmptyOverseerRegistry();
                 break;
             }
@@ -63,8 +77,8 @@ export class DistributionOverseer extends OverseerBase {
     ActivateOverseer() {
         let completedOrders: number[] = [];
         for (let index = 0, length = this.CurrentOrders.length; index < length; index++) {
-            if(!this.CurrentOrders[index].creepID || !this.CurrentOrders[index].fromTarget) { continue; }
-            let creep = Game.getObjectById(this.CurrentOrders[index].creepID) as Creep;
+            if (!this.CurrentOrders[index].creepName || !this.CurrentOrders[index].fromTarget) { continue; }
+            let creep = Game.getObjectById(this.CurrentOrders[index].creepName) as Creep;
             if (creep.spawning) {
                 continue;
             }
@@ -79,7 +93,7 @@ export class DistributionOverseer extends OverseerBase {
                 target = Game.getObjectById(this.CurrentOrders[index].toTarget) as Structure | Creep;
                 if (!target) {
                     // This job is complete, end it.
-                    this.ReassignCreep(creep);
+                    this.ReassignCreep(creep.name);
                     continue;
                 }
                 action = new TransferAction(creep, target, resourceType, amount)
@@ -89,8 +103,8 @@ export class DistributionOverseer extends OverseerBase {
                 if (!target) {
                     // The withdraw target has been destroyed.  Need to find a new one.
                     delete this.CurrentOrders[index].fromTarget;
-                    delete this.CurrentOrders[index].creepID;
-                    this.ReassignCreep(creep);
+                    delete this.CurrentOrders[index].creepName;
+                    this.ReassignCreep(creep.name);
                     continue;
                 }
                 action = new WithdrawAction(creep, target, resourceType, amount);
@@ -106,13 +120,13 @@ export class DistributionOverseer extends OverseerBase {
             switch (actionResponse) {
                 case (SwarmEnums.CRT_None): console.log('THIS IS NOT POSSIBLE { DistributionOverseer.CRT_None }'); break;
                 case (SwarmEnums.CRT_Condition_Empty):
-                    this.ReassignCreep(creep);
+                    this.ReassignCreep(creep.name);
                     completedOrders.push(index);
                     break; //Means we successfully Delivered.
                 case (SwarmEnums.CRT_Condition_Full):
                     break; // Means we successfully Withdrew
                 case (SwarmEnums.CRT_Next): console.log('THIS IS NOT POSSIBLE { DistributionOverseer.CRT_Next }'); break;
-                case (SwarmEnums.CRT_NewTarget):  console.log('THIS IS NOT POSSIBLE { DistributionOverseer.CRT_NewTarget }'); break;
+                case (SwarmEnums.CRT_NewTarget): console.log('THIS IS NOT POSSIBLE { DistributionOverseer.CRT_NewTarget }'); break;
             }
         }
         for (let i = completedOrders.length; i > 1; i--) {
@@ -120,33 +134,55 @@ export class DistributionOverseer extends OverseerBase {
         }
     }
 
+    CheckOrderIDIsValid(id: string): boolean {
+        for (let i = 0, length = this.CurrentOrders.length; i < length; i++) {
+            if (id == this.CurrentOrders[i].orderID) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    CancelOrder(id: string) {
+        for (let i = 0, length = this.CurrentOrders.length; i < length; i++) {
+            if (id == this.CurrentOrders[i].orderID) {
+                let cancelledOrder = this.CurrentOrders.splice(i, 1)[0];
+                if (cancelledOrder.creepName) {
+                    this.ReassignCreep(cancelledOrder.creepName)
+                }
+                return;
+            }
+        }
+    }
+
     AssignCreep(creepName: string): void {
+        console.log('Assign to DO');
         let orderFound = false;
         // Make sure the creep can carry enough for the job before assigning it an order.
         for (let i = 0, length = this.CurrentOrders.length; i < length; i++) {
-            if (!this.CurrentOrders[i].creepID) {
-                this.CurrentOrders[i].creepID = creepName;
+            if (!this.CurrentOrders[i].creepName) {
+                this.CurrentOrders[i].creepName = creepName;
                 orderFound = true;
                 break;
             }
         }
 
-        if(!orderFound) {
+        if (!orderFound) {
             this.idleCreeps.push(creepName);
         }
     }
 
     ReleaseCreep(creepName: string, releaseReason: string) {
         for (let i = 0, length = this.CurrentOrders.length; i < length; i++) {
-            if (this.CurrentOrders[i].creepID == creepName) {
-                delete this.CurrentOrders[i].creepID;
+            if (this.CurrentOrders[i].creepName == creepName) {
+                delete this.CurrentOrders[i].creepName;
                 break;
             }
         }
     }
 
-    protected ReassignCreep(creep: Creep): void {
-        this.ReleaseCreep(creep.name, 'Reassignment');
-        this.AssignCreep(creep.name);
+    protected ReassignCreep(creepName: string): void {
+        this.ReleaseCreep(creepName, 'Reassignment');
+        this.AssignCreep(creepName);
     }
 }
