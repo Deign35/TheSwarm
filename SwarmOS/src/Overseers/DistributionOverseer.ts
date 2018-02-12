@@ -1,4 +1,5 @@
 import * as SwarmEnums from "SwarmEnums";
+import * as SwarmConsts from "SwarmConsts";
 import { OverseerBase } from "Overseers/OverseerBase";
 import { ActionBase } from "Actions/ActionBase";
 import { TransferAction } from "Actions/TransferAction";
@@ -14,6 +15,7 @@ const ORDER_STATE_WITHDRAW = 'OSW';
 const ORDER_STATE_DELIVER = 'OSD';
 
 export class DistributionOverseer extends OverseerBase {
+    // ISSUE: Distribution appears to go by the reverse order of creation or something.  It stays deterministic, but it means some things don't get filled up.
     AssignOrder(orderID: string): boolean {
         throw new Error("Method not implemented.");
     }
@@ -52,6 +54,7 @@ export class DistributionOverseer extends OverseerBase {
 
     ValidateOverseer() {
         let registry = OverseerBase.CreateEmptyOverseerRegistry();
+        let miniSpawns = this.Queen.Minispawns;
         let orderCount = 0;
         for (let orderID in this.CurrentOrders) { // Cancel expired orders.
             let order = this.CurrentOrders[orderID];
@@ -78,6 +81,7 @@ export class DistributionOverseer extends OverseerBase {
                 continue;
             }
             let creep = Game.creeps[name];
+            miniSpawns = false;
 
             let orderID = (this.AssignedCreeps[name].orderID && this.AssignedCreeps[name].orderID) as string || undefined;
             let validOrder = orderID && this.CheckOrderIDIsValid(orderID);
@@ -157,9 +161,9 @@ export class DistributionOverseer extends OverseerBase {
             this.AssignedCreeps[unassignedCreeps[0].name].orderID = orderID;
             delete unassignedOrders[orderID];
         }
-        let orderRatio = (Object.keys(unassignedOrders).length) > (Object.keys(this.AssignedCreeps).length) * 3; // meaning 3 unassigned orders per creep or 1 creep per for 4orders
+        let orderRatio = (Object.keys(unassignedOrders).length) >= (Object.keys(this.AssignedCreeps).length) * 3; // meaning 3 unassigned orders per creep or 1 creep per for 4orders
         if (unassignedCreeps.length == 0 && orderRatio) {
-            registry.Requirements.Creeps.push({ time: 0, creepBody: [CARRY, MOVE] });
+            registry.Requirements.Creeps.push({ time: 0, creepBody: miniSpawns ? SwarmConsts.MINI_DELIVERER : SwarmConsts.BIG_DELIVERY });
         }
         this.Registry = registry;
     }

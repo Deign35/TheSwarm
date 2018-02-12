@@ -57,7 +57,7 @@ export class ArchitectureOverseer extends OverseerBase { // Needs a different na
             let creep = upgradeData.upgradeCreeps[i] ? Game.creeps[upgradeData.upgradeCreeps[i].creepName] : undefined;
             if (!creep) {
                 if (upgradeData.upgradeCreeps[i]) { upgradeData.upgradeCreeps.splice(i--, 1); }
-                registry.Requirements.Creeps.push({ time: 0, creepBody: [WORK, WORK, CARRY, MOVE] });
+                registry.Requirements.Creeps.push({ time: 0, creepBody: SwarmConsts.UPGRADER });
             } else {
                 if (creep.carry.energy < creep.carryCapacity / 2) {
                     if (!this.OrderIDs[creep.id]) {

@@ -1,18 +1,20 @@
 import * as _ from "lodash";
 import * as SwarmEnums from "SwarmEnums";
+import * as SwarmConsts from "SwarmConsts";
 import { OverseerBase } from "Overseers/OverseerBase";
 import { BuildAction } from "Actions/BuildAction";
 
 const BUILDER_DATA = 'BD';
 const NEW_SITES = 'NS';
 const REQUEST_DATA = 'RD';
-export class ConstructionOverseer extends OverseerBase { // Needs a different name.
+export class ConstructionOverseer extends OverseerBase { // Needs a different name?
     Hive!: Room;
     protected RequestData!: {[siteID: string]: BuildOrder}
     protected BuilderCreeps!: {[creepName:string]: { siteID?: string, orderID?: string }};
     protected newSites!: {build: BuildOrder, pos: {x: number, y:number, roomName: string}}[];
     protected _loadedSites!: {[id: string]: ConstructionSite};
 
+    private _loaded = false;
     Save() {
         this.SetData(BUILDER_DATA, this.BuilderCreeps);
         this.SetData(REQUEST_DATA, this.RequestData);
@@ -27,6 +29,32 @@ export class ConstructionOverseer extends OverseerBase { // Needs a different na
         this.RequestData = this.GetData(REQUEST_DATA) || {};
         this.newSites = this.GetData(NEW_SITES) || [];
         this._loadedSites = {};
+        if(!this._loaded) {
+            this._loaded = true;
+            for(let name in Game.flags) {
+                let flag = Game.flags[name];
+                let structureType = STRUCTURE_ROAD as BuildableStructureConstant;
+                let numBuilders = 1;
+                switch(flag.color) {
+                    case(COLOR_RED):
+                        structureType = STRUCTURE_EXTENSION;
+                        numBuilders = 4;
+                        break;
+                    case(COLOR_WHITE):
+                        structureType = STRUCTURE_ROAD
+                        numBuilders = 1;
+                        break;
+                    case(COLOR_BLUE):
+                        structureType = STRUCTURE_TOWER;
+                        numBuilders = 2;
+                        break;
+                }
+
+                if(this.CreateNewStructure(structureType, flag.pos, numBuilders) == OK) {
+                    flag.remove();
+                }
+            }
+        }
     }
 
     HasResources(): boolean { return false; } // It's just easier for now...
@@ -102,8 +130,8 @@ export class ConstructionOverseer extends OverseerBase { // Needs a different na
                 this.RequestData[openJobs[0]].assignedBuilders++;
             }
         }
-        if(Object.keys(this.BuilderCreeps).length * 4 <= requestedBuilders) { // 1 builder per max
-            registry.Requirements.Creeps.push({time: 0, creepBody: [MOVE, CARRY, CARRY, WORK]});
+        if(Object.keys(this.BuilderCreeps).length * 3 <= requestedBuilders) { // 1 builder per 4 max
+            registry.Requirements.Creeps.push({time: 0, creepBody: SwarmConsts.BUILDER });
         }
 
         this.Registry = registry;
@@ -118,7 +146,7 @@ export class ConstructionOverseer extends OverseerBase { // Needs a different na
                 continue;
             }
             let action = new BuildAction(creep, targetSite);
-            let actionResponse =action.Run()
+            let actionResponse = action.Run()
             // I actually basically don't care what the result is
             // For now I will continue to check as a verification tool
             switch (actionResponse) {

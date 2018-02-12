@@ -1,5 +1,6 @@
 import * as SwarmEnums from "SwarmEnums";
 import * as _ from "lodash";
+import * as SwarmConsts from "SwarmConsts";
 import { OverseerBase } from "Overseers/OverseerBase";
 import { ActionBase } from "Actions/ActionBase";
 import { BuildAction } from "Actions/BuildAction";
@@ -75,9 +76,7 @@ export class HiveHarvestOverseer extends OverseerBase {
                 if (!newNodeObj.creep) { // || newNodeObj.creep.ticksToLive < SomeCalculatedValue) { // 100 to start with?
                     registry.Requirements.Creeps.push({
                         time: 0, // Use this to request ahead of time.
-                        creepBody: newNodeObj.container ?
-                            [WORK, MOVE, MOVE, CARRY] :
-                            [WORK, CARRY, MOVE]
+                        creepBody: this.Queen.Minispawns ? SwarmConsts.MINI_HARVESTER : SwarmConsts.PRIME_HARVESTER,
                     });
                 }
                 if (this.SourceNodes[i].constructionSiteID) {
