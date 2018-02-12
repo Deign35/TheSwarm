@@ -76,7 +76,7 @@ export class HiveHarvestOverseer extends OverseerBase {
                 if (!newNodeObj.creep) { // || newNodeObj.creep.ticksToLive < SomeCalculatedValue) { // 100 to start with?
                     registry.Requirements.Creeps.push({
                         time: 0, // Use this to request ahead of time.
-                        creepBody: this.Queen.Minispawns ? SwarmConsts.MINI_HARVESTER : SwarmConsts.PRIME_HARVESTER,
+                        creepBody: SwarmConsts.PRIME_HARVESTER,
                     });
                 }
                 if (this.SourceNodes[i].constructionSiteID) {

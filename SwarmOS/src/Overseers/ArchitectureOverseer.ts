@@ -102,7 +102,7 @@ export class ArchitectureOverseer extends OverseerBase { // Needs a different na
             }
             let action;
             if (i == 0 && (!((this.Hive.controller as StructureController).sign) ||
-                ((this.Hive.controller as StructureController).sign as SignDefinition).username != SwarmConsts.MY_USERNAME)) {
+                ((this.Hive.controller as StructureController).sign as SignDefinition).text != SwarmConsts.MY_SIGNATURE)) {
 
                 if (creep.pos.getRangeTo(this.Hive.controller as StructureController) > 1) {
                     action = new MoveToPositionAction(creep, (this.Hive.controller as StructureController).pos);

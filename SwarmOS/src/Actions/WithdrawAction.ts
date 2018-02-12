@@ -12,9 +12,9 @@ export class WithdrawAction extends ActionWithTarget<Structure> {
     protected ActionImplemented(): SwarmEnums.CommandResponseType {
         let carryCapacity = this.AssignedCreep.carryCapacity - _.sum(this.AssignedCreep.carry);
         let targetAllows = 0;
-        if((this.Target as StructureContainer).store) {
+        if ((this.Target as StructureContainer).storeCapacity) {
             targetAllows = (this.Target as StructureContainer).store[this.ResourceType];
-        } else if((this.Target as StructureExtension).energy) {
+        } else if ((this.Target as StructureExtension).energyCapacity) {
             targetAllows = (this.Target as StructureExtension).energy;
         }
 
@@ -38,11 +38,11 @@ export class WithdrawAction extends ActionWithTarget<Structure> {
         let validationResult = SwarmEnums.CRT_None as SwarmEnums.CommandResponseType;
         if (_.sum(this.AssignedCreep.carry) == this.AssignedCreep.carryCapacity) {
             validationResult = SwarmEnums.CRT_Next;
-        } else if ((this.Target as StructureSpawn).energy) {
+        } else if ((this.Target as StructureSpawn).energyCapacity) {
             if ((this.Target as StructureSpawn).energy == 0) {
                 validationResult = SwarmEnums.CRT_NewTarget;
             }
-        } else if ((this.Target as StructureContainer).store) {
+        } else if ((this.Target as StructureContainer).storeCapacity) {
             if (!(this.Target as StructureContainer).store[this.ResourceType]) {
                 validationResult = SwarmEnums.CRT_NewTarget;
             }

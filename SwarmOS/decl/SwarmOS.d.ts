@@ -31,6 +31,10 @@ declare interface IOverseerRequirements {
     Resources: IOverseerData_Resource[],
 }
 
+declare interface Hive_CreepData { // CreepName is id
+    Assignment: string,
+}
+
 declare interface IOverseerAvailable {
     Resources: IOverseerData_Resource[],
 }

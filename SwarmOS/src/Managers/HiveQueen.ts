@@ -11,6 +11,8 @@ const HIVE_HARVESTER = 'HH';
 const ARCHITECTURE = 'Ar';
 const HIVELORD = 'HL';
 const CONSTRUCTION = 'Ct';
+const CREEP_DATA = 'CD';
+const NO_ASSIGNMENT = 'NA';
 export class HiveQueen extends SwarmMemory {
     Hive!: Room;
     Overseers!: IOverseer[];
@@ -19,7 +21,8 @@ export class HiveQueen extends SwarmMemory {
     hivelord!: SwarmLinkOverseer;
     architectureOverseer!: ArchitectureOverseer;
     ConstructionOverseer!: ConstructionOverseer;
-    Minispawns: boolean = false;
+
+    protected CreepData!: { [creepName: string]: Hive_CreepData }
 
     Save() {
         this.architectureOverseer.Save();
@@ -27,13 +30,15 @@ export class HiveQueen extends SwarmMemory {
         this.HiveHarvester.Save();
         this.hivelord.Save();
         this.ConstructionOverseer.Save();
+
+        this.SetData(CREEP_DATA, this.CreepData);
         super.Save();
     }
 
     Load() {
         super.Load();
         this.Hive = Game.rooms[this.MemoryID];
-        this.Minispawns = true;
+        this.CreepData = this.GetData(CREEP_DATA) || {};
         this.hivelord = new SwarmLinkOverseer(HIVELORD, this); // Special overseer.  does not request/require things.
         this.Overseers = [];
         this.Distribution = new DistributionOverseer(DISTRIBUTION, this); // Special.  Must be init before all other overseers.
@@ -46,17 +51,13 @@ export class HiveQueen extends SwarmMemory {
         this.ConstructionOverseer = new ConstructionOverseer(CONSTRUCTION, this);
         this.Overseers.push(this.ConstructionOverseer);
 
-        for(let i = 0, length = this.Overseers.length; i < length; i++) {
+        // Revalidate
+        for (let i = 0, length = this.Overseers.length; i < length; i++) {
             this.Overseers[i].ValidateOverseer();
         }
     }
 
     Activate() {
-        if(this.Hive.find(FIND_STRUCTURES, (structure) => {
-            return structure.structureType == STRUCTURE_CONTAINER;
-        })) {
-            this.Minispawns = false;
-        }
         let spawned = false;
         for (let i = 0, length = this.Overseers.length; i < length; i++) {
             let requirements = this.Overseers[i].GetRequirements();
@@ -67,6 +68,8 @@ export class HiveQueen extends SwarmMemory {
                     spawns[0].spawnCreep(requirements.Creeps[0].creepBody, newSpawnName, { memory: { Assigned: 'HiveHarvestOverseer' } });
                     this.Overseers[i].AssignCreep(newSpawnName);
                     spawned = true;
+
+                    this.CreepData[newSpawnName] = { Assignment: this.Overseers[i].MemoryID };
                 }
             }
             for (let j = 0, length = requirements.Resources.length; j < length; j++) {
@@ -81,9 +84,20 @@ export class HiveQueen extends SwarmMemory {
                 }
             }
             this.Overseers[i].ActivateOverseer();
-            this.Overseers[i].Save();
-            this.Overseers[i].Load();
         }
+    }
+
+    GiveCreepToHive(creepName: string, forward: boolean = true) {
+        if (this.CreepData[creepName] && forward) {
+            let id = this.CreepData[creepName].Assignment;
+            // forward the release to the appropriate overseer
+            // Or all I guess....
+            for (let i = 0, length = this.Overseers.length; i < length; i++) {
+                this.Overseers[i].ReleaseCreep(creepName, 'Released');
+            }
+        }
+
+        this.CreepData[creepName].Assignment = NO_ASSIGNMENT;
     }
 
     protected SpawnCreepForHivelord(requirements: IOverseerRequirements) {

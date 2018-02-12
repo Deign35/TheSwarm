@@ -54,7 +54,6 @@ export class DistributionOverseer extends OverseerBase {
 
     ValidateOverseer() {
         let registry = OverseerBase.CreateEmptyOverseerRegistry();
-        let miniSpawns = this.Queen.Minispawns;
         let orderCount = 0;
         for (let orderID in this.CurrentOrders) { // Cancel expired orders.
             let order = this.CurrentOrders[orderID];
@@ -81,7 +80,6 @@ export class DistributionOverseer extends OverseerBase {
                 continue;
             }
             let creep = Game.creeps[name];
-            miniSpawns = false;
 
             let orderID = (this.AssignedCreeps[name].orderID && this.AssignedCreeps[name].orderID) as string || undefined;
             let validOrder = orderID && this.CheckOrderIDIsValid(orderID);
@@ -114,56 +112,19 @@ export class DistributionOverseer extends OverseerBase {
         }
 
         while (unassignedCreeps.length > 0 && Object.keys(unassignedOrders).length > 0) {
-            let orderID = Object.keys(unassignedOrders)[0];
-            let order = this.CurrentOrders[orderID];
-            if (order.distributionStatus != ORDER_STATE_WAIT) {
-                console.log('THIS IS NOT POSSIBLE { DistributionOverseer.unassignedCreeps } -- Didnt remove order thats ready');
+            let creep = unassignedCreeps.pop() as Creep;
+            let order = this.FindOrderForCreep(creep);
+            if (order) {
+                this.AssignedCreeps[creep.name].orderID = order;
+                delete unassignedOrders[order];
+            } else {
+                // Couldn't find a delivery order.
+                break;
             }
-            unassignedCreeps.sort((creepA: Creep, creepB: Creep) => {
-                let aHasEnough = creepA.carry[order.resourceType] && creepA.carry[order.resourceType] > order.amount;
-                let bHasEnough = creepB.carry[order.resourceType] && creepB.carry[order.resourceType] > order.amount;
-
-                if (aHasEnough && !bHasEnough) {
-                    return -1;
-                } else if (bHasEnough && !aHasEnough) {
-                    return 1;
-                } else if (!aHasEnough && !bHasEnough) {
-                    if (creepA.carryCapacity >= order.amount && creepB.carryCapacity < order.amount) {
-                        return -1;
-                    }
-                    if (creepB.carryCapacity >= order.amount && creepA.carryCapacity < order.amount) {
-                        return 1;
-                    }
-                }
-
-                // Yes or no on both, so check for an available path and the distance along that path.
-                var distA = creepA.pos.findPathTo(Game.getObjectById(order.toTarget) as RoomObject).length;
-                var distB = creepB.pos.findPathTo(Game.getObjectById(order.toTarget) as RoomObject).length; // little repeat on getObj here.
-                // REALLY WANT TO CACHE THIS!!!!!!!
-                if (distA == 0) {
-                    return 1;
-                }
-                if (distB == 0) {
-                    return -1;
-                }
-
-                // Path found to both locations, check distance
-                if (distA < distB) {
-                    return -1;
-                }
-                if (distB < distA) {
-                    return 1;
-                }
-                // No more ways to compare at this time.
-                return 0;
-            });
-
-            this.AssignedCreeps[unassignedCreeps[0].name].orderID = orderID;
-            delete unassignedOrders[orderID];
         }
         let orderRatio = (Object.keys(unassignedOrders).length) >= (Object.keys(this.AssignedCreeps).length) * 3; // meaning 3 unassigned orders per creep or 1 creep per for 4orders
         if (unassignedCreeps.length == 0 && orderRatio) {
-            registry.Requirements.Creeps.push({ time: 0, creepBody: miniSpawns ? SwarmConsts.MINI_DELIVERER : SwarmConsts.BIG_DELIVERY });
+            registry.Requirements.Creeps.push({ time: 0, creepBody: SwarmConsts.BIG_DELIVERY });
         }
         this.Registry = registry;
     }
@@ -176,11 +137,11 @@ export class DistributionOverseer extends OverseerBase {
             }
             let resourceType = this.CurrentOrders[orderID].resourceType;
             let creep = this._orderData[orderID].creep as Creep;
-            if(creep.spawning) continue;
+            if (creep.spawning) continue;
             let amount;
             let target;
             let action: ActionBase;
-            if(this.CurrentOrders[orderID].distributionStatus == ORDER_STATE_DELIVER) {
+            if (this.CurrentOrders[orderID].distributionStatus == ORDER_STATE_DELIVER) {
                 target = this._orderData[orderID].toTarget as Structure | Creep;
                 action = new TransferAction(creep, target, resourceType, amount)
             } else {
@@ -188,10 +149,10 @@ export class DistributionOverseer extends OverseerBase {
                 action = new WithdrawAction(creep, target, resourceType, amount);
             }
             let actionValidation = action.ValidateAction();
-            if(actionValidation == SwarmEnums.CRT_NewTarget) {
+            if (actionValidation == SwarmEnums.CRT_NewTarget) {
                 this.CancelOrder(orderID);
                 continue;
-            } else if(actionValidation != SwarmEnums.CRT_None && actionValidation != SwarmEnums.CRT_Next) {
+            } else if (actionValidation != SwarmEnums.CRT_None && actionValidation != SwarmEnums.CRT_Next) {
                 console.log('THIS IS NOT POSSIBLE { DistributionOverseer.actionValidation }' + actionValidation);
             }
 
@@ -212,10 +173,10 @@ export class DistributionOverseer extends OverseerBase {
             }
         }
 
-        for(let name in this.AssignedCreeps) {
+        for (let name in this.AssignedCreeps) {
             let creepIsBored = !this.AssignedCreeps[name].orderID ||
-                               this.CurrentOrders[this.AssignedCreeps[name].orderID as string].distributionStatus == ORDER_STATE_WAIT;
-            if(creepIsBored) {
+                this.CurrentOrders[this.AssignedCreeps[name].orderID as string].distributionStatus == ORDER_STATE_WAIT;
+            if (creepIsBored) {
                 let sayAction = new SayAction(Game.creeps[name], 'Im bored');
             }
         }
@@ -244,6 +205,40 @@ export class DistributionOverseer extends OverseerBase {
 
     ReleaseCreep(creepName: string, releaseReason: string) {
         delete this.AssignedCreeps[creepName];
+    }
+
+    protected FindOrderForCreep(creep: Creep) {
+        let orderKeys = Object.keys(this.CurrentOrders);
+        orderKeys.sort((a: string, b: string) => {
+            if (this._orderData[a].creep) { return 1; } // already assigned.
+            if (this._orderData[b].creep) { return -1; }
+            let orderA = this.CurrentOrders[a];
+            let needA = creep.carry[orderA.resourceType] > orderA.amount;
+            let orderB = this.CurrentOrders[b];
+            let needB = creep.carry[orderB.resourceType] > orderB.amount;
+
+            if (needA != needB) {
+                return needA ? -1 : 1;
+            }
+
+            let distA = creep.pos.findPathTo(this._orderData[a].toTarget).length;
+            let distB = creep.pos.findPathTo(this._orderData[b].toTarget).length;
+            if (distA == 0) {
+                return 1;
+            }
+            if (distB == 0) {
+                return -1;
+            }
+            if (distA < distB) {
+                return -1;
+            }
+            if (distB < distA) {
+                return 1;
+            }
+            return 0;
+        });
+
+        return orderKeys[0];
     }
 
     protected FindContainerForCreep(fromPos: RoomPosition, resourceType: ResourceConstant, amount: number): StructureContainer | undefined {
