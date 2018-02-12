@@ -242,7 +242,7 @@ export class DistributionOverseer extends OverseerBase {
     }
 
     protected FindContainerForCreep(fromPos: RoomPosition, resourceType: ResourceConstant, amount: number): StructureContainer | undefined {
-        let containers = this.Queen.hivelord.FindTargets<STRUCTURE_CONTAINER>(FIND_STRUCTURES, STRUCTURE_CONTAINER) as StructureContainer[];
+        let containers = this.Queen.hivelord.FindTargets<STRUCTURE_CONTAINER>(FIND_STRUCTURES, 250, STRUCTURE_CONTAINER) as StructureContainer[];
         if (containers.length == 0) { return; }
         containers.sort((a: StructureContainer, b: StructureContainer) => {
             // Contains the resource?

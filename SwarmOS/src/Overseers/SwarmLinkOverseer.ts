@@ -144,7 +144,7 @@ export class SwarmLinkOverseer extends SwarmMemory { // One per room.
         return targetData;
     }
 
-    FindTargets<T extends StructureConstant>(findID: FindConstant, structureType?: T) {
+    FindTargets<T extends StructureConstant>(findID: FindConstant, updateNewerThan: number = 5, structureType?: T ): RoomObject[] { // Consider putting the desired last update as a parameter here.
         let isStructureFind = false;
         if (!this.HiveTargets[findID]) {
             this.HiveTargets[findID] = {}
@@ -162,7 +162,7 @@ export class SwarmLinkOverseer extends SwarmMemory { // One per room.
             lastUpdate = this.HiveTargets[findID][LAST_UPDATE] || 0;
         }
 
-        if (lastUpdate - Game.time < -5) { // Updates at most once every 6 ticks.  CAREFUL WHEN CHANGING
+        if (lastUpdate - Game.time < -updateNewerThan) { // Updates at most once every 6 ticks.  CAREFUL WHEN CHANGING
             if(isStructureFind) {
                 this.HiveTargets[findID][structureType as T][LAST_UPDATE] = Game.time;
             } else {
@@ -184,18 +184,21 @@ export class SwarmLinkOverseer extends SwarmMemory { // One per room.
             findData = this.HiveTargets[findID];
         }
 
-        let targets = [];
+        let targets: RoomObject[] = [];
         for (let id in findData) {
-            let target = Game.getObjectById(id);
+            let target = Game.getObjectById(id) as Structure | Creep;
             if (target) {
                 targets.push(target);
             }
         }
 
+        if(targets.length == 0 && updateNewerThan > 25) {
+            return this.FindTargets(findID, 0, structureType);
+        }
         return targets;
     }
 
-    FindTarget(forPos: RoomPosition, findID: FindConstant, structureType?: StructureConstant) {
+    FindTarget(forPos: RoomPosition, findID: FindConstant, updateNewerThan: number = -5, structureType?: StructureConstant) {
         let sortFunc = (a: any, b: any) => {
             let aData = this.TargetCounts[a.id];
             let countA = aData[TARGET_TOTAL];
@@ -231,7 +234,7 @@ export class SwarmLinkOverseer extends SwarmMemory { // One per room.
             return distA < distB ? -1 : (distA > distB ? 1 : 0);
         }
 
-        let targets = this.FindTargets(findID).sort(sortFunc);
+        let targets = this.FindTargets(findID, updateNewerThan).sort(sortFunc);
         return targets[0];
     }
 }

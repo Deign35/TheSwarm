@@ -9,7 +9,7 @@ import { UpgradeAction } from "Actions/UpgradeAction";
 const LAST_UPDATE = 'LD';
 const ORDER_IDS = 'OI';
 const RCL_DATA = 'RCL';
-export class ArchitectureOverseer extends OverseerBase {
+export class ArchitectureOverseer extends OverseerBase { // Needs a different name.
     Hive!: Room;
     protected _lastUpdate!: number;
     protected ControllerData!: {
@@ -71,11 +71,11 @@ export class ArchitectureOverseer extends OverseerBase {
         if (this._lastUpdate - Game.time < 100) {
             this._lastUpdate = Game.time;
             this.ControllerData.spawnStorage = [];
-            let spawns = this.Queen.hivelord.FindTargets(FIND_MY_SPAWNS) as StructureSpawn[];
+            let spawns = this.Queen.hivelord.FindTargets<STRUCTURE_SPAWN>(FIND_STRUCTURES, 10000, STRUCTURE_SPAWN) as StructureSpawn[];
             for (let index in spawns) {
                 this.ControllerData.spawnStorage.push(spawns[index].id);
             }
-            let extensions = this.Queen.hivelord.FindTargets<STRUCTURE_EXTENSION>(FIND_STRUCTURES, STRUCTURE_EXTENSION) as StructureExtension[];
+            let extensions = this.Queen.hivelord.FindTargets<STRUCTURE_EXTENSION>(FIND_STRUCTURES, 10000, STRUCTURE_EXTENSION) as StructureExtension[];
             for (let index in extensions) {
                 this.ControllerData.spawnStorage.push(extensions[index].id);
             }

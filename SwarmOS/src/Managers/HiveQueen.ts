@@ -42,29 +42,16 @@ export class HiveQueen extends SwarmMemory {
     }
 
     Activate() {
-        let spawns: StructureSpawn[] | undefined;
-        let spawnIndex = -1;
         let spawned = false;
         for (let i = 0, length = this.Overseers.length; i < length; i++) {
             let requirements = this.Overseers[i].GetRequirements();
             if (!spawned && requirements.Creeps.length > 0) {
-                if (!spawns) {
-                    spawns = this.hivelord.FindTargets(FIND_MY_SPAWNS) as StructureSpawn[];
-                    spawnIndex = spawns.length - 1;
-                }
-                let spawn: StructureSpawn | undefined = spawns ? spawns[spawnIndex] : undefined;
-                while (!spawn && spawnIndex >= 0) {
-                    if (!spawns[spawnIndex] || spawns[spawnIndex].spawning) {
-                        spawnIndex--;
-                    } else {
-                        spawn = spawns[spawnIndex];
-                    }
-                }
-                if (spawn && spawn.spawnCreep(requirements.Creeps[0].creepBody, 'TEST_SPAWN', { dryRun: true }) == OK) {
+                let spawns = this.hivelord.FindTargets<STRUCTURE_SPAWN>(FIND_STRUCTURES, 10000, STRUCTURE_SPAWN) as StructureSpawn[];
+
+                if (spawns.length > 0 && spawns[0].spawnCreep(requirements.Creeps[0].creepBody, 'TEST_SPAWN', { dryRun: true }) == OK) {
                     let newSpawnName = this.MemoryID + '_' + ('' + Game.time).slice(-4);
-                    spawn.spawnCreep(requirements.Creeps[0].creepBody, newSpawnName, { memory: { Assigned: 'HiveHarvestOverseer' } });
+                    spawns[0].spawnCreep(requirements.Creeps[0].creepBody, newSpawnName, { memory: { Assigned: 'HiveHarvestOverseer' } });
                     this.Overseers[i].AssignCreep(newSpawnName);
-                    spawnIndex--;
                     spawned = true;
                 }
             }
