@@ -3,7 +3,6 @@ import { OverseerBase } from "Overseers/OverseerBase";
 import { MoveToPositionAction } from "Actions/MoveToPositionAction";
 import * as SwarmConsts from "SwarmConsts";
 import * as SwarmEnums from "SwarmEnums";
-import { SwarmQueen } from "Managers/SwarmQueen";
 import { UpgradeAction } from "Actions/UpgradeAction";
 
 const LAST_UPDATE = 'LD';

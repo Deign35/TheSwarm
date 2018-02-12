@@ -172,6 +172,7 @@ export class DistributionOverseer extends OverseerBase {
             }
             let resourceType = this.CurrentOrders[orderID].resourceType;
             let creep = this._orderData[orderID].creep as Creep;
+            if(creep.spawning) continue;
             let amount;
             let target;
             let action: ActionBase;
@@ -192,7 +193,7 @@ export class DistributionOverseer extends OverseerBase {
 
             let actionResponse = action.Run();
             switch (actionResponse) {
-                case (SwarmEnums.CRT_None): console.log('THIS IS NOT POSSIBLE { DistributionOverseer.CRT_None }'); break;
+                case (SwarmEnums.CRT_None): break;//?? break;
                 case (SwarmEnums.CRT_Condition_Empty):
                     this.CancelOrder(orderID);
                     break; //Means we successfully Delivered.

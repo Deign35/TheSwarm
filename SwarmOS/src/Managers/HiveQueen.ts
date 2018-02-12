@@ -4,11 +4,13 @@ import { HiveHarvestOverseer } from "Overseers/HiveHarvestOverseer";
 import { DistributionOverseer } from "Overseers/DistributionOverseer";
 import { SwarmLinkOverseer } from "Overseers/SwarmLinkOverseer";
 import { ArchitectureOverseer } from "Overseers/ArchitectureOverseer";
+import { ConstructionOverseer } from "Overseers/ConstructionOverseer";
 
 const DISTRIBUTION = 'Di';
 const HIVE_HARVESTER = 'HH';
 const ARCHITECTURE = 'Ar';
 const HIVELORD = 'HL';
+const CONSTRUCTION = 'Ct';
 export class HiveQueen extends SwarmMemory {
     Hive!: Room;
     Overseers!: IOverseer[];
@@ -16,18 +18,23 @@ export class HiveQueen extends SwarmMemory {
     HiveHarvester!: HiveHarvestOverseer;
     hivelord!: SwarmLinkOverseer;
     architectureOverseer!: ArchitectureOverseer;
+    ConstructionOverseer!: ConstructionOverseer;
 
     Save() {
         this.architectureOverseer.Save();
         this.Distribution.Save();
         this.HiveHarvester.Save();
         this.hivelord.Save();
+        this.ConstructionOverseer.Save();
         super.Save();
     }
 
     Load() {
         super.Load();
         this.Hive = Game.rooms[this.MemoryID];
+
+
+
         this.hivelord = new SwarmLinkOverseer(HIVELORD, this); // Special overseer.  does not request/require things.
         this.Overseers = [];
         this.Distribution = new DistributionOverseer(DISTRIBUTION, this); // Special.  Must be init before all other overseers.
@@ -37,8 +44,37 @@ export class HiveQueen extends SwarmMemory {
         this.Overseers.push(this.Distribution);
         this.architectureOverseer = new ArchitectureOverseer(ARCHITECTURE, this);
         this.Overseers.push(this.architectureOverseer);
+        this.ConstructionOverseer = new ConstructionOverseer(CONSTRUCTION, this);
+        this.Overseers.push(this.ConstructionOverseer);
 
-        this.Distribution.ValidateOverseer(); // Assign new jobs if available.
+
+        for(let name in Game.flags) {
+            let flag = Game.flags[name];
+            let structureType = STRUCTURE_ROAD as BuildableStructureConstant;
+            let numBuilders = 1;
+            switch(flag.color) {
+                case(COLOR_RED):
+                    structureType = STRUCTURE_EXTENSION;
+                    numBuilders = 4;
+                    break;
+                case(COLOR_WHITE):
+                    structureType = STRUCTURE_ROAD
+                    numBuilders = 1;
+                    break;
+                case(COLOR_BLUE):
+                    structureType = STRUCTURE_TOWER;
+                    numBuilders = 2;
+                    break;
+            }
+
+            if(this.ConstructionOverseer.CreateNewStructure(structureType, flag.pos, numBuilders) == OK) {
+                flag.remove();
+            }
+        }
+
+        for(let i = 0, length = this.Overseers.length; i < length; i++) {
+            this.Overseers[i].ValidateOverseer();
+        }
     }
 
     Activate() {

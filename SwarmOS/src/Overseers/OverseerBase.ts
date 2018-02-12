@@ -8,7 +8,7 @@ export abstract class OverseerBase extends SwarmMemory implements IOverseer {
         this.ValidateOverseer();
     }
 
-    protected abstract ValidateOverseer(): void;
+    abstract ValidateOverseer(): void;
     protected Registry!: IOverseer_Registry;
     static CreateEmptyOverseerRegistry(): IOverseer_Registry {
         return {

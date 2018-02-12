@@ -149,7 +149,8 @@ export class HiveHarvestOverseer extends OverseerBase {
                 case (SwarmEnums.CRT_Condition_Full):
                     if (!constructionSite && !container) {
                         if (creep.pos.lookFor(LOOK_CONSTRUCTION_SITES).length == 0) {
-                            creep.room.createConstructionSite(creep.pos, STRUCTURE_CONTAINER);
+                            //creep.room.createConstructionSite(creep.pos, STRUCTURE_CONTAINER);
+                            this.Queen.ConstructionOverseer.CreateNewStructure(STRUCTURE_CONTAINER, creep.pos, 8);
                         }
                     }
                     break; //Means we successfully harvested.

@@ -48,6 +48,7 @@ declare interface IOverseer extends IMemory {
     ActivateOverseer(): void;
     ReleaseCreep(name: string, releaseReason: string): void;
     AssignOrder(orderID: string): boolean;
+    ValidateOverseer(): void;
 }
 
 declare interface DistributionOrder {
@@ -55,4 +56,11 @@ declare interface DistributionOrder {
     resourceType: ResourceConstant,
     toTarget: string,
     distributionStatus: string,
+}
+
+declare interface BuildOrder {
+    siteID?: string,
+    pos?: { x: number, y: number, roomName: string }
+    assignedBuilders: number,
+    numBuilders: number
 }
