@@ -84,7 +84,8 @@ export class ArchitectureOverseer extends OverseerBase {
         for (let i = 0, length = this.ControllerData.spawnStorage.length; i < length; i++) {
             let spawnStorageObj = Game.getObjectById(this.ControllerData.spawnStorage[i]) as StructureSpawn | StructureExtension;
             if (spawnStorageObj.energy < spawnStorageObj.energyCapacity) {
-                if(!this.OrderIDs[spawnStorageObj.id] || this.Queen.Distribution.CheckOrderIDIsValid(this.OrderIDs[spawnStorageObj.id])) {
+                debugger;
+                if (!this.OrderIDs[spawnStorageObj.id] || !this.Queen.Distribution.CheckOrderIDIsValid(this.OrderIDs[spawnStorageObj.id])) {
                     registry.Requirements.Resources.push({ amount: spawnStorageObj.energyCapacity - spawnStorageObj.energy, location: spawnStorageObj, type: RESOURCE_ENERGY });
                 }
             }
@@ -172,7 +173,7 @@ export class ArchitectureOverseer extends OverseerBase {
     AssignOrder(orderID: string): boolean {
         let orderDetails = this.Queen.Distribution.RetreiveOrderDetails(orderID);
         this.OrderIDs[orderDetails.toTarget]
-        if(this.OrderIDs[orderDetails.toTarget] && this.Queen.Distribution.CheckOrderIDIsValid(this.OrderIDs[orderDetails.toTarget])) {
+        if (this.OrderIDs[orderDetails.toTarget] && this.Queen.Distribution.CheckOrderIDIsValid(this.OrderIDs[orderDetails.toTarget])) {
             console.log('THIS IS NOT POSSIBLE { ArchitectureOverseer.AssignOrder } -- Multiple order requests');
             return false;
         }

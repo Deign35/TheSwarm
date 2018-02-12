@@ -37,6 +37,9 @@ export class HiveQueen extends SwarmMemory {
         this.Overseers.push(this.Distribution);
         this.architectureOverseer = new ArchitectureOverseer(ARCHITECTURE, this);
         this.Overseers.push(this.architectureOverseer);
+
+        this.Distribution.Save();
+        this.Distribution.Load();
     }
 
     Activate() {
