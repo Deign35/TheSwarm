@@ -4,6 +4,7 @@ import { ActionBase } from "Actions/ActionBase";
 import { TransferAction } from "Actions/TransferAction";
 import { WithdrawAction } from "Actions/WithdrawAction";
 import * as _ from "lodash";
+import { SayAction } from "Actions/SayAction";
 
 const CURRENT_ORDERS = 'CO';
 const CREEP_DATA = 'CD';
@@ -203,6 +204,14 @@ export class DistributionOverseer extends OverseerBase {
                     console.log('THIS IS NOT POSSIBLE { DistributionOverseer.CRT_NewTarget }');
                     break;
 
+            }
+        }
+
+        for(let name in this.AssignedCreeps) {
+            let creepIsBored = !this.AssignedCreeps[name].orderID ||
+                               this.CurrentOrders[this.AssignedCreeps[name].orderID as string].distributionStatus == ORDER_STATE_WAIT;
+            if(creepIsBored) {
+                let sayAction = new SayAction(Game.creeps[name], 'Im bored');
             }
         }
     }
