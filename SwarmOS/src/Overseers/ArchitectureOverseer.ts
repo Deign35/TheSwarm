@@ -51,7 +51,7 @@ export class ArchitectureOverseer extends OverseerBase {
         let numUpgraders = 1;
         switch (upgradeData.level) {
             case (8): break;
-            default: numUpgraders = 3;
+            default: numUpgraders = 8;
         }
 
         for (let i = 0; i < numUpgraders; i++) {
@@ -60,7 +60,7 @@ export class ArchitectureOverseer extends OverseerBase {
                 if (upgradeData.upgradeCreeps[i]) { upgradeData.upgradeCreeps.splice(i--, 1); }
                 registry.Requirements.Creeps.push({ time: 0, creepBody: [WORK, WORK, CARRY, MOVE] });
             } else {
-                if (creep.carry.energy < creep.carryCapacity / 4) {
+                if (creep.carry.energy < creep.carryCapacity / 2) {
                     if (!this.OrderIDs[creep.id]) {
                         registry.Requirements.Resources.push({ amount: creep.carryCapacity, location: creep, type: RESOURCE_ENERGY })
                     }
@@ -84,7 +84,6 @@ export class ArchitectureOverseer extends OverseerBase {
         for (let i = 0, length = this.ControllerData.spawnStorage.length; i < length; i++) {
             let spawnStorageObj = Game.getObjectById(this.ControllerData.spawnStorage[i]) as StructureSpawn | StructureExtension;
             if (spawnStorageObj.energy < spawnStorageObj.energyCapacity) {
-                debugger;
                 if (!this.OrderIDs[spawnStorageObj.id] || !this.Queen.Distribution.CheckOrderIDIsValid(this.OrderIDs[spawnStorageObj.id])) {
                     registry.Requirements.Resources.push({ amount: spawnStorageObj.energyCapacity - spawnStorageObj.energy, location: spawnStorageObj, type: RESOURCE_ENERGY });
                 }

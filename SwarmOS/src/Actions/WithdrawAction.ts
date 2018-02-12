@@ -10,7 +10,16 @@ export class WithdrawAction extends ActionWithTarget<Structure> {
         }
     }
     protected ActionImplemented(): SwarmEnums.CommandResponseType {
-        let result = this.AssignedCreep.withdraw(this.Target, this.ResourceType, this.Amount);
+        let carryCapacity = this.AssignedCreep.carryCapacity - _.sum(this.AssignedCreep.carry);
+        let targetAllows = 0;
+        if((this.Target as StructureContainer).store) {
+            targetAllows = (this.Target as StructureContainer).store[this.ResourceType];
+        } else if((this.Target as StructureExtension).energy) {
+            targetAllows = (this.Target as StructureExtension).energy;
+        }
+
+        let amount = Math.min(carryCapacity, targetAllows);
+        let result = this.AssignedCreep.withdraw(this.Target, this.ResourceType, amount);
         let actionResponse: SwarmEnums.CommandResponseType = SwarmEnums.CRT_None;
         switch (result) {
             case (OK): actionResponse = SwarmEnums.CRT_Condition_Full; break;

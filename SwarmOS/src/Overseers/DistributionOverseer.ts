@@ -24,7 +24,6 @@ export class DistributionOverseer extends OverseerBase {
 
     CreateNewDistributionOrder(requestor: Structure | Creep, resourceType: ResourceConstant, amount: number) {
         let orderID = ('' + Game.time).slice(-4) + '_' + ('' + Math.random() * 1000).slice(-3);
-        console.log(orderID);
         if (this.CurrentOrders[orderID]) {
             console.log('what are the odds...');
             orderID = Game.time + '' + Math.random;
@@ -82,14 +81,12 @@ export class DistributionOverseer extends OverseerBase {
             let orderID = (this.AssignedCreeps[name].orderID && this.AssignedCreeps[name].orderID) as string || undefined;
             let validOrder = orderID && this.CheckOrderIDIsValid(orderID);
             if (!validOrder) {
-                console.log('creep[' + creep.name + '] has no assignment');
                 this.AssignedCreeps[name] = {};
                 unassignedCreeps.push(creep);
                 continue;
             }
             orderID = orderID as string;
             let order = this.CurrentOrders[orderID];
-            console.log('creep[' + creep.name + '] has order[' + orderID + ']');
 
             delete unassignedOrders[orderID];
             this._orderData[orderID].creep = creep;
@@ -113,7 +110,6 @@ export class DistributionOverseer extends OverseerBase {
 
         while (unassignedCreeps.length > 0 && Object.keys(unassignedOrders).length > 0) {
             let orderID = Object.keys(unassignedOrders)[0];
-            console.log('looking for a creep for order: ' + orderID);
             let order = this.CurrentOrders[orderID];
             if (order.distributionStatus != ORDER_STATE_WAIT) {
                 console.log('THIS IS NOT POSSIBLE { DistributionOverseer.unassignedCreeps } -- Didnt remove order thats ready');
@@ -168,7 +164,6 @@ export class DistributionOverseer extends OverseerBase {
     }
 
     ActivateOverseer() {
-        debugger;
         let completedOrders: number[] = [];
         for (let orderID in this._orderData) {
             if (this.CurrentOrders[orderID].distributionStatus == ORDER_STATE_WAIT) {
@@ -176,35 +171,35 @@ export class DistributionOverseer extends OverseerBase {
             }
             let resourceType = this.CurrentOrders[orderID].resourceType;
             let creep = this._orderData[orderID].creep as Creep;
-            //let amount = this.CurrentOrders[orderID].amount;
-            // This could be changed to just withdraw the full amount and deliver them back when no orders or 
-            // what about depositing anything on this creep before withdrawing.
-            let amount = Math.min(creep.carryCapacity - _.sum(creep.carry), this.CurrentOrders[orderID].amount)
-            let target = this.CurrentOrders[orderID].distributionStatus == ORDER_STATE_DELIVER ?
-                this._orderData[orderID].toTarget as Structure | Creep :
-                this._orderData[orderID].fromTarget as StructureContainer;
-            let action: ActionBase = this.CurrentOrders[orderID].distributionStatus == ORDER_STATE_DELIVER ?
-                new TransferAction(creep, target, resourceType, amount) :
-                new WithdrawAction(creep, target as StructureContainer, resourceType, amount);
-
+            let amount;
+            let target;
+            let action: ActionBase;
+            if(this.CurrentOrders[orderID].distributionStatus == ORDER_STATE_DELIVER) {
+                target = this._orderData[orderID].toTarget as Structure | Creep;
+                action = new TransferAction(creep, target, resourceType, amount)
+            } else {
+                target = this._orderData[orderID].fromTarget as StructureContainer;
+                action = new WithdrawAction(creep, target, resourceType, amount);
+            }
             let actionValidation = action.ValidateAction();
-            if (actionValidation != SwarmEnums.CRT_None) {
-                // NewTarget and Next
-                console.log('THIS IS NOT POSSIBLE { DistributionOverseer.actionValidation } -- Couldnt find a delivery target');
+            if(actionValidation == SwarmEnums.CRT_NewTarget) {
+                this.CancelOrder(orderID);
+                continue;
+            } else if(actionValidation != SwarmEnums.CRT_None && actionValidation != SwarmEnums.CRT_Next) {
+                console.log('THIS IS NOT POSSIBLE { DistributionOverseer.actionValidation }' + actionValidation);
             }
 
-            debugger;
-            let actionResponse = action.Run(true);
+            let actionResponse = action.Run();
             switch (actionResponse) {
                 case (SwarmEnums.CRT_None): console.log('THIS IS NOT POSSIBLE { DistributionOverseer.CRT_None }'); break;
                 case (SwarmEnums.CRT_Condition_Empty):
-                    console.log('order canceled because it was successful?')
                     this.CancelOrder(orderID);
                     break; //Means we successfully Delivered.
                 case (SwarmEnums.CRT_Condition_Full):
                     break; // Means we successfully Withdrew
                 case (SwarmEnums.CRT_Next): console.log('THIS IS NOT POSSIBLE { DistributionOverseer.CRT_Next }'); break;
                 case (SwarmEnums.CRT_NewTarget):
+                    console.log(this.CurrentOrders[orderID].distributionStatus);
                     console.log('THIS IS NOT POSSIBLE { DistributionOverseer.CRT_NewTarget }');
                     break;
 
@@ -220,7 +215,6 @@ export class DistributionOverseer extends OverseerBase {
     }
 
     CancelOrder(id: string) {
-        debugger;
         delete this.CurrentOrders[id];
         delete this._orderData[id];
         for (let creepName in this.AssignedCreeps) {

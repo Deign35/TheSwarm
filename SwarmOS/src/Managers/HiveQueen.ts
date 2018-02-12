@@ -38,8 +38,7 @@ export class HiveQueen extends SwarmMemory {
         this.architectureOverseer = new ArchitectureOverseer(ARCHITECTURE, this);
         this.Overseers.push(this.architectureOverseer);
 
-        this.Distribution.Save();
-        this.Distribution.Load();
+        this.Distribution.ValidateOverseer(); // Assign new jobs if available.
     }
 
     Activate() {
@@ -72,7 +71,6 @@ export class HiveQueen extends SwarmMemory {
             for (let j = 0, length = requirements.Resources.length; j < length; j++) {
                 let resourceRequest = requirements.Resources[j];
                 let newOrder = this.Distribution.CreateNewDistributionOrder(resourceRequest.location as Structure, resourceRequest.type, resourceRequest.amount);
-                console.log('NewORder: ' + JSON.stringify(newOrder));
                 if (newOrder) {
                     if (!this.Overseers[i].AssignOrder(newOrder)) {
                         console.log('what?');
