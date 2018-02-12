@@ -19,6 +19,7 @@ export class HiveQueen extends SwarmMemory {
     hivelord!: SwarmLinkOverseer;
     architectureOverseer!: ArchitectureOverseer;
     ConstructionOverseer!: ConstructionOverseer;
+    Minispawns: boolean = false;
 
     Save() {
         this.architectureOverseer.Save();
@@ -47,43 +48,22 @@ export class HiveQueen extends SwarmMemory {
         this.ConstructionOverseer = new ConstructionOverseer(CONSTRUCTION, this);
         this.Overseers.push(this.ConstructionOverseer);
 
-
-        for(let name in Game.flags) {
-            let flag = Game.flags[name];
-            let structureType = STRUCTURE_ROAD as BuildableStructureConstant;
-            let numBuilders = 1;
-            switch(flag.color) {
-                case(COLOR_RED):
-                    structureType = STRUCTURE_EXTENSION;
-                    numBuilders = 4;
-                    break;
-                case(COLOR_WHITE):
-                    structureType = STRUCTURE_ROAD
-                    numBuilders = 1;
-                    break;
-                case(COLOR_BLUE):
-                    structureType = STRUCTURE_TOWER;
-                    numBuilders = 2;
-                    break;
-            }
-
-            if(this.ConstructionOverseer.CreateNewStructure(structureType, flag.pos, numBuilders) == OK) {
-                flag.remove();
-            }
-        }
-
         for(let i = 0, length = this.Overseers.length; i < length; i++) {
             this.Overseers[i].ValidateOverseer();
         }
     }
 
     Activate() {
+        if(this.Hive.find(FIND_STRUCTURES, (structure) => {
+            return structure.structureType == STRUCTURE_CONTAINER;
+        })) {
+            this.Minispawns = false;
+        }
         let spawned = false;
         for (let i = 0, length = this.Overseers.length; i < length; i++) {
             let requirements = this.Overseers[i].GetRequirements();
             if (!spawned && requirements.Creeps.length > 0) {
                 let spawns = this.hivelord.FindTargets<STRUCTURE_SPAWN>(FIND_STRUCTURES, 10000, STRUCTURE_SPAWN) as StructureSpawn[];
-
                 if (spawns.length > 0 && spawns[0].spawnCreep(requirements.Creeps[0].creepBody, 'TEST_SPAWN', { dryRun: true }) == OK) {
                     let newSpawnName = this.MemoryID + '_' + ('' + Game.time).slice(-4);
                     spawns[0].spawnCreep(requirements.Creeps[0].creepBody, newSpawnName, { memory: { Assigned: 'HiveHarvestOverseer' } });
