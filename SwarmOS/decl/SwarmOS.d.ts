@@ -68,3 +68,13 @@ declare interface BuildOrder {
     assignedBuilders: number,
     numBuilders: number
 }
+
+declare interface RoomMap {
+    Tiles: { [name: string]: RoomTile };
+}
+
+declare interface RoomTile {
+    PrimaryObject: RoomObject; // Source, road, container, 
+    xPos: number,
+    yPos: number,
+}
