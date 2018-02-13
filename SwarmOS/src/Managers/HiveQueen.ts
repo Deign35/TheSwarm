@@ -49,7 +49,7 @@ export class HiveQueen extends SwarmMemory {
         this.CreepData = this.GetData(CREEP_DATA) || {};
         let lastFrameBootStrapped = this.GetData(HIVE_BOOTSTRAPPING);
         this.BootStrapping = lastFrameBootStrapped ||
-            (this.Hive.find(FIND_STRUCTURES, { filter: function(structure) { return structure.structureType == STRUCTURE_EXTENSION; }}).length < 5) ||
+            this.Hive.energyCapacityAvailable < 550 ||
             (this.Hive.find(FIND_MY_CREEPS, { filter: function(creep) { return creep.getActiveBodyparts(WORK) > 0 && creep.getActiveBodyparts(CARRY) > 0}}).length == 0);
 
         this.hivelord = new SwarmLinkOverseer(HIVELORD, this); // Special overseer.  does not request/require things.
@@ -94,14 +94,20 @@ export class HiveQueen extends SwarmMemory {
                 let needsSpawn = !spawned;
                 if (unassignedCreeps.length > 0) { // Check unassigned creeps first.
                     let bestPick = -1;
-                    let bestBodyMatch = 0;
+                    let bestBodyMatch = 35000; // 50 claim parts = 50 * 600 = 30000;
                     let desiredBody = requirements.Creeps[i].creepBody;
                     for (let k = 0, length2 = unassignedCreeps.length; k < length2; k++) {
                         if (this.CanCreepFillRole(Game.creeps[unassignedCreeps[i]], desiredBody)) {
                             let newBody = Game.creeps[unassignedCreeps[i]].body;
 
                             let newScore = this.CompareBodyToTemplate(newBody, desiredBody);
-                            if (newScore > bestBodyMatch) {
+                            if(newScore < 0) {
+                                newScore *= -1;
+                            }
+                            // closer to 0 = better;
+                            // positive score means its not strong enough
+                            // negative score means its overpowered for the task at hand
+                            if (newScore < bestBodyMatch) {
                                 bestPick = k;
                             }
                         }
@@ -166,11 +172,37 @@ export class HiveQueen extends SwarmMemory {
     }
 
     CompareBodyToTemplate(bodyToCompare: BodyPartDefinition[], desiredBody: BodyPartConstant[]): number {
+        let creepParts: {[part: string]: number} = {};
+        for(let i = 0, length = desiredBody.length; i < length; i++) {
+            if(!creepParts[desiredBody[i]]) {
+                creepParts[desiredBody[i]] = 0;
+            }
+            creepParts[desiredBody[i]]++;
+        }
+        for(let i = 0, length = bodyToCompare.length; i < length; i++) {
+            if(!creepParts[bodyToCompare[i].type]) {
+                creepParts[bodyToCompare[i].type] = 0;
+            }
+            creepParts[bodyToCompare[i].type]--;
+        }
+
         let score = 0;
 
+        for(let part in creepParts) {
+            score += creepParts[part] * BODYPART_COST[part];
+        }
         return score;
     }
     CanCreepFillRole(creep: Creep, desiredBody: BodyPartConstant[]): boolean {
-        return false;
+        let checkedParts: {[part: string]: boolean} = {}
+        for(let i = 0, length = desiredBody.length; i < length; i++) {
+            if(!checkedParts[desiredBody[i]]) {
+                if(creep.getActiveBodyparts(desiredBody[i]) == 0) {
+                    return false;
+                }
+                checkedParts[desiredBody[i]] = true;
+            }
+        }
+        return true;
     }
 }

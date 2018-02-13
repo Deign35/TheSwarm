@@ -22,7 +22,6 @@ const DELIVERY_BODY = [CARRY, CARRY, CARRY, CARRY, MOVE, MOVE]
 const ROLE_UPGRADE = 'Up';
 const UPGRADE_BODY = [WORK, WORK, CARRY, MOVE];
 
-
 // This should just be a HiveLarva or something (small HiveQueen).
 // This is only needed until we have at least one container next to a source.  Once that is complete,
 // and all 5 extensions are built, we can afford normal 5w + 1m harvesters.
@@ -59,6 +58,12 @@ export class BootstrapOverseer extends OverseerBase {
     }
 
     ValidateOverseer(): void {
+        debugger;
+        /*let flags = this.Queen.Hive.find(FIND_FLAGS);
+        for(let name in flags) {
+            if()
+        }*/
+        let HasIncreased = (this.Queen.Hive.controller as StructureController).level > 1;
         let registry = OverseerBase.CreateEmptyOverseerRegistry();
         let creepJobs: {[role: string]: string[]} = {};
         creepJobs[ROLE_DELIVERY] = [];
@@ -76,6 +81,16 @@ export class BootstrapOverseer extends OverseerBase {
         for(let i = 0, length = this.BootCreeps.length; i < length; i++) {
             let creepName = this.BootCreeps[i];
             if(!Game.creeps[creepName]) {
+                if(this.CreepData[creepName] && this.CreepData[creepName].targetID) {
+                    let obj = Game.getObjectById(this.CreepData[creepName].targetID);
+                    if(obj && (obj as Source).ticksToRegeneration) {
+                        let sourceIndex = 0;
+                        if(this.SourceData.length > 1 && this.SourceData[1].id == (obj as Source).id) {
+                            sourceIndex = 1;
+                        }
+                        this.SourceData[sourceIndex].harvesters--;
+                    }
+                }
                 delete this.CreepData[creepName];
             } else {
                 let creep = Game.creeps[creepName];
@@ -90,6 +105,13 @@ export class BootstrapOverseer extends OverseerBase {
         for(let creepName in this._creepData) {
             let creep = this._creepData[creepName].creep;
             let role = this.CreepData[creepName].role;
+            if(this.CreepData[creepName].action) {
+                if(this.CreepData[creepName].action == SwarmEnums.C_Upgrade && HasIncreased) {
+                    delete this.CreepData[creepName].action;
+                    delete this.CreepData[creepName].targetID;
+                }
+            }
+
             if(!this.CreepData[creepName].action) {
                 // Decide what to do with this creep.
                 switch(role) {
@@ -101,14 +123,18 @@ export class BootstrapOverseer extends OverseerBase {
                         }
                     break;
                     case(ROLE_UPGRADE):
-                        this.CreepData[creep.name].action = SwarmEnums.C_Upgrade;
+                        if(HasIncreased) {
+                            this.CreepData[creep.name].action = SwarmEnums.C_Build;
+                        } else {
+                            this.CreepData[creep.name].action = SwarmEnums.C_Upgrade;
+                        }
                     break;
                     case(ROLE_GENERAL):
                     default:
                         if(_.sum(creep.carry) != creep.carryCapacity) {
                             this.CreepData[creep.name].action = SwarmEnums.C_Harvest;
                         } else {
-                            if(creep.room.find(FIND_CONSTRUCTION_SITES).length > 0) {
+                            if(creep.room.find(FIND_CONSTRUCTION_SITES).length > 0 && this.BootCreeps.length > 1) {
                                 this.CreepData[creep.name].action = SwarmEnums.C_Build;
                             } else {
                                 this.CreepData[creep.name].action = SwarmEnums.C_Transfer;
@@ -117,7 +143,6 @@ export class BootstrapOverseer extends OverseerBase {
                     break;
                 }
             }
-
             let actionTarget = this.CreepData[creep.name].targetID && Game.getObjectById(this.CreepData[creep.name].targetID) as Creep | Structure | Source | ConstructionSite | undefined;
             if(actionTarget && (this.CreepData[creep.name].action as string) == ROLE_DELIVERY) {
                 // Check that the target isn't already full.
@@ -142,18 +167,23 @@ export class BootstrapOverseer extends OverseerBase {
                         }
                         break;
                     case(SwarmEnums.C_Transfer):
-                        if(spawner.energy < spawner.energyCapacity) {
-                            actionTarget = spawner; // Fill up spawner first.
+                        let structureTargets = this.Queen.Hive.find(FIND_MY_STRUCTURES, {
+                            filter: function(structure) {
+                                return (structure.structureType == STRUCTURE_EXTENSION ||
+                                        structure.structureType == STRUCTURE_SPAWN) &&
+                                            structure.energy < structure.energyCapacity;
+                            }
+                        });
+                        if(structureTargets.length > 0) {
+                            actionTarget = structureTargets[0]; // Fill up spawner first.
                         } else {
+                            //Check for the extensions here
                             let newTarget: string | undefined;
                             if(!newTarget && this.CreepData[creep.name].role == ROLE_GENERAL) {
                                 newTarget = this.FindDeliveryTarget(creep, creepJobs[ROLE_DELIVERY]);
                             }
                             if(!newTarget) {
                                 newTarget = this.FindDeliveryTarget(creep, creepJobs[ROLE_UPGRADE]);
-                            }
-                            if(!newTarget && this.CreepData[creep.name].role != ROLE_GENERAL) {
-                                newTarget = this.FindDeliveryTarget(creep, creepJobs[ROLE_GENERAL]);
                             }
 
                             if(!newTarget) {
@@ -172,7 +202,7 @@ export class BootstrapOverseer extends OverseerBase {
                     case(SwarmEnums.C_Harvest):
                         let selectedSource = 0;
                         if(this.SourceData.length > 1 && this.SourceData[0].harvesters > this.SourceData[1].harvesters) {
-                            selectedSource = 0;
+                            selectedSource = 1;
                         }
                         actionTarget = Game.getObjectById(this.SourceData[selectedSource].id) as Source;
                         this.SourceData[selectedSource].harvesters++;
@@ -196,51 +226,53 @@ export class BootstrapOverseer extends OverseerBase {
                 continue;
             }
 
-            debugger;
             if(this.CreepData[creepName].action == SwarmEnums.C_Withdraw) {
                 if(creep.pos.getRangeTo(this._creepData[creepName].target as Creep) <= 1) {
                     this._overrides[(this._creepData[creepName].target as Creep).name] = this._creepData[creepName].creep;
+                    delete this._creepData[creepName];
                 }
             }
 
         }
 
         let creepToBuild: BodyPartConstant[] = [];
-        if(creepJobs[ROLE_GENERAL].length < 2) {
+        if(creepJobs[ROLE_GENERAL].length < 1) {
             creepToBuild = GENERAL_BODY;
-        } else if(creepJobs[ROLE_UPGRADE].length < 1) {
-            creepToBuild = UPGRADE_BODY;
         } else if(creepJobs[ROLE_DELIVERY].length < 1) {
             creepToBuild = DELIVERY_BODY;
+        } else if(creepJobs[ROLE_GENERAL].length < 4) {
+            creepToBuild = GENERAL_BODY;
+        } else if(creepJobs[ROLE_DELIVERY].length < 2) {
+            creepToBuild = DELIVERY_BODY;
+        } else if(creepJobs[ROLE_GENERAL].length < 6) {
+            creepToBuild = GENERAL_BODY;
+        } else if(creepJobs[ROLE_UPGRADE].length < 2) {
+            creepToBuild = UPGRADE_BODY;
+        } else if(creepJobs[ROLE_GENERAL].length < 8) {
+            creepToBuild = GENERAL_BODY;
         }
 
-        if(creepToBuild.length == 0) {
-            let deliverers = creepJobs[ROLE_DELIVERY].length;
-            let upgraders = creepJobs[ROLE_UPGRADE].length;
-            let generalWorkers = creepJobs[ROLE_GENERAL].length;
-
-            if(deliverers <= 2) {
-                if(generalWorkers <= upgraders * 2) {
-                    creepToBuild = GENERAL_BODY;
-                } else if(upgraders > deliverers) {
-                    creepToBuild = DELIVERY_BODY;
-                } else {
-                    creepToBuild = UPGRADE_BODY;
-                }
-            }
+        if(creepToBuild.length > 0) {
+            registry.Requirements.Creeps.push({time: 0, creepBody: creepToBuild})
         }
-        registry.Requirements.Creeps.push({time: 0, creepBody: creepToBuild})
 
         this.Registry = registry;
     }
     HasResources(): boolean { return false; }
     ActivateOverseer(): void {
+        debugger;
         for(let creepName in this._creepData) {
             // Choose the creeps job and targets if it doesn't already have them.
             let creep = this._creepData[creepName].creep;
             let action: ActionBase | undefined;
-            if(this._overrides[creepName]) {
+            if(this._overrides[creepName] && creep.carry[RESOURCE_ENERGY] > 0) {
                 action = new TransferAction(creep, this._overrides[creepName] as Creep, RESOURCE_ENERGY);
+                if(action.Run(false) == SwarmEnums.CRT_Condition_Empty) {
+                    // Withdraw successful.
+                    this.CreepData[this._overrides[creepName].name].action = SwarmEnums.C_Transfer;
+                    delete this.CreepData[this._overrides[creepName].name].targetID;
+                }
+                continue;
             } else {
                 let target = this._creepData[creepName].target;
                 switch(this.CreepData[creepName].action) {
@@ -254,6 +286,7 @@ export class BootstrapOverseer extends OverseerBase {
                         action = new TransferAction(creep, target as Creep | Structure, RESOURCE_ENERGY);
                         break;
                     case(SwarmEnums.C_Upgrade):
+                        if(creep.carry[RESOURCE_ENERGY])
                         action = new UpgradeAction(creep, target as StructureController);
                         break;
                     case(SwarmEnums.C_Withdraw):
@@ -270,7 +303,19 @@ export class BootstrapOverseer extends OverseerBase {
 
             let actionResponse = action.Run(true);
             switch(actionResponse) {
-                case(SwarmEnums.CRT_Condition_Full): break; // Harvest Complete
+                case(SwarmEnums.CRT_Condition_Full):
+                    if(this._creepData[creepName].carryAmount == creep.carryCapacity) {
+                        let index = 0;
+                        if(this.SourceData.length > 0) {
+                            if(this.SourceData[1].id == this.CreepData[creepName].targetID) {
+                                index = 1;
+                            }
+                        }
+                        this.SourceData[index].harvesters--;
+                        delete this.CreepData[creepName].action;
+                        delete this.CreepData[creepName].targetID;
+                    }
+                    break; // Harvest Complete
                 case(SwarmEnums.CRT_Condition_Empty):
                     if(this.CreepData[creepName].action == SwarmEnums.C_Transfer) {
                         delete this.CreepData[creepName].action;
@@ -278,9 +323,18 @@ export class BootstrapOverseer extends OverseerBase {
                     }
                     break; // Transfer Successful -- Upgrade successful -- Build successful
                 case(SwarmEnums.CRT_NewTarget):
+                    if(this.CreepData[creepName].action == SwarmEnums.C_Harvest) {
+                        let index = 0;
+                        if(this.SourceData.length > 0) {
+                            if(this.SourceData[1].id == this.CreepData[creepName].targetID) {
+                                index = 1;
+                            }
+                        }
+                        this.SourceData[index].harvesters--;
+                    }
                     delete this.CreepData[creepName].action;
                     delete this.CreepData[creepName].targetID;
-                    break; // Harvest failed - Source empty -- Transfer failed - target full
+                    break; // Harvest failed - Source empty -- Transfer failed - Target full
                 case(SwarmEnums.CRT_Next):
                     delete this.CreepData[creepName].action;
                     delete this.CreepData[creepName].targetID;
@@ -307,6 +361,8 @@ export class BootstrapOverseer extends OverseerBase {
         for(let name in this.CreepData) {
             this.ReleaseCreep(name, 'Done Bootstrapping');
         }
+        this.CreepData = {};
+        this.BootCreeps = [];
     }
 
     protected static DetermineRoleFromBody(creep: Creep) {
@@ -322,10 +378,10 @@ export class BootstrapOverseer extends OverseerBase {
 
     protected FindWithdrawTarget(creep: Creep, potentialTargets: string[]) {if(potentialTargets.length == 0) { return;}
     potentialTargets.sort((a: string, b:string) => {
-        if(this._creepData[a].hasDelivery) {
+        if(!this._creepData[a] || this._creepData[a].hasDelivery) {
             return 1;
         }
-        if(this._creepData[b].hasDelivery) {
+        if(!this._creepData[b] || this._creepData[b].hasDelivery) {
             return -1;
         }
         let creepA = this._creepData[a].creep;
