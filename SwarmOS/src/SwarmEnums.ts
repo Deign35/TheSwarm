@@ -14,7 +14,7 @@ declare type C_Transfer = 'Tr'; export const C_Transfer = 'Tr';
 declare type C_Upgrade = 'Up'; export const C_Upgrade = 'Up';
 declare type C_Withdraw = 'Wi'; export const C_Withdraw = 'Wi';
 
-declare type CreepActionType = C_Attack | C_Build | C_Dismantle | C_Harvest | C_Heal | C_Pickup | C_RangedAttack |
+export type CreepActionType = C_Attack | C_Build | C_Dismantle | C_Harvest | C_Heal | C_Pickup | C_RangedAttack |
     C_RangedHeal | C_Repair | C_Say | C_Suicide | C_Transfer | C_Upgrade | C_Withdraw;
 export type SwarmReturnCode = ScreepsReturnCode;
 

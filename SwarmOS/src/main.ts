@@ -16,14 +16,14 @@ export const loop = function () {
     swarmQueen.Save();
 
 
-    let targets = Game.rooms['E9N35'].find(FIND_HOSTILE_CREEPS);
+    /*let targets = Game.rooms['E9N35'].find(FIND_HOSTILE_CREEPS);
     if(targets.length > 0) {
         let tower = Game.getObjectById(Memory['TowerID']) as StructureTower;
         tower.attack(targets[0]);
     }
     Game.rooms['E9N35'].visual.text(("CPU: " + Game.cpu.getUsed()).slice(0, 10), 21, 20.5, {color:'black', backgroundColor: 'white', font: 0.8})
     Game.rooms['E9N35'].visual.text(("MEM: " + RawMemory.get().length).slice(0, 10), 21, 21.5, {color:'black', backgroundColor: 'white', font: 0.8})
-    Game.rooms['E9N35'].visual.text(("B: " + Game.cpu.bucket), 21, 22.5, {color:'black', backgroundColor: 'white', font: 0.8})
+    Game.rooms['E9N35'].visual.text(("B: " + Game.cpu.bucket), 21, 22.5, {color:'black', backgroundColor: 'white', font: 0.8})*/
 }
 
 const initSwarm = function () {

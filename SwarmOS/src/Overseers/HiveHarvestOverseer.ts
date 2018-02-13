@@ -44,49 +44,44 @@ export class HiveHarvestOverseer extends OverseerBase {
             }
         }
 
-        if (!this.Hive.controller || !this.Hive.controller.my || !(this.Hive.controller.level >= 3)) {
-            // do boot strapper instead.
-            console.log('Controller isnt level 3');
-        } else {
-            for (let i = 0, length = this.SourceNodes.length; i < length; i++) {
-                let newNodeObj: { creep?: Creep, source: Source, container?: StructureContainer, constructionSite?: ConstructionSite };
-                newNodeObj = { source: Game.getObjectById(this.SourceNodes[i].sourceID) as Source }
+        for (let i = 0, length = this.SourceNodes.length; i < length; i++) {
+            let newNodeObj: { creep?: Creep, source: Source, container?: StructureContainer, constructionSite?: ConstructionSite };
+            newNodeObj = { source: Game.getObjectById(this.SourceNodes[i].sourceID) as Source }
 
-                if (!this.SourceNodes[i].containerID) {
-                    this.SourceNodes[i] = this.UpdateNodeData(this.SourceNodes[i]);
-                }
-
-                if (this.SourceNodes[i].containerID) {
-                    newNodeObj.container = Game.getObjectById(this.SourceNodes[i].containerID as string) as StructureContainer;
-                    if (!newNodeObj.container) {
-                        delete this.SourceNodes[i].containerID;
-                    } else {
-                        registry.Available.Resources.push({ amount: newNodeObj.container.store.energy, type: RESOURCE_ENERGY, location: newNodeObj.container.pos });
-                    }
-                }
-
-                if (this.SourceNodes[i].creepName) {
-                    newNodeObj.creep = Game.creeps[this.SourceNodes[i].creepName as string];
-                    if (!newNodeObj.creep) {
-                        // creep has died.
-                        this.ReleaseCreep((this.SourceNodes[i].creepName as string), 'Dead creep');
-                    }
-                }
-
-                if (!newNodeObj.creep) { // || newNodeObj.creep.ticksToLive < SomeCalculatedValue) { // 100 to start with?
-                    registry.Requirements.Creeps.push({
-                        time: 0, // Use this to request ahead of time.
-                        creepBody: SwarmConsts.PRIME_HARVESTER,
-                    });
-                }
-                if (this.SourceNodes[i].constructionSiteID) {
-                    newNodeObj.constructionSite = Game.constructionSites[this.SourceNodes[i].constructionSiteID as string];
-                    if (!newNodeObj.constructionSite) {
-                        delete this.SourceNodes[i].constructionSiteID;
-                    }
-                }
-                this.NodeObjects.push(newNodeObj);
+            if (!this.SourceNodes[i].containerID) {
+                this.SourceNodes[i] = this.UpdateNodeData(this.SourceNodes[i]);
             }
+
+            if (this.SourceNodes[i].containerID) {
+                newNodeObj.container = Game.getObjectById(this.SourceNodes[i].containerID as string) as StructureContainer;
+                if (!newNodeObj.container) {
+                    delete this.SourceNodes[i].containerID;
+                } else {
+                    registry.Available.Resources.push({ amount: newNodeObj.container.store.energy, type: RESOURCE_ENERGY, location: newNodeObj.container.pos });
+                }
+            }
+
+            if (this.SourceNodes[i].creepName) {
+                newNodeObj.creep = Game.creeps[this.SourceNodes[i].creepName as string];
+                if (!newNodeObj.creep) {
+                    // creep has died.
+                    this.ReleaseCreep((this.SourceNodes[i].creepName as string), 'Dead creep');
+                }
+            }
+
+            if (!newNodeObj.creep) { // || newNodeObj.creep.ticksToLive < SomeCalculatedValue) { // 100 to start with?
+                registry.Requirements.Creeps.push({
+                    time: 0, // Use this to request ahead of time.
+                    creepBody: newNodeObj.container ? SwarmConsts.PRIME_HARVESTER : [WORK, WORK, WORK, WORK, CARRY, MOVE], // Check if bootstrapping?
+                });
+            }
+            if (this.SourceNodes[i].constructionSiteID) {
+                newNodeObj.constructionSite = Game.constructionSites[this.SourceNodes[i].constructionSiteID as string];
+                if (!newNodeObj.constructionSite) {
+                    delete this.SourceNodes[i].constructionSiteID;
+                }
+            }
+            this.NodeObjects.push(newNodeObj);
         }
 
         this.Registry = registry;

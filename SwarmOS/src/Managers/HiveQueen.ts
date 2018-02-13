@@ -5,6 +5,7 @@ import { DistributionOverseer } from "Overseers/DistributionOverseer";
 import { SwarmLinkOverseer } from "Overseers/SwarmLinkOverseer";
 import { ArchitectureOverseer } from "Overseers/ArchitectureOverseer";
 import { ConstructionOverseer } from "Overseers/ConstructionOverseer";
+import { BootstrapOverseer } from "Overseers/BoostrapOverseer";
 
 const DISTRIBUTION = 'Di';
 const HIVE_HARVESTER = 'HH';
@@ -13,6 +14,8 @@ const HIVELORD = 'HL';
 const CONSTRUCTION = 'Ct';
 const CREEP_DATA = 'CD';
 const NO_ASSIGNMENT = 'NA';
+const HIVE_BOOTSTRAPPING = 'HB';
+const BOOTSTRAPPER = 'BS';
 export class HiveQueen extends SwarmMemory {
     Hive!: Room;
     Overseers!: IOverseer[];
@@ -23,14 +26,19 @@ export class HiveQueen extends SwarmMemory {
     ConstructionOverseer!: ConstructionOverseer;
 
     protected CreepData!: { [creepName: string]: Hive_CreepData }
+    private BootStrapping!: boolean;
+    private BootStrapper!: BootstrapOverseer;
 
     Save() {
-        this.architectureOverseer.Save();
-        this.Distribution.Save();
-        this.HiveHarvester.Save();
-        this.hivelord.Save();
-        this.ConstructionOverseer.Save();
-
+        if(this.BootStrapping) {
+            this.BootStrapper.Save();
+        } else {
+            this.architectureOverseer.Save();
+            this.Distribution.Save();
+            this.HiveHarvester.Save();
+            this.hivelord.Save();
+            this.ConstructionOverseer.Save();
+        }
         this.SetData(CREEP_DATA, this.CreepData);
         super.Save();
     }
@@ -39,21 +47,36 @@ export class HiveQueen extends SwarmMemory {
         super.Load();
         this.Hive = Game.rooms[this.MemoryID];
         this.CreepData = this.GetData(CREEP_DATA) || {};
+        let lastFrameBootStrapped = this.GetData(HIVE_BOOTSTRAPPING);
+        this.BootStrapping = lastFrameBootStrapped ||
+            (this.Hive.find(FIND_STRUCTURES, { filter: function(structure) { return structure.structureType == STRUCTURE_EXTENSION; }}).length < 5) ||
+            (this.Hive.find(FIND_MY_CREEPS, { filter: function(creep) { return creep.getActiveBodyparts(WORK) > 0 && creep.getActiveBodyparts(CARRY) > 0}}).length == 0);
+
         this.hivelord = new SwarmLinkOverseer(HIVELORD, this); // Special overseer.  does not request/require things.
         this.Overseers = [];
-        this.Distribution = new DistributionOverseer(DISTRIBUTION, this); // Special.  Must be init before all other overseers.
+        if(this.BootStrapping) {
+            this.BootStrapper = new BootstrapOverseer(BOOTSTRAPPER, this);
+            this.Overseers.push(this.BootStrapper);
+        } else {
+            if(lastFrameBootStrapped) {
+                this.BootStrapper = new BootstrapOverseer(BOOTSTRAPPER, this);
+                this.BootStrapper.EndBootstrap();
+                this.BootStrapper.Save();
+            }
+            this.Distribution = new DistributionOverseer(DISTRIBUTION, this); // Special.  Must be init before all other overseers.
 
-        this.HiveHarvester = new HiveHarvestOverseer(HIVE_HARVESTER, this);
-        this.Overseers.push(this.HiveHarvester);
-        this.Overseers.push(this.Distribution);
-        this.architectureOverseer = new ArchitectureOverseer(ARCHITECTURE, this);
-        this.Overseers.push(this.architectureOverseer);
-        this.ConstructionOverseer = new ConstructionOverseer(CONSTRUCTION, this);
-        this.Overseers.push(this.ConstructionOverseer);
+            this.HiveHarvester = new HiveHarvestOverseer(HIVE_HARVESTER, this);
+            this.Overseers.push(this.HiveHarvester);
+            this.Overseers.push(this.Distribution);
+            this.architectureOverseer = new ArchitectureOverseer(ARCHITECTURE, this);
+            this.Overseers.push(this.architectureOverseer);
+            this.ConstructionOverseer = new ConstructionOverseer(CONSTRUCTION, this);
+            this.Overseers.push(this.ConstructionOverseer);
 
-        // Revalidate
-        for (let i = 0, length = this.Overseers.length; i < length; i++) {
-            this.Overseers[i].ValidateOverseer();
+            // Revalidate
+            for (let i = 0, length = this.Overseers.length; i < length; i++) {
+                this.Overseers[i].ValidateOverseer();
+            }
         }
     }
 
@@ -98,7 +121,7 @@ export class HiveQueen extends SwarmMemory {
                         //got a spawn
                         spawned = true;
                         this.Overseers[i].AssignCreep(creepName);
-                        this.CreepData[creepName].Assignment = this.Overseers[i].MemoryID;
+                        this.CreepData[creepName] = { Assignment: this.Overseers[i].MemoryID};
                     }
                 }
             }
