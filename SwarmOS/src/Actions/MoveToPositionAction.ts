@@ -2,21 +2,20 @@ import { ActionWithPosition } from "Actions/ActionBase";
 import * as SwarmEnums from "SwarmEnums";
 
 export class MoveToPositionAction extends ActionWithPosition {
+    static SimultaneousActionValue = 0;
+    protected get BlockValue() { return MoveToPositionAction.SimultaneousActionValue; }
     protected ActionImplemented(): SwarmEnums.CommandResponseType {
-        let result = ERR_NOT_IN_RANGE as SwarmEnums.SwarmReturnCode;
+        let response: SwarmEnums.CommandResponseType = SwarmEnums.CRT_Move;
         if(this.AssignedCreep.pos.isEqualTo(this.TargetPos)) {
-            result = OK;
-        }
-        let actionResponse: SwarmEnums.CommandResponseType = SwarmEnums.CRT_None;
-        result = this.AssignedCreep.moveTo(this.TargetPos);
-        switch(result) {
-            case(OK): actionResponse = SwarmEnums.CRT_Next; break;
-            case(ERR_NOT_IN_RANGE): actionResponse = SwarmEnums.CRT_Move; break;
+            response = SwarmEnums.CRT_Next;
         }
 
-        return actionResponse;
+        return response;
     }
     ValidateAction(): SwarmEnums.CommandResponseType {
-        return SwarmEnums.CRT_None; // Except ensuring there's a path from A to B.
+        if(this.AssignedCreep.pos.isEqualTo(this.TargetPos)) {
+            return SwarmEnums.CRT_Next;
+        }
+        return SwarmEnums.CRT_None;
     }
 }

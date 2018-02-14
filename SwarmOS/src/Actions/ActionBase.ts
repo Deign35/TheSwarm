@@ -17,6 +17,10 @@ export abstract class ActionBase {
         return SwarmEnums.CRT_None;
     }
 
+    protected abstract get BlockValue(): number;
+    protected get EnergyBlockValue() { return 0; }
+    // Not set up with a blockValue yet: dismantle:5, attackController:6, rangedHeal: 7, heal: 8
+    //                                 : rangedAttack / rangedMassAttack / build / repair / rangedHeal <-- Separate chart for ranged actions (minus upgrade)
     protected abstract ActionImplemented(): SwarmEnums.CommandResponseType;
     protected abstract GetMovePosition(): RoomPosition;
     abstract ValidateAction(): SwarmEnums.CommandResponseType;
@@ -36,8 +40,4 @@ export abstract class ActionWithTarget<T extends RoomObject> extends ActionBase 
     GetMovePosition() {
         return this.Target.pos;
     }
-}
-
-export function ActionGenerator() {
-
 }

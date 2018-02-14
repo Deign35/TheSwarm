@@ -2,6 +2,9 @@ import { ActionWithTarget } from "Actions/ActionBase";
 import * as SwarmEnums from "SwarmEnums";
 
 export class RepairAction extends ActionWithTarget<Structure> {
+    static SimultaneousActionValue = 4;
+    protected get BlockValue() { return RepairAction.SimultaneousActionValue; }
+    protected get EnergyBlockValue() { return 3; }
     protected ActionImplemented(): SwarmEnums.CommandResponseType {
         let result = this.AssignedCreep.repair(this.Target);
         let actionResponse: SwarmEnums.CommandResponseType = SwarmEnums.CRT_None;

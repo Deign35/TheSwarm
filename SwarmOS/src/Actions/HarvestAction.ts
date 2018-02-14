@@ -3,6 +3,8 @@ import * as _ from "lodash";
 import { ActionWithTarget } from "Actions/ActionBase";
 
 export class HarvestAction extends ActionWithTarget<Source | Mineral> {
+    static SimultaneousActionValue = 1;
+    protected get BlockValue() { return HarvestAction.SimultaneousActionValue; }
     ActionImplemented() {
         let result = this.AssignedCreep.harvest(this.Target);
         let actionResponse: SwarmEnums.CommandResponseType = SwarmEnums.CRT_None;

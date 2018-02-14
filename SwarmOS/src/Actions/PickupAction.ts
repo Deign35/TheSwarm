@@ -3,6 +3,8 @@ import * as SwarmEnums from "SwarmEnums";
 import * as _ from "lodash";
 
 export class PickupAction extends ActionWithTarget<Resource> {
+    static SimultaneousActionValue = 0;
+    protected get BlockValue() { return PickupAction.SimultaneousActionValue; }
     protected ActionImplemented(): SwarmEnums.CommandResponseType {
         let result = this.AssignedCreep.pickup(this.Target);
         let actionResponse: SwarmEnums.CommandResponseType = SwarmEnums.CRT_None;

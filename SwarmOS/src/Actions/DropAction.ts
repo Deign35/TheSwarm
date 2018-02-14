@@ -2,12 +2,15 @@ import { ActionWithPosition } from "Actions/ActionBase";
 import * as SwarmEnums from "SwarmEnums";
 
 export class DropAction extends ActionWithPosition {
+    static SimultaneousActionValue = 0;
+    protected get BlockValue() { return DropAction.SimultaneousActionValue; }
     constructor(creep: Creep, targetPos: RoomPosition, protected ResourceType: ResourceConstant = RESOURCE_ENERGY, protected Amount: number = 0) {
         super(creep, targetPos);
         if(Amount == 0) {
-            Amount = creep.carry[ResourceType];
+            Amount = creep.carry[ResourceType] || 0;
         }
     }
+    protected get EnergyBlockValue() { return 6; }
     protected ActionImplemented(): SwarmEnums.CommandResponseType {
         let result = ERR_NOT_IN_RANGE as SwarmEnums.SwarmReturnCode;
         if(this.AssignedCreep.pos.isEqualTo(this.TargetPos)) {

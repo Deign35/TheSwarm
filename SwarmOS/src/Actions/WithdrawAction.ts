@@ -3,17 +3,20 @@ import * as SwarmEnums from "SwarmEnums";
 import * as _ from "lodash";
 
 export class WithdrawAction extends ActionWithTarget<Structure> {
+    static SimultaneousActionValue = 0;
+    protected get BlockValue() { return WithdrawAction.SimultaneousActionValue; }
+    protected get EnergyBlockValue() { return 4; }
     constructor(creep: Creep, target: Structure, protected ResourceType: ResourceConstant = RESOURCE_ENERGY, protected Amount: number = 0) {
         super(creep, target);
         if (Amount == 0) {
-            Amount = creep.carry[ResourceType];
+            Amount = creep.carry[ResourceType] || 0;
         }
     }
     protected ActionImplemented(): SwarmEnums.CommandResponseType {
         let carryCapacity = this.AssignedCreep.carryCapacity - _.sum(this.AssignedCreep.carry);
         let targetAllows = 0;
         if ((this.Target as StructureContainer).storeCapacity) {
-            targetAllows = (this.Target as StructureContainer).store[this.ResourceType];
+            targetAllows = (this.Target as StructureContainer).store[this.ResourceType] || 0;
         } else if ((this.Target as StructureExtension).energyCapacity) {
             targetAllows = (this.Target as StructureExtension).energy;
         }

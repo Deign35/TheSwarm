@@ -28,7 +28,6 @@ declare const ERR_NO_BODYPART: -12;
 declare const ERR_NOT_ENOUGH_EXTENSIONS: -6;
 declare const ERR_RCL_NOT_ENOUGH: -14;
 declare const ERR_GCL_NOT_ENOUGH: -15;
-declare const ERR_MY_ERROR: -16;
 
 declare const FIND_EXIT_TOP: 1;
 declare const FIND_EXIT_RIGHT: 3;
@@ -357,7 +356,6 @@ declare const NUKE_RANGE: number;
 declare const NUKE_DAMAGE: {
     0: number,
     1: number,
-    4: number
 };
 
 declare const REACTIONS: {
@@ -1220,7 +1218,7 @@ interface CPUShardLimits {
     [shard: string]: number;
 }
 
-type StoreDefinition = any;//Partial<Record<_ResourceConstantSansEnergy, number>>;// & { energy: number, length: number };
+type StoreDefinition = Partial<Record<_ResourceConstantSansEnergy, number>> & { energy: number, length: number };
 // type SD<K extends ResourceConstant> = {
 //   [P in K]: number;
 //   energy: number;
@@ -1451,8 +1449,7 @@ type ScreepsReturnCode =
     ERR_NO_BODYPART |
     ERR_NOT_ENOUGH_EXTENSIONS |
     ERR_RCL_NOT_ENOUGH |
-    ERR_GCL_NOT_ENOUGH |
-    number;
+    ERR_GCL_NOT_ENOUGH;
 
 type OK = 0;
 type ERR_NOT_OWNER = -1;
@@ -1471,7 +1468,6 @@ type ERR_NO_BODYPART = -12;
 type ERR_NOT_ENOUGH_EXTENSIONS = -6;
 type ERR_RCL_NOT_ENOUGH = -14;
 type ERR_GCL_NOT_ENOUGH = -15;
-type ERR_MY_ERROR = -16;
 
 type CreepActionReturnCode =
     OK |
@@ -3044,10 +3040,6 @@ interface StructureSpawn extends OwnedStructure<STRUCTURE_SPAWN> {
      * The total amount of energy the spawn can contain
      */
     energyCapacity: number;
-    /**
-     * The last tick that this spawn began a spawn.
-     */
-    lastSpawnTick: number;
     /**
      * A shorthand to `Memory.spawns[spawn.name]`. You can use it for quick access
      * the spawn’s specific memory data object.
