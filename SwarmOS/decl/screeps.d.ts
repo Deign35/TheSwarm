@@ -28,7 +28,6 @@ declare const ERR_NO_BODYPART: -12;
 declare const ERR_NOT_ENOUGH_EXTENSIONS: -6;
 declare const ERR_RCL_NOT_ENOUGH: -14;
 declare const ERR_GCL_NOT_ENOUGH: -15;
-declare const ERR_MY_ERROR: -16;
 
 declare const FIND_EXIT_TOP: 1;
 declare const FIND_EXIT_RIGHT: 3;
@@ -357,7 +356,6 @@ declare const NUKE_RANGE: number;
 declare const NUKE_DAMAGE: {
     0: number,
     1: number,
-    4: number
 };
 
 declare const REACTIONS: {
@@ -761,7 +759,7 @@ interface Creep extends RoomObject {
      * @param target The target object to be attacked.
      * @returns Result Code: OK, ERR_NOT_OWNER, ERR_BUSY, ERR_NOT_ENOUGH_RESOURCES, ERR_INVALID_TARGET, ERR_NOT_IN_RANGE, ERR_NO_BODYPART, ERR_RCL_NOT_ENOUGH
      */
-    build(target: ConstructionSite): CreepActionReturnCode | ERR_RCL_NOT_ENOUGH | ERR_NOT_ENOUGH_RESOURCES;
+    build(target: ConstructionSite): CreepActionReturnCode | ERR_RCL_NOT_ENOUGH;
     /**
      * Cancel the order given during the current game tick.
      * @param methodName The name of a creep's method to be cancelled.
@@ -1220,7 +1218,7 @@ interface CPUShardLimits {
     [shard: string]: number;
 }
 
-type StoreDefinition = any;//Partial<Record<_ResourceConstantSansEnergy, number>>;// & { energy: number, length: number };
+type StoreDefinition = Partial<Record<_ResourceConstantSansEnergy, number>> & { energy: number, length: number };
 // type SD<K extends ResourceConstant> = {
 //   [P in K]: number;
 //   energy: number;
@@ -1451,8 +1449,7 @@ type ScreepsReturnCode =
     ERR_NO_BODYPART |
     ERR_NOT_ENOUGH_EXTENSIONS |
     ERR_RCL_NOT_ENOUGH |
-    ERR_GCL_NOT_ENOUGH |
-    number;
+    ERR_GCL_NOT_ENOUGH;
 
 type OK = 0;
 type ERR_NOT_OWNER = -1;
@@ -1471,7 +1468,6 @@ type ERR_NO_BODYPART = -12;
 type ERR_NOT_ENOUGH_EXTENSIONS = -6;
 type ERR_RCL_NOT_ENOUGH = -14;
 type ERR_GCL_NOT_ENOUGH = -15;
-type ERR_MY_ERROR = -16;
 
 type CreepActionReturnCode =
     OK |
@@ -2046,12 +2042,12 @@ interface Memory {
     spawns: { [name: string]: SpawnMemory };
 }
 
-interface CreepMemory { [name: string]: any }
-interface FlagMemory { [name: string]: any }
-interface RoomMemory { [name: string]: any }
-interface SpawnMemory { [name: string]: any }
+interface CreepMemory { }
+interface FlagMemory { }
+interface RoomMemory { }
+interface SpawnMemory { }
 
-declare var Memory: { [name: string]: any; };
+declare const Memory: Memory;
 /**
  * A mineral deposit object. Can be harvested by creeps with a WORK body part using the extractor structure.
  * @see http://docs.screeps.com/api/#Mineral
@@ -3045,10 +3041,6 @@ interface StructureSpawn extends OwnedStructure<STRUCTURE_SPAWN> {
      */
     energyCapacity: number;
     /**
-     * The last tick that this spawn began a spawn.
-     */
-    lastSpawnTick: number;
-    /**
      * A shorthand to `Memory.spawns[spawn.name]`. You can use it for quick access
      * the spawn’s specific memory data object.
      *
@@ -3068,6 +3060,42 @@ interface StructureSpawn extends OwnedStructure<STRUCTURE_SPAWN> {
      * @param remainingTime Remaining time to go.
      */
     spawning: { name: string, needTime: number, remainingTime: number };
+
+    /**
+     * Check if a creep can be created.
+     *
+     * @deprecated This method is deprecated and will be removed soon. Please use `StructureSpawn.spawnCreep` with `dryRun` flag instead.
+     * @param body An array describing the new creep’s body. Should contain 1 to 50 elements with one of these constants: WORK, MOVE, CARRY, ATTACK, RANGED_ATTACK, HEAL, TOUGH, CLAIM
+     * @param name The name of a new creep.
+     *
+     * It should be unique creep name, i.e. the Game.creeps object should not contain another creep with the same name (hash key).
+     *
+     * If not defined, a random name will be generated.
+     */
+    canCreateCreep(body: BodyPartConstant[], name?: string): ScreepsReturnCode;
+    /**
+     * Start the creep spawning process.
+     *
+     * @deprecated This method is deprecated and will be removed soon. Please use `StructureSpawn.spawnCreep` instead.
+     * @param body An array describing the new creep’s body. Should contain 1 to 50 elements with one of these constants: WORK, MOVE, CARRY, ATTACK, RANGED_ATTACK, HEAL, TOUGH, CLAIM
+     * @param name The name of a new creep.
+     *
+     * It should be unique creep name, i.e. the Game.creeps object should not contain another creep with the same name (hash key).
+     *
+     * If not defined, a random name will be generated.
+     * @param memory The memory of a new creep. If provided, it will be immediately stored into Memory.creeps[name].
+     * @returns The name of a new creep or one of these error codes:
+     * ```
+     * ERR_NOT_OWNER            -1  You are not the owner of this spawn.
+     * ERR_NAME_EXISTS          -3  There is a creep with the same name already.
+     * ERR_BUSY                 -4  The spawn is already in process of spawning another creep.
+     * ERR_NOT_ENOUGH_ENERGY    -6  The spawn and its extensions contain not enough energy to create a creep with the given body.
+     * ERR_INVALID_ARGS         -10 Body is not properly described.
+     * ERR_RCL_NOT_ENOUGH       -14 Your Room Controller level is not enough to use this spawn.
+     * ```
+     */
+    createCreep(body: BodyPartConstant[], name?: string, memory?: CreepMemory): ScreepsReturnCode | string;
+
     /**
      * Start the creep spawning process. The required energy amount can be withdrawn from all spawns and extensions in the room.
      *

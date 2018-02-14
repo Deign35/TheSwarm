@@ -2,6 +2,8 @@ import { ActionWithTarget } from "Actions/ActionBase";
 import * as SwarmEnums from "SwarmEnums";
 
 export class AttackAction extends ActionWithTarget<Creep | Structure> {
+    static SimultaneousActionValue = 2;
+    protected get BlockValue() { return AttackAction.SimultaneousActionValue; }
     protected ActionImplemented(): SwarmEnums.CommandResponseType {
         let result = this.AssignedCreep.attack(this.Target);
         let actionResponse: SwarmEnums.CommandResponseType = SwarmEnums.CRT_None;

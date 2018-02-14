@@ -3,12 +3,15 @@ import * as _ from "lodash";
 import { ActionWithTarget } from "Actions/ActionBase";
 
 export class TransferAction extends ActionWithTarget<Creep | Structure> {
+    static SimultaneousActionValue = 0;
+    protected get BlockValue() { return TransferAction.SimultaneousActionValue; }
+    protected get EnergyBlockValue() { return 5; }
     constructor(creep: Creep, target: Creep | Structure, protected ResourceType: ResourceConstant = RESOURCE_ENERGY, protected Amount?: number) {
         super(creep, target);
         //Amount unused.
     }
     ActionImplemented() {
-        let carryAmount = this.AssignedCreep.carry[this.ResourceType];
+        let carryAmount = this.AssignedCreep.carry[this.ResourceType] || 0;
         let targetAllows = 0;
         if ((this.Target as StructureContainer).storeCapacity) {
             targetAllows = (this.Target as StructureContainer).storeCapacity - _.sum((this.Target as StructureContainer).store);

@@ -3,6 +3,9 @@ import * as _ from "lodash";
 import { ActionWithTarget } from "Actions/ActionBase";
 
 export class UpgradeAction extends ActionWithTarget<StructureController> {
+    static SimultaneousActionValue = 0;
+    protected get BlockValue() { return UpgradeAction.SimultaneousActionValue; }
+    protected get EnergyBlockValue() { return 1; }
     ActionImplemented() {
         let result = this.AssignedCreep.upgradeController(this.Target);
         let actionResponse: SwarmEnums.CommandResponseType = SwarmEnums.CRT_None;

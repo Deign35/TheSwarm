@@ -9,12 +9,14 @@ declare interface IDelegate<T extends CallbackFunction> {
     Unsubscribe(id: string): void;
     Notify(...args: any[]): void;
 }
+
 declare interface IMemory {
-    readonly MemoryID: string;
-    GetData(id: string): any;
-    SetData(id: string, data: any): void;
+    readonly id: string;
     Save(): void;
     Load(): void;
+    GetData(id: string): any;
+    SetData(id: string, data: any): void;
+    RemoveData(id: string): any;
 }
 
 declare interface IOverseerRequirements_Creep {
@@ -74,7 +76,13 @@ declare interface RoomMap {
 }
 
 declare interface RoomTile {
-    PrimaryObject: RoomObject; // Source, road, container, 
+    PrimaryObject: RoomObject; // Source, road, container,
     xPos: number,
     yPos: number,
 }
+
+declare interface IDisposable {
+    dispose(): void;
+}
+declare type DisposableCallback<T extends IDisposable> = (disposableObject: T) => void;
+declare function using<T extends IDisposable>(disposableObject: T, disposableAction: DisposableCallback<T>): void;
