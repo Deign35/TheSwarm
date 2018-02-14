@@ -9,7 +9,6 @@ const LAST_UPDATE = 'LD';
 const ORDER_IDS = 'OI';
 const RCL_DATA = 'RCL';
 export class ArchitectureOverseer extends OverseerBase { // Needs a different name.
-    Hive!: Room;
     protected _lastUpdate!: number;
     protected ControllerData!: {
         upgradeCreeps: { creepName: string, carryCapacity: number }[],
@@ -28,7 +27,6 @@ export class ArchitectureOverseer extends OverseerBase { // Needs a different na
 
     Load() {
         super.Load();
-        this.Hive = Game.rooms[this.ParentMemoryID];
         this._lastUpdate = this.GetData(LAST_UPDATE) || 0;
         this.OrderIDs = this.GetData(ORDER_IDS) || {};
         this.ControllerData = this.GetData(RCL_DATA) || { upgradeCreeps: [], level: (this.Hive.controller as StructureController).level };

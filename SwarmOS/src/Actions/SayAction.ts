@@ -2,6 +2,8 @@ import { ActionBase } from "./ActionBase";
 import * as SwarmEnums from "../SwarmEnums"
 
 export class SayAction extends ActionBase {
+    static SimultaneousActionValue = 0;
+    protected get BlockValue() { return SayAction.SimultaneousActionValue; }
     constructor(creep: Creep, public SayString: string) {
         super(creep);
     }

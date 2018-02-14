@@ -1,4 +1,4 @@
-import { SwarmMemory } from "Memory/SwarmMemory";
+import { ChildMemory } from "Memory/SwarmMemory";
 import * as _ from "lodash";
 
 const HIVE_TARGETS = 'HT';
@@ -23,7 +23,7 @@ const TARGET_MAX = 'TM';
 const TARGET_TOTAL = 'TT';
 const TICKS_TO_DECAY = 'TD';
 
-export class SwarmLinkOverseer extends SwarmMemory { // One per room.
+export class SwarmLinkOverseer extends ChildMemory { // One per room.
     // Targetting
     HiveTargets!: { [id: number]: { [id: string]: any } };
     TargetCounts!: { [id: string]: any };
@@ -144,7 +144,7 @@ export class SwarmLinkOverseer extends SwarmMemory { // One per room.
         return targetData;
     }
 
-    FindTargets<T extends StructureConstant>(findID: FindConstant, updateNewerThan: number = 5, structureType?: T ): RoomObject[] { // Consider putting the desired last update as a parameter here.
+    FindTargets<T extends StructureConstant>(findID: FindConstant, updateNewerThan: number = 5, structureType?: T): RoomObject[] { // Consider putting the desired last update as a parameter here.
         let isStructureFind = false;
         if (!this.HiveTargets[findID]) {
             this.HiveTargets[findID] = {}
@@ -156,20 +156,20 @@ export class SwarmLinkOverseer extends SwarmMemory { // One per room.
             }
         }
         let lastUpdate = 0;
-        if(isStructureFind) {
+        if (isStructureFind) {
             lastUpdate = this.HiveTargets[findID][structureType as T][LAST_UPDATE] || 0;
         } else {
             lastUpdate = this.HiveTargets[findID][LAST_UPDATE] || 0;
         }
 
         if (lastUpdate - Game.time < -updateNewerThan) { // Updates at most once every 6 ticks.  CAREFUL WHEN CHANGING
-            if(isStructureFind) {
+            if (isStructureFind) {
                 this.HiveTargets[findID][structureType as T][LAST_UPDATE] = Game.time;
             } else {
                 this.HiveTargets[findID][LAST_UPDATE] = Game.time;
             }
 
-            let foundTargets = Game.rooms[this.ParentMemoryID].find(findID);
+            let foundTargets = Game.rooms[this.Parent.id].find(findID);
             if (foundTargets.length == 0) {
                 this.HiveTargets[findID] = {};
             } else {
@@ -192,7 +192,7 @@ export class SwarmLinkOverseer extends SwarmMemory { // One per room.
             }
         }
 
-        if(targets.length == 0 && updateNewerThan > 25) {
+        if (targets.length == 0 && updateNewerThan > 25) {
             return this.FindTargets(findID, 0, structureType);
         }
         return targets;

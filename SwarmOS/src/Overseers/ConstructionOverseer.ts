@@ -8,7 +8,6 @@ const BUILDER_DATA = 'BD';
 const NEW_SITES = 'NS';
 const REQUEST_DATA = 'RD';
 export class ConstructionOverseer extends OverseerBase { // Needs a different name?
-    Hive!: Room;
     protected RequestData!: { [siteID: string]: BuildOrder }
     protected BuilderCreeps!: { [creepName: string]: { siteID?: string, orderID?: string } };
     protected newSites!: { build: BuildOrder, pos: { x: number, y: number, roomName: string } }[];
@@ -24,7 +23,6 @@ export class ConstructionOverseer extends OverseerBase { // Needs a different na
 
     Load() {
         super.Load();
-        this.Hive = Game.rooms[this.ParentMemoryID];
         this.BuilderCreeps = this.GetData(BUILDER_DATA) || {};
         this.RequestData = this.GetData(REQUEST_DATA) || {};
         this.newSites = this.GetData(NEW_SITES) || [];

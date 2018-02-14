@@ -1,7 +1,7 @@
-import { SwarmMemory } from "Memory/SwarmMemory";
+import { QueenMemory } from "Memory/SwarmMemory";
 import { HiveQueen } from "Managers/HiveQueen";
 
-export class SwarmQueen extends SwarmMemory {
+export class SwarmQueen extends QueenMemory {
     HiveQueens!: { [name: string]: HiveQueen };
 
     Activate() {

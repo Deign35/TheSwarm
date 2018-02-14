@@ -1,14 +1,17 @@
-import { SwarmMemory } from "Memory/SwarmMemory";
+import { ChildMemory } from "Memory/SwarmMemory";
 import * as SwarmEnums from "SwarmEnums";
 import { HiveQueen } from "Managers/HiveQueen";
 
-export abstract class OverseerBase extends SwarmMemory implements IOverseer {
+export abstract class OverseerBase extends ChildMemory implements IOverseer {
     constructor(memID: string, protected Queen: HiveQueen) {
         super(memID, Queen);
-        this.ValidateOverseer();
     }
 
-    abstract ValidateOverseer(): void;
+    Hive!: Room;
+    Load() {
+        super.Load();
+        this.Hive = Game.rooms[this.Queen.id];
+    }
     protected Registry!: IOverseer_Registry;
     static CreateEmptyOverseerRegistry(): IOverseer_Registry {
         return {
@@ -21,6 +24,8 @@ export abstract class OverseerBase extends SwarmMemory implements IOverseer {
             }
         }
     };
+
+    abstract ValidateOverseer(): void;
 
     abstract HasResources(): boolean;
     GetAvailableResources(): IOverseerData_Resource[] {

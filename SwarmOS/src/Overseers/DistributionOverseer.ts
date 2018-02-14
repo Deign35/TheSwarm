@@ -19,7 +19,6 @@ export class DistributionOverseer extends OverseerBase {
     AssignOrder(orderID: string): boolean {
         throw new Error("Method not implemented.");
     }
-    Hive!: Room;
     protected CurrentOrders!: { [orderID: string]: DistributionOrder };
     protected AssignedCreeps!: { [creepName: string]: { orderID?: string, fromTarget?: string } }
     protected _orderData!: { [orderID: string]: { toTarget: Structure | Creep, fromTarget?: StructureContainer, creep?: Creep } };
@@ -44,7 +43,6 @@ export class DistributionOverseer extends OverseerBase {
 
     Load() {
         super.Load();
-        this.Hive = Game.rooms[this.ParentMemoryID];
         this.CurrentOrders = this.GetData(CURRENT_ORDERS) || {};
         this.AssignedCreeps = this.GetData(CREEP_DATA) || {};
         this._orderData = {};
@@ -94,7 +92,7 @@ export class DistributionOverseer extends OverseerBase {
             delete unassignedOrders[orderID];
             this._orderData[orderID].creep = creep;
 
-            if (creep.carry[order.resourceType] >= order.amount || _.sum(creep.carry) == creep.carryCapacity) {
+            if (creep.carry[order.resourceType as string] >= order.amount || _.sum(creep.carry) == creep.carryCapacity) {
                 this.CurrentOrders[orderID].distributionStatus = ORDER_STATE_DELIVER
             } else {
                 let fromContainer = this.AssignedCreeps[name].fromTarget && Game.getObjectById(this.AssignedCreeps[name].fromTarget) as StructureContainer;
@@ -213,9 +211,9 @@ export class DistributionOverseer extends OverseerBase {
             if (this._orderData[a].creep) { return 1; } // already assigned.
             if (this._orderData[b].creep) { return -1; }
             let orderA = this.CurrentOrders[a];
-            let needA = creep.carry[orderA.resourceType] > orderA.amount;
+            let needA = creep.carry[orderA.resourceType as string] > orderA.amount;
             let orderB = this.CurrentOrders[b];
-            let needB = creep.carry[orderB.resourceType] > orderB.amount;
+            let needB = creep.carry[orderB.resourceType as string] > orderB.amount;
 
             if (needA != needB) {
                 return needA ? -1 : 1;
@@ -254,10 +252,10 @@ export class DistributionOverseer extends OverseerBase {
             }
 
             // Yes, do they have enough?
-            if (a.store[resourceType] >= amount && b.store[resourceType] < amount) {
+            if (a.store[resourceType as string] >= amount && b.store[resourceType as string] < amount) {
                 return -1;
             }
-            if (b.store[resourceType] >= amount && a.store[resourceType] < amount) {
+            if (b.store[resourceType as string] >= amount && a.store[resourceType as string] < amount) {
                 return 1;
             }
 

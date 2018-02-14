@@ -25,7 +25,6 @@ export class HiveHarvestOverseer extends OverseerBase {
 
     Load() {
         super.Load();
-        this.Hive = Game.rooms[this.ParentMemoryID];
         this.SourceNodes = this.GetData(NODE_DATA) || [];
         this.NodeObjects = [];
     }

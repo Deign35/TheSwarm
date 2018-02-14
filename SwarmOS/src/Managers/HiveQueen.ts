@@ -1,4 +1,4 @@
-import { SwarmMemory } from "Memory/SwarmMemory";
+import { QueenMemory } from "Memory/SwarmMemory";
 import * as SwarmEnums from "SwarmEnums";
 import { HiveHarvestOverseer } from "Overseers/HiveHarvestOverseer";
 import { DistributionOverseer } from "Overseers/DistributionOverseer";
@@ -16,7 +16,7 @@ const CREEP_DATA = 'CD';
 const NO_ASSIGNMENT = 'NA';
 const HIVE_BOOTSTRAPPING = 'HB';
 const BOOTSTRAPPER = 'BS';
-export class HiveQueen extends SwarmMemory {
+export class HiveQueen extends QueenMemory {
     Hive!: Room;
     Overseers!: IOverseer[];
     Distribution!: DistributionOverseer;
@@ -30,7 +30,7 @@ export class HiveQueen extends SwarmMemory {
     private BootStrapper!: BootstrapOverseer;
 
     Save() {
-        if(this.BootStrapping) {
+        if (this.BootStrapping) {
             this.BootStrapper.Save();
         } else {
             this.architectureOverseer.Save();
@@ -45,38 +45,27 @@ export class HiveQueen extends SwarmMemory {
 
     Load() {
         super.Load();
-        this.Hive = Game.rooms[this.MemoryID];
+        this.Hive = Game.rooms[this.id];
         this.CreepData = this.GetData(CREEP_DATA) || {};
         let lastFrameBootStrapped = this.GetData(HIVE_BOOTSTRAPPING);
         this.BootStrapping = lastFrameBootStrapped ||
             this.Hive.energyCapacityAvailable < 550 ||
-            (this.Hive.find(FIND_MY_CREEPS, { filter: function(creep) { return creep.getActiveBodyparts(WORK) > 0 && creep.getActiveBodyparts(CARRY) > 0}}).length == 0);
+            (this.Hive.find(FIND_MY_CREEPS, { filter: function (creep) { return creep.getActiveBodyparts(WORK) > 0 && creep.getActiveBodyparts(CARRY) > 0 } }).length == 0);
 
         this.hivelord = new SwarmLinkOverseer(HIVELORD, this); // Special overseer.  does not request/require things.
-        this.Overseers = [];
-        if(this.BootStrapping) {
-            this.BootStrapper = new BootstrapOverseer(BOOTSTRAPPER, this);
-            this.Overseers.push(this.BootStrapper);
-        } else {
-            if(lastFrameBootStrapped) {
-                this.BootStrapper = new BootstrapOverseer(BOOTSTRAPPER, this);
-                this.BootStrapper.EndBootstrap();
-                this.BootStrapper.Save();
-            }
-            this.Distribution = new DistributionOverseer(DISTRIBUTION, this); // Special.  Must be init before all other overseers.
+        this.Distribution = new DistributionOverseer(DISTRIBUTION, this); // Special.  Must be init before all other overseers.
 
-            this.HiveHarvester = new HiveHarvestOverseer(HIVE_HARVESTER, this);
-            this.Overseers.push(this.HiveHarvester);
-            this.Overseers.push(this.Distribution);
-            this.architectureOverseer = new ArchitectureOverseer(ARCHITECTURE, this);
-            this.Overseers.push(this.architectureOverseer);
-            this.ConstructionOverseer = new ConstructionOverseer(CONSTRUCTION, this);
-            this.Overseers.push(this.ConstructionOverseer);
+        this.HiveHarvester = new HiveHarvestOverseer(HIVE_HARVESTER, this);
+        this.Overseers.push(this.HiveHarvester);
+        this.Overseers.push(this.Distribution);
+        this.architectureOverseer = new ArchitectureOverseer(ARCHITECTURE, this);
+        this.Overseers.push(this.architectureOverseer);
+        this.ConstructionOverseer = new ConstructionOverseer(CONSTRUCTION, this);
+        this.Overseers.push(this.ConstructionOverseer);
 
-            // Revalidate
-            for (let i = 0, length = this.Overseers.length; i < length; i++) {
-                this.Overseers[i].ValidateOverseer();
-            }
+        // Revalidate
+        for (let i = 0, length = this.Overseers.length; i < length; i++) {
+            this.Overseers[i].ValidateOverseer();
         }
     }
 
@@ -101,7 +90,7 @@ export class HiveQueen extends SwarmMemory {
                             let newBody = Game.creeps[unassignedCreeps[i]].body;
 
                             let newScore = this.CompareBodyToTemplate(newBody, desiredBody);
-                            if(newScore < 0) {
+                            if (newScore < 0) {
                                 newScore *= -1;
                             }
                             // closer to 0 = better;
@@ -115,19 +104,19 @@ export class HiveQueen extends SwarmMemory {
                     if (bestPick >= 0) {
                         // bestpick is now the best creep to bestBodyMatch
                         this.Overseers[i].AssignCreep(unassignedCreeps[bestPick]);
-                        this.CreepData[unassignedCreeps[bestPick]].Assignment = this.Overseers[i].MemoryID;
+                        this.CreepData[unassignedCreeps[bestPick]].Assignment = this.Overseers[i].id;
                         unassignedCreeps.splice(bestPick, 1);
                         needsSpawn = false;
                     }
                 }
 
                 if (needsSpawn) {
-                    let creepName = this.SpawnCreepForHivelord(requirements, this.Overseers[i].MemoryID);
+                    let creepName = this.SpawnCreepForHivelord(requirements, this.Overseers[i].id);
                     if (creepName) {
                         //got a spawn
                         spawned = true;
                         this.Overseers[i].AssignCreep(creepName);
-                        this.CreepData[creepName] = { Assignment: this.Overseers[i].MemoryID};
+                        this.CreepData[creepName] = { Assignment: this.Overseers[i].id };
                     }
                 }
             }
@@ -164,7 +153,7 @@ export class HiveQueen extends SwarmMemory {
         // Try to spawn here...Add multiple spawns when I get there.
         let spawn = this.hivelord.FindTarget((this.Hive.controller as StructureController).pos, FIND_MY_SPAWNS) as StructureSpawn;
         if (spawn && !spawn.spawning && spawn.spawnCreep(requirements.Creeps[0].creepBody, 'TEST_SPAWN', { dryRun: true }) == OK) {
-            let newSpawnName = this.MemoryID + '_' + ('' + Game.time).slice(-4);
+            let newSpawnName = this.id + '_' + ('' + Game.time).slice(-4);
             spawn.spawnCreep(requirements.Creeps[0].creepBody, newSpawnName, { memory: { Assigned: assignmentID } });
             return newSpawnName;
         }
@@ -172,15 +161,15 @@ export class HiveQueen extends SwarmMemory {
     }
 
     CompareBodyToTemplate(bodyToCompare: BodyPartDefinition[], desiredBody: BodyPartConstant[]): number {
-        let creepParts: {[part: string]: number} = {};
-        for(let i = 0, length = desiredBody.length; i < length; i++) {
-            if(!creepParts[desiredBody[i]]) {
+        let creepParts: { [part: string]: number } = {};
+        for (let i = 0, length = desiredBody.length; i < length; i++) {
+            if (!creepParts[desiredBody[i]]) {
                 creepParts[desiredBody[i]] = 0;
             }
             creepParts[desiredBody[i]]++;
         }
-        for(let i = 0, length = bodyToCompare.length; i < length; i++) {
-            if(!creepParts[bodyToCompare[i].type]) {
+        for (let i = 0, length = bodyToCompare.length; i < length; i++) {
+            if (!creepParts[bodyToCompare[i].type]) {
                 creepParts[bodyToCompare[i].type] = 0;
             }
             creepParts[bodyToCompare[i].type]--;
@@ -188,16 +177,16 @@ export class HiveQueen extends SwarmMemory {
 
         let score = 0;
 
-        for(let part in creepParts) {
+        for (let part in creepParts) {
             score += creepParts[part] * BODYPART_COST[part];
         }
         return score;
     }
     CanCreepFillRole(creep: Creep, desiredBody: BodyPartConstant[]): boolean {
-        let checkedParts: {[part: string]: boolean} = {}
-        for(let i = 0, length = desiredBody.length; i < length; i++) {
-            if(!checkedParts[desiredBody[i]]) {
-                if(creep.getActiveBodyparts(desiredBody[i]) == 0) {
+        let checkedParts: { [part: string]: boolean } = {}
+        for (let i = 0, length = desiredBody.length; i < length; i++) {
+            if (!checkedParts[desiredBody[i]]) {
+                if (creep.getActiveBodyparts(desiredBody[i]) == 0) {
                     return false;
                 }
                 checkedParts[desiredBody[i]] = true;

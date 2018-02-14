@@ -1,14 +1,7 @@
-import { LoadFromMemory } from "./MemoryBacking";
-
-const LOCK = 'MEM_LOCK';
-
-abstract class MemoryBase implements IMemory {
-    constructor(id: string) {
-        this.id = id;
-    }
-    readonly id: string;
-    protected _cache: {[id: string]: any} = {};
-    protected abstract LoadCache(): void;
+abstract class _SwarmMemory implements IMemory {
+    constructor(public readonly id: string, public Parent?: IMemory) { }
+    protected _cache: { [id: string]: any } = {};
+    abstract Load(): void;
     abstract Save(): void;
     GetData(id: string) {
         return this._cache[id];
@@ -19,65 +12,28 @@ abstract class MemoryBase implements IMemory {
     RemoveData(id: string) {
         delete this._cache[id];
     }
-
-    protected UpdateLockState(state: boolean) {
-        debugger;
-        if((!!this.GetData(LOCK)) == state) {
-            console.log('Error: Expected[' + state + '], but Lock was different');
-            this.RemoveData(LOCK);
-            throw "MEMORY ACCESS DENIED";
-        }
-        if(state) {
-            this.SetData(LOCK, state);
-        } else {
-            this.RemoveData(LOCK);
-        }
-    }
 }
 
-export abstract class SwarmMemory extends MemoryBase {
-    protected _cache!: {[dataID: string]: any}
+export abstract class QueenMemory extends _SwarmMemory {
     constructor(id: string) {
         super(id);
-        this.LoadCache();
     }
     Save() {
-        this.FinalizeCache();
-        this.UpdateLockState(false);
         Memory[this.id] = this._cache;
     }
-    protected abstract FinalizeCache(): void;
-    protected LoadCache() {
-        let tempObject = LoadFromMemory(this.id); // Memory[this.id] || {};
-        this.PushToCache(tempObject);
-        this.UpdateLockState(true);
-    }
-
-    private PushToCache(tempObject: any) {
-        this._cache = tempObject;
+    Load() {
+        this._cache = Memory[this.id];
     }
 }
 
-export abstract class ChildMemory extends MemoryBase {
-    constructor(public Parent: SwarmMemory, id: string,) {
-        super(id);
-        this.LoadCache();
+export abstract class ChildMemory extends _SwarmMemory {
+    constructor(id: string, public Parent: QueenMemory) {
+        super(id, Parent);
     }
     Save() {
-        this.FinalizeCache();
-        this.UpdateLockState(false);
         this.Parent.SetData(this.id, this._cache);
     }
-    protected abstract FinalizeCache(): void;
-    protected LoadCache() {
+    Load() {
         this._cache = this.Parent.GetData(this.id) || {};
-        this.UpdateLockState(true);
     }
-}
-
-export class TestSwarmMemory extends SwarmMemory {
-    protected FinalizeCache(): void { }
-}
-export class TestChildMemory extends ChildMemory {
-    protected FinalizeCache(): void { }
 }
