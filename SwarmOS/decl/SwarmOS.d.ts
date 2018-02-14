@@ -47,7 +47,6 @@ declare interface IOverseer_Registry {
 }
 
 declare interface IOverseer extends IMemory {
-    HasResources(): boolean;
     GetAvailableResources(): IOverseerData_Resource[];
     GetRequirements(): IOverseerRequirements;
     AssignCreep(creepName: string): void;
