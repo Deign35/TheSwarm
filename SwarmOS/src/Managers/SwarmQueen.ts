@@ -2,7 +2,7 @@ import { QueenMemory } from "Memory/SwarmMemory";
 import { HiveQueen } from "Managers/HiveQueen";
 
 export class SwarmQueen extends QueenMemory {
-    HiveQueens!: { [name: string]: HiveQueen };
+    HiveQueens!: { [name: string]: HiveQueen }
 
     Activate() {
         //Activate each job or request for resources.
@@ -22,7 +22,7 @@ export class SwarmQueen extends QueenMemory {
         super.Save();
     }
     Load() {
-        if(!super.Load()) { return false; }
+        if (!super.Load()) { return false; }
         this.HiveQueens = {};
         let HiveQueenData = this.GetData('HiveQueenData') || [] as string[];
         for (let i = 0, length = HiveQueenData.length; i < length; i++) {
@@ -45,8 +45,6 @@ export class SwarmQueen extends QueenMemory {
             if (!room.controller || !room.controller.my) { continue; }
 
             newSwarm.HiveQueens[name] = new HiveQueen(name);
-            newSwarm.HiveQueens[name].Save();
-            newSwarm.HiveQueens[name].Load();
         }
         // Create a HiveQueen per controlled room.
 

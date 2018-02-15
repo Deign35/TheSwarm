@@ -9,7 +9,7 @@ import { MoveToPositionAction } from "Actions/MoveToPositionAction";
 import { HarvestConsul } from "Consuls/HarvestConsul";
 
 const NODE_DATA = 'NodeData';
-export class HiveHarvestOverseer extends OverseerBase<HarvestConsul> {
+export class HiveHarvestOverseer extends OverseerBase {
     InitNewOverseer(): void {
         let foundSources = this.Hive.find(FIND_SOURCES);
         for (let index in foundSources) {
@@ -32,9 +32,6 @@ export class HiveHarvestOverseer extends OverseerBase<HarvestConsul> {
         this.NodeObjects = [];
 
         return true;
-    }
-    LoadConsul() {
-        this.Consul = new HarvestConsul(HarvestConsul.ConsulType, this);
     }
 
     ValidateOverseer() {

@@ -38,6 +38,9 @@ declare interface IConsul extends IMemory {
     ScanRoom(roomName: string): void;
     DetermineRequirements(): void;
 }
+declare interface PrimeConsul extends IMemory {
+
+}
 /*
 declare interface IOverseerRequirements_Creep {
     time: number,

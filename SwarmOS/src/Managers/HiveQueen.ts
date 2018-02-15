@@ -1,6 +1,8 @@
 import { QueenMemory } from "Memory/SwarmMemory";
 import * as SwarmEnums from "SwarmEnums";
 import { HiveHarvestOverseer } from "Overseers/HiveHarvestOverseer";
+import { NestQueenBase } from "Managers/NestQueenBase";
+import { HiveConsul } from "Consuls/PrimeConsuls.ts/HiveConsul";
 
 const DISTRIBUTION = 'Di';
 const HIVE_HARVESTER = 'HH';
@@ -11,7 +13,25 @@ const CREEP_DATA = 'CD';
 const NO_ASSIGNMENT = 'NA';
 const HIVE_BOOTSTRAPPING = 'HB';
 const BOOTSTRAPPER = 'BS';
-export class HiveQueen extends QueenMemory {
+export class HiveQueen extends NestQueenBase<HiveConsul> {
+    LoadConsul(): void {
+        throw new Error("Method not implemented.");
+    }
+    ReceiveOrder(): void {
+        throw new Error("Method not implemented.");
+    }
+    Harvester!: HiveHarvestOverseer;
+
+    Save() {
+        this.SetData(HIVE_HARVESTER, this.Harvester);
+        super.Save();
+    }
+    Load() {
+        if (!super.Load()) { return false; }
+        this.Harvester = new HiveHarvestOverseer(HIVELORD, this);
+
+        return true;
+    }
     /*Hive!: Room;
     Overseers!: IOverseer[];
     Distribution!: DistributionOverseer;
