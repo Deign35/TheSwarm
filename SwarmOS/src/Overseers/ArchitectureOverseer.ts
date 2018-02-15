@@ -1,4 +1,4 @@
-import * as _ from "lodash";
+/*import * as _ from "lodash";
 import { OverseerBase } from "Overseers/OverseerBase";
 import { MoveToPositionAction } from "Actions/MoveToPositionAction";
 import * as SwarmConsts from "SwarmConsts";
@@ -176,4 +176,4 @@ export class ArchitectureOverseer extends OverseerBase { // Needs a different na
         this.OrderIDs[orderDetails.toTarget] = orderID;
         return true;
     }
-}
+}*/

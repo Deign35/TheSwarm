@@ -1,4 +1,4 @@
-import { OverseerBase } from "./OverseerBase";
+/*import { OverseerBase } from "./OverseerBase";
 import * as SwarmEnums from "SwarmEnums";
 import * as _ from "lodash";
 import { ActionBase } from "Actions/ActionBase";
@@ -62,7 +62,7 @@ export class BootstrapOverseer extends OverseerBase {
         /*let flags = this.Queen.Hive.find(FIND_FLAGS);
         for(let name in flags) {
             if()
-        }*/
+        }/
         let HasIncreased = (this.Queen.Hive.controller as StructureController).level > 1;
         let registry = OverseerBase.CreateEmptyOverseerRegistry();
         let creepJobs: {[role: string]: string[]} = {};
@@ -187,7 +187,7 @@ export class BootstrapOverseer extends OverseerBase {
                             }
 
                             if(!newTarget) {
-                                /* We have an issue ... */
+                                /* We have an issue ... /
                                 delete this._creepData[creep.name];
                                 console.log('THIS IS POSSIBLE, BUT I WISH IT WERENT { BootstrapOverseer.NoTransferTarget }');
                                 continue;
@@ -450,4 +450,4 @@ export class BootstrapOverseer extends OverseerBase {
 
         return potentialTargets[0];
     }
-}
+}*/

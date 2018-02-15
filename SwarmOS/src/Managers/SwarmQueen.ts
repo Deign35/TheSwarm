@@ -7,7 +7,7 @@ export class SwarmQueen extends QueenMemory {
     Activate() {
         //Activate each job or request for resources.
         for (let name in this.HiveQueens) {
-            this.HiveQueens[name].Activate();
+            //this.HiveQueens[name].Activate();
         }
     }
 
@@ -22,12 +22,14 @@ export class SwarmQueen extends QueenMemory {
         super.Save();
     }
     Load() {
-        super.Load();
+        if(!super.Load()) { return false; }
         this.HiveQueens = {};
         let HiveQueenData = this.GetData('HiveQueenData') || [] as string[];
         for (let i = 0, length = HiveQueenData.length; i < length; i++) {
             this.HiveQueens[HiveQueenData[i]] = new HiveQueen(HiveQueenData[i]);
         }
+
+        return true;
     }
 
     static LoadSwarmData(): SwarmQueen {

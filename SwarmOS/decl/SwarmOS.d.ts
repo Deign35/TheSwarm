@@ -19,6 +19,26 @@ declare interface IMemory {
     RemoveData(id: string): any;
 }
 
+
+declare interface IDisposable {
+    dispose(): void;
+}
+declare type DisposableCallback<T extends IDisposable> = (disposableObject: T) => void;
+declare function using<T extends IDisposable>(disposableObject: T, disposableAction: DisposableCallback<T>): void;
+declare function DisposeAll(): void;
+
+declare interface IOverseer extends IMemory {
+    ActivateOverseer(): void;
+    InitNewOverseer(): void;
+    ValidateOverseer(): void;
+}
+
+declare interface IConsul extends IMemory {
+    consulType: string;
+    ScanRoom(roomName: string): void;
+    DetermineRequirements(): void;
+}
+/*
 declare interface IOverseerRequirements_Creep {
     time: number,
     creepBody: BodyPartConstant[]
@@ -46,15 +66,6 @@ declare interface IOverseer_Registry {
     Requirements: IOverseerRequirements
 }
 
-declare interface IOverseer extends IMemory {
-    GetAvailableResources(): IOverseerData_Resource[];
-    GetRequirements(): IOverseerRequirements;
-    AssignCreep(creepName: string): void;
-    ActivateOverseer(): void;
-    ReleaseCreep(name: string, releaseReason: string): void;
-    AssignOrder(orderID: string): boolean;
-    ValidateOverseer(): void;
-}
 
 declare interface DistributionOrder {
     amount: number
@@ -78,11 +89,4 @@ declare interface RoomTile {
     PrimaryObject: RoomObject; // Source, road, container,
     xPos: number,
     yPos: number,
-}
-
-declare interface IDisposable {
-    dispose(): void;
-}
-declare type DisposableCallback<T extends IDisposable> = (disposableObject: T) => void;
-declare function using<T extends IDisposable>(disposableObject: T, disposableAction: DisposableCallback<T>): void;
-declare function DisposeAll(): void;
+}*/

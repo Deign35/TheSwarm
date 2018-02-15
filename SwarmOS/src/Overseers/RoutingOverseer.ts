@@ -1,4 +1,4 @@
-import { HiveQueen } from "Managers/HiveQueen";
+/*import { HiveQueen } from "Managers/HiveQueen";
 import { OverseerBase } from "./OverseerBase";
 
 const ROUTE_MAP = 'RM';
@@ -30,9 +30,9 @@ export class RoutingOverseer extends OverseerBase { // One per room for sure.
     AssignOrder(orderID: string): boolean {
         throw new Error("Method not implemented.");
     }
-    // Routing Overseer can handle repairs.  
+    // Routing Overseer can handle repairs.
 
     CreateRoute(fromPos: RoomPosition, toPos: RoomPosition) {
 
     }
-}
+}*/

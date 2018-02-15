@@ -18,6 +18,11 @@ export class SwarmCreep<T extends Creep> extends NotifiableSwarmObject<Creep> {
         }
         return this.data[CURRENT_PATH];
     }
+    get endTickEnergy() {
+        // This should utilize calls to things like Drop/Harvest/Pickup etc... and calculate if reactions aught to be
+        // enacted as a result of being invalid next tick.
+        return 0;
+    }
     Attack(target: Creep | Structure) {
         this._instance.attack(target);
     }

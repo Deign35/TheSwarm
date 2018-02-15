@@ -1,53 +1,29 @@
-import { ChildMemory } from "Memory/SwarmMemory";
-import * as SwarmEnums from "SwarmEnums";
-import { HiveQueen } from "Managers/HiveQueen";
+import { ChildMemory, _SwarmMemory } from "Memory/SwarmMemory";
+import { ConsulBase } from "Consuls/ConsulBase"
 
-const ASSIGNED_CREEPNAMES = 'AssignedCreeps';
-export abstract class OverseerBase extends ChildMemory implements IOverseer {
-    constructor(memID: string, protected Queen: HiveQueen) {
+const CONSUL_TYPE = 'ConsulType';
+export abstract class OverseerBase<T extends IConsul> extends ChildMemory implements IOverseer {
+    Hive!: Room;
+    Consul!: T;
+
+    constructor(memID: string, protected Queen: _SwarmMemory) {
         super(memID, Queen);
     }
 
-    Hive!: Room;
-    AssignedCreeps!: { [creepName: string]: Creep };
-
     Save() {
-        this.SetData(ASSIGNED_CREEPNAMES, this.AssignedCreeps)
+        this.Consul.Save();
         super.Save();
     }
     Load() {
-        super.Load();
+        if(!super.Load()) { return false; }
         this.Hive = Game.rooms[this.Queen.id];
-        let creepNames = this.GetData(ASSIGNED_CREEPNAMES);
-        for (let i = 0, length = creepNames.length; i < length; i++) {
-            this.AssignedCreeps[creepNames[i]] = Game.creeps[creepNames[i]]
-        }
+        this.LoadConsul();
+
+        return true;
     }
 
-    // This should be converted from passive to active.
-    protected Registry!: IOverseer_Registry;
-    static CreateEmptyOverseerRegistry(): IOverseer_Registry {
-        return {
-            Available: {
-                Resources: []
-            },
-            Requirements: {
-                Creeps: [],
-                Resources: []
-            }
-        }
-    };
-    GetAvailableResources(): IOverseerData_Resource[] {
-        return this.Registry.Available.Resources;
-    }
-    GetRequirements(): IOverseerRequirements {
-        return this.Registry.Requirements;
-    }
-
-    abstract ValidateOverseer(): void;
-    abstract AssignCreep(creepName: string): void;
     abstract ActivateOverseer(): void;
-    abstract ReleaseCreep(name: string, releaseReason: string): void;
-    abstract AssignOrder(orderID: string): boolean;
-    abstract PrepareCreep(creepName: string): number;
+    abstract InitNewOverseer(): void;
+    abstract LoadConsul(): void;
+    abstract ValidateOverseer(): void;
 }

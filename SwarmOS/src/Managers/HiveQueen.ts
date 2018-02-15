@@ -1,11 +1,6 @@
 import { QueenMemory } from "Memory/SwarmMemory";
 import * as SwarmEnums from "SwarmEnums";
 import { HiveHarvestOverseer } from "Overseers/HiveHarvestOverseer";
-import { DistributionOverseer } from "Overseers/DistributionOverseer";
-import { SwarmLinkOverseer } from "Overseers/SwarmLinkOverseer";
-import { ArchitectureOverseer } from "Overseers/ArchitectureOverseer";
-import { ConstructionOverseer } from "Overseers/ConstructionOverseer";
-import { BootstrapOverseer } from "Overseers/BoostrapOverseer";
 
 const DISTRIBUTION = 'Di';
 const HIVE_HARVESTER = 'HH';
@@ -17,7 +12,7 @@ const NO_ASSIGNMENT = 'NA';
 const HIVE_BOOTSTRAPPING = 'HB';
 const BOOTSTRAPPER = 'BS';
 export class HiveQueen extends QueenMemory {
-    Hive!: Room;
+    /*Hive!: Room;
     Overseers!: IOverseer[];
     Distribution!: DistributionOverseer;
     HiveHarvester!: HiveHarvestOverseer;
@@ -193,5 +188,5 @@ export class HiveQueen extends QueenMemory {
             }
         }
         return true;
-    }
+    }*/
 }

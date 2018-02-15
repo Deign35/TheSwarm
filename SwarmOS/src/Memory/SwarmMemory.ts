@@ -1,6 +1,11 @@
-abstract class _SwarmMemory implements IMemory {
-    constructor(public readonly id: string, public Parent?: IMemory) { }
+export abstract class _SwarmMemory implements IMemory {
+    constructor(public readonly id: string, public Parent?: IMemory) {
+        if(!this.Load()) {
+            this.InitMemory();
+        }
+    }
     protected _cache: { [id: string]: any } = {};
+
     abstract Load(): void;
     abstract Save(): void;
     GetData(id: string) {
@@ -12,9 +17,13 @@ abstract class _SwarmMemory implements IMemory {
     RemoveData(id: string) {
         delete this._cache[id];
     }
+
+    protected InitMemory() {
+
+    }
 }
 
-export abstract class QueenMemory extends _SwarmMemory {
+export abstract class QueenMemory extends _SwarmMemory { // If QueenMemory were to implement dispose, i would be good for all the shtuff I save.
     constructor(id: string) {
         super(id);
     }
@@ -23,6 +32,10 @@ export abstract class QueenMemory extends _SwarmMemory {
     }
     Load() {
         this._cache = Memory[this.id];
+
+        if(!this._cache) { return false; }
+
+        return true;
     }
 }
 
@@ -34,6 +47,10 @@ export abstract class ChildMemory extends _SwarmMemory {
         this.Parent.SetData(this.id, this._cache);
     }
     Load() {
-        this._cache = this.Parent.GetData(this.id) || {};
+        this._cache = this.Parent.GetData(this.id);
+
+        if(!this._cache) { return false; }
+
+        return true;
     }
 }
