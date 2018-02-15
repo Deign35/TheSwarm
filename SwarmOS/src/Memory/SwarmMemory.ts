@@ -27,7 +27,7 @@ export abstract class QueenMemory extends _SwarmMemory {
 }
 
 export abstract class ChildMemory extends _SwarmMemory {
-    constructor(id: string, public Parent: QueenMemory) {
+    constructor(id: string, public Parent: _SwarmMemory) {
         super(id, Parent);
     }
     Save() {

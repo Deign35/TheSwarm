@@ -85,3 +85,4 @@ declare interface IDisposable {
 }
 declare type DisposableCallback<T extends IDisposable> = (disposableObject: T) => void;
 declare function using<T extends IDisposable>(disposableObject: T, disposableAction: DisposableCallback<T>): void;
+declare function DisposeAll(): void;

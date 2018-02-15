@@ -26,7 +26,7 @@ export class DisposalDelegate extends Delegate<DisposableCallback<IDisposable>> 
     static DiposeAll() {
         this._instance.Notify();
     }
-} global['DisposeAll'] = new DisposalDelegate() && DisposalDelegate;
+} global['DisposeAll'] = new DisposalDelegate() && DisposalDelegate.DiposeAll;
 
 export function using<T extends IDisposable>(disposableObject: T, disposableAction: DisposableCallback<T>) {
     try {

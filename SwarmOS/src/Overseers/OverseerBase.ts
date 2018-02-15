@@ -2,22 +2,26 @@ import { ChildMemory } from "Memory/SwarmMemory";
 import * as SwarmEnums from "SwarmEnums";
 import { HiveQueen } from "Managers/HiveQueen";
 
-const ASSIGNED_CREEPS = 'AssignedCreeps';
+const ASSIGNED_CREEPNAMES = 'AssignedCreeps';
 export abstract class OverseerBase extends ChildMemory implements IOverseer {
     constructor(memID: string, protected Queen: HiveQueen) {
         super(memID, Queen);
     }
 
     Hive!: Room;
-    AssignedCreeps!: string[];
+    AssignedCreeps!: { [creepName: string]: Creep };
+
     Save() {
-        this.SetData(ASSIGNED_CREEPS, this.AssignedCreeps)
+        this.SetData(ASSIGNED_CREEPNAMES, this.AssignedCreeps)
         super.Save();
     }
     Load() {
         super.Load();
         this.Hive = Game.rooms[this.Queen.id];
-        this.AssignedCreeps = this.GetData(ASSIGNED_CREEPS);
+        let creepNames = this.GetData(ASSIGNED_CREEPNAMES);
+        for (let i = 0, length = creepNames.length; i < length; i++) {
+            this.AssignedCreeps[creepNames[i]] = Game.creeps[creepNames[i]]
+        }
     }
 
     // This should be converted from passive to active.

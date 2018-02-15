@@ -2,19 +2,22 @@
 import { SwarmReturnCode } from 'SwarmEnums';
 
 export const loop = function () {
-    if (initSwarm() != OK) {
-        console.log('CATASTROPHIC END!!!!!!');
-        return;
-    }
-    for (let name in Memory.creeps) {
-        if (!Game.creeps[name]) {
-            delete Memory.creeps[name];
+    try {
+        if (initSwarm() != OK) {
+            console.log('CATASTROPHIC END!!!!!!');
+            return;
         }
-    } // Temp solution
-    let swarmQueen = SwarmQueen.LoadSwarmData();
-    swarmQueen.Activate();
-    swarmQueen.Save();
-
+        for (let name in Memory.creeps) {
+            if (!Game.creeps[name]) {
+                delete Memory.creeps[name];
+            }
+        } // Temp solution
+        let swarmQueen = SwarmQueen.LoadSwarmData();
+        swarmQueen.Activate();
+        swarmQueen.Save();
+    } finally {
+        DisposeAll();
+    }
 
     /*let targets = Game.rooms['E9N35'].find(FIND_HOSTILE_CREEPS);
     if(targets.length > 0) {
