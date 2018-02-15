@@ -18,7 +18,7 @@ export class HarvestAction extends ActionWithTarget<HarvestTargetType> {
             //case(ERR_INVALID_TARGET): Target is not a valid harvest object.
             case (ERR_NOT_IN_RANGE): actionResponse = SwarmCodes.C_MOVE; break;
             //case(ERR_NO_BODYPART): No work body parts on this creep.
-            default: console.log('FAILED ACTION[AttackAction] -- ' + result);
+            default: console.log('FAILED ACTION[HarvestAction] -- ' + result);
         }
 
         return actionResponse;
@@ -35,6 +35,6 @@ export class HarvestAction extends ActionWithTarget<HarvestTargetType> {
         } else if ((this.Target as Mineral).mineralAmount) {
             validTarget = (this.Target as Mineral).mineralAmount > 0;
         }
-        return (validTarget ? SwarmCodes.C_NONE : SwarmCodes.E_TARGET_INELLIGIBLE;);
+        return (validTarget ? SwarmCodes.C_NONE : SwarmCodes.E_TARGET_INELLIGIBLE);
     }
 }

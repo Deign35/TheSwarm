@@ -35,7 +35,7 @@ export class TransferAction extends ActionWithTarget<TransferTargetType> {
             case (ERR_FULL): actionResponse = SwarmCodes.E_TARGET_INELLIGIBLE; break;
             case (ERR_NOT_IN_RANGE): actionResponse = SwarmCodes.C_MOVE; break;
             //case(ERR_INVALID_ARGS): The resources amount is incorrect.
-            default: console.log('FAILED ACTION[AttackAction] -- ' + result);
+            default: console.log('FAILED ACTION[TransferAction] -- ' + result);
         }
 
         return actionResponse;

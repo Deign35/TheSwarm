@@ -10,13 +10,7 @@ export class BuildAction extends ActionWithTarget<BuildTargetType> {
         let result = this.AssignedCreep.build(this.Target);
         let actionResponse: SwarmCodes.SwarmlingResponse = SwarmCodes.C_NONE;
         switch (result) {
-            case (OK):
-                /*if (this.AssignedCreep.carry[RESOURCE_ENERGY] <= this.AssignedCreep.getActiveBodyparts(WORK) * 5) {
-                    actionResponse = SwarmCodes.E_REQUIRES_ENERGY;
-                } Decided not to do this yet.  I would prefer to not do this very complicated
-                  area between which actions get precedence.
-                */
-                actionResponse = SwarmCodes.C_NONE; break;
+            case (OK): actionResponse = SwarmCodes.C_NONE; break;
             //case(ERR_NOT_OWNER): Not the owner of this object.
             //case(ERR_BUSY): Creep is still being spawned.
             case (ERR_NOT_ENOUGH_RESOURCES): actionResponse = SwarmCodes.E_REQUIRES_ENERGY; break;

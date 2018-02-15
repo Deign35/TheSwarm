@@ -1,4 +1,4 @@
-import * as SwarmEnums from "SwarmEnums";
+import * as SwarmCodes from "Consts/SwarmCodes";
 import { OverseerBase } from "Overseers/OverseerBase";
 import { ActionBase } from "Actions/ActionBase";
 import { BuildAction } from "Actions/BuildAction";
@@ -27,7 +27,7 @@ export class HiveHarvestOverseer extends OverseerBase<HarvestConsul> {
     }
 
     Load() {
-        if(!super.Load()) { return false; }
+        if (!super.Load()) { return false; }
         this.SourceNodes = this.GetData(NODE_DATA) || [];
         this.NodeObjects = [];
 
@@ -89,7 +89,7 @@ export class HiveHarvestOverseer extends OverseerBase<HarvestConsul> {
             let container = this.NodeObjects[index].container as StructureContainer;
 
             let action: ActionBase | undefined;
-            if (creep.carry.energy > creep.carryCapacity / 2) {
+            if (creep.carryCapacity > 0 && creep.carry.energy * 2 > creep.carryCapacity) {
                 if (constructionSite) {
                     // Build it
                     action = new BuildAction(creep, constructionSite);
@@ -101,46 +101,34 @@ export class HiveHarvestOverseer extends OverseerBase<HarvestConsul> {
                         action = new DropAction(creep, container.pos, RESOURCE_ENERGY);
                     }
                 }
-            }
-
-            let primaryResponse: SwarmEnums.CommandResponseType = SwarmEnums.CRT_None;
-            if (action && action.ValidateAction() == SwarmEnums.CRT_None) {
-                primaryResponse = action.Run(false);
-            }
-            if (primaryResponse == SwarmEnums.CRT_Next || primaryResponse == SwarmEnums.CRT_None) {
+                let suplementalActionResponse: SwarmCodes.SwarmlingResponse = SwarmCodes.C_NONE;
+                if (action && action.ValidateAction() == SwarmCodes.C_NONE) {
+                    suplementalActionResponse = action.Run(false);
+                    //Need to do some validation here maybe?
+                    // if successful, should just exit now.
+                }
+            } else if (creep.carryCapacity == 0) {
                 let targetPos = this.NodeObjects[index].source.pos;
                 if (container) {
                     targetPos = container.pos;
                 } else if (constructionSite) {
                     targetPos = constructionSite.pos;
                 }
-
-                if ((container && creep.pos.isEqualTo(targetPos)) ||
-                    (!container && creep.pos.getRangeTo(targetPos) <= 1)) {
-                    action = new HarvestAction(
-                        this.NodeObjects[index].creep as Creep, this.NodeObjects[index].source);
-                } else {
-                    action = new MoveToPositionAction(creep, targetPos);
-                }
-            } else {
-                // Means we had to do some other action, and it was not a completed task.
-                return;
+                action = new MoveToPositionAction(creep, targetPos);
+                action.Run();
             }
+
+
+
+            action = new HarvestAction(this.NodeObjects[index].creep as Creep, this.NodeObjects[index].source);
 
             action.ValidateAction();
             let harvestResult = action.Run(true);
             // Check if harvest worked
             switch (harvestResult) {
-                case (SwarmEnums.CRT_None): console.log("THIS IS NOT POSSIBLE"); break; // Unless we haven't fixed Next/NewTarget above.
-                case (SwarmEnums.CRT_Condition_Full):
-                    if (!constructionSite && !container) {
-                        if (creep.pos.lookFor(LOOK_CONSTRUCTION_SITES).length == 0) {
-                            //creep.room.createConstructionSite(creep.pos, STRUCTURE_CONTAINER);
-                            //this.Queen.ConstructionOverseer.CreateNewStructure(STRUCTURE_CONTAINER, creep.pos, 8);
-                        }
-                    }
-                    break; //Means we successfully harvested.
-                case (SwarmEnums.CRT_NewTarget): break; // The source is empty.  Just wait.
+                case (SwarmCodes.C_NONE):
+                case (SwarmCodes.E_TARGET_INELLIGIBLE): break; // The source is empty.  Just wait.
+                default: console.log('FAILED ACTION[HiveHarvestOverseer] -- ' + harvestResult);
             }
         }
     }

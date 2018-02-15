@@ -18,7 +18,7 @@ export class UpgradeAction extends ActionWithTarget<UpgradeTargetType> {
             //case(ERR_INVALID_TARGET): Target is not a valid transfer object.
             case (ERR_NOT_IN_RANGE): actionResponse = SwarmCodes.C_MOVE; break;
             //case(ERR_NO_BODYPART): No work body parts on this creep.
-            default: console.log('FAILED ACTION[AttackAction] -- ' + result);
+            default: console.log('FAILED ACTION[UpgradeAction] -- ' + result);
         }
 
         return actionResponse;

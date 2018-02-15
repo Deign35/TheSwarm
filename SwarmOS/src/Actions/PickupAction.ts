@@ -16,7 +16,7 @@ export class PickupAction extends ActionWithTarget<PickupTargetType> {
             //case(ERR_INVALID_TARGET): Target is not a valid constructionsite.
             case (ERR_FULL): actionResponse = SwarmCodes.E_ACTION_UNNECESSARY; break;
             case (ERR_NOT_IN_RANGE): actionResponse = SwarmCodes.C_MOVE; break;
-            default: console.log('FAILED ACTION[AttackAction] -- ' + result);
+            default: console.log('FAILED ACTION[PickupAction] -- ' + result);
         }
 
         return actionResponse;

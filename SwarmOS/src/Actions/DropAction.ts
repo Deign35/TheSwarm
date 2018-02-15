@@ -22,8 +22,8 @@ export class DropAction extends ActionWithPosition {
             case (OK): actionResponse = SwarmCodes.C_NONE; break;
             //case(ERR_NOT_OWNER): Not the owner of this object.
             //case(ERR_BUSY): Creep is still being spawned.
-            case (ERR_NOT_ENOUGH_RESOURCES): actionResponse = SwarmCodes.C_NONE; break;
-            default: console.log('FAILED ACTION[AttackAction] -- ' + result);
+            case (ERR_NOT_ENOUGH_RESOURCES): actionResponse = SwarmCodes.E_ACTION_UNNECESSARY; break;
+            default: console.log('FAILED ACTION[DropAction] -- ' + result);
         }
 
         return actionResponse;
@@ -31,7 +31,7 @@ export class DropAction extends ActionWithPosition {
     ValidateAction(): SwarmCodes.SwarmlingResponse {
         // Sum!
         if (this.AssignedCreep.carry[this.ResourceType as string] < this.Amount) {
-            return SwarmCodes.E_REQUIRES_ENERGY;
+            return SwarmCodes.E_ACTION_UNNECESSARY;
         }
         return SwarmCodes.C_NONE;
     }
