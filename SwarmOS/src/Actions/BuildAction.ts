@@ -1,7 +1,8 @@
 import { ActionWithTarget } from "Actions/ActionBase";
 import * as SwarmEnums from "SwarmEnums";
 
-export class BuildAction extends ActionWithTarget<ConstructionSite> {
+declare type BuildTargetType = ConstructionSite;
+export class BuildAction extends ActionWithTarget<BuildTargetType> {
     static SimultaneousActionValue = 3;
     protected get BlockValue() { return BuildAction.SimultaneousActionValue; }
     protected get EnergyBlockValue() { return 2; }

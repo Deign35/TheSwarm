@@ -2,7 +2,8 @@ import * as SwarmEnums from "SwarmEnums";
 import * as _ from "lodash";
 import { ActionWithTarget } from "Actions/ActionBase";
 
-export class UpgradeAction extends ActionWithTarget<StructureController> {
+declare type UpgradeTargetType = StructureController;
+export class UpgradeAction extends ActionWithTarget<UpgradeTargetType> {
     static SimultaneousActionValue = 0;
     protected get BlockValue() { return UpgradeAction.SimultaneousActionValue; }
     protected get EnergyBlockValue() { return 1; }

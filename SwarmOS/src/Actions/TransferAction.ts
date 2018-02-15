@@ -2,7 +2,8 @@ import * as SwarmEnums from "SwarmEnums";
 import * as _ from "lodash";
 import { ActionWithTarget } from "Actions/ActionBase";
 
-export class TransferAction extends ActionWithTarget<Creep | Structure> {
+declare type TransferTargetType = Creep | Structure;
+export class TransferAction extends ActionWithTarget<TransferTargetType> {
     static SimultaneousActionValue = 0;
     protected get BlockValue() { return TransferAction.SimultaneousActionValue; }
     protected get EnergyBlockValue() { return 5; }

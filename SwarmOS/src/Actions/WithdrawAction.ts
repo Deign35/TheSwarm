@@ -2,11 +2,13 @@ import { ActionWithTarget } from "Actions/ActionBase";
 import * as SwarmEnums from "SwarmEnums";
 import * as _ from "lodash";
 
-export class WithdrawAction extends ActionWithTarget<Structure> {
+declare type WithdrawTargetType = StructureContainer | StructureExtension | StructureSpawn | StructureLab | StructureLink |
+    StructureStorage | StructureTower;
+export class WithdrawAction extends ActionWithTarget<WithdrawTargetType> {
     static SimultaneousActionValue = 0;
     protected get BlockValue() { return WithdrawAction.SimultaneousActionValue; }
     protected get EnergyBlockValue() { return 4; }
-    constructor(creep: Creep, target: Structure, protected ResourceType: ResourceConstant = RESOURCE_ENERGY, protected Amount: number = 0) {
+    constructor(creep: Creep, target: WithdrawTargetType, protected ResourceType: ResourceConstant = RESOURCE_ENERGY, protected Amount: number = 0) {
         super(creep, target);
         if (Amount == 0) {
             Amount = creep.carry[ResourceType] || 0;

@@ -1,7 +1,8 @@
 import { ActionWithTarget } from "Actions/ActionBase";
 import * as SwarmEnums from "SwarmEnums";
 
-export class RepairAction extends ActionWithTarget<Structure> {
+declare type RepairTargetType = Structure;
+export class RepairAction extends ActionWithTarget<RepairTargetType> {
     static SimultaneousActionValue = 4;
     protected get BlockValue() { return RepairAction.SimultaneousActionValue; }
     protected get EnergyBlockValue() { return 3; }
