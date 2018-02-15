@@ -1,5 +1,5 @@
 import { ActionWithTarget } from "Actions/ActionBase";
-import * as SwarmEnums from "SwarmEnums";
+import * as SwarmCodes from "Consts/SwarmCodes";
 import * as _ from "lodash";
 
 declare type WithdrawTargetType = StructureContainer | StructureExtension | StructureSpawn | StructureLab | StructureLink |
@@ -14,7 +14,7 @@ export class WithdrawAction extends ActionWithTarget<WithdrawTargetType> {
             Amount = creep.carry[ResourceType] || 0;
         }
     }
-    protected ActionImplemented(): SwarmEnums.CommandResponseType {
+    protected ActionImplemented(): SwarmCodes.SwarmlingResponse {
         let carryCapacity = this.AssignedCreep.carryCapacity - _.sum(this.AssignedCreep.carry);
         let targetAllows = 0;
         if ((this.Target as StructureContainer).storeCapacity) {
@@ -25,31 +25,32 @@ export class WithdrawAction extends ActionWithTarget<WithdrawTargetType> {
 
         let amount = Math.min(carryCapacity, targetAllows);
         let result = this.AssignedCreep.withdraw(this.Target, this.ResourceType, amount);
-        let actionResponse: SwarmEnums.CommandResponseType = SwarmEnums.CRT_None;
+        let actionResponse: SwarmCodes.SwarmlingResponse = SwarmCodes.C_NONE;
         switch (result) {
-            case (OK): actionResponse = SwarmEnums.CRT_Condition_Full; break;
+            case (OK): actionResponse = SwarmCodes.C_NONE; break;
             //case(ERR_NOT_OWNER): Not the owner of this object.
             //case(ERR_BUSY): Creep is still being spawned.
-            case (ERR_NOT_ENOUGH_RESOURCES): actionResponse = SwarmEnums.CRT_NewTarget; break;
+            case (ERR_NOT_ENOUGH_RESOURCES): actionResponse = SwarmCodes.E_TARGET_INELLIGIBLE; break;
             //case(ERR_INVALID_TARGET): Target is not a valid constructionsite.
-            case (ERR_FULL): actionResponse = SwarmEnums.CRT_Next; break;
-            case (ERR_NOT_IN_RANGE): actionResponse = SwarmEnums.CRT_Move; break;
+            case (ERR_FULL): actionResponse = SwarmCodes.E_ACTION_UNNECESSARY; break;
+            case (ERR_NOT_IN_RANGE): actionResponse = SwarmCodes.C_MOVE; break;
             //case(ERR_INVALID_ARGS): The resources amount or type is incorrect.
+            default: console.log('FAILED ACTION[AttackAction] -- ' + result);
         }
 
         return actionResponse;
     }
-    ValidateAction(): SwarmEnums.CommandResponseType {
-        let validationResult = SwarmEnums.CRT_None as SwarmEnums.CommandResponseType;
+    ValidateAction(): SwarmCodes.SwarmlingResponse {
+        let validationResult = SwarmCodes.C_NONE as SwarmCodes.SwarmlingResponse;
         if (_.sum(this.AssignedCreep.carry) == this.AssignedCreep.carryCapacity) {
-            validationResult = SwarmEnums.CRT_Next;
+            validationResult = SwarmCodes.E_ACTION_UNNECESSARY;
         } else if ((this.Target as StructureSpawn).energyCapacity) {
             if ((this.Target as StructureSpawn).energy == 0) {
-                validationResult = SwarmEnums.CRT_NewTarget;
+                validationResult = SwarmCodes.E_TARGET_INELLIGIBLE;
             }
         } else if ((this.Target as StructureContainer).storeCapacity) {
             if (!(this.Target as StructureContainer).store[this.ResourceType]) {
-                validationResult = SwarmEnums.CRT_NewTarget;
+                validationResult = SwarmCodes.E_TARGET_INELLIGIBLE;
             }
         }
         return validationResult;

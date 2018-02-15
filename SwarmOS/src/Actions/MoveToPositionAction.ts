@@ -1,21 +1,21 @@
 import { ActionWithPosition } from "Actions/ActionBase";
-import * as SwarmEnums from "SwarmEnums";
+import * as SwarmCodes from "consts/SwarmCodes";
 
 export class MoveToPositionAction extends ActionWithPosition {
     static SimultaneousActionValue = 0;
     protected get BlockValue() { return MoveToPositionAction.SimultaneousActionValue; }
-    protected ActionImplemented(): SwarmEnums.CommandResponseType {
-        let response: SwarmEnums.CommandResponseType = SwarmEnums.CRT_Move;
-        if(this.AssignedCreep.pos.isEqualTo(this.TargetPos)) {
-            response = SwarmEnums.CRT_Next;
+    protected ActionImplemented(): SwarmCodes.SwarmlingResponse {
+        let response: SwarmCodes.SwarmlingResponse = SwarmCodes.C_MOVE;
+        if (this.AssignedCreep.pos.isEqualTo(this.TargetPos)) {
+            response = SwarmCodes.E_ACTION_UNNECESSARY;
         }
 
         return response;
     }
-    ValidateAction(): SwarmEnums.CommandResponseType {
-        if(this.AssignedCreep.pos.isEqualTo(this.TargetPos)) {
-            return SwarmEnums.CRT_Next;
+    ValidateAction(): SwarmCodes.SwarmlingResponse {
+        if (this.AssignedCreep.pos.isEqualTo(this.TargetPos)) {
+            return SwarmCodes.E_ACTION_UNNECESSARY;
         }
-        return SwarmEnums.CRT_None;
+        return SwarmCodes.C_NONE;
     }
 }

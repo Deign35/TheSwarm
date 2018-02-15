@@ -1,32 +1,39 @@
 import { ActionWithTarget } from "Actions/ActionBase";
-import * as SwarmEnums from "SwarmEnums";
+import * as SwarmCodes from "Consts/SwarmCodes";
 
 declare type BuildTargetType = ConstructionSite;
 export class BuildAction extends ActionWithTarget<BuildTargetType> {
     static SimultaneousActionValue = 3;
     protected get BlockValue() { return BuildAction.SimultaneousActionValue; }
     protected get EnergyBlockValue() { return 2; }
-    protected ActionImplemented(): SwarmEnums.CommandResponseType {
+    protected ActionImplemented(): SwarmCodes.SwarmlingResponse {
         let result = this.AssignedCreep.build(this.Target);
-        let actionResponse: SwarmEnums.CommandResponseType = SwarmEnums.CRT_None;
-        switch(result) {
-            case(OK): actionResponse = SwarmEnums.CRT_Condition_Empty; break;
+        let actionResponse: SwarmCodes.SwarmlingResponse = SwarmCodes.C_NONE;
+        switch (result) {
+            case (OK):
+                /*if (this.AssignedCreep.carry[RESOURCE_ENERGY] <= this.AssignedCreep.getActiveBodyparts(WORK) * 5) {
+                    actionResponse = SwarmCodes.E_REQUIRES_ENERGY;
+                } Decided not to do this yet.  I would prefer to not do this very complicated
+                  area between which actions get precedence.
+                */
+                actionResponse = SwarmCodes.C_NONE; break;
             //case(ERR_NOT_OWNER): Not the owner of this object.
             //case(ERR_BUSY): Creep is still being spawned.
-            case(ERR_NOT_ENOUGH_RESOURCES): actionResponse = SwarmEnums.CRT_Next; break;
+            case (ERR_NOT_ENOUGH_RESOURCES): actionResponse = SwarmCodes.E_REQUIRES_ENERGY; break;
             //case(ERR_INVALID_TARGET): Target is not a valid constructionsite.
-            case(ERR_NOT_IN_RANGE): actionResponse = SwarmEnums.CRT_Move; break;
+            case (ERR_NOT_IN_RANGE): actionResponse = SwarmCodes.C_MOVE; break;
             //case(ERR_NO_BODYPART): No work body parts on this creep.
             //case(ERR_RCL_NOT_ENOUGH): Need higher room control
+            default: console.log('FAILED ACTION[BuildAction] -- ' + result);
         }
 
         return actionResponse;
     }
-    ValidateAction(): SwarmEnums.CommandResponseType {
+    ValidateAction(): SwarmCodes.SwarmlingResponse {
         // Sum!
-        if(this.AssignedCreep.carry.energy == 0) {
-            return SwarmEnums.CRT_Next as SwarmEnums.CommandResponseType;
+        if (this.AssignedCreep.carry.energy == 0) {
+            return SwarmCodes.E_REQUIRES_ENERGY;
         }
-        return SwarmEnums.CRT_None;
+        return SwarmCodes.C_NONE;
     }
 }

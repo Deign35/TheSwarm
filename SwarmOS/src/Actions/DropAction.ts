@@ -1,5 +1,5 @@
 import { ActionWithPosition } from "Actions/ActionBase";
-import * as SwarmEnums from "SwarmEnums";
+import * as SwarmCodes from "Consts/SwarmCodes";
 
 export class DropAction extends ActionWithPosition {
     static SimultaneousActionValue = 0;
@@ -11,28 +11,28 @@ export class DropAction extends ActionWithPosition {
         }
     }
     protected get EnergyBlockValue() { return 6; }
-    protected ActionImplemented(): SwarmEnums.CommandResponseType {
-        let result = ERR_NOT_IN_RANGE as SwarmEnums.SwarmReturnCode;
-        if (this.AssignedCreep.pos.isEqualTo(this.TargetPos)) {
+    protected ActionImplemented(): SwarmCodes.SwarmlingResponse {
+        if (!this.AssignedCreep.pos.isEqualTo(this.TargetPos)) {
             //We're here!
-            result = this.AssignedCreep.drop(this.ResourceType, this.Amount);
+            return SwarmCodes.C_MOVE;
         }
-        let actionResponse: SwarmEnums.CommandResponseType = SwarmEnums.CRT_None;
+        let result = this.AssignedCreep.drop(this.ResourceType, this.Amount);
+        let actionResponse: SwarmCodes.SwarmlingResponse = SwarmCodes.C_NONE;
         switch (result) {
-            case (OK): actionResponse = SwarmEnums.CRT_Next; break;
+            case (OK): actionResponse = SwarmCodes.C_NONE; break;
             //case(ERR_NOT_OWNER): Not the owner of this object.
             //case(ERR_BUSY): Creep is still being spawned.
-            case (ERR_NOT_ENOUGH_RESOURCES): actionResponse = SwarmEnums.CRT_Next; break;
-            case (ERR_NOT_IN_RANGE): actionResponse = SwarmEnums.CRT_Move; break;
+            case (ERR_NOT_ENOUGH_RESOURCES): actionResponse = SwarmCodes.C_NONE; break;
+            default: console.log('FAILED ACTION[AttackAction] -- ' + result);
         }
 
         return actionResponse;
     }
-    ValidateAction(): SwarmEnums.CommandResponseType {
+    ValidateAction(): SwarmCodes.SwarmlingResponse {
         // Sum!
-        if (this.AssignedCreep.carry[this.ResourceType] == 0) {
-            return SwarmEnums.CRT_Next as SwarmEnums.CommandResponseType;
+        if (this.AssignedCreep.carry[this.ResourceType as string] < this.Amount) {
+            return SwarmCodes.E_REQUIRES_ENERGY;
         }
-        return SwarmEnums.CRT_None;
+        return SwarmCodes.C_NONE;
     }
 }
