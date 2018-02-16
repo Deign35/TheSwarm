@@ -41,6 +41,15 @@ declare interface IConsul extends IMemory {
 declare interface PrimeConsul extends IMemory {
 
 }
+
+declare type RoomObjectData = {
+    x: number,
+    y: number
+}
+
+declare type HarvestConsul_SourceData = RoomObjectData & {
+    id: string,
+}
 /*
 declare interface IOverseerRequirements_Creep {
     time: number,
