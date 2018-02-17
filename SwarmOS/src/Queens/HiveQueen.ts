@@ -1,8 +1,8 @@
 import { QueenMemory } from "Memory/SwarmMemory";
 import * as SwarmEnums from "SwarmEnums";
 import { HiveHarvestOverseer } from "Overseers/HiveHarvestOverseer";
-import { NestQueenBase } from "Managers/NestQueenBase";
-import { HiveConsul } from "Consuls/PrimeConsuls.ts/HiveConsul";
+import { HiveQueenBase } from "Queens/HiveQueenBase";
+import { HiveConsul } from "Consuls/PrimeConsuls/HiveConsul";
 
 const DISTRIBUTION = 'Di';
 const HIVE_HARVESTER = 'HH';
@@ -13,8 +13,24 @@ const CREEP_DATA = 'CD';
 const NO_ASSIGNMENT = 'NA';
 const HIVE_BOOTSTRAPPING = 'HB';
 const BOOTSTRAPPER = 'BS';
-export class HiveQueen extends NestQueenBase<HiveConsul> {
-    LoadConsul(): void {
+export class HiveQueen extends HiveQueenBase {
+    InitMemory(): void {
+        throw new Error("Method not implemented.");
+    }
+    ReceiveCommand(): void {
+        throw new Error("Method not implemented.");
+    }
+    // Hive Queen is created once the BabyHiveQueen has finished it's tasks (and evolves!);
+    LoadImperators(): void {
+        throw new Error("Method not implemented.");
+    }
+    LoadPrimeConsul(): void {
+        throw new Error("Method not implemented.");
+    }
+    InitializeNest(): void {
+        throw new Error("Method not implemented.");
+    }
+    ActivateNest(): void {
         throw new Error("Method not implemented.");
     }
     ReceiveOrder(): void {

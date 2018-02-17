@@ -1,5 +1,5 @@
 import { QueenMemory } from "Memory/SwarmMemory";
-import { HiveQueen } from "Managers/HiveQueen";
+import { HiveQueen } from "Queens/HiveQueen";
 
 export class SwarmQueen extends QueenMemory {
     HiveQueens!: { [name: string]: HiveQueen }
@@ -32,11 +32,15 @@ export class SwarmQueen extends QueenMemory {
         return true;
     }
 
-    static LoadSwarmData(): SwarmQueen {
+    static LoadSwarmData(): SwarmQueen { // Why is this even here?
         return new SwarmQueen('SwarmQueen');
     }
 
     static InitializeSwarm() {
+        // If the swarm has already been initialized and is still in memory, this will be a noop
+        // due to how _SwarmMemory works.
+        // The only effect this could have is adding rooms that you didn't previously add.
+        // In that sense, it is safe to call, but explicitly adding the room would be better perf-wise.
         let newSwarm = new SwarmQueen('SwarmQueen');
         newSwarm.Save();
         newSwarm.Load();
@@ -46,10 +50,8 @@ export class SwarmQueen extends QueenMemory {
 
             newSwarm.HiveQueens[name] = new HiveQueen(name);
         }
-        // Create a HiveQueen per controlled room.
 
         // Initialize each HiveQueen
         newSwarm.Save();
-        return OK;
     }
 }

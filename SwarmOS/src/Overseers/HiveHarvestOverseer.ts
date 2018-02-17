@@ -2,11 +2,13 @@ import * as SwarmCodes from "Consts/SwarmCodes";
 import { OverseerBase } from "Overseers/OverseerBase";
 import { ActionBase } from "Actions/ActionBase";
 import { HarvestConsul } from "Consuls/HarvestConsul";
+import { HarvestAction } from "Actions/HarvestAction";
+import { MoveToPositionAction } from "Actions/MoveToPositionAction";
 
 const CONSUL_DATA = 'ConsulData';
 export class HiveHarvestOverseer extends OverseerBase {
     Consul!: HarvestConsul;
-    InitNewOverseer(): void {
+    InitMemory(): void {
         // Request a harvester for each source.
     }
 
@@ -16,7 +18,7 @@ export class HiveHarvestOverseer extends OverseerBase {
     }
 
     Load() {
-        if (!super.Load()) { throw 'Unable to load Harvest Overseer for: ' + this.Hive.name }
+        if (!super.Load()) { return false; }
         this.Consul = new HarvestConsul(CONSUL_DATA, this);
         return true;
     }
@@ -24,105 +26,57 @@ export class HiveHarvestOverseer extends OverseerBase {
     ValidateOverseer() {
         if (Game.time % 100 == 65) {
             this.Consul.ScanRoom();
-
         }
     }
 
     ActivateOverseer() {
-        for (let index in this.NodeObjects) {
-            if (!this.NodeObjects[index].creep || (this.NodeObjects[index].creep as Creep).spawning) {
+        let requirements = this.Consul.DetermineRequirements();
+        // Order hive harvesters from the nestqueen.
+        let sourceData = this.Consul.SourceData;
+        for(let i = 0, length = this.Consul.SourceData.length; i < length; i++) {
+            let data = this.Consul.SourceData[i];
+            if(!data.harvester) continue;
+            let harvester = Game.creeps[data.harvester];
+            if(!harvester) {
+                // update the consul,
                 continue;
             }
-            let creep = this.NodeObjects[index].creep as Creep;
-            let constructionSite = this.NodeObjects[index].constructionSite as ConstructionSite;
-            let container = this.NodeObjects[index].container as StructureContainer;
 
-            let action: ActionBase | undefined;
-            if (creep.carryCapacity > 0 && creep.carry.energy * 2 > creep.carryCapacity) {
-                if (constructionSite) {
-                    // Build it
-                    action = new BuildAction(creep, constructionSite);
-                } else if (container) {
-                    if (container.hits < container.hitsMax) {
-                        // Repair it
-                        action = new RepairAction(creep, container);
-                    } else {
-                        action = new DropAction(creep, container.pos, RESOURCE_ENERGY);
+            let sourceTarget =  Game.getObjectById(data.id) as Source;
+            let harvestAction = new HarvestAction(harvester, sourceTarget);
+            let harvestValidation = harvestAction.ValidateAction();
+            switch(harvestValidation) {
+                case(SwarmCodes.C_NONE):
+                    if(!data.constructionSite && !data.containerID) {
+                        harvester.room.createConstructionSite(harvester.pos, STRUCTURE_CONTAINER);
                     }
-                }
-                let suplementalActionResponse: SwarmCodes.SwarmlingResponse = SwarmCodes.C_NONE;
-                if (action && action.ValidateAction() == SwarmCodes.C_NONE) {
-                    suplementalActionResponse = action.Run(false);
-                    //Need to do some validation here maybe?
-                    // if successful, should just exit now.
-                }
-            } else if (creep.carryCapacity == 0) {
-                let targetPos = this.NodeObjects[index].source.pos;
-                if (container) {
-                    targetPos = container.pos;
-                } else if (constructionSite) {
-                    targetPos = constructionSite.pos;
-                }
-                action = new MoveToPositionAction(creep, targetPos);
-                action.Run();
-            }
-
-
-
-            action = new HarvestAction(this.NodeObjects[index].creep as Creep, this.NodeObjects[index].source);
-
-            action.ValidateAction();
-            let harvestResult = action.Run(true);
-            // Check if harvest worked
-            switch (harvestResult) {
-                case (SwarmCodes.C_NONE):
-                case (SwarmCodes.E_TARGET_INELLIGIBLE): break; // The source is empty.  Just wait.
-                default: console.log('FAILED ACTION[HiveHarvestOverseer] -- ' + harvestResult);
+                    break;
+                case(SwarmCodes.E_ACTION_UNNECESSARY): break; // Creep's carry is full
+                case(SwarmCodes.E_TARGET_INELLIGIBLE): break; // Target is empty.
+                case(SwarmCodes.C_MOVE):
+                    let targetPos = sourceTarget.pos;
+                    if(data.constructionSite || data.containerID) {
+                        let targetStruct = (Game.getObjectById(data.constructionSite) || Game.getObjectById(data.containerID)) as ConstructionSite | StructureContainer;
+                        if(targetStruct) {
+                            targetPos = targetStruct.pos;
+                        }
+                    }
+                    new MoveToPositionAction(harvester, targetPos).Run(true);
+                    break;
             }
         }
     }
 
     AssignCreep(creepName: string): void {
-        for (let i = 0, length = this.NodeObjects.length; i < length; i++) {
-            if (!this.NodeObjects[i].creep) {
-                this.SourceNodes[i].creepName = creepName;
-                break;
-            }
+        let result = this.Consul.AssignCreepToSource(creepName);
+
+        if(result == SwarmCodes.E_MISSING_TARGET) {
+            this.ReleaseCreep(creepName, 'No jobs available');
         }
     }
 
     ReleaseCreep(creepName: string, releaseReason: string) {
-        for (let i = 0, length = this.SourceNodes.length; i < length; i++) {
-            if (this.SourceNodes[i].creepName == creepName) {
-                delete this.SourceNodes[i].creepName;
-                break;
-            }
-        }
-    }
-
-    private UpdateNodeData(nodeInfo: { creepID?: string, sourceID: string, containerID?: string, constructionSiteID?: string }, source?: Source) {
-        if (!source) {
-            source = Game.getObjectById(nodeInfo.sourceID) as Source;
-        }
-        let foundStructures = this.Hive.lookForAtArea(LOOK_STRUCTURES, source.pos.y - 1, source.pos.x - 1, source.pos.y + 1, source.pos.x + 1, true);
-        if (foundStructures.length > 0) {
-            for (let i in foundStructures) {
-                if ((foundStructures[i].structure as Structure).structureType == STRUCTURE_CONTAINER) {
-                    nodeInfo.containerID = (foundStructures[i].structure as Structure).id;
-                }
-            }
-        }
-        if (!nodeInfo.containerID) {
-            let foundCSites = this.Hive.lookForAtArea(LOOK_CONSTRUCTION_SITES, source.pos.y - 1, source.pos.x - 1, source.pos.y + 1, source.pos.x + 1, true);
-            if (foundCSites.length > 0) {
-                for (let i in foundCSites) {
-                    if ((foundCSites[i].constructionSite as ConstructionSite).structureType == STRUCTURE_CONTAINER) {
-                        nodeInfo.constructionSiteID = (foundCSites[i].constructionSite as ConstructionSite).id;
-                    }
-                }
-            }
-        }
-
-        return nodeInfo;
+        // This should be to give the harvester creep back to the queen.
+        this.Consul.ReleaseCreep(creepName);
     }
 }

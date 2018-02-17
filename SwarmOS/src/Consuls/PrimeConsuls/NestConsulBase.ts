@@ -1,6 +1,6 @@
 import { ChildMemory } from "Memory/SwarmMemory";
 
-export abstract class NestConsulBase extends ChildMemory implements PrimeConsul {
+export abstract class NestConsulBase extends ChildMemory implements IPrimeConsul {
     Save() {
 
         this.Save();

@@ -2,6 +2,7 @@ export abstract class _SwarmMemory implements IMemory {
     constructor(public readonly id: string, public Parent?: IMemory) {
         if(!this.Load()) {
             this.InitMemory();
+            this.Load();
         }
     }
     protected _cache: { [id: string]: any } = {};

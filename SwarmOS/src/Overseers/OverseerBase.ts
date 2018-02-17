@@ -3,7 +3,7 @@ import { ConsulBase } from "Consuls/ConsulBase"
 
 const CONSUL_TYPE = 'ConsulType';
 export abstract class OverseerBase extends ChildMemory implements IOverseer {
-    Hive!: Room;
+    Nest!: Room;
 
     constructor(memID: string, protected Queen: _SwarmMemory) {
         super(memID, Queen);
@@ -14,12 +14,11 @@ export abstract class OverseerBase extends ChildMemory implements IOverseer {
     }
     Load() {
         if (!super.Load()) { return false; }
-        this.Hive = Game.rooms[this.Queen.id];
+        this.Nest = Game.rooms[this.Queen.id];
 
         return true;
     }
 
     abstract ActivateOverseer(): void;
-    abstract InitNewOverseer(): void;
     abstract ValidateOverseer(): void;
 }

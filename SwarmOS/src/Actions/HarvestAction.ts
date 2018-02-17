@@ -25,7 +25,7 @@ export class HarvestAction extends ActionWithTarget<HarvestTargetType> {
     }
 
     ValidateAction() {
-        if (_.sum(this.AssignedCreep.carry) == this.AssignedCreep.carryCapacity) {
+        if (this.AssignedCreep.carryCapacity > 0 && _.sum(this.AssignedCreep.carry) == this.AssignedCreep.carryCapacity) {
             return SwarmCodes.E_ACTION_UNNECESSARY;
         }
 
@@ -34,6 +34,14 @@ export class HarvestAction extends ActionWithTarget<HarvestTargetType> {
             validTarget = (this.Target as Source).energy > 0;
         } else if ((this.Target as Mineral).mineralAmount) {
             validTarget = (this.Target as Mineral).mineralAmount > 0;
+        }
+
+        if(!validTarget) {
+            return SwarmCodes.E_TARGET_INELLIGIBLE;
+        }
+
+        if(this.AssignedCreep.pos.getRangeTo(this.Target.pos) > 1) {
+            return SwarmCodes.C_MOVE;
         }
         return (validTarget ? SwarmCodes.C_NONE : SwarmCodes.E_TARGET_INELLIGIBLE);
     }

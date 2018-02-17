@@ -3,6 +3,7 @@ import { OverseerBase } from "Overseers/OverseerBase";
 import * as SwarmCodes from "Consts/SwarmCodes"
 import _ from "lodash";
 import { HarvestAction } from "Actions/HarvestAction";
+import { HiveHarvestOverseer } from "Overseers/HiveHarvestOverseer";
 
 const CONSUL_TYPE = 'H_Consul';
 const SOURCE_DATA = 'S_DATA';
@@ -15,7 +16,7 @@ export class HarvestConsul extends ConsulBase implements IConsul {
     }
 
     Load() {
-        if (!super.Load()) { throw 'Unable to load Harvest Consul for: ' + this.Overseer.Hive.name }
+        if (!super.Load()) { return false; }
 
         this.SourceData = this.GetData(SOURCE_DATA);
 
@@ -30,7 +31,7 @@ export class HarvestConsul extends ConsulBase implements IConsul {
     ScanRoom(): void {
         if (!this.SourceData || this.SourceData.length == 0) {
             this.SourceData = [];
-            let foundSources = this.Overseer.Hive.find(FIND_SOURCES);
+            let foundSources = this.Overseer.Nest.find(FIND_SOURCES);
             for (let i = 0, length = foundSources.length; i < length; i++) {
                 this.SourceData.push(this.InitSourceData(foundSources[i]));
             }
@@ -67,9 +68,11 @@ export class HarvestConsul extends ConsulBase implements IConsul {
         while (index < this.SourceData.length) {
             if (this.SourceData[index].harvester) {
                 if (Game.getObjectById(this.SourceData[index].harvester) != undefined) {
+                    index++;
                     continue;
                 }
-                // Release the creepName?
+                // garbage!
+                (this.Overseer as HiveHarvestOverseer).ReleaseCreep(this.SourceData[index].harvester as string, 'missing creep');
             }
 
             this.SourceData[index].harvester = creepName;
@@ -79,15 +82,13 @@ export class HarvestConsul extends ConsulBase implements IConsul {
         return SwarmCodes.E_MISSING_TARGET;
     }
 
-    CreateHarvestActionObject(data: HarvestConsul_SourceData) {
-        let creep = Game.creeps[data.harvester as string];
-        if (!creep) {
-            return SwarmCodes.E_INVALID;
+    ReleaseCreep(creepName: string) {
+        let index = 0;
+        while (index < this.SourceData.length) {
+            if(this.SourceData[index].harvester == creepName) {
+                this.SourceData[index].harvester = undefined;
+            }
         }
-        let source = Game.getObjectById(data.id);
-        let action = new HarvestAction(creep, source as Source);
-
-        return action;
     }
 
     protected InitSourceData(source: Source): HarvestConsul_SourceData {
@@ -97,7 +98,7 @@ export class HarvestConsul extends ConsulBase implements IConsul {
         sourceData.id = source.id;
         sourceData.harvestRate = 0;
         sourceData.spawnBuffer = 0; // This is how soon a creep must be spawned to get to the source at the right moment.
-        let structures = this.Overseer.Hive.lookForAtArea(LOOK_STRUCTURES,
+        let structures = this.Overseer.Nest.lookForAtArea(LOOK_STRUCTURES,
             sourceData.y - 1, sourceData.x - 1,
             sourceData.y + 1, sourceData.x + 1, true);
 
@@ -109,7 +110,7 @@ export class HarvestConsul extends ConsulBase implements IConsul {
         if (container.length > 0) {
             sourceData.containerID = (container[0].structure as Structure).id;
         } else {
-            let constructionSites = this.Overseer.Hive.lookForAtArea(LOOK_CONSTRUCTION_SITES,
+            let constructionSites = this.Overseer.Nest.lookForAtArea(LOOK_CONSTRUCTION_SITES,
                 sourceData.y - 1, sourceData.x - 1,
                 sourceData.y + 1, sourceData.x + 1, true);
             let site = _.filter(constructionSites, (site) => {
@@ -120,12 +121,6 @@ export class HarvestConsul extends ConsulBase implements IConsul {
             }
         }
         return sourceData;
-    }
-
-    protected PlaceConstructionSite(data: HarvestConsul_SourceData) {
-        if (data.constructionSite || data.containerID) { return SwarmCodes.E_ACTION_UNNECESSARY; }
-        // This should request the "designer" overseer to give it a location based on the rest of the rooms layout.
-        return SwarmCodes.C_NONE;
     }
 
     static get ConsulType(): string { return CONSUL_TYPE; }

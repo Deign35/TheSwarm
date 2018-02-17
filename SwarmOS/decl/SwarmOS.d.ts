@@ -29,7 +29,6 @@ declare function DisposeAll(): void;
 
 declare interface IOverseer extends IMemory {
     ActivateOverseer(): void;
-    InitNewOverseer(): void;
     ValidateOverseer(): void;
 }
 
@@ -39,13 +38,18 @@ declare interface IConsul extends IMemory {
     DetermineRequirements(): void;
 }
 
-declare interface PrimeConsul extends IMemory {
+declare interface IPrimeConsul extends IMemory {
 
 }
 
 declare type RoomObjectData = {
     x: number,
     y: number
+}
+
+declare type Requirement_CreepDefinition = {
+    Body: BodyPartConstant[];
+
 }
 
 declare type HarvestConsul_SourceData = RoomObjectData & {
@@ -55,6 +59,9 @@ declare type HarvestConsul_SourceData = RoomObjectData & {
     harvester?: string,
     containerID?: string,
     constructionSite?: string,
+}
+declare type HarvestConsul_RequirementsData = {
+    creeps: Requirement_CreepDefinition;
 }
 
 declare type BasicAction_Data = {
