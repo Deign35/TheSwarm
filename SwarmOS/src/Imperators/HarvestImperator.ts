@@ -20,6 +20,14 @@ export class HarvestImperator extends ImperatorBase {
 
     InitImperator(memoryHandle: string): void {
         this.Consul = new HarvestConsul(memoryHandle, this.Queen);
+        if (this.Consul.RefinementRequired && Game.time % 1000) {
+
+            try {
+                this.Consul.RefineSourceData();
+            } finally {
+
+            }
+        }
     }
 
     ActivateImperator(): SwarmCodes.SwarmErrors {

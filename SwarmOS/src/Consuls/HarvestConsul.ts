@@ -7,11 +7,16 @@ import { HarvestImperator } from "Imperators/HarvestImperator";
 
 const CONSUL_TYPE = 'H_Consul';
 const SOURCE_DATA = 'S_DATA';
+const REFINEMENT_REQUIRED = 'REFINE';
 export class HarvestConsul extends ConsulBase implements IConsul {
     readonly consulType = CONSUL_TYPE;
     SourceData!: HarvestConsul_SourceData[];
+    RefinementRequired!: boolean;
     Save() {
         this.SetData(SOURCE_DATA, this.SourceData);
+        if (this.RefinementRequired) {
+            this.SetData(REFINEMENT_REQUIRED, this.RefinementRequired);
+        }
         super.Save();
     }
 
@@ -19,6 +24,7 @@ export class HarvestConsul extends ConsulBase implements IConsul {
         if (!super.Load()) { return false; }
 
         this.SourceData = this.GetData(SOURCE_DATA);
+        this.RefinementRequired = this.GetData(REFINEMENT_REQUIRED) || false;
 
         return true;
     }
@@ -38,29 +44,48 @@ export class HarvestConsul extends ConsulBase implements IConsul {
         }
 
         for (let i = 0, length = this.SourceData.length; i < length; i++) {
-            if (this.SourceData[i].harvester && !Game.creeps[this.SourceData[i].harvester as string]) {
-                this.SourceData[i].harvester = undefined;
+            let data = this.SourceData[i];
+            if (data.harvester && !Game.creeps[data.harvester as string]) {
+                data.harvester = undefined;
             }
 
-            if (this.SourceData[i].constructionSite && !Game.getObjectById(this.SourceData[i].constructionSite)) {
-                this.SourceData[i].constructionSite = undefined;
+            if (data.constructionSite && !Game.getObjectById(data.constructionSite)) {
+                data.constructionSite = undefined;
             }
 
-            if (this.SourceData[i].containerID && !Game.getObjectById(this.SourceData[i].containerID)) {
-                this.SourceData[i].containerID = undefined;
+            if (data.containerID && !Game.getObjectById(data.containerID)) {
+                data.containerID = undefined;
             }
 
-            if (!this.SourceData[i].containerID && !this.SourceData[i].constructionSite) {
-                // Find the right place to put the site.
+            if (!data.containerID) {
+                if (data.harvester && !data.constructionSite) {
+                    let creep = Game.creeps[data.harvester as string];
+                    if (creep.pos.getRangeTo(new RoomPosition(data.x, data.y, this.Queen.id)) <= 1) {
+                        this.Queen.Nest.createConstructionSite(creep.pos.x, creep.pos.y, STRUCTURE_CONTAINER);
+                        // Have to retrieve or assign this somehow
+                    }
+                }
             }
+
+            if (data.temporaryWorkers) {
+                for (let i = 0, length = data.temporaryWorkers.length; i < length; i++) {
+                    if (!Game.creeps[data.temporaryWorkers[i]]) {
+                        data.temporaryWorkers.splice(i--, 1);
+                    }
+                }
+            }
+            this.SourceData[i] = data;
         }
+    }
+
+    RefineSourceData(): SwarmCodes.SwarmErrors {
+        return SwarmCodes.C_NONE;
     }
 
     DetermineRequirements(): void {
         // Calculates the distance to new sources
         // Orders creation of new screep so that they will arrive at the harvest node
         // just a few ticks before the previous one dies.
-        throw new Error("Method not implemented.");
     }
 
     AssignCreepToSource(creepName: string): SwarmCodes.SwarmlingResponse {
@@ -79,6 +104,7 @@ export class HarvestConsul extends ConsulBase implements IConsul {
             return SwarmCodes.C_NONE;
         }
 
+        // Assign the creep to an open position on the source with the lowest consumption rate comparison to distance needed.
         return SwarmCodes.E_MISSING_TARGET;
     }
 

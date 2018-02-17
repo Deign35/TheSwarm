@@ -50,6 +50,8 @@ declare type HarvestConsul_SourceData = RoomObjectData & {
     harvester?: string,
     containerID?: string,
     constructionSite?: string,
+    droppedResourcePile?: RoomObjectData,
+    temporaryWorkers?: string[],
 }
 declare type HarvestConsul_RequirementsData = {
     creeps: Requirement_CreepDefinition;
