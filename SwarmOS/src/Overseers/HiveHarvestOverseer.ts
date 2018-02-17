@@ -1,79 +1,31 @@
 import * as SwarmCodes from "Consts/SwarmCodes";
 import { OverseerBase } from "Overseers/OverseerBase";
 import { ActionBase } from "Actions/ActionBase";
-import { BuildAction } from "Actions/BuildAction";
-import { RepairAction } from "Actions/RepairAction";
-import { DropAction } from "Actions/DropAction";
-import { HarvestAction } from "Actions/HarvestAction";
-import { MoveToPositionAction } from "Actions/MoveToPositionAction";
 import { HarvestConsul } from "Consuls/HarvestConsul";
 
-const NODE_DATA = 'NodeData';
+const CONSUL_DATA = 'ConsulData';
 export class HiveHarvestOverseer extends OverseerBase {
+    Consul!: HarvestConsul;
     InitNewOverseer(): void {
-        let foundSources = this.Hive.find(FIND_SOURCES);
-        for (let index in foundSources) {
-            let foundSource = foundSources[index];
-            let newNode = { creepID: undefined as string | undefined, sourceID: foundSource.id, containerID: undefined as string | undefined, constructionSiteID: undefined as string | undefined };
-            this.SourceNodes.push(this.UpdateNodeData(newNode, foundSource));
-        }
+        // Request a harvester for each source.
     }
-    protected SourceNodes!: { creepName?: string, sourceID: string, containerID?: string, constructionSiteID?: string }[];
-    protected NodeObjects!: { creep?: Creep, source: Source, container?: StructureContainer, constructionSite?: ConstructionSite }[];
 
     Save() {
-        this.SetData(NODE_DATA, this.SourceNodes);
+        this.Consul.Save();
         super.Save();
     }
 
     Load() {
-        if (!super.Load()) { return false; }
-        this.SourceNodes = this.GetData(NODE_DATA) || [];
-        this.NodeObjects = [];
-
+        if (!super.Load()) { throw 'Unable to load Harvest Overseer for: ' + this.Hive.name }
+        this.Consul = new HarvestConsul(CONSUL_DATA, this);
         return true;
     }
 
     ValidateOverseer() {
-        for (let i = 0, length = this.SourceNodes.length; i < length; i++) {
-            let newNodeObj: { creep?: Creep, source: Source, container?: StructureContainer, constructionSite?: ConstructionSite };
-            newNodeObj = { source: Game.getObjectById(this.SourceNodes[i].sourceID) as Source }
+        if (Game.time % 100 == 65) {
+            this.Consul.ScanRoom();
 
-            if (!this.SourceNodes[i].containerID) {
-                this.SourceNodes[i] = this.UpdateNodeData(this.SourceNodes[i]);
-            }
-
-            if (this.SourceNodes[i].containerID) {
-                newNodeObj.container = Game.getObjectById(this.SourceNodes[i].containerID as string) as StructureContainer;
-                if (!newNodeObj.container) {
-                    delete this.SourceNodes[i].containerID;
-                }
-            }
-
-            if (this.SourceNodes[i].creepName) {
-                newNodeObj.creep = Game.creeps[this.SourceNodes[i].creepName as string];
-                if (!newNodeObj.creep) {
-                    // creep has died.
-                    this.ReleaseCreep((this.SourceNodes[i].creepName as string), 'Dead creep');
-                }
-            }
-
-            if (!newNodeObj.creep) { // || newNodeObj.creep.ticksToLive < SomeCalculatedValue) { // 100 to start with?
-                /*registry.Requirements.Creeps.push({
-                    time: 0, // Use this to request ahead of time.
-                    creepBody: newNodeObj.container ? SwarmConsts.PRIME_HARVESTER : [WORK, WORK, WORK, WORK, CARRY, MOVE], // Check if bootstrapping?
-                });*/
-            }
-            if (this.SourceNodes[i].constructionSiteID) {
-                newNodeObj.constructionSite = Game.constructionSites[this.SourceNodes[i].constructionSiteID as string];
-                if (!newNodeObj.constructionSite) {
-                    delete this.SourceNodes[i].constructionSiteID;
-                }
-            }
-            this.NodeObjects.push(newNodeObj);
         }
-
-        //this.Registry = registry;
     }
 
     ActivateOverseer() {

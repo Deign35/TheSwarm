@@ -16,8 +16,8 @@ room assistant will need to be handled at the Imperaturs/Consul -- HiveQueen lev
 Or does the SwarmQueen direct the HiveQueen to deliver to the new HiveQueen?
 */
 export abstract class ConsulBase extends ChildMemory implements IConsul {
-    constructor(id: string, public Parent: OverseerBase) {
-        super(id, Parent);
+    constructor(id: string, public Overseer: OverseerBase) {
+        super(id, Overseer);
     }
     abstract get consulType(): string;
     abstract ScanRoom(roomName: string): void;

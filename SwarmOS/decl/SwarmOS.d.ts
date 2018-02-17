@@ -38,6 +38,7 @@ declare interface IConsul extends IMemory {
     ScanRoom(roomName: string): void;
     DetermineRequirements(): void;
 }
+
 declare interface PrimeConsul extends IMemory {
 
 }
@@ -49,6 +50,22 @@ declare type RoomObjectData = {
 
 declare type HarvestConsul_SourceData = RoomObjectData & {
     id: string,
+    spawnBuffer: number,
+    harvestRate: number,
+    harvester?: string,
+    containerID?: string,
+    constructionSite?: string,
+}
+
+declare type BasicAction_Data = {
+    creep: Creep,
+    builder?: Creep,
+    repairer?: Creep,
+    defender?: Creep,
+}
+
+declare type HarvestAction_Data = BasicAction_Data & {
+    source: Source,
 }
 /*
 declare interface IOverseerRequirements_Creep {
