@@ -27,19 +27,10 @@ declare type DisposableCallback<T extends IDisposable> = (disposableObject: T) =
 declare function using<T extends IDisposable>(disposableObject: T, disposableAction: DisposableCallback<T>): void;
 declare function DisposeAll(): void;
 
-declare interface IOverseer extends IMemory {
-    ActivateOverseer(): void;
-    ValidateOverseer(): void;
-}
-
 declare interface IConsul extends IMemory {
     consulType: string;
     ScanRoom(roomName: string): void;
     DetermineRequirements(): void;
-}
-
-declare interface IPrimeConsul extends IMemory {
-
 }
 
 declare type RoomObjectData = {

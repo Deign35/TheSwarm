@@ -1,9 +1,9 @@
-import { ConsulBase } from "./ConsulBase";
-import { OverseerBase } from "Overseers/OverseerBase";
 import * as SwarmCodes from "Consts/SwarmCodes"
 import _ from "lodash";
+import { ConsulBase } from "./ConsulBase";
+import { ImperatorBase } from "Imperators/ImperatorBase";
 import { HarvestAction } from "Actions/HarvestAction";
-import { HiveHarvestOverseer } from "Overseers/HiveHarvestOverseer";
+import { HarvestImperator } from "Imperators/HarvestImperator";
 
 const CONSUL_TYPE = 'H_Consul';
 const SOURCE_DATA = 'S_DATA';
@@ -31,7 +31,7 @@ export class HarvestConsul extends ConsulBase implements IConsul {
     ScanRoom(): void {
         if (!this.SourceData || this.SourceData.length == 0) {
             this.SourceData = [];
-            let foundSources = this.Overseer.Nest.find(FIND_SOURCES);
+            let foundSources = this.Queen.Nest.find(FIND_SOURCES);
             for (let i = 0, length = foundSources.length; i < length; i++) {
                 this.SourceData.push(this.InitSourceData(foundSources[i]));
             }
@@ -46,12 +46,12 @@ export class HarvestConsul extends ConsulBase implements IConsul {
                 this.SourceData[i].constructionSite = undefined;
             }
 
-            if (!this.SourceData[i].constructionSite) {
-                // Find the right place to put the site.
-            }
-
             if (this.SourceData[i].containerID && !Game.getObjectById(this.SourceData[i].containerID)) {
                 this.SourceData[i].containerID = undefined;
+            }
+
+            if (!this.SourceData[i].containerID && !this.SourceData[i].constructionSite) {
+                // Find the right place to put the site.
             }
         }
     }
@@ -72,7 +72,7 @@ export class HarvestConsul extends ConsulBase implements IConsul {
                     continue;
                 }
                 // garbage!
-                (this.Overseer as HiveHarvestOverseer).ReleaseCreep(this.SourceData[index].harvester as string, 'missing creep');
+                //(this.Imperator as HarvestImperator).ReleaseCreep(this.SourceData[index].harvester as string, 'missing creep');
             }
 
             this.SourceData[index].harvester = creepName;
@@ -85,7 +85,7 @@ export class HarvestConsul extends ConsulBase implements IConsul {
     ReleaseCreep(creepName: string) {
         let index = 0;
         while (index < this.SourceData.length) {
-            if(this.SourceData[index].harvester == creepName) {
+            if (this.SourceData[index].harvester == creepName) {
                 this.SourceData[index].harvester = undefined;
             }
         }
@@ -98,7 +98,7 @@ export class HarvestConsul extends ConsulBase implements IConsul {
         sourceData.id = source.id;
         sourceData.harvestRate = 0;
         sourceData.spawnBuffer = 0; // This is how soon a creep must be spawned to get to the source at the right moment.
-        let structures = this.Overseer.Nest.lookForAtArea(LOOK_STRUCTURES,
+        let structures = this.Queen.Nest.lookForAtArea(LOOK_STRUCTURES,
             sourceData.y - 1, sourceData.x - 1,
             sourceData.y + 1, sourceData.x + 1, true);
 
@@ -110,7 +110,7 @@ export class HarvestConsul extends ConsulBase implements IConsul {
         if (container.length > 0) {
             sourceData.containerID = (container[0].structure as Structure).id;
         } else {
-            let constructionSites = this.Overseer.Nest.lookForAtArea(LOOK_CONSTRUCTION_SITES,
+            let constructionSites = this.Queen.Nest.lookForAtArea(LOOK_CONSTRUCTION_SITES,
                 sourceData.y - 1, sourceData.x - 1,
                 sourceData.y + 1, sourceData.x + 1, true);
             let site = _.filter(constructionSites, (site) => {

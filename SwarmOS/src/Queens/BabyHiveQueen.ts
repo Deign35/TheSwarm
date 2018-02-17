@@ -1,8 +1,8 @@
 import { QueenMemory } from "Memory/SwarmMemory";
-import * as SwarmEnums from "SwarmEnums";
-import { HiveHarvestOverseer } from "Overseers/HiveHarvestOverseer";
+import * as SwarmCodes from "Consts/SwarmCodes";
+import { HarvestImperator } from "Imperators/HarvestImperator";
 import { HiveQueenBase } from "Queens/HiveQueenBase";
-import { HiveConsul } from "Consuls/PrimeConsuls/HiveConsul";
+import { ImperatorBase } from "Imperators/ImperatorBase";
 
 const DISTRIBUTION = 'Di';
 const HIVE_HARVESTER = 'HH';
@@ -11,8 +11,6 @@ const HIVELORD = 'HL';
 const CONSTRUCTION = 'Ct';
 const CREEP_DATA = 'CD';
 const NO_ASSIGNMENT = 'NA';
-const HIVE_BOOTSTRAPPING = 'HB';
-const BOOTSTRAPPER = 'BS';
 export class BabyHiveQueen extends HiveQueenBase {
     InitMemory(): void {
         throw new Error("Method not implemented.");
@@ -26,19 +24,21 @@ export class BabyHiveQueen extends HiveQueenBase {
     LoadImperators(): void {
         throw new Error("Method not implemented.");
     }
-    LoadPrimeConsul(): void {
-        throw new Error("Method not implemented.");
-    }
     InitializeNest(): void {
         throw new Error("Method not implemented.");
+        
+    }
+    ActivateImperator(imperator: ImperatorBase): SwarmCodes.SwarmErrors {
+        return imperator.ActivateImperator();
     }
     ActivateNest(): void {
-        throw new Error("Method not implemented.");
+        let errorCode = this.ActivateImperator(this.Harvester);
+        // do the rest of them.
     }
     ReceiveOrder(): void {
         throw new Error("Method not implemented.");
     }
-    Harvester!: HiveHarvestOverseer;
+    Harvester!: HarvestImperator;
 
     Save() {
         this.SetData(HIVE_HARVESTER, this.Harvester);
@@ -46,7 +46,7 @@ export class BabyHiveQueen extends HiveQueenBase {
     }
     Load() {
         if (!super.Load()) { return false; }
-        this.Harvester = new HiveHarvestOverseer(HIVELORD, this);
+        this.Harvester = new HarvestImperator(HIVE_HARVESTER, this);
 
         return true;
     }

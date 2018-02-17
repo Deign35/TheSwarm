@@ -1,8 +1,7 @@
 import { QueenMemory } from "Memory/SwarmMemory";
-import * as SwarmEnums from "SwarmEnums";
-import { HiveHarvestOverseer } from "Overseers/HiveHarvestOverseer";
+import * as SwarmCodes from "Consts/SwarmCodes";
+import { HarvestImperator } from "Imperators/HarvestImperator";
 import { HiveQueenBase } from "Queens/HiveQueenBase";
-import { HiveConsul } from "Consuls/PrimeConsuls/HiveConsul";
 
 const DISTRIBUTION = 'Di';
 const HIVE_HARVESTER = 'HH';
@@ -36,7 +35,11 @@ export class HiveQueen extends HiveQueenBase {
     ReceiveOrder(): void {
         throw new Error("Method not implemented.");
     }
-    Harvester!: HiveHarvestOverseer;
+    ActivateImperator(): SwarmCodes.SwarmErrors {
+        throw new Error("Method not implemented.");
+
+    }
+    Harvester!: HarvestImperator;
 
     Save() {
         this.SetData(HIVE_HARVESTER, this.Harvester);
@@ -44,7 +47,7 @@ export class HiveQueen extends HiveQueenBase {
     }
     Load() {
         if (!super.Load()) { return false; }
-        this.Harvester = new HiveHarvestOverseer(HIVELORD, this);
+        this.Harvester = new HarvestImperator(HIVELORD, this);
 
         return true;
     }

@@ -1,5 +1,7 @@
+import * as SwarmCodes from "consts/SwarmCodes"
 import { ChildMemory } from "Memory/SwarmMemory";
-import { OverseerBase } from "Overseers/OverseerBase";
+import { ImperatorBase } from "Imperators/ImperatorBase";
+import { NestQueenBase } from "Queens/NestQueenBase";
 
 /* Consuls will be responsible for surveying for the information needed for its assigned overseer.
 This could include detecting when to spawn a new creep, scheduling deliveries and repair orders, etc...
@@ -16,11 +18,11 @@ room assistant will need to be handled at the Imperaturs/Consul -- HiveQueen lev
 Or does the SwarmQueen direct the HiveQueen to deliver to the new HiveQueen?
 */
 export abstract class ConsulBase extends ChildMemory implements IConsul {
-    constructor(id: string, public Overseer: OverseerBase) {
-        super(id, Overseer);
+    constructor(id: string, public Queen: NestQueenBase) {
+        super(id, Queen);
     }
     abstract get consulType(): string;
-    abstract ScanRoom(roomName: string): void;
+    abstract ScanRoom(): void;
     abstract DetermineRequirements(): void;
-    static get ConsulType(): string { return 'NOT_CONFIGURED'; }
+    static get ConsulType(): string { return 'SwarmCodes.E_NOT_IMPLEMENTED'; }
 }
