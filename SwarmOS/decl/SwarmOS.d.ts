@@ -3,6 +3,7 @@ declare type IDictionary<T> = { [id: string]: T };
 declare type Dictionary = IDictionary<any>
 declare var global: Dictionary;
 
+
 declare type CallbackFunction = (...args: any[]) => any;
 declare interface IDelegate<T extends CallbackFunction> {
     Subscribe(id: string, callback: T): void;
@@ -33,24 +34,33 @@ declare interface IConsul extends IMemory {
     DetermineRequirements(): void;
 }
 
-declare type RoomObjectData = {
+declare type RoomPositionData = {
     x: number,
     y: number
+}
+declare type RoomObjectWithID = RoomPositionData & {
+    id: string
 }
 
 declare type Requirement_CreepDefinition = {
     Body: BodyPartConstant[];
 
 }
-
-declare type HarvestConsul_SourceData = RoomObjectData & {
-    id: string,
+declare type SpawnConsul_SpawnData = RoomObjectWithID & {
+}
+declare type SpawnConsul_SpawnArgs = {
+    body: BodyPartConstant[],
+    targetTime: number,
+    creepName: string,
+    targetPos?: RoomPositionData,
+}
+declare type HarvestConsul_SourceData = RoomObjectWithID & {
     spawnBuffer: number,
     harvestRate: number,
     harvester?: string,
     containerID?: string,
     constructionSite?: string,
-    droppedResourcePile?: RoomObjectData,
+    droppedResourcePile?: RoomPositionData,
     temporaryWorkers?: string[],
 }
 declare type HarvestConsul_RequirementsData = {

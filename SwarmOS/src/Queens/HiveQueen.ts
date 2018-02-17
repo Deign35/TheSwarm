@@ -1,4 +1,3 @@
-import { QueenMemory } from "Memory/SwarmMemory";
 import * as SwarmCodes from "Consts/SwarmCodes";
 import { HarvestImperator } from "Imperators/HarvestImperator";
 import { HiveQueenBase } from "Queens/HiveQueenBase";
@@ -13,6 +12,9 @@ const NO_ASSIGNMENT = 'NA';
 const HIVE_BOOTSTRAPPING = 'HB';
 const BOOTSTRAPPER = 'BS';
 export class HiveQueen extends HiveQueenBase {
+    protected ActivateImperators(): SwarmCodes.SwarmErrors {
+        throw new Error("Method not implemented.");
+    }
     InitMemory(): void {
         throw new Error("Method not implemented.");
     }

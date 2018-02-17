@@ -1,6 +1,5 @@
 ﻿import * as SwarmCodes from 'Consts/SwarmCodes';
 import { SwarmQueen } from 'Queens/SwarmQueen';
-import { SwarmReturnCode } from 'SwarmEnums';
 
 export const loop = function () {
     if (initSwarm() != SwarmCodes.C_NONE) {

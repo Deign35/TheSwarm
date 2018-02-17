@@ -1,4 +1,3 @@
-import { QueenMemory } from "Memory/SwarmMemory";
 import * as SwarmCodes from "Consts/SwarmCodes";
 import { HarvestImperator } from "Imperators/HarvestImperator";
 import { HiveQueenBase } from "Queens/HiveQueenBase";
@@ -12,6 +11,9 @@ const CONSTRUCTION = 'Ct';
 const CREEP_DATA = 'CD';
 const NO_ASSIGNMENT = 'NA';
 export class BabyHiveQueen extends HiveQueenBase {
+    protected ActivateImperators(): SwarmCodes.SwarmErrors {
+        throw new Error("Method not implemented.");
+    }
     InitMemory(): void {
         throw new Error("Method not implemented.");
     }
@@ -26,7 +28,7 @@ export class BabyHiveQueen extends HiveQueenBase {
     }
     InitializeNest(): void {
         throw new Error("Method not implemented.");
-        
+
     }
     ActivateImperator(imperator: ImperatorBase): SwarmCodes.SwarmErrors {
         return imperator.ActivateImperator();

@@ -42,7 +42,7 @@ export abstract class _SwarmMemory implements IMemory {
     }
 }
 
-export abstract class QueenMemory extends _SwarmMemory { // If QueenMemory were to implement dispose, i would be good for all the shtuff I save.
+export abstract class QueenMemory extends _SwarmMemory {
     constructor(id: string) {
         super(id);
     }

@@ -1,8 +1,6 @@
 import * as SwarmCodes from "Consts/SwarmCodes"
-import { QueenMemory } from "Memory/SwarmMemory";
-import { ImperatorBase } from "Imperators/ImperatorBase";
+import { QueenMemory } from "Tools/SwarmMemory";
 
-const IMPERATOR_IDS = 'IMP_IDS';
 export abstract class NestQueenBase extends QueenMemory implements INestQueen {
     Nest!: Room;
     Load() {
@@ -17,8 +15,8 @@ export abstract class NestQueenBase extends QueenMemory implements INestQueen {
 
     Commands!: any; // Needs to be defined
     abstract ReceiveCommand(): void;
-    abstract LoadImperators(): void;
-    abstract ActivateImperator(imperator: ImperatorBase): SwarmCodes.SwarmErrors;
+    protected abstract LoadImperators(): void;
+    protected abstract ActivateImperators(): SwarmCodes.SwarmErrors;
     // Pathfinder
     // Overwatch (SwarmLinkOverseer)
     // This is where a HiveQueen will tell the NestQueens what to do

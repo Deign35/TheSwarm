@@ -21,11 +21,12 @@ export class HarvestImperator extends ImperatorBase {
     InitImperator(memoryHandle: string): void {
         this.Consul = new HarvestConsul(memoryHandle, this.Queen);
         if (this.Consul.RefinementRequired && Game.time % 1000) {
-
+            this.Consul.SnapshotData();
             try {
                 this.Consul.RefineSourceData();
-            } finally {
-
+                this.Consul.ResetSnapshotData();
+            } catch {
+                this.Consul.ReloadSnapshot(true);
             }
         }
     }

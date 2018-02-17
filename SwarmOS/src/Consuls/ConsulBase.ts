@@ -1,5 +1,5 @@
 import * as SwarmCodes from "consts/SwarmCodes"
-import { ChildMemory } from "Memory/SwarmMemory";
+import { ChildMemory } from "Tools/SwarmMemory";
 import { ImperatorBase } from "Imperators/ImperatorBase";
 import { NestQueenBase } from "Queens/NestQueenBase";
 

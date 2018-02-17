@@ -1,4 +1,4 @@
-import { QueenMemory } from "Memory/SwarmMemory";
+import { QueenMemory } from "Tools/SwarmMemory";
 import { HiveQueen } from "Queens/HiveQueen";
 
 export class SwarmQueen extends QueenMemory {
