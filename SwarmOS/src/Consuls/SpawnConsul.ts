@@ -29,12 +29,21 @@ export class SpawnConsul extends ConsulBase implements IConsul {
     }
 
     ScanRoom(): void {
-
+        let spawns = this.Queen.Nest.find(FIND_MY_SPAWNS);
+        this.SpawnData = [];
+        for (let i = 0, length = spawns.length; i < length; i++) {
+            let newSpawnData: SpawnConsul_SpawnData = {
+                x: spawns[i].pos.x,
+                y: spawns[i].pos.y,
+                id: spawns[i].name
+            };
+        }
     }
 
     AddSpawner(spawnName: string) {
 
     }
+
     AddSpawnToQueue(spawnArgs: SpawnConsul_SpawnArgs) {
 
     }
@@ -46,4 +55,11 @@ export class SpawnConsul extends ConsulBase implements IConsul {
     }
 
     static get ConsulType(): string { return CONSUL_TYPE; }
+
+    protected static SerializeSpawnRequest(spawnData: SpawnConsul_SpawnArgs): string {
+        return JSON.stringify(spawnData);
+    }
+    protected static DeserializeSpawnRequest(data: string): SpawnConsul_SpawnArgs {
+        return JSON.parse(data) as SpawnConsul_SpawnArgs;
+    }
 }
