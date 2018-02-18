@@ -1,22 +1,25 @@
 import * as SwarmCodes from "Consts/SwarmCodes"
-import _ from "lodash";
+import * as _ from "lodash";
 import { ConsulBase } from "./ConsulBase";
-import { ImperatorBase } from "Imperators/ImperatorBase";
 import { HarvestAction } from "Actions/HarvestAction";
 import { HarvestImperator } from "Imperators/HarvestImperator";
+import { RateTracker } from "Tools/RateTracker";
 
 const CONSUL_TYPE = 'H_Consul';
 const SOURCE_DATA = 'S_DATA';
+const SOURCE_RATE = 'S_RATE';
 const REFINEMENT_REQUIRED = 'REFINE';
-export class HarvestConsul extends ConsulBase implements IConsul {
+export class HarvestConsul extends ConsulBase {
     readonly consulType = CONSUL_TYPE;
     SourceData!: HarvestConsul_SourceData[];
     RefinementRequired!: boolean;
+    protected SourceHarvestRateTrackers!: RateTracker;
     Save() {
         this.SetData(SOURCE_DATA, this.SourceData);
         if (this.RefinementRequired) {
             this.SetData(REFINEMENT_REQUIRED, this.RefinementRequired);
         }
+        this.SourceHarvestRateTrackers.Save();
         super.Save();
     }
 
@@ -24,24 +27,22 @@ export class HarvestConsul extends ConsulBase implements IConsul {
         if (!super.Load()) { return false; }
         this.SourceData = this.GetData(SOURCE_DATA);
         this.RefinementRequired = this.GetData(REFINEMENT_REQUIRED) || false;
-
+        this.SourceHarvestRateTrackers = new RateTracker(SOURCE_RATE, this);
         return true;
     }
 
     InitMemory() {
         super.InitMemory();
+        this.SourceHarvestRateTrackers = new RateTracker(SOURCE_RATE, this);
+        this.SourceData = [];
+        let foundSources = this.Nest.find(FIND_SOURCES);
+        for (let i = 0, length = foundSources.length; i < length; i++) {
+            this.SourceData.push(this.InitSourceData(foundSources[i]));
+        }
         this.ScanRoom();
     }
 
     ScanRoom(): void {
-        if (!this.SourceData || this.SourceData.length == 0) {
-            this.SourceData = [];
-            let foundSources = this.Nest.find(FIND_SOURCES);
-            for (let i = 0, length = foundSources.length; i < length; i++) {
-                this.SourceData.push(this.InitSourceData(foundSources[i]));
-            }
-        }
-
         for (let i = 0, length = this.SourceData.length; i < length; i++) {
             let data = this.SourceData[i];
             if (data.harvester && !Game.creeps[data.harvester as string]) {
@@ -59,7 +60,7 @@ export class HarvestConsul extends ConsulBase implements IConsul {
             if (!data.containerID) {
                 if (data.harvester && !data.constructionSite) {
                     let creep = Game.creeps[data.harvester as string];
-                    if (creep.pos.getRangeTo(new RoomPosition(data.x, data.y, this.Queen.id)) <= 1) {
+                    if (creep.pos.isNearTo(new RoomPosition(data.x, data.y, this.Queen.id))) {
                         this.Nest.createConstructionSite(creep.pos.x, creep.pos.y, STRUCTURE_CONTAINER);
                         // Have to retrieve or assign this somehow
                     }
@@ -78,6 +79,7 @@ export class HarvestConsul extends ConsulBase implements IConsul {
     }
 
     RefineSourceData(): SwarmCodes.SwarmErrors {
+        this.RemoveData(REFINEMENT_REQUIRED);
         return SwarmCodes.C_NONE;
     }
 
@@ -85,25 +87,43 @@ export class HarvestConsul extends ConsulBase implements IConsul {
         // Calculates the distance to new sources
         // Orders creation of new screep so that they will arrive at the harvest node
         // just a few ticks before the previous one dies.
+
     }
 
     AssignCreepToSource(creepName: string): SwarmCodes.SwarmlingResponse {
+        if (this.SourceData.length == 0) {
+            return SwarmCodes.E_MISSING_TARGET;
+        }
+        // Check main harvester position
         let index = 0;
-        while (index < this.SourceData.length) {
+        do {
             if (this.SourceData[index].harvester) {
                 if (Game.getObjectById(this.SourceData[index].harvester) != undefined) {
                     index++;
                     continue;
                 }
-                // garbage!
-                //(this.Imperator as HarvestImperator).ReleaseCreep(this.SourceData[index].harvester as string, 'missing creep');
             }
 
             this.SourceData[index].harvester = creepName;
             return SwarmCodes.C_NONE;
+        } while (++index < this.SourceData.length);
+
+        // Pick the better source to help with.
+        let min = this.SourceData[0].temporaryWorkers ? (this.SourceData[0].temporaryWorkers as string[]).length : 0;
+        let bestPick = 0;
+        index = 1;
+        do {
+            let curMin = this.SourceData[index].temporaryWorkers ? (this.SourceData[index].temporaryWorkers as string[]).length : 0;
+            if (curMin < min) {
+                bestPick = index;
+            }
+        } while (++index < this.SourceData.length);
+
+        if (!this.SourceData[bestPick].temporaryWorkers) {
+            this.SourceData[bestPick].temporaryWorkers = [];
         }
 
-        // Assign the creep to an open position on the source with the lowest consumption rate comparison to distance needed.
+        (this.SourceData[bestPick].temporaryWorkers as string[]).push(creepName);
         return SwarmCodes.E_MISSING_TARGET;
     }
 
@@ -112,7 +132,19 @@ export class HarvestConsul extends ConsulBase implements IConsul {
         while (index < this.SourceData.length) {
             if (this.SourceData[index].harvester == creepName) {
                 this.SourceData[index].harvester = undefined;
+                break;
             }
+            if (this.SourceData[index].temporaryWorkers) {
+                for (let i = 0, length = (this.SourceData[index].temporaryWorkers as string[]).length; i < length; i++) {
+                    if ((this.SourceData[index].temporaryWorkers as string[])[i] == creepName) {
+                        (this.SourceData[index].temporaryWorkers as string[]).splice(i, 1);
+                    }
+                }
+                if ((this.SourceData[index].temporaryWorkers as string[]).length == 0) {
+                    this.SourceData[index].temporaryWorkers = undefined;
+                }
+            }
+            index++;
         }
     }
 
