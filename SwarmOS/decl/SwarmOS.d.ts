@@ -48,6 +48,7 @@ declare type Requirement_CreepDefinition = {
 }
 declare type SpawnConsul_SpawnData = RoomObjectWithID & {
 }
+
 declare type SpawnConsul_SpawnArgs = {
     body: BodyPartConstant[],
     targetTime: number,

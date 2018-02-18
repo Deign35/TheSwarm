@@ -17,9 +17,9 @@
 			"**/*.njsproj*": true,
 			"**/npm*/": true,
 			"**/build/": true,
-			"**/dist/": false,
+			"**/dist/": true,
 			"**/package*.json": true,
-			"**/tsconfig.json": false,
+			"**/tsconfig.json": true,
 			"**/Gruntfile.js": true,
 			"**/README.md": true
 		},

@@ -1,159 +1,164 @@
 const REBALANCE_CONSTANT = 3;
 export class MinHeap<T> {
     protected headNode?: Node<T>;
-    Pop(): T | undefined {
-        if (!this.headNode) { return undefined; }
-        let poppedValue = this.headNode;
-        let leftWeight = poppedValue.left ? poppedValue.left.weight : -1;
-        let rightWeight = poppedValue.right ? poppedValue.right.weight : -1;
 
-        if (leftWeight < rightWeight) {
-            // Use left side
-        } else {
-            // Use right side
-        }
-
-        this.RebalanceBranch(this.headNode);
-        return poppedValue.obj;
-    }
-    protected BubbleUp(headNode: Node<T>): Node<T> | undefined {
-        let prevHead = headNode;
-        let replacement: Node<T> | undefined;
-        if (headNode.left && headNode.right) {
-            if (headNode.left.weight < headNode.right.weight) {
-                // Use left side
-                replacement = this.BubbleUp(headNode.left);
-            } else {
-                // Use right side
-                replacement = this.BubbleUp(headNode.right);
-            }
-        } else if (headNode.left) {
-            replacement = headNode.left;
-        }
-        // I don't think this is complete...
-        if (replacement === undefined) {
+    Push(obj: T, weight: number) {
+        let node: Node<T> = { obj: obj, weight: weight, depth: -1, childCount: 0 };
+        if (!this.headNode) { // first node.
+            this.headNode = node;
+            this.headNode.depth = 1;
             return;
         }
-        this.CopyNodeValue(replacement, headNode);
-
-        return prevHead;
+        this.Insert(this.headNode, node);
+        this.RebalanceBranch(this.headNode);
     }
-    Push(obj: T, weight: number) {
-        let node: Node<T> = { obj: obj, weight: weight, depth: -1 };
-        if (!this.headNode) { this.headNode = node; return; }
-        this.headNode = this.Insert(this.headNode, node);
 
-        let leftChild = this.headNode.left;
-        let rightChild = this.headNode.right;
-        this.GetDepth(leftChild, false);
-        this.GetDepth(rightChild, false);
-        let leftDepth = leftChild ? leftChild.depth : 0;
-        let rightDepth = rightChild ? rightChild.depth : 0;
-        if (false) {
-            //this.RebalanceBranch(this.headNode);
+    protected Insert(headNode: Node<T>, newObj: Node<T>) {
+        if (newObj.weight < headNode.weight) { // replace the headnode with newObj and then reinsert the old one.
+            let oldHead = headNode;
+            this.CopyNodeValue(newObj, headNode);
+            this.CopyNodeValue(oldHead, newObj);
+        }
+        if (headNode.left && headNode.right) {
+            if (headNode.left.depth < headNode.right.depth) { // Try to keep it as balanced as we can
+                this.Insert(headNode.left, newObj);
+            } else {
+                this.Insert(headNode.right, newObj);
+            }
+            headNode.depth = Math.max(headNode.left.depth, headNode.right.depth) + 1;
+            headNode.childCount = headNode.left.childCount + headNode.right.childCount + 2;
+        } else if (headNode.left) { // right side is empty
+            newObj.parent = headNode;
+            newObj.depth = 1;
+            headNode.right = newObj;
+            headNode.depth = headNode.left.depth + 1;
+            headNode.childCount = headNode.left.childCount + 2;
+        } else { // left side is empty
+            newObj.parent = headNode;
+            newObj.depth = 1;
+            headNode.left = newObj;
+            headNode.depth = 2;
+            headNode.childCount = 1;
         }
     }
-    protected Insert(headNode: Node<T>, newObj: Node<T>): Node<T> {
-        let leftChild = headNode.left;
-        let rightChild = headNode.right;
 
-        if (newObj.weight < headNode.weight) {
-            newObj.parent = headNode.parent;
-            headNode.parent = newObj;
+    Peek(): T | undefined {
+        if (!this.headNode) { return undefined; }
+        return this.headNode.obj;
+    }
 
-            if (leftChild && rightChild) {
-                this.GetDepth(leftChild, false);
-                this.GetDepth(rightChild, false);
+    Pop(): T | undefined {
+        if (!this.headNode) { return undefined; }
+        let retVal = this.headNode.obj;
+        this.BubbleUp(this.headNode);
+        if (this.headNode) {
+            this.RebalanceBranch(this.headNode);
+        }
+        return retVal;
+    }
 
-                if (leftChild.depth < rightChild.depth) {
-                    newObj.left = headNode;
-                    newObj.right = rightChild;
-                    rightChild.parent = newObj;
-                    headNode.right = undefined;
-                } else {
-                    newObj.right = headNode;
-                    newObj.left = leftChild;
-                    leftChild.parent = newObj;
-                    headNode.left = undefined;
-                }
-                this.RebalanceBranch(headNode);
-            } else if (leftChild) {
-                // balance to the right
-                newObj.left = headNode;
-                headNode.depth++;
-                newObj.right = leftChild;
-                headNode.left = undefined;
-            } else {
-                // put it on the left by default
-                newObj.left = headNode;
-                headNode.depth++;
+    protected BubbleUp(headNode: Node<T>) {
+        headNode.childCount--; // This should be good enough right?
+        // headNode is considered dead atm, need to replace with next in line.
+        if (headNode.left && headNode.right) {
+            if (headNode.left.weight < headNode.right.weight) { // Use left side
+                this.CopyNodeValue(headNode.left, headNode);
+                this.BubbleUp(headNode.left);
+            } else { // Use right side
+                this.CopyNodeValue(headNode.right, headNode);
+                this.BubbleUp(headNode.right);
             }
 
-            return newObj;
-        } else {
-            if (leftChild && rightChild) {
-                this.GetDepth(leftChild, false);
-                this.GetDepth(rightChild, false);
-
-                if (leftChild.depth < rightChild.depth) {
-                    this.Insert(leftChild, newObj);
-                } else {
-                    this.Insert(rightChild, newObj);
-                }
-            } else if (leftChild) {
-                headNode.right = newObj;
+            // bubble up could replace the child node to undefined, check it again.
+            let leftDepth = headNode.left ? headNode.left.depth : 0;
+            let rightDepth = headNode.right ? headNode.right.depth : 0;
+            headNode.depth = Math.max(leftDepth, rightDepth) + 1;
+        } else if (headNode.left) {
+            this.CopyNodeValue(headNode.left, headNode);
+            this.BubbleUp(headNode.left); // just in case...not sure if this is necessary yet.
+            headNode.depth = (headNode.left ? headNode.left.depth : 0) + 1;
+        } else if (headNode.right) {
+            this.CopyNodeValue(headNode.right, headNode);
+            this.BubbleUp(headNode.right);
+            headNode.depth = (headNode.right ? headNode.right.depth : 0) + 1;
+        } else { // nothing can replace this node, so replace it with undefined in the parent.
+            if (headNode.parent === undefined) { // This is the head node.
+                this.headNode = undefined;
             } else {
-                headNode.left = newObj;
+                if (headNode.parent.left && headNode.parent.left === headNode) { // headNode is on the left
+                    headNode.parent.left = undefined;
+                    headNode.parent.depth = headNode.parent.right ? headNode.parent.right.depth + 1 : 1;
+                } else if (headNode.parent.right && headNode.parent.right === headNode) { // headNode is on the right
+                    headNode.parent.right = undefined;
+                    headNode.parent.depth = headNode.parent.left ? headNode.parent.left.depth + 1 : 1;
+                }
             }
         }
-
-        return headNode;
     }
 
     protected RebalanceBranch(headNode: Node<T>) {
-        let leftChild = headNode.left;
-        let rightChild = headNode.right;
+        // Will only get called once per operation.  This means the tree may not be as balanced
+        // as it could be, but I also won't spend much cpu balancing the tree.
+        if (headNode.depth - Math.log2(headNode.childCount) > REBALANCE_CONSTANT) { // Unbalanced tree.
+            let balanceLeft = false;
+            if (headNode.left && headNode.right) {
+                if (headNode.left.depth < headNode.right.depth) {
+                    balanceLeft = true;
+                }
+            } else if (headNode.right) {
+                balanceLeft = true;
+            }
 
-        this.GetDepth(leftChild, true);
-        this.GetDepth(rightChild, true);
-
-        let leftDepth = leftChild ? leftChild.depth : -1;
-        let rightDepth = rightChild ? rightChild.depth : -1;
-
-        if (Math.abs(leftDepth - rightDepth) * REBALANCE_CONSTANT > leftDepth + rightDepth) {
-            return;
+            if (balanceLeft) { // Can only be true if headNode.right is true
+                let savedNode = headNode.right;
+                this.BubbleUp(headNode.right as Node<T>);
+                this.Insert(headNode, savedNode as Node<T>);
+            } else { // Can't be here if headNode has no children, therefore, there must be a left child.
+                let savedNode = headNode.left;
+                this.BubbleUp(headNode.left as Node<T>);
+                this.Insert(headNode, savedNode as Node<T>);
+            }
         }
     }
 
-    protected GetDepth(headNode: Node<T> | undefined, reset: boolean) {
-        if (!headNode) { return; }
-        if (headNode.depth >= 0 && !reset) { return }
-
-        let leftDepth: number = 0;
-        if (headNode.left) {
-            this.GetDepth(headNode.left, true);
-            leftDepth = headNode.left.depth as number;
-        }
-        let rightDepth: number = 0;
-        if (headNode.right) {
-            this.GetDepth(headNode.right, true);
-            rightDepth = headNode.right.depth as number;
-        }
-
-        headNode.depth = Math.max(leftDepth, rightDepth) + 1;
-    }
-
-    // This leaves me a little nervous 
-    CopyNodeValue(from: Node<T>, to: Node<T>) {
+    protected CopyNodeValue(from: Node<T>, to: Node<T>) {
         to.weight = from.weight;
         to.depth = from.depth;
     }
+
+    static CompressHeap<T>(heap: MinHeap<T>, itemSerializer: ItemSerializer<T>): SerializedHeap[] {
+        let compressedArray: SerializedHeap[] = [];
+        while (heap.headNode) {
+            let nodeVal = itemSerializer(heap.headNode.obj);
+            let nodeWeight = heap.headNode.weight;
+            compressedArray.push([nodeVal, nodeWeight]);
+            heap.Pop();
+        }
+
+        return compressedArray;
+    }
+    static DeserializeHeap<T>(compressedArray: SerializedHeap[], itemDeserializer: ItemDeserializer<T>): MinHeap<T> {
+        let newHeap = new MinHeap<T>();
+        while (compressedArray.length > 0) {
+            let curItem = compressedArray.splice(0, 1)[0];
+            newHeap.Push(itemDeserializer(curItem[0]), curItem[1])
+        }
+
+        return newHeap;
+    }
 }
+declare type ItemSerializer<T> = (inVal: T) => string;
+declare type ItemDeserializer<T> = (inString: string) => T;
+declare type SerializedHeap = [
+    string, // serialized obj
+    number  // obj weight
+]
 
 type Node<T> = {
     obj: T,
     weight: number,
     depth: number,
+    childCount: number,
     parent?: Node<T>,
     left?: Node<T>,
     right?: Node<T>,
