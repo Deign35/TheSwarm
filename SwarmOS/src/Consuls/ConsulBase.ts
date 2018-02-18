@@ -27,6 +27,10 @@ export abstract class ConsulBase extends ChildMemory implements IConsul {
 
         return true;
     }
+    InitMemory() {
+        super.InitMemory();
+        this.Nest = Game.rooms[this.Parent.id];
+    }
     abstract get consulType(): string;
     abstract ScanRoom(): void;
     abstract DetermineRequirements(): void;

@@ -29,6 +29,7 @@ export class HarvestConsul extends ConsulBase {
         if (!super.Load()) { return false; }
         this.CreepRequested = this.GetData(REQUESTED_CREEP);
         this.SourceData = this.GetData(SOURCE_DATA);
+        this.SourceHarvestRateTrackers = [];
         for (let i = 0; i < this.SourceData.length; i++) {
             this.SourceHarvestRateTrackers.push(new RateTracker(TRACKER_PREFIX + i, this));
         }
@@ -38,7 +39,8 @@ export class HarvestConsul extends ConsulBase {
     InitMemory() {
         super.InitMemory();
         this.SourceData = [];
-        let foundSources = this.Parent.Nest.find(FIND_SOURCES);
+        this.SourceHarvestRateTrackers = [];
+        let foundSources = this.Nest.find(FIND_SOURCES);
         for (let i = 0, length = foundSources.length; i < length; i++) {
             this.SourceData.push(this.InitSourceData(foundSources[i]));
             this.SourceHarvestRateTrackers.push(new RateTracker(TRACKER_PREFIX + i, this));

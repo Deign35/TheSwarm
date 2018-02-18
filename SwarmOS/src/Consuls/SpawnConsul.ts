@@ -81,7 +81,7 @@ export class SpawnConsul extends ConsulBase implements IConsul {
     }
 
     AddSpawner(spawner: StructureSpawn) {
-        if (spawner.room.name != this.Queen.id) { return; }
+        if (spawner.room.name != this.Nest.name) { return; }
         let newSpawnData: SpawnConsul_SpawnData = {
             x: spawner.pos.x,
             y: spawner.pos.y,

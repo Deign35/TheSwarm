@@ -39,7 +39,7 @@ export abstract class _SwarmMemory implements IMemory {
     }
 
     protected InitMemory() {
-        this._cache = { };
+        this._cache = {};
     }
 }
 
@@ -53,6 +53,7 @@ export abstract class QueenMemory extends _SwarmMemory {
             this.ReloadSnapshot(true);
         }
         Memory[this.id] = this._cache;
+        delete this._cache;
     }
     Load() {
         this._cache = Memory[this.id];
