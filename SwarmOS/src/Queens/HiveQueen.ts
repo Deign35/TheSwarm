@@ -4,12 +4,30 @@ import { HiveQueenBase } from "Queens/HiveQueenBase";
 
 export class HiveQueen extends HiveQueenBase {
     protected CheckForSpawnRequirements(): void {
-        throw new Error("Method not implemented.");
+        if (this.Collector.Consul.DetermineRequirements()) {
+            let newName = ('Harv' + Game.time);
+            this.Spawner.AddSpawnToQueue({
+                body: [WORK, WORK, MOVE, CARRY],
+                creepName: newName,
+                requestorID: 'HARVEST',
+                targetTime: Game.time
+            });
+            this.Collector.Consul.CreepRequested = newName;
+        }
     }
     InitializeNest(): void {
-        //throw new Error("Method not implemented.");
+        // Don't think I need anything eh?
     }
     ReceiveCommand(): void {
-        //throw new Error("Method not implemented.");
+        //Not implemented
+    }
+
+    Save() {
+        super.Save();
+    }
+    Load() {
+        if (!super.Load()) { return false; }
+
+        return true;
     }
 }

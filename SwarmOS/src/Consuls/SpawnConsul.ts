@@ -33,7 +33,7 @@ export class SpawnConsul extends ConsulBase implements IConsul {
         super.InitMemory();
         this.ScanRoom();
         this.SpawnQueue = new MinHeap();
-        this.SpawnData = [];
+        this.ScanRoom();
     }
 
     ScanRoom(): void {
@@ -104,14 +104,18 @@ export class SpawnConsul extends ConsulBase implements IConsul {
         for (let i = 0; i < 3; i++) {
             if (this.SpawnQueue.Peek()) {
                 peeked.push(this.SpawnQueue.Pop() as SpawnConsul_SpawnArgs);
+                // Have to pop this off to get to the first 3
             }
         }
         if (peeked.length > 0) {
             requirements.neededBy = peeked[0].targetTime;
         }
         for (let i = 0; i < 3; i++) {
-            requirements.energyNeeded += SpawnConsul.CalculateEnergyCost(peeked[i]);
-            this.AddSpawnToQueue(peeked[i]);
+            if (peeked[i]) {
+                requirements.energyNeeded += SpawnConsul.CalculateEnergyCost(peeked[i]);
+                this.AddSpawnToQueue(peeked[i]);
+            }
+            // Add it back to the list
         }
 
         return requirements;

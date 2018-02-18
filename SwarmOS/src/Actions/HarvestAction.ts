@@ -40,7 +40,7 @@ export class HarvestAction extends ActionWithTarget<HarvestTargetType> {
             return SwarmCodes.E_TARGET_INELLIGIBLE;
         }
 
-        if (this.AssignedCreep.pos.isNearTo(this.Target.pos)) {
+        if (!this.AssignedCreep.pos.isNearTo(this.Target.pos)) {
             return SwarmCodes.C_MOVE;
         }
         return SwarmCodes.C_NONE;

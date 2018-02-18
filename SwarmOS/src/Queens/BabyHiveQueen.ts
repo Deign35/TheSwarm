@@ -10,7 +10,7 @@ export class BabyHiveQueen extends HiveQueenBase {
             this.Spawner.AddSpawnToQueue({
                 body: [WORK, WORK, MOVE, CARRY],
                 creepName: newName,
-                requestorID: 'HARVESTER',
+                requestorID: 'HARVEST',
                 targetTime: Game.time
             });
             this.Collector.Consul.CreepRequested = newName;

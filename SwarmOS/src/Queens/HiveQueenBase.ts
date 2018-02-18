@@ -18,8 +18,13 @@ export abstract class HiveQueenBase extends NestQueenBase implements IHiveQueen 
         this.ActivateImperators();
         this.CheckForSpawnRequirements();
         let requirements = this.Spawner.DetermineRequirements();
-        if (this.Nest.energyAvailable > requirements.energyNeeded && requirements.neededBy <= (Game.time - 3)) { // 3 tick buffer??
-            this.Spawner.SpawnCreep();
+        if (this.Nest.energyAvailable >= requirements.energyNeeded && requirements.neededBy <= (Game.time - 3)) { // 3 tick buffer??
+            let spawnedCreep = this.Spawner.SpawnCreep();
+            if (spawnedCreep) {
+                if (spawnedCreep.requestorID == HARVEST_IMPERATOR_ID) {
+                    this.Collector.AssignCreep(spawnedCreep.creepName);
+                }
+            }
         }
     }
     protected LoadImperators() {

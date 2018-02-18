@@ -103,6 +103,10 @@ export class HarvestConsul extends ConsulBase {
         if (this.SourceData.length == 0) {
             return SwarmCodes.E_MISSING_TARGET;
         }
+        if (creepName != this.CreepRequested) {
+            console.log('CREEP NAME NO MATCH');
+        }
+        this.RemoveData(REQUESTED_CREEP);
         // Check main harvester position
         let index = 0;
         do {
@@ -172,7 +176,6 @@ export class HarvestConsul extends ConsulBase {
             return (struct.structure as Structure).structureType == STRUCTURE_CONTAINER;
         });
 
-        sourceData.containerID = '';
         if (container.length > 0) {
             sourceData.containerID = (container[0].structure as Structure).id;
         } else {
