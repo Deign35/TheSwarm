@@ -106,13 +106,13 @@ export class HarvestConsul extends ConsulBase {
         if (creepName != this.CreepRequested) {
             console.log('CREEP NAME NO MATCH');
         }
+        delete this.CreepRequested;
         this.RemoveData(REQUESTED_CREEP);
         // Check main harvester position
         let index = 0;
         do {
             if (this.SourceData[index].harvester) {
-                if (Game.getObjectById(this.SourceData[index].harvester) != undefined) {
-                    index++;
+                if (Game.creeps[this.SourceData[index].harvester as string] != undefined) {
                     continue;
                 }
             }

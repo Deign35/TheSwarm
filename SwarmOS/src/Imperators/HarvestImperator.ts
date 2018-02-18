@@ -31,35 +31,47 @@ export class HarvestImperator extends ImperatorBase {
         let sourceData = this.Consul.SourceData;
         for (let i = 0, length = this.Consul.SourceData.length; i < length; i++) {
             let data = this.Consul.SourceData[i];
-            if (!data.harvester) continue;
-            let harvester = Game.creeps[data.harvester];
-            if (!harvester) {
-                // update the consul?
-                continue;
+            if(data.harvester && Game.creeps[data.harvester]) {
+                this.ActivateCreep(data, Game.creeps[data.harvester]);
+            }
+            if(data.temporaryWorkers && data.temporaryWorkers.length > 0) {
+                for(let j = 0, length2 = data.temporaryWorkers.length; j < length2; j++) {
+                    let creep = Game.creeps[(data.temporaryWorkers as string[])[j]];
+                    if(creep) {
+                        this.ActivateCreep(data, creep);
+                    }
+                }
             }
 
-            let sourceTarget = Game.getObjectById(data.id) as Source;
-            let harvestAction: ActionBase = new HarvestAction(harvester, sourceTarget);
-            let harvestResult = harvestAction.ValidateAction();
-            switch (harvestResult) {
-                case (SwarmCodes.C_NONE):
-                    if (!data.constructionSite && !data.containerID) {
-                        let foundCS = harvester.pos.lookFor(LOOK_CONSTRUCTION_SITES);
-                        if (foundCS && foundCS.length > 0) {
-                            if ((foundCS[0] as ConstructionSite).structureType == STRUCTURE_CONTAINER) {
-                                data.constructionSite = (foundCS[0] as ConstructionSite).id;
-                            }
+        }
+
+        return SwarmCodes.C_NONE; // unused
+    }
+
+    protected ActivateCreep(data: HarvestConsul_SourceData, harvester: Creep) {
+        let sourceTarget = Game.getObjectById(data.id) as Source;
+        let harvestAction: ActionBase = new HarvestAction(harvester, sourceTarget);
+        let harvestResult = harvestAction.ValidateAction();
+        switch (harvestResult) {
+            case (SwarmCodes.C_NONE):
+                if (!data.constructionSite && !data.containerID) {
+                    let foundCS = harvester.pos.lookFor(LOOK_CONSTRUCTION_SITES);
+                    if (foundCS && foundCS.length > 0) {
+                        if ((foundCS[0] as ConstructionSite).structureType == STRUCTURE_CONTAINER) {
+                            data.constructionSite = (foundCS[0] as ConstructionSite).id;
+                        }
+                    } else {
+                        let foundS = harvester.pos.lookFor(LOOK_STRUCTURES);
+                        if (foundS && foundS.length > 0 && (foundS[0] as Structure).structureType == STRUCTURE_CONTAINER) {
+                            data.containerID = (foundS[0] as StructureContainer).id;
                         } else {
-                            let foundS = harvester.pos.lookFor(LOOK_STRUCTURES);
-                            if (foundS && foundS.length > 0 && (foundS[0] as Structure).structureType == STRUCTURE_CONTAINER) {
-                                data.containerID = (foundS[0] as StructureContainer).id;
-                            } else {
-                                harvester.room.createConstructionSite(harvester.pos, STRUCTURE_CONTAINER);
-                            }
+                            harvester.room.createConstructionSite(harvester.pos, STRUCTURE_CONTAINER);
                         }
                     }
-                    break;
-                case (SwarmCodes.E_ACTION_UNNECESSARY):
+                }
+                break;
+            case (SwarmCodes.E_ACTION_UNNECESSARY):
+                if(data.harvester == harvester.name) {
                     if (data.constructionSite) {
                         harvestAction = new BuildAction(harvester, Game.getObjectById(data.constructionSite) as ConstructionSite);
                     } else if (data.containerID) {
@@ -68,28 +80,29 @@ export class HarvestImperator extends ImperatorBase {
                             harvestAction = new RepairAction(harvester, container);
                         }
                     }
-                    break; // Creep's carry is full
-                case (SwarmCodes.E_TARGET_INELLIGIBLE): break; // Target is empty.
-                case (SwarmCodes.C_MOVE):
-                    let targetPos = sourceTarget.pos;
-                    if (data.constructionSite || data.containerID) {
-                        let targetStruct = (Game.getObjectById(data.constructionSite) ||
-                            Game.getObjectById(data.containerID)) as ConstructionSite | StructureContainer;
-                        if (targetStruct) {
-                            targetPos = targetStruct.pos;
-                        }
-                    }
-                    new MoveToPositionAction(harvester, targetPos).Run(true);
-                    break;
-            }
+                } else {
+                    this.ReleaseCreep(harvester.name, 'Creep harvest is full');
+                }
+                break; // Creep's carry is full
+            case (SwarmCodes.E_TARGET_INELLIGIBLE): break; // Target is empty.
+            case (SwarmCodes.C_MOVE):
+                let targetPos = sourceTarget.pos;
 
-            if (harvestResult != SwarmCodes.C_MOVE) {
-                harvestResult = harvestAction.Run();
-                // Dont care about the result
-            }
+                if (data.harvester == harvester.name && (data.constructionSite || data.containerID)) {
+                    let targetStruct = (Game.getObjectById(data.constructionSite) ||
+                        Game.getObjectById(data.containerID)) as ConstructionSite | StructureContainer;
+                    if (targetStruct) {
+                        targetPos = targetStruct.pos;
+                    }
+                }
+                new MoveToPositionAction(harvester, targetPos).Run(true);
+                break;
         }
 
-        return SwarmCodes.C_NONE; // unused
+        if (harvestResult != SwarmCodes.C_MOVE) {
+            harvestResult = harvestAction.Run();
+            // Dont care about the result
+        }
     }
 
     ImperatorComplete(): void {

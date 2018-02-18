@@ -40,7 +40,7 @@ export class RateTracker extends ChildMemory {
         }
 
         let cummulative = _.sum(this.tracer[this.Depth - 1]);
-        return cummulative / this.tracer[this.Depth].length;
+        return cummulative / this.tracer[this.Depth - 1].length;
     }
 
     protected insertAt(inVal: number, level: number) {
