@@ -9,7 +9,7 @@ export class HarvestImperator extends ImperatorBase {
     AssignCreep(creepName: string): void {
         let result = this.Consul.AssignCreepToSource(creepName);
         if (result == SwarmCodes.E_MISSING_TARGET) {
-            this.ReleaseCreep(creepName, 'No jobs available');
+            this.ReleaseCreep(creepName, 'No jobs available'); // Then make it supplement an open spot or so?
         }
     }
 

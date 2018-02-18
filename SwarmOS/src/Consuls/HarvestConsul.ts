@@ -22,7 +22,6 @@ export class HarvestConsul extends ConsulBase implements IConsul {
 
     Load() {
         if (!super.Load()) { return false; }
-
         this.SourceData = this.GetData(SOURCE_DATA);
         this.RefinementRequired = this.GetData(REFINEMENT_REQUIRED) || false;
 
@@ -37,7 +36,7 @@ export class HarvestConsul extends ConsulBase implements IConsul {
     ScanRoom(): void {
         if (!this.SourceData || this.SourceData.length == 0) {
             this.SourceData = [];
-            let foundSources = this.Queen.Nest.find(FIND_SOURCES);
+            let foundSources = this.Nest.find(FIND_SOURCES);
             for (let i = 0, length = foundSources.length; i < length; i++) {
                 this.SourceData.push(this.InitSourceData(foundSources[i]));
             }
@@ -61,7 +60,7 @@ export class HarvestConsul extends ConsulBase implements IConsul {
                 if (data.harvester && !data.constructionSite) {
                     let creep = Game.creeps[data.harvester as string];
                     if (creep.pos.getRangeTo(new RoomPosition(data.x, data.y, this.Queen.id)) <= 1) {
-                        this.Queen.Nest.createConstructionSite(creep.pos.x, creep.pos.y, STRUCTURE_CONTAINER);
+                        this.Nest.createConstructionSite(creep.pos.x, creep.pos.y, STRUCTURE_CONTAINER);
                         // Have to retrieve or assign this somehow
                     }
                 }
@@ -124,7 +123,7 @@ export class HarvestConsul extends ConsulBase implements IConsul {
         sourceData.id = source.id;
         sourceData.harvestRate = 0;
         sourceData.spawnBuffer = 0; // This is how soon a creep must be spawned to get to the source at the right moment.
-        let structures = this.Queen.Nest.lookForAtArea(LOOK_STRUCTURES,
+        let structures = this.Nest.lookForAtArea(LOOK_STRUCTURES,
             sourceData.y - 1, sourceData.x - 1,
             sourceData.y + 1, sourceData.x + 1, true);
 
@@ -136,7 +135,7 @@ export class HarvestConsul extends ConsulBase implements IConsul {
         if (container.length > 0) {
             sourceData.containerID = (container[0].structure as Structure).id;
         } else {
-            let constructionSites = this.Queen.Nest.lookForAtArea(LOOK_CONSTRUCTION_SITES,
+            let constructionSites = this.Nest.lookForAtArea(LOOK_CONSTRUCTION_SITES,
                 sourceData.y - 1, sourceData.x - 1,
                 sourceData.y + 1, sourceData.x + 1, true);
             let site = _.filter(constructionSites, (site) => {

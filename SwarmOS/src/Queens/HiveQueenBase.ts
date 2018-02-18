@@ -1,24 +1,29 @@
 import * as SwarmCodes from 'Consts/SwarmCodes'
 import { NestQueenBase } from "./NestQueenBase";
 import { HarvestImperator } from "Imperators/HarvestImperator";
+import { SpawnImperator } from 'Imperators/SpawnImperator';
 
-const HARVEST_IMPERATOR_ID = 'HARV';
+const HARVEST_IMPERATOR_ID = 'HARVEST';
+const SPAWNER_IMPERATOR_ID = 'SPAWNER';
 export abstract class HiveQueenBase extends NestQueenBase implements IHiveQueen {
-    protected Collector!: HarvestImperator;
+    Collector!: HarvestImperator;
+    Spawner!: SpawnImperator;
     Save() {
         this.Collector.ImperatorComplete();
+        this.Spawner.ImperatorComplete();
         super.Save();
-    }
-    Load() {
-        if (!super.Load()) { return false; }
-
-        this.Collector = new HarvestImperator(HARVEST_IMPERATOR_ID, this);
-        return true;
     }
     ActivateNest() {
         this.ActivateImperators();
     }
+    protected LoadImperators() {
+        this.Collector = new HarvestImperator(HARVEST_IMPERATOR_ID, this);
+        this.Spawner = new SpawnImperator(SPAWNER_IMPERATOR_ID, this);
+    }
     protected ActivateImperators(): SwarmCodes.SwarmErrors {
-        return SwarmCodes.E_NOT_IMPLEMENTED;
+        this.Collector.ActivateImperator();
+        this.Spawner.ActivateImperator();
+
+        return SwarmCodes.C_NONE;
     }
 }

@@ -9,7 +9,11 @@ export abstract class NestQueenBase extends QueenMemory implements INestQueen {
         this.LoadImperators();
         return true;
     }
-    abstract InitMemory(): void;
+
+    protected InitMemory() {
+        super.InitMemory();
+        this.LoadImperators();
+    }
     abstract InitializeNest(): void;
     abstract ActivateNest(): void;
 

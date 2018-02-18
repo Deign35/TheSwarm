@@ -18,8 +18,19 @@ room assistant will need to be handled at the Imperaturs/Consul -- HiveQueen lev
 Or does the SwarmQueen direct the HiveQueen to deliver to the new HiveQueen?
 */
 export abstract class ConsulBase extends ChildMemory implements IConsul {
+    Nest!: Room;
     constructor(id: string, public Queen: NestQueenBase) {
         super(id, Queen);
+    }
+    InitMemory() {
+        super.InitMemory();
+        this.Nest = Game.rooms[this.Parent.id];
+    }
+    Load() {
+        if(!super.Load()) { return false; }
+        this.Nest = Game.rooms[this.Parent.id];
+
+        return true;
     }
     abstract get consulType(): string;
     abstract ScanRoom(): void;
