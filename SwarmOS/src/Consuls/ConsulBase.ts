@@ -1,6 +1,5 @@
 import * as SwarmCodes from "consts/SwarmCodes"
 import { ChildMemory } from "Tools/SwarmMemory";
-import { ImperatorBase } from "Imperators/ImperatorBase";
 import { NestQueenBase } from "Queens/NestQueenBase";
 
 /* Consuls will be responsible for surveying for the information needed for its assigned overseer.
@@ -19,15 +18,11 @@ Or does the SwarmQueen direct the HiveQueen to deliver to the new HiveQueen?
 */
 export abstract class ConsulBase extends ChildMemory implements IConsul {
     Nest!: Room;
-    constructor(id: string, public Queen: NestQueenBase) {
-        super(id, Queen);
-    }
-    InitMemory() {
-        super.InitMemory();
-        this.Nest = Game.rooms[this.Parent.id];
+    constructor(id: string, public Parent: NestQueenBase) {
+        super(id, Parent);
     }
     Load() {
-        if(!super.Load()) { return false; }
+        if (!super.Load()) { return false; }
         this.Nest = Game.rooms[this.Parent.id];
 
         return true;

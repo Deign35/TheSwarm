@@ -10,6 +10,7 @@ declare type SpawnConsul_SpawnArgs = {
     body: BodyPartConstant[],
     targetTime: number,
     creepName: string,
+    requestorID: string,
     targetPos?: RoomPositionData,
     calculatedCost?: number,
 }
@@ -20,7 +21,7 @@ declare type SpawnConsul_RequirementsData = {
 }
 declare type HarvestConsul_SourceData = RoomObjectWithID & {
     spawnBuffer: number,
-    harvestRate: number,
+    lastEnergy: number,
     harvester?: string,
     containerID?: string,
     constructionSite?: string,

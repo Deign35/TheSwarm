@@ -36,13 +36,13 @@ export class HarvestAction extends ActionWithTarget<HarvestTargetType> {
             validTarget = (this.Target as Mineral).mineralAmount > 0;
         }
 
-        if(!validTarget) {
+        if (!validTarget) {
             return SwarmCodes.E_TARGET_INELLIGIBLE;
         }
 
-        if(this.AssignedCreep.pos.getRangeTo(this.Target.pos) > 1) {
+        if (this.AssignedCreep.pos.isNearTo(this.Target.pos)) {
             return SwarmCodes.C_MOVE;
         }
-        return (validTarget ? SwarmCodes.C_NONE : SwarmCodes.E_TARGET_INELLIGIBLE);
+        return SwarmCodes.C_NONE;
     }
 }

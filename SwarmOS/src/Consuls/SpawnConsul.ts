@@ -46,40 +46,42 @@ export class SpawnConsul extends ConsulBase implements IConsul {
 
     SpawnCreep() {
         let spawnData = this.SpawnQueue.Peek();
-        if(!spawnData) { return ; }
-        if(this.Nest.energyAvailable >= SpawnConsul.CalculateEnergyCost(spawnData)) {
-            let spawnToUse: StructureSpawn|undefined;
-            for(let i = 0, length = this.SpawnData.length; i < length; i++) {
+        if (!spawnData) { return; }
+        if (this.Nest.energyAvailable >= SpawnConsul.CalculateEnergyCost(spawnData)) {
+            let spawnToUse: StructureSpawn | undefined;
+            for (let i = 0, length = this.SpawnData.length; i < length; i++) {
                 let spawn = Game.spawns[this.SpawnData[i].id];
-                if(!spawn) { this.SpawnData.splice(i--, 1); continue; }
-                if(spawn.spawning) { continue; }
-                if(spawnToUse && spawnData.targetPos) {
+                if (!spawn) { this.SpawnData.splice(i--, 1); continue; }
+                if (spawn.spawning) { continue; }
+                if (spawnToUse && spawnData.targetPos) {
                     let xDist1 = spawnToUse.pos.x - spawnData.targetPos.x;
                     let yDist1 = spawnToUse.pos.y - spawnData.targetPos.y;
                     let xDist2 = spawn.pos.x - spawnData.targetPos.x;
                     let yDist2 = spawn.pos.y - spawnData.targetPos.y;
 
-                    if((xDist1 * xDist1 + yDist1 * yDist1) > (xDist2 * xDist2 + yDist2 * yDist2)) {
+                    if ((xDist1 * xDist1 + yDist1 * yDist1) > (xDist2 * xDist2 + yDist2 * yDist2)) {
                         spawnToUse = spawn;
                     }
                 } else {
                     spawnToUse = spawn;
                 }
             }
-            if(spawnToUse) {
-                if(Game.creeps[spawnData.creepName]) {
+            if (spawnToUse) {
+                if (Game.creeps[spawnData.creepName]) {
                     spawnData.creepName += ('' + Game.time).slice(-3);
                 }
-                if(spawnToUse.spawnCreep(spawnData.body, spawnData.creepName, { dryRun: true }) == OK) {
+                if (spawnToUse.spawnCreep(spawnData.body, spawnData.creepName, { dryRun: true }) == OK) {
                     spawnToUse.spawnCreep(spawnData.body, spawnData.creepName);
-                    this.SpawnQueue.Pop();
+                    return this.SpawnQueue.Pop();
                 }
             }
         }
+
+        return;
     }
 
     AddSpawner(spawner: StructureSpawn) {
-        if(spawner.room.name != this.Queen.id) { return; }
+        if (spawner.room.name != this.Queen.id) { return; }
         let newSpawnData: SpawnConsul_SpawnData = {
             x: spawner.pos.x,
             y: spawner.pos.y,
@@ -89,7 +91,7 @@ export class SpawnConsul extends ConsulBase implements IConsul {
     }
 
     AddSpawnToQueue(spawnArgs: SpawnConsul_SpawnArgs) {
-        if(!this.SpawnQueue.Peek()) {
+        if (!this.SpawnQueue.Peek()) {
             this.RelativeTime = Game.time;
             this.SetData(RELATIVE_TIME, this.RelativeTime);
         }
@@ -97,17 +99,17 @@ export class SpawnConsul extends ConsulBase implements IConsul {
     }
 
     DetermineRequirements(): SpawnConsul_RequirementsData {
-        let requirements: SpawnConsul_RequirementsData = {energyNeeded: 0, neededBy: 0 };
+        let requirements: SpawnConsul_RequirementsData = { energyNeeded: 0, neededBy: 0 };
         let peeked: SpawnConsul_SpawnArgs[] = [];
-        for(let i = 0; i < 3; i++) {
-            if(this.SpawnQueue.Peek()) {
+        for (let i = 0; i < 3; i++) {
+            if (this.SpawnQueue.Peek()) {
                 peeked.push(this.SpawnQueue.Pop() as SpawnConsul_SpawnArgs);
             }
         }
-        if(peeked.length > 0) {
+        if (peeked.length > 0) {
             requirements.neededBy = peeked[0].targetTime;
         }
-        for(let i = 0; i < 3; i++) {
+        for (let i = 0; i < 3; i++) {
             requirements.energyNeeded += SpawnConsul.CalculateEnergyCost(peeked[i]);
             this.AddSpawnToQueue(peeked[i]);
         }
@@ -118,10 +120,10 @@ export class SpawnConsul extends ConsulBase implements IConsul {
     static get ConsulType(): string { return CONSUL_TYPE; }
 
     protected static CalculateEnergyCost(spawnData: SpawnConsul_SpawnArgs): number {
-        if(spawnData.calculatedCost) { return spawnData.calculatedCost; }
+        if (spawnData.calculatedCost) { return spawnData.calculatedCost; }
         let totalCost = 0;
         let body = spawnData.body;
-        for(let i = 0, length = body.length; i < length; i++) {
+        for (let i = 0, length = body.length; i < length; i++) {
             totalCost += BODYPART_COST[body[i]];
         }
 

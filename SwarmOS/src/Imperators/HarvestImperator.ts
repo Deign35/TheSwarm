@@ -3,6 +3,9 @@ import { ImperatorBase } from "Imperators/ImperatorBase";
 import { HarvestConsul } from "Consuls/HarvestConsul";
 import { HarvestAction } from "Actions/HarvestAction";
 import { MoveToPositionAction } from "Actions/MoveToPositionAction";
+import { RepairAction } from "Actions/RepairAction";
+import { BuildAction } from "Actions/BuildAction";
+import { ActionBase } from "Actions/ActionBase";
 
 export class HarvestImperator extends ImperatorBase {
     Consul!: HarvestConsul;
@@ -20,19 +23,10 @@ export class HarvestImperator extends ImperatorBase {
 
     InitImperator(memoryHandle: string): void {
         this.Consul = new HarvestConsul(memoryHandle, this.Queen);
-        if (this.Consul.RefinementRequired && Game.time % 1000) {
-            this.Consul.SnapshotData();
-            try {
-                this.Consul.RefineSourceData();
-                this.Consul.ResetSnapshotData();
-            } catch {
-                this.Consul.ReloadSnapshot(true);
-            }
-        }
+        this.Consul.ScanRoom();
     }
 
     ActivateImperator(): SwarmCodes.SwarmErrors {
-        let requirements = this.Consul.DetermineRequirements();
         // Request hive harvesters from the nestqueen.
         let sourceData = this.Consul.SourceData;
         for (let i = 0, length = this.Consul.SourceData.length; i < length; i++) {
@@ -40,20 +34,41 @@ export class HarvestImperator extends ImperatorBase {
             if (!data.harvester) continue;
             let harvester = Game.creeps[data.harvester];
             if (!harvester) {
-                // update the consul,
+                // update the consul?
                 continue;
             }
 
             let sourceTarget = Game.getObjectById(data.id) as Source;
-            let harvestAction = new HarvestAction(harvester, sourceTarget);
+            let harvestAction: ActionBase = new HarvestAction(harvester, sourceTarget);
             let harvestResult = harvestAction.ValidateAction();
             switch (harvestResult) {
                 case (SwarmCodes.C_NONE):
                     if (!data.constructionSite && !data.containerID) {
-                        harvester.room.createConstructionSite(harvester.pos, STRUCTURE_CONTAINER);
+                        let foundCS = harvester.pos.lookFor(LOOK_CONSTRUCTION_SITES);
+                        if (foundCS && foundCS.length > 0) {
+                            if ((foundCS[0] as ConstructionSite).structureType == STRUCTURE_CONTAINER) {
+                                data.constructionSite = (foundCS[0] as ConstructionSite).id;
+                            }
+                        } else {
+                            let foundS = harvester.pos.lookFor(LOOK_STRUCTURES);
+                            if (foundS && foundS.length > 0 && (foundS[0] as Structure).structureType == STRUCTURE_CONTAINER) {
+                                data.containerID = (foundS[0] as StructureContainer).id;
+                            } else {
+                                harvester.room.createConstructionSite(harvester.pos, STRUCTURE_CONTAINER);
+                            }
+                        }
                     }
                     break;
-                case (SwarmCodes.E_ACTION_UNNECESSARY): break; // Creep's carry is full
+                case (SwarmCodes.E_ACTION_UNNECESSARY):
+                    if (data.constructionSite) {
+                        harvestAction = new BuildAction(harvester, Game.getObjectById(data.constructionSite) as ConstructionSite);
+                    } else if (data.containerID) {
+                        let container = Game.getObjectById(data.containerID) as StructureContainer;
+                        if (container.hits < container.hitsMax) {
+                            harvestAction = new RepairAction(harvester, container);
+                        }
+                    }
+                    break; // Creep's carry is full
                 case (SwarmCodes.E_TARGET_INELLIGIBLE): break; // Target is empty.
                 case (SwarmCodes.C_MOVE):
                     let targetPos = sourceTarget.pos;

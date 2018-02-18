@@ -46,18 +46,15 @@ export class RateTracker extends ChildMemory {
     protected insertAt(inVal: number, level: number) {
         this.tracer[level].push(inVal);
         if (this.tracer[level].length >= this.Width) {
-            if (level < this.Depth - 1) {
+            if (level < this.Depth - 1) {// All but last
                 if (this.tracer.length == level + 1) {
                     this.tracer.push([]);
                 }
-                // All but last
                 let sumForDepth = _.sum(this.tracer[level]);
                 this.insertAt(sumForDepth / this.tracer[level].length, level + 1);
                 this.tracer[level] = [];
-            } else {
-                if (this.tracer[level].length >= this.Width) {
-                    this.tracer[level].splice(0, 1);
-                }
+            } else { // Trim off the oldest.
+                this.tracer[level].splice(0, 1);
             }
         }
     }

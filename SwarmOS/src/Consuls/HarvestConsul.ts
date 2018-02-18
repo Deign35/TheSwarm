@@ -6,45 +6,53 @@ import { HarvestImperator } from "Imperators/HarvestImperator";
 import { RateTracker } from "Tools/RateTracker";
 
 const CONSUL_TYPE = 'H_Consul';
-const SOURCE_DATA = 'S_DATA';
-const SOURCE_RATE = 'S_RATE';
-const REFINEMENT_REQUIRED = 'REFINE';
+const SOURCE_DATA = 'S_Data';
+const TRACKER_PREFIX = 'Track_';
+const REQUESTED_CREEP = 'R_Creep';
 export class HarvestConsul extends ConsulBase {
     readonly consulType = CONSUL_TYPE;
+    CreepRequested?: string;
     SourceData!: HarvestConsul_SourceData[];
-    RefinementRequired!: boolean;
-    protected SourceHarvestRateTrackers!: RateTracker;
+    protected SourceHarvestRateTrackers!: RateTracker[];
     Save() {
-        this.SetData(SOURCE_DATA, this.SourceData);
-        if (this.RefinementRequired) {
-            this.SetData(REFINEMENT_REQUIRED, this.RefinementRequired);
+        if (this.CreepRequested) {
+            this.SetData(REQUESTED_CREEP, this.CreepRequested);
         }
-        this.SourceHarvestRateTrackers.Save();
+        this.SetData(SOURCE_DATA, this.SourceData);
+        for (let i = 0, length = this.SourceHarvestRateTrackers.length; i < length; i++) {
+            this.SourceHarvestRateTrackers[i].Save();
+        }
         super.Save();
     }
 
     Load() {
         if (!super.Load()) { return false; }
+        this.CreepRequested = this.GetData(REQUESTED_CREEP);
         this.SourceData = this.GetData(SOURCE_DATA);
-        this.RefinementRequired = this.GetData(REFINEMENT_REQUIRED) || false;
-        this.SourceHarvestRateTrackers = new RateTracker(SOURCE_RATE, this);
+        for (let i = 0; i < this.SourceData.length; i++) {
+            this.SourceHarvestRateTrackers.push(new RateTracker(TRACKER_PREFIX + i, this));
+        }
         return true;
     }
 
     InitMemory() {
         super.InitMemory();
-        this.SourceHarvestRateTrackers = new RateTracker(SOURCE_RATE, this);
         this.SourceData = [];
-        let foundSources = this.Nest.find(FIND_SOURCES);
+        let foundSources = this.Parent.Nest.find(FIND_SOURCES);
         for (let i = 0, length = foundSources.length; i < length; i++) {
             this.SourceData.push(this.InitSourceData(foundSources[i]));
+            this.SourceHarvestRateTrackers.push(new RateTracker(TRACKER_PREFIX + i, this));
         }
-        this.ScanRoom();
     }
 
     ScanRoom(): void {
         for (let i = 0, length = this.SourceData.length; i < length; i++) {
             let data = this.SourceData[i];
+            let sourceTarget = Game.getObjectById(data.id) as Source;
+            if (sourceTarget.energy < sourceTarget.energyCapacity) {
+                this.SourceHarvestRateTrackers[i].InsertData(data.lastEnergy - sourceTarget.energy);
+            }
+            data.lastEnergy = sourceTarget.energy;
             if (data.harvester && !Game.creeps[data.harvester as string]) {
                 data.harvester = undefined;
             }
@@ -55,16 +63,6 @@ export class HarvestConsul extends ConsulBase {
 
             if (data.containerID && !Game.getObjectById(data.containerID)) {
                 data.containerID = undefined;
-            }
-
-            if (!data.containerID) {
-                if (data.harvester && !data.constructionSite) {
-                    let creep = Game.creeps[data.harvester as string];
-                    if (creep.pos.isNearTo(new RoomPosition(data.x, data.y, this.Queen.id))) {
-                        this.Nest.createConstructionSite(creep.pos.x, creep.pos.y, STRUCTURE_CONTAINER);
-                        // Have to retrieve or assign this somehow
-                    }
-                }
             }
 
             if (data.temporaryWorkers) {
@@ -78,16 +76,25 @@ export class HarvestConsul extends ConsulBase {
         }
     }
 
-    RefineSourceData(): SwarmCodes.SwarmErrors {
-        this.RemoveData(REFINEMENT_REQUIRED);
-        return SwarmCodes.C_NONE;
-    }
-
-    DetermineRequirements(): void {
+    DetermineRequirements(): boolean {
         // Calculates the distance to new sources
         // Orders creation of new screep so that they will arrive at the harvest node
         // just a few ticks before the previous one dies.
+        if (!this.CreepRequested) {
+            for (let i = 0, length = this.SourceData.length; i < length; i++) {
+                if (this.SourceData[i].harvester) {
+                    let curRate = this.SourceHarvestRateTrackers[i].GetRate();
+                    console.log('Rate[' + this.SourceData[i].id + '] -- ' + curRate);
+                    if (curRate != 0 && curRate < 250) {
+                        return true;
+                    }
+                } else {
+                    return true;
+                }
+            }
+        }
 
+        return false;
     }
 
     AssignCreepToSource(creepName: string): SwarmCodes.SwarmlingResponse {
@@ -124,7 +131,7 @@ export class HarvestConsul extends ConsulBase {
         }
 
         (this.SourceData[bestPick].temporaryWorkers as string[]).push(creepName);
-        return SwarmCodes.E_MISSING_TARGET;
+        return SwarmCodes.C_NONE;
     }
 
     ReleaseCreep(creepName: string) {
@@ -153,7 +160,7 @@ export class HarvestConsul extends ConsulBase {
         sourceData.x = source.pos.x;
         sourceData.y = source.pos.y;
         sourceData.id = source.id;
-        sourceData.harvestRate = 0;
+        sourceData.lastEnergy = source.energy;
         sourceData.spawnBuffer = 0; // This is how soon a creep must be spawned to get to the source at the right moment.
         let structures = this.Nest.lookForAtArea(LOOK_STRUCTURES,
             sourceData.y - 1, sourceData.x - 1,
