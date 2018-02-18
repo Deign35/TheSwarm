@@ -49,6 +49,13 @@ export class MinHeap<T> {
         if (!this.headNode) { return undefined; }
         return this.headNode.obj;
     }
+    PeekDeep(maxDepth: number): T[] {
+        return this.DeepPeek(maxDepth, this.headNode);
+    }
+    protected DeepPeek(maxDepth: number, headNode?: Node<T>): T[] {
+        if (!headNode || headNode.depth > maxDepth) return [];
+        return _.union([headNode.obj], this.DeepPeek(maxDepth, headNode.left), this.DeepPeek(maxDepth, headNode.right));
+    }
 
     Pop(): T | undefined {
         if (!this.headNode) { return undefined; }

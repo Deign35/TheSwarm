@@ -9,7 +9,7 @@ export class HiveQueen extends HiveQueenBase {
             this.Spawner.AddSpawnToQueue({
                 body: [WORK, WORK, MOVE, CARRY],
                 creepName: newName,
-                requestorID: 'HARVEST',
+                requestorID: this.Collector.Consul.consulType,
                 targetTime: Game.time
             });
             this.Collector.Consul.CreepRequested = newName;

@@ -3,6 +3,7 @@ import { QueenMemory } from "Tools/SwarmMemory";
 
 export abstract class NestQueenBase extends QueenMemory implements INestQueen {
     Nest!: Room;
+    Commands!: any; // Needs to be defined
     Load() {
         if (!super.Load()) { return false; }
         this.Nest = Game.rooms[this.id];
@@ -14,10 +15,10 @@ export abstract class NestQueenBase extends QueenMemory implements INestQueen {
         super.InitMemory();
         this.LoadImperators();
     }
+    abstract ReturnCreep(creep: Creep): void;
     abstract InitializeNest(): void;
     abstract ActivateNest(): void;
 
-    Commands!: any; // Needs to be defined
     abstract ReceiveCommand(): void;
     protected abstract LoadImperators(): void;
     protected abstract ActivateImperators(): SwarmCodes.SwarmErrors;

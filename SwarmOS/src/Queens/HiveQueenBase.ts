@@ -2,9 +2,8 @@ import * as SwarmCodes from 'Consts/SwarmCodes'
 import { NestQueenBase } from "./NestQueenBase";
 import { HarvestImperator } from "Imperators/HarvestImperator";
 import { SpawnConsul } from 'Consuls/SpawnConsul';
+import { HarvestConsul } from 'Consuls/HarvestConsul';
 
-const HARVEST_IMPERATOR_ID = 'HARVEST';
-const SPAWNER_ID = 'SPAWNER';
 export abstract class HiveQueenBase extends NestQueenBase implements IHiveQueen {
     Collector!: HarvestImperator;
     Spawner!: SpawnConsul;
@@ -21,15 +20,21 @@ export abstract class HiveQueenBase extends NestQueenBase implements IHiveQueen 
         if (this.Nest.energyAvailable >= requirements.energyNeeded && requirements.neededBy <= (Game.time - 3)) { // 3 tick buffer??
             let spawnedCreep = this.Spawner.SpawnCreep();
             if (spawnedCreep) {
-                if (spawnedCreep.requestorID == HARVEST_IMPERATOR_ID) {
+                if (spawnedCreep.requestorID == HarvestConsul.ConsulType) {
                     this.Collector.AssignCreep(spawnedCreep.creepName);
                 }
+                // Other imperators should go here.
             }
         }
     }
+
+    ReturnCreep(creep: Creep) {
+
+    }
+
     protected LoadImperators() {
-        this.Spawner = new SpawnConsul(SPAWNER_ID, this);
-        this.Collector = new HarvestImperator(HARVEST_IMPERATOR_ID, this);
+        this.Spawner = new SpawnConsul(SpawnConsul.ConsulType, this);
+        this.Collector = new HarvestImperator(HarvestConsul.ConsulType, this);
     }
     protected ActivateImperators(): SwarmCodes.SwarmErrors {
         this.Collector.ActivateImperator();

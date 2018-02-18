@@ -28,10 +28,3 @@ declare type HarvestConsul_SourceData = RoomObjectWithID & {
     droppedResourcePile?: RoomPositionData,
     temporaryWorkers?: string[],
 }
-declare type HarvestConsul_RequirementsData = {
-    creeps: Requirement_CreepDefinition;
-}
-
-declare type Requirement_CreepDefinition = {
-    Body: BodyPartConstant[];
-}

@@ -9,6 +9,38 @@ import { ActionBase } from "Actions/ActionBase";
 
 export class HarvestImperator extends ImperatorBase {
     Consul!: HarvestConsul;
+
+    InitImperator(memoryHandle: string): void {
+        this.Consul = new HarvestConsul(memoryHandle, this.Queen);
+        this.Consul.ScanRoom();
+    }
+
+    ImperatorComplete(): void {
+        this.Consul.Save();
+    }
+
+    ActivateImperator(): SwarmCodes.SwarmErrors {
+        // Request hive harvesters from the nestqueen.
+        let sourceData = this.Consul.SourceData;
+        for (let i = 0, length = this.Consul.SourceData.length; i < length; i++) {
+            let data = this.Consul.SourceData[i];
+            if (data.harvester && Game.creeps[data.harvester]) {
+                this.ActivateCreep(data, Game.creeps[data.harvester]);
+            }
+            if (data.temporaryWorkers && data.temporaryWorkers.length > 0) {
+                for (let j = 0, length2 = data.temporaryWorkers.length; j < length2; j++) {
+                    let creep = Game.creeps[(data.temporaryWorkers as string[])[j]];
+                    if (creep) {
+                        this.ActivateCreep(data, creep);
+                    }
+                }
+            }
+
+        }
+
+        return SwarmCodes.C_NONE; // unused
+    }
+
     AssignCreep(creepName: string): void {
         let result = this.Consul.AssignCreepToSource(creepName);
         if (result == SwarmCodes.E_MISSING_TARGET) {
@@ -19,33 +51,6 @@ export class HarvestImperator extends ImperatorBase {
     ReleaseCreep(creepName: string, releaseReason: string) {
         // This should be to give the harvester creep back to the queen.
         this.Consul.ReleaseCreep(creepName);
-    }
-
-    InitImperator(memoryHandle: string): void {
-        this.Consul = new HarvestConsul(memoryHandle, this.Queen);
-        this.Consul.ScanRoom();
-    }
-
-    ActivateImperator(): SwarmCodes.SwarmErrors {
-        // Request hive harvesters from the nestqueen.
-        let sourceData = this.Consul.SourceData;
-        for (let i = 0, length = this.Consul.SourceData.length; i < length; i++) {
-            let data = this.Consul.SourceData[i];
-            if(data.harvester && Game.creeps[data.harvester]) {
-                this.ActivateCreep(data, Game.creeps[data.harvester]);
-            }
-            if(data.temporaryWorkers && data.temporaryWorkers.length > 0) {
-                for(let j = 0, length2 = data.temporaryWorkers.length; j < length2; j++) {
-                    let creep = Game.creeps[(data.temporaryWorkers as string[])[j]];
-                    if(creep) {
-                        this.ActivateCreep(data, creep);
-                    }
-                }
-            }
-
-        }
-
-        return SwarmCodes.C_NONE; // unused
     }
 
     protected ActivateCreep(data: HarvestConsul_SourceData, harvester: Creep) {
@@ -71,7 +76,7 @@ export class HarvestImperator extends ImperatorBase {
                 }
                 break;
             case (SwarmCodes.E_ACTION_UNNECESSARY):
-                if(data.harvester == harvester.name) {
+                if (data.harvester == harvester.name) {
                     if (data.constructionSite) {
                         harvestAction = new BuildAction(harvester, Game.getObjectById(data.constructionSite) as ConstructionSite);
                     } else if (data.containerID) {
@@ -82,6 +87,7 @@ export class HarvestImperator extends ImperatorBase {
                     }
                 } else {
                     this.ReleaseCreep(harvester.name, 'Creep harvest is full');
+                    this.Queen.ReturnCreep(harvester);
                 }
                 break; // Creep's carry is full
             case (SwarmCodes.E_TARGET_INELLIGIBLE): break; // Target is empty.
@@ -103,9 +109,5 @@ export class HarvestImperator extends ImperatorBase {
             harvestResult = harvestAction.Run();
             // Dont care about the result
         }
-    }
-
-    ImperatorComplete(): void {
-        this.Consul.Save();
     }
 }

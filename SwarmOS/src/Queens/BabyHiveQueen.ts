@@ -1,7 +1,5 @@
 import * as SwarmCodes from "Consts/SwarmCodes";
-import { HarvestImperator } from "Imperators/HarvestImperator";
 import { HiveQueenBase } from "Queens/HiveQueenBase";
-import { ImperatorBase } from "Imperators/ImperatorBase";
 
 export class BabyHiveQueen extends HiveQueenBase {
     protected CheckForSpawnRequirements(): void {
@@ -10,7 +8,7 @@ export class BabyHiveQueen extends HiveQueenBase {
             this.Spawner.AddSpawnToQueue({
                 body: [WORK, WORK, MOVE, CARRY],
                 creepName: newName,
-                requestorID: 'HARVEST',
+                requestorID: this.Collector.Consul.consulType,
                 targetTime: Game.time
             });
             this.Collector.Consul.CreepRequested = newName;
