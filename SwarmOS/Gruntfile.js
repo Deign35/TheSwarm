@@ -166,7 +166,7 @@ let ReplaceImports = function (abspath, rootdir, subdir, filename) {
         if ((line).match(/[.]*\/\/ Compiler: IgnoreLine[.]*/)) {
             continue;
         }
-        if ((line).match(/[.]*var _ = require\("lodash"\);[.]*/)) {
+        if ((line).match(/[.]*require\("lodash"\);[.]*/)) {
             console.log(line);
             continue;
         }

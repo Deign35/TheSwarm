@@ -1,3 +1,5 @@
+import * as _ from "lodash"; // Compiler: IgnoreLine
+
 const REBALANCE_CONSTANT = 3;
 export class MinHeap<T> {
     protected headNode?: Node<T>;
@@ -14,8 +16,9 @@ export class MinHeap<T> {
     }
 
     protected Insert(headNode: Node<T>, newObj: Node<T>) {
+        if (!headNode || !newObj) { return; }
         if (newObj.weight < headNode.weight) { // replace the headnode with newObj and then reinsert the old one.
-            let oldHead = headNode;
+            let oldHead = this.createTempNode(headNode);
             this.CopyNodeValue(newObj, headNode);
             this.CopyNodeValue(oldHead, newObj);
         }
@@ -58,6 +61,7 @@ export class MinHeap<T> {
     }
 
     protected BubbleUp(headNode: Node<T>) {
+        if (!headNode) { return; }
         headNode.childCount--; // This should be good enough right?
         // headNode is considered dead atm, need to replace with next in line.
         if (headNode.left && headNode.right) {
@@ -124,15 +128,29 @@ export class MinHeap<T> {
     protected CopyNodeValue(from: Node<T>, to: Node<T>) {
         to.weight = from.weight;
         to.depth = from.depth;
+        to.obj = from.obj;
+    }
+    protected createTempNode(from: Node<T>): Node<T> {
+        let newNode: Node<T> = { weight: from.weight, obj: from.obj, childCount: 0, depth: -1 }
+        return newNode;
     }
 
     static CompressHeap<T>(heap: MinHeap<T>, itemSerializer: ItemSerializer<T>): SerializedHeap[] {
+        if (heap.headNode) {
+            return this.compressNode(heap.headNode, itemSerializer);
+        }
+
+        return [];
+    }
+    protected static compressNode<T>(headNode: Node<T>, itemSerializer: ItemSerializer<T>): SerializedHeap[] {
         let compressedArray: SerializedHeap[] = [];
-        while (heap.headNode) {
-            let nodeVal = itemSerializer(heap.headNode.obj);
-            let nodeWeight = heap.headNode.weight;
-            compressedArray.push([nodeVal, nodeWeight]);
-            heap.Pop();
+        if (headNode.left) {
+            compressedArray = this.compressNode(headNode.left, itemSerializer);
+        }
+        compressedArray.push([itemSerializer(headNode.obj), headNode.weight]);
+        if (headNode.right) {
+            let rightArray = this.compressNode(headNode.right, itemSerializer);
+            compressedArray = _.union(compressedArray, rightArray);
         }
 
         return compressedArray;

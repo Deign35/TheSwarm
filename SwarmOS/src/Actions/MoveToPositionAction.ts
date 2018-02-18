@@ -1,5 +1,5 @@
 import { ActionWithPosition } from "Actions/ActionBase";
-import * as SwarmCodes from "consts/SwarmCodes";
+import * as SwarmCodes from "Consts/SwarmCodes";
 
 export class MoveToPositionAction extends ActionWithPosition {
     static SimultaneousActionValue = 0;
