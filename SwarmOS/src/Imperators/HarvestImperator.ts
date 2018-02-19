@@ -39,11 +39,6 @@ export class HarvestImperator extends ImperatorBase {
         return SwarmCodes.C_NONE; // unused
     }
 
-    ReleaseCreep(creepName: string, releaseReason: string) {
-        // This should be to give the harvester creep back to the queen.
-        this.Consul.ReleaseCreep(creepName);
-    }
-
     protected ActivateCreep(data: HarvestConsul_SourceData, harvester: Creep, prime: boolean) {
         this.Queen.Nest.visual.text('Harv', harvester.pos);
         if (harvester.spawning) { return; }

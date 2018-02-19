@@ -95,10 +95,6 @@ export class ControllerConsul extends CreepConsul {
             }
         }
 
-        for (let i = 0, length = idleCreeps.length; i < length; i++) {
-            this.ReleaseCreep(idleCreeps[i].name);
-        }
-
         return idleCreeps;
     }
     protected _assignCreep(creepName: string) {

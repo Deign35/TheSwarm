@@ -19,6 +19,7 @@ export class ConstructionConsul extends CreepConsul {
     Load() {
         if (!super.Load()) { return false; }
 
+        // :(  not working
         let allSites = this.Nest.find(FIND_CONSTRUCTION_SITES);
         let validSites: { [id: string]: ConstructionSite } = {}
         this.siteData = this.GetData(SITE_DATA) || [];

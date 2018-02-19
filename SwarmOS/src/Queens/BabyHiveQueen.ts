@@ -36,9 +36,24 @@ export class BabyHiveQueen extends HiveQueenBase {
         //Not implemented
     }
     protected GatherIdleCreeps(): Creep[] {
-        return _.union(this.Collector.Consul.GetIdleCreeps(),
-            this.Builder.Consul.GetIdleCreeps(),
-            this.Upgrader.Consul.GetIdleCreeps());
+        let allCreeps: Creep[] = [];
+        let idleCreeps = this.Collector.Consul.GetIdleCreeps();
+        for (let i = 0, length = idleCreeps.length; i < length; i++) {
+            allCreeps.push(idleCreeps[i]);
+            this.Collector.Consul.ReleaseCreep(idleCreeps[i].name);
+        }
+        idleCreeps = this.Upgrader.Consul.GetIdleCreeps();
+        for (let i = 0, length = idleCreeps.length; i < length; i++) {
+            allCreeps.push(idleCreeps[i]);
+            this.Upgrader.Consul.ReleaseCreep(idleCreeps[i].name);
+        }
+        idleCreeps = this.Builder.Consul.GetIdleCreeps();
+        for (let i = 0, length = idleCreeps.length; i < length; i++) {
+            allCreeps.push(idleCreeps[i]);
+            this.Builder.Consul.ReleaseCreep(idleCreeps[i].name);
+        }
+
+        return allCreeps;
     }
     protected ReassignIdleCreeps(): void {
         for (let i = 0, length = this.IdleCreeps.length; i < length; i++) {
