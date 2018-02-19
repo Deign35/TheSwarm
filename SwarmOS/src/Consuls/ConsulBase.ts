@@ -33,6 +33,13 @@ export abstract class ConsulBase extends ChildMemory implements IConsul {
     }
     abstract get consulType(): string;
     abstract ScanRoom(): void;
-    abstract DetermineRequirements(): void;
     static get ConsulType(): string { return 'SwarmCodes.E_NOT_IMPLEMENTED'; }
+}
+
+export abstract class CreepConsul extends ConsulBase {
+    CreepRequested?: string;
+    abstract AssignCreep(creepName: string): void;
+    abstract ReleaseCreep(creepName: string): void;
+    abstract GetSpawnDefinition(): SpawnConsul_SpawnArgs;
+    abstract RequiresSpawn(): boolean;
 }

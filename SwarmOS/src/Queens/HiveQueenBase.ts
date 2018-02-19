@@ -16,7 +16,7 @@ export abstract class HiveQueenBase extends NestQueenBase implements IHiveQueen 
     ActivateNest() {
         this.ActivateImperators();
         this.CheckForSpawnRequirements();
-        let requirements = this.Spawner.DetermineRequirements();
+        let requirements = this.Spawner.RequiresSpawn();
         if (this.Nest.energyAvailable >= requirements.energyNeeded && requirements.neededBy <= (Game.time - 3)) { // 3 tick buffer??
             let spawnedCreep = this.Spawner.SpawnCreep();
             if (spawnedCreep) {

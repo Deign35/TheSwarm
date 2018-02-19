@@ -1,8 +1,20 @@
-import { ConsulBase } from "Consuls/ConsulBase";
+import { CreepConsul } from "Consuls/ConsulBase";
 
 const DISTRIBUTOR_DATA = 'D_Data';
 const CONSUL_TYPE = 'Distribution';
-export class DistributionConsul extends ConsulBase {
+export class DistributionConsul extends CreepConsul {
+    RequiresSpawn(): boolean {
+        throw new Error("Method not implemented.");
+    }
+    AssignCreep(creepName: string): void {
+        throw new Error("Method not implemented.");
+    }
+    ReleaseCreep(creepName: string): void {
+        throw new Error("Method not implemented.");
+    }
+    GetSpawnDefinition(): SpawnConsul_SpawnArgs {
+        throw new Error("Method not implemented.");
+    }
     get consulType(): string { return CONSUL_TYPE }
 
     protected DistributorData!: { [id: string]: DistributionOrder };
@@ -27,9 +39,6 @@ export class DistributionConsul extends ConsulBase {
         this.DistributorData[registrationData.id] = registrationData;
     }
     ScanRoom(): void {
-
-    }
-    DetermineRequirements(): void {
 
     }
     static get ConsulType(): string { return CONSUL_TYPE; }

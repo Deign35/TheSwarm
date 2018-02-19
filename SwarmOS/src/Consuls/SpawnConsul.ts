@@ -98,7 +98,7 @@ export class SpawnConsul extends ConsulBase implements IConsul {
         this.SpawnQueue.Push(spawnArgs, spawnArgs.targetTime - this.RelativeTime - (spawnArgs.body.length * 3));
     }
 
-    DetermineRequirements(): SpawnConsul_RequirementsData {
+    RequiresSpawn(): SpawnConsul_RequirementsData {
         let requirements: SpawnConsul_RequirementsData = { energyNeeded: 0, neededBy: 0 };
         let peeked: SpawnConsul_SpawnArgs[] = [];
         for (let i = 0; i < 3; i++) {

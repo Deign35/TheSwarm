@@ -1,19 +1,19 @@
 import * as SwarmCodes from "Consts/SwarmCodes"
 import * as _ from "lodash";
-import { ConsulBase } from "./ConsulBase";
 import { HarvestAction } from "Actions/HarvestAction";
 import { HarvestImperator } from "Imperators/HarvestImperator";
 import { RateTracker } from "Tools/RateTracker";
+import { CreepConsul } from "./ConsulBase";
 
 const CONSUL_TYPE = 'H_Consul';
 const SOURCE_DATA = 'S_Data';
 const TRACKER_PREFIX = 'Track_';
 const REQUESTED_CREEP = 'R_Creep';
-export class HarvestConsul extends ConsulBase {
+export class HarvestConsul extends CreepConsul {
     readonly consulType = CONSUL_TYPE;
-    CreepRequested?: string;
     SourceData!: HarvestConsul_SourceData[];
     protected SourceHarvestRateTrackers!: RateTracker[];
+
     Save() {
         if (this.CreepRequested) {
             this.SetData(REQUESTED_CREEP, this.CreepRequested);
@@ -78,7 +78,7 @@ export class HarvestConsul extends ConsulBase {
         }
     }
 
-    DetermineRequirements(): boolean {
+    RequiresSpawn(): boolean {
         // Calculates the distance to new sources
         // Orders creation of new screep so that they will arrive at the harvest node
         // just a few ticks before the previous one dies.
@@ -87,7 +87,7 @@ export class HarvestConsul extends ConsulBase {
                 if (this.SourceData[i].harvester) {
                     let curRate = this.SourceHarvestRateTrackers[i].GetRate();
                     console.log('Rate[' + this.SourceData[i].id + '] -- ' + curRate);
-                    if (curRate != 0 && curRate < 250) {
+                    if (curRate != 0 && curRate < 10) {
                         return true;
                     }
                 } else {
@@ -99,7 +99,7 @@ export class HarvestConsul extends ConsulBase {
         return false;
     }
 
-    AssignCreepToSource(creepName: string): SwarmCodes.SwarmlingResponse {
+    AssignCreep(creepName: string): SwarmCodes.SwarmlingResponse {
         if (this.SourceData.length == 0) {
             return SwarmCodes.E_MISSING_TARGET;
         }
@@ -158,6 +158,13 @@ export class HarvestConsul extends ConsulBase {
                 }
             }
             index++;
+        }
+    }
+    GetSpawnDefinition(): SpawnConsul_SpawnArgs {
+        return {
+            creepName: 'Harv' + ('' + Game.time).slice(-3),
+            body: [WORK, WORK, WORK, WORK, WORK, MOVE],
+            targetTime: Game.time, requestorID: this.consulType
         }
     }
 

@@ -3,7 +3,7 @@ import { HiveQueenBase } from "Queens/HiveQueenBase";
 
 export class BabyHiveQueen extends HiveQueenBase {
     protected CheckForSpawnRequirements(): void {
-        if (this.Collector.Consul.DetermineRequirements()) {
+        if (this.Collector.Consul.RequiresSpawn()) {
             let newName = ('Harv' + Game.time);
             this.Spawner.AddSpawnToQueue({
                 body: [WORK, WORK, MOVE, CARRY],

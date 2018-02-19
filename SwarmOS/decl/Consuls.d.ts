@@ -1,7 +1,5 @@
 declare interface IConsul extends IMemory {
     consulType: string;
-    ScanRoom(roomName: string): void;
-    DetermineRequirements(): void;
 }
 declare type SpawnConsul_SpawnData = RoomObjectWithID & {
 }
