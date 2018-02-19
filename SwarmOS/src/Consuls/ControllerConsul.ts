@@ -12,13 +12,14 @@ const RCL_UPGRADER_RATIO: { [index: number]: { numUpgraders: number, body: BodyP
     5: { numUpgraders: 4, body: [WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE] },
     6: { numUpgraders: 4, body: [WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE] },
     7: { numUpgraders: 4, body: [WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE] },
-    8: {
-        numUpgraders: 1, body: [WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK,
+    8: { numUpgraders: 1,
+        body: [WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK,
             WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY,
             CARRY, MOVE, MOVE, MOVE, MOVE, MOVE]
     },
 }
 export class ControllerConsul extends CreepConsul {
+    static get ConsulType(): string { return CONSUL_TYPE; }
     get consulType(): string { return CONSUL_TYPE }
     UpgraderCreeps!: Creep[];
     protected newCreepName?: string;
@@ -88,5 +89,4 @@ export class ControllerConsul extends CreepConsul {
             }
         }
     }
-    static get ConsulType(): string { return CONSUL_TYPE; }
 }

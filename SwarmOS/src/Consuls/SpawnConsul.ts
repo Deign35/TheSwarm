@@ -8,11 +8,13 @@ const SPAWN_DATA = 'S_DATA';
 const SPAWN_QUEUE = 'S_QUEUE';
 const RELATIVE_TIME = 'R_TIME';
 export class SpawnConsul extends ConsulBase implements IConsul {
-    readonly consulType = CONSUL_TYPE;
+    static get ConsulType(): string { return CONSUL_TYPE; }
+    readonly consulType = SpawnConsul.ConsulType;
 
-    SpawnData!: SpawnConsul_SpawnData[];
+    protected SpawnData!: SpawnConsul_SpawnData[];
     protected SpawnQueue!: MinHeap<SpawnConsul_SpawnArgs>;
     protected RelativeTime!: number;
+    
     Save() {
         this.SetData(SPAWN_DATA, this.SpawnData);
         let serializedQueue = MinHeap.CompressHeap(this.SpawnQueue, SpawnConsul.SerializeSpawnRequest);
@@ -120,8 +122,6 @@ export class SpawnConsul extends ConsulBase implements IConsul {
 
         return requirements;
     }
-
-    static get ConsulType(): string { return CONSUL_TYPE; }
 
     protected static CalculateEnergyCost(spawnData: SpawnConsul_SpawnArgs): number {
         if (spawnData.calculatedCost) { return spawnData.calculatedCost; }
