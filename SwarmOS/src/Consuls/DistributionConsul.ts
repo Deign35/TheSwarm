@@ -82,10 +82,10 @@ export class DistributionConsul extends CreepConsul {
             targetTime: Game.time
         }
     }
-    HasIdleCreeps(): boolean {
+    GetIdleCreeps(): Creep[] {
         throw new Error("Method not implemented.");
     }
-    protected _assignCreep(creepData: SpawnConsul_SpawnArgs): void {
+    protected _assignCreep(creepName: string): void {
         throw new Error("Method not implemented.");
     }
 }

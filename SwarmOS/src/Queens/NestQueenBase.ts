@@ -15,7 +15,6 @@ export abstract class NestQueenBase extends QueenMemory implements INestQueen {
         super.InitMemory();
         this.LoadImperators();
     }
-    abstract ReturnCreep(creep: Creep): void;
     abstract InitializeNest(): void;
     abstract ActivateNest(): void;
 

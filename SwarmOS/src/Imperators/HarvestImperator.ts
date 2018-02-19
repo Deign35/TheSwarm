@@ -24,13 +24,13 @@ export class HarvestImperator extends ImperatorBase {
         for (let i = 0, length = this.Consul.SourceData.length; i < length; i++) {
             let data = this.Consul.SourceData[i];
             if (data.harvester && Game.creeps[data.harvester]) {
-                this.ActivateCreep(data, Game.creeps[data.harvester]);
+                this.ActivateCreep(data, Game.creeps[data.harvester], true);
             }
             if (data.temporaryWorkers && data.temporaryWorkers.length > 0) {
                 for (let j = 0, length2 = data.temporaryWorkers.length; j < length2; j++) {
                     let creep = Game.creeps[(data.temporaryWorkers as string[])[j]];
                     if (creep) {
-                        this.ActivateCreep(data, creep);
+                        this.ActivateCreep(data, creep, false);
                     }
                 }
             }
@@ -44,14 +44,15 @@ export class HarvestImperator extends ImperatorBase {
         this.Consul.ReleaseCreep(creepName);
     }
 
-    protected ActivateCreep(data: HarvestConsul_SourceData, harvester: Creep) {
+    protected ActivateCreep(data: HarvestConsul_SourceData, harvester: Creep, prime: boolean) {
+        this.Queen.Nest.visual.text('Harv', harvester.pos);
         if (harvester.spawning) { return; }
         let sourceTarget = Game.getObjectById(data.id) as Source;
         let harvestAction: ActionBase = new HarvestAction(harvester, sourceTarget);
         let harvestResult = harvestAction.ValidateAction();
         switch (harvestResult) {
             case (SwarmCodes.C_NONE):
-                if (!data.constructionSite && !data.containerID) {
+                if (prime && !data.constructionSite && !data.containerID) {
                     let foundCS = harvester.pos.lookFor(LOOK_CONSTRUCTION_SITES);
                     if (foundCS && foundCS.length > 0) {
                         if ((foundCS[0] as ConstructionSite).structureType == STRUCTURE_CONTAINER) {
@@ -77,9 +78,6 @@ export class HarvestImperator extends ImperatorBase {
                             harvestAction = new RepairAction(harvester, container);
                         }
                     }
-                } else {
-                    this.ReleaseCreep(harvester.name, 'Creep harvest is full');
-                    this.Queen.ReturnCreep(harvester);
                 }
                 break; // Creep's carry is full
             case (SwarmCodes.E_TARGET_INELLIGIBLE): break; // Target is empty.

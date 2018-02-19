@@ -16,6 +16,7 @@ export class ConstructionImperator extends ImperatorBase {
         let buildData = this.Consul.BuilderData;
         for (let i = 0, length = buildData.length; i < length; i++) {
             let creep = Game.creeps[buildData[i].creepName];
+            this.Queen.Nest.visual.text('Cons', creep.pos);
             let site = Game.constructionSites[buildData[i].target];
             let buildAction = new BuildAction(creep, site);
             let buildResult = buildAction.ValidateAction();

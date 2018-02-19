@@ -61,7 +61,6 @@ export class ControllerConsul extends CreepConsul {
         return true;
     }
     InitMemory() {
-        debugger;
         super.InitMemory();
         if (!this.Nest.controller) {
             throw 'ATTEMPTING TO ADD CONTROLLERCONSUL TO A ROOM WITH NO CONTROLLER'
@@ -87,17 +86,23 @@ export class ControllerConsul extends CreepConsul {
 
         return spawnArgs;
     }
-    HasIdleCreeps(): boolean {
+    GetIdleCreeps(): Creep[] {
+        let idleCreeps = []
         for (let i = 0, length = this.UpgraderCreeps.length; i < length; i++) {
-            if ((this.UpgraderCreeps[RESOURCE_ENERGY] || 0) == 0) {
-                return true;
+            if (this.UpgraderCreeps[i].spawning) { continue; }
+            if ((this.UpgraderCreeps[i].carry[RESOURCE_ENERGY] || 0) == 0) {
+                idleCreeps.push(this.UpgraderCreeps[i])
             }
         }
 
-        return false;
+        for (let i = 0, length = idleCreeps.length; i < length; i++) {
+            this.ReleaseCreep(idleCreeps[i].name);
+        }
+
+        return idleCreeps;
     }
-    protected _assignCreep(creepData: SpawnConsul_SpawnArgs) {
-        this.newCreepName = creepData.creepName;
+    protected _assignCreep(creepName: string) {
+        this.newCreepName = creepName;
     }
     ReleaseCreep(creepName: string): void {
         for (let i = 0, length = this.UpgraderCreeps.length; i < length; i++) {

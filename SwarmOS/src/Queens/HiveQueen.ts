@@ -3,6 +3,12 @@ import { HarvestImperator } from "Imperators/HarvestImperator";
 import { HiveQueenBase } from "Queens/HiveQueenBase";
 
 export class HiveQueen extends HiveQueenBase {
+    protected GatherIdleCreeps(): Creep[] {
+        throw new Error("Method not implemented.");
+    }
+    protected ReassignIdleCreeps(): void {
+        throw new Error("Method not implemented.");
+    }
     protected CheckForSpawnRequirements(): void {
         if (this.Collector.Consul.RequiresSpawn()) {
             let newName = ('Harv' + Game.time);

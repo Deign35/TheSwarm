@@ -7,6 +7,7 @@ import { ControllerImperator } from 'Imperators/ControllerImperator';
 import { ControllerConsul } from 'Consuls/ControllerConsul';
 import { ConstructionConsul } from 'Consuls/ConstructionConsul';
 import { ConstructionImperator } from 'Imperators/ConstructionImperator';
+import * as _ from 'lodash';
 
 export abstract class HiveQueenBase extends NestQueenBase implements IHiveQueen {
     Collector!: HarvestImperator;
@@ -14,6 +15,8 @@ export abstract class HiveQueenBase extends NestQueenBase implements IHiveQueen 
     Builder!: ConstructionImperator;
 
     Spawner!: SpawnConsul;
+
+    IdleCreeps: Creep[] = [];
     Save() {
         this.Upgrader.ImperatorComplete();
         this.Collector.ImperatorComplete();
@@ -22,7 +25,16 @@ export abstract class HiveQueenBase extends NestQueenBase implements IHiveQueen 
         super.Save();
     }
 
+    InitMemory() {
+        super.InitMemory();
+        this.IdleCreeps = [];
+    }
+
     ActivateNest() {
+        debugger;
+        // Check for idle creeps and reassign them
+        this.IdleCreeps = _.union(this.IdleCreeps, this.GatherIdleCreeps());
+        this.ReassignIdleCreeps();
         this.ActivateImperators();
         this.CheckForSpawnRequirements();
         let requirements = this.Spawner.RequiresSpawn();
@@ -31,19 +43,15 @@ export abstract class HiveQueenBase extends NestQueenBase implements IHiveQueen 
                 let spawnedCreep = this.Spawner.SpawnCreep();
                 if (spawnedCreep) {
                     if (spawnedCreep.requestorID == HarvestConsul.ConsulType) {
-                        this.Collector.Consul.AssignCreep(spawnedCreep);
+                        this.Collector.Consul.AssignSpawn(spawnedCreep.creepName);
                     } else if (spawnedCreep.requestorID == ControllerConsul.ConsulType) {
-                        this.Upgrader.Consul.AssignCreep(spawnedCreep);
+                        this.Upgrader.Consul.AssignSpawn(spawnedCreep.creepName);
                     } else if (spawnedCreep.requestorID == ConstructionConsul.ConsulType) {
-                        this.Builder.Consul.AssignCreep(spawnedCreep);
+                        this.Builder.Consul.AssignSpawn(spawnedCreep.creepName);
                     }
                 }
             }
         }
-    }
-
-    ReturnCreep(creep: Creep) {
-
     }
 
     protected LoadImperators() {
@@ -53,11 +61,12 @@ export abstract class HiveQueenBase extends NestQueenBase implements IHiveQueen 
         this.Builder = new ConstructionImperator(ConstructionConsul.ConsulType, this);
     }
     protected ActivateImperators(): SwarmCodes.SwarmErrors {
-        this.Collector.Consul.ScanRoom();
         this.Collector.ActivateImperator();
         this.Upgrader.ActivateImperator();
         this.Builder.ActivateImperator();
         return SwarmCodes.C_NONE;
     }
+    protected abstract GatherIdleCreeps(): Creep[];
+    protected abstract ReassignIdleCreeps(): void;
     protected abstract CheckForSpawnRequirements(): void;
 }

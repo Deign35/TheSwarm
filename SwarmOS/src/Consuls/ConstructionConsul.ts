@@ -19,38 +19,58 @@ export class ConstructionConsul extends CreepConsul {
     Load() {
         if (!super.Load()) { return false; }
 
-        this.BuilderData = this.GetData(BUILDER_DATA);
+        let allSites = this.Nest.find(FIND_CONSTRUCTION_SITES);
+        let validSites: { [id: string]: ConstructionSite } = {}
+        this.siteData = this.GetData(SITE_DATA) || [];
+        for (let i = 0, length = this.siteData.length; i < length; i++) {
+            let siteId = this.siteData[i].siteId;
+            if (allSites[siteId]) {
+                validSites[siteId] = allSites[siteId];
+                delete allSites[siteId]
+            } else if (!Game.constructionSites[siteId]) {
+                if (this.siteData[i].requestor != this.consulType) {
+                    // notify the original requestor.
+                }
+                this.siteData.splice(i--, 1);
+                continue;
+            }
+        }
+
+        for (let id in allSites) {
+            //new sites.
+            this.AddSiteForConstruction({ siteId: allSites[id].id, requestor: this.consulType })
+            validSites[allSites[id].id] = Game.getObjectById(allSites[id].id) as ConstructionSite;
+        }
+
+        this.BuilderData = this.GetData(BUILDER_DATA) || {};
         for (let i = 0, length = this.BuilderData.length; i < length; i++) {
             if (!Game.creeps[this.BuilderData[i].creepName]) {
                 this.BuilderData.splice(i--, 1);
                 continue;
             }
-            //this.BuilderCreeps.push(Game.creeps[this.BuilderData[i].creepName]);
-        }
 
-        this.siteData = this.GetData(SITE_DATA);
-        for (let i = 0, length = this.siteData.length; i < length; i++) {
-            if (!Game.constructionSites[this.siteData[i].siteId]) {
-                this.siteData.splice(i--, 1);
-                // Notify the requestor that their building is complete.
-                continue;
+            //Check that the construction site is valid
+            if (!validSites[this.BuilderData[i].target]) {
+                if (!this.siteData[0]) {
+                    this.BuilderData[i].target = '';
+                    continue;
+                }
+                this.BuilderData[i].target = this.siteData[0].siteId;
             }
-            //this.Sites.push(Game.constructionSites[this.siteData[i].siteId]);
         }
 
         return true;
     }
     AddSiteForConstruction(request: ConstructionRequest) {
-        let site = Game.getObjectById(request.siteId) as ConstructionSite;
-        //this.Sites.push(site);
-        this.siteData.push({ siteId: site.id, requestor: request.requestor });
+        this.siteData.push(request);
     }
 
     protected IsCreepIdle(creepIndex: number): boolean {
+        let creep = Game.creeps[this.BuilderData[creepIndex].creepName];
+        if (creep.spawning) { return false; }
         if (this.BuilderData[creepIndex].target == '') {
             return true;
         }
-        let creep = Game.creeps[this.BuilderData[creepIndex].creepName];
         if ((creep.carry[RESOURCE_ENERGY] || 0) == 0) {
             return true;
         }
@@ -68,28 +88,17 @@ export class ConstructionConsul extends CreepConsul {
 
         return idleCreeps;
     }
-
-    HasIdleCreeps(): boolean {
-        for (let i = 0, length = this.BuilderData.length; i < length; i++) {
-            if (this.IsCreepIdle(i)) {
-                return true;
-            }
+    protected _assignCreep(creepName: string): void {
+        if (this.siteData.length == 0) {
+            this.BuilderData.push({ creepName: creepName, target: '' });
+        } else {
+            this.BuilderData.push({ creepName: creepName, target: this.siteData[0].siteId });
         }
-
-        return false;
-    }
-    protected _assignCreep(creepData: SpawnConsul_SpawnArgs): void {
-        if (!this.siteData[0]) {
-            this.Parent.ReturnCreep(Game.creeps[creepData.creepName]);
-            return;
-        }
-        this.BuilderData.push({ creepName: creepData.creepName, target: this.siteData[0].siteId });
     }
     ReleaseCreep(creepName: string): void {
         for (let i = 0, length = this.BuilderData.length; i < length; i++) {
             if (this.BuilderData[i].creepName == creepName) {
                 this.BuilderData.splice(i, 1);
-                this.Parent.ReturnCreep(Game.creeps[creepName])
                 return;
             }
         }
@@ -103,7 +112,7 @@ export class ConstructionConsul extends CreepConsul {
         }
     }
     RequiresSpawn(): boolean {
-        return this.BuilderData.length < 3;
+        return this.siteData.length > 0 && this.BuilderData.length < 3;
     }
 }
 

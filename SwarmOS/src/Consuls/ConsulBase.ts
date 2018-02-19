@@ -35,18 +35,22 @@ export abstract class CreepConsul extends ConsulBase {
         this.CreepRequested = this.GetData(REQUESTED_CREEP);
         return true;
     }
-    AssignCreep(creepData: SpawnConsul_SpawnArgs): void {
-        if (creepData.creepName != this.CreepRequested) {
+    AssignSpawn(creepName: string): void {
+        if (creepName != this.CreepRequested) {
             console.log('CREEP NAME NO MATCH');
+            throw 'Assignment bad!!!!';
         }
         delete this.CreepRequested;
         this.RemoveData(REQUESTED_CREEP);
-        this._assignCreep(creepData);
+        this._assignCreep(creepName);
+    }
+    AssignCreep(creep: Creep): void {
+        this._assignCreep(creep.name);
     }
 
     abstract ReleaseCreep(creepName: string): void;
     abstract GetSpawnDefinition(): SpawnConsul_SpawnArgs;
     abstract RequiresSpawn(): boolean;
-    abstract HasIdleCreeps(): boolean;
-    protected abstract _assignCreep(creepData: SpawnConsul_SpawnArgs): void;
+    abstract GetIdleCreeps(): Creep[];
+    protected abstract _assignCreep(creepName: string): void;
 }

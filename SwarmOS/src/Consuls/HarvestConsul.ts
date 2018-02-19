@@ -28,6 +28,7 @@ export class HarvestConsul extends CreepConsul {
         for (let i = 0; i < this.SourceData.length; i++) {
             this.SourceHarvestRateTrackers.push(new RateTracker(TRACKER_PREFIX + i, this));
         }
+        this.ScanRoom();
         return true;
     }
 
@@ -94,10 +95,9 @@ export class HarvestConsul extends CreepConsul {
 
         return false;
     }
-
-    protected _assignCreep(creepData: SpawnConsul_SpawnArgs): SwarmCodes.SwarmlingResponse {
+    AssignSpawn(creepName: string) {
         if (this.SourceData.length == 0) {
-            return SwarmCodes.E_MISSING_TARGET;
+            return;
         }
         // Check main harvester position
         let index = 0;
@@ -108,14 +108,20 @@ export class HarvestConsul extends CreepConsul {
                 }
             }
 
-            this.SourceData[index].harvester = creepData.creepName;
-            return SwarmCodes.C_NONE;
+            this.SourceData[index].harvester = creepName;
+            return;
         } while (++index < this.SourceData.length);
+        this._assignCreep(creepName);
+    }
 
+    protected _assignCreep(creepName: string): SwarmCodes.SwarmlingResponse {
+        if (this.SourceData.length == 0) {
+            return SwarmCodes.E_MISSING_TARGET;
+        }
         // Pick the better source to help with.
         let min = this.SourceData[0].temporaryWorkers ? (this.SourceData[0].temporaryWorkers as string[]).length : 0;
         let bestPick = 0;
-        index = 1;
+        let index = 1;
         do {
             let curMin = this.SourceData[index].temporaryWorkers ? (this.SourceData[index].temporaryWorkers as string[]).length : 0;
             if (curMin < min) {
@@ -127,7 +133,7 @@ export class HarvestConsul extends CreepConsul {
             this.SourceData[bestPick].temporaryWorkers = [];
         }
 
-        (this.SourceData[bestPick].temporaryWorkers as string[]).push(creepData.creepName);
+        (this.SourceData[bestPick].temporaryWorkers as string[]).push(creepName);
         return SwarmCodes.C_NONE;
     }
 
@@ -159,9 +165,18 @@ export class HarvestConsul extends CreepConsul {
             requestorID: this.consulType,
         }
     }
-    HasIdleCreeps(): boolean {
-        // Loop over temp workers and return true if they are full.
-        return false;
+    GetIdleCreeps(): Creep[] {
+        let fullCreeps = [];
+        for (let i = 0, length = this.SourceData.length; i < length; i++) {
+            if (!this.SourceData[i].temporaryWorkers) { continue; }
+            for (let j = 0, length2 = (this.SourceData[i].temporaryWorkers as string[]).length; j < length2; j++) {
+                let creep = Game.creeps[(this.SourceData[i].temporaryWorkers as string[])[j]];
+                if (creep.carry[RESOURCE_ENERGY] == creep.carryCapacity) {
+                    fullCreeps.push(creep); // This assumes the creep will carry nothing but energy.
+                }
+            }
+        }
+        return fullCreeps;
     }
 
     protected InitSourceData(source: Source): HarvestConsul_SourceData {
