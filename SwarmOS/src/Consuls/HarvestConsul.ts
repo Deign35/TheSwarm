@@ -95,8 +95,7 @@ export class HarvestConsul extends CreepConsul {
         return false;
     }
 
-    AssignCreep(creepData: SpawnConsul_SpawnArgs): SwarmCodes.SwarmlingResponse {
-        super.AssignCreep(creepData);
+    protected _assignCreep(creepData: SpawnConsul_SpawnArgs): SwarmCodes.SwarmlingResponse {
         if (this.SourceData.length == 0) {
             return SwarmCodes.E_MISSING_TARGET;
         }
@@ -156,8 +155,13 @@ export class HarvestConsul extends CreepConsul {
         return {
             creepName: 'Harv' + ('' + Game.time).slice(-3),
             body: [WORK, WORK, WORK, WORK, WORK, MOVE],
-            targetTime: Game.time, requestorID: this.consulType
+            targetTime: Game.time,
+            requestorID: this.consulType,
         }
+    }
+    HasIdleCreeps(): boolean {
+        // Loop over temp workers and return true if they are full.
+        return false;
     }
 
     protected InitSourceData(source: Source): HarvestConsul_SourceData {

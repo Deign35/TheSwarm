@@ -1,6 +1,7 @@
 import { CreepConsul } from "Consuls/ConsulBase";
 import * as SwarmConsts from 'Consts/SwarmConsts';
 import * as SwarmCodes from 'Consts/SwarmCodes';
+import * as _ from "lodash";
 
 const CONSUL_TYPE = 'Controller';
 const UPGRADER_IDS = 'U_IDs'
@@ -13,7 +14,8 @@ const RCL_UPGRADER_RATIO: { [index: number]: { numUpgraders: number, body: BodyP
     5: { numUpgraders: 4, body: [WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE] },
     6: { numUpgraders: 4, body: [WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE] },
     7: { numUpgraders: 4, body: [WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE] },
-    8: { numUpgraders: 1,
+    8: {
+        numUpgraders: 1,
         body: [WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK,
             WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY,
             CARRY, MOVE, MOVE, MOVE, MOVE, MOVE]
@@ -85,10 +87,17 @@ export class ControllerConsul extends CreepConsul {
 
         return spawnArgs;
     }
-    AssignCreep(creepData: SpawnConsul_SpawnArgs): SwarmCodes.SwarmlingResponse {
-        super.AssignCreep(creepData);
+    HasIdleCreeps(): boolean {
+        for (let i = 0, length = this.UpgraderCreeps.length; i < length; i++) {
+            if ((this.UpgraderCreeps[RESOURCE_ENERGY] || 0) == 0) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+    protected _assignCreep(creepData: SpawnConsul_SpawnArgs) {
         this.newCreepName = creepData.creepName;
-        return SwarmCodes.C_NONE;
     }
     ReleaseCreep(creepName: string): void {
         for (let i = 0, length = this.UpgraderCreeps.length; i < length; i++) {

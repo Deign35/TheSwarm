@@ -24,6 +24,9 @@ export class BuildAction extends ActionWithTarget<BuildTargetType> {
         return actionResponse;
     }
     ValidateAction(): SwarmCodes.SwarmlingResponse {
+        if (!this.AssignedCreep.pos.inRangeTo(this.Target, 3)) {
+            return SwarmCodes.C_MOVE;
+        }
         // Sum!
         if (this.AssignedCreep.carry.energy == 0) {
             return SwarmCodes.E_REQUIRES_ENERGY;

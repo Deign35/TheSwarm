@@ -3,7 +3,6 @@ declare type IDictionary<T> = { [id: string]: T };
 declare type Dictionary = IDictionary<any>
 declare var global: Dictionary;
 
-
 declare type CallbackFunction = (...args: any[]) => any;
 declare interface IDelegate<T extends CallbackFunction> {
     Subscribe(id: string, callback: T): void;

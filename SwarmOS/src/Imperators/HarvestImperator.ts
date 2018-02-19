@@ -39,20 +39,13 @@ export class HarvestImperator extends ImperatorBase {
         return SwarmCodes.C_NONE; // unused
     }
 
-    AssignCreep(creepData: SpawnConsul_SpawnArgs): void {
-        let result = this.Consul.AssignCreep(creepData);
-        if (result == SwarmCodes.E_MISSING_TARGET) {
-            this.ReleaseCreep(creepData.creepName, 'No jobs available'); // Then make it supplement an open spot or so?
-        }
-    }
-
     ReleaseCreep(creepName: string, releaseReason: string) {
         // This should be to give the harvester creep back to the queen.
         this.Consul.ReleaseCreep(creepName);
     }
 
     protected ActivateCreep(data: HarvestConsul_SourceData, harvester: Creep) {
-        if(harvester.spawning) { return; }
+        if (harvester.spawning) { return; }
         let sourceTarget = Game.getObjectById(data.id) as Source;
         let harvestAction: ActionBase = new HarvestAction(harvester, sourceTarget);
         let harvestResult = harvestAction.ValidateAction();
