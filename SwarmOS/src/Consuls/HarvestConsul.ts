@@ -8,16 +8,12 @@ import { CreepConsul } from "./ConsulBase";
 const CONSUL_TYPE = 'H_Consul';
 const SOURCE_DATA = 'S_Data';
 const TRACKER_PREFIX = 'Track_';
-const REQUESTED_CREEP = 'R_Creep';
 export class HarvestConsul extends CreepConsul {
     readonly consulType = CONSUL_TYPE;
     SourceData!: HarvestConsul_SourceData[];
     protected SourceHarvestRateTrackers!: RateTracker[];
 
     Save() {
-        if (this.CreepRequested) {
-            this.SetData(REQUESTED_CREEP, this.CreepRequested);
-        }
         this.SetData(SOURCE_DATA, this.SourceData);
         for (let i = 0, length = this.SourceHarvestRateTrackers.length; i < length; i++) {
             this.SourceHarvestRateTrackers[i].Save();
@@ -27,7 +23,6 @@ export class HarvestConsul extends CreepConsul {
 
     Load() {
         if (!super.Load()) { return false; }
-        this.CreepRequested = this.GetData(REQUESTED_CREEP);
         this.SourceData = this.GetData(SOURCE_DATA);
         this.SourceHarvestRateTrackers = [];
         for (let i = 0; i < this.SourceData.length; i++) {
@@ -45,6 +40,7 @@ export class HarvestConsul extends CreepConsul {
             this.SourceData.push(this.InitSourceData(foundSources[i]));
             this.SourceHarvestRateTrackers.push(new RateTracker(TRACKER_PREFIX + i, this));
         }
+        this.ScanRoom();
     }
 
     ScanRoom(): void {
@@ -86,7 +82,7 @@ export class HarvestConsul extends CreepConsul {
             for (let i = 0, length = this.SourceData.length; i < length; i++) {
                 if (this.SourceData[i].harvester) {
                     let curRate = this.SourceHarvestRateTrackers[i].GetRate();
-                    console.log('Rate[' + this.SourceData[i].id + '] -- ' + curRate);
+                    //console.log('Rate[' + this.SourceData[i].id + '] -- ' + curRate);
                     if (curRate != 0 && curRate < 10) {
                         return true;
                     }
@@ -99,15 +95,11 @@ export class HarvestConsul extends CreepConsul {
         return false;
     }
 
-    AssignCreep(creepName: string): SwarmCodes.SwarmlingResponse {
+    AssignCreep(creepData: SpawnConsul_SpawnArgs): SwarmCodes.SwarmlingResponse {
+        super.AssignCreep(creepData);
         if (this.SourceData.length == 0) {
             return SwarmCodes.E_MISSING_TARGET;
         }
-        if (creepName != this.CreepRequested) {
-            console.log('CREEP NAME NO MATCH');
-        }
-        delete this.CreepRequested;
-        this.RemoveData(REQUESTED_CREEP);
         // Check main harvester position
         let index = 0;
         do {
@@ -117,7 +109,7 @@ export class HarvestConsul extends CreepConsul {
                 }
             }
 
-            this.SourceData[index].harvester = creepName;
+            this.SourceData[index].harvester = creepData.creepName;
             return SwarmCodes.C_NONE;
         } while (++index < this.SourceData.length);
 
@@ -136,7 +128,7 @@ export class HarvestConsul extends CreepConsul {
             this.SourceData[bestPick].temporaryWorkers = [];
         }
 
-        (this.SourceData[bestPick].temporaryWorkers as string[]).push(creepName);
+        (this.SourceData[bestPick].temporaryWorkers as string[]).push(creepData.creepName);
         return SwarmCodes.C_NONE;
     }
 

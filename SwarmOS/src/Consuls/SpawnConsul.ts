@@ -14,7 +14,7 @@ export class SpawnConsul extends ConsulBase implements IConsul {
     protected SpawnData!: SpawnConsul_SpawnData[];
     protected SpawnQueue!: MinHeap<SpawnConsul_SpawnArgs>;
     protected RelativeTime!: number;
-    
+
     Save() {
         this.SetData(SPAWN_DATA, this.SpawnData);
         let serializedQueue = MinHeap.CompressHeap(this.SpawnQueue, SpawnConsul.SerializeSpawnRequest);
@@ -33,7 +33,6 @@ export class SpawnConsul extends ConsulBase implements IConsul {
 
     InitMemory() {
         super.InitMemory();
-        this.ScanRoom();
         this.SpawnQueue = new MinHeap();
         this.ScanRoom();
     }
@@ -100,8 +99,8 @@ export class SpawnConsul extends ConsulBase implements IConsul {
         this.SpawnQueue.Push(spawnArgs, spawnArgs.targetTime - this.RelativeTime - (spawnArgs.body.length * 3));
     }
 
-    RequiresSpawn(): SpawnConsul_RequirementsData {
-        let requirements: SpawnConsul_RequirementsData = { energyNeeded: 0, neededBy: 0 };
+    RequiresSpawn(): SpawnConsul_RequirementsData[] {
+        let requirements: SpawnConsul_RequirementsData[] = [];
         let peeked: SpawnConsul_SpawnArgs[] = [];
         for (let i = 0; i < 3; i++) {
             if (this.SpawnQueue.Peek()) {
@@ -109,12 +108,10 @@ export class SpawnConsul extends ConsulBase implements IConsul {
                 // Have to pop this off to get to the first 3
             }
         }
-        if (peeked.length > 0) {
-            requirements.neededBy = peeked[0].targetTime;
-        }
         for (let i = 0; i < 3; i++) {
             if (peeked[i]) {
-                requirements.energyNeeded += SpawnConsul.CalculateEnergyCost(peeked[i]);
+                let newReq = {energyNeeded: SpawnConsul.CalculateEnergyCost(peeked[i]), neededBy: peeked[i].targetTime };
+                requirements.push(newReq);
                 this.AddSpawnToQueue(peeked[i]);
             }
             // Add it back to the list

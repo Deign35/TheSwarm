@@ -22,8 +22,4 @@ export abstract class NestQueenBase extends QueenMemory implements INestQueen {
     abstract ReceiveCommand(): void;
     protected abstract LoadImperators(): void;
     protected abstract ActivateImperators(): SwarmCodes.SwarmErrors;
-    // Pathfinder
-    // Overwatch (SwarmLinkOverseer)
-    // This is where a HiveQueen will tell the NestQueens what to do
-    // Or the SwarmQueen will tell the HiveQueens what to do.
 }

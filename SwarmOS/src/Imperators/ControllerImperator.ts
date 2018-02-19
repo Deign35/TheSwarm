@@ -1,6 +1,9 @@
 import * as SwarmCodes from "Consts/SwarmCodes"
 import { ImperatorBase } from "Imperators/ImperatorBase";
 import { ControllerConsul } from "Consuls/ControllerConsul";
+import { ActionBase } from "Actions/ActionBase";
+import { UpgradeAction } from "Actions/UpgradeAction";
+import { MoveToPositionAction } from "Actions/MoveToPositionAction";
 
 export class ControllerImperator extends ImperatorBase {
     Consul!: ControllerConsul;
@@ -11,6 +14,25 @@ export class ControllerImperator extends ImperatorBase {
         this.Consul.Save();
     }
     ActivateImperator(): SwarmCodes.SwarmErrors {
-        return SwarmCodes.E_NOT_IMPLEMENTED;
+        let creeps = this.Consul.UpgraderCreeps;
+        let target = this.Consul.Controller;
+        for(let i = 0, length = creeps.length; i < length; i++) {
+            let creep = creeps[i];
+            let upgradeAction: ActionBase = new UpgradeAction(creep, target);
+            let upgradeResult = upgradeAction.ValidateAction();
+            switch(upgradeResult) {
+                case(SwarmCodes.C_NONE): break;
+                case(SwarmCodes.C_MOVE):
+                    new MoveToPositionAction(creep, target.pos).Run(true);
+                    break;
+                case(SwarmCodes.E_REQUIRES_ENERGY): break;
+            }
+
+            if(upgradeResult != SwarmCodes.C_MOVE) {
+                upgradeAction.Run();
+            }
+        }
+
+        return SwarmCodes.C_NONE;
     }
 }

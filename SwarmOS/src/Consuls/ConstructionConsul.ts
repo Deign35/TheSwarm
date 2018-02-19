@@ -2,9 +2,6 @@ import { CreepConsul } from "Consuls/ConsulBase";
 
 const CONSUL_TYPE = 'Constructor';
 export class ConstructionConsul extends CreepConsul {
-    AssignCreep(creepName: string): void {
-        throw new Error("Method not implemented.");
-    }
     ReleaseCreep(creepName: string): void {
         throw new Error("Method not implemented.");
     }

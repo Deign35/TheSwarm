@@ -6,9 +6,6 @@ export class DistributionConsul extends CreepConsul {
     RequiresSpawn(): boolean {
         throw new Error("Method not implemented.");
     }
-    AssignCreep(creepName: string): void {
-        throw new Error("Method not implemented.");
-    }
     ReleaseCreep(creepName: string): void {
         throw new Error("Method not implemented.");
     }
@@ -28,6 +25,9 @@ export class DistributionConsul extends CreepConsul {
         this.DistributorData = this.GetData(DISTRIBUTOR_DATA);
 
         return true;
+    }
+    InitMemory() {
+        super.InitMemory();
     }
     RequestDistribution(requestData: DistributionOrder): DistributionType {
         // Search for available resources.

@@ -16,10 +16,15 @@ This Overseer can be one that is bootstrapping a room, a PrimeHarvester, a dista
 room assistant will need to be handled at the Imperaturs/Consul -- HiveQueen level since it needs to be communicated through the SwarmQueen.
 Or does the SwarmQueen direct the HiveQueen to deliver to the new HiveQueen?
 */
+const REQUESTED_CREEP = 'R_Creep';
 export abstract class ConsulBase extends ChildMemory implements IConsul {
     Nest!: Room;
     constructor(id: string, public Parent: NestQueenBase) {
         super(id, Parent);
+    }
+    Save() {
+
+        super.Save();
     }
     Load() {
         if (!super.Load()) { return false; }
@@ -32,13 +37,29 @@ export abstract class ConsulBase extends ChildMemory implements IConsul {
         this.Nest = Game.rooms[this.Parent.id];
     }
     abstract get consulType(): string;
-    abstract ScanRoom(): void;
     static get ConsulType(): string { return 'SwarmCodes.E_NOT_IMPLEMENTED'; }
 }
 
 export abstract class CreepConsul extends ConsulBase {
     CreepRequested?: string;
-    abstract AssignCreep(creepName: string): void;
+    Save() {
+        if (this.CreepRequested) {
+            this.SetData(REQUESTED_CREEP, this.CreepRequested);
+        }
+        super.Save();
+    }
+    Load() {
+        if(!super.Load()) { return false; }
+        this.CreepRequested = this.GetData(REQUESTED_CREEP);
+        return true;
+    }
+    AssignCreep(creepData: SpawnConsul_SpawnArgs): void {
+        if (creepData.creepName != this.CreepRequested) {
+            console.log('CREEP NAME NO MATCH');
+        }
+        delete this.CreepRequested;
+        this.RemoveData(REQUESTED_CREEP);
+    }
     abstract ReleaseCreep(creepName: string): void;
     abstract GetSpawnDefinition(): SpawnConsul_SpawnArgs;
     abstract RequiresSpawn(): boolean;

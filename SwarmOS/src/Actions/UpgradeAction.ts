@@ -29,6 +29,9 @@ export class UpgradeAction extends ActionWithTarget<UpgradeTargetType> {
         if (this.AssignedCreep.carry.energy == 0) {
             result = SwarmCodes.E_REQUIRES_ENERGY;
         }
+        if(!this.AssignedCreep.pos.inRangeTo(this.Target, 3)) {
+            result = SwarmCodes.C_MOVE;
+        }
         return result as SwarmCodes.SwarmlingResponse;
     }
 }

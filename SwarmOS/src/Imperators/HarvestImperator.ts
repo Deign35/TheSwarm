@@ -12,7 +12,6 @@ export class HarvestImperator extends ImperatorBase {
 
     InitImperator(memoryHandle: string): void {
         this.Consul = new HarvestConsul(memoryHandle, this.Queen);
-        this.Consul.ScanRoom();
     }
 
     ImperatorComplete(): void {
@@ -40,10 +39,10 @@ export class HarvestImperator extends ImperatorBase {
         return SwarmCodes.C_NONE; // unused
     }
 
-    AssignCreep(creepName: string): void {
-        let result = this.Consul.AssignCreep(creepName);
+    AssignCreep(creepData: SpawnConsul_SpawnArgs): void {
+        let result = this.Consul.AssignCreep(creepData);
         if (result == SwarmCodes.E_MISSING_TARGET) {
-            this.ReleaseCreep(creepName, 'No jobs available'); // Then make it supplement an open spot or so?
+            this.ReleaseCreep(creepData.creepName, 'No jobs available'); // Then make it supplement an open spot or so?
         }
     }
 

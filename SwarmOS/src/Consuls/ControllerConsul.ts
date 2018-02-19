@@ -1,5 +1,6 @@
 import { CreepConsul } from "Consuls/ConsulBase";
-import * as SwarmConsts from 'Consts/SwarmConsts'
+import * as SwarmConsts from 'Consts/SwarmConsts';
+import * as SwarmCodes from 'Consts/SwarmCodes';
 
 const CONSUL_TYPE = 'Controller';
 const UPGRADER_IDS = 'U_IDs'
@@ -22,8 +23,8 @@ export class ControllerConsul extends CreepConsul {
     static get ConsulType(): string { return CONSUL_TYPE; }
     get consulType(): string { return CONSUL_TYPE }
     UpgraderCreeps!: Creep[];
+    Controller!: StructureController;
     protected newCreepName?: string;
-    protected Controller!: StructureController;
     Save() {
         let creepIds = [];
         for (let i = 0, length = this.UpgraderCreeps.length; i < length; i++) {
@@ -31,20 +32,24 @@ export class ControllerConsul extends CreepConsul {
         }
         if (this.newCreepName) {
             creepIds.push(this.newCreepName);
+
+            this.newCreepName = undefined;
         }
         this.SetData(UPGRADER_IDS, creepIds);
         super.Save();
     }
     Load() {
         if (!super.Load()) { return false }
-        this.Controller = this.Nest.controller as StructureController; // Compiler: IgnoreLine
+        this.Controller = this.Nest.controller as StructureController;
 
         if (!this.Controller.my && // I dont control it
             (!this.Controller.reservation ||
                 this.Controller.reservation.username != SwarmConsts.MY_USERNAME)) { // I dont have it reserved
-            // Lost control of this room
+            console.log('Lost control of this nest');
+            // Need to update the NestQueen and on up.
         }
 
+        this.UpgraderCreeps = [];
         let creepIds = this.GetData(UPGRADER_IDS);
         for (let i = 0, length = creepIds.length; i < length; i++) {
             if (!Game.creeps[creepIds[i]]) continue;
@@ -54,12 +59,13 @@ export class ControllerConsul extends CreepConsul {
         return true;
     }
     InitMemory() {
+        debugger;
+        super.InitMemory();
         if (!this.Nest.controller) {
             throw 'ATTEMPTING TO ADD CONTROLLERCONSUL TO A ROOM WITH NO CONTROLLER'
         }
-    }
-    ScanRoom(): void {
-        // nothing really...
+        this.UpgraderCreeps = [];
+        this.SetData(UPGRADER_IDS, this.UpgraderCreeps);
     }
     RequiresSpawn(): boolean {
         if (!this.CreepRequested) {
@@ -75,11 +81,14 @@ export class ControllerConsul extends CreepConsul {
         spawnArgs.creepName = 'Upg_' + ('' + Game.time).slice(-3);
         spawnArgs.requestorID = this.consulType;
         spawnArgs.body = RCL_UPGRADER_RATIO[this.Controller.level].body;
+        spawnArgs.targetTime = Game.time;
 
         return spawnArgs;
     }
-    AssignCreep(creepName: string): void {
-        this.newCreepName = creepName;
+    AssignCreep(creepData: SpawnConsul_SpawnArgs): SwarmCodes.SwarmlingResponse {
+        super.AssignCreep(creepData);
+        this.newCreepName = creepData.creepName;
+        return SwarmCodes.C_NONE;
     }
     ReleaseCreep(creepName: string): void {
         for (let i = 0, length = this.UpgraderCreeps.length; i < length; i++) {
