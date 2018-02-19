@@ -46,6 +46,7 @@ export abstract class HiveQueenBase extends NestQueenBase implements IHiveQueen 
         this.Upgrader = new ControllerImperator(ControllerConsul.ConsulType, this);
     }
     protected ActivateImperators(): SwarmCodes.SwarmErrors {
+        this.Collector.Consul.ScanRoom();
         this.Collector.ActivateImperator();
         this.Upgrader.ActivateImperator();
         return SwarmCodes.C_NONE;

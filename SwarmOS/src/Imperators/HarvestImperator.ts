@@ -52,6 +52,7 @@ export class HarvestImperator extends ImperatorBase {
     }
 
     protected ActivateCreep(data: HarvestConsul_SourceData, harvester: Creep) {
+        if(harvester.spawning) { return; }
         let sourceTarget = Game.getObjectById(data.id) as Source;
         let harvestAction: ActionBase = new HarvestAction(harvester, sourceTarget);
         let harvestResult = harvestAction.ValidateAction();

@@ -18,6 +18,7 @@ export class ControllerImperator extends ImperatorBase {
         let target = this.Consul.Controller;
         for(let i = 0, length = creeps.length; i < length; i++) {
             let creep = creeps[i];
+            if(creep.spawning) { continue; }
             let upgradeAction: ActionBase = new UpgradeAction(creep, target);
             let upgradeResult = upgradeAction.ValidateAction();
             switch(upgradeResult) {
