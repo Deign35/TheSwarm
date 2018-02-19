@@ -10,7 +10,7 @@ export class ConstructionConsul extends CreepConsul {
     //Sites!: ConstructionSite[];
 
     BuilderData!: ConstructorData[];
-    protected siteData!: ConstructionRequest[];
+    protected siteData!: { [id: string]: ConstructionRequest };
     Save() {
         this.SetData(BUILDER_DATA, this.BuilderData);
         this.SetData(SITE_DATA, this.siteData);
@@ -22,17 +22,17 @@ export class ConstructionConsul extends CreepConsul {
         // :(  not working
         let allSites = this.Nest.find(FIND_CONSTRUCTION_SITES);
         let validSites: { [id: string]: ConstructionSite } = {}
-        this.siteData = this.GetData(SITE_DATA) || [];
-        for (let i = 0, length = this.siteData.length; i < length; i++) {
-            let siteId = this.siteData[i].siteId;
+        this.siteData = this.GetData(SITE_DATA) || {};
+        for (let id in this.siteData) {
+            let siteId = this.siteData[id].siteId;
             if (allSites[siteId]) {
                 validSites[siteId] = allSites[siteId];
                 delete allSites[siteId]
             } else if (!Game.constructionSites[siteId]) {
-                if (this.siteData[i].requestor != this.consulType) {
+                if (this.siteData[id].requestor != this.consulType) {
                     // notify the original requestor.
                 }
-                this.siteData.splice(i--, 1);
+                delete this.siteData[id];
                 continue;
             }
         }
@@ -63,7 +63,7 @@ export class ConstructionConsul extends CreepConsul {
         return true;
     }
     AddSiteForConstruction(request: ConstructionRequest) {
-        this.siteData.push(request);
+        this.siteData[request.siteId] = request;
     }
 
     protected IsCreepIdle(creepIndex: number): boolean {
@@ -90,7 +90,7 @@ export class ConstructionConsul extends CreepConsul {
         return idleCreeps;
     }
     protected _assignCreep(creepName: string): void {
-        if (this.siteData.length == 0) {
+        if (Object.keys(this.siteData).length == 0) {
             this.BuilderData.push({ creepName: creepName, target: '' });
         } else {
             this.BuilderData.push({ creepName: creepName, target: this.siteData[0].siteId });
@@ -113,7 +113,7 @@ export class ConstructionConsul extends CreepConsul {
         }
     }
     RequiresSpawn(): boolean {
-        return this.siteData.length > 0 && this.BuilderData.length < 3;
+        return Object.keys(this.siteData).length > 0 && this.BuilderData.length < 3;
     }
 }
 
