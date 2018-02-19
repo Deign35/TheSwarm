@@ -111,7 +111,7 @@ export class HarvestConsul extends CreepConsul {
             this.SourceData[index].harvester = creepName;
             return;
         } while (++index < this.SourceData.length);
-        this._assignCreep(creepName);
+        super.AssignSpawn(creepName);
     }
 
     protected _assignCreep(creepName: string): SwarmCodes.SwarmlingResponse {

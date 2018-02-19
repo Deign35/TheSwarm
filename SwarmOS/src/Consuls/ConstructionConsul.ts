@@ -43,7 +43,7 @@ export class ConstructionConsul extends CreepConsul {
             validSites[allSites[id].id] = Game.getObjectById(allSites[id].id) as ConstructionSite;
         }
 
-        this.BuilderData = this.GetData(BUILDER_DATA) || {};
+        this.BuilderData = this.GetData(BUILDER_DATA) || [];
         for (let i = 0, length = this.BuilderData.length; i < length; i++) {
             if (!Game.creeps[this.BuilderData[i].creepName]) {
                 this.BuilderData.splice(i--, 1);
@@ -113,6 +113,7 @@ export class ConstructionConsul extends CreepConsul {
         }
     }
     RequiresSpawn(): boolean {
+        if (this.CreepRequested) { return false; }
         return Object.keys(this.siteData).length > 0 && this.BuilderData.length < 3;
     }
 }
