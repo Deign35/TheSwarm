@@ -27,9 +27,9 @@ export class ControllerConsul extends CreepConsul {
     get consulType(): string { return CONSUL_TYPE }
     UpgraderCreeps!: Creep[];
     Controller!: StructureController;
-    protected upgradeCreepData!: ControllerConsul_CreepData[];
+    UpgradeCreepData!: ControllerConsul_CreepData[];
     Save() {
-        this.SetData(UPGRADER_IDS, this.upgradeCreepData);
+        this.SetData(UPGRADER_IDS, this.UpgradeCreepData);
         super.Save();
     }
     Load() {
@@ -44,23 +44,21 @@ export class ControllerConsul extends CreepConsul {
         }
 
         this.UpgraderCreeps = [];
-        this.upgradeCreepData = this.GetData(UPGRADER_IDS) || [];
-        for (let i = 0, length = this.upgradeCreepData.length; i < length; i++) {
-            let creep = Game.creeps[this.upgradeCreepData[i].creepName];
+        this.UpgradeCreepData = this.GetData(UPGRADER_IDS) || [];
+        for (let i = 0, length = this.UpgradeCreepData.length; i < length; i++) {
+            let creep = Game.creeps[this.UpgradeCreepData[i].creepName];
             if (!creep) {
-                this.upgradeCreepData.splice(i--, 1);
+                this.UpgradeCreepData.splice(i--, 1);
                 continue;
             }
-            if(this.upgradeCreepData[i].fetching) {
-                if(creep.carry[RESOURCE_ENERGY] == creep.carryCapacity) {
+            if (this.UpgradeCreepData[i].fetching) {
+                if (creep.carry[RESOURCE_ENERGY] == creep.carryCapacity) {
                     (this.Parent as HiveQueenBase).Collector.Consul.ReleaseManagedCreep(creep.name);
-                    this.upgradeCreepData[i].fetching = false;
-                } else {
-                    continue;
+                    this.UpgradeCreepData[i].fetching = false;
                 }
-            } else if(creep.carry[RESOURCE_ENERGY] == 0) {
+            } else if (creep.carry[RESOURCE_ENERGY] == 0) {
                 (this.Parent as HiveQueenBase).Collector.Consul.AssignManagedCreep(creep);
-                this.upgradeCreepData[i].fetching = true;
+                this.UpgradeCreepData[i].fetching = true;
             }
             this.UpgraderCreeps.push(creep);
         }
@@ -94,12 +92,12 @@ export class ControllerConsul extends CreepConsul {
         return spawnArgs;
     }
     protected _assignCreep(creepName: string) {
-        this.upgradeCreepData.push({ creepName: creepName, fetching: false });
+        this.UpgradeCreepData.push({ creepName: creepName, fetching: false });
     }
     ReleaseCreep(creepName: string): void {
-        for (let i = 0, length = this.upgradeCreepData.length; i < length; i++) {
-            if (this.upgradeCreepData[i]) {
-                this.upgradeCreepData.splice(i, 1);
+        for (let i = 0, length = this.UpgradeCreepData.length; i < length; i++) {
+            if (this.UpgradeCreepData[i]) {
+                this.UpgradeCreepData.splice(i, 1);
                 return;
             }
         }

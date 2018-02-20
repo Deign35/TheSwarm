@@ -7,8 +7,6 @@ const SITE_DATA = 'S_Data';
 export class ConstructionConsul extends CreepConsul {
     static get ConsulType(): string { return CONSUL_TYPE; }
     get consulType(): string { return CONSUL_TYPE }
-    //BuilderCreeps!: Creep[];
-    //Sites!: ConstructionSite[];
 
     BuilderData!: ConstructorData[];
     protected siteData!: { [id: string]: ConstructionRequest };
@@ -20,7 +18,6 @@ export class ConstructionConsul extends CreepConsul {
     Load() {
         if (!super.Load()) { return false; }
 
-        // :(  not working
         let allSites = this.Nest.find(FIND_CONSTRUCTION_SITES);
         let validSites: { [id: string]: ConstructionSite } = {}
         this.siteData = this.GetData(SITE_DATA) || {};
@@ -51,23 +48,24 @@ export class ConstructionConsul extends CreepConsul {
                 this.BuilderData.splice(i--, 1);
                 continue;
             }
-            if(this.BuilderData[i].fetching) {
-                if(creep.carry[RESOURCE_ENERGY] == creep.carryCapacity) {
+            if (this.BuilderData[i].fetching) {
+                if (creep.carry[RESOURCE_ENERGY] == creep.carryCapacity) {
                     (this.Parent as HiveQueenBase).Collector.Consul.ReleaseManagedCreep(creep.name);
                     this.BuilderData[i].fetching = false;
                 }
                 continue;
-            } else if(!this.BuilderData[i].fetching && creep.carry[RESOURCE_ENERGY] == 0) {
+            } else if (!this.BuilderData[i].fetching && creep.carry[RESOURCE_ENERGY] == 0) {
                 (this.Parent as HiveQueenBase).Collector.Consul.AssignManagedCreep(creep);
                 this.BuilderData[i].fetching = true;
             }
             //Check that the construction site is valid
             if (!validSites[this.BuilderData[i].target]) {
-                if (!this.siteData[0]) {
+                if (Object.keys(this.siteData).length == 0) {
+
                     this.BuilderData[i].target = '';
                     continue;
                 }
-                this.BuilderData[i].target = this.siteData[0].siteId;
+                this.BuilderData[i].target = this.siteData[Object.keys(this.siteData)[0]].siteId;
             }
         }
 
@@ -80,7 +78,7 @@ export class ConstructionConsul extends CreepConsul {
         if (Object.keys(this.siteData).length == 0) {
             this.BuilderData.push({ creepName: creepName, target: '', fetching: false });
         } else {
-            this.BuilderData.push({ creepName: creepName, target: this.siteData[0].siteId, fetching: false });
+            this.BuilderData.push({ creepName: creepName, target: this.siteData[Object.keys(this.siteData)[0]].siteId, fetching: false });
         }
     }
     ReleaseCreep(creepName: string): void {

@@ -29,11 +29,10 @@ export abstract class HiveQueenBase extends NestQueenBase implements IHiveQueen 
     }
 
     ActivateNest() {
-        debugger;
         // Check for idle creeps and reassign them
         this.ActivateImperators();
         this.CheckForSpawnRequirements();
-        let requirements = this.Spawner.Consul.GetNextSpawns(3);
+        let requirements = this.Spawner.Consul.GetNextSpawns(2);
         for (let i = 0, length = requirements.length; i < length; i++) {
             if (this.Nest.energyAvailable >= requirements[i].energyNeeded && requirements[i].neededBy <= (Game.time - 3)) {
                 let spawnedCreep = this.Spawner.Consul.SpawnCreep();
@@ -44,7 +43,7 @@ export abstract class HiveQueenBase extends NestQueenBase implements IHiveQueen 
                         this.Upgrader.Consul.AssignSpawn(spawnedCreep.creepName);
                     } else if (spawnedCreep.requestorID == ConstructionConsul.ConsulType) {
                         this.Builder.Consul.AssignSpawn(spawnedCreep.creepName);
-                    } else if(spawnedCreep.requestorID == SpawnConsul.ConsulType) {
+                    } else if (spawnedCreep.requestorID == SpawnConsul.ConsulType) {
                         this.Spawner.Consul.AssignSpawn(spawnedCreep.creepName);
                     }
                 }
@@ -52,15 +51,16 @@ export abstract class HiveQueenBase extends NestQueenBase implements IHiveQueen 
         }
     }
     protected LoadImperators() {
-        this.Spawner = new SpawnImperator(SpawnConsul.ConsulType, this);
         this.Collector = new HarvestImperator(HarvestConsul.ConsulType, this);
         this.Upgrader = new ControllerImperator(ControllerConsul.ConsulType, this);
         this.Builder = new ConstructionImperator(ConstructionConsul.ConsulType, this);
+        this.Spawner = new SpawnImperator(SpawnConsul.ConsulType, this);
     }
     protected ActivateImperators(): SwarmCodes.SwarmErrors {
         this.Collector.ActivateImperator();
         this.Upgrader.ActivateImperator();
         this.Builder.ActivateImperator();
+        this.Spawner.ActivateImperator();
         return SwarmCodes.C_NONE;
     }
     protected abstract CheckForSpawnRequirements(): void;

@@ -39,7 +39,7 @@ export class HarvestImperator extends ImperatorBase {
             let cycleProtection = 0;
             do {
                 if (cycleProtection++ > this.Consul.SourceData.length) {
-                    continue;
+                    break;
                 }
                 if (!target) {
                     // find a target by cycling through
@@ -67,14 +67,16 @@ export class HarvestImperator extends ImperatorBase {
                 }
                 if (target) {
                     if ((target as Source).energyCapacity) {
-                        break;
                     } else if ((target as StructureContainer).storeCapacity) {
-                        break;
                     } else if ((target as Creep).carryCapacity) {
-                        break;
                     } else {
                         target = undefined;
+                        continue;
                     }
+                    //let targetId = this.Consul._tempData[tempWorkers[id].name];
+                    //let target: RoomObject | undefined = Game.getObjectById(targetId) || undefined;
+                    this.Consul._tempData[tempWorkers[id].name] = (target as Source).id;
+                    break;
                 }
             } while (!target);
             this.ActivateTempWorker(tempWorkers[id], target as Source | StructureContainer | Creep);
@@ -88,6 +90,13 @@ export class HarvestImperator extends ImperatorBase {
         this.Queen.Nest.visual.text('Harv', harvester.pos);
         if (harvester.spawning) { return; }
         let sourceTarget = Game.getObjectById(data.id) as Source;
+        let moveTarget = (Game.getObjectById(data.constructionSite || data.containerID) as RoomObject);
+        if (moveTarget) {
+            if (!harvester.pos.isEqualTo(moveTarget.pos)) {
+                new MoveToPositionAction(harvester, moveTarget.pos).Run(true);
+            }
+        }
+
         let harvestAction: ActionBase = new HarvestAction(harvester, sourceTarget);
         // Do a container check, where if it exists, do an express version that doesn't go through this logic.
         let harvestResult = harvestAction.ValidateAction();
@@ -123,16 +132,9 @@ export class HarvestImperator extends ImperatorBase {
                 break; // Creep's carry is full
             case (SwarmCodes.E_TARGET_INELLIGIBLE): break; // Target is empty.
             case (SwarmCodes.C_MOVE):
-                let targetPos = sourceTarget.pos;
-
-                if (data.harvester == harvester.name && (data.constructionSite || data.containerID)) {
-                    let targetStruct = (Game.getObjectById(data.constructionSite) ||
-                        Game.getObjectById(data.containerID)) as ConstructionSite | StructureContainer;
-                    if (targetStruct) {
-                        targetPos = targetStruct.pos;
-                    }
+                if (!moveTarget) {
+                    new MoveToPositionAction(harvester, sourceTarget.pos).Run(true);
                 }
-                new MoveToPositionAction(harvester, targetPos).Run(true);
                 break;
         }
 
@@ -144,6 +146,7 @@ export class HarvestImperator extends ImperatorBase {
 
     ActivateTempWorker(creep: Creep, target: Source | StructureContainer | Creep) {
         let action: ActionBase | undefined;
+        if (!target) { return; }
         if ((target as Source).energyCapacity) {
             // Have to mine
             action = new HarvestAction(creep, target as Source);
@@ -154,26 +157,29 @@ export class HarvestImperator extends ImperatorBase {
             //Need to request a transfer when we get there.
             action = new RequestTransferAction(creep, target as Creep);
         }
-        if(!action) {
+        if (!action) {
             return;
         }
 
         let actionResult = action.ValidateAction();
-        switch(actionResult) {
-            case(SwarmCodes.C_NONE): break;
-            case(SwarmCodes.C_MOVE):
+        switch (actionResult) {
+            case (SwarmCodes.C_NONE): break;
+            case (SwarmCodes.C_MOVE):
                 new MoveToPositionAction(creep, target.pos).Run(true);
                 break;
-            case(SwarmCodes.E_TARGET_INELLIGIBLE):
-            case(SwarmCodes.E_ACTION_UNNECESSARY):
+            case (SwarmCodes.E_TARGET_INELLIGIBLE):
+            case (SwarmCodes.E_ACTION_UNNECESSARY):
                 // Move this creep out of the way
+                //let direction = creep.pos.getDirectionTo(target.pos) + 4;
+                //if (direction > 9) { direction -= 8; }
+                //creep.move(direction as DirectionConstant);
                 break;
-            case(SwarmCodes.E_REQUIRES_ENERGY):
+            case (SwarmCodes.E_REQUIRES_ENERGY):
                 // harvester has nothing to give.
                 break;
         }
-        if(actionResult != SwarmCodes.C_MOVE) {
-            action.Run();
+        if (actionResult != SwarmCodes.C_MOVE) {
+            action.Run(false);
         }
     }
 }

@@ -109,6 +109,12 @@ export class HarvestConsul extends CreepConsul {
     ReleaseManagedCreep(creepName: string) {
         if (this._tempData[creepName]) {
             delete this._tempData[creepName];
+            for (let i = 0, length = this.TempWorkers.length; i < length; i++) {
+                if (this.TempWorkers[i].name == creepName) {
+                    this.TempWorkers.splice(i, 1);
+                    return;
+                }
+            }
         }
     }
 

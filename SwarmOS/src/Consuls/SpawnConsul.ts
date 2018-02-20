@@ -41,16 +41,14 @@ export class SpawnConsul extends CreepConsul {
             if (!this.SpawnRefiller) {
                 this.RefillerData.creepName = '';
             } else {
-                if(this.RefillerData.fetching) {
-                    if(this.SpawnRefiller.carry[RESOURCE_ENERGY] == this.SpawnRefiller.carryCapacity) {
+                if (this.RefillerData.fetching) {
+                    if (this.SpawnRefiller.carry[RESOURCE_ENERGY] == this.SpawnRefiller.carryCapacity) {
                         (this.Parent as HiveQueenBase).Collector.Consul.ReleaseManagedCreep(this.SpawnRefiller.name);
                         this.RefillerData.fetching = false;
                     }
-                } else {
-                    if(this.SpawnRefiller.carry[RESOURCE_ENERGY] == 0) {
-                        (this.Parent as HiveQueenBase).Collector.Consul.AssignManagedCreep(this.SpawnRefiller);
-                        this.RefillerData.fetching = true;
-                    }
+                } else if (this.SpawnRefiller.carry[RESOURCE_ENERGY] == 0) {
+                    (this.Parent as HiveQueenBase).Collector.Consul.AssignManagedCreep(this.SpawnRefiller);
+                    this.RefillerData.fetching = true;
                 }
             }
         }
@@ -60,7 +58,7 @@ export class SpawnConsul extends CreepConsul {
     InitMemory() {
         super.InitMemory();
         this.SpawnQueue = new MinHeap();
-        this.RefillerData = { creepName: '', fetching: true, extensionList: [], curTarget: 0 };
+        this.RefillerData = { creepName: '', fetching: false, extensionList: [], curTarget: 0 };
         this.ScanRoom();
     }
 
