@@ -19,6 +19,7 @@ export abstract class NestQueenBase extends QueenMemory implements INestQueen {
     abstract ActivateNest(): void;
 
     abstract ReceiveCommand(): void;
+    abstract ReleaseControl(creepName: string): void;
     protected abstract LoadImperators(): void;
     protected abstract ActivateImperators(): SwarmCodes.SwarmErrors;
 }

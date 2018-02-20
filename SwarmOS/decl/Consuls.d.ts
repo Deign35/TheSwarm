@@ -20,9 +20,7 @@ declare type SpawnConsul_RequirementsData = {
 declare type HarvestConsul_SourceData = RoomObjectWithID & {
     spawnBuffer: number,
     lastEnergy: number,
-    harvester?: string,
+    harvester: string,
     containerID?: string,
     constructionSite?: string,
-    droppedResourcePile?: RoomPositionData,
-    temporaryWorkers?: string[],
 }

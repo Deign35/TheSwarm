@@ -65,30 +65,6 @@ export class ConstructionConsul extends CreepConsul {
     AddSiteForConstruction(request: ConstructionRequest) {
         this.siteData[request.siteId] = request;
     }
-
-    protected IsCreepIdle(creepIndex: number): boolean {
-        let creep = Game.creeps[this.BuilderData[creepIndex].creepName];
-        if (creep.spawning) { return false; }
-        if (this.BuilderData[creepIndex].target == '') {
-            return true;
-        }
-        if ((creep.carry[RESOURCE_ENERGY] || 0) == 0) {
-            return true;
-        }
-
-        return false;
-    }
-    GetIdleCreeps(): Creep[] {
-        let idleCreeps: Creep[] = [];
-        for (let i = 0, length = this.BuilderData.length; i < length; i++) {
-            if (this.IsCreepIdle(i)) {
-                idleCreeps.push(Game.creeps[this.BuilderData[i].creepName]);
-                continue;
-            }
-        }
-
-        return idleCreeps;
-    }
     protected _assignCreep(creepName: string): void {
         if (Object.keys(this.siteData).length == 0) {
             this.BuilderData.push({ creepName: creepName, target: '' });

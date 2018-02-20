@@ -15,8 +15,6 @@ export abstract class HiveQueenBase extends NestQueenBase implements IHiveQueen 
     Builder!: ConstructionImperator;
 
     Spawner!: SpawnConsul;
-
-    IdleCreeps: Creep[] = [];
     Save() {
         this.Upgrader.ImperatorComplete();
         this.Collector.ImperatorComplete();
@@ -27,17 +25,14 @@ export abstract class HiveQueenBase extends NestQueenBase implements IHiveQueen 
 
     InitMemory() {
         super.InitMemory();
-        this.IdleCreeps = [];
     }
 
     ActivateNest() {
         debugger;
         // Check for idle creeps and reassign them
-        this.IdleCreeps = _.union(this.IdleCreeps, this.GatherIdleCreeps());
-        this.ReassignIdleCreeps();
         this.ActivateImperators();
         this.CheckForSpawnRequirements();
-        let requirements = this.Spawner.RequiresSpawn();
+        let requirements = this.Spawner.GetNextSpawns(3);
         for (let i = 0, length = requirements.length; i < length; i++) {
             if (this.Nest.energyAvailable >= requirements[i].energyNeeded && requirements[i].neededBy <= (Game.time - 3)) {
                 let spawnedCreep = this.Spawner.SpawnCreep();
@@ -53,7 +48,6 @@ export abstract class HiveQueenBase extends NestQueenBase implements IHiveQueen 
             }
         }
     }
-
     protected LoadImperators() {
         this.Spawner = new SpawnConsul(SpawnConsul.ConsulType, this);
         this.Collector = new HarvestImperator(HarvestConsul.ConsulType, this);
@@ -66,7 +60,5 @@ export abstract class HiveQueenBase extends NestQueenBase implements IHiveQueen 
         this.Builder.ActivateImperator();
         return SwarmCodes.C_NONE;
     }
-    protected abstract GatherIdleCreeps(): Creep[];
-    protected abstract ReassignIdleCreeps(): void;
     protected abstract CheckForSpawnRequirements(): void;
 }

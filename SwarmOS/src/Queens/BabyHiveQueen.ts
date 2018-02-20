@@ -35,38 +35,8 @@ export class BabyHiveQueen extends HiveQueenBase {
     ReceiveCommand(): void {
         //Not implemented
     }
-    protected GatherIdleCreeps(): Creep[] {
-        let allCreeps: Creep[] = [];
-        let idleCreeps = this.Collector.Consul.GetIdleCreeps();
-        for (let i = 0, length = idleCreeps.length; i < length; i++) {
-            allCreeps.push(idleCreeps[i]);
-            this.Collector.Consul.ReleaseCreep(idleCreeps[i].name);
-        }
-        idleCreeps = this.Upgrader.Consul.GetIdleCreeps();
-        for (let i = 0, length = idleCreeps.length; i < length; i++) {
-            allCreeps.push(idleCreeps[i]);
-            this.Upgrader.Consul.ReleaseCreep(idleCreeps[i].name);
-        }
-        idleCreeps = this.Builder.Consul.GetIdleCreeps();
-        for (let i = 0, length = idleCreeps.length; i < length; i++) {
-            allCreeps.push(idleCreeps[i]);
-            this.Builder.Consul.ReleaseCreep(idleCreeps[i].name);
-        }
-
-        return allCreeps;
-    }
-    protected ReassignIdleCreeps(): void {
-        for (let i = 0, length = this.IdleCreeps.length; i < length; i++) {
-            if (this.IdleCreeps[i].carry[RESOURCE_ENERGY] == 0) {
-                this.Collector.Consul.AssignCreep(this.IdleCreeps[i]);
-            } else if (this.Builder.Consul.RequiresSpawn()) {
-                this.Builder.Consul.AssignCreep(this.IdleCreeps[i]);
-            } else {
-                this.Upgrader.Consul.AssignCreep(this.IdleCreeps[i]);
-            }
-        }
-
-        this.IdleCreeps = [];
+    ReleaseControl(creepName: string): void {
+        
     }
 
     MetamorphiseToFullGrownHiveQueen(): HiveQueenBase {
