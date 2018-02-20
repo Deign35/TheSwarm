@@ -10,7 +10,7 @@ export class BabyHiveQueen extends HiveQueenBase {
     protected CheckForSpawnRequirements(): void {
         if (this.Collector.Consul.RequiresSpawn()) {
             let spawnArgs;
-            if (this.Nest.energyCapacityAvailable > 550) {
+            if (this.Nest.energyCapacityAvailable >= 550) {
                 spawnArgs = this.Collector.Consul.GetSpawnDefinition();
             } else {
                 let newName = ('Harv' + Game.time);
@@ -36,12 +36,20 @@ export class BabyHiveQueen extends HiveQueenBase {
             this.Spawner.Consul.AddSpawnToQueue(spawnArgs);
             this.Builder.Consul.CreepRequested = spawnArgs.creepName;
         }
-
         if (this.Spawner.Consul.RequiresSpawn()) {
             let spawnArgs = this.Spawner.Consul.GetSpawnDefinition();
-            spawnArgs.targetTime = Game.time - 100;
+            spawnArgs.targetTime = Game.time - 10000;
             this.Spawner.Consul.AddSpawnToQueue(spawnArgs);
             this.Spawner.Consul.CreepRequested = spawnArgs.creepName;
+        }
+
+        if(this.Spawner.Consul.RefillerData.idleTime > 50) {
+            if(!this.Builder.Consul.CreepRequested) {
+                let spawnArgs = this.Builder.Consul.GetSpawnDefinition();
+                spawnArgs.targetTime = Game.time - 25;
+                this.Spawner.Consul.AddSpawnToQueue(spawnArgs);
+                this.Builder.Consul.CreepRequested = spawnArgs.creepName;
+            }
         }
     }
     InitializeNest(): void {
@@ -49,15 +57,16 @@ export class BabyHiveQueen extends HiveQueenBase {
         if (this.Nest.find(FIND_MY_CREEPS).length == 0) {
             this.Spawner.Consul.AddSpawnToQueue({
                 body: [WORK, MOVE, CARRY], creepName: this.Nest.name + '_FIRST',
-                requestorID: this.Spawner.Consul.consulType, targetTime: Game.time - 1000
+                requestorID: this.Spawner.Consul.consulType, targetTime: Game.time - 10000
             });
+            this.Spawner.Consul.CreepRequested = this.Nest.name + '_FIRST';
         }
     }
     ReceiveCommand(): void {
         //Not implemented
     }
-    ReleaseControl(creepName: string): void {
-
+    ReleaseControl(creep: Creep): void {
+        this.Upgrader.Consul.AssignCreep(creep);
     }
 
     MetamorphiseToFullGrownHiveQueen(): HiveQueenBase {

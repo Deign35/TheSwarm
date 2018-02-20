@@ -30,22 +30,66 @@ export abstract class HiveQueenBase extends NestQueenBase implements IHiveQueen 
 
     ActivateNest() {
         // Check for idle creeps and reassign them
+        let idleCreeps: Creep[] = [];
+        for(let creepName in Game.creeps) {
+            for(let i = 0, length = this.Upgrader.Consul.UpgradeCreepData.length; i < length; i++) {
+                if(this.Upgrader.Consul.UpgradeCreepData[i].creepName == creepName) {
+                    continue;
+                }
+            }
+            for(let i = 0, length = this.Collector.Consul.SourceData.length; i < length; i++) {
+                if(this.Collector.Consul.SourceData[i].harvester == creepName) {
+                    continue;
+                }
+            }
+            for(let i = 0, length = this.Builder.Consul.BuilderData.length; i < length; i++) {
+                if(this.Builder.Consul.BuilderData[i].creepName == creepName) {
+                    continue;
+                }
+            }
+            if(this.Spawner.Consul.RefillerData.creepName == creepName) {
+                continue;
+            }
+            idleCreeps.push(Game.creeps[creepName]);
+        }
+
+        for(let i = 0, length = idleCreeps.length; i < length; i++) {
+            if(idleCreeps[i].getActiveBodyparts(WORK) == 0) {
+                if(!this.Spawner.Consul.RefillerData.creepName) {
+                    this.Spawner.Consul.AssignCreep(idleCreeps[i]);
+                    continue;
+                }
+                // What to do with this?
+                idleCreeps[i].suicide();
+                continue;
+            }
+
+            if(this.Nest.find(FIND_MY_CONSTRUCTION_SITES)) {
+                this.Builder.Consul.AssignCreep(idleCreeps[i]);
+                continue;
+            }
+
+            if(idleCreeps[i].getActiveBodyparts(WORK) >= 5) {
+                this.Collector.Consul.AssignCreep(idleCreeps[i]);
+                continue;
+            }
+
+            this.Upgrader.Consul.AssignCreep(idleCreeps[i]);
+        }
         this.ActivateImperators();
         this.CheckForSpawnRequirements();
-        let requirements = this.Spawner.Consul.GetNextSpawns(2);
-        for (let i = 0, length = requirements.length; i < length; i++) {
-            if (this.Nest.energyAvailable >= requirements[i].energyNeeded && requirements[i].neededBy <= (Game.time - 3)) {
-                let spawnedCreep = this.Spawner.Consul.SpawnCreep();
-                if (spawnedCreep) {
-                    if (spawnedCreep.requestorID == HarvestConsul.ConsulType) {
-                        this.Collector.Consul.AssignSpawn(spawnedCreep.creepName);
-                    } else if (spawnedCreep.requestorID == ControllerConsul.ConsulType) {
-                        this.Upgrader.Consul.AssignSpawn(spawnedCreep.creepName);
-                    } else if (spawnedCreep.requestorID == ConstructionConsul.ConsulType) {
-                        this.Builder.Consul.AssignSpawn(spawnedCreep.creepName);
-                    } else if (spawnedCreep.requestorID == SpawnConsul.ConsulType) {
-                        this.Spawner.Consul.AssignSpawn(spawnedCreep.creepName);
-                    }
+        let requirements = this.Spawner.Consul.GetNextSpawns(1);
+        if (this.Nest.energyAvailable >= requirements[0].energyNeeded && requirements[0].neededBy) {
+            let spawnedCreep = this.Spawner.Consul.SpawnCreep();
+            if (spawnedCreep) {
+                if (spawnedCreep.requestorID == HarvestConsul.ConsulType) {
+                    this.Collector.Consul.AssignSpawn(spawnedCreep.creepName);
+                } else if (spawnedCreep.requestorID == ControllerConsul.ConsulType) {
+                    this.Upgrader.Consul.AssignSpawn(spawnedCreep.creepName);
+                } else if (spawnedCreep.requestorID == ConstructionConsul.ConsulType) {
+                    this.Builder.Consul.AssignSpawn(spawnedCreep.creepName);
+                } else if (spawnedCreep.requestorID == SpawnConsul.ConsulType) {
+                    this.Spawner.Consul.AssignSpawn(spawnedCreep.creepName);
                 }
             }
         }

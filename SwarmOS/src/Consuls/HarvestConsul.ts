@@ -38,6 +38,7 @@ export class HarvestConsul extends CreepConsul {
         for (let id in this._tempData) {
             let tempCreep = Game.creeps[id];
             if (!tempCreep) {
+                console.log('Temp Creep deleted cause it was dead[' + id + ']: ' + JSON.stringify(this._tempData));
                 delete this._tempData[id];
                 continue;
             }
@@ -116,6 +117,8 @@ export class HarvestConsul extends CreepConsul {
                 }
             }
         }
+
+        console.log("Release Managed Creep with name[" + creepName + "]: was not assigned to harvest consul");
     }
 
     protected _assignCreep(creepName: string) {
@@ -129,8 +132,9 @@ export class HarvestConsul extends CreepConsul {
             }
         }
         // If we're here, then this creep has no place, return it to the nest.
+        console.log("Assign regular Creep with name[" + creepName + "]: had no where to focus harvesting.");
         this.ReleaseCreep(creepName);
-        (this.Parent as HiveQueenBase).ReleaseControl(creepName);
+        (this.Parent as HiveQueenBase).Upgrader.Consul.AssignSpawn(creepName);
     }
 
     ReleaseCreep(creepName: string) {

@@ -9,7 +9,7 @@ const UPGRADER_IDS = 'U_IDs'
 
 const RCL_UPGRADER_RATIO: { [index: number]: { numUpgraders: number, body: BodyPartConstant[] } } = {
     1: { numUpgraders: 1, body: [WORK, CARRY, MOVE] },
-    2: { numUpgraders: 4, body: [WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE] },
+    2: { numUpgraders: 4, body: [WORK, CARRY, CARRY, CARRY, MOVE] },
     3: { numUpgraders: 4, body: [WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE] },
     4: { numUpgraders: 4, body: [WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE] },
     5: { numUpgraders: 4, body: [WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE] },

@@ -3,7 +3,7 @@ import { HarvestImperator } from "Imperators/HarvestImperator";
 import { HiveQueenBase } from "Queens/HiveQueenBase";
 
 export class HiveQueen extends HiveQueenBase {
-    ReleaseControl(creepName: string): void {
+    ReleaseControl(creepName: Creep): void {
         throw new Error("Method not implemented.");
     }
     protected GatherIdleCreeps(): Creep[] {

@@ -13,13 +13,15 @@ export abstract class NestQueenBase extends QueenMemory implements INestQueen {
 
     protected InitMemory() {
         super.InitMemory();
+        this.Nest = Game.rooms[this.id];
         this.LoadImperators();
+        this.InitializeNest();
     }
     abstract InitializeNest(): void;
     abstract ActivateNest(): void;
 
     abstract ReceiveCommand(): void;
-    abstract ReleaseControl(creepName: string): void;
+    abstract ReleaseControl(creep: Creep): void;
     protected abstract LoadImperators(): void;
     protected abstract ActivateImperators(): SwarmCodes.SwarmErrors;
 }

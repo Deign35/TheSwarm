@@ -34,6 +34,7 @@ export class HarvestImperator extends ImperatorBase {
         let rotateBackward = Game.time % 2 == 0;
         let curIndex = Game.time % this.Consul.SourceData.length;
         for (let id in tempWorkers) {
+            if(tempWorkers[id].spawning) { continue;}
             let targetId = this.Consul._tempData[tempWorkers[id].name];
             let target: RoomObject | undefined = Game.getObjectById(targetId) || undefined;
             let cycleProtection = 0;
@@ -68,7 +69,15 @@ export class HarvestImperator extends ImperatorBase {
                 if (target) {
                     if ((target as Source).energyCapacity) {
                     } else if ((target as StructureContainer).storeCapacity) {
+                        if ((target as StructureContainer).store[RESOURCE_ENERGY] == 0) {
+                            target = undefined;
+                            continue;
+                        }
                     } else if ((target as Creep).carryCapacity) {
+                        if ((target as Creep).carry[RESOURCE_ENERGY] == 0) {
+                            target = undefined;
+                            continue;
+                        }
                     } else {
                         target = undefined;
                         continue;
@@ -94,6 +103,7 @@ export class HarvestImperator extends ImperatorBase {
         if (moveTarget) {
             if (!harvester.pos.isEqualTo(moveTarget.pos)) {
                 new MoveToPositionAction(harvester, moveTarget.pos).Run(true);
+                return;
             }
         }
 
@@ -164,9 +174,10 @@ export class HarvestImperator extends ImperatorBase {
         let actionResult = action.ValidateAction();
         switch (actionResult) {
             case (SwarmCodes.C_NONE): break;
+            case (SwarmCodes.E_REQUIRES_ENERGY):
             case (SwarmCodes.C_MOVE):
                 new MoveToPositionAction(creep, target.pos).Run(true);
-                break;
+                return;
             case (SwarmCodes.E_TARGET_INELLIGIBLE):
             case (SwarmCodes.E_ACTION_UNNECESSARY):
                 // Move this creep out of the way
@@ -174,12 +185,8 @@ export class HarvestImperator extends ImperatorBase {
                 //if (direction > 9) { direction -= 8; }
                 //creep.move(direction as DirectionConstant);
                 break;
-            case (SwarmCodes.E_REQUIRES_ENERGY):
                 // harvester has nothing to give.
-                break;
         }
-        if (actionResult != SwarmCodes.C_MOVE) {
-            action.Run(false);
-        }
+        action.Run();
     }
 }

@@ -13,25 +13,25 @@ export class ConstructionImperator extends ImperatorBase {
         this.Consul.Save();
     }
     ActivateImperator(): SwarmCodes.SwarmErrors {
-        let buildData = this.Consul.BuilderData;
-        for (let i = 0, length = buildData.length; i < length; i++) {
-            if(buildData[i].fetching) { continue; }
-            let creep = Game.creeps[buildData[i].creepName];
-            this.Queen.Nest.visual.text('Cons', creep.pos);
-            let site = Game.constructionSites[buildData[i].target];
-            let buildAction = new BuildAction(creep, site);
-            let buildResult = buildAction.ValidateAction();
-            switch (buildResult) {
-                case (SwarmCodes.C_MOVE):
-                    new MoveToPositionAction(creep, site.pos).Run(true);
-                    break;
-                case (SwarmCodes.C_NONE): break;
-                case (SwarmCodes.E_REQUIRES_ENERGY): break; // Release it?
+            let buildData = this.Consul.BuilderData;
+            for (let i = 0, length = buildData.length; i < length; i++) {
+                if(buildData[i].fetching || buildData[i].target == '') { continue; }
+                let creep = Game.creeps[buildData[i].creepName];
+                this.Queen.Nest.visual.text('Cons', creep.pos);
+                let site = Game.constructionSites[buildData[i].target];
+                let buildAction = new BuildAction(creep, site);
+                let buildResult = buildAction.ValidateAction();
+                switch (buildResult) {
+                    case (SwarmCodes.C_MOVE):
+                        new MoveToPositionAction(creep, site.pos).Run(true);
+                        break;
+                    case (SwarmCodes.C_NONE): break;
+                    case (SwarmCodes.E_REQUIRES_ENERGY): break; // Release it?
+                }
+                if (buildResult != SwarmCodes.C_MOVE) {
+                    buildAction.Run();
+                }
             }
-            if (buildResult != SwarmCodes.C_MOVE) {
-                buildAction.Run();
-            }
-        }
 
         return SwarmCodes.C_NONE;
     }

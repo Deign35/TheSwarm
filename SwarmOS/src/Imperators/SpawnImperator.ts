@@ -47,6 +47,7 @@ export class SpawnImperator extends ImperatorBase {
                     case(SwarmCodes.E_ACTION_UNNECESSARY):
                         //get new target.
                         if(this.Queen.Nest.energyAvailable < this.Queen.Nest.energyCapacityAvailable) {
+                            this.Consul.RefillerData.idleTime = 0;
                             // We still have more to fill.
                             let cycleProtection = 0;
                             do {
@@ -63,6 +64,8 @@ export class SpawnImperator extends ImperatorBase {
                                     break;
                                 }
                             } while(true);
+                        } else {
+                            this.Consul.Nest.visual.text('' + this.Consul.RefillerData.idleTime++, (this.Consul.SpawnRefiller as Creep).pos);
                         }
                         break;
                 }

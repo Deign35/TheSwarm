@@ -58,7 +58,7 @@ export class SpawnConsul extends CreepConsul {
     InitMemory() {
         super.InitMemory();
         this.SpawnQueue = new MinHeap();
-        this.RefillerData = { creepName: '', fetching: false, extensionList: [], curTarget: 0 };
+        this.RefillerData = { creepName: '', fetching: false, extensionList: [], curTarget: 0, idleTime: 0 };
         this.ScanRoom();
     }
 
@@ -192,6 +192,7 @@ export class SpawnConsul extends CreepConsul {
         if (this.SpawnRefiller) {
             this.SpawnRefiller = undefined;
             this.RefillerData.creepName = '';
+            this.RefillerData.fetching = false;
         }
     }
     GetSpawnDefinition(): SpawnConsul_SpawnArgs {
@@ -202,11 +203,9 @@ export class SpawnConsul extends CreepConsul {
             requestorID: this.consulType,
         }
     }
-    GetIdleCreeps(): Creep[] {
-        return [];
-    }
     protected _assignCreep(creepName: string): void {
         this.RefillerData.creepName = creepName;
+        this.RefillerData.fetching = false;
         this.SpawnRefiller = Game.creeps[creepName];
     }
 }
@@ -216,4 +215,5 @@ declare type SpawnConsul_RefillerData = {
     extensionList: string[],
     curTarget: number,
     fetching: boolean
+    idleTime: number,
 }

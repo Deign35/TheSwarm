@@ -26,7 +26,7 @@ export class ConstructionConsul extends CreepConsul {
             if (allSites[siteId]) {
                 validSites[siteId] = allSites[siteId];
                 delete allSites[siteId]
-            } else if (!Game.constructionSites[siteId]) {
+            } else {
                 if (this.siteData[id].requestor != this.consulType) {
                     // notify the original requestor.
                 }
@@ -53,7 +53,6 @@ export class ConstructionConsul extends CreepConsul {
                     (this.Parent as HiveQueenBase).Collector.Consul.ReleaseManagedCreep(creep.name);
                     this.BuilderData[i].fetching = false;
                 }
-                continue;
             } else if (!this.BuilderData[i].fetching && creep.carry[RESOURCE_ENERGY] == 0) {
                 (this.Parent as HiveQueenBase).Collector.Consul.AssignManagedCreep(creep);
                 this.BuilderData[i].fetching = true;
@@ -61,8 +60,8 @@ export class ConstructionConsul extends CreepConsul {
             //Check that the construction site is valid
             if (!validSites[this.BuilderData[i].target]) {
                 if (Object.keys(this.siteData).length == 0) {
-
-                    this.BuilderData[i].target = '';
+                    (this.Parent as HiveQueenBase).ReleaseControl(creep);
+                    this.ReleaseCreep(creep.name);
                     continue;
                 }
                 this.BuilderData[i].target = this.siteData[Object.keys(this.siteData)[0]].siteId;
@@ -75,7 +74,16 @@ export class ConstructionConsul extends CreepConsul {
         this.siteData[request.siteId] = request;
     }
     protected _assignCreep(creepName: string): void {
-        if (Object.keys(this.siteData).length == 0) {
+        if(!creepName) {
+            throw "ASSIGNMENT IS EMPTY";
+        }
+        let builderKeys = Object.keys(this.siteData);
+        for(let i = 0, length = this.BuilderData.length; i < length; i++) {
+            if(this.BuilderData[i].creepName == creepName) {
+                return;
+            }
+        }
+        if (builderKeys.length == 0) {
             this.BuilderData.push({ creepName: creepName, target: '', fetching: false });
         } else {
             this.BuilderData.push({ creepName: creepName, target: this.siteData[Object.keys(this.siteData)[0]].siteId, fetching: false });
