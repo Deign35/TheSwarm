@@ -20,7 +20,7 @@ export class SpawnConsul extends CreepConsul {
     protected RelativeTime!: number;
 
     SpawnRefiller?: Creep;
-    protected RefillerData!: SpawnConsul_RefillerData;
+    RefillerData!: SpawnConsul_RefillerData;
     Save() {
         this.SetData(SPAWN_DATA, this.SpawnData);
         let serializedQueue = MinHeap.CompressHeap(this.SpawnQueue, SpawnConsul.SerializeSpawnRequest);
@@ -40,13 +40,18 @@ export class SpawnConsul extends CreepConsul {
             this.SpawnRefiller = Game.creeps[this.RefillerData.creepName];
             if (!this.SpawnRefiller) {
                 this.RefillerData.creepName = '';
-            }
-            if (this.RefillerData.fetching && this.SpawnRefiller.carry[RESOURCE_ENERGY] == this.SpawnRefiller.carryCapacity) {
-                (this.Parent as HiveQueenBase).Collector.Consul.ReleaseCreep(this.RefillerData.creepName);
-                this.RefillerData.fetching = false;
-            } else if (!this.RefillerData.fetching && this.SpawnRefiller.carry[RESOURCE_ENERGY] == 0) {
-                (this.Parent as HiveQueenBase).Collector.Consul.AssignCreep(this.SpawnRefiller);
-                this.RefillerData.fetching = true;
+            } else {
+                if(this.RefillerData.fetching) {
+                    if(this.SpawnRefiller.carry[RESOURCE_ENERGY] == this.SpawnRefiller.carryCapacity) {
+                        (this.Parent as HiveQueenBase).Collector.Consul.ReleaseManagedCreep(this.SpawnRefiller.name);
+                        this.RefillerData.fetching = false;
+                    }
+                } else {
+                    if(this.SpawnRefiller.carry[RESOURCE_ENERGY] == 0) {
+                        (this.Parent as HiveQueenBase).Collector.Consul.AssignManagedCreep(this.SpawnRefiller);
+                        this.RefillerData.fetching = true;
+                    }
+                }
             }
         }
         return true;
@@ -62,18 +67,23 @@ export class SpawnConsul extends CreepConsul {
     ScanRoom(): void {
         let spawns = this.Nest.find(FIND_MY_SPAWNS);
         this.SpawnData = [];
+        this.RefillerData.extensionList = [];
         for (let i = 0, length = spawns.length; i < length; i++) {
             this.AddSpawner(spawns[i]);
+            this.RefillerData.extensionList.push(spawns[i].id);
         }
         let extensions = this.Nest.find(FIND_MY_STRUCTURES, {
             filter: function (struct) {
                 return struct.structureType == STRUCTURE_EXTENSION;
             }
         });
-        this.RefillerData.extensionList = [];
         for (let i = 0, length = extensions.length; i < length; i++) {
             this.RefillerData.extensionList.push(extensions[i].id);
         }
+        this.RefillerData.extensionList.sort((a, b) => {
+
+            return 0;
+        })
     }
 
     SpawnCreep() {
@@ -171,7 +181,7 @@ export class SpawnConsul extends CreepConsul {
     }
 
     RequiresSpawn(): boolean {
-        // Check if 
+        // Check if
         if (!this.CreepRequested && !this.SpawnRefiller) {
             return true;
         }
@@ -189,7 +199,7 @@ export class SpawnConsul extends CreepConsul {
     GetSpawnDefinition(): SpawnConsul_SpawnArgs {
         return {
             body: [CARRY, MOVE, CARRY, MOVE],
-            targetTime: 0,
+            targetTime: Game.time - 100,
             creepName: 'SR' + Game.time,
             requestorID: this.consulType,
         }

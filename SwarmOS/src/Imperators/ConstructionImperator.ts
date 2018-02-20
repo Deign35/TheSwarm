@@ -15,6 +15,7 @@ export class ConstructionImperator extends ImperatorBase {
     ActivateImperator(): SwarmCodes.SwarmErrors {
         let buildData = this.Consul.BuilderData;
         for (let i = 0, length = buildData.length; i < length; i++) {
+            if(buildData[i].fetching) { continue; }
             let creep = Game.creeps[buildData[i].creepName];
             this.Queen.Nest.visual.text('Cons', creep.pos);
             let site = Game.constructionSites[buildData[i].target];

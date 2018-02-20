@@ -7,6 +7,8 @@ import { RepairAction } from "Actions/RepairAction";
 import { BuildAction } from "Actions/BuildAction";
 import { ActionBase } from "Actions/ActionBase";
 import * as _ from "lodash";
+import { WithdrawAction } from "Actions/WithdrawAction";
+import { RequestTransferAction } from "Actions/RequestTransfer";
 
 export class HarvestImperator extends ImperatorBase {
     Consul!: HarvestConsul;
@@ -31,12 +33,12 @@ export class HarvestImperator extends ImperatorBase {
         let tempWorkers = this.Consul.TempWorkers;
         let rotateBackward = Game.time % 2 == 0;
         let curIndex = Game.time % this.Consul.SourceData.length;
-        for (let i = 0, length = tempWorkers.length; i < length; i++) {
-            let targetId = this.Consul._tempData[tempWorkers[i].name];
+        for (let id in tempWorkers) {
+            let targetId = this.Consul._tempData[tempWorkers[id].name];
             let target: RoomObject | undefined = Game.getObjectById(targetId) || undefined;
             let cycleProtection = 0;
             do {
-                if (++cycleProtection > this.Consul.SourceData.length) {
+                if (cycleProtection++ > this.Consul.SourceData.length) {
                     continue;
                 }
                 if (!target) {
@@ -56,7 +58,7 @@ export class HarvestImperator extends ImperatorBase {
                             target = undefined;
                         }
                     }
-                    if (!target && tempWorkers[i].getActiveBodyparts(WORK) > 0) {
+                    if (!target && tempWorkers[id].getActiveBodyparts(WORK) > 0) {
                         target = Game.getObjectById(data.id) as Source;
                     }
                     if (!target && data.harvester) {
@@ -65,14 +67,17 @@ export class HarvestImperator extends ImperatorBase {
                 }
                 if (target) {
                     if ((target as Source).energyCapacity) {
+                        break;
                     } else if ((target as StructureContainer).storeCapacity) {
+                        break;
                     } else if ((target as Creep).carryCapacity) {
+                        break;
                     } else {
                         target = undefined;
                     }
                 }
             } while (!target);
-            this.ActivateTempWorker(tempWorkers[i], target as Source | StructureContainer | Creep);
+            this.ActivateTempWorker(tempWorkers[id], target as Source | StructureContainer | Creep);
         }
         return SwarmCodes.C_NONE; // unused
     }
@@ -138,12 +143,37 @@ export class HarvestImperator extends ImperatorBase {
     }
 
     ActivateTempWorker(creep: Creep, target: Source | StructureContainer | Creep) {
+        let action: ActionBase | undefined;
         if ((target as Source).energyCapacity) {
             // Have to mine
+            action = new HarvestAction(creep, target as Source);
         } else if ((target as StructureContainer).storeCapacity) {
             // go go withdraw!
+            action = new WithdrawAction(creep, (target as StructureContainer));
         } else if ((target as Creep).carryCapacity) {
             //Need to request a transfer when we get there.
+            action = new RequestTransferAction(creep, target as Creep);
+        }
+        if(!action) {
+            return;
+        }
+
+        let actionResult = action.ValidateAction();
+        switch(actionResult) {
+            case(SwarmCodes.C_NONE): break;
+            case(SwarmCodes.C_MOVE):
+                new MoveToPositionAction(creep, target.pos).Run(true);
+                break;
+            case(SwarmCodes.E_TARGET_INELLIGIBLE):
+            case(SwarmCodes.E_ACTION_UNNECESSARY):
+                // Move this creep out of the way
+                break;
+            case(SwarmCodes.E_REQUIRES_ENERGY):
+                // harvester has nothing to give.
+                break;
+        }
+        if(actionResult != SwarmCodes.C_MOVE) {
+            action.Run();
         }
     }
 }

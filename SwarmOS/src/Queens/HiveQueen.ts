@@ -3,6 +3,9 @@ import { HarvestImperator } from "Imperators/HarvestImperator";
 import { HiveQueenBase } from "Queens/HiveQueenBase";
 
 export class HiveQueen extends HiveQueenBase {
+    ReleaseControl(creepName: string): void {
+        throw new Error("Method not implemented.");
+    }
     protected GatherIdleCreeps(): Creep[] {
         throw new Error("Method not implemented.");
     }
@@ -12,7 +15,7 @@ export class HiveQueen extends HiveQueenBase {
     protected CheckForSpawnRequirements(): void {
         if (this.Collector.Consul.RequiresSpawn()) {
             let newName = ('Harv' + Game.time);
-            this.Spawner.AddSpawnToQueue({
+            this.Spawner.Consul.AddSpawnToQueue({
                 body: [WORK, WORK, MOVE, CARRY],
                 creepName: newName,
                 requestorID: this.Collector.Consul.consulType,

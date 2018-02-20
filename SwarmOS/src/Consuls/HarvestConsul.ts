@@ -34,6 +34,7 @@ export class HarvestConsul extends CreepConsul {
             this.SourceHarvestRateTrackers.push(new RateTracker(TRACKER_PREFIX + i, this));
         }
         this._tempData = this.GetData(TEMP_DATA);
+        this.TempWorkers = [];
         for (let id in this._tempData) {
             let tempCreep = Game.creeps[id];
             if (!tempCreep) {
@@ -50,6 +51,7 @@ export class HarvestConsul extends CreepConsul {
         super.InitMemory();
         this.SourceData = [];
         this.SourceHarvestRateTrackers = [];
+        this._tempData = {};
         let foundSources = this.Nest.find(FIND_SOURCES);
         for (let i = 0, length = foundSources.length; i < length; i++) {
             this.SourceData.push(this.InitSourceData(foundSources[i]));
@@ -115,7 +117,7 @@ export class HarvestConsul extends CreepConsul {
             return;
         }
         for (let i = 0, length = this.SourceData.length; i < length; i++) {
-            if (!this.SourceData[i].harvester || !Game.creeps[this.SourceData[i].harvester]) {
+            if (!this.SourceData[i].harvester || !Game.creeps[this.SourceData[i].harvester as string]) {
                 this.SourceData[i].harvester = creepName;
                 return;
             }

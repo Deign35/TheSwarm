@@ -2,6 +2,7 @@ import { CreepConsul } from "Consuls/ConsulBase";
 import * as SwarmConsts from 'Consts/SwarmConsts';
 import * as SwarmCodes from 'Consts/SwarmCodes';
 import * as _ from "lodash";
+import { HiveQueenBase } from "Queens/HiveQueenBase";
 
 const CONSUL_TYPE = 'Controller';
 const UPGRADER_IDS = 'U_IDs'
@@ -26,7 +27,7 @@ export class ControllerConsul extends CreepConsul {
     get consulType(): string { return CONSUL_TYPE }
     UpgraderCreeps!: Creep[];
     Controller!: StructureController;
-    protected upgradeCreepData!: string[];
+    protected upgradeCreepData!: ControllerConsul_CreepData[];
     Save() {
         this.SetData(UPGRADER_IDS, this.upgradeCreepData);
         super.Save();
@@ -45,11 +46,23 @@ export class ControllerConsul extends CreepConsul {
         this.UpgraderCreeps = [];
         this.upgradeCreepData = this.GetData(UPGRADER_IDS) || [];
         for (let i = 0, length = this.upgradeCreepData.length; i < length; i++) {
-            if (!Game.creeps[this.upgradeCreepData[i]]) {
+            let creep = Game.creeps[this.upgradeCreepData[i].creepName];
+            if (!creep) {
                 this.upgradeCreepData.splice(i--, 1);
                 continue;
             }
-            this.UpgraderCreeps.push(Game.creeps[this.upgradeCreepData[i]]);
+            if(this.upgradeCreepData[i].fetching) {
+                if(creep.carry[RESOURCE_ENERGY] == creep.carryCapacity) {
+                    (this.Parent as HiveQueenBase).Collector.Consul.ReleaseManagedCreep(creep.name);
+                    this.upgradeCreepData[i].fetching = false;
+                } else {
+                    continue;
+                }
+            } else if(creep.carry[RESOURCE_ENERGY] == 0) {
+                (this.Parent as HiveQueenBase).Collector.Consul.AssignManagedCreep(creep);
+                this.upgradeCreepData[i].fetching = true;
+            }
+            this.UpgraderCreeps.push(creep);
         }
 
         return true;
@@ -81,7 +94,7 @@ export class ControllerConsul extends CreepConsul {
         return spawnArgs;
     }
     protected _assignCreep(creepName: string) {
-        this.upgradeCreepData.push(creepName);
+        this.upgradeCreepData.push({ creepName: creepName, fetching: false });
     }
     ReleaseCreep(creepName: string): void {
         for (let i = 0, length = this.upgradeCreepData.length; i < length; i++) {
@@ -91,4 +104,9 @@ export class ControllerConsul extends CreepConsul {
             }
         }
     }
+}
+
+declare type ControllerConsul_CreepData = {
+    creepName: string,
+    fetching: boolean,
 }

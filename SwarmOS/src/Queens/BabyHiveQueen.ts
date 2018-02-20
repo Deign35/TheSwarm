@@ -10,7 +10,7 @@ export class BabyHiveQueen extends HiveQueenBase {
     protected CheckForSpawnRequirements(): void {
         if (this.Collector.Consul.RequiresSpawn()) {
             let newName = ('Harv' + Game.time);
-            this.Spawner.AddSpawnToQueue({
+            this.Spawner.Consul.AddSpawnToQueue({
                 body: [WORK, WORK, MOVE, CARRY],
                 creepName: newName,
                 requestorID: this.Collector.Consul.consulType,
@@ -20,13 +20,19 @@ export class BabyHiveQueen extends HiveQueenBase {
         }
         if (this.Upgrader.Consul.RequiresSpawn()) {
             let spawnArgs = this.Upgrader.Consul.GetSpawnDefinition();
-            this.Spawner.AddSpawnToQueue(spawnArgs);
+            this.Spawner.Consul.AddSpawnToQueue(spawnArgs);
             this.Upgrader.Consul.CreepRequested = spawnArgs.creepName;
         }
         if (this.Builder.Consul.RequiresSpawn()) {
             let spawnArgs = this.Builder.Consul.GetSpawnDefinition();
-            this.Spawner.AddSpawnToQueue(spawnArgs);
+            this.Spawner.Consul.AddSpawnToQueue(spawnArgs);
             this.Builder.Consul.CreepRequested = spawnArgs.creepName;
+        }
+
+        if(this.Spawner.Consul.RequiresSpawn()) {
+            let spawnArgs = this.Spawner.Consul.GetSpawnDefinition();
+            this.Spawner.Consul.AddSpawnToQueue(spawnArgs);
+            this.Spawner.Consul.CreepRequested = spawnArgs.creepName;
         }
     }
     InitializeNest(): void {
@@ -36,7 +42,7 @@ export class BabyHiveQueen extends HiveQueenBase {
         //Not implemented
     }
     ReleaseControl(creepName: string): void {
-        
+
     }
 
     MetamorphiseToFullGrownHiveQueen(): HiveQueenBase {

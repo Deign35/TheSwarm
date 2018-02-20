@@ -64,6 +64,12 @@ export class TransferAction extends ActionWithTarget<TransferTargetType> {
             console.log('this.Target: ' + JSON.stringify(this.Target));
             result = SwarmCodes.E_INVALID;
         }
+
+        if(result == SwarmCodes.C_NONE) {
+            if (!this.AssignedCreep.pos.isNearTo(this.Target)) {
+                return SwarmCodes.C_MOVE;
+            }
+        }
         return result;
     }
 }

@@ -1,4 +1,5 @@
 import { CreepConsul } from "Consuls/ConsulBase";
+import { HiveQueenBase } from "Queens/HiveQueenBase";
 
 const CONSUL_TYPE = 'Constructor';
 const BUILDER_DATA = 'B_Data';
@@ -45,11 +46,21 @@ export class ConstructionConsul extends CreepConsul {
 
         this.BuilderData = this.GetData(BUILDER_DATA) || [];
         for (let i = 0, length = this.BuilderData.length; i < length; i++) {
-            if (!Game.creeps[this.BuilderData[i].creepName]) {
+            let creep = Game.creeps[this.BuilderData[i].creepName];
+            if (!creep) {
                 this.BuilderData.splice(i--, 1);
                 continue;
             }
-
+            if(this.BuilderData[i].fetching) {
+                if(creep.carry[RESOURCE_ENERGY] == creep.carryCapacity) {
+                    (this.Parent as HiveQueenBase).Collector.Consul.ReleaseManagedCreep(creep.name);
+                    this.BuilderData[i].fetching = false;
+                }
+                continue;
+            } else if(!this.BuilderData[i].fetching && creep.carry[RESOURCE_ENERGY] == 0) {
+                (this.Parent as HiveQueenBase).Collector.Consul.AssignManagedCreep(creep);
+                this.BuilderData[i].fetching = true;
+            }
             //Check that the construction site is valid
             if (!validSites[this.BuilderData[i].target]) {
                 if (!this.siteData[0]) {
@@ -67,9 +78,9 @@ export class ConstructionConsul extends CreepConsul {
     }
     protected _assignCreep(creepName: string): void {
         if (Object.keys(this.siteData).length == 0) {
-            this.BuilderData.push({ creepName: creepName, target: '' });
+            this.BuilderData.push({ creepName: creepName, target: '', fetching: false });
         } else {
-            this.BuilderData.push({ creepName: creepName, target: this.siteData[0].siteId });
+            this.BuilderData.push({ creepName: creepName, target: this.siteData[0].siteId, fetching: false });
         }
     }
     ReleaseCreep(creepName: string): void {
@@ -102,4 +113,5 @@ declare type ConstructionRequest = {
 declare type ConstructorData = {
     creepName: string,
     target: string,
+    fetching: boolean
 }

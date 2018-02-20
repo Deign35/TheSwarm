@@ -71,6 +71,12 @@ export class WithdrawAction extends ActionWithTarget<WithdrawTargetType> {
                 }
             }
         }
+
+        if(validationResult == SwarmCodes.C_NONE) {
+            if (!this.AssignedCreep.pos.isNearTo(this.Target)) {
+                return SwarmCodes.C_MOVE;
+            }
+        }
         return validationResult;
     }
 }
