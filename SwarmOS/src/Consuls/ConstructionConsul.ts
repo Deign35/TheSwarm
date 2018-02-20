@@ -42,7 +42,7 @@ export class ConstructionConsul extends CreepConsul {
         }
 
         this.BuilderData = this.GetData(BUILDER_DATA) || [];
-        for (let i = 0, length = this.BuilderData.length; i < length; i++) {
+        for (let i = 0; i < this.BuilderData.length; i++) {
             let creep = Game.creeps[this.BuilderData[i].creepName];
             if (!creep) {
                 this.BuilderData.splice(i--, 1);

@@ -18,6 +18,7 @@ export class SpawnConsul extends CreepConsul {
     protected SpawnData!: SpawnConsul_SpawnData[];
     protected SpawnQueue!: MinHeap<SpawnConsul_SpawnArgs>;
     protected RelativeTime!: number;
+    ActiveSpawnNames!: {[creepName: string]: string};
 
     SpawnRefiller?: Creep;
     RefillerData!: SpawnConsul_RefillerData;
@@ -33,6 +34,17 @@ export class SpawnConsul extends CreepConsul {
         if (!super.Load()) { return false; }
         this.SpawnData = this.GetData(SPAWN_DATA);
         let serializedQueue = this.GetData(SPAWN_QUEUE);
+        this.ActiveSpawnNames = {};
+        let expiredSpawns = [];
+        for(let i = 0; i < serializedQueue.length; i++) {
+            let creepdata = (SpawnConsul.DeserializeSpawnRequest(serializedQueue[i][0])) as SpawnConsul_SpawnArgs;
+            if(creepdata) {
+                if(creepdata.targetTime < Game.time - 1000) {
+                    serializedQueue.splice(i--, 1);
+                }
+                this.ActiveSpawnNames[creepdata.creepName] = creepdata.creepName;
+            }
+        }
         this.SpawnQueue = MinHeap.DeserializeHeap(serializedQueue, SpawnConsul.DeserializeSpawnRequest);
         this.RelativeTime = this.GetData(RELATIVE_TIME);
         this.RefillerData = this.GetData(REFILLER_DATA);
@@ -89,7 +101,7 @@ export class SpawnConsul extends CreepConsul {
         if (!spawnData) { return; }
         if (this.Nest.energyAvailable >= SpawnConsul.CalculateEnergyCost(spawnData)) {
             let spawnToUse: StructureSpawn | undefined;
-            for (let i = 0, length = this.SpawnData.length; i < length; i++) {
+            for (let i = 0; i < this.SpawnData.length; i++) {
                 let spawn = Game.spawns[this.SpawnData[i].id];
                 if (!spawn) { this.SpawnData.splice(i--, 1); continue; }
                 if (spawn.spawning) { continue; }
@@ -175,7 +187,8 @@ export class SpawnConsul extends CreepConsul {
         return JSON.stringify(spawnData);
     }
     protected static DeserializeSpawnRequest(data: string): SpawnConsul_SpawnArgs {
-        return JSON.parse(data) as SpawnConsul_SpawnArgs;
+        let spawnArgs = JSON.parse(data) as SpawnConsul_SpawnArgs;
+        return spawnArgs;
     }
 
     RequiresSpawn(): boolean {

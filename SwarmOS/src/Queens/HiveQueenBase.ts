@@ -32,21 +32,28 @@ export abstract class HiveQueenBase extends NestQueenBase implements IHiveQueen 
         // Check for idle creeps and reassign them
         let idleCreeps: Creep[] = [];
         for(let creepName in Game.creeps) {
+            let creepFound = false;
             for(let i = 0, length = this.Upgrader.Consul.UpgradeCreepData.length; i < length; i++) {
                 if(this.Upgrader.Consul.UpgradeCreepData[i].creepName == creepName) {
-                    continue;
+                    creepFound = true;
+                    break;
                 }
             }
+            if(creepFound) { continue;}
             for(let i = 0, length = this.Collector.Consul.SourceData.length; i < length; i++) {
                 if(this.Collector.Consul.SourceData[i].harvester == creepName) {
-                    continue;
+                    creepFound = true;
+                    break;
                 }
             }
+            if(creepFound) { continue;}
             for(let i = 0, length = this.Builder.Consul.BuilderData.length; i < length; i++) {
                 if(this.Builder.Consul.BuilderData[i].creepName == creepName) {
-                    continue;
+                    creepFound = true;
+                    break;
                 }
             }
+            if(creepFound) { continue;}
             if(this.Spawner.Consul.RefillerData.creepName == creepName) {
                 continue;
             }
@@ -79,17 +86,19 @@ export abstract class HiveQueenBase extends NestQueenBase implements IHiveQueen 
         this.ActivateImperators();
         this.CheckForSpawnRequirements();
         let requirements = this.Spawner.Consul.GetNextSpawns(1);
-        if (this.Nest.energyAvailable >= requirements[0].energyNeeded && requirements[0].neededBy) {
-            let spawnedCreep = this.Spawner.Consul.SpawnCreep();
-            if (spawnedCreep) {
-                if (spawnedCreep.requestorID == HarvestConsul.ConsulType) {
-                    this.Collector.Consul.AssignSpawn(spawnedCreep.creepName);
-                } else if (spawnedCreep.requestorID == ControllerConsul.ConsulType) {
-                    this.Upgrader.Consul.AssignSpawn(spawnedCreep.creepName);
-                } else if (spawnedCreep.requestorID == ConstructionConsul.ConsulType) {
-                    this.Builder.Consul.AssignSpawn(spawnedCreep.creepName);
-                } else if (spawnedCreep.requestorID == SpawnConsul.ConsulType) {
-                    this.Spawner.Consul.AssignSpawn(spawnedCreep.creepName);
+        if(requirements.length > 0) {
+            if (this.Nest.energyAvailable >= requirements[0].energyNeeded && requirements[0].neededBy) {
+                let spawnedCreep = this.Spawner.Consul.SpawnCreep();
+                if (spawnedCreep) {
+                    if (spawnedCreep.requestorID == HarvestConsul.ConsulType) {
+                        this.Collector.Consul.AssignSpawn(spawnedCreep.creepName);
+                    } else if (spawnedCreep.requestorID == ControllerConsul.ConsulType) {
+                        this.Upgrader.Consul.AssignSpawn(spawnedCreep.creepName);
+                    } else if (spawnedCreep.requestorID == ConstructionConsul.ConsulType) {
+                        this.Builder.Consul.AssignSpawn(spawnedCreep.creepName);
+                    } else if (spawnedCreep.requestorID == SpawnConsul.ConsulType) {
+                        this.Spawner.Consul.AssignSpawn(spawnedCreep.creepName);
+                    }
                 }
             }
         }
@@ -102,8 +111,10 @@ export abstract class HiveQueenBase extends NestQueenBase implements IHiveQueen 
     }
     protected ActivateImperators(): SwarmCodes.SwarmErrors {
         this.Collector.ActivateImperator();
-        this.Upgrader.ActivateImperator();
-        this.Builder.ActivateImperator();
+        if(Game.cpu.bucket > 500) {
+            this.Upgrader.ActivateImperator();
+            this.Builder.ActivateImperator();
+        }
         this.Spawner.ActivateImperator();
         return SwarmCodes.C_NONE;
     }

@@ -45,7 +45,7 @@ export class ControllerConsul extends CreepConsul {
 
         this.UpgraderCreeps = [];
         this.UpgradeCreepData = this.GetData(UPGRADER_IDS) || [];
-        for (let i = 0, length = this.UpgradeCreepData.length; i < length; i++) {
+        for (let i = 0; i < this.UpgradeCreepData.length; i++) {
             let creep = Game.creeps[this.UpgradeCreepData[i].creepName];
             if (!creep) {
                 this.UpgradeCreepData.splice(i--, 1);
