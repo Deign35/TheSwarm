@@ -18,7 +18,7 @@ export class ControllerImperator extends ImperatorBase {
         let target = this.Consul.Controller;
         for (let i = 0, length = creeps.length; i < length; i++) {
             let creep = creeps[i];
-            this.Queen.Nest.visual.text('Upg', creep.pos);
+            this.Queen.Nest.visual.text('' + creep.carry[RESOURCE_ENERGY], creep.pos);
             if (creep.spawning) { continue; }
             if (this.Consul.UpgradeCreepData[i].fetching) { continue; }
             let upgradeAction: ActionBase = new UpgradeAction(creep, target);

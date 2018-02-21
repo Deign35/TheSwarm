@@ -24,3 +24,9 @@ declare type HarvestConsul_SourceData = RoomObjectWithID & {
     containerID?: string,
     constructionSite?: string,
 }
+
+declare type CreepConsul_BaseData = {
+    creepName: string,
+    fetching: boolean,
+    targetID?: string,
+}

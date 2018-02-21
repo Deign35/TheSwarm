@@ -31,38 +31,38 @@ export abstract class HiveQueenBase extends NestQueenBase implements IHiveQueen 
     ActivateNest() {
         // Check for idle creeps and reassign them
         let idleCreeps: Creep[] = [];
-        for(let creepName in Game.creeps) {
+        for (let creepName in Game.creeps) {
             let creepFound = false;
-            for(let i = 0, length = this.Upgrader.Consul.UpgradeCreepData.length; i < length; i++) {
-                if(this.Upgrader.Consul.UpgradeCreepData[i].creepName == creepName) {
+            for (let i = 0, length = this.Upgrader.Consul.UpgradeCreepData.length; i < length; i++) {
+                if (this.Upgrader.Consul.UpgradeCreepData[i].creepName == creepName) {
                     creepFound = true;
                     break;
                 }
             }
-            if(creepFound) { continue;}
-            for(let i = 0, length = this.Collector.Consul.SourceData.length; i < length; i++) {
-                if(this.Collector.Consul.SourceData[i].harvester == creepName) {
+            if (creepFound) { continue; }
+            for (let i = 0, length = this.Collector.Consul.SourceData.length; i < length; i++) {
+                if (this.Collector.Consul.SourceData[i].harvester == creepName) {
                     creepFound = true;
                     break;
                 }
             }
-            if(creepFound) { continue;}
-            for(let i = 0, length = this.Builder.Consul.BuilderData.length; i < length; i++) {
-                if(this.Builder.Consul.BuilderData[i].creepName == creepName) {
+            if (creepFound) { continue; }
+            for (let i = 0, length = this.Builder.Consul.BuilderData.length; i < length; i++) {
+                if (this.Builder.Consul.BuilderData[i].creepName == creepName) {
                     creepFound = true;
                     break;
                 }
             }
-            if(creepFound) { continue;}
-            if(this.Spawner.Consul.RefillerData.creepName == creepName) {
+            if (creepFound) { continue; }
+            if (this.Spawner.Consul.RefillerData.creepName == creepName) {
                 continue;
             }
             idleCreeps.push(Game.creeps[creepName]);
         }
 
-        for(let i = 0, length = idleCreeps.length; i < length; i++) {
-            if(idleCreeps[i].getActiveBodyparts(WORK) == 0) {
-                if(!this.Spawner.Consul.RefillerData.creepName) {
+        for (let i = 0, length = idleCreeps.length; i < length; i++) {
+            if (idleCreeps[i].getActiveBodyparts(WORK) == 0) {
+                if (!this.Spawner.Consul.RefillerData.creepName) {
                     this.Spawner.Consul.AssignCreep(idleCreeps[i]);
                     continue;
                 }
@@ -71,13 +71,13 @@ export abstract class HiveQueenBase extends NestQueenBase implements IHiveQueen 
                 continue;
             }
 
-            if(this.Nest.find(FIND_MY_CONSTRUCTION_SITES)) {
-                this.Builder.Consul.AssignCreep(idleCreeps[i]);
+            if (idleCreeps[i].getActiveBodyparts(WORK) > 1) {
+                this.Collector.Consul.AssignCreep(idleCreeps[i]);
                 continue;
             }
 
-            if(idleCreeps[i].getActiveBodyparts(WORK) >= 5) {
-                this.Collector.Consul.AssignCreep(idleCreeps[i]);
+            if (this.Nest.find(FIND_MY_CONSTRUCTION_SITES)) {
+                this.Builder.Consul.AssignCreep(idleCreeps[i]);
                 continue;
             }
 
@@ -86,7 +86,7 @@ export abstract class HiveQueenBase extends NestQueenBase implements IHiveQueen 
         this.ActivateImperators();
         this.CheckForSpawnRequirements();
         let requirements = this.Spawner.Consul.GetNextSpawns(1);
-        if(requirements.length > 0) {
+        if (requirements.length > 0) {
             if (this.Nest.energyAvailable >= requirements[0].energyNeeded && requirements[0].neededBy) {
                 let spawnedCreep = this.Spawner.Consul.SpawnCreep();
                 if (spawnedCreep) {
@@ -111,7 +111,7 @@ export abstract class HiveQueenBase extends NestQueenBase implements IHiveQueen 
     }
     protected ActivateImperators(): SwarmCodes.SwarmErrors {
         this.Collector.ActivateImperator();
-        if(Game.cpu.bucket > 500) {
+        if (Game.cpu.bucket > 500) {
             this.Upgrader.ActivateImperator();
             this.Builder.ActivateImperator();
         }

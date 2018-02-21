@@ -15,6 +15,15 @@ export const loop = function () {
     let swarmQueen = SwarmQueen.LoadSwarmData();
     swarmQueen.Activate();
     swarmQueen.Save();
+
+    /*let hostiles = Game.rooms['E44S1'].find(FIND_HOSTILE_CREEPS);
+    if (hostiles.length > 0) {
+        Game.getObjectById('5a8cc4e55415643b964b2e2e').attack(hostiles[0]);
+    }
+    Game.rooms['E44S1'].visual.text(("CPU: " + Game.cpu.getUsed()).slice(0, 10), 21, 20.5, { color: 'black', backgroundColor: 'white', font: 0.8 })
+    Game.rooms['E44S1'].visual.text(("MEM: " + RawMemory.get().length).slice(0, 10), 21, 21.5, { color: 'black', backgroundColor: 'white', font: 0.8 })
+    Game.rooms['E44S1'].visual.text(("B: " + Game.cpu.bucket), 21, 22.5, { color: 'black', backgroundColor: 'white', font: 0.8 })*/
+
 }
 
 const initSwarm = function () {

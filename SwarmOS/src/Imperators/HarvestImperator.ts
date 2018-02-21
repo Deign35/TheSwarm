@@ -34,7 +34,7 @@ export class HarvestImperator extends ImperatorBase {
         let rotateBackward = Game.time % 2 == 0;
         let curIndex = Game.time % this.Consul.SourceData.length;
         for (let id in tempWorkers) {
-            if(tempWorkers[id].spawning) { continue;}
+            if (tempWorkers[id].spawning) { continue; }
             let targetId = this.Consul._tempData[tempWorkers[id].name];
             let target: RoomObject | undefined = Game.getObjectById(targetId) || undefined;
             let cycleProtection = 0;
@@ -55,7 +55,7 @@ export class HarvestImperator extends ImperatorBase {
 
                     if (data.containerID) {
                         target = Game.getObjectById(data.containerID) as StructureContainer;
-                        if ((target as StructureContainer).store[RESOURCE_ENERGY] == 0) {
+                        if ((target as StructureContainer).store[RESOURCE_ENERGY] < 10) {
                             target = undefined;
                         }
                     }
@@ -96,7 +96,7 @@ export class HarvestImperator extends ImperatorBase {
     // Activate temp worker as a different function
     // temp worker can try to withdraw from the container first.
     protected ActivateHarvester(data: HarvestConsul_SourceData, harvester: Creep) {
-        this.Queen.Nest.visual.text('Harv', harvester.pos);
+        this.Queen.Nest.visual.text('' + harvester.ticksToLive, harvester.pos);
         if (harvester.spawning) { return; }
         let sourceTarget = Game.getObjectById(data.id) as Source;
         let moveTarget = (Game.getObjectById(data.constructionSite || data.containerID) as RoomObject);
@@ -185,7 +185,7 @@ export class HarvestImperator extends ImperatorBase {
                 //if (direction > 9) { direction -= 8; }
                 //creep.move(direction as DirectionConstant);
                 break;
-                // harvester has nothing to give.
+            // harvester has nothing to give.
         }
         action.Run();
     }

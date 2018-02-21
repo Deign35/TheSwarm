@@ -74,12 +74,12 @@ export class ConstructionConsul extends CreepConsul {
         this.siteData[request.siteId] = request;
     }
     protected _assignCreep(creepName: string): void {
-        if(!creepName) {
+        if (!creepName) {
             throw "ASSIGNMENT IS EMPTY";
         }
         let builderKeys = Object.keys(this.siteData);
-        for(let i = 0, length = this.BuilderData.length; i < length; i++) {
-            if(this.BuilderData[i].creepName == creepName) {
+        for (let i = 0, length = this.BuilderData.length; i < length; i++) {
+            if (this.BuilderData[i].creepName == creepName) {
                 return;
             }
         }
@@ -107,7 +107,7 @@ export class ConstructionConsul extends CreepConsul {
     }
     RequiresSpawn(): boolean {
         if (this.CreepRequested) { return false; }
-        return Object.keys(this.siteData).length > 0 && this.BuilderData.length < 3;
+        return Object.keys(this.siteData).length > 0 && this.BuilderData.length < 5;
     }
 }
 

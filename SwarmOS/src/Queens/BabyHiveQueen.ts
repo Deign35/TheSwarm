@@ -8,23 +8,23 @@ import { ControllerConsul } from "Consuls/ControllerConsul";
 
 export class BabyHiveQueen extends HiveQueenBase {
     protected CheckForSpawnRequirements(): void {
-        if(this.Collector.Consul.CreepRequested) {
-            if(!this.Spawner.Consul.ActiveSpawnNames[this.Collector.Consul.CreepRequested]) {
+        if (this.Collector.Consul.CreepRequested) {
+            if (!this.Spawner.Consul.ActiveSpawnNames[this.Collector.Consul.CreepRequested]) {
                 this.Collector.Consul.ForgetSpawn();
             }
         }
-        if(this.Upgrader.Consul.CreepRequested) {
-            if(!this.Spawner.Consul.ActiveSpawnNames[this.Upgrader.Consul.CreepRequested]) {
+        if (this.Upgrader.Consul.CreepRequested) {
+            if (!this.Spawner.Consul.ActiveSpawnNames[this.Upgrader.Consul.CreepRequested]) {
                 this.Upgrader.Consul.ForgetSpawn();
             }
         }
-        if(this.Builder.Consul.CreepRequested) {
-            if(!this.Spawner.Consul.ActiveSpawnNames[this.Builder.Consul.CreepRequested]) {
+        if (this.Builder.Consul.CreepRequested) {
+            if (!this.Spawner.Consul.ActiveSpawnNames[this.Builder.Consul.CreepRequested]) {
                 this.Builder.Consul.ForgetSpawn();
             }
         }
-        if(this.Spawner.Consul.CreepRequested) {
-            if(!this.Spawner.Consul.ActiveSpawnNames[this.Spawner.Consul.CreepRequested]) {
+        if (this.Spawner.Consul.CreepRequested) {
+            if (!this.Spawner.Consul.ActiveSpawnNames[this.Spawner.Consul.CreepRequested]) {
                 this.Spawner.Consul.ForgetSpawn();
             }
         }
@@ -64,12 +64,12 @@ export class BabyHiveQueen extends HiveQueenBase {
             this.Spawner.Consul.CreepRequested = spawnArgs.creepName;
         }
 
-        if(this.Spawner.Consul.RefillerData.idleTime > 50) {
-            if(!this.Builder.Consul.CreepRequested) {
-                let spawnArgs = this.Builder.Consul.GetSpawnDefinition();
-                spawnArgs.targetTime = Game.time - 25;
+        if (this.Spawner.Consul.RefillerData.idleTime > 100) {
+            if (!this.Upgrader.Consul.CreepRequested) {
+                let spawnArgs = this.Upgrader.Consul.GetSpawnDefinition();
+                spawnArgs.targetTime = Game.time;
                 this.Spawner.Consul.AddSpawnToQueue(spawnArgs);
-                this.Builder.Consul.CreepRequested = spawnArgs.creepName;
+                this.Upgrader.Consul.CreepRequested = spawnArgs.creepName;
             }
         }
     }

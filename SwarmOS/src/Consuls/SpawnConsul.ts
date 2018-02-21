@@ -18,11 +18,16 @@ export class SpawnConsul extends CreepConsul {
     protected SpawnData!: SpawnConsul_SpawnData[];
     protected SpawnQueue!: MinHeap<SpawnConsul_SpawnArgs>;
     protected RelativeTime!: number;
-    ActiveSpawnNames!: {[creepName: string]: string};
+    ActiveSpawnNames!: { [creepName: string]: string };
 
     SpawnRefiller?: Creep;
     RefillerData!: SpawnConsul_RefillerData;
     Save() {
+        if (this.SpawnQueue.Peek()) {
+            this.Parent.Nest.visual.text(this.Parent.Nest.energyAvailable + ' of ' + (this.SpawnQueue.Peek() as SpawnConsul_SpawnArgs).calculatedCost, 8, 20);
+        } else {
+            this.Parent.Nest.visual.text(this.Parent.Nest.energyAvailable + ' of ' + this.Parent.Nest.energyCapacityAvailable, 8, 20);
+        }
         this.SetData(SPAWN_DATA, this.SpawnData);
         let serializedQueue = MinHeap.CompressHeap(this.SpawnQueue, SpawnConsul.SerializeSpawnRequest);
         this.SetData(SPAWN_QUEUE, serializedQueue);
@@ -36,10 +41,10 @@ export class SpawnConsul extends CreepConsul {
         let serializedQueue = this.GetData(SPAWN_QUEUE);
         this.ActiveSpawnNames = {};
         let expiredSpawns = [];
-        for(let i = 0; i < serializedQueue.length; i++) {
+        for (let i = 0; i < serializedQueue.length; i++) {
             let creepdata = (SpawnConsul.DeserializeSpawnRequest(serializedQueue[i][0])) as SpawnConsul_SpawnArgs;
-            if(creepdata) {
-                if(creepdata.targetTime < Game.time - 1000) {
+            if (creepdata) {
+                if (creepdata.targetTime < Game.time - 1000) {
                     serializedQueue.splice(i--, 1);
                 }
                 this.ActiveSpawnNames[creepdata.creepName] = creepdata.creepName;
@@ -84,7 +89,8 @@ export class SpawnConsul extends CreepConsul {
         }
         let extensions = this.Nest.find(FIND_MY_STRUCTURES, {
             filter: function (struct) {
-                return struct.structureType == STRUCTURE_EXTENSION;
+                return struct.structureType == STRUCTURE_EXTENSION ||
+                    struct.structureType == STRUCTURE_TOWER;
             }
         });
         for (let i = 0, length = extensions.length; i < length; i++) {
