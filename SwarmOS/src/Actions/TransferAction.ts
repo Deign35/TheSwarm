@@ -18,7 +18,6 @@ export class TransferAction extends ActionWithTarget<TransferTargetType> {
             targetAllows = (this.Target as StructureContainer).storeCapacity - _.sum((this.Target as StructureContainer).store);
         } else if ((this.Target as Creep).carryCapacity) {
             targetAllows = (this.Target as Creep).carryCapacity - _.sum((this.Target as Creep).carry);
-
         } else if ((this.Target as StructureExtension).energyCapacity) {
             targetAllows = (this.Target as StructureExtension).energyCapacity - (this.Target as StructureExtension).energy;
         }
@@ -65,7 +64,7 @@ export class TransferAction extends ActionWithTarget<TransferTargetType> {
             result = SwarmCodes.E_INVALID;
         }
 
-        if(result == SwarmCodes.C_NONE) {
+        if (result == SwarmCodes.C_NONE) {
             if (!this.AssignedCreep.pos.isNearTo(this.Target)) {
                 return SwarmCodes.C_MOVE;
             }

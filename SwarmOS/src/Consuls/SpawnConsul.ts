@@ -8,10 +8,7 @@ const CONSUL_TYPE = 'Spawn_Consul';
 const SPAWN_DATA = 'S_DATA';
 const SPAWN_QUEUE = 'S_QUEUE';
 const RELATIVE_TIME = 'R_TIME';
-const REFILLER_ID = 'Refiller';
-const REFILLER_DATA = 'R_DATA';
-const EXTENSION_IDS = 'Extensions';
-export class SpawnConsul extends CreepConsul {
+export class SpawnConsul extends ConsulBase {
     static get ConsulType(): string { return CONSUL_TYPE; }
     readonly consulType = SpawnConsul.ConsulType;
 
@@ -19,9 +16,6 @@ export class SpawnConsul extends CreepConsul {
     protected SpawnQueue!: MinHeap<SpawnConsul_SpawnArgs>;
     protected RelativeTime!: number;
     ActiveSpawnNames!: { [creepName: string]: string };
-
-    SpawnRefiller?: Creep;
-    RefillerData!: SpawnConsul_RefillerData;
     Save() {
         if (this.SpawnQueue.Peek()) {
             this.Parent.Nest.visual.text(this.Parent.Nest.energyAvailable + ' of ' + (this.SpawnQueue.Peek() as SpawnConsul_SpawnArgs).calculatedCost, 8, 20);
@@ -31,7 +25,6 @@ export class SpawnConsul extends CreepConsul {
         this.SetData(SPAWN_DATA, this.SpawnData);
         let serializedQueue = MinHeap.CompressHeap(this.SpawnQueue, SpawnConsul.SerializeSpawnRequest);
         this.SetData(SPAWN_QUEUE, serializedQueue);
-        this.SetData(REFILLER_DATA, this.RefillerData);
         super.Save();
     }
 
@@ -52,40 +45,21 @@ export class SpawnConsul extends CreepConsul {
         }
         this.SpawnQueue = MinHeap.DeserializeHeap(serializedQueue, SpawnConsul.DeserializeSpawnRequest);
         this.RelativeTime = this.GetData(RELATIVE_TIME);
-        this.RefillerData = this.GetData(REFILLER_DATA);
-        if (this.RefillerData.creepName) {
-            this.SpawnRefiller = Game.creeps[this.RefillerData.creepName];
-            if (!this.SpawnRefiller) {
-                this.RefillerData.creepName = '';
-            } else {
-                if (this.RefillerData.fetching) {
-                    if (this.SpawnRefiller.carry[RESOURCE_ENERGY] == this.SpawnRefiller.carryCapacity) {
-                        (this.Parent as HiveQueenBase).Collector.Consul.ReleaseManagedCreep(this.SpawnRefiller.name);
-                        this.RefillerData.fetching = false;
-                    }
-                } else if (this.SpawnRefiller.carry[RESOURCE_ENERGY] == 0) {
-                    (this.Parent as HiveQueenBase).Collector.Consul.AssignManagedCreep(this.SpawnRefiller);
-                    this.RefillerData.fetching = true;
-                }
-            }
-        }
+        
         return true;
     }
 
     InitMemory() {
         super.InitMemory();
         this.SpawnQueue = new MinHeap();
-        this.RefillerData = { creepName: '', fetching: false, extensionList: [], curTarget: 0, idleTime: 0 };
         this.ScanRoom();
     }
 
     ScanRoom(): void {
         let spawns = this.Nest.find(FIND_MY_SPAWNS);
         this.SpawnData = [];
-        this.RefillerData.extensionList = [];
         for (let i = 0, length = spawns.length; i < length; i++) {
             this.AddSpawner(spawns[i]);
-            this.RefillerData.extensionList.push(spawns[i].id);
         }
         let extensions = this.Nest.find(FIND_MY_STRUCTURES, {
             filter: function (struct) {
@@ -93,13 +67,6 @@ export class SpawnConsul extends CreepConsul {
                     struct.structureType == STRUCTURE_TOWER;
             }
         });
-        for (let i = 0, length = extensions.length; i < length; i++) {
-            this.RefillerData.extensionList.push(extensions[i].id);
-        }
-        this.RefillerData.extensionList.sort((a, b) => {
-
-            return 0;
-        })
     }
 
     SpawnCreep() {
@@ -196,43 +163,4 @@ export class SpawnConsul extends CreepConsul {
         let spawnArgs = JSON.parse(data) as SpawnConsul_SpawnArgs;
         return spawnArgs;
     }
-
-    RequiresSpawn(): boolean {
-        // Check if
-        if (!this.CreepRequested && !this.SpawnRefiller) {
-            return true;
-        }
-        return false;
-    }
-    ReleaseCreep(creepName: string): void {
-        if (this.CreepRequested) {
-            this.CreepRequested = undefined;
-        }
-        if (this.SpawnRefiller) {
-            this.SpawnRefiller = undefined;
-            this.RefillerData.creepName = '';
-            this.RefillerData.fetching = false;
-        }
-    }
-    GetSpawnDefinition(): SpawnConsul_SpawnArgs {
-        return {
-            body: [CARRY, MOVE, CARRY, MOVE],
-            targetTime: Game.time - 100,
-            creepName: 'SR' + Game.time,
-            requestorID: this.consulType,
-        }
-    }
-    protected _assignCreep(creepName: string): void {
-        this.RefillerData.creepName = creepName;
-        this.RefillerData.fetching = false;
-        this.SpawnRefiller = Game.creeps[creepName];
-    }
-}
-
-declare type SpawnConsul_RefillerData = {
-    creepName: string,
-    extensionList: string[],
-    curTarget: number,
-    fetching: boolean
-    idleTime: number,
 }
