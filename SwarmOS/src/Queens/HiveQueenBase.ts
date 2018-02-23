@@ -1,3 +1,4 @@
+import * as _ from 'lodash';
 import * as SwarmCodes from 'Consts/SwarmCodes'
 import { NestQueenBase } from "./NestQueenBase";
 import { HarvestImperator } from "Imperators/HarvestImperator";
@@ -7,28 +8,17 @@ import { ControllerImperator } from 'Imperators/ControllerImperator';
 import { ControllerConsul } from 'Consuls/ControllerConsul';
 import { ConstructionConsul } from 'Consuls/ConstructionConsul';
 import { ConstructionImperator } from 'Imperators/ConstructionImperator';
-import * as _ from 'lodash';
 import { DistributionImperator } from 'Imperators/DistributionImperator';
 import { DistributionConsul } from 'Consuls/DistributionConsul';
 
 export abstract class HiveQueenBase extends NestQueenBase implements IHiveQueen {
-    Collector!: HarvestImperator;
     Upgrader!: ControllerImperator;
-    Builder!: ConstructionImperator;
-    Distributor!: DistributionImperator;
 
     Spawner!: SpawnConsul;
     Save() {
         this.Upgrader.ImperatorComplete();
-        this.Collector.ImperatorComplete();
-        this.Builder.ImperatorComplete();
-        this.Distributor.ImperatorComplete();
         this.Spawner.Save();
         super.Save();
-    }
-
-    InitMemory() {
-        super.InitMemory();
     }
 
     ActivateNest() {
@@ -107,19 +97,15 @@ export abstract class HiveQueenBase extends NestQueenBase implements IHiveQueen 
         }
     }
     protected LoadImperators() {
+        super.LoadImperators();
         this.Spawner = new SpawnConsul(SpawnConsul.ConsulType, this);
-        this.Collector = new HarvestImperator(HarvestConsul.ConsulType, this);
         this.Upgrader = new ControllerImperator(ControllerConsul.ConsulType, this);
-        this.Builder = new ConstructionImperator(ConstructionConsul.ConsulType, this);
-        this.Distributor = new DistributionImperator(DistributionConsul.ConsulType, this);
     }
     protected ActivateImperators(): SwarmCodes.SwarmErrors {
-        this.Collector.ActivateImperator();
+        super.ActivateImperators();
         if (Game.cpu.bucket > 500 || Game.shard.name == 'sim') {
             this.Upgrader.ActivateImperator();
-            this.Builder.ActivateImperator();
         }
-        this.Distributor.ActivateImperator();
         return SwarmCodes.C_NONE;
     }
     protected abstract CheckForSpawnRequirements(): void;
