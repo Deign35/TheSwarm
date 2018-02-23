@@ -36,7 +36,7 @@ export class DistributionImperator extends ImperatorBase {
             if (actionResult != SwarmCodes.C_MOVE) {
                 let transferResult = action.Run();
                 switch (transferResult) {
-                    case (SwarmCodes.C_NONE):
+                    case (SwarmCodes.C_NONE): break;
                     case (SwarmCodes.E_TARGET_INELLIGIBLE):
                     case (SwarmCodes.E_ACTION_UNNECESSARY):
                         console.log('DistributionResult: ' + transferResult); // What happens i wonder?

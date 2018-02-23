@@ -1,20 +1,21 @@
 import * as _ from 'lodash';
 import * as SwarmCodes from 'Consts/SwarmCodes'
-import { NestQueenBase } from "./NestQueenBase";
-import { HarvestImperator } from "Imperators/HarvestImperator";
+import { NestQueenBase } from 'Queens/NestQueenBase';
+import { ControllerImperator } from 'Imperators/ControllerImperator';
 import { SpawnConsul } from 'Consuls/SpawnConsul';
 import { HarvestConsul } from 'Consuls/HarvestConsul';
-import { ControllerImperator } from 'Imperators/ControllerImperator';
 import { ControllerConsul } from 'Consuls/ControllerConsul';
 import { ConstructionConsul } from 'Consuls/ConstructionConsul';
+import { DistributionConsul } from 'Consuls/DistributionConsul';
+import { HarvestImperator } from 'Imperators/HarvestImperator';
 import { ConstructionImperator } from 'Imperators/ConstructionImperator';
 import { DistributionImperator } from 'Imperators/DistributionImperator';
-import { DistributionConsul } from 'Consuls/DistributionConsul';
 
 export abstract class HiveQueenBase extends NestQueenBase implements IHiveQueen {
     Upgrader!: ControllerImperator;
-
     Spawner!: SpawnConsul;
+
+
     Save() {
         this.Upgrader.ImperatorComplete();
         this.Spawner.Save();

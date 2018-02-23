@@ -1,6 +1,5 @@
 import { QueenMemory } from "Tools/SwarmMemory";
 import { HiveQueen } from "Queens/HiveQueen";
-import { BabyHiveQueen } from "./BabyHiveQueen";
 import { HiveQueenBase } from "./HiveQueenBase";
 
 export class SwarmQueen extends QueenMemory {
@@ -27,7 +26,7 @@ export class SwarmQueen extends QueenMemory {
         this.HiveQueens = {};
         let HiveQueenData = this.GetData('HiveQueenData') || [] as string[];
         for (let i = 0, length = HiveQueenData.length; i < length; i++) {
-            this.HiveQueens[HiveQueenData[i]] = new BabyHiveQueen(HiveQueenData[i]);
+            this.HiveQueens[HiveQueenData[i]] = new HiveQueen(HiveQueenData[i]);
         }
 
         return true;
@@ -49,7 +48,7 @@ export class SwarmQueen extends QueenMemory {
             let room = Game.rooms[name];
             if (!room.controller || !room.controller.my) { continue; }
 
-            newSwarm.HiveQueens[name] = new BabyHiveQueen(name);
+            newSwarm.HiveQueens[name] = new HiveQueen(name);
         }
 
         // Initialize each HiveQueen
