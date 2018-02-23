@@ -6,7 +6,7 @@ const CONSUL_TYPE = 'Distribution';
 const SCAN_COOLDOWN = 'SCAN_CD';
 const SCAN_LIMIT = 10;
 export class DistributionConsul extends CreepConsul {
-    CreepData!: CreepConsul_Data[];
+    CreepData!: DistributionConsul_RefillerData[];
     static get ConsulType(): string { return CONSUL_TYPE; }
     get consulType(): string { return CONSUL_TYPE }
 
@@ -37,11 +37,11 @@ export class DistributionConsul extends CreepConsul {
             this.CreepData.push(this.SpawnRefillerData);
             if (this.SpawnRefillerData.fetching) {
                 if (this.SpawnRefiller.carry[RESOURCE_ENERGY] == this.SpawnRefiller.carryCapacity) {
-                    (this.Parent as HiveQueenBase).Collector.Consul.ReleaseManagedCreep(this.SpawnRefillerData.creepName);
+                    (this.Parent as HiveQueenBase).Collector.ReleaseManagedCreep(this.SpawnRefillerData.creepName);
                     this.SpawnRefillerData.fetching = false;
                 }
             } else if (!this.SpawnRefillerData.fetching && this.SpawnRefiller.carry[RESOURCE_ENERGY] == 0) {
-                (this.Parent as HiveQueenBase).Collector.Consul.AssignManagedCreep(this.SpawnRefiller);
+                (this.Parent as HiveQueenBase).Collector.AssignManagedCreep(this.SpawnRefiller);
                 this.SpawnRefillerData.fetching = true;
             }
         }
@@ -130,13 +130,8 @@ export class DistributionConsul extends CreepConsul {
 
         return;
     }
-}
 
-declare type SpawnRefillTarget = StructureSpawn | StructureExtension | StructureTower; // For now...
-
-declare type DistributionConsul_RefillerData = CreepConsul_Data & {
-    refillList: string[],
-    curTarget: number,
-    fetching: boolean,
-    idleTime: number,
+    GetIdleTime() {
+        return this.SpawnRefillerData.idleTime;
+    }
 }

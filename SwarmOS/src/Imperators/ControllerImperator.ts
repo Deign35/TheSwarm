@@ -5,37 +5,36 @@ import { ActionBase } from "Actions/ActionBase";
 import { UpgradeAction } from "Actions/UpgradeAction";
 import { MoveToPositionAction } from "Actions/MoveToPositionAction";
 
+const CONSUL_TYPE = 'Controller';
 export class ControllerImperator extends ImperatorBase {
-    Consul!: ControllerConsul;
-    InitImperator(memoryHandle: string): void {
-        this.Consul = new ControllerConsul(memoryHandle, this.Queen);
+    static get ConsulType(): string { return CONSUL_TYPE; }
+    get consulType(): string { return CONSUL_TYPE }
+    protected Consul!: ControllerConsul;
+    InitImperator(): void {
+        this.Consul = new ControllerConsul(this.consulType, this.Queen);
     }
     ImperatorComplete(): void {
         this.Consul.Save();
     }
     ActivateImperator(): SwarmCodes.SwarmErrors {
-        let creeps = this.Consul.UpgraderCreeps;
-        let target = this.Consul.Controller;
+        let creeps = this.Consul.CreepData;
         for (let i = 0, length = creeps.length; i < length; i++) {
-            let creep = creeps[i];
-            this.Queen.Nest.visual.text('' + creep.carry[RESOURCE_ENERGY], creep.pos);
-            if (creep.spawning) { continue; }
-            if (this.Consul.CreepData[i].fetching) { continue; }
-            let upgradeAction: ActionBase = new UpgradeAction(creep, target);
-            let upgradeResult = upgradeAction.ValidateAction();
-            switch (upgradeResult) {
-                case (SwarmCodes.C_NONE): break;
-                case (SwarmCodes.C_MOVE):
-                    new MoveToPositionAction(creep, target.pos).Run(true);
-                    break;
-                case (SwarmCodes.E_REQUIRES_ENERGY): break;
-            }
-
-            if (upgradeResult != SwarmCodes.C_MOVE) {
-                upgradeAction.Run();
-            }
+            this.ActivateCreep(creeps[i]);
         }
 
         return SwarmCodes.C_NONE;
+    }
+    protected ActivateCreep(creepData: ControllerConsul_CreepData): void {
+        let creep = Game.creeps[creepData.creepName];
+        this.Queen.Nest.visual.text('' + creep.carry[RESOURCE_ENERGY], creep.pos);
+        if (creep.spawning || creepData.fetching) { return; }
+        let upgradeAction: ActionBase = new UpgradeAction(creep, this.Consul.Controller);
+        let upgradeResult = upgradeAction.ValidateAction();
+
+        if (upgradeResult == SwarmCodes.C_MOVE) {
+            new MoveToPositionAction(creep, this.Consul.Controller.pos).Run(true);
+        } else {
+            upgradeAction.Run();
+        }
     }
 }

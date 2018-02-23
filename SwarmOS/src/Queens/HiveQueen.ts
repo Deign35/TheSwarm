@@ -3,68 +3,68 @@ import { HiveQueenBase } from "Queens/HiveQueenBase";
 
 export class HiveQueen extends HiveQueenBase {
     protected CheckForSpawnRequirements(): void {
-        if (this.Collector.Consul.CreepRequested) {
-            if (!this.Spawner.ActiveSpawnNames[this.Collector.Consul.CreepRequested]) {
-                this.Collector.Consul.ForgetSpawn();
+        if (this.Collector.CreepRequested) {
+            if (!this.Spawner.ActiveSpawnNames[this.Collector.CreepRequested]) {
+                this.Collector.ForgetSpawn();
             }
         }
-        if (this.Upgrader.Consul.CreepRequested) {
-            if (!this.Spawner.ActiveSpawnNames[this.Upgrader.Consul.CreepRequested]) {
-                this.Upgrader.Consul.ForgetSpawn();
+        if (this.Upgrader.CreepRequested) {
+            if (!this.Spawner.ActiveSpawnNames[this.Upgrader.CreepRequested]) {
+                this.Upgrader.ForgetSpawn();
             }
         }
-        if (this.Builder.Consul.CreepRequested) {
-            if (!this.Spawner.ActiveSpawnNames[this.Builder.Consul.CreepRequested]) {
-                this.Builder.Consul.ForgetSpawn();
+        if (this.Builder.CreepRequested) {
+            if (!this.Spawner.ActiveSpawnNames[this.Builder.CreepRequested]) {
+                this.Builder.ForgetSpawn();
             }
         }
-        if (this.Distributor.Consul.CreepRequested) {
-            if (!this.Spawner.ActiveSpawnNames[this.Distributor.Consul.CreepRequested]) {
-                this.Distributor.Consul.ForgetSpawn();
+        if (this.Distributor.CreepRequested) {
+            if (!this.Spawner.ActiveSpawnNames[this.Distributor.CreepRequested]) {
+                this.Distributor.ForgetSpawn();
             }
         }
 
-        if (this.Collector.Consul.RequiresSpawn()) {
+        if (this.Collector.RequiresSpawn()) {
             let spawnArgs;
             if (this.Nest.energyCapacityAvailable >= 550) {
-                spawnArgs = this.Collector.Consul.GetSpawnDefinition();
+                spawnArgs = this.Collector.GetSpawnDefinition();
             } else {
                 let newName = ('Harv' + Game.time);
                 spawnArgs = {
                     body: [WORK, WORK, MOVE, CARRY],
                     creepName: newName,
-                    requestorID: this.Collector.Consul.consulType,
+                    requestorID: this.Collector.consulType,
                     targetTime: Game.time - 80
                 }
             }
             this.Spawner.AddSpawnToQueue(spawnArgs);
-            this.Collector.Consul.CreepRequested = spawnArgs.creepName;
+            this.Collector.CreepRequested = spawnArgs.creepName;
         }
-        if (this.Upgrader.Consul.RequiresSpawn()) {
-            let spawnArgs = this.Upgrader.Consul.GetSpawnDefinition();
+        if (this.Upgrader.RequiresSpawn()) {
+            let spawnArgs = this.Upgrader.GetSpawnDefinition();
             spawnArgs.targetTime = Game.time;
             this.Spawner.AddSpawnToQueue(spawnArgs);
-            this.Upgrader.Consul.CreepRequested = spawnArgs.creepName;
+            this.Upgrader.CreepRequested = spawnArgs.creepName;
         }
-        if (this.Builder.Consul.RequiresSpawn()) {
-            let spawnArgs = this.Builder.Consul.GetSpawnDefinition();
+        if (this.Builder.RequiresSpawn()) {
+            let spawnArgs = this.Builder.GetSpawnDefinition();
             spawnArgs.targetTime = Game.time - 25;
             this.Spawner.AddSpawnToQueue(spawnArgs);
-            this.Builder.Consul.CreepRequested = spawnArgs.creepName;
+            this.Builder.CreepRequested = spawnArgs.creepName;
         }
-        if (this.Distributor.Consul.RequiresSpawn()) {
-            let spawnArgs = this.Distributor.Consul.GetSpawnDefinition();
+        if (this.Distributor.RequiresSpawn()) {
+            let spawnArgs = this.Distributor.GetSpawnDefinition();
             spawnArgs.targetTime = Game.time - 100;
             this.Spawner.AddSpawnToQueue(spawnArgs);
-            this.Distributor.Consul.CreepRequested = spawnArgs.creepName;
+            this.Distributor.CreepRequested = spawnArgs.creepName;
         }
 
-        if (this.Distributor.Consul.SpawnRefillerData.idleTime > 100) {
-            if (!this.Upgrader.Consul.CreepRequested) {
-                let spawnArgs = this.Upgrader.Consul.GetSpawnDefinition();
+        if (this.Distributor.GetDistributionIdleTime() > 100) {
+            if (!this.Upgrader.CreepRequested) {
+                let spawnArgs = this.Upgrader.GetSpawnDefinition();
                 spawnArgs.targetTime = Game.time;
                 this.Spawner.AddSpawnToQueue(spawnArgs);
-                this.Upgrader.Consul.CreepRequested = spawnArgs.creepName;
+                this.Upgrader.CreepRequested = spawnArgs.creepName;
             }
         }
     }
@@ -73,15 +73,15 @@ export class HiveQueen extends HiveQueenBase {
         if (this.Nest.find(FIND_MY_CREEPS).length == 0) {
             this.Spawner.AddSpawnToQueue({
                 body: [WORK, MOVE, CARRY], creepName: this.Nest.name + '_FIRST',
-                requestorID: this.Distributor.Consul.consulType, targetTime: Game.time - 500
+                requestorID: this.Distributor.consulType, targetTime: Game.time - 500
             });
-            this.Distributor.Consul.CreepRequested = this.Nest.name + '_FIRST';
+            this.Distributor.CreepRequested = this.Nest.name + '_FIRST';
         }
     }
     ReceiveCommand(): void {
         //Not implemented
     }
     ReleaseControl(creep: Creep): void {
-        this.Upgrader.Consul.AssignCreep(creep);
+        this.Upgrader.AssignCreep(creep);
     }
 }

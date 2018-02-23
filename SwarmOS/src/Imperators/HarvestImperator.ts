@@ -1,3 +1,4 @@
+import * as _ from "lodash";
 import * as SwarmCodes from "Consts/SwarmCodes";
 import { ImperatorBase } from "Imperators/ImperatorBase";
 import { HarvestConsul } from "Consuls/HarvestConsul";
@@ -6,21 +7,25 @@ import { MoveToPositionAction } from "Actions/MoveToPositionAction";
 import { RepairAction } from "Actions/RepairAction";
 import { BuildAction } from "Actions/BuildAction";
 import { ActionBase } from "Actions/ActionBase";
-import * as _ from "lodash";
 import { WithdrawAction } from "Actions/WithdrawAction";
 import { RequestTransferAction } from "Actions/RequestTransfer";
 
+const CONSUL_TYPE = 'H_Consul';
 export class HarvestImperator extends ImperatorBase {
-    Consul!: HarvestConsul;
+    static get ConsulType(): string { return CONSUL_TYPE; }
+    get consulType(): string { return CONSUL_TYPE }
+    protected Consul!: HarvestConsul;
 
-    InitImperator(memoryHandle: string): void {
-        this.Consul = new HarvestConsul(memoryHandle, this.Queen);
+    InitImperator(): void {
+        this.Consul = new HarvestConsul(this.consulType, this.Queen);
     }
     ImperatorComplete(): void {
         this.Consul.Save();
     }
-
-    ActivateImperator(): SwarmCodes.SwarmErrors {
+    protected ActivateCreep(creep: CreepConsul_Data): void {
+        throw new Error("Method not implemented.");
+    }
+    ActivateImperator(): SwarmCodes.SwarmErrors { // Overrides base.
         // Request hive harvesters from the nestqueen.
         let sourceData = this.Consul.CreepData;
         for (let i = 0, length = sourceData.length; i < length; i++) {
@@ -188,5 +193,11 @@ export class HarvestImperator extends ImperatorBase {
             // harvester has nothing to give.
         }
         action.Run();
+    }
+    AssignManagedCreep(creep: Creep) {
+        this.Consul.AssignManagedCreep(creep);
+    }
+    ReleaseManagedCreep(creepName: string) {
+        this.Consul.ReleaseManagedCreep(creepName);
     }
 }

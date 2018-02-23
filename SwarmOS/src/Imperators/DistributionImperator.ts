@@ -5,10 +5,13 @@ import { MoveToPositionAction } from "Actions/MoveToPositionAction";
 import { HiveQueenBase } from "Queens/HiveQueenBase";
 import { TransferAction } from "Actions/TransferAction";
 
+const CONSUL_TYPE = 'Distribution';
 export class DistributionImperator extends ImperatorBase {
-    Consul!: DistributionConsul;
-    InitImperator(memoryHandle: string): void {
-        this.Consul = new DistributionConsul(memoryHandle, this.Queen);
+    static get ConsulType(): string { return CONSUL_TYPE; }
+    get consulType(): string { return CONSUL_TYPE }
+    protected Consul!: DistributionConsul;
+    InitImperator(): void {
+        this.Consul = new DistributionConsul(this.consulType, this.Queen);
     }
     ImperatorComplete(): void {
         this.Consul.Save();
@@ -18,19 +21,27 @@ export class DistributionImperator extends ImperatorBase {
         if (!refiller) {
             return SwarmCodes.C_NONE;
         }
+        this.ActivateCreep(this.Consul.CreepData[0]);
 
+        return SwarmCodes.C_NONE;
+    }
+    GetDistributionIdleTime() {
+        return this.Consul.GetIdleTime();
+    }
+    protected ActivateCreep(creepData: DistributionConsul_RefillerData): void {
+        let creep = Game.creeps[creepData.creepName];
         if (!this.Consul.SpawnRefillerData.fetching) {
-            let target = this.Consul.GetSpawnRefillerTarget() as StructureExtension | StructureSpawn | StructureTower;
-            if (!target) { return SwarmCodes.E_ACTION_UNNECESSARY; } // This should not return from here.
+            let target = this.Consul.GetSpawnRefillerTarget() as SpawnRefillTarget;
+            if (!target) { return; } // This should not return from here.
 
-            let action = new TransferAction(refiller, target);
+            let action = new TransferAction(creep, target);
             let actionResult = action.ValidateAction();
             switch (actionResult) {
                 case (SwarmCodes.C_NONE): break;
                 case (SwarmCodes.E_INVALID): break;
                 case (SwarmCodes.E_TARGET_INELLIGIBLE): break;
                 case (SwarmCodes.C_MOVE):
-                    new MoveToPositionAction(refiller, target.pos).Run(true);
+                    new MoveToPositionAction(creep, target.pos).Run(true);
                     break;
             }
             if (actionResult != SwarmCodes.C_MOVE) {
@@ -44,7 +55,5 @@ export class DistributionImperator extends ImperatorBase {
                 }
             }
         }
-
-        return SwarmCodes.C_NONE;
     }
 }

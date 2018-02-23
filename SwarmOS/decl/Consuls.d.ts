@@ -33,3 +33,26 @@ declare type CreepConsul_BaseData = {
     fetching: boolean,
     targetID?: string,
 }
+
+declare type ConstructionRequest = {
+    siteId: string,
+    requestor: string,
+}
+
+declare type ConstructorData = CreepConsul_Data & {
+    target: string,
+    fetching: boolean
+}
+
+declare type ControllerConsul_CreepData = {
+    creepName: string,
+    fetching: boolean,
+}
+declare type SpawnRefillTarget = StructureSpawn | StructureExtension | StructureTower; // For now...
+
+declare type DistributionConsul_RefillerData = CreepConsul_Data & {
+    refillList: string[],
+    curTarget: number,
+    fetching: boolean,
+    idleTime: number,
+}

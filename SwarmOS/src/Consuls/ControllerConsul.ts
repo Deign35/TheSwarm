@@ -25,7 +25,6 @@ const RCL_UPGRADER_RATIO: { [index: number]: { numUpgraders: number, body: BodyP
 export class ControllerConsul extends CreepConsul {
     static get ConsulType(): string { return CONSUL_TYPE; }
     get consulType(): string { return CONSUL_TYPE }
-    UpgraderCreeps!: Creep[];
     Controller!: StructureController;
     CreepData!: ControllerConsul_CreepData[];
     Save() {
@@ -43,7 +42,6 @@ export class ControllerConsul extends CreepConsul {
             // Need to update the NestQueen and on up.
         }
 
-        this.UpgraderCreeps = [];
         this.CreepData = this.GetData(UPGRADER_IDS) || [];
         for (let i = 0; i < this.CreepData.length; i++) {
             let creep = Game.creeps[this.CreepData[i].creepName];
@@ -53,14 +51,13 @@ export class ControllerConsul extends CreepConsul {
             }
             if (this.CreepData[i].fetching) {
                 if (creep.carry[RESOURCE_ENERGY] == creep.carryCapacity) {
-                    (this.Parent as HiveQueenBase).Collector.Consul.ReleaseManagedCreep(creep.name);
+                    (this.Parent as HiveQueenBase).Collector.ReleaseManagedCreep(creep.name);
                     this.CreepData[i].fetching = false;
                 }
             } else if (creep.carry[RESOURCE_ENERGY] == 0) {
-                (this.Parent as HiveQueenBase).Collector.Consul.AssignManagedCreep(creep);
+                (this.Parent as HiveQueenBase).Collector.AssignManagedCreep(creep);
                 this.CreepData[i].fetching = true;
             }
-            this.UpgraderCreeps.push(creep);
         }
 
         return true;
@@ -70,12 +67,12 @@ export class ControllerConsul extends CreepConsul {
         if (!this.Nest.controller) {
             throw 'ATTEMPTING TO ADD CONTROLLERCONSUL TO A ROOM WITH NO CONTROLLER'
         }
-        this.UpgraderCreeps = [];
-        this.SetData(UPGRADER_IDS, this.UpgraderCreeps);
+        this.CreepData = [];
+        this.SetData(UPGRADER_IDS, this.CreepData);
     }
     RequiresSpawn(): boolean {
         if (!this.CreepRequested) {
-            if (this.UpgraderCreeps.length < RCL_UPGRADER_RATIO[this.Controller.level].numUpgraders) {
+            if (this.CreepData.length < RCL_UPGRADER_RATIO[this.Controller.level].numUpgraders) {
                 return true;
             }
         }
@@ -102,9 +99,4 @@ export class ControllerConsul extends CreepConsul {
             }
         }
     }
-}
-
-declare type ControllerConsul_CreepData = {
-    creepName: string,
-    fetching: boolean,
 }

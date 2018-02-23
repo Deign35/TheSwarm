@@ -134,7 +134,7 @@ export class HarvestConsul extends CreepConsul {
         // If we're here, then this creep has no place, return it to the nest.
         console.log("Assign regular Creep with name[" + creepName + "]: had no where to focus harvesting.");
         this.ReleaseCreep(creepName);
-        (this.Parent as HiveQueenBase).Upgrader.Consul.AssignSpawn(creepName);
+        (this.Parent as HiveQueenBase).Upgrader.AssignSpawn(creepName); // this is really shitty.
     }
 
     ReleaseCreep(creepName: string) {

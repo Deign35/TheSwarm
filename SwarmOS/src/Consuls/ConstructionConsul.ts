@@ -50,11 +50,11 @@ export class ConstructionConsul extends CreepConsul {
             }
             if (this.CreepData[i].fetching) {
                 if (creep.carry[RESOURCE_ENERGY] == creep.carryCapacity) {
-                    (this.Parent as HiveQueenBase).Collector.Consul.ReleaseManagedCreep(creep.name);
+                    (this.Parent as HiveQueenBase).Collector.ReleaseManagedCreep(creep.name);
                     this.CreepData[i].fetching = false;
                 }
             } else if (!this.CreepData[i].fetching && creep.carry[RESOURCE_ENERGY] == 0) {
-                (this.Parent as HiveQueenBase).Collector.Consul.AssignManagedCreep(creep);
+                (this.Parent as HiveQueenBase).Collector.AssignManagedCreep(creep);
                 this.CreepData[i].fetching = true;
             }
             //Check that the construction site is valid
@@ -109,14 +109,4 @@ export class ConstructionConsul extends CreepConsul {
         if (this.CreepRequested) { return false; }
         return Object.keys(this.siteData).length > 0 && this.CreepData.length < 5;
     }
-}
-
-declare type ConstructionRequest = {
-    siteId: string,
-    requestor: string,
-}
-
-declare type ConstructorData = CreepConsul_Data & {
-    target: string,
-    fetching: boolean
 }

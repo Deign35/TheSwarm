@@ -6,6 +6,7 @@ import { DistributionImperator } from "Imperators/DistributionImperator";
 import { HarvestConsul } from "Consuls/HarvestConsul";
 import { ConstructionConsul } from "Consuls/ConstructionConsul";
 import { DistributionConsul } from "Consuls/DistributionConsul";
+import { ImperatorBase } from "Imperators/ImperatorBase";
 
 export abstract class NestQueenBase extends QueenMemory implements INestQueen {
     Nest!: Room;
@@ -14,7 +15,7 @@ export abstract class NestQueenBase extends QueenMemory implements INestQueen {
     Builder!: ConstructionImperator;
     Distributor!: DistributionImperator;
 
-    ImperatorList!: IImperator[];
+    ImperatorList!: ImperatorBase[];
     Save() {
         this.Collector.ImperatorComplete();
         this.Builder.ImperatorComplete();
@@ -46,23 +47,14 @@ export abstract class NestQueenBase extends QueenMemory implements INestQueen {
         let idleCreeps: Creep[] = [];
         for (let creepName in Game.creeps) {
             let creepFound = false;
-            for (let i = 0, length = this.Collector.Consul.CreepData.length; i < length; i++) {
-                if (this.Collector.Consul.CreepData[i].creepName == creepName) {
+
+            for(let i = 0, length = this.ImperatorList.length; i < length; i++) {
+                if(this.ImperatorList[i].IsCreepAssigned(creepName)) {
                     creepFound = true;
                     break;
                 }
             }
-            if (creepFound) { continue; }
-            for (let i = 0, length = this.Builder.Consul.CreepData.length; i < length; i++) {
-                if (this.Builder.Consul.CreepData[i].creepName == creepName) {
-                    creepFound = true;
-                    break;
-                }
-            }
-            if (creepFound) { continue; }
-            if (this.Distributor.Consul.SpawnRefillerData.creepName == creepName) {
-                continue;
-            }
+            if(creepFound) { continue; }
             idleCreeps.push(Game.creeps[creepName]);
         }
         return idleCreeps;
@@ -70,11 +62,11 @@ export abstract class NestQueenBase extends QueenMemory implements INestQueen {
     abstract AssignIdleCreeps(idleCreeps: Creep[]): void;
     protected LoadImperators() {
         this.ImperatorList = []
-        this.Collector = new HarvestImperator(HarvestConsul.ConsulType, this);
+        this.Collector = new HarvestImperator(this);
         this.ImperatorList.push(this.Collector);
-        this.Builder = new ConstructionImperator(ConstructionConsul.ConsulType, this);
+        this.Builder = new ConstructionImperator(this);
         this.ImperatorList.push(this.Builder);
-        this.Distributor = new DistributionImperator(DistributionConsul.ConsulType, this);
+        this.Distributor = new DistributionImperator(this);
         this.ImperatorList.push(this.Distributor);
     }
     protected ActivateImperators(): SwarmCodes.SwarmErrors {
@@ -85,4 +77,5 @@ export abstract class NestQueenBase extends QueenMemory implements INestQueen {
         this.Distributor.ActivateImperator();
         return SwarmCodes.C_NONE;
     }
+    protected abstract CheckForSpawnRequirements(): void; // Return a list of spawnArgs.
 }
