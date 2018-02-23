@@ -8,19 +8,22 @@ import { ControllerConsul } from 'Consuls/ControllerConsul';
 import { ConstructionConsul } from 'Consuls/ConstructionConsul';
 import { ConstructionImperator } from 'Imperators/ConstructionImperator';
 import * as _ from 'lodash';
-import { SpawnImperator } from 'Imperators/SpawnImperator';
+import { DistributionImperator } from 'Imperators/DistributionImperator';
+import { DistributionConsul } from 'Consuls/DistributionConsul';
 
 export abstract class HiveQueenBase extends NestQueenBase implements IHiveQueen {
     Collector!: HarvestImperator;
     Upgrader!: ControllerImperator;
     Builder!: ConstructionImperator;
+    Distributor!: DistributionImperator;
 
-    Spawner!: SpawnImperator;
+    Spawner!: SpawnConsul;
     Save() {
         this.Upgrader.ImperatorComplete();
         this.Collector.ImperatorComplete();
         this.Builder.ImperatorComplete();
-        this.Spawner.ImperatorComplete();
+        this.Distributor.ImperatorComplete();
+        this.Spawner.Save();
         super.Save();
     }
 
@@ -54,7 +57,7 @@ export abstract class HiveQueenBase extends NestQueenBase implements IHiveQueen 
                 }
             }
             if (creepFound) { continue; }
-            if (this.Spawner.Consul.RefillerData.creepName == creepName) {
+            if (this.Distributor.Consul.SpawnRefillerData.creepName == creepName) {
                 continue;
             }
             idleCreeps.push(Game.creeps[creepName]);
@@ -62,8 +65,8 @@ export abstract class HiveQueenBase extends NestQueenBase implements IHiveQueen 
 
         for (let i = 0, length = idleCreeps.length; i < length; i++) {
             if (idleCreeps[i].getActiveBodyparts(WORK) == 0) {
-                if (!this.Spawner.Consul.RefillerData.creepName) {
-                    this.Spawner.Consul.AssignCreep(idleCreeps[i]);
+                if (!this.Distributor.Consul.SpawnRefillerData.creepName) {
+                    this.Distributor.Consul.AssignCreep(idleCreeps[i]);
                     continue;
                 }
                 // What to do with this?
@@ -85,10 +88,10 @@ export abstract class HiveQueenBase extends NestQueenBase implements IHiveQueen 
         }
         this.ActivateImperators();
         this.CheckForSpawnRequirements();
-        let requirements = this.Spawner.Consul.GetNextSpawns(1);
+        let requirements = this.Spawner.GetNextSpawns(1);
         if (requirements.length > 0) {
             if (this.Nest.energyAvailable >= requirements[0].energyNeeded && requirements[0].neededBy) {
-                let spawnedCreep = this.Spawner.Consul.SpawnCreep();
+                let spawnedCreep = this.Spawner.SpawnCreep();
                 if (spawnedCreep) {
                     if (spawnedCreep.requestorID == HarvestConsul.ConsulType) {
                         this.Collector.Consul.AssignSpawn(spawnedCreep.creepName);
@@ -96,26 +99,27 @@ export abstract class HiveQueenBase extends NestQueenBase implements IHiveQueen 
                         this.Upgrader.Consul.AssignSpawn(spawnedCreep.creepName);
                     } else if (spawnedCreep.requestorID == ConstructionConsul.ConsulType) {
                         this.Builder.Consul.AssignSpawn(spawnedCreep.creepName);
-                    } else if (spawnedCreep.requestorID == SpawnConsul.ConsulType) {
-                        this.Spawner.Consul.AssignSpawn(spawnedCreep.creepName);
+                    } else if (spawnedCreep.requestorID == DistributionConsul.ConsulType) {
+                        this.Distributor.Consul.AssignSpawn(spawnedCreep.creepName);
                     }
                 }
             }
         }
     }
     protected LoadImperators() {
+        this.Spawner = new SpawnConsul(SpawnConsul.ConsulType, this);
         this.Collector = new HarvestImperator(HarvestConsul.ConsulType, this);
         this.Upgrader = new ControllerImperator(ControllerConsul.ConsulType, this);
         this.Builder = new ConstructionImperator(ConstructionConsul.ConsulType, this);
-        this.Spawner = new SpawnImperator(SpawnConsul.ConsulType, this);
+        this.Distributor = new DistributionImperator(DistributionConsul.ConsulType, this);
     }
     protected ActivateImperators(): SwarmCodes.SwarmErrors {
         this.Collector.ActivateImperator();
-        if (Game.cpu.bucket > 500) {
+        if (Game.cpu.bucket > 500 || Game.shard.name == 'sim') {
             this.Upgrader.ActivateImperator();
             this.Builder.ActivateImperator();
         }
-        this.Spawner.ActivateImperator();
+        this.Distributor.ActivateImperator();
         return SwarmCodes.C_NONE;
     }
     protected abstract CheckForSpawnRequirements(): void;

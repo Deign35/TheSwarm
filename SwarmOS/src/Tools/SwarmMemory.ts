@@ -6,7 +6,7 @@ export abstract class _SwarmMemory implements IMemory {
             this.Load();
         }
     }
-    protected _cache: { [id: string]: any } = {};
+    protected _cache: { [id: string]: any } = {}; // this probably shouldn't be initialized like this
     protected _snapshot?: { [id: string]: any };
 
     abstract Load(): void;

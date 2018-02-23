@@ -15,7 +15,7 @@ export class HiveQueen extends HiveQueenBase {
     protected CheckForSpawnRequirements(): void {
         if (this.Collector.Consul.RequiresSpawn()) {
             let newName = ('Harv' + Game.time);
-            this.Spawner.Consul.AddSpawnToQueue({
+            this.Spawner.AddSpawnToQueue({
                 body: [WORK, WORK, MOVE, CARRY],
                 creepName: newName,
                 requestorID: this.Collector.Consul.consulType,

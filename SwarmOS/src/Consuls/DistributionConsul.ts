@@ -31,6 +31,16 @@ export class DistributionConsul extends CreepConsul {
         this.SpawnRefiller = Game.creeps[this.SpawnRefillerData.creepName];
         if (!this.SpawnRefiller) {
             this.SpawnRefillerData.creepName = '';
+        } else {
+            if (this.SpawnRefillerData.fetching) {
+                if (this.SpawnRefiller.carry[RESOURCE_ENERGY] == this.SpawnRefiller.carryCapacity) {
+                    (this.Parent as HiveQueenBase).Collector.Consul.ReleaseManagedCreep(this.SpawnRefillerData.creepName);
+                    this.SpawnRefillerData.fetching = false;
+                }
+            } else if (!this.SpawnRefillerData.fetching && this.SpawnRefiller.carry[RESOURCE_ENERGY] == 0) {
+                (this.Parent as HiveQueenBase).Collector.Consul.AssignManagedCreep(this.SpawnRefiller);
+                this.SpawnRefillerData.fetching = true;
+            }
         }
         this.ScanCooldown = this.GetData(SCAN_COOLDOWN);
         if (this.SpawnRefillerData.curTarget >= this.SpawnRefillerData.refillList.length &&

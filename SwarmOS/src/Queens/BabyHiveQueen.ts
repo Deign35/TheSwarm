@@ -9,23 +9,23 @@ import { ControllerConsul } from "Consuls/ControllerConsul";
 export class BabyHiveQueen extends HiveQueenBase {
     protected CheckForSpawnRequirements(): void {
         if (this.Collector.Consul.CreepRequested) {
-            if (!this.Spawner.Consul.ActiveSpawnNames[this.Collector.Consul.CreepRequested]) {
+            if (!this.Spawner.ActiveSpawnNames[this.Collector.Consul.CreepRequested]) {
                 this.Collector.Consul.ForgetSpawn();
             }
         }
         if (this.Upgrader.Consul.CreepRequested) {
-            if (!this.Spawner.Consul.ActiveSpawnNames[this.Upgrader.Consul.CreepRequested]) {
+            if (!this.Spawner.ActiveSpawnNames[this.Upgrader.Consul.CreepRequested]) {
                 this.Upgrader.Consul.ForgetSpawn();
             }
         }
         if (this.Builder.Consul.CreepRequested) {
-            if (!this.Spawner.Consul.ActiveSpawnNames[this.Builder.Consul.CreepRequested]) {
+            if (!this.Spawner.ActiveSpawnNames[this.Builder.Consul.CreepRequested]) {
                 this.Builder.Consul.ForgetSpawn();
             }
         }
-        if (this.Spawner.Consul.CreepRequested) {
-            if (!this.Spawner.Consul.ActiveSpawnNames[this.Spawner.Consul.CreepRequested]) {
-                this.Spawner.Consul.ForgetSpawn();
+        if (this.Distributor.Consul.CreepRequested) {
+            if (!this.Spawner.ActiveSpawnNames[this.Distributor.Consul.CreepRequested]) {
+                this.Distributor.Consul.ForgetSpawn();
             }
         }
 
@@ -42,33 +42,33 @@ export class BabyHiveQueen extends HiveQueenBase {
                     targetTime: Game.time - 80
                 }
             }
-            this.Spawner.Consul.AddSpawnToQueue(spawnArgs);
+            this.Spawner.AddSpawnToQueue(spawnArgs);
             this.Collector.Consul.CreepRequested = spawnArgs.creepName;
         }
         if (this.Upgrader.Consul.RequiresSpawn()) {
             let spawnArgs = this.Upgrader.Consul.GetSpawnDefinition();
             spawnArgs.targetTime = Game.time;
-            this.Spawner.Consul.AddSpawnToQueue(spawnArgs);
+            this.Spawner.AddSpawnToQueue(spawnArgs);
             this.Upgrader.Consul.CreepRequested = spawnArgs.creepName;
         }
         if (this.Builder.Consul.RequiresSpawn()) {
             let spawnArgs = this.Builder.Consul.GetSpawnDefinition();
             spawnArgs.targetTime = Game.time - 25;
-            this.Spawner.Consul.AddSpawnToQueue(spawnArgs);
+            this.Spawner.AddSpawnToQueue(spawnArgs);
             this.Builder.Consul.CreepRequested = spawnArgs.creepName;
         }
-        if (this.Spawner.Consul.RequiresSpawn()) {
-            let spawnArgs = this.Spawner.Consul.GetSpawnDefinition();
+        if (this.Distributor.Consul.RequiresSpawn()) {
+            let spawnArgs = this.Distributor.Consul.GetSpawnDefinition();
             spawnArgs.targetTime = Game.time - 100;
-            this.Spawner.Consul.AddSpawnToQueue(spawnArgs);
-            this.Spawner.Consul.CreepRequested = spawnArgs.creepName;
+            this.Spawner.AddSpawnToQueue(spawnArgs);
+            this.Distributor.Consul.CreepRequested = spawnArgs.creepName;
         }
 
-        if (this.Spawner.Consul.RefillerData.idleTime > 100) {
+        if (this.Distributor.Consul.SpawnRefillerData.idleTime > 100) {
             if (!this.Upgrader.Consul.CreepRequested) {
                 let spawnArgs = this.Upgrader.Consul.GetSpawnDefinition();
                 spawnArgs.targetTime = Game.time;
-                this.Spawner.Consul.AddSpawnToQueue(spawnArgs);
+                this.Spawner.AddSpawnToQueue(spawnArgs);
                 this.Upgrader.Consul.CreepRequested = spawnArgs.creepName;
             }
         }
@@ -76,11 +76,11 @@ export class BabyHiveQueen extends HiveQueenBase {
     InitializeNest(): void {
         // Don't think I need anything eh?
         if (this.Nest.find(FIND_MY_CREEPS).length == 0) {
-            this.Spawner.Consul.AddSpawnToQueue({
+            this.Spawner.AddSpawnToQueue({
                 body: [WORK, MOVE, CARRY], creepName: this.Nest.name + '_FIRST',
-                requestorID: this.Spawner.Consul.consulType, targetTime: Game.time - 500
+                requestorID: this.Distributor.Consul.consulType, targetTime: Game.time - 500
             });
-            this.Spawner.Consul.CreepRequested = this.Nest.name + '_FIRST';
+            this.Distributor.Consul.CreepRequested = this.Nest.name + '_FIRST';
         }
     }
     ReceiveCommand(): void {
