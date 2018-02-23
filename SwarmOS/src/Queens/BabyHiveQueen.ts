@@ -89,8 +89,4 @@ export class BabyHiveQueen extends HiveQueenBase {
     ReleaseControl(creep: Creep): void {
         this.Upgrader.Consul.AssignCreep(creep);
     }
-
-    MetamorphiseToFullGrownHiveQueen(): HiveQueenBase {
-        throw new Error("Method not implemented.");
-    }
 }

@@ -22,34 +22,34 @@ export class HarvestImperator extends ImperatorBase {
 
     ActivateImperator(): SwarmCodes.SwarmErrors {
         // Request hive harvesters from the nestqueen.
-        let sourceData = this.Consul.SourceData;
+        let sourceData = this.Consul.CreepData;
         for (let i = 0, length = sourceData.length; i < length; i++) {
             let data = sourceData[i];
-            if (data.harvester && Game.creeps[data.harvester]) {
-                this.ActivateHarvester(data, Game.creeps[data.harvester]);
+            if (data.creepName && Game.creeps[data.creepName]) {
+                this.ActivateHarvester(data, Game.creeps[data.creepName]);
             }
         }
 
         let tempWorkers = this.Consul.TempWorkers;
         let rotateBackward = Game.time % 2 == 0;
-        let curIndex = Game.time % this.Consul.SourceData.length;
+        let curIndex = Game.time % this.Consul.CreepData.length;
         for (let id in tempWorkers) {
             if (tempWorkers[id].spawning) { continue; }
             let targetId = this.Consul._tempData[tempWorkers[id].name];
             let target: RoomObject | undefined = Game.getObjectById(targetId) || undefined;
             let cycleProtection = 0;
             do {
-                if (cycleProtection++ > this.Consul.SourceData.length) {
+                if (cycleProtection++ > this.Consul.CreepData.length) {
                     break;
                 }
                 if (!target) {
                     // find a target by cycling through
-                    let data = this.Consul.SourceData[curIndex];
+                    let data = this.Consul.CreepData[curIndex];
                     curIndex = rotateBackward ? curIndex - 1 : curIndex + 1;
                     if (curIndex < 0) {
-                        curIndex = this.Consul.SourceData.length - 1;
+                        curIndex = this.Consul.CreepData.length - 1;
                     }
-                    if (curIndex >= this.Consul.SourceData.length) {
+                    if (curIndex >= this.Consul.CreepData.length) {
                         curIndex = 0;
                     }
 
@@ -62,8 +62,8 @@ export class HarvestImperator extends ImperatorBase {
                     if (!target && tempWorkers[id].getActiveBodyparts(WORK) > 0) {
                         target = Game.getObjectById(data.id) as Source;
                     }
-                    if (!target && data.harvester) {
-                        target = Game.creeps[data.harvester];
+                    if (!target && data.creepName) {
+                        target = Game.creeps[data.creepName];
                     }
                 }
                 if (target) {
@@ -129,7 +129,7 @@ export class HarvestImperator extends ImperatorBase {
                 }
                 break;
             case (SwarmCodes.E_ACTION_UNNECESSARY):
-                if (data.harvester == harvester.name) {
+                if (data.creepName == harvester.name) {
                     if (data.constructionSite) {
                         harvestAction = new BuildAction(harvester, Game.getObjectById(data.constructionSite) as ConstructionSite);
                     } else if (data.containerID) {

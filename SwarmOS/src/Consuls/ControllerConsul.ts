@@ -27,9 +27,9 @@ export class ControllerConsul extends CreepConsul {
     get consulType(): string { return CONSUL_TYPE }
     UpgraderCreeps!: Creep[];
     Controller!: StructureController;
-    UpgradeCreepData!: ControllerConsul_CreepData[];
+    CreepData!: ControllerConsul_CreepData[];
     Save() {
-        this.SetData(UPGRADER_IDS, this.UpgradeCreepData);
+        this.SetData(UPGRADER_IDS, this.CreepData);
         super.Save();
     }
     Load() {
@@ -44,21 +44,21 @@ export class ControllerConsul extends CreepConsul {
         }
 
         this.UpgraderCreeps = [];
-        this.UpgradeCreepData = this.GetData(UPGRADER_IDS) || [];
-        for (let i = 0; i < this.UpgradeCreepData.length; i++) {
-            let creep = Game.creeps[this.UpgradeCreepData[i].creepName];
+        this.CreepData = this.GetData(UPGRADER_IDS) || [];
+        for (let i = 0; i < this.CreepData.length; i++) {
+            let creep = Game.creeps[this.CreepData[i].creepName];
             if (!creep) {
-                this.UpgradeCreepData.splice(i--, 1);
+                this.CreepData.splice(i--, 1);
                 continue;
             }
-            if (this.UpgradeCreepData[i].fetching) {
+            if (this.CreepData[i].fetching) {
                 if (creep.carry[RESOURCE_ENERGY] == creep.carryCapacity) {
                     (this.Parent as HiveQueenBase).Collector.Consul.ReleaseManagedCreep(creep.name);
-                    this.UpgradeCreepData[i].fetching = false;
+                    this.CreepData[i].fetching = false;
                 }
             } else if (creep.carry[RESOURCE_ENERGY] == 0) {
                 (this.Parent as HiveQueenBase).Collector.Consul.AssignManagedCreep(creep);
-                this.UpgradeCreepData[i].fetching = true;
+                this.CreepData[i].fetching = true;
             }
             this.UpgraderCreeps.push(creep);
         }
@@ -92,12 +92,12 @@ export class ControllerConsul extends CreepConsul {
         return spawnArgs;
     }
     protected _assignCreep(creepName: string) {
-        this.UpgradeCreepData.push({ creepName: creepName, fetching: false });
+        this.CreepData.push({ creepName: creepName, fetching: false });
     }
     ReleaseCreep(creepName: string): void {
-        for (let i = 0, length = this.UpgradeCreepData.length; i < length; i++) {
-            if (this.UpgradeCreepData[i]) {
-                this.UpgradeCreepData.splice(i, 1);
+        for (let i = 0, length = this.CreepData.length; i < length; i++) {
+            if (this.CreepData[i]) {
+                this.CreepData.splice(i, 1);
                 return;
             }
         }

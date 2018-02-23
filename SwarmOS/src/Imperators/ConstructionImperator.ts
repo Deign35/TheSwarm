@@ -13,7 +13,7 @@ export class ConstructionImperator extends ImperatorBase {
         this.Consul.Save();
     }
     ActivateImperator(): SwarmCodes.SwarmErrors {
-        let buildData = this.Consul.BuilderData;
+        let buildData = this.Consul.CreepData;
         for (let i = 0, length = buildData.length; i < length; i++) {
             if (buildData[i].fetching || buildData[i].target == '') { continue; }
             let creep = Game.creeps[buildData[i].creepName];

@@ -7,10 +7,8 @@ export class SwarmQueen extends QueenMemory {
     HiveQueens!: { [name: string]: HiveQueenBase }
 
     Activate() {
-        //Activate each job or request for resources.
         for (let name in this.HiveQueens) {
             this.HiveQueens[name].ActivateNest();
-            //this.HiveQueens[name].Activate();
         }
     }
 

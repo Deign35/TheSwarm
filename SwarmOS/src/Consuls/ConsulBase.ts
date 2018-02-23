@@ -24,6 +24,7 @@ export abstract class ConsulBase extends ChildMemory implements IConsul {
 
 export abstract class CreepConsul extends ConsulBase {
     CreepRequested?: string;
+    abstract CreepData: CreepConsul_Data[];
     Save() {
         if (this.CreepRequested) {
             this.SetData(REQUESTED_CREEP, this.CreepRequested);

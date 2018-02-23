@@ -1,6 +1,9 @@
 declare interface IConsul extends IMemory {
     consulType: string;
 }
+declare type CreepConsul_Data = {
+    creepName: string;
+}
 declare type SpawnConsul_SpawnData = RoomObjectWithID & {
 }
 
@@ -20,7 +23,7 @@ declare type SpawnConsul_RequirementsData = {
 declare type HarvestConsul_SourceData = RoomObjectWithID & {
     spawnBuffer: number,
     lastEnergy: number,
-    harvester: string,
+    creepName: string,
     containerID?: string,
     constructionSite?: string,
 }

@@ -6,6 +6,7 @@ const CONSUL_TYPE = 'Distribution';
 const SCAN_COOLDOWN = 'SCAN_CD';
 const SCAN_LIMIT = 10;
 export class DistributionConsul extends CreepConsul {
+    CreepData!: CreepConsul_Data[];
     static get ConsulType(): string { return CONSUL_TYPE; }
     get consulType(): string { return CONSUL_TYPE }
 
@@ -32,6 +33,8 @@ export class DistributionConsul extends CreepConsul {
         if (!this.SpawnRefiller) {
             this.SpawnRefillerData.creepName = '';
         } else {
+            this.CreepData = [];
+            this.CreepData.push(this.SpawnRefillerData);
             if (this.SpawnRefillerData.fetching) {
                 if (this.SpawnRefiller.carry[RESOURCE_ENERGY] == this.SpawnRefiller.carryCapacity) {
                     (this.Parent as HiveQueenBase).Collector.Consul.ReleaseManagedCreep(this.SpawnRefillerData.creepName);
@@ -69,7 +72,7 @@ export class DistributionConsul extends CreepConsul {
             }
         }) as SpawnRefillTarget[];
         structures.sort((a, b) => {
-            // Left to right scan will be more efficient than a simple distance check, but 
+            // Left to right scan will be more efficient than a simple distance check, but
             // this is still a bad solution for a difficult problem.
             return a.pos.x < b.pos.x ? -1 : 1;
         });
@@ -131,8 +134,7 @@ export class DistributionConsul extends CreepConsul {
 
 declare type SpawnRefillTarget = StructureSpawn | StructureExtension | StructureTower; // For now...
 
-declare type DistributionConsul_RefillerData = {
-    creepName: string,
+declare type DistributionConsul_RefillerData = CreepConsul_Data & {
     refillList: string[],
     curTarget: number,
     fetching: boolean,

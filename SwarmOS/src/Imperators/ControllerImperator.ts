@@ -20,7 +20,7 @@ export class ControllerImperator extends ImperatorBase {
             let creep = creeps[i];
             this.Queen.Nest.visual.text('' + creep.carry[RESOURCE_ENERGY], creep.pos);
             if (creep.spawning) { continue; }
-            if (this.Consul.UpgradeCreepData[i].fetching) { continue; }
+            if (this.Consul.CreepData[i].fetching) { continue; }
             let upgradeAction: ActionBase = new UpgradeAction(creep, target);
             let upgradeResult = upgradeAction.ValidateAction();
             switch (upgradeResult) {

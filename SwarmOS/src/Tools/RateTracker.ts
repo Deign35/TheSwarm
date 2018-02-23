@@ -1,4 +1,4 @@
-import { ChildMemory, _SwarmMemory } from "./SwarmMemory";
+import { ChildMemory } from "./SwarmMemory";
 import * as _ from "lodash";
 
 const DEPTH = 'Depth';

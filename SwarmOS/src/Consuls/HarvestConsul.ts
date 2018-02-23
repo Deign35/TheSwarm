@@ -13,13 +13,13 @@ const TEMP_DATA = 'T_DATA';
 export class HarvestConsul extends CreepConsul {
     readonly consulType = CONSUL_TYPE;
     TempWorkers!: Creep[];
-    SourceData!: HarvestConsul_SourceData[];
+    CreepData!: HarvestConsul_SourceData[];
     protected SourceHarvestRateTrackers!: RateTracker[];
     _tempData!: { [id: string]: string };
     protected _hasContainers!: boolean;
     Save() {
         this.SetData(TEMP_DATA, this._tempData);
-        this.SetData(SOURCE_DATA, this.SourceData);
+        this.SetData(SOURCE_DATA, this.CreepData);
         for (let i = 0, length = this.SourceHarvestRateTrackers.length; i < length; i++) {
             this.SourceHarvestRateTrackers[i].Save();
         }
@@ -28,9 +28,9 @@ export class HarvestConsul extends CreepConsul {
 
     Load() {
         if (!super.Load()) { return false; }
-        this.SourceData = this.GetData(SOURCE_DATA);
+        this.CreepData = this.GetData(SOURCE_DATA);
         this.SourceHarvestRateTrackers = [];
-        for (let i = 0; i < this.SourceData.length; i++) {
+        for (let i = 0; i < this.CreepData.length; i++) {
             this.SourceHarvestRateTrackers.push(new RateTracker(TRACKER_PREFIX + i, this));
         }
         this._tempData = this.GetData(TEMP_DATA);
@@ -50,27 +50,27 @@ export class HarvestConsul extends CreepConsul {
 
     InitMemory() {
         super.InitMemory();
-        this.SourceData = [];
+        this.CreepData = [];
         this.SourceHarvestRateTrackers = [];
         this._tempData = {};
         let foundSources = this.Nest.find(FIND_SOURCES);
         for (let i = 0, length = foundSources.length; i < length; i++) {
-            this.SourceData.push(this.InitSourceData(foundSources[i]));
+            this.CreepData.push(this.InitSourceData(foundSources[i]));
             this.SourceHarvestRateTrackers.push(new RateTracker(TRACKER_PREFIX + i, this));
         }
         this.ScanRoom();
     }
 
     ScanRoom(): void {
-        for (let i = 0, length = this.SourceData.length; i < length; i++) {
-            let data = this.SourceData[i];
+        for (let i = 0, length = this.CreepData.length; i < length; i++) {
+            let data = this.CreepData[i];
             let sourceTarget = Game.getObjectById(data.id) as Source;
             if (sourceTarget.energy < sourceTarget.energyCapacity) {
                 this.SourceHarvestRateTrackers[i].InsertData(data.lastEnergy - sourceTarget.energy);
             }
             data.lastEnergy = sourceTarget.energy;
-            if (data.harvester && !Game.creeps[data.harvester as string]) {
-                data.harvester = '';
+            if (data.creepName && !Game.creeps[data.creepName as string]) {
+                data.creepName = '';
             }
 
             if (data.constructionSite && !Game.getObjectById(data.constructionSite)) {
@@ -82,7 +82,7 @@ export class HarvestConsul extends CreepConsul {
                     data.containerID = undefined;
                 }
             }
-            this.SourceData[i] = data;
+            this.CreepData[i] = data;
         }
     }
 
@@ -91,8 +91,8 @@ export class HarvestConsul extends CreepConsul {
         // Orders creation of new screep so that they will arrive at the harvest node
         // just a few ticks before the previous one dies.
         if (!this.CreepRequested) {
-            for (let i = 0, length = this.SourceData.length; i < length; i++) {
-                if (!this.SourceData[i].harvester) {
+            for (let i = 0, length = this.CreepData.length; i < length; i++) {
+                if (!this.CreepData[i].creepName) {
                     return true;
                 }
             }
@@ -122,12 +122,12 @@ export class HarvestConsul extends CreepConsul {
     }
 
     protected _assignCreep(creepName: string) {
-        if (this.SourceData.length == 0) {
+        if (this.CreepData.length == 0) {
             return;
         }
-        for (let i = 0, length = this.SourceData.length; i < length; i++) {
-            if (!this.SourceData[i].harvester || !Game.creeps[this.SourceData[i].harvester as string]) {
-                this.SourceData[i].harvester = creepName;
+        for (let i = 0, length = this.CreepData.length; i < length; i++) {
+            if (!this.CreepData[i].creepName || !Game.creeps[this.CreepData[i].creepName as string]) {
+                this.CreepData[i].creepName = creepName;
                 return;
             }
         }
@@ -138,9 +138,9 @@ export class HarvestConsul extends CreepConsul {
     }
 
     ReleaseCreep(creepName: string) {
-        for (let i = 0, length = this.SourceData.length; i < length; i++) {
-            if (this.SourceData[i].harvester && this.SourceData[i].harvester == creepName) {
-                this.SourceData[i].harvester = '';
+        for (let i = 0, length = this.CreepData.length; i < length; i++) {
+            if (this.CreepData[i].creepName && this.CreepData[i].creepName == creepName) {
+                this.CreepData[i].creepName = '';
                 break;
             }
         }
