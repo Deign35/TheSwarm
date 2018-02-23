@@ -66,10 +66,10 @@ export abstract class HiveQueenBase extends NestQueenBase implements IHiveQueen 
     }
     protected LoadNestCounsel() {
         this.Collector = new HarvestConsul(HarvestConsul.ConsulType, this);
+        this.Upgrader = new ControllerConsul(ControllerConsul.ConsulType, this);
         this.Spawner = new SpawnConsul(SpawnConsul.ConsulType, this);
         this.Builder = new ConstructionConsul(ConstructionConsul.ConsulType, this);
         this.Distributor = new DistributionConsul(DistributionConsul.ConsulType, this);
-        this.Upgrader = new ControllerConsul(ControllerConsul.ConsulType, this);
     }
     protected ActivateImperators(): SwarmCodes.SwarmErrors {
         this.Collector.ActivateConsul();
