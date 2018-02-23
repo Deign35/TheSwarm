@@ -3,6 +3,7 @@ import * as SwarmConsts from 'Consts/SwarmConsts';
 import * as SwarmCodes from 'Consts/SwarmCodes';
 import * as _ from "lodash";
 import { HiveQueenBase } from "Queens/HiveQueenBase";
+import { ControllerImperator } from "Imperators/ControllerImperator";
 
 const CONSUL_TYPE = 'Controller';
 const UPGRADER_IDS = 'U_IDs'
@@ -23,6 +24,10 @@ const RCL_UPGRADER_RATIO: { [index: number]: { numUpgraders: number, body: BodyP
     },
 }
 export class ControllerConsul extends CreepConsul {
+    constructor(memId: string, parent: HiveQueenBase) {
+        super(memId, parent);
+    }
+    Imperator!: ControllerImperator;
     static get ConsulType(): string { return CONSUL_TYPE; }
     get consulType(): string { return CONSUL_TYPE }
     Controller!: StructureController;
@@ -33,7 +38,7 @@ export class ControllerConsul extends CreepConsul {
     }
     Load() {
         if (!super.Load()) { return false }
-        this.Controller = this.Nest.controller as StructureController;
+        this.Controller = this.Queen.Nest.controller as StructureController;
 
         if (!this.Controller.my && // I dont control it
             (!this.Controller.reservation ||
@@ -60,17 +65,18 @@ export class ControllerConsul extends CreepConsul {
             }
         }
 
+        this.Imperator = new ControllerImperator();
         return true;
     }
     InitMemory() {
         super.InitMemory();
-        if (!this.Nest.controller) {
+        if (!this.Queen.Nest.controller) {
             throw 'ATTEMPTING TO ADD CONTROLLERCONSUL TO A ROOM WITH NO CONTROLLER'
         }
         this.CreepData = [];
         this.SetData(UPGRADER_IDS, this.CreepData);
     }
-    RequiresSpawn(): boolean {
+    GetNextSpawn(): boolean {
         if (!this.CreepRequested) {
             if (this.CreepData.length < RCL_UPGRADER_RATIO[this.Controller.level].numUpgraders) {
                 return true;
@@ -89,7 +95,7 @@ export class ControllerConsul extends CreepConsul {
         return spawnArgs;
     }
     protected _assignCreep(creepName: string) {
-        this.CreepData.push({ creepName: creepName, fetching: false });
+        this.CreepData.push({ creepName: creepName, fetching: false, controllerTarget: (this.Queen.Nest.controller as StructureController).id });
     }
     ReleaseCreep(creepName: string): void {
         for (let i = 0, length = this.CreepData.length; i < length; i++) {

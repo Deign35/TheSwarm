@@ -5,36 +5,20 @@ import { ActionBase } from "Actions/ActionBase";
 import { UpgradeAction } from "Actions/UpgradeAction";
 import { MoveToPositionAction } from "Actions/MoveToPositionAction";
 
-const CONSUL_TYPE = 'Controller';
 export class ControllerImperator extends ImperatorBase {
-    static get ConsulType(): string { return CONSUL_TYPE; }
-    get consulType(): string { return CONSUL_TYPE }
-    protected Consul!: ControllerConsul;
-    InitImperator(): void {
-        this.Consul = new ControllerConsul(this.consulType, this.Queen);
-    }
-    ImperatorComplete(): void {
-        this.Consul.Save();
-    }
-    ActivateImperator(): SwarmCodes.SwarmErrors {
-        let creeps = this.Consul.CreepData;
-        for (let i = 0, length = creeps.length; i < length; i++) {
-            this.ActivateCreep(creeps[i]);
-        }
-
-        return SwarmCodes.C_NONE;
-    }
-    protected ActivateCreep(creepData: ControllerConsul_CreepData): void {
+    ActivateCreep(creepData: ControllerConsul_CreepData): SwarmCodes.SwarmlingResponse {
         let creep = Game.creeps[creepData.creepName];
-        this.Queen.Nest.visual.text('' + creep.carry[RESOURCE_ENERGY], creep.pos);
-        if (creep.spawning || creepData.fetching) { return; }
-        let upgradeAction: ActionBase = new UpgradeAction(creep, this.Consul.Controller);
+        if (creep.spawning || creepData.fetching) { return SwarmCodes.C_NONE; }
+        // This is very fragile, if the creep is in another room, this breaks!
+        let controller = Game.getObjectById(creepData.controllerTarget) as StructureController;
+        let upgradeAction: ActionBase = new UpgradeAction(creep, controller);
         let upgradeResult = upgradeAction.ValidateAction();
 
         if (upgradeResult == SwarmCodes.C_MOVE) {
-            new MoveToPositionAction(creep, this.Consul.Controller.pos).Run(true);
+            new MoveToPositionAction(creep, controller.pos).Run(true);
         } else {
             upgradeAction.Run();
         }
+        return SwarmCodes.C_NONE;
     }
 }

@@ -9,6 +9,9 @@ const SPAWN_DATA = 'S_DATA';
 const SPAWN_QUEUE = 'S_QUEUE';
 const RELATIVE_TIME = 'R_TIME';
 export class SpawnConsul extends ConsulBase {
+    ActivateConsul(): void {
+        throw new Error("Method not implemented.");
+    }
     static get ConsulType(): string { return CONSUL_TYPE; }
     readonly consulType = SpawnConsul.ConsulType;
 
@@ -45,7 +48,7 @@ export class SpawnConsul extends ConsulBase {
         }
         this.SpawnQueue = MinHeap.DeserializeHeap(serializedQueue, SpawnConsul.DeserializeSpawnRequest);
         this.RelativeTime = this.GetData(RELATIVE_TIME);
-        
+
         return true;
     }
 
@@ -56,12 +59,12 @@ export class SpawnConsul extends ConsulBase {
     }
 
     ScanRoom(): void {
-        let spawns = this.Nest.find(FIND_MY_SPAWNS);
+        let spawns = this.Queen.Nest.find(FIND_MY_SPAWNS);
         this.SpawnData = [];
         for (let i = 0, length = spawns.length; i < length; i++) {
             this.AddSpawner(spawns[i]);
         }
-        let extensions = this.Nest.find(FIND_MY_STRUCTURES, {
+        let extensions = this.Queen.Nest.find(FIND_MY_STRUCTURES, {
             filter: function (struct) {
                 return struct.structureType == STRUCTURE_EXTENSION ||
                     struct.structureType == STRUCTURE_TOWER;
@@ -72,7 +75,7 @@ export class SpawnConsul extends ConsulBase {
     SpawnCreep() {
         let spawnData = this.SpawnQueue.Peek();
         if (!spawnData) { return; }
-        if (this.Nest.energyAvailable >= SpawnConsul.CalculateEnergyCost(spawnData)) {
+        if (this.Queen.Nest.energyAvailable >= SpawnConsul.CalculateEnergyCost(spawnData)) {
             let spawnToUse: StructureSpawn | undefined;
             for (let i = 0; i < this.SpawnData.length; i++) {
                 let spawn = Game.spawns[this.SpawnData[i].id];
@@ -106,7 +109,7 @@ export class SpawnConsul extends ConsulBase {
     }
 
     AddSpawner(spawner: StructureSpawn) {
-        if (spawner.room.name != this.Nest.name) { return; }
+        if (spawner.room.name != this.Queen.Nest.name) { return; }
         let newSpawnData: SpawnConsul_SpawnData = {
             x: spawner.pos.x,
             y: spawner.pos.y,

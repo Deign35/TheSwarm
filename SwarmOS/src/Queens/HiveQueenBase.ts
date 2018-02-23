@@ -12,12 +12,12 @@ import { ConstructionImperator } from 'Imperators/ConstructionImperator';
 import { DistributionImperator } from 'Imperators/DistributionImperator';
 
 export abstract class HiveQueenBase extends NestQueenBase implements IHiveQueen {
-    Upgrader!: ControllerImperator;
+    Upgrader!: ControllerConsul;
     Spawner!: SpawnConsul;
 
     ReservedNests!: NestQueenBase[];
     Save() {
-        this.Upgrader.ImperatorComplete();
+        this.Upgrader.Save();
         this.Spawner.Save();
         super.Save();
     }
@@ -64,25 +64,20 @@ export abstract class HiveQueenBase extends NestQueenBase implements IHiveQueen 
             }
         }
     }
-    protected LoadImperators() {
-        this.ImperatorList = []
+    protected LoadNestCounsel() {
+        this.Collector = new HarvestConsul(HarvestConsul.ConsulType, this);
         this.Spawner = new SpawnConsul(SpawnConsul.ConsulType, this);
-        this.Collector = new HarvestImperator(this);
-        this.ImperatorList.push(this.Collector);
-        this.Upgrader = new ControllerImperator(this);
-        this.ImperatorList.push(this.Upgrader);
-        this.Builder = new ConstructionImperator(this);
-        this.ImperatorList.push(this.Builder);
-        this.Distributor = new DistributionImperator(this);
-        this.ImperatorList.push(this.Distributor);
+        this.Builder = new ConstructionConsul(ConstructionConsul.ConsulType, this);
+        this.Distributor = new DistributionConsul(DistributionConsul.ConsulType, this);
+        this.Upgrader = new ControllerConsul(ControllerConsul.ConsulType, this);
     }
     protected ActivateImperators(): SwarmCodes.SwarmErrors {
-        this.Collector.ActivateImperator();
+        this.Collector.ActivateConsul();
         if (Game.cpu.bucket > 500 || Game.shard.name == 'sim') {
-            this.Builder.ActivateImperator();
-            this.Upgrader.ActivateImperator();
+            this.Builder.ActivateConsul();
+            this.Upgrader.ActivateConsul();
         }
-        this.Distributor.ActivateImperator();
+        this.Distributor.ActivateConsul();
         return SwarmCodes.C_NONE;
     }
 }

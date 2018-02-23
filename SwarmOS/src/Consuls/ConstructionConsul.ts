@@ -1,10 +1,12 @@
 import { CreepConsul } from "Consuls/ConsulBase";
 import { HiveQueenBase } from "Queens/HiveQueenBase";
+import { ConstructionImperator } from "Imperators/ConstructionImperator";
 
 const CONSUL_TYPE = 'Constructor';
 const BUILDER_DATA = 'B_Data';
 const SITE_DATA = 'S_Data';
 export class ConstructionConsul extends CreepConsul {
+    Imperator!: ConstructionImperator;
     static get ConsulType(): string { return CONSUL_TYPE; }
     get consulType(): string { return CONSUL_TYPE }
 
@@ -18,7 +20,7 @@ export class ConstructionConsul extends CreepConsul {
     Load() {
         if (!super.Load()) { return false; }
 
-        let allSites = this.Nest.find(FIND_CONSTRUCTION_SITES);
+        let allSites = this.Queen.Nest.find(FIND_CONSTRUCTION_SITES);
         let validSites: { [id: string]: ConstructionSite } = {}
         this.siteData = this.GetData(SITE_DATA) || {};
         for (let id in this.siteData) {
@@ -68,6 +70,7 @@ export class ConstructionConsul extends CreepConsul {
             }
         }
 
+        this.Imperator = new ConstructionImperator();
         return true;
     }
     AddSiteForConstruction(request: ConstructionRequest) {
@@ -105,7 +108,7 @@ export class ConstructionConsul extends CreepConsul {
             requestorID: this.consulType,
         }
     }
-    RequiresSpawn(): boolean {
+    GetNextSpawn(): boolean {
         if (this.CreepRequested) { return false; }
         return Object.keys(this.siteData).length > 0 && this.CreepData.length < 5;
     }

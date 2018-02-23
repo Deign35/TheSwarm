@@ -11,28 +11,21 @@ const SOURCE_DATA = 'S_Data';
 const TRACKER_PREFIX = 'Track_';
 const TEMP_DATA = 'T_DATA';
 export class HarvestConsul extends CreepConsul {
+    Imperator!: HarvestImperator;
     readonly consulType = CONSUL_TYPE;
     TempWorkers!: Creep[];
     CreepData!: HarvestConsul_SourceData[];
-    protected SourceHarvestRateTrackers!: RateTracker[];
     _tempData!: { [id: string]: string };
     protected _hasContainers!: boolean;
     Save() {
         this.SetData(TEMP_DATA, this._tempData);
         this.SetData(SOURCE_DATA, this.CreepData);
-        for (let i = 0, length = this.SourceHarvestRateTrackers.length; i < length; i++) {
-            this.SourceHarvestRateTrackers[i].Save();
-        }
         super.Save();
     }
 
     Load() {
         if (!super.Load()) { return false; }
         this.CreepData = this.GetData(SOURCE_DATA);
-        this.SourceHarvestRateTrackers = [];
-        for (let i = 0; i < this.CreepData.length; i++) {
-            this.SourceHarvestRateTrackers.push(new RateTracker(TRACKER_PREFIX + i, this));
-        }
         this._tempData = this.GetData(TEMP_DATA);
         this.TempWorkers = [];
         for (let id in this._tempData) {
@@ -45,18 +38,17 @@ export class HarvestConsul extends CreepConsul {
             this.TempWorkers.push(tempCreep);
         }
         this.ScanRoom();
+        this.Imperator = new HarvestImperator();
         return true;
     }
 
     InitMemory() {
         super.InitMemory();
         this.CreepData = [];
-        this.SourceHarvestRateTrackers = [];
         this._tempData = {};
-        let foundSources = this.Nest.find(FIND_SOURCES);
+        let foundSources = this.Queen.Nest.find(FIND_SOURCES);
         for (let i = 0, length = foundSources.length; i < length; i++) {
             this.CreepData.push(this.InitSourceData(foundSources[i]));
-            this.SourceHarvestRateTrackers.push(new RateTracker(TRACKER_PREFIX + i, this));
         }
         this.ScanRoom();
     }
@@ -65,10 +57,6 @@ export class HarvestConsul extends CreepConsul {
         for (let i = 0, length = this.CreepData.length; i < length; i++) {
             let data = this.CreepData[i];
             let sourceTarget = Game.getObjectById(data.id) as Source;
-            if (sourceTarget.energy < sourceTarget.energyCapacity) {
-                this.SourceHarvestRateTrackers[i].InsertData(data.lastEnergy - sourceTarget.energy);
-            }
-            data.lastEnergy = sourceTarget.energy;
             if (data.creepName && !Game.creeps[data.creepName as string]) {
                 data.creepName = '';
             }
@@ -86,7 +74,7 @@ export class HarvestConsul extends CreepConsul {
         }
     }
 
-    RequiresSpawn(): boolean {
+    GetNextSpawn(): boolean {
         // Calculates the distance to new sources
         // Orders creation of new screep so that they will arrive at the harvest node
         // just a few ticks before the previous one dies.
@@ -161,7 +149,7 @@ export class HarvestConsul extends CreepConsul {
         sourceData.id = source.id;
         sourceData.lastEnergy = source.energy;
         sourceData.spawnBuffer = 0; // This is how soon a creep must be spawned to get to the source at the right moment.
-        let structures = this.Nest.lookForAtArea(LOOK_STRUCTURES,
+        let structures = this.Queen.Nest.lookForAtArea(LOOK_STRUCTURES,
             sourceData.y - 1, sourceData.x - 1,
             sourceData.y + 1, sourceData.x + 1, true);
 
@@ -172,7 +160,7 @@ export class HarvestConsul extends CreepConsul {
         if (container.length > 0) {
             sourceData.containerID = (container[0].structure as Structure).id;
         } else {
-            let constructionSites = this.Nest.lookForAtArea(LOOK_CONSTRUCTION_SITES,
+            let constructionSites = this.Queen.Nest.lookForAtArea(LOOK_CONSTRUCTION_SITES,
                 sourceData.y - 1, sourceData.x - 1,
                 sourceData.y + 1, sourceData.x + 1, true);
             let site = _.filter(constructionSites, (site) => {
@@ -183,6 +171,78 @@ export class HarvestConsul extends CreepConsul {
             }
         }
         return sourceData;
+    }
+    ActivateConsul() {
+        // Request hive harvesters from the nestqueen.
+        let sourceData = this.CreepData;
+        for (let i = 0, length = sourceData.length; i < length; i++) {
+            let data = sourceData[i];
+            if (data.creepName && Game.creeps[data.creepName]) {
+                this.Imperator.ActivateHarvester(data, Game.creeps[data.creepName]);
+            }
+        }
+
+        let tempWorkers = this.TempWorkers;
+        let rotateBackward = Game.time % 2 == 0;
+        let curIndex = Game.time % this.CreepData.length;
+        for (let id in tempWorkers) {
+            if (tempWorkers[id].spawning) { continue; }
+            let targetId = this._tempData[tempWorkers[id].name];
+            let target: RoomObject | undefined = Game.getObjectById(targetId) || undefined;
+            let cycleProtection = 0;
+            do {
+                if (cycleProtection++ > this.CreepData.length) {
+                    break;
+                }
+                if (!target) {
+                    // find a target by cycling through
+                    let data = this.CreepData[curIndex];
+                    curIndex = rotateBackward ? curIndex - 1 : curIndex + 1;
+                    if (curIndex < 0) {
+                        curIndex = this.CreepData.length - 1;
+                    }
+                    if (curIndex >= this.CreepData.length) {
+                        curIndex = 0;
+                    }
+
+                    if (data.containerID) {
+                        target = Game.getObjectById(data.containerID) as StructureContainer;
+                        if ((target as StructureContainer).store[RESOURCE_ENERGY] < 10) {
+                            target = undefined;
+                        }
+                    }
+                    if (!target && tempWorkers[id].getActiveBodyparts(WORK) > 0) {
+                        target = Game.getObjectById(data.id) as Source;
+                    }
+                    if (!target && data.creepName) {
+                        target = Game.creeps[data.creepName];
+                    }
+                }
+                if (target) {
+                    if ((target as Source).energyCapacity) {
+                    } else if ((target as StructureContainer).storeCapacity) {
+                        if ((target as StructureContainer).store[RESOURCE_ENERGY] == 0) {
+                            target = undefined;
+                            continue;
+                        }
+                    } else if ((target as Creep).carryCapacity) {
+                        if ((target as Creep).carry[RESOURCE_ENERGY] == 0) {
+                            target = undefined;
+                            continue;
+                        }
+                    } else {
+                        target = undefined;
+                        continue;
+                    }
+                    //let targetId = this.Consul._tempData[tempWorkers[id].name];
+                    //let target: RoomObject | undefined = Game.getObjectById(targetId) || undefined;
+                    this._tempData[tempWorkers[id].name] = (target as Source).id;
+                    break;
+                }
+            } while (!target);
+            this.Imperator.ActivateTempWorker(tempWorkers[id], target as Source | StructureContainer | Creep);
+        }
+        return SwarmCodes.C_NONE; // unused
     }
 
     static get ConsulType(): string { return CONSUL_TYPE; }

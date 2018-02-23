@@ -1,11 +1,13 @@
 import { CreepConsul } from "Consuls/ConsulBase";
 import { HiveQueenBase } from "Queens/HiveQueenBase";
+import { DistributionImperator } from "Imperators/DistributionImperator";
 
 const REFILLER_DATA = 'R_DATA';
 const CONSUL_TYPE = 'Distribution';
 const SCAN_COOLDOWN = 'SCAN_CD';
 const SCAN_LIMIT = 10;
 export class DistributionConsul extends CreepConsul {
+    Imperator!: DistributionImperator;
     CreepData!: DistributionConsul_RefillerData[];
     static get ConsulType(): string { return CONSUL_TYPE; }
     get consulType(): string { return CONSUL_TYPE }
@@ -30,10 +32,10 @@ export class DistributionConsul extends CreepConsul {
 
         this.SpawnRefillerData = this.GetData(REFILLER_DATA);
         this.SpawnRefiller = Game.creeps[this.SpawnRefillerData.creepName];
+        this.CreepData = [];
         if (!this.SpawnRefiller) {
             this.SpawnRefillerData.creepName = '';
         } else {
-            this.CreepData = [];
             this.CreepData.push(this.SpawnRefillerData);
             if (this.SpawnRefillerData.fetching) {
                 if (this.SpawnRefiller.carry[RESOURCE_ENERGY] == this.SpawnRefiller.carryCapacity) {
@@ -51,6 +53,7 @@ export class DistributionConsul extends CreepConsul {
             this.ScanRoom();
         }
 
+        this.Imperator = new DistributionImperator();
         return true;
     }
     InitMemory() {
@@ -59,7 +62,7 @@ export class DistributionConsul extends CreepConsul {
     }
     ScanRoom(): void {
         if (!this.SpawnRefiller) { return };
-        let structures = this.Nest.find(FIND_STRUCTURES, {
+        let structures = this.Queen.Nest.find(FIND_STRUCTURES, {
             filter: function (struct) {
                 return (struct.structureType == STRUCTURE_EXTENSION ||
                     struct.structureType == STRUCTURE_SPAWN ||
@@ -96,7 +99,7 @@ export class DistributionConsul extends CreepConsul {
             targetTime: Game.time,
         }
     }
-    RequiresSpawn(): boolean {
+    GetNextSpawn(): boolean {
         if (!this.CreepRequested && !this.SpawnRefillerData.creepName) {
             return true;
         }

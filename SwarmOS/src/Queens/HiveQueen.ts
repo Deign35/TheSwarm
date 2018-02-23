@@ -24,7 +24,7 @@ export class HiveQueen extends HiveQueenBase {
             }
         }
 
-        if (this.Collector.RequiresSpawn()) {
+        if (this.Collector.GetNextSpawn()) {
             let spawnArgs;
             if (this.Nest.energyCapacityAvailable >= 550) {
                 spawnArgs = this.Collector.GetSpawnDefinition();
@@ -40,26 +40,26 @@ export class HiveQueen extends HiveQueenBase {
             this.Spawner.AddSpawnToQueue(spawnArgs);
             this.Collector.CreepRequested = spawnArgs.creepName;
         }
-        if (this.Upgrader.RequiresSpawn()) {
+        if (this.Upgrader.GetNextSpawn()) {
             let spawnArgs = this.Upgrader.GetSpawnDefinition();
             spawnArgs.targetTime = Game.time;
             this.Spawner.AddSpawnToQueue(spawnArgs);
             this.Upgrader.CreepRequested = spawnArgs.creepName;
         }
-        if (this.Builder.RequiresSpawn()) {
+        if (this.Builder.GetNextSpawn()) {
             let spawnArgs = this.Builder.GetSpawnDefinition();
             spawnArgs.targetTime = Game.time - 25;
             this.Spawner.AddSpawnToQueue(spawnArgs);
             this.Builder.CreepRequested = spawnArgs.creepName;
         }
-        if (this.Distributor.RequiresSpawn()) {
+        if (this.Distributor.GetNextSpawn()) {
             let spawnArgs = this.Distributor.GetSpawnDefinition();
             spawnArgs.targetTime = Game.time - 100;
             this.Spawner.AddSpawnToQueue(spawnArgs);
             this.Distributor.CreepRequested = spawnArgs.creepName;
         }
 
-        if (this.Distributor.GetDistributionIdleTime() > 100) {
+        if (this.Distributor.GetIdleTime() > 100) {
             if (!this.Upgrader.CreepRequested) {
                 let spawnArgs = this.Upgrader.GetSpawnDefinition();
                 spawnArgs.targetTime = Game.time;

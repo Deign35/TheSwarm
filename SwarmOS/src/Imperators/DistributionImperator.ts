@@ -7,32 +7,11 @@ import { TransferAction } from "Actions/TransferAction";
 
 const CONSUL_TYPE = 'Distribution';
 export class DistributionImperator extends ImperatorBase {
-    static get ConsulType(): string { return CONSUL_TYPE; }
-    get consulType(): string { return CONSUL_TYPE }
-    protected Consul!: DistributionConsul;
-    InitImperator(): void {
-        this.Consul = new DistributionConsul(this.consulType, this.Queen);
-    }
-    ImperatorComplete(): void {
-        this.Consul.Save();
-    }
-    ActivateImperator(): SwarmCodes.SwarmErrors {
-        let refiller = this.Consul.SpawnRefiller;
-        if (!refiller) {
-            return SwarmCodes.C_NONE;
-        }
-        this.ActivateCreep(this.Consul.CreepData[0]);
-
-        return SwarmCodes.C_NONE;
-    }
-    GetDistributionIdleTime() {
-        return this.Consul.GetIdleTime();
-    }
-    protected ActivateCreep(creepData: DistributionConsul_RefillerData): void {
+    ActivateCreep(creepData: DistributionConsul_RefillerData): SwarmCodes.SwarmlingResponse {
         let creep = Game.creeps[creepData.creepName];
-        if (!this.Consul.SpawnRefillerData.fetching) {
-            let target = this.Consul.GetSpawnRefillerTarget() as SpawnRefillTarget;
-            if (!target) { return; } // This should not return from here.
+        if (!creepData.fetching) {
+            let target = Game.getObjectById(creepData.refillList[creepData.curTarget]) as SpawnRefillTarget;
+            if (!target) { return SwarmCodes.C_NONE; } // This should not return from here.
 
             let action = new TransferAction(creep, target);
             let actionResult = action.ValidateAction();
@@ -55,5 +34,6 @@ export class DistributionImperator extends ImperatorBase {
                 }
             }
         }
+        return SwarmCodes.C_NONE;
     }
 }

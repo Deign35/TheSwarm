@@ -11,22 +11,22 @@ import { ImperatorBase } from "Imperators/ImperatorBase";
 export abstract class NestQueenBase extends QueenMemory implements INestQueen {
     Nest!: Room;
 
-    Collector!: HarvestImperator;
-    Builder!: ConstructionImperator;
-    Distributor!: DistributionImperator;
+    Collector!: HarvestConsul;
+    Builder!: ConstructionConsul;
+    Distributor!: DistributionConsul;
 
-    ImperatorList!: ImperatorBase[];
+    //ImperatorList!: ImperatorBase[];
     Save() {
-        this.Collector.ImperatorComplete();
-        this.Builder.ImperatorComplete();
-        this.Distributor.ImperatorComplete();
+        this.Collector.Save();
+        this.Builder.Save();
+        this.Distributor.Save();
         super.Save();
     }
     Load() {
         if (!super.Load()) { return false; }
         this.Nest = Game.rooms[this.id];
-        this.LoadImperators();
-        if(Game.time % 10 == 0) {
+        this.LoadNestCounsel();
+        if (Game.time % 10 == 0) {
             let idleCreeps = this.FindIdleCreeps();
             this.AssignIdleCreeps(idleCreeps);
         }
@@ -36,7 +36,7 @@ export abstract class NestQueenBase extends QueenMemory implements INestQueen {
     protected InitMemory() {
         super.InitMemory();
         this.Nest = Game.rooms[this.id];
-        this.LoadImperators();
+        this.LoadNestCounsel();
         this.InitializeNest();
     }
     abstract InitializeNest(): void;
@@ -48,33 +48,36 @@ export abstract class NestQueenBase extends QueenMemory implements INestQueen {
         for (let creepName in Game.creeps) {
             let creepFound = false;
 
-            for(let i = 0, length = this.ImperatorList.length; i < length; i++) {
-                if(this.ImperatorList[i].IsCreepAssigned(creepName)) {
+            /*for (let i = 0, length = this.ImperatorList.length; i < length; i++) {
+                if (this.ImperatorList[i].IsCreepAssigned(creepName)) {
                     creepFound = true;
                     break;
                 }
             }
-            if(creepFound) { continue; }
-            idleCreeps.push(Game.creeps[creepName]);
+            if (creepFound) { continue; }
+            idleCreeps.push(Game.creeps[creepName]);*/
         }
         return idleCreeps;
     }
     abstract AssignIdleCreeps(idleCreeps: Creep[]): void;
-    protected LoadImperators() {
-        this.ImperatorList = []
+    protected LoadNestCounsel() {
+        /*this.ImperatorList = []
         this.Collector = new HarvestImperator(this);
         this.ImperatorList.push(this.Collector);
         this.Builder = new ConstructionImperator(this);
         this.ImperatorList.push(this.Builder);
         this.Distributor = new DistributionImperator(this);
-        this.ImperatorList.push(this.Distributor);
+        this.ImperatorList.push(this.Distributor);*/
+        this.Collector = new HarvestConsul(HarvestConsul.ConsulType, this);
+        this.Builder = new ConstructionConsul(ConstructionConsul.ConsulType, this);
+        this.Distributor = new DistributionConsul(DistributionConsul.ConsulType, this);
     }
     protected ActivateImperators(): SwarmCodes.SwarmErrors {
-        this.Collector.ActivateImperator();
+        this.Collector.ActivateConsul();
         if (Game.cpu.bucket > 500 || Game.shard.name == 'sim') {
-            this.Builder.ActivateImperator();
+            this.Builder.ActivateConsul();
         }
-        this.Distributor.ActivateImperator();
+        this.Distributor.ActivateConsul();
         return SwarmCodes.C_NONE;
     }
     protected abstract CheckForSpawnRequirements(): void; // Return a list of spawnArgs.
