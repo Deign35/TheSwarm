@@ -7,10 +7,10 @@ import { TransferAction } from "Actions/TransferAction";
 
 const CONSUL_TYPE = 'Distribution';
 export class DistributionImperator extends ImperatorBase {
-    ActivateCreep(creepData: DistributionConsul_RefillerData): SwarmCodes.SwarmlingResponse {
+    ActivateCreep(creepData: DelivererData): SwarmCodes.SwarmlingResponse {
         let creep = Game.creeps[creepData.creepName];
         if (!creepData.fetching) {
-            let target = Game.getObjectById(creepData.refillList[creepData.curTarget]) as SpawnRefillTarget;
+            let target = Game.getObjectById(creepData.target) as SpawnRefillTarget;
             if (!target) { return SwarmCodes.C_NONE; } // This should not return from here.
 
             let action = new TransferAction(creep, target);

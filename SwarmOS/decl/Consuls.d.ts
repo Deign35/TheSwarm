@@ -1,5 +1,14 @@
 declare interface IConsul extends IMemory {
     consulType: string;
+    ActivateConsul(): void;
+}
+declare interface ICreepConsul extends IConsul {
+    AssignSpawn(creepName: string): void;
+    AssignCreep(creep: Creep): void;
+    ForgetSpawn(creepName?: string): void;
+    ReleaseCreep(creepName: string): void;
+    GetSpawnDefinition(): SpawnConsul_SpawnArgs;
+    GetNextSpawn(): boolean;
 }
 declare type CreepConsul_Data = {
     creepName: string;
@@ -57,13 +66,14 @@ declare type DistributionConsul_RefillerData = CreepConsul_Data & {
     idleTime: number,
 }
 
-
 declare type DistributionConsul_DeliveryRequest = {
     id: string,
-    amount: number
+    amount: number,
+    time: number,
     resourceType?: ResourceConstant,
 }
-declare type DelivererData = CreepConsul_BaseData & {
-    refillList: string[], // just go to [0] or [end] and slice off when delivered.
+declare type DelivererData = CreepConsul_Data & {
+    refillList: DistributionConsul_DeliveryRequest[], // just go to [0] or [end] and slice off when delivered.
     fetching: boolean,
+    target: string,
 }

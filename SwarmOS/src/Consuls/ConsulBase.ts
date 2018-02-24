@@ -24,7 +24,7 @@ export abstract class ConsulBase extends ChildMemory implements IConsul {
     static get ConsulType(): string { return 'SwarmCodes.E_NOT_IMPLEMENTED'; }
 }
 
-export abstract class CreepConsul extends ConsulBase {
+export abstract class CreepConsul extends ConsulBase implements ICreepConsul {
     CreepRequested?: string;
     abstract Imperator: ImperatorBase;
     abstract CreepData: CreepConsul_Data[];

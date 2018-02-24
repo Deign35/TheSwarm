@@ -45,15 +45,6 @@ export class HiveQueen extends HiveQueenBase {
             this.Spawner.AddSpawnToQueue(spawnArgs);
             this.Distributor.CreepRequested = spawnArgs.creepName;
         }
-
-        if (this.Distributor.GetIdleTime() > 100) {
-            if (!this.Upgrader.CreepRequested) {
-                let spawnArgs = this.Upgrader.GetSpawnDefinition();
-                spawnArgs.targetTime = Game.time;
-                this.Spawner.AddSpawnToQueue(spawnArgs);
-                this.Upgrader.CreepRequested = spawnArgs.creepName;
-            }
-        }
     }
     InitializeNest(): void {
         // Don't think I need anything eh?
