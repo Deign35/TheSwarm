@@ -65,11 +65,17 @@ export abstract class HiveQueenBase extends NestQueenBase implements IHiveQueen 
         }
     }
     protected LoadNestCounsel() {
+        this.CreepConsulList = [];
         this.Collector = new HarvestConsul(HarvestConsul.ConsulType, this);
+        this.CreepConsulList.push(this.Collector);
         this.Upgrader = new ControllerConsul(ControllerConsul.ConsulType, this);
-        this.Spawner = new SpawnConsul(SpawnConsul.ConsulType, this);
+        this.CreepConsulList.push(this.Upgrader);
         this.Builder = new ConstructionConsul(ConstructionConsul.ConsulType, this);
+        this.CreepConsulList.push(this.Builder);
         this.Distributor = new DistributionConsul(DistributionConsul.ConsulType, this);
+        this.CreepConsulList.push(this.Distributor);
+
+        this.Spawner = new SpawnConsul(SpawnConsul.ConsulType, this);
     }
     protected ActivateImperators(): SwarmCodes.SwarmErrors {
         this.Collector.ActivateConsul();

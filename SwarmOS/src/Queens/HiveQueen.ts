@@ -3,24 +3,11 @@ import { HiveQueenBase } from "Queens/HiveQueenBase";
 
 export class HiveQueen extends HiveQueenBase {
     protected CheckForSpawnRequirements(): void {
-        if (this.Collector.CreepRequested) {
-            if (!this.Spawner.ActiveSpawnNames[this.Collector.CreepRequested]) {
-                this.Collector.ForgetSpawn();
-            }
-        }
-        if (this.Upgrader.CreepRequested) {
-            if (!this.Spawner.ActiveSpawnNames[this.Upgrader.CreepRequested]) {
-                this.Upgrader.ForgetSpawn();
-            }
-        }
-        if (this.Builder.CreepRequested) {
-            if (!this.Spawner.ActiveSpawnNames[this.Builder.CreepRequested]) {
-                this.Builder.ForgetSpawn();
-            }
-        }
-        if (this.Distributor.CreepRequested) {
-            if (!this.Spawner.ActiveSpawnNames[this.Distributor.CreepRequested]) {
-                this.Distributor.ForgetSpawn();
+        for (let i = 0, length = this.CreepConsulList.length; i < length; i++) {
+            if (this.CreepConsulList[i].CreepRequested) {
+                if (!this.Spawner.ActiveSpawnNames[this.CreepConsulList[i].CreepRequested as string]) {
+                    this.CreepConsulList[i].ForgetSpawn();
+                }
             }
         }
 

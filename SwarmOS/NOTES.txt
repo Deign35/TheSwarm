@@ -1,9 +1,17 @@
-StoreDefinition is currently set to any, which means no intellisense on it.  This should be fixed soon.
+Queen refactor including adding nests to HiveQueens.
+Refactor the spawning system.  The spawn system should request from the consul,
+    what the next spawn is and when it is needed by.
+    This will make the spawning much simpler to handle.
 
-Multiple transfer targets still doesn't work.  Transfer get's OK and moves to next.
-Because after a successful transfer, it still has 50/50 energy.
-But this should mean that it keeps looking for a new target the next tick...
-Because the creep is still trying to fill the old target and it needs to erase its target after transfer.
+HarvestImperator should be split between one that builds its container and one that doesnt.
+    use this to double check that no construction site already exists right before plopping it down.
 
-Flag values:
-Red/Green -- Container for harvesters
+Change bootstrapping after refactoring spawning.  Use refactored spawning to setup the first group of 
+    spawns for bootstrapping room #1.  Not needed for rooms #2+.  This should require a Nest queen that is bootstrapping
+    when the spawn has been created, the containers, and the controller captured, release it to the SwarmQueen.
+
+Get SwarmObjects implemented.  These can be like suits that a creep or a nest will wear.  The suit is essentially the imperator...
+    In fact, these probably are for very similar roles.  Whats the diff once SwarmCreep splits to HarvesterCreep,
+        DistributorCreep, etc...
+
+Better reuse of existing creeps.

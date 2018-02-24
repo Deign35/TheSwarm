@@ -56,3 +56,14 @@ declare type DistributionConsul_RefillerData = CreepConsul_Data & {
     fetching: boolean,
     idleTime: number,
 }
+
+
+declare type DistributionConsul_DeliveryRequest = {
+    id: string,
+    amount: number
+    resourceType?: ResourceConstant,
+}
+declare type DelivererData = CreepConsul_BaseData & {
+    refillList: string[], // just go to [0] or [end] and slice off when delivered.
+    fetching: boolean,
+}

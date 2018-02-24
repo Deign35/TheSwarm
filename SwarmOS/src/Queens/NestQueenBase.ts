@@ -7,6 +7,7 @@ import { HarvestConsul } from "Consuls/HarvestConsul";
 import { ConstructionConsul } from "Consuls/ConstructionConsul";
 import { DistributionConsul } from "Consuls/DistributionConsul";
 import { ImperatorBase } from "Imperators/ImperatorBase";
+import { CreepConsul } from "Consuls/ConsulBase";
 
 export abstract class NestQueenBase extends QueenMemory implements INestQueen {
     Nest!: Room;
@@ -15,7 +16,7 @@ export abstract class NestQueenBase extends QueenMemory implements INestQueen {
     Builder!: ConstructionConsul;
     Distributor!: DistributionConsul;
 
-    //ImperatorList!: ImperatorBase[];
+    CreepConsulList!: CreepConsul[];
     Save() {
         this.Collector.Save();
         this.Builder.Save();
@@ -48,29 +49,28 @@ export abstract class NestQueenBase extends QueenMemory implements INestQueen {
         for (let creepName in Game.creeps) {
             let creepFound = false;
 
-            /*for (let i = 0, length = this.ImperatorList.length; i < length; i++) {
-                if (this.ImperatorList[i].IsCreepAssigned(creepName)) {
-                    creepFound = true;
-                    break;
+            for (let i = 0, length = this.CreepConsulList.length; i < length; i++) {
+                for (let j = 0, length2 = this.CreepConsulList[i].CreepData.length; j < length2; j++) {
+                    if (this.CreepConsulList[i].CreepData[j].creepName == creepName) {
+                        creepFound = true;
+                        break;
+                    }
                 }
+                if (creepFound) { continue; }
+                idleCreeps.push(Game.creeps[creepName]);
             }
-            if (creepFound) { continue; }
-            idleCreeps.push(Game.creeps[creepName]);*/
         }
         return idleCreeps;
     }
     abstract AssignIdleCreeps(idleCreeps: Creep[]): void;
     protected LoadNestCounsel() {
-        /*this.ImperatorList = []
-        this.Collector = new HarvestImperator(this);
-        this.ImperatorList.push(this.Collector);
-        this.Builder = new ConstructionImperator(this);
-        this.ImperatorList.push(this.Builder);
-        this.Distributor = new DistributionImperator(this);
-        this.ImperatorList.push(this.Distributor);*/
+        this.CreepConsulList = [];
         this.Collector = new HarvestConsul(HarvestConsul.ConsulType, this);
+        this.CreepConsulList.push(this.Collector);
         this.Builder = new ConstructionConsul(ConstructionConsul.ConsulType, this);
+        this.CreepConsulList.push(this.Builder);
         this.Distributor = new DistributionConsul(DistributionConsul.ConsulType, this);
+        this.CreepConsulList.push(this.Distributor);
     }
     protected ActivateImperators(): SwarmCodes.SwarmErrors {
         this.Collector.ActivateConsul();

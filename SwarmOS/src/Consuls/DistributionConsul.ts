@@ -5,15 +5,18 @@ import { DistributionImperator } from "Imperators/DistributionImperator";
 const REFILLER_DATA = 'R_DATA';
 const CONSUL_TYPE = 'Distribution';
 const SCAN_COOLDOWN = 'SCAN_CD';
+const DISTRIBUTION_REQUESTS = 'D_DATA';
 const SCAN_LIMIT = 10;
 export class DistributionConsul extends CreepConsul {
-    Imperator!: DistributionImperator;
-    CreepData!: DistributionConsul_RefillerData[];
     static get ConsulType(): string { return CONSUL_TYPE; }
     get consulType(): string { return CONSUL_TYPE }
 
+    Imperator!: DistributionImperator;
+    CreepData!: DistributionConsul_RefillerData[];
+
     SpawnRefiller?: Creep;
     SpawnRefillerData!: DistributionConsul_RefillerData;
+    protected DeliveryRequests!: DistributionConsul_DeliveryRequest[];
     protected ScanCooldown?: number;
     Save() {
         if (this.ScanCooldown) {
@@ -24,12 +27,14 @@ export class DistributionConsul extends CreepConsul {
                 this.SetData(SCAN_COOLDOWN, this.ScanCooldown);
             }
         }
+        this.SetData(DISTRIBUTION_REQUESTS, this.DeliveryRequests);
         this.SetData(REFILLER_DATA, this.SpawnRefillerData);
         super.Save();
     }
     Load() {
         if (!super.Load()) { return false }
 
+        this.DeliveryRequests = this.GetData(DISTRIBUTION_REQUESTS);
         this.SpawnRefillerData = this.GetData(REFILLER_DATA);
         this.SpawnRefiller = Game.creeps[this.SpawnRefillerData.creepName];
         this.CreepData = [];
@@ -132,6 +137,13 @@ export class DistributionConsul extends CreepConsul {
         }
 
         return;
+    }
+
+    ScheduleResourceDelivery(target: Creep | StructureExtension | StructureSpawn | StructureLink, amount: number, resourceType?: ResourceConstant) {
+        let request: DistributionConsul_DeliveryRequest = { id: target.id, amount: amount };
+        if (resourceType) {
+            request.resourceType = resourceType;
+        }
     }
 
     GetIdleTime() {
