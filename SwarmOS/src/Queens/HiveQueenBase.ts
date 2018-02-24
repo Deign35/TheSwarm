@@ -40,8 +40,8 @@ export abstract class HiveQueenBase extends NestQueenBase implements IHiveQueen 
     }
 
     ActivateNest() {
-        this.ValidateCounsel();
-        this.ActivateCounsel();
+        this.ValidateCouncil();
+        this.ActivateCouncil();
         this.CheckForSpawnRequirements();
         let requirements = this.Spawner.GetNextSpawns(1);
         if (requirements.length > 0) {
@@ -61,7 +61,7 @@ export abstract class HiveQueenBase extends NestQueenBase implements IHiveQueen 
             }
         }
     }
-    protected LoadNestCounsel() {
+    protected LoadNestCouncil() {
         this.CreepConsulList = [];
         this.Distributor = new DistributionConsul(DistributionConsul.ConsulType, this);
         this.CreepConsulList.push(this.Distributor);
@@ -74,17 +74,12 @@ export abstract class HiveQueenBase extends NestQueenBase implements IHiveQueen 
 
         this.Spawner = new SpawnConsul(SpawnConsul.ConsulType, this);
     }
-    protected ValidateCounsel() {
+    protected ValidateCouncil() {
         this.Spawner.ValidateConsulState();
-        super.ValidateCounsel();
+        super.ValidateCouncil();
     }
-    protected ActivateCounsel(): SwarmCodes.SwarmErrors {
-        this.Collector.ActivateConsul();
-        if (Game.cpu.bucket > 500 || Game.shard.name == 'sim') {
-            this.Builder.ActivateConsul();
-            this.Upgrader.ActivateConsul();
-        }
-        this.Distributor.ActivateConsul();
-        return SwarmCodes.C_NONE;
+    protected ActivateSupportConsuls() {
+        this.Upgrader.ActivateConsul();
+        super.ActivateSupportConsuls();
     }
 }

@@ -24,9 +24,7 @@ const RCL_UPGRADER_RATIO: { [index: number]: { numUpgraders: number, body: BodyP
     },
 }
 export class ControllerConsul extends CreepConsul {
-    constructor(memId: string, parent: HiveQueenBase) {
-        super(memId, parent);
-    }
+    get Queen(): HiveQueenBase { return this.Parent as HiveQueenBase; }
     Imperator!: ControllerImperator;
     static get ConsulType(): string { return CONSUL_TYPE; }
     get consulType(): string { return CONSUL_TYPE }
@@ -59,11 +57,11 @@ export class ControllerConsul extends CreepConsul {
             }
             if (this.CreepData[i].fetching) {
                 if (creep.carry[RESOURCE_ENERGY] == creep.carryCapacity) {
-                    (this.Parent as HiveQueenBase).Collector.ReleaseManagedCreep(creep.name);
+                    this.Queen.Collector.ReleaseManagedCreep(creep.name);
                     this.CreepData[i].fetching = false;
                 }
             } else if (creep.carry[RESOURCE_ENERGY] == 0) {
-                (this.Parent as HiveQueenBase).Collector.AssignManagedCreep(creep, true);
+                this.Queen.Collector.AssignManagedCreep(creep, true);
                 this.CreepData[i].fetching = true;
             }
         }
@@ -100,7 +98,7 @@ export class ControllerConsul extends CreepConsul {
     ReleaseCreep(creepName: string): void {
         for (let i = 0, length = this.CreepData.length; i < length; i++) {
             if (this.CreepData[i].creepName == creepName) {
-                if(this.CreepData[i].fetching) {
+                if (this.CreepData[i].fetching) {
                     this.Queen.Collector.ReleaseManagedCreep(creepName);
                 }
                 this.CreepData.splice(i, 1);

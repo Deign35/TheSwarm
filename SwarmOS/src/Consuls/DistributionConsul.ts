@@ -27,7 +27,7 @@ export class DistributionConsul extends CreepConsul {
         return true;
     }
     ValidateConsulState(): void {
-        if(this.DeliveryRequests.length == 0) {
+        if (this.DeliveryRequests.length == 0) {
             this.ScanRoom();
         }
         for (let i = 0; i < this.CreepData.length; i++) {
@@ -38,17 +38,17 @@ export class DistributionConsul extends CreepConsul {
             }
             if (this.CreepData[i].fetching) {
                 if (creep.carry[RESOURCE_ENERGY] == creep.carryCapacity) {
-                    this.Parent.Collector.ReleaseManagedCreep(creep.name);
+                    this.Queen.Collector.ReleaseManagedCreep(creep.name);
                     this.CreepData[i].fetching = false;
                 }
             } else if (creep.carry[RESOURCE_ENERGY] == 0) {
-                this.Parent.Collector.AssignManagedCreep(creep, false);
+                this.Queen.Collector.AssignManagedCreep(creep, false);
                 this.CreepData[i].fetching = true;
             }
 
             // THIS IS FUGLY
             let target = this.GetSpawnRefillerTarget(this.CreepData[i]);
-            if(!target) {
+            if (!target) {
                 this.SetDelivererTargets(this.CreepData[i]);
                 target = this.GetSpawnRefillerTarget(this.CreepData[i]);
             }
@@ -65,7 +65,7 @@ export class DistributionConsul extends CreepConsul {
     ReleaseCreep(creepName: string): void {
         for (let i = 0, length = this.CreepData.length; i < length; i++) {
             if (this.CreepData[i].creepName == creepName) {
-                if(this.CreepData[i].fetching) {
+                if (this.CreepData[i].fetching) {
                     this.Queen.Collector.ReleaseManagedCreep(creepName);
                 }
                 this.CreepData.splice(i, 1);
@@ -116,7 +116,7 @@ export class DistributionConsul extends CreepConsul {
         while (creepData.refillList.length > 0) {
             let targetID = creepData.refillList[0].id;
             let target = Game.getObjectById(targetID) as RefillTarget;
-            if(((target as StructureSpawn).energyCapacity && (target as StructureSpawn).energy < (target as StructureSpawn).energyCapacity) ||
+            if (((target as StructureSpawn).energyCapacity && (target as StructureSpawn).energy < (target as StructureSpawn).energyCapacity) ||
                 ((target as Creep).carryCapacity && (target as Creep).carry.energy < (target as Creep).carryCapacity)) {
                 return target;
             } else {

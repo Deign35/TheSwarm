@@ -55,17 +55,17 @@ export class ConstructionConsul extends CreepConsul {
             }
             if (this.CreepData[i].fetching) {
                 if (creep.carry[RESOURCE_ENERGY] == creep.carryCapacity) {
-                    this.Parent.Collector.ReleaseManagedCreep(creep.name);
+                    this.Queen.Collector.ReleaseManagedCreep(creep.name);
                     this.CreepData[i].fetching = false;
                 }
             } else if (!this.CreepData[i].fetching && creep.carry[RESOURCE_ENERGY] == 0) {
-                this.Parent.Collector.AssignManagedCreep(creep, true);
+                this.Queen.Collector.AssignManagedCreep(creep, true);
                 this.CreepData[i].fetching = true;
             }
             //Check that the construction site is valid
             if (!validSites[this.CreepData[i].target]) {
                 if (Object.keys(this.siteData).length == 0) {
-                    this.Parent.ReleaseControl(creep);
+                    this.Queen.ReleaseControl(creep);
                     this.ReleaseCreep(creep.name);
                     continue;
                 }
@@ -95,7 +95,7 @@ export class ConstructionConsul extends CreepConsul {
     ReleaseCreep(creepName: string): void {
         for (let i = 0, length = this.CreepData.length; i < length; i++) {
             if (this.CreepData[i].creepName == creepName) {
-                if(this.CreepData[i].fetching) {
+                if (this.CreepData[i].fetching) {
                     this.Queen.Collector.ReleaseManagedCreep(creepName);
                 }
                 this.CreepData.splice(i, 1);
