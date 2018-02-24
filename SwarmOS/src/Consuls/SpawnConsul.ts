@@ -21,9 +21,9 @@ export class SpawnConsul extends ConsulBase {
     ActiveSpawnNames!: { [creepName: string]: string };
     Save() {
         if (this.SpawnQueue.Peek()) {
-            this.Parent.Nest.visual.text(this.Parent.Nest.energyAvailable + ' of ' + (this.SpawnQueue.Peek() as SpawnConsul_SpawnArgs).calculatedCost, 8, 20);
+            this.Queen.Nest.visual.text(this.Queen.Nest.energyAvailable + ' of ' + (this.SpawnQueue.Peek() as SpawnConsul_SpawnArgs).calculatedCost, 8, 20);
         } else {
-            this.Parent.Nest.visual.text(this.Parent.Nest.energyAvailable + ' of ' + this.Parent.Nest.energyCapacityAvailable, 8, 20);
+            this.Queen.Nest.visual.text(this.Queen.Nest.energyAvailable + ' of ' + this.Queen.Nest.energyCapacityAvailable, 8, 20);
         }
         this.SetData(SPAWN_DATA, this.SpawnData);
         let serializedQueue = MinHeap.CompressHeap(this.SpawnQueue, SpawnConsul.SerializeSpawnRequest);

@@ -12,8 +12,10 @@ const SOURCE_DATA = 'S_Data';
 const TRACKER_PREFIX = 'Track_';
 const TEMP_DATA = 'T_DATA';
 export class HarvestConsul extends CreepConsul {
+    static get ConsulType(): string { return CONSUL_TYPE; }
+    get consulType(): string { return CONSUL_TYPE }
+
     Imperator!: HarvestImperator;
-    readonly consulType = CONSUL_TYPE;
     TempWorkers!: Creep[];
     CreepData!: HarvestConsul_SourceData[];
     _tempData!: { [id: string]: string };
@@ -261,6 +263,4 @@ export class HarvestConsul extends CreepConsul {
         }
         return SwarmCodes.C_NONE; // unused
     }
-
-    static get ConsulType(): string { return CONSUL_TYPE; }
 }

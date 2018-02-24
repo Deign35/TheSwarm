@@ -5,9 +5,9 @@ import { ImperatorBase } from "Imperators/ImperatorBase";
 
 const REQUESTED_CREEP = 'R_Creep';
 export abstract class ConsulBase extends ChildMemory implements IConsul {
-    get Queen() { return this.Parent; }
-    constructor(id: string, public Parent: NestQueenBase) {
-        super(id, Parent);
+    get Queen(): NestQueenBase { return this.Parent as NestQueenBase; }
+    constructor(id: string, parent: NestQueenBase) {
+        super(id, parent);
     }
     Load() {
         if (!super.Load()) { return false; }
