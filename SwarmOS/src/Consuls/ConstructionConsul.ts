@@ -20,9 +20,15 @@ export class ConstructionConsul extends CreepConsul {
     Load() {
         if (!super.Load()) { return false; }
 
+        this.CreepData = this.GetData(BUILDER_DATA) || [];
+        this.siteData = this.GetData(SITE_DATA) || {};
+
+        this.Imperator = new ConstructionImperator();
+        return true;
+    }
+    ValidateConsulState(): void {
         let allSites = this.Queen.Nest.find(FIND_CONSTRUCTION_SITES);
         let validSites: { [id: string]: ConstructionSite } = {}
-        this.siteData = this.GetData(SITE_DATA) || {};
         for (let id in this.siteData) {
             let siteId = this.siteData[id].siteId;
             if (allSites[siteId]) {
@@ -36,14 +42,11 @@ export class ConstructionConsul extends CreepConsul {
                 continue;
             }
         }
-
         for (let id in allSites) {
             //new sites.
             this.AddSiteForConstruction({ siteId: allSites[id].id, requestor: this.consulType })
             validSites[allSites[id].id] = Game.getObjectById(allSites[id].id) as ConstructionSite;
         }
-
-        this.CreepData = this.GetData(BUILDER_DATA) || [];
         for (let i = 0; i < this.CreepData.length; i++) {
             let creep = Game.creeps[this.CreepData[i].creepName];
             if (!creep) {
@@ -52,26 +55,23 @@ export class ConstructionConsul extends CreepConsul {
             }
             if (this.CreepData[i].fetching) {
                 if (creep.carry[RESOURCE_ENERGY] == creep.carryCapacity) {
-                    (this.Parent as HiveQueenBase).Collector.ReleaseManagedCreep(creep.name);
+                    this.Parent.Collector.ReleaseManagedCreep(creep.name);
                     this.CreepData[i].fetching = false;
                 }
             } else if (!this.CreepData[i].fetching && creep.carry[RESOURCE_ENERGY] == 0) {
-                (this.Parent as HiveQueenBase).Collector.AssignManagedCreep(creep);
+                this.Parent.Collector.AssignManagedCreep(creep, true);
                 this.CreepData[i].fetching = true;
             }
             //Check that the construction site is valid
             if (!validSites[this.CreepData[i].target]) {
                 if (Object.keys(this.siteData).length == 0) {
-                    (this.Parent as HiveQueenBase).ReleaseControl(creep);
+                    this.Parent.ReleaseControl(creep);
                     this.ReleaseCreep(creep.name);
                     continue;
                 }
                 this.CreepData[i].target = this.siteData[Object.keys(this.siteData)[0]].siteId;
             }
         }
-
-        this.Imperator = new ConstructionImperator();
-        return true;
     }
     AddSiteForConstruction(request: ConstructionRequest) {
         this.siteData[request.siteId] = request;
@@ -95,6 +95,9 @@ export class ConstructionConsul extends CreepConsul {
     ReleaseCreep(creepName: string): void {
         for (let i = 0, length = this.CreepData.length; i < length; i++) {
             if (this.CreepData[i].creepName == creepName) {
+                if(this.CreepData[i].fetching) {
+                    this.Queen.Collector.ReleaseManagedCreep(creepName);
+                }
                 this.CreepData.splice(i, 1);
                 return;
             }

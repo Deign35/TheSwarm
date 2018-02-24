@@ -10,7 +10,7 @@ const SPAWN_QUEUE = 'S_QUEUE';
 const RELATIVE_TIME = 'R_TIME';
 export class SpawnConsul extends ConsulBase {
     ActivateConsul(): void {
-        throw new Error("Method not implemented.");
+        //throw new Error("Method not implemented.");
     }
     static get ConsulType(): string { return CONSUL_TYPE; }
     readonly consulType = SpawnConsul.ConsulType;
@@ -50,6 +50,9 @@ export class SpawnConsul extends ConsulBase {
         this.RelativeTime = this.GetData(RELATIVE_TIME);
 
         return true;
+    }
+    ValidateConsulState(): void {
+        //throw new Error("Method not implemented.");
     }
 
     InitMemory() {

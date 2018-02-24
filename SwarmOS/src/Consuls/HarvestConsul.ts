@@ -2,11 +2,12 @@ import * as SwarmCodes from "Consts/SwarmCodes"
 import * as _ from "lodash";
 import { HarvestAction } from "Actions/HarvestAction";
 import { HarvestImperator } from "Imperators/HarvestImperator";
+import { BootstrapImperator } from "Imperators/BootstrapImperator";
 import { RateTracker } from "Tools/RateTracker";
 import { CreepConsul } from "./ConsulBase";
 import { HiveQueenBase } from "Queens/HiveQueenBase";
 
-const CONSUL_TYPE = 'H_Consul';
+const CONSUL_TYPE = 'Collector';
 const SOURCE_DATA = 'S_Data';
 const TRACKER_PREFIX = 'Track_';
 const TEMP_DATA = 'T_DATA';
@@ -37,9 +38,11 @@ export class HarvestConsul extends CreepConsul {
             }
             this.TempWorkers.push(tempCreep);
         }
-        this.ScanRoom();
         this.Imperator = new HarvestImperator();
         return true;
+    }
+    ValidateConsulState(): void {
+        this.ScanRoom();
     }
 
     InitMemory() {
@@ -89,9 +92,10 @@ export class HarvestConsul extends CreepConsul {
         return false;
     }
 
-    AssignManagedCreep(creep: Creep) {
+    AssignManagedCreep(creep: Creep, acceptsDelivery: boolean = false) {
         if (!this._tempData[creep.name]) {
             this._tempData[creep.name] = '';//target id
+            this.Queen.Distributor.ScheduleResourceDelivery(creep, creep.carryCapacity);
         }
     }
 
@@ -134,9 +138,17 @@ export class HarvestConsul extends CreepConsul {
         }
     }
     GetSpawnDefinition(): SpawnConsul_SpawnArgs {
+        let spawnBody = [WORK, WORK, CARRY, MOVE];
+        let availableCap = this.Queen.Nest.energyCapacityAvailable;
+        // if the target source has a container, then different body without carry.
+        switch(true) {
+            case(availableCap <= 300): spawnBody = [WORK, WORK, CARRY, MOVE]; break;
+            case(availableCap <= 550): spawnBody = [WORK, WORK, WORK, WORK, WORK, MOVE]; break;
+            default: spawnBody = [WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE]; break;
+        }
         return {
             creepName: 'Harv' + ('' + Game.time).slice(-3),
-            body: [WORK, WORK, WORK, WORK, WORK, MOVE],
+            body: spawnBody,
             targetTime: Game.time,
             requestorID: this.consulType,
         }
@@ -178,7 +190,12 @@ export class HarvestConsul extends CreepConsul {
         for (let i = 0, length = sourceData.length; i < length; i++) {
             let data = sourceData[i];
             if (data.creepName && Game.creeps[data.creepName]) {
-                this.Imperator.ActivateHarvester(data, Game.creeps[data.creepName]);
+                if(!data.containerID) {
+                    let bootStrapper = new BootstrapImperator();
+                    bootStrapper.ActivateHarvester(data, Game.creeps[data.creepName]);
+                } else {
+                    this.Imperator.ActivateHarvester(data, Game.creeps[data.creepName]);
+                }
             }
         }
 

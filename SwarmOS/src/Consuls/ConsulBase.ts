@@ -19,6 +19,7 @@ export abstract class ConsulBase extends ChildMemory implements IConsul {
         super.InitMemory();
         this.Queen.Nest = Game.rooms[this.Queen.id];
     }
+    abstract ValidateConsulState(): void;
     abstract ActivateConsul(): void;
     abstract get consulType(): string;
     static get ConsulType(): string { return 'SwarmCodes.E_NOT_IMPLEMENTED'; }

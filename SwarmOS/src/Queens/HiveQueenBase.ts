@@ -1,15 +1,11 @@
 import * as _ from 'lodash';
 import * as SwarmCodes from 'Consts/SwarmCodes'
 import { NestQueenBase } from 'Queens/NestQueenBase';
-import { ControllerImperator } from 'Imperators/ControllerImperator';
 import { SpawnConsul } from 'Consuls/SpawnConsul';
 import { HarvestConsul } from 'Consuls/HarvestConsul';
 import { ControllerConsul } from 'Consuls/ControllerConsul';
 import { ConstructionConsul } from 'Consuls/ConstructionConsul';
 import { DistributionConsul } from 'Consuls/DistributionConsul';
-import { HarvestImperator } from 'Imperators/HarvestImperator';
-import { ConstructionImperator } from 'Imperators/ConstructionImperator';
-import { DistributionImperator } from 'Imperators/DistributionImperator';
 
 export abstract class HiveQueenBase extends NestQueenBase implements IHiveQueen {
     Upgrader!: ControllerConsul;
@@ -44,7 +40,8 @@ export abstract class HiveQueenBase extends NestQueenBase implements IHiveQueen 
     }
 
     ActivateNest() {
-        this.ActivateImperators();
+        this.ValidateCounsel();
+        this.ActivateCounsel();
         this.CheckForSpawnRequirements();
         let requirements = this.Spawner.GetNextSpawns(1);
         if (requirements.length > 0) {
@@ -66,18 +63,22 @@ export abstract class HiveQueenBase extends NestQueenBase implements IHiveQueen 
     }
     protected LoadNestCounsel() {
         this.CreepConsulList = [];
+        this.Distributor = new DistributionConsul(DistributionConsul.ConsulType, this);
+        this.CreepConsulList.push(this.Distributor);
         this.Collector = new HarvestConsul(HarvestConsul.ConsulType, this);
         this.CreepConsulList.push(this.Collector);
         this.Upgrader = new ControllerConsul(ControllerConsul.ConsulType, this);
         this.CreepConsulList.push(this.Upgrader);
         this.Builder = new ConstructionConsul(ConstructionConsul.ConsulType, this);
         this.CreepConsulList.push(this.Builder);
-        this.Distributor = new DistributionConsul(DistributionConsul.ConsulType, this);
-        this.CreepConsulList.push(this.Distributor);
 
         this.Spawner = new SpawnConsul(SpawnConsul.ConsulType, this);
     }
-    protected ActivateImperators(): SwarmCodes.SwarmErrors {
+    protected ValidateCounsel() {
+        this.Spawner.ValidateConsulState();
+        super.ValidateCounsel();
+    }
+    protected ActivateCounsel(): SwarmCodes.SwarmErrors {
         this.Collector.ActivateConsul();
         if (Game.cpu.bucket > 500 || Game.shard.name == 'sim') {
             this.Builder.ActivateConsul();

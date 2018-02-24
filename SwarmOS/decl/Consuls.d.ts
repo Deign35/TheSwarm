@@ -57,7 +57,7 @@ declare type ControllerConsul_CreepData = CreepConsul_Data & {
     controllerTarget: string,
     fetching: boolean,
 }
-declare type SpawnRefillTarget = StructureSpawn | StructureExtension | StructureTower; // For now...
+declare type RefillTarget = StructureSpawn | StructureExtension | StructureTower | StructureLink | Creep; // For now...
 
 declare type DistributionConsul_RefillerData = CreepConsul_Data & {
     refillList: string[],

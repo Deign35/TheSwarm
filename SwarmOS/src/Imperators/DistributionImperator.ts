@@ -5,17 +5,17 @@ import { MoveToPositionAction } from "Actions/MoveToPositionAction";
 import { HiveQueenBase } from "Queens/HiveQueenBase";
 import { TransferAction } from "Actions/TransferAction";
 
-const CONSUL_TYPE = 'Distribution';
 export class DistributionImperator extends ImperatorBase {
     ActivateCreep(creepData: DelivererData): SwarmCodes.SwarmlingResponse {
         let creep = Game.creeps[creepData.creepName];
-        if (!creepData.fetching) {
-            let target = Game.getObjectById(creepData.target) as SpawnRefillTarget;
+        let transferResult: SwarmCodes.SwarmlingResponse = SwarmCodes.C_NONE;
+        if (creep && !creepData.fetching) {
+            let target = Game.getObjectById(creepData.target) as RefillTarget;
             if (!target) { return SwarmCodes.C_NONE; } // This should not return from here.
 
             let action = new TransferAction(creep, target);
-            let actionResult = action.ValidateAction();
-            switch (actionResult) {
+            transferResult = action.ValidateAction();
+            switch (transferResult) {
                 case (SwarmCodes.C_NONE): break;
                 case (SwarmCodes.E_INVALID): break;
                 case (SwarmCodes.E_TARGET_INELLIGIBLE): break;
@@ -23,17 +23,20 @@ export class DistributionImperator extends ImperatorBase {
                     new MoveToPositionAction(creep, target.pos).Run(true);
                     break;
             }
-            if (actionResult != SwarmCodes.C_MOVE) {
-                let transferResult = action.Run();
+            if (transferResult != SwarmCodes.C_MOVE) {
+                transferResult = action.Run();
                 switch (transferResult) {
-                    case (SwarmCodes.C_NONE): break;
+                    case (SwarmCodes.C_NONE):
+                        break;
                     case (SwarmCodes.E_TARGET_INELLIGIBLE):
                     case (SwarmCodes.E_ACTION_UNNECESSARY):
                         console.log('DistributionResult: ' + transferResult); // What happens i wonder?
                         break;
                 }
+                creepData.refillList.splice(0, 1);
+                creepData.target = '';
             }
         }
-        return SwarmCodes.C_NONE;
+        return transferResult;
     }
 }

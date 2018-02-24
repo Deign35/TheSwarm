@@ -21,7 +21,7 @@ export class HiveQueen extends HiveQueenBase {
                     body: [WORK, WORK, MOVE, CARRY],
                     creepName: newName,
                     requestorID: this.Collector.consulType,
-                    targetTime: Game.time - 80
+                    targetTime: Game.time - 120
                 }
             }
             this.Spawner.AddSpawnToQueue(spawnArgs);
