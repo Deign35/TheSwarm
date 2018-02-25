@@ -1,17 +1,4 @@
-Queen refactor including adding nests to HiveQueens.
-Refactor the spawning system.  The spawn system should request from the consul,
-    what the next spawn is and when it is needed by.
-    This will make the spawning much simpler to handle.
+Add a container to the controllerConsul/Imperator.
+Add it as a delivery target to the distributionImperator
 
-HarvestImperator should be split between one that builds its container and one that doesnt.
-    use this to double check that no construction site already exists right before plopping it down.
-
-Change bootstrapping after refactoring spawning.  Use refactored spawning to setup the first group of 
-    spawns for bootstrapping room #1.  Not needed for rooms #2+.  This should require a Nest queen that is bootstrapping
-    when the spawn has been created, the containers, and the controller captured, release it to the SwarmQueen.
-
-Get SwarmObjects implemented.  These can be like suits that a creep or a nest will wear.  The suit is essentially the imperator...
-    In fact, these probably are for very similar roles.  Whats the diff once SwarmCreep splits to HarvesterCreep,
-        DistributorCreep, etc...
-
-Better reuse of existing creeps.
+Change distributor to split hauling duty.  One source for spawnEnergy and one source for upgraderEnergy (primary purpose)

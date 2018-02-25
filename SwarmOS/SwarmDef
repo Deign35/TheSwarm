@@ -19,6 +19,15 @@ SwarmCommander: Commands the armies of the swarm
 HiveCaptain: Commands a single Hive's Army
 The HiveCommander: Type of Hivelord for HiveSquadrons
 HiveSquadrons: Group of one or more military creeps.
+Phalanx: A group of Big Mosquitos to block passage and annoy.
+
+Mosquito: A unit with no offensive parts (for tricking attackers).  All they do is annoy and screw with pathfinding.
+Big Mosquito: A mosquito with heal and tough to tank (maybe big mosquito is dumb name?);
+
+HoneyBee: Each tick: Pickup(PosA), Drop(PosB), Move(PosC) -- PosA(last tick), PosB(this tick), PosC(next tick);
+            careful with energy decay though, will need to refill.
+            consider dropping only if spawning is available in case units get assigned to jobs permanently.
+            (Fix this vulnerability in my AI).
 
 
 Unused Words:
@@ -29,7 +38,6 @@ Defiler
 Devourer
 NueroProphet - Healer
 Nest - Spawners?
-Imperator
 
 Change overseers to Imperators?
 
