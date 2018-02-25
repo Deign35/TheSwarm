@@ -4,30 +4,38 @@ import { HarvestConsul } from "Consuls/HarvestConsul";
 import { ConstructionConsul } from "Consuls/ConstructionConsul";
 import { DistributionConsul } from "Consuls/DistributionConsul";
 import { CreepConsul } from "Consuls/ConsulBase";
+import { NestJobs } from "Consuls/NestJobs";
+import { ControllerConsul } from "Consuls/ControllerConsul";
 
 const ASSIGNED_CREEPS = 'A_DATA';
+const NESTJOBS_DATA = 'N_JOBS';
 export abstract class NestQueenBase extends QueenMemory implements INestQueen {
     Nest!: Room;
 
     Collector!: HarvestConsul;
     Builder!: ConstructionConsul;
     Distributor!: DistributionConsul;
+    Upgrader!: ControllerConsul;
     CreepConsulList!: CreepConsul[];
+    JobBoard!: NestJobs;
 
     AssignedCreeps!: string[];
     Save() {
         this.Collector.Save();
         this.Builder.Save();
         this.Distributor.Save();
+        this.Upgrader.Save();
         this.SetData(ASSIGNED_CREEPS, this.AssignedCreeps);
+        this.JobBoard.Save();
         super.Save();
     }
     Load() {
         if (!super.Load()) { return false; }
         this.Nest = Game.rooms[this.id];
         this.AssignedCreeps = this.GetData(ASSIGNED_CREEPS);
+        this.JobBoard = new NestJobs(NESTJOBS_DATA, this);
         this.LoadNestCouncil();
-        if (Game.time % 10 == 0) {
+        if (Game.time % 10 == 3) {
             let idleCreeps = this.FindIdleCreeps();
             this.AssignIdleCreeps(idleCreeps);
         }
@@ -43,7 +51,7 @@ export abstract class NestQueenBase extends QueenMemory implements INestQueen {
     abstract InitializeNest(): void;
     abstract ActivateNest(): void;
 
-    abstract ReleaseControl(creep: Creep): void;
+    abstract ReleaseControl(creep: string): void;
 
     FindIdleCreeps(): Creep[] {
         let idleCreeps: Creep[] = [];
@@ -66,7 +74,26 @@ export abstract class NestQueenBase extends QueenMemory implements INestQueen {
         }
         return idleCreeps;
     }
-    abstract AssignIdleCreeps(idleCreeps: Creep[]): void;
+    AssignIdleCreeps(idleCreeps: Creep[]) {
+        for (let i = 0, length = idleCreeps.length; i < length; i++) {
+            if (idleCreeps[i].getActiveBodyparts(WORK) == 0) {
+                this.Distributor.AssignCreep(idleCreeps[i]);
+                continue;
+            }
+
+            if (idleCreeps[i].getActiveBodyparts(WORK) > 1) {
+                this.Collector.AssignCreep(idleCreeps[i]);
+                continue;
+            }
+
+            if (this.Nest.find(FIND_MY_CONSTRUCTION_SITES)) {
+                this.Builder.AssignCreep(idleCreeps[i]);
+                continue;
+            }
+
+            this.Upgrader.AssignCreep(idleCreeps[i]);
+        }
+    }
     protected LoadNestCouncil() {
         this.CreepConsulList = [];
         this.Distributor = new DistributionConsul(DistributionConsul.ConsulType, this);
@@ -75,12 +102,15 @@ export abstract class NestQueenBase extends QueenMemory implements INestQueen {
         this.CreepConsulList.push(this.Collector);
         this.Builder = new ConstructionConsul(ConstructionConsul.ConsulType, this);
         this.CreepConsulList.push(this.Builder);
+        this.Upgrader = new ControllerConsul(ControllerConsul.ConsulType, this);
+        this.CreepConsulList.push(this.Upgrader);
     }
     protected ValidateCouncil() {
         for (let i = 0, length = this.CreepConsulList.length; i < length; i++) {
             this.CreepConsulList[i].ValidateConsulState();
         }
     }
+
     protected ActivateCouncil(): SwarmCodes.SwarmErrors {
         this.ActivateRequiredConsuls();
         if (Game.cpu.bucket > 500 || Game.shard.name == 'sim') {
@@ -95,5 +125,5 @@ export abstract class NestQueenBase extends QueenMemory implements INestQueen {
     protected ActivateSupportConsuls() {
         this.Builder.ActivateConsul();
     }
-    protected abstract CheckForSpawnRequirements(): void; // Return a list of spawnArgs.
+    protected abstract CheckForSpawnRequirements(): void;
 }

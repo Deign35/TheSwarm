@@ -1,4 +1,5 @@
-import * as SwarmCodes from "Consts/SwarmCodes"
+import * as SwarmCodes from "Consts/SwarmCodes";
+import * as SwarmConsts from "Consts/SwarmConsts";
 import { ImperatorBase } from "Imperators/ImperatorBase";
 import { ControllerConsul } from "Consuls/ControllerConsul";
 import { ActionBase } from "Actions/ActionBase";
@@ -20,5 +21,14 @@ export class ControllerImperator extends ImperatorBase {
             upgradeAction.Run();
         }
         return SwarmCodes.C_NONE;
+    }
+    ActivateSigner(creepData: ControllerConsul_CreepData) {
+        let creep = Game.creeps[creepData.creepName];
+        if(!creep.room.controller!.sign || creep.room.controller!.sign!.text != SwarmConsts.MY_SIGNATURE) {
+            if(!creep.pos.isNearTo(creep.room.controller!.pos)) {
+                creep.moveTo(creep.room.controller!.pos);
+            }
+            creep.signController(creep.room.controller!, SwarmConsts.MY_SIGNATURE);
+        }
     }
 }

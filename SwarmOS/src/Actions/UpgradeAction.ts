@@ -1,4 +1,5 @@
 import * as SwarmCodes from "Consts/SwarmCodes";
+import * as SwarmConsts from "Consts/SwarmConsts";
 import * as _ from "lodash";
 import { ActionWithTarget } from "Actions/ActionBase";
 
@@ -31,6 +32,15 @@ export class UpgradeAction extends ActionWithTarget<UpgradeTargetType> {
         }
         if(!this.AssignedCreep.pos.inRangeTo(this.Target, 3)) {
             result = SwarmCodes.C_MOVE;
+        }
+        if(!this.Target.sign || this.Target.sign.text != SwarmConsts.MY_SIGNATURE) {
+            if(!this.AssignedCreep.pos.isNearTo(this.Target)) {
+                result = SwarmCodes.C_MOVE;
+            }
+            else
+            {
+                this.AssignedCreep.signController(this.Target, SwarmConsts.MY_SIGNATURE);
+            }
         }
         return result as SwarmCodes.SwarmlingResponse;
     }

@@ -66,6 +66,7 @@ export class HarvestImperator extends ImperatorBase {
             action = new HarvestAction(creep, target as Source);
         } else if ((target as StructureContainer).storeCapacity) {
             // go go withdraw!
+            // TODO: check for resources under the container (only if full?).
             action = new WithdrawAction(creep, (target as StructureContainer));
         } else if ((target as Creep).carryCapacity) {
             //Need to request a transfer when we get there.

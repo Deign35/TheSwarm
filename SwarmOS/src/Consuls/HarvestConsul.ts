@@ -15,20 +15,21 @@ export class HarvestConsul extends CreepConsul {
     static get ConsulType(): string { return CONSUL_TYPE; }
     get consulType(): string { return CONSUL_TYPE }
 
-    Imperator!: HarvestImperator;
+    get _Imperator() { return new HarvestImperator() }
     TempWorkers!: Creep[];
-    CreepData!: HarvestConsul_SourceData[];
+    CreepData!: CreepConsul_Data[];
+    SourceData!: HarvestConsul_SourceData[];
     _tempData!: { [id: string]: string };
     protected _hasContainers!: boolean;
     Save() {
         this.SetData(TEMP_DATA, this._tempData);
-        this.SetData(SOURCE_DATA, this.CreepData);
+        this.SetData(SOURCE_DATA, this.SourceData);
         super.Save();
     }
 
     Load() {
         if (!super.Load()) { return false; }
-        this.CreepData = this.GetData(SOURCE_DATA);
+        this.SourceData = this.GetData(SOURCE_DATA);
         this._tempData = this.GetData(TEMP_DATA);
         this.TempWorkers = [];
         for (let id in this._tempData) {
@@ -40,154 +41,54 @@ export class HarvestConsul extends CreepConsul {
             }
             this.TempWorkers.push(tempCreep);
         }
-        this.Imperator = new HarvestImperator();
         return true;
-    }
-    ValidateConsulState(): void {
-        this.ScanRoom();
     }
 
     InitMemory() {
         super.InitMemory();
-        this.CreepData = [];
+        this.SourceData = [];
         this._tempData = {};
         let foundSources = this.Queen.Nest.find(FIND_SOURCES);
         for (let i = 0, length = foundSources.length; i < length; i++) {
-            this.CreepData.push(this.InitSourceData(foundSources[i]));
-        }
-        this.ScanRoom();
-    }
-
-    ScanRoom(): void {
-        for (let i = 0, length = this.CreepData.length; i < length; i++) {
-            let data = this.CreepData[i];
-            let sourceTarget = Game.getObjectById(data.id) as Source;
-            if (data.creepName && !Game.creeps[data.creepName as string]) {
-                data.creepName = '';
-            }
-
-            if (data.constructionSite && !Game.getObjectById(data.constructionSite)) {
-                data.constructionSite = undefined;
-            }
-
-            if (data.containerID) {
-                if (!Game.getObjectById(data.containerID)) {
-                    data.containerID = undefined;
-                }
-            }
-            this.CreepData[i] = data;
-        }
-    }
-
-    GetNextSpawn(): boolean {
-        // Calculates the distance to new sources
-        // Orders creation of new screep so that they will arrive at the harvest node
-        // just a few ticks before the previous one dies.
-        if (!this.CreepRequested) {
-            for (let i = 0, length = this.CreepData.length; i < length; i++) {
-                if (!this.CreepData[i].creepName) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    AssignManagedCreep(creep: Creep, acceptsDelivery: boolean = false) {
-        if (!this._tempData[creep.name]) {
-            this._tempData[creep.name] = '';//target id
-            this.Queen.Distributor.ScheduleResourceDelivery(creep, creep.carryCapacity);
-        }
-    }
-
-    ReleaseManagedCreep(creepName: string) {
-        if (this._tempData[creepName]) {
-            delete this._tempData[creepName];
-            for (let i = 0, length = this.TempWorkers.length; i < length; i++) {
-                if (this.TempWorkers[i].name == creepName) {
-                    this.TempWorkers.splice(i, 1);
-                    return;
-                }
-            }
-        }
-
-        console.log("Release Managed Creep with name[" + creepName + "]: was not assigned to harvest consul");
-    }
-
-    protected _assignCreep(creepName: string) {
-        if (this.CreepData.length == 0) {
-            return;
-        }
-        for (let i = 0, length = this.CreepData.length; i < length; i++) {
-            if (!this.CreepData[i].creepName || !Game.creeps[this.CreepData[i].creepName as string]) {
-                this.CreepData[i].creepName = creepName;
-                return;
-            }
-        }
-        // If we're here, then this creep has no place, return it to the nest.
-        console.log("Assign regular Creep with name[" + creepName + "]: had no where to focus harvesting.");
-        this.ReleaseCreep(creepName);
-        (this.Parent as HiveQueenBase).Upgrader.AssignSpawn(creepName); // this is really shitty.
-    }
-
-    ReleaseCreep(creepName: string) {
-        for (let i = 0, length = this.CreepData.length; i < length; i++) {
-            if (this.CreepData[i].creepName && this.CreepData[i].creepName == creepName) {
-                this.CreepData[i].creepName = '';
-                break;
-            }
-        }
-    }
-    GetSpawnDefinition(): SpawnConsul_SpawnArgs {
-        let spawnBody = [WORK, WORK, CARRY, MOVE];
-        let availableCap = this.Queen.Nest.energyCapacityAvailable;
-        // if the target source has a container, then different body without carry.
-        switch(true) {
-            case(availableCap <= 300): spawnBody = [WORK, WORK, CARRY, MOVE]; break;
-            case(availableCap <= 550): spawnBody = [WORK, WORK, WORK, WORK, WORK, MOVE]; break;
-            default: spawnBody = [WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE]; break;
-        }
-        return {
-            creepName: 'Harv' + ('' + Game.time).slice(-3),
-            body: spawnBody,
-            targetTime: Game.time,
-            requestorID: this.consulType,
+            this.SourceData.push(this.InitSourceData(foundSources[i]));
         }
     }
 
     protected InitSourceData(source: Source): HarvestConsul_SourceData {
         let sourceData = {} as HarvestConsul_SourceData;
-        sourceData.x = source.pos.x;
-        sourceData.y = source.pos.y;
-        sourceData.id = source.id;
-        sourceData.lastEnergy = source.energy;
-        sourceData.spawnBuffer = 0; // This is how soon a creep must be spawned to get to the source at the right moment.
+        sourceData.sourceID = source.id;
+        let sourcePos = source.pos;
         let structures = this.Queen.Nest.lookForAtArea(LOOK_STRUCTURES,
-            sourceData.y - 1, sourceData.x - 1,
-            sourceData.y + 1, sourceData.x + 1, true);
+            sourcePos.y - 1, sourcePos.x - 1,
+            sourcePos.y + 1, sourcePos.x + 1, true);
 
         let container = _.filter(structures, (struct) => {
-            return (struct.structure as Structure).structureType == STRUCTURE_CONTAINER;
+            return struct.structure!.structureType == STRUCTURE_CONTAINER;
         });
 
         if (container.length > 0) {
-            sourceData.containerID = (container[0].structure as Structure).id;
+            sourceData.containerID = container[0].structure!.id;
         } else {
             let constructionSites = this.Queen.Nest.lookForAtArea(LOOK_CONSTRUCTION_SITES,
-                sourceData.y - 1, sourceData.x - 1,
-                sourceData.y + 1, sourceData.x + 1, true);
+                sourcePos.y - 1, sourcePos.x - 1,
+                sourcePos.y + 1, sourcePos.x + 1, true);
             let site = _.filter(constructionSites, (site) => {
-                return (site.constructionSite as ConstructionSite).structureType == STRUCTURE_CONTAINER;
+                return site.constructionSite!.structureType == STRUCTURE_CONTAINER;
             });
             if (site.length > 0) {
-                sourceData.constructionSite = (site[0].constructionSite as ConstructionSite).id;
+                sourceData.constructionSite = site[0].constructionSite!.id;
             }
         }
         return sourceData;
     }
+    InitJobRequirements(): void {
+        throw new Error("Method not implemented.");
+        // Include supplementalData = true/false to correlate with a prime harvester.
+    }
+    ValidateConsulState(): void {
+        throw new Error("Method not implemented.");
+    }
     ActivateConsul() {
-        // Request hive harvesters from the nestqueen.
         let sourceData = this.CreepData;
         for (let i = 0, length = sourceData.length; i < length; i++) {
             let data = sourceData[i];
@@ -262,5 +163,37 @@ export class HarvestConsul extends CreepConsul {
             this.Imperator.ActivateTempWorker(tempWorkers[id], target as Source | StructureContainer | Creep);
         }
         return SwarmCodes.C_NONE; // unused
+    }
+
+    AssignCreep(creepName: string, jobId: string) {
+        let request = this.Queen.JobBoard.GetJobRequest(jobId);
+        if(request && request.requestor == this.consulType) {
+            // Assigned creep!
+        } else {
+            // Temp worker!
+        }
+    }
+
+    AssignManagedCreep(creep: Creep, acceptsDelivery: boolean = false) {
+        if (!this._tempData[creep.name]) {
+            this._tempData[creep.name] = '';//target id
+            if(acceptsDelivery) {
+                this.Queen.Distributor.ScheduleResourceDelivery(creep, creep.carryCapacity);
+            }
+        }
+    }
+
+    ReleaseManagedCreep(creepName: string) {
+        if (this._tempData[creepName]) {
+            delete this._tempData[creepName];
+            for (let i = 0, length = this.TempWorkers.length; i < length; i++) {
+                if (this.TempWorkers[i].name == creepName) {
+                    this.TempWorkers.splice(i, 1);
+                    return;
+                }
+            }
+        }
+
+        console.log("Release Managed Creep with name[" + creepName + "]: was not assigned to harvest consul");
     }
 }

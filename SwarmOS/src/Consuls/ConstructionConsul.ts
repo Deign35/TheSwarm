@@ -65,7 +65,7 @@ export class ConstructionConsul extends CreepConsul {
             //Check that the construction site is valid
             if (!validSites[this.CreepData[i].target]) {
                 if (Object.keys(this.siteData).length == 0) {
-                    this.Queen.ReleaseControl(creep);
+                    this.Queen.ReleaseControl(creep.name);
                     this.ReleaseCreep(creep.name);
                     continue;
                 }

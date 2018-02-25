@@ -116,12 +116,21 @@ export class DistributionConsul extends CreepConsul {
         while (creepData.refillList.length > 0) {
             let targetID = creepData.refillList[0].id;
             let target = Game.getObjectById(targetID) as RefillTarget;
-            if (((target as StructureSpawn).energyCapacity && (target as StructureSpawn).energy < (target as StructureSpawn).energyCapacity) ||
-                ((target as Creep).carryCapacity && (target as Creep).carry.energy < (target as Creep).carryCapacity)) {
-                return target;
-            } else {
+            let validTarget = !!target;
+
+            if(validTarget) {
+                if((target as StructureSpawn).energyCapacity) {
+                    target = target as StructureSpawn;
+                    validTarget = target.energy < target.energyCapacity;
+                } else if((target as Creep).carryCapacity) {
+                    target = target as Creep;
+                    validTarget = target.carry.energy < target.carryCapacity;
+                }
+            }
+            if(!validTarget) {
                 creepData.refillList.splice(0, 1);
             }
+            return target;
         }
 
         return;

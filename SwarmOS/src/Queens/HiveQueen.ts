@@ -59,7 +59,9 @@ export class HiveQueen extends HiveQueenBase {
     ReceiveCommand(): void {
         //Not implemented
     }
-    ReleaseControl(creep: Creep): void {
-        this.Upgrader.AssignCreep(creep);
+    ReleaseControl(creep: string): void {
+        if(Game.creeps[creep]) {
+            this.Upgrader.AssignCreep(Game.creeps[creep]);
+        }
     }
 }
