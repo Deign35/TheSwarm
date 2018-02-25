@@ -104,24 +104,24 @@ export class HarvestConsul extends CreepConsul {
 
         let tempWorkers = this.TempWorkers;
         let rotateBackward = Game.time % 2 == 0;
-        let curIndex = Game.time % this.CreepData.length;
+        let curIndex = Game.time % this.SourceData.length;
         for (let id in tempWorkers) {
             if (tempWorkers[id].spawning) { continue; }
             let targetId = this._tempData[tempWorkers[id].name];
             let target: RoomObject | undefined = Game.getObjectById(targetId) || undefined;
             let cycleProtection = 0;
             do {
-                if (cycleProtection++ > this.CreepData.length) {
+                if (cycleProtection++ > this.SourceData.length) {
                     break;
                 }
                 if (!target) {
                     // find a target by cycling through
-                    let data = this.CreepData[curIndex];
+                    let data = this.SourceData[curIndex];
                     curIndex = rotateBackward ? curIndex - 1 : curIndex + 1;
                     if (curIndex < 0) {
-                        curIndex = this.CreepData.length - 1;
+                        curIndex = this.SourceData.length - 1;
                     }
-                    if (curIndex >= this.CreepData.length) {
+                    if (curIndex >= this.SourceData.length) {
                         curIndex = 0;
                     }
 
@@ -132,11 +132,11 @@ export class HarvestConsul extends CreepConsul {
                         }
                     }
                     if (!target && tempWorkers[id].getActiveBodyparts(WORK) > 0) {
-                        target = Game.getObjectById(data.id) as Source;
+                        target = Game.getObjectById(data.sourceID) as Source;
                     }
                     if (!target && data.creepName) {
                         target = Game.creeps[data.creepName];
-                    }
+                    } // last resort is to pull from the harvester, but this doesn't work like this anymore.
                 }
                 if (target) {
                     if ((target as Source).energyCapacity) {
