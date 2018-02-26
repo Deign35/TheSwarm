@@ -18,7 +18,7 @@ export class HarvestImperator extends ImperatorBase {
     // temp worker can try to withdraw from the container first.
     ActivateHarvester(data: HarvestConsul_SourceData, harvester: Creep) {
         if (harvester.spawning) { return; }
-        let sourceTarget = Game.getObjectById(data.id) as Source;
+        let sourceTarget = Game.getObjectById(data.sourceID) as Source;
         let moveTarget = (Game.getObjectById(data.containerID) as StructureContainer);
         if (moveTarget) {
             if (!harvester.pos.isEqualTo(moveTarget.pos)) {
@@ -33,15 +33,9 @@ export class HarvestImperator extends ImperatorBase {
         switch (harvestResult) {
             case (SwarmCodes.C_NONE): break;
             case (SwarmCodes.E_ACTION_UNNECESSARY):
-                if (data.creepName == harvester.name) {
-                    if (data.constructionSite) {
-                        harvestAction = new BuildAction(harvester, Game.getObjectById(data.constructionSite) as ConstructionSite);
-                    } else if (data.containerID) {
-                        let container = Game.getObjectById(data.containerID) as StructureContainer;
-                        if (container.hits < container.hitsMax) {
-                            harvestAction = new RepairAction(harvester, container);
-                        }
-                    }
+                let container = Game.getObjectById(data.containerID) as StructureContainer;
+                if (container.hits < container.hitsMax) {
+                    harvestAction = new RepairAction(harvester, container);
                 }
                 break; // Creep's carry is full
             case (SwarmCodes.E_TARGET_INELLIGIBLE): break; // Target is empty.

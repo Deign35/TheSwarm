@@ -6,11 +6,11 @@ import { HiveQueenBase } from "Queens/HiveQueenBase";
 import { TransferAction } from "Actions/TransferAction";
 
 export class DistributionImperator extends ImperatorBase {
-    ActivateCreep(creepData: DelivererData): SwarmCodes.SwarmlingResponse {
+    ActivateCreep(creepData: DistributionConsul_CreepData): SwarmCodes.SwarmlingResponse {
         let creep = Game.creeps[creepData.creepName];
         let transferResult: SwarmCodes.SwarmlingResponse = SwarmCodes.C_NONE;
-        if (creep && !creepData.fetching) {
-            let target = Game.getObjectById(creepData.target) as RefillTarget;
+        if (creep) {
+            let target = Game.getObjectById(creepData.targetID) as RefillTarget;
             if (!target) { return SwarmCodes.C_NONE; } // This should not return from here.
 
             let action = new TransferAction(creep, target);
@@ -33,8 +33,6 @@ export class DistributionImperator extends ImperatorBase {
                         console.log('DistributionResult: ' + transferResult); // What happens i wonder?
                         break;
                 }
-                creepData.refillList.splice(0, 1);
-                creepData.target = '';
             }
         }
         return transferResult;

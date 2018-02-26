@@ -16,7 +16,7 @@ export class BootstrapImperator extends ImperatorBase {
     // temp worker can try to withdraw from the container first.
     ActivateHarvester(data: HarvestConsul_SourceData, harvester: Creep) {
         if (harvester.spawning) { return; }
-        let sourceTarget = Game.getObjectById(data.id) as Source;
+        let sourceTarget = Game.getObjectById(data.sourceID) as Source;
         let moveTarget = (Game.getObjectById(data.constructionSite || data.containerID) as RoomObject);
         if (moveTarget) {
             if (!harvester.pos.isEqualTo(moveTarget.pos)) {
