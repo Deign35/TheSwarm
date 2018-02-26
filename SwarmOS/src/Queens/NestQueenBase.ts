@@ -107,7 +107,7 @@ export abstract class NestQueenBase extends QueenMemory implements INestQueen {
     }
     protected ValidateCouncil() {
         for (let i = 0, length = this.CreepConsulList.length; i < length; i++) {
-            this.CreepConsulList[i].ValidateConsulState();
+            this.CreepConsulList[i].ValidateConsul();
         }
     }
 

@@ -51,7 +51,7 @@ export class SpawnConsul extends ConsulBase {
 
         return true;
     }
-    ValidateConsulState(): void {
+    ValidateConsul(): void {
         //throw new Error("Method not implemented.");
     }
 

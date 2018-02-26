@@ -10,7 +10,7 @@ export class HiveConsul extends ConsulBase {
     constructor(id: string, parent: HiveQueenBase) {
         super(id, parent);
     }
-    ValidateConsulState(): void {
+    ValidateConsul(): void {
         throw new Error("Method not implemented.");
     }
     ActivateConsul(): void {

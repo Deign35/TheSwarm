@@ -47,20 +47,30 @@ export class NestJobs extends ChildMemory {
         return this.JobBoard[requestId];
     }
 
-    DetermineNextJobs(count: number) : CreepRequestData[] {
+    DetermineNextJobs(count: number, maxCapacity: number = -1) : CreepRequestData[] {
         let requests = Object.keys(this.JobBoard);
         if(requests.length == 0) {
             return [];
         }
 
         requests.sort((a, b) => {
+            // check if they either are disabled
             let reqA = this.JobBoard[requests[a]];
+            if(reqA.disabled) { return 1; }
             let reqB = this.JobBoard[requests[b]];
+            if(reqB.disabled) { return -1; }
+
+            // Check that the body can even be spawned
+            let bodyA = CalculateBodyCost(reqA.body);
+            if(maxCapacity > 0 && bodyA > maxCapacity) { return 1; }
+            let bodyB = CalculateBodyCost(reqB.body);
+            if(maxCapacity > 0 && bodyB > maxCapacity) { return -1; }
 
             // Check priority
             if(reqA.priority < reqB.priority) { return 1; }
             if(reqB.priority < reqA.priority) { return -1; }
 
+            // Compare target time
             if(!!reqA.targetTime) {
                 if(!reqB.targetTime) {
                     if(reqA.targetTime < ARBITRARY_SPAWN_CONSTANT) {
@@ -73,10 +83,12 @@ export class NestJobs extends ChildMemory {
                 return 1;
             }
 
-            return CalculateBodyCost(reqA.body) > CalculateBodyCost(reqB.body) ? -1 : 1;
+            // return the more expensive one (as it is harder to spawn and therefore higher priority to get rid of)
+            return bodyA > bodyB ? -1 : 1;
         });
         let topRequests = [];
-        for(let i = 0, length = requests.length; i < length && i < count; i++) {
+        for(let i = 0, length = requests.length; i < length && topRequests.length < count; i++) {
+            if(this.JobBoard[requests[i]].disabled) { continue; }
             topRequests.push(this.JobBoard[requests[i]]);
         }
 

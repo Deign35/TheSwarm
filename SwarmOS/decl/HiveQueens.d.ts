@@ -12,6 +12,8 @@ declare type CreepRequestData = {
     creepSuffix: string,
     terminationType: number,
     priority: number,
+    initMemory?: any,
+    disabled?: boolean,
     targetTime?: number,
     supplementalData?: any
 }

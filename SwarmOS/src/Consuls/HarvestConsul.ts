@@ -17,7 +17,7 @@ export class HarvestConsul extends CreepConsul {
 
     get _Imperator() { return new HarvestImperator() }
     TempWorkers!: Creep[];
-    CreepData!: CreepConsul_Data[];
+    protected CreepData!: CreepConsul_Data[];
     SourceData!: HarvestConsul_SourceData[];
     _tempData!: { [id: string]: string };
     protected _hasContainers!: boolean;
@@ -85,7 +85,7 @@ export class HarvestConsul extends CreepConsul {
         throw new Error("Method not implemented.");
         // Include supplementalData = true/false to correlate with a prime harvester.
     }
-    ValidateConsulState(): void {
+    ValidateConsul(): void {
         throw new Error("Method not implemented.");
     }
     ActivateConsul() {

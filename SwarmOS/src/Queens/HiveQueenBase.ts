@@ -42,7 +42,7 @@ export abstract class HiveQueenBase extends NestQueenBase implements IHiveQueen 
         this.Spawner = new SpawnConsul(SpawnConsul.ConsulType, this);
     }
     protected ValidateCouncil() {
-        this.Spawner.ValidateConsulState();
+        this.Spawner.ValidateConsul();
         super.ValidateCouncil();
     }
     protected ActivateSupportConsuls() {

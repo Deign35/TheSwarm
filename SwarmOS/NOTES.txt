@@ -2,3 +2,14 @@ Add a container to the controllerConsul/Imperator.
 Add it as a delivery target to the distributionImperator
 
 Change distributor to split hauling duty.  One source for spawnEnergy and one source for upgraderEnergy (primary purpose)
+
+Have specific spawn filling logic that gets replaced from storage
+all excess energy goes into storage.
+towers filled by storage as well
+
+Update distributors to pickup off the ground first.  Huge energy saver!!!!!
+
+Add a template parameter to CreepConsulBase so I can:
+export class SomeConsul extends CreepConsul<SomeConsul_CreepData>
+
+Add to ConsulBase an abstract function for handling supplemental data.

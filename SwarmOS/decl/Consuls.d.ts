@@ -1,7 +1,7 @@
 declare interface IConsul extends IMemory {
     consulType: string;
     ActivateConsul(): void;
-    ValidateConsulState(): void;
+    ValidateConsul(): void;
     Queen: INestQueen;
 }
 declare interface ICreepConsul extends IConsul {
@@ -14,9 +14,12 @@ declare interface ICreepConsul extends IConsul {
 declare type CreepConsul_Data = {
     creepName: string;
     jobId: string;
-    fetching: boolean;
+    active: boolean;
     targetID?: string;
     respawnedCreep?: string;
+}
+declare type DistributionConsul_CreepData = CreepConsul_Data & {
+    prime?: boolean;
 }
 
 declare type HarvestConsul_SourceData = {
@@ -37,6 +40,7 @@ declare type SpawnConsul_SpawnArgs = {
 declare type ConstructionRequest = {
     siteId: string;
     requestor: string;
+    // priority!  Expand NestJobs to handle requests more generally?
 }
 
 declare type ConstructorData = CreepConsul_Data & {
@@ -44,23 +48,12 @@ declare type ConstructorData = CreepConsul_Data & {
     fetching: boolean;
 }
 
-declare type RefillTarget = StructureSpawn | StructureExtension | StructureTower | StructureLink | Creep; // For now...
-
-declare type DistributionConsul_RefillerData = CreepConsul_Data & {
-    refillList: string[];
-    curTarget: number;
-    fetching: boolean;
-    idleTime: number;
-}
+declare type EnergyStructure = StructureSpawn | StructureExtension | StructureTower | StructureLink;
+declare type RefillTarget = EnergyStructure | Creep; // For now...
 
 declare type DistributionConsul_DeliveryRequest = {
     id: string;
     amount: number;
     time: number;
     resourceType?: ResourceConstant;
-}
-declare type DelivererData = CreepConsul_Data & {
-    refillList: DistributionConsul_DeliveryRequest[];
-    fetching: boolean;
-    target: string;
 }

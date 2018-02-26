@@ -17,7 +17,7 @@ export class Respawner extends ConsulBase {
         this.RequestData = this.GetData(REQUEST_DATA);
         return true;
     }
-    ValidateConsulState(): void {
+    ValidateConsul(): void {
         throw new Error("Method not implemented.");
     }
     ActivateConsul(): void {
