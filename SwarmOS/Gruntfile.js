@@ -1,4 +1,5 @@
 ﻿let gObj;
+let lineCount;
 module.exports = function (grunt) {
     gObj = grunt;
     grunt.loadNpmTasks('grunt-contrib-clean');
@@ -29,7 +30,9 @@ module.exports = function (grunt) {
     });
 
     grunt.registerTask('replace', 'Replaces file paths with _', function () {
+        lineCount = 0;
         grunt.file.recurse('./build/compiled', ReplaceImports);
+        console.log('Line Count: ' + lineCount);
     });
     grunt.registerTask('help', 'Help info', function () {
         let output = 'Grunt Help Menu *******************';
@@ -161,6 +164,7 @@ let ReplaceImports = function (abspath, rootdir, subdir, filename) {
 
     //let path = subdir ? subdir.split('/') : [];
     let lines = file.split('\n');
+    lineCount += lines.length;
     for (let line of lines) {
         // Compiler: IgnoreLine
         if ((line).match(/[.]*\/\/ Compiler: IgnoreLine[.]*/)) {
