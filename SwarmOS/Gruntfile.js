@@ -1,5 +1,7 @@
-﻿let gObj;
-let lineCount;
+﻿var gObj;
+var lineCount;
+var charCount;
+var fileCount;
 module.exports = function (grunt) {
     gObj = grunt;
     grunt.loadNpmTasks('grunt-contrib-clean');
@@ -14,7 +16,7 @@ module.exports = function (grunt) {
 
     // Output the current date and branch.
     grunt.log.subhead('Task Start: ' + currentdate.toLocaleString());
-    let gruntConfig = {};
+    var gruntConfig = {};
     gruntConfig['pkg'] = grunt.file.readJSON('package.json');
     gruntConfig['screeps'] = InitGruntScreepsConfig();
     gruntConfig['ts'] = InitTSConfig();
@@ -29,6 +31,34 @@ module.exports = function (grunt) {
         grunt.config.set('screeps.options.branch', branchID);
     });
 
+    grunt.registerTask('DirStats', 'Counts the number of TS lines in current repository.', function () {
+        var startTime = new Date();
+        let fileExt = grunt.option('fileExt');
+        let srcDir = grunt.option('srcDir');
+        lineCount = 0;
+        charCount = 0;
+        fileCount = 0;
+        try {
+            grunt.file.recurse(srcDir, (abspath, rootdir, subdir, filename) => {
+                let reg = new RegExp(('/([^\.\\n]*)\.($1)([ ;\\n])*/i').replace('$1', fileExt));
+                reg.compile();
+                if (abspath.match(reg) == null) {
+                    return;
+                }
+                var file = gObj.file.read(abspath);
+                fileCount += 1;
+                charCount += file.length;
+                lineCount += file.split('\n').length;
+            });
+        } catch (e) {
+            console.log(e);
+        }
+        console.log('Files: ' + fileCount);
+        console.log('Lines: ' + lineCount);
+        console.log('Chars: ' + charCount);
+        var endTime = new Date();
+        console.log('EndTime: ' + (endTime - startTime));
+    });
     grunt.registerTask('replace', 'Replaces file paths with _', function () {
         lineCount = 0;
         grunt.file.recurse('./build/compiled', ReplaceImports);
@@ -40,6 +70,8 @@ module.exports = function (grunt) {
         output += '\ncopy: Copies the final files into the dist folder for staging';
         output += '\nts: Compiles the TypeScript';
         output += '\nreplace: Replaces marked lines with appropriate replacements.';
+        output += '\nDirStats: Counts the files, lines and chars of the provided directory';
+        output += '\n\tParams(srcDir,fileExt)';
         output += '\n----------------------------------';
         output += '\ncommitMain: Commits to SwarmOS_Main';
         output += '\ncommitSim: Commits to SwarmOS_Sim';
