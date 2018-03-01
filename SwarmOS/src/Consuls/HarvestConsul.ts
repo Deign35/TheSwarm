@@ -1,17 +1,29 @@
 import * as SwarmCodes from "Consts/SwarmCodes"
 import * as _ from "lodash";
-import { HarvestAction } from "Actions/HarvestAction";
-import { HarvestImperator } from "Imperators/HarvestImperator";
-import { BootstrapImperator } from "Imperators/BootstrapImperator";
-import { RateTracker } from "Tools/RateTracker";
 import { CreepConsul } from "./ConsulBase";
-import { HiveQueenBase } from "Queens/HiveQueenBase";
+import { SpawnPriority, SpawnRequest_TerminationType } from "Consts/SwarmConsts";
+import { HarvestImperator } from "Imperators/HarvestImperator";
 
 const CONSUL_TYPE = 'Collector';
 const SOURCE_DATA = 'S_Data';
 const TRACKER_PREFIX = 'Track_';
 const TEMP_DATA = 'T_DATA';
 export class HarvestConsul extends CreepConsul {
+    GetBodyTemplate(): BodyPartConstant[] {
+        throw new Error("Method not implemented.");
+    }
+    GetCreepSuffix(): string {
+        throw new Error("Method not implemented.");
+    }
+    GetDefaultSpawnPriority(): SpawnPriority {
+        throw new Error("Method not implemented.");
+    }
+    GetDefaultTerminationType(): SpawnRequest_TerminationType {
+        throw new Error("Method not implemented.");
+    }
+    GetDefaultJobCount(): number {
+        throw new Error("Method not implemented.");
+    }
     static get ConsulType(): string { return CONSUL_TYPE; }
     get consulType(): string { return CONSUL_TYPE }
 

@@ -57,3 +57,7 @@ declare type DistributionConsul_DeliveryRequest = {
     time: number;
     resourceType?: ResourceConstant;
 }
+
+declare type CollectorData = CreepConsul_Data & {
+    sourceIndex: number,
+}

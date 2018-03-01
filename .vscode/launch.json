@@ -8,9 +8,9 @@
             "type": "node",
             "request": "launch",
             "name": "Launch Program",
-            "program": "${workspaceFolder}/SwarmOS\\src\\Memory\\SwarmMemory.ts",
+            "program": "${workspaceFolder}\\ScreepTools\\public\\js\\app.js",
             "outFiles": [
-                "${workspaceFolder}/**/*.js"
+                "${workspaceFolder}/garbage/poop/garbage/**.js"
             ]
         }
     ]
