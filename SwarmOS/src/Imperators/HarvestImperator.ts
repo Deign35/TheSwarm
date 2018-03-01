@@ -8,6 +8,7 @@ import { BuildAction } from "Actions/BuildAction";
 import { ActionBase } from "Actions/ActionBase";
 import { WithdrawAction } from "Actions/WithdrawAction";
 import { RequestTransferAction } from "Actions/RequestTransfer";
+import { PickupAction } from "Actions/PickupAction";
 
 export class HarvestImperator extends ImperatorBase {
     ActivateCreep(creep: CreepConsul_Data): SwarmCodes.SwarmlingResponse {
@@ -86,6 +87,14 @@ export class HarvestImperator extends ImperatorBase {
                 break;
             // harvester has nothing to give.
         }
-        action.Run();
+        if (actionResult != SwarmCodes.C_MOVE as number) {
+            let recs = target.pos.lookFor(LOOK_RESOURCES);
+            // how to ensure that pickup happens before withdraw?
+            if (recs.length > 0 && recs[0]!.resourceType == RESOURCE_ENERGY) {
+                let pickupAction = new PickupAction(creep, recs[0]!);
+                pickupAction.Run(false);
+            }
+            action.Run();
+        }
     }
 }

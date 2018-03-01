@@ -57,18 +57,18 @@ export abstract class CreepConsul extends ConsulBase implements ICreepConsul {
     ActivateConsul(): void {
         let imperator = this._Imperator;
         for (let i = 0, length = this.CreepData.length; i < length; i++) {
-            if(!this.RequiresCreepsAreActive || this.CreepData[i].active) {
+            if (!this.RequiresCreepsAreActive || this.CreepData[i].active) {
                 this.ActivateCreep(imperator, this.CreepData[i]);
             }
         }
     }
     AssignCreep(creepName: string, jobId: string) {
         let jobExists = false;
-        for(let i = 0, length = this.CreepData.length; i < length; i++) {
-            if(this.CreepData[i].jobId == jobId) {
+        for (let i = 0, length = this.CreepData.length; i < length; i++) {
+            if (this.CreepData[i].jobId == jobId) {
                 jobExists = true;
-                if(this.CreepData[i].creepName && Game.creeps[this.CreepData[i].creepName]) {
-                    if(this.CreepData[i].respawnedCreep) { throw 'Attempted to fill a job thats already overfilled'}
+                if (this.CreepData[i].creepName && Game.creeps[this.CreepData[i].creepName]) {
+                    if (this.CreepData[i].respawnedCreep) { throw 'Attempted to fill a job thats already overfilled' }
                     this.CreepData[i].respawnedCreep = creepName;
                 } else {
                     this.CreepData[i].creepName = creepName;
@@ -77,7 +77,7 @@ export abstract class CreepConsul extends ConsulBase implements ICreepConsul {
                 break;
             }
         }
-        if(!jobExists) {
+        if (!jobExists) {
             this.JobIDs.push(jobId);
             this.CreepData.push({ creepName: creepName, jobId: jobId, active: true });
         }
@@ -86,7 +86,7 @@ export abstract class CreepConsul extends ConsulBase implements ICreepConsul {
 
     protected _ReleaseCreep(index: number) {
         this.CreepData[index].creepName = '';
-        if(this.CreepData[index].respawnedCreep) {
+        if (this.CreepData[index].respawnedCreep) {
             this.CreepData[index].creepName = this.CreepData[index].respawnedCreep!;
             delete this.CreepData[index].respawnedCreep;
         }
@@ -95,8 +95,8 @@ export abstract class CreepConsul extends ConsulBase implements ICreepConsul {
     }
 
     ReleaseCreep(creepName: string) {
-        for(let i = 0, length = this.CreepData.length; i < length; i++) {
-            if(this.CreepData[i].creepName == creepName) {
+        for (let i = 0, length = this.CreepData.length; i < length; i++) {
+            if (this.CreepData[i].creepName == creepName) {
                 this._ReleaseCreep(i);
             }
         }
@@ -134,9 +134,11 @@ export abstract class CreepConsul extends ConsulBase implements ICreepConsul {
     abstract GetDefaultSpawnPriority(): SpawnPriority;
     abstract GetDefaultTerminationType(): SpawnRequest_TerminationType;
     abstract GetDefaultJobCount(): number;
+    GetSupplementalData(): any { return undefined; };
+
     InitJobRequirements(): void {
         let newJobList = this.JobIDs || [];
-        while(newJobList.length > 0) {
+        while (newJobList.length > 0) {
             let creep = newJobList[0];
             newJobList.splice(0, 1);
             this.Queen.JobBoard.RemoveJobRequest(creep);
@@ -145,13 +147,14 @@ export abstract class CreepConsul extends ConsulBase implements ICreepConsul {
         }
 
         let numJobsToCreate = this.GetDefaultJobCount();
-        for(let i = 0; i < numJobsToCreate; i++) {
+        for (let i = 0; i < numJobsToCreate; i++) {
             this.AddDefaultJob(this.consulType + i);
         }
 
         this.JobIDs = newJobList;
     }
-    CreateDefaultJobTemplate(newJobId: string) : CreepRequestData {
+
+    CreateDefaultJobTemplate(newJobId: string): CreepRequestData {
         return {
             body: this.GetBodyTemplate(),
             creepSuffix: this.GetCreepSuffix(),
@@ -159,15 +162,16 @@ export abstract class CreepConsul extends ConsulBase implements ICreepConsul {
             priority: this.GetDefaultSpawnPriority(),
             terminationType: this.GetDefaultTerminationType(),
             requestID: newJobId,
+            supplementalData: this.GetSupplementalData(),
         }
     }
     AddDefaultJob(newJobId: string, targetTime: number = Game.time, disabled: boolean = false, supplementalData?: any): void {
         let newJob = this.CreateDefaultJobTemplate(newJobId);
         newJob.targetTime = targetTime;
-        if(disabled) {
+        if (disabled) {
             newJob.disabled = true;
         }
-        if(supplementalData) {
+        if (supplementalData) {
             newJob.supplementalData = supplementalData;
         }
 
@@ -175,20 +179,20 @@ export abstract class CreepConsul extends ConsulBase implements ICreepConsul {
     }
     UpdateJob(jobId: string): void {
         let request = this.Queen.JobBoard.GetJobRequest(jobId);
-        if(!request) { return; } // No job means the job is expired as far as being filled again.
+        if (!request) { return; } // No job means the job is expired as far as being filled again.
         let creepData;
-        for(let i = 0, length = this.CreepData.length; i < length; i++) {
-            if(this.CreepData[i].jobId == jobId) {
+        for (let i = 0, length = this.CreepData.length; i < length; i++) {
+            if (this.CreepData[i].jobId == jobId) {
                 creepData = this.CreepData[i];
             }
         }
 
-        if(!creepData) {
+        if (!creepData) {
             return;
         }
 
         let creep = Game.creeps[creepData.creepName];
-        if(creepData.respawnedCreep && Game.creeps[creepData.creepName]) {
+        if (creepData.respawnedCreep && Game.creeps[creepData.creepName]) {
             creep = Game.creeps[creepData.creepName];
         }
 
@@ -197,11 +201,11 @@ export abstract class CreepConsul extends ConsulBase implements ICreepConsul {
     }
 
     AddNewJob(request: CreepRequestData): void {
-        for(let i = 0, length = this.JobIDs.length; i < length; i++) {
-            if(this.JobIDs[i] == request.requestID) { return; }
+        for (let i = 0, length = this.JobIDs.length; i < length; i++) {
+            if (this.JobIDs[i] == request.requestID) { return; }
         }
 
-        if(request.disabled) { delete request.disabled; }
+        if (request.disabled) { delete request.disabled; }
         this.JobIDs.push(request.requestID);
         this.Queen.JobBoard.AddOrUpdateJobPosting(request);
     }
