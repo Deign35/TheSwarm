@@ -4,7 +4,7 @@ import { CalculateBodyCost } from "Tools/QuickCalculations";
 import { ChildMemory } from "Tools/SwarmMemory";
 import { NestQueenBase } from "Queens/NestQueenBase";
 
-const ARBITRARY_SPAWN_CONSTANT = 200;
+const ARBITRARY_SPAWN_CONSTANT = 100;
 const JOB_BOARD = 'Job_Board';
 export class NestJobs extends ChildMemory {
     protected JobBoard!: { [requestId: string]: CreepRequestData };
@@ -73,8 +73,12 @@ export class NestJobs extends ChildMemory {
                     if (reqA.targetTime < ARBITRARY_SPAWN_CONSTANT) {
                         return -1; // don't let future creeps clog up one off requests.
                     }
-                } else if (reqA.targetTime != reqB.targetTime) {
-                    return reqA.targetTime < reqB.targetTime ? -1 : 1;
+                } else {
+                    if (reqA.priority < reqB.priority) { return 1; }
+                    if (reqB.priority < reqA.priority) { return -1; }
+                    if (reqA.targetTime != reqB.targetTime) {
+                        return reqA.targetTime < reqB.targetTime ? -1 : 1;
+                    }
                 }
             } else if (!!reqB.targetTime && reqB.targetTime < ARBITRARY_SPAWN_CONSTANT) {
                 return 1;

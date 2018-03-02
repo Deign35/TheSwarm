@@ -71,7 +71,7 @@ export class CollectionConsul extends CreepConsul {
             if (this.CreepData[i].creepName == creepName) {
                 this.CreepData[i].targetID = this.SourceData[job.supplementalData].sourceId;
 
-                this.CreepData[i].harvestPosition = (Game.getObjectById(this.CreepData[i].targetID) as Source).pos;
+                this.CreepData[i].harvestPosition = new RoomPosition(this.SourceData[job.supplementalData].harvesterPositionX, this.SourceData[job.supplementalData].harvesterPositionY, this.Queen.id);
                 break;
             }
         }
@@ -80,7 +80,7 @@ export class CollectionConsul extends CreepConsul {
         creepData.harvestPosition = new RoomPosition(creepData.harvestPosition.x,
             creepData.harvestPosition.y,
             creepData.harvestPosition.roomName);
-        
+
         return true;
     }
 

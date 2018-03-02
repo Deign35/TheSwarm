@@ -23,6 +23,7 @@ export abstract class HiveQueenBase extends NestQueenBase implements IHiveQueen 
             spawnIDs.push(spawns[i].id);
         }
         this.SetData(SPAWN_DATA, spawnIDs);
+        
     }
 
     ActivateNest() {
