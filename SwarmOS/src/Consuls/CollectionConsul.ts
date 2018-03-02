@@ -12,7 +12,7 @@ export class CollectionConsul extends CreepConsul {
     get consulType(): string { return CONSUL_TYPE }
     get _Imperator() { return new HarvestImperator() }
 
-    protected CreepData!: CollectorData[];
+    protected CreepData!: CollectorConsul_CreepData[];
     protected SourceData!: SourceData[];
     Save() {
         this.SetData(SOURCE_DATA, this.SourceData);
@@ -26,36 +26,43 @@ export class CollectionConsul extends CreepConsul {
     }
 
     InitMemory() {
-        super.InitMemory();
-
         let sources = this.Queen.Nest.find(FIND_SOURCES);
+        this.SourceData = [];
         for (let i = 0, length = sources.length; i < length; i++) {
-            let newSource: SourceData = {
+            let newSource = {
                 sourceId: sources[i].id,
-            }
+            } as SourceData;
 
-            /*let pos = sources[i].pos;
+            let pos = sources[i].pos;
             let foundStructures = Finder.FindStructureNextTo(pos, STRUCTURE_CONTAINER, { distance: 1 });
             if (foundStructures.length > 0) {
                 // We have a container!
                 if (foundStructures.length > 1) {
                     Game.notify('Somehow found multiple Containers near ID: ' + sources[i].id + ' in room: ' + this.Queen.id);
                 }
-                newSource.container = foundStructures[0].structure!.id;
+                pos = foundStructures[0].structure!.pos;
             } else {
                 let foundConstructionSites = Finder.FindNextTo(pos, LOOK_CONSTRUCTION_SITES, { distance: 1 });
                 foundConstructionSites.filter((a) => {
                     return a.constructionSite && (a.constructionSite! as ConstructionSite<BuildableStructureConstant>).structureType == STRUCTURE_CONTAINER;
                 });
                 if (foundConstructionSites.length > 0) {
-                    // we have a construction site
+                    // we have a construction site.  This should already be picked up by the StructurePlanner.
                     if (foundConstructionSites.length > 1) {
                         Game.notify('Somehow found multiple Containers near ID: ' + sources[i].id + ' in room: ' + this.Queen.id);
                     }
-                    newSource.container = (foundConstructionSites[0].constructionSite! as ConstructionSite<BuildableStructureConstant>).id;
+                    pos = (foundConstructionSites[0].constructionSite! as ConstructionSite<BuildableStructureConstant>).pos;
+                } else {
+                    // StructurePlanner.NewSite(STRUCTURE_CONTAINER);
                 }
-            }*///Probably not the best place for this.  Harvesters should be quite stupid.
+            }
+
+            newSource.harvesterPositionX = pos.x;
+            newSource.harvesterPositionY = pos.y;
+
+            this.SourceData.push(newSource);
         }
+        super.InitMemory();
     }
     AssignCreep(creepName: string, jobId: string) {
         super.AssignCreep(creepName, jobId);
@@ -63,9 +70,18 @@ export class CollectionConsul extends CreepConsul {
         for (let i = 0; i < this.CreepData.length; i++) {
             if (this.CreepData[i].creepName == creepName) {
                 this.CreepData[i].targetID = this.SourceData[job.supplementalData].sourceId;
+
+                this.CreepData[i].harvestPosition = (Game.getObjectById(this.CreepData[i].targetID) as Source).pos;
                 break;
             }
         }
+    }
+    ValidateCreep(creepData: CollectorConsul_CreepData, creep: Creep): boolean {
+        creepData.harvestPosition = new RoomPosition(creepData.harvestPosition.x,
+            creepData.harvestPosition.y,
+            creepData.harvestPosition.roomName);
+        
+        return true;
     }
 
     GetBodyTemplate(): BodyPartConstant[] {
@@ -99,6 +115,7 @@ export class CollectionConsul extends CreepConsul {
 
 declare type SourceData = {
     sourceId: string,
-    //container?: string, // Use this for the construction site too
+    harvesterPositionX: number,
+    harvesterPositionY: number
     //room distance map for choosing predefined paths.
 }

@@ -21,7 +21,7 @@ export class ControllerConsul extends CreepConsul {
         if (!super.Load()) { return false }
         this.Controller = this.Queen.Nest.controller!;
 
-        if(this.Controller.progress < 1000 && this.GetData(LAST_UPDATE) != this.Controller.level) {
+        if (this.Controller.progress < 1000 && this.GetData(LAST_UPDATE) != this.Controller.level) {
             this.InitJobRequirements();
             this.SetData(LAST_UPDATE, this.Controller.level);
         }
@@ -29,7 +29,7 @@ export class ControllerConsul extends CreepConsul {
     }
 
     ValidateConsulState(): void { // spawn data managed from in here.
-        if(!this.Controller) { return; }
+        if (!this.Controller) { return; }
         if (!this.Controller.my && // I dont control it
             (!this.Controller.reservation ||
                 this.Controller.reservation.username != SwarmConsts.MY_USERNAME)) { // I dont have it reserved
@@ -46,30 +46,30 @@ export class ControllerConsul extends CreepConsul {
     }
 
     GetBodyTemplate(): BodyPartConstant[] {
-        if(!this.Controller) { return []; }
-        switch(this.Controller.level) {
-            case(1): return [WORK, MOVE, CARRY];
-            case(2): return [WORK, MOVE, CARRY];
-            case(3): return [WORK, MOVE, CARRY];
-            case(4): return [WORK, MOVE, CARRY];
-            case(5): return [WORK, MOVE, CARRY];
-            case(6): return [WORK, MOVE, CARRY];
-            case(7): return [WORK, MOVE, CARRY];
-            case(8): return [WORK, MOVE, CARRY];
+        if (!this.Controller) { return []; }
+        switch (this.Controller.level) {
+            case (1): return [WORK, MOVE, CARRY];
+            case (2): return [WORK, MOVE, CARRY];
+            case (3): return [WORK, MOVE, CARRY];
+            case (4): return [WORK, MOVE, CARRY];
+            case (5): return [WORK, MOVE, CARRY];
+            case (6): return [WORK, MOVE, CARRY];
+            case (7): return [WORK, MOVE, CARRY];
+            case (8): return [WORK, MOVE, CARRY];
             default: return [WORK, MOVE, CARRY];
         }
     }
     GetSuperUpgraderBody(): BodyPartConstant[] {
-        if(!this.Controller) { return []; }
-        switch(this.Controller.level) {
-            case(1): return [WORK, MOVE, CARRY];
-            case(2): return [WORK, MOVE, CARRY];
-            case(3): return [WORK, MOVE, CARRY];
-            case(4): return [WORK, MOVE, CARRY];
-            case(5): return [WORK, MOVE, CARRY];
-            case(6): return [WORK, MOVE, CARRY];
-            case(7): return [WORK, MOVE, CARRY];
-            case(8): return [WORK, MOVE, CARRY];
+        if (!this.Controller) { return []; }
+        switch (this.Controller.level) {
+            case (1): return [WORK, MOVE, CARRY];
+            case (2): return [WORK, MOVE, CARRY];
+            case (3): return [WORK, MOVE, CARRY];
+            case (4): return [WORK, MOVE, CARRY];
+            case (5): return [WORK, MOVE, CARRY];
+            case (6): return [WORK, MOVE, CARRY];
+            case (7): return [WORK, MOVE, CARRY];
+            case (8): return [WORK, MOVE, CARRY];
             default: return [WORK, MOVE, CARRY];
         }
     }

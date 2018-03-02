@@ -9,7 +9,7 @@ export class DistributionImperator extends ImperatorBase {
     ActivateCreep(creepData: DistributionConsul_CreepData): SwarmCodes.SwarmlingResponse {
         let creep = Game.creeps[creepData.creepName];
         let transferResult: SwarmCodes.SwarmlingResponse = SwarmCodes.C_NONE;
-        if (creep) {
+        if (creep && !creep.spawning) {
             let target = Game.getObjectById(creepData.targetID) as RefillTarget;
             if (!target) { return SwarmCodes.C_NONE; } // This should not return from here.
 

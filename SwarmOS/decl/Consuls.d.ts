@@ -21,6 +21,9 @@ declare type CreepConsul_Data = {
 declare type DistributionConsul_CreepData = CreepConsul_Data & {
     prime?: boolean;
 }
+declare type CollectorConsul_CreepData = CreepConsul_Data & {
+    harvestPosition: RoomPosition;
+}
 
 declare type HarvestConsul_SourceData = {
     sourceID: string;

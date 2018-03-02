@@ -2,6 +2,7 @@ import { QueenMemory } from "Tools/SwarmMemory";
 import { HiveQueen } from "Queens/HiveQueen";
 import { HiveQueenBase } from "./HiveQueenBase";
 
+const CREEP_COUNTER = 'CreepCounter';
 export class SwarmQueen extends QueenMemory {
     HiveQueens!: { [name: string]: HiveQueenBase }
 
@@ -19,6 +20,7 @@ export class SwarmQueen extends QueenMemory {
         }
 
         this.SetData('HiveQueenData', queenList);
+        this.SetData(CREEP_COUNTER, global[CREEP_COUNTER]);
         super.Save();
     }
     Load() {
@@ -29,6 +31,7 @@ export class SwarmQueen extends QueenMemory {
             this.HiveQueens[HiveQueenData[i]] = new HiveQueen(HiveQueenData[i]);
         }
 
+        global[CREEP_COUNTER] = this.GetData(CREEP_COUNTER);
         return true;
     }
 
@@ -42,6 +45,7 @@ export class SwarmQueen extends QueenMemory {
         // The only effect this could have is adding rooms that you didn't previously add.
         // In that sense, it is safe to call, but explicitly adding the room would be better perf-wise.
         let newSwarm = new SwarmQueen('SwarmQueen');
+        global[CREEP_COUNTER] = 0;
         newSwarm.Save();
         newSwarm.Load();
         for (let name in Game.rooms) {

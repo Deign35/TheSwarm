@@ -103,7 +103,6 @@ export abstract class CreepConsul extends ConsulBase implements ICreepConsul {
     }
 
     ValidateConsul() {
-        this.ValidateConsul();
         for (let i = 0; i < this.CreepData.length; i++) {
             let creep = Game.creeps[this.CreepData[i].creepName];
             if (!creep) {
@@ -188,15 +187,20 @@ export abstract class CreepConsul extends ConsulBase implements ICreepConsul {
         }
 
         if (!creepData) {
-            return;
+            request.targetTime = Game.time;
+        } else {
+            let creep = Game.creeps[creepData.creepName];
+            if (!creep) { // just spawned it?
+            } else {
+                if (creepData.respawnedCreep && Game.creeps[creepData.creepName]) {
+                    let recreep = Game.creeps[creepData.respawnedCreep];
+                    if (recreep) {
+                        creep = recreep;
+                    }
+                }
+                request.targetTime = Game.time + creep.ticksToLive - 50;
+            }
         }
-
-        let creep = Game.creeps[creepData.creepName];
-        if (creepData.respawnedCreep && Game.creeps[creepData.creepName]) {
-            creep = Game.creeps[creepData.creepName];
-        }
-
-        request.targetTime = Game.time + creep.ticksToLive - 50;
         this.Queen.JobBoard.AddOrUpdateJobPosting(request);
     }
 

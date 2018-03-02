@@ -47,11 +47,11 @@ export class BootstrapImperator extends ImperatorBase {
                 }
                 break;
             case (SwarmCodes.E_ACTION_UNNECESSARY):
-                if (data.creepName == harvester.name) {
+                /*if (data.creepName == harvester.name) {
                     if (data.constructionSite) {
                         harvestAction = new BuildAction(harvester, Game.getObjectById(data.constructionSite) as ConstructionSite);
                     }
-                }
+                }*/
                 break; // Creep's carry is full
             case (SwarmCodes.E_TARGET_INELLIGIBLE): break; // Target is empty.
             case (SwarmCodes.C_MOVE):
