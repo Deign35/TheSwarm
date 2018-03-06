@@ -1176,6 +1176,65 @@ interface CPU {
      * @memberof CPU
      */
     setShardLimits(limits: CPUShardLimits): OK | ERR_BUSY | ERR_INVALID_ARGS;
+    getHeapStatistics(): HeapStatistics;
+}
+interface HeapStatistics {
+    "total_heap_size": number,
+    "total_heap_size_executable": number,
+    "total_physical_size": number,
+    "total_available_size": number,
+    "used_heap_size": number,
+    "heap_size_limit": number,
+    "malloced_memory": number,
+    "peak_malloced_memory": number,
+    "does_zap_garbage": number,
+    "externally_allocated_size": number
+}
+
+interface Tombstone extends RoomObject {
+    creep: Creep,
+    deathTime: number,
+    id: string,
+    store: StoreDefinition,
+    ticksToDecay: number
+}
+declare type FIND_TOMBSTONES = 118; declare const FIND_TOMBSTONES = 118;
+declare type LOOK_TOMBSTONES = "tombstone"; declare const LOOK_TOMBSTONES = "tombstone"
+declare type TOMBSTONE_DECAY_PER_PART = 5; declare const TOMBSTONE_DECAY_PER_PART = 5;
+declare const REACTION_TIME: {
+    OH: 20,
+    ZK: 5,
+    UL: 5,
+    UH: 10,
+    UH2O: 5,
+    XUH2O: 60,
+    UO: 10,
+    UHO2: 5,
+    XUHO2: 60,
+    KH: 10,
+    KH2O: 5,
+    XKH2O: 60,
+    KO: 10,
+    KHO2: 5,
+    XKHO2: 60,
+    LH: 15,
+    LH2O: 10,
+    XLH2O: 65,
+    LO: 10,
+    LHO2: 5,
+    XLHO2: 60,
+    ZH: 20,
+    ZH2O: 40,
+    XZH2O: 160,
+    ZO: 10,
+    ZHO2: 5,
+    XZHO2: 60,
+    GH: 10,
+    GH2O: 15,
+    XGH2O: 80,
+    GO: 10,
+    GHO2: 15,
+    XGHO2: 90,
 }
 
 /**
@@ -1359,6 +1418,16 @@ interface FindPathOpts {
      * Path to within (range) tiles of target tile. The default is to path to the tile that the target is on (0).
      */
     range?: number;
+
+    /** 
+     * Cost for walking on plain positions. The default is 1.
+    */
+    plainCost: number;
+
+    /** 
+     * Cost for walking on swamp positions. The default is 5.
+    */
+    swampCost: number;
 }
 
 interface MoveToOpts extends FindPathOpts {
@@ -2408,7 +2477,7 @@ interface RoomPosition {
      *  * STRUCTURE_WALL
      *  * STRUCTURE_LINK
      */
-    createConstructionSite(structureType: BuildableStructureConstant): ScreepsReturnCode;
+    createConstructionSite(structureType: BuildableStructureConstant, name?: string): ScreepsReturnCode;
     /**
      * Create new Flag at the specified location.
      * @param name The name of a new flag.
@@ -2802,14 +2871,14 @@ interface Room {
      * @param structureType One of the following constants: STRUCTURE_EXTENSION, STRUCTURE_RAMPART, STRUCTURE_ROAD, STRUCTURE_SPAWN, STRUCTURE_WALL, STRUCTURE_LINK
      * @returns Result Code: OK, ERR_INVALID_TARGET, ERR_INVALID_ARGS, ERR_RCL_NOT_ENOUGH
      */
-    createConstructionSite(x: number, y: number, structureType: BuildableStructureConstant): ScreepsReturnCode;
+    createConstructionSite(x: number, y: number, structureType: BuildableStructureConstant, name?: string): ScreepsReturnCode;
     /**
      * Create new ConstructionSite at the specified location.
      * @param pos Can be a RoomPosition object or any object containing RoomPosition.
      * @param structureType One of the following constants: STRUCTURE_EXTENSION, STRUCTURE_RAMPART, STRUCTURE_ROAD, STRUCTURE_SPAWN, STRUCTURE_WALL, STRUCTURE_LINK
      * @returns Result Code: OK, ERR_INVALID_TARGET, ERR_INVALID_ARGS, ERR_RCL_NOT_ENOUGH
      */
-    createConstructionSite(pos: RoomPosition | _HasRoomPosition, structureType: StructureConstant): ScreepsReturnCode;
+    createConstructionSite(pos: RoomPosition | _HasRoomPosition, structureType: StructureConstant, name?: string): ScreepsReturnCode;
     /**
      * Create new Flag at the specified location.
      * @param x The X position.
@@ -3085,7 +3154,7 @@ interface StructureSpawn extends OwnedStructure<STRUCTURE_SPAWN> {
      * ERR_RCL_NOT_ENOUGH       -14 Your Room Controller level is insufficient to use this spawn.
      * ```
      */
-    spawnCreep(body: BodyPartConstant[], name: string, opts?: { memory?: CreepMemory, energyStructures?: Array<(StructureSpawn | StructureExtension)>, dryRun?: boolean }): ScreepsReturnCode;
+    spawnCreep(body: BodyPartConstant[], name: string, opts?: { memory?: CreepMemory, energyStructures?: Array<(StructureSpawn | StructureExtension)>, dryRun?: boolean, directions?: DirectionConstant[] }): ScreepsReturnCode;
 
     /**
      * Destroy this spawn immediately.
@@ -3118,6 +3187,16 @@ interface StructureSpawn extends OwnedStructure<STRUCTURE_SPAWN> {
      * @param target The target creep object.
      */
     recycleCreep(target: Creep): ScreepsReturnCode;
+
+    Spawning: {
+        directions: DirectionConstant[];
+        name: string;
+        needTime: string;
+        remainingTime: number;
+        spawn: StructureSpawn;
+        cancel(): OK | ERR_NOT_OWNER;
+        setDirections(directions: DirectionConstant[]): OK | ERR_NOT_OWNER | ERR_INVALID_ARGS;
+    }
 }
 
 interface StructureSpawnConstructor extends _Constructor<StructureSpawn>, _ConstructorById<StructureSpawn> {
