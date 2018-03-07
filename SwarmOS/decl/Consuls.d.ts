@@ -7,8 +7,6 @@ declare interface IConsul extends IMemory {
 declare interface ICreepConsul extends IConsul {
     AssignCreep(creepName: string, jobId: string): void;
     ReleaseCreep(creepName: string): void;
-    UpdateJob(jobId: string): void;
-    InitJobRequirements(): void;
 }
 
 declare type CreepConsul_Data = {

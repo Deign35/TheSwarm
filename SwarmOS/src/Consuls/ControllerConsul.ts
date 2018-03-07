@@ -22,7 +22,6 @@ export class ControllerConsul extends CreepConsul {
         this.Controller = this.Queen.Nest.controller!;
 
         if (this.Controller.progress < 1000 && this.GetData(LAST_UPDATE) != this.Controller.level) {
-            this.InitJobRequirements();
             this.SetData(LAST_UPDATE, this.Controller.level);
         }
         return true;
@@ -76,13 +75,14 @@ export class ControllerConsul extends CreepConsul {
     GetCreepSuffix(): string {
         return CREEP_SUFFIX;
     }
-    GetDefaultSpawnPriority(): SwarmConsts.SpawnPriority {
+    GetSpawnPriority(): SwarmConsts.SpawnPriority {
         return SwarmConsts.SpawnPriority.Lowest;
     }
-    GetDefaultTerminationType(): SwarmConsts.SpawnRequest_TerminationType {
-        return SwarmConsts.SpawnRequest_TerminationType.OneOff;
-    }
-    GetDefaultJobCount(): number {
-        return 0;
+    GetNextSpawnTime(): number {
+        if (this.CreepData.length == 0) {
+            return Game.time;
+        }
+
+        return Game.time + Game.creeps[this.CreepData[0].creepName].ticksToLive - 50;
     }
 }

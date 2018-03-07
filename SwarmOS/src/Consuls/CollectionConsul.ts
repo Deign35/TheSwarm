@@ -96,21 +96,47 @@ export class CollectionConsul extends CreepConsul {
     GetCreepSuffix(): string {
         return CREEP_SUFFIX;
     }
-    GetDefaultSpawnPriority(): SwarmConsts.SpawnPriority {
+    GetSpawnPriority(): SwarmConsts.SpawnPriority {
+        if (this.CreepData.length == 0) {
+            return SwarmConsts.SpawnPriority.EMERGENCY;
+        }
         return SwarmConsts.SpawnPriority.Highest;
     }
-    GetDefaultTerminationType(): SwarmConsts.SpawnRequest_TerminationType {
-        return SwarmConsts.SpawnRequest_TerminationType.Infinite;
-    }
-    GetDefaultJobCount(): number {
-        return this.Queen.Nest.find(FIND_SOURCES).length;
-    }
     GetSupplementalData(): any {
-        if (this.JobIDs.length < this.SourceData.length) {
-            return this.JobIDs.length; // 1 per source
+        let sourceIds: { [id: string]: boolean } = {};
+        for (let i = 0; i < this.CreepData.length; i++) {
+            if (this.CreepData[i].targetID) {
+                sourceIds[this.CreepData[i].targetID!] = true;
+            }
+        }
+        for (let i = 0; i < this.SourceData.length; i++) {
+            if (!sourceIds[this.SourceData[i].sourceId]) {
+                return i;
+            }
         }
         return super.GetSupplementalData();
     };
+    GetNextSpawnTime(): number {
+        let sourceStatus: { [id: string]: number } = {};
+        for (let i = 0; i < this.CreepData.length; i++) {
+            if (this.CreepData[i].targetID) {
+                sourceStatus[this.CreepData[i].targetID!] = Game.time - 100 + Game.creeps[this.CreepData[i].creepName].ticksToLive;
+            }
+        }
+
+        let nextSpawn = Game.time + 1500;
+        for (let i = 0; i < this.SourceData.length; i++) {
+            if (sourceStatus[this.SourceData[i].sourceId]) {
+                if (sourceStatus[this.SourceData[i].sourceId] < nextSpawn) {
+                    nextSpawn = sourceStatus[this.SourceData[i].sourceId];
+                }
+            } else {
+                return Game.time;
+            }
+        }
+
+        return nextSpawn;
+    }
 }
 
 declare type SourceData = {

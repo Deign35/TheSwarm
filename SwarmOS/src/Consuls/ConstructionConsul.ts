@@ -43,20 +43,20 @@ export class ConstructionConsul extends CreepConsul {
     }
 
     ValidateConsulState(): void {
-        if(Game.time % SITE_UPDATE_FREQUENCY == 0) {
+        if (Game.time % SITE_UPDATE_FREQUENCY == 0) {
             let existingSites = this.siteData;
-            for(let siteId in existingSites) {
-                if(!Game.getObjectById(existingSites[siteId].siteId)) {
+            for (let siteId in existingSites) {
+                if (!Game.getObjectById(existingSites[siteId].siteId)) {
                     this.RemoveConstructionSite(existingSites[siteId]);
                 }
             }
             let newSites = this.Queen.Nest.find<FIND_MY_CONSTRUCTION_SITES>(FIND_MY_CONSTRUCTION_SITES, {
-                    filter: function(cSite) {
+                filter: function (cSite) {
                     return !!(existingSites[cSite.id]);
                 }
             });
 
-            for(let i = 0, length = newSites.length; i < length; i++) {
+            for (let i = 0, length = newSites.length; i < length; i++) {
                 let cSite = newSites[i];
                 let newRequest: ConstructionRequest = {
                     requestor: this.consulType,
@@ -69,7 +69,7 @@ export class ConstructionConsul extends CreepConsul {
     }
 
     ValidateCreep(creepData: CreepConsul_Data, creep: Creep): boolean {
-        if(!super.ValidateCreep(creepData, creep)) {
+        if (!super.ValidateCreep(creepData, creep)) {
             return false;
         }
         let request;// = this.siteData[creepData.targetID!]
@@ -78,12 +78,12 @@ export class ConstructionConsul extends CreepConsul {
         do {
             request = this.siteData[creepData.targetID!];
             target = Game.getObjectById(request.siteId);
-            if(!target && !!request) {
+            if (!target && !!request) {
                 this.RemoveConstructionSite(request);
             }
-        } while(creepData.active && !target && !!request);
+        } while (creepData.active && !target && !!request);
 
-        if(!request) {
+        if (!request) {
             // no csites remaining, disperse
         }
         return true;
@@ -95,13 +95,25 @@ export class ConstructionConsul extends CreepConsul {
     GetCreepSuffix(): string {
         return CREEP_SUFFIX;
     }
-    GetDefaultSpawnPriority(): SwarmConsts.SpawnPriority {
+    GetSpawnPriority(): SwarmConsts.SpawnPriority {
         return SwarmConsts.SpawnPriority.Low;
     }
-    GetDefaultTerminationType(): SwarmConsts.SpawnRequest_TerminationType {
-        return SwarmConsts.SpawnRequest_TerminationType.OneOff;
-    }
-    GetDefaultJobCount(): number {
-        return 0;
+    GetNextSpawnTime(): number {
+        let nextSpawn = 0;
+        if (this.Queen.Nest.find(FIND_CONSTRUCTION_SITES).length > 0) {
+            if (this.CreepData.length < 3) {
+                return Game.time;
+            }
+
+            nextSpawn = Game.time + 1500;
+            for (let i = 0; i < this.CreepData.length; i++) {
+                let creepSpawn = Game.time - 100 + Game.creeps[this.CreepData[i].creepName].ticksToLive;
+                if (creepSpawn < nextSpawn) {
+                    nextSpawn = creepSpawn;
+                }
+            }
+        }
+
+        return nextSpawn;
     }
 }

@@ -30,7 +30,7 @@ export class DistributionImperator extends ImperatorBase {
                         break;
                     case (SwarmCodes.E_TARGET_INELLIGIBLE):
                     case (SwarmCodes.E_ACTION_UNNECESSARY):
-                        console.log('DistributionResult: ' + transferResult); // What happens i wonder?
+                        //console.log('DistributionResult: ' + transferResult); // What happens i wonder?
                         break;
                 }
             }

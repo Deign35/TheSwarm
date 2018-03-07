@@ -10,10 +10,6 @@ declare type CreepRequestData = {
     requestor: string,
     body: BodyPartConstant[],
     creepSuffix: string,
-    terminationType: number,
     priority: number,
-    initMemory?: any,
-    disabled?: boolean,
-    targetTime?: number,
     supplementalData?: any
 }

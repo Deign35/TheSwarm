@@ -35,8 +35,6 @@ export class NestJobs extends ChildMemory {
             body: body,
             priority: priority,
             requestor: consul,
-            terminationType: SwarmConsts.SpawnRequest_TerminationType.OneOff,
-            targetTime: time
         };
 
         this.AddOrUpdateJobPosting(newRequest);
@@ -55,34 +53,14 @@ export class NestJobs extends ChildMemory {
         }
 
         requests.sort((a, b) => {
-            // check if they either are disabled
             let reqA = this.JobBoard[a];
-            if (reqA.disabled) { return 1; }
             let reqB = this.JobBoard[b];
-            if (reqB.disabled) { return -1; }
 
             // Check that the body can even be spawned
             let bodyA = CalculateBodyCost(reqA.body);
             if (maxCapacity > 0 && bodyA > maxCapacity) { return 1; }
             let bodyB = CalculateBodyCost(reqB.body);
             if (maxCapacity > 0 && bodyB > maxCapacity) { return -1; }
-
-            // Compare target time
-            if (!!reqA.targetTime) {
-                if (!reqB.targetTime) {
-                    if (reqA.targetTime < ARBITRARY_SPAWN_CONSTANT) {
-                        return -1; // don't let future creeps clog up one off requests.
-                    }
-                } else {
-                    if (reqA.priority < reqB.priority) { return 1; }
-                    if (reqB.priority < reqA.priority) { return -1; }
-                    if (reqA.targetTime != reqB.targetTime) {
-                        return reqA.targetTime < reqB.targetTime ? -1 : 1;
-                    }
-                }
-            } else if (!!reqB.targetTime && reqB.targetTime < ARBITRARY_SPAWN_CONSTANT) {
-                return 1;
-            }
 
             // Check priority
             if (reqA.priority < reqB.priority) { return 1; }
@@ -93,7 +71,6 @@ export class NestJobs extends ChildMemory {
         });
         let topRequests = [];
         for (let i = 0, length = requests.length; i < length && topRequests.length < count; i++) {
-            if (this.JobBoard[requests[i]].disabled) { continue; }
             topRequests.push(this.JobBoard[requests[i]]);
         }
 

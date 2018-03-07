@@ -195,19 +195,33 @@ export class DistributionConsul extends CreepConsul {
     GetCreepSuffix(): string {
         return CREEP_SUFFIX;
     }
-    GetDefaultSpawnPriority(): SwarmConsts.SpawnPriority {
+    GetSpawnPriority(): SwarmConsts.SpawnPriority {
+        if (this.CreepData.length == 0) {
+            return SwarmConsts.SpawnPriority.Highest;
+        }
         return SwarmConsts.SpawnPriority.High;
     }
-    GetDefaultTerminationType(): SwarmConsts.SpawnRequest_TerminationType {
-        return SwarmConsts.SpawnRequest_TerminationType.Infinite;
-    }
-    GetDefaultJobCount(): number {
-        return 1;
+    GetNextSpawnTime(): number {
+        if (this.CreepData.length < 2) {
+            return Game.time;
+        }
+
+        let nextSpawn = Game.time + 1500;
+        for (let i = 0; i < this.CreepData.length; i++) {
+            let creepSpawn = Game.time - 100 + Game.creeps[this.CreepData[i].creepName].ticksToLive;
+            if (creepSpawn < nextSpawn) {
+                nextSpawn = creepSpawn;
+            }
+        }
+
+        return nextSpawn;
     }
     GetSupplementalData(): any {
-        if (this.JobIDs.length == 0) {
-            return SPAWN_REFILLER; //Just need 1?
+        for (let i = 0; i < this.CreepData.length; i++) {
+            if (this.CreepData[i].prime) {
+                return super.GetSupplementalData();
+            }
         }
-        return super.GetSupplementalData();
+        return SPAWN_REFILLER;
     };
 }
