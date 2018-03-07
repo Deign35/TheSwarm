@@ -43,17 +43,12 @@ export class DistributionConsul extends CreepConsul {
         this.SpawnRefillRequests = [];
         this.OtherRequests = [];
     }
-    AssignCreep(creepName: string, jobId: string) {
-        super.AssignCreep(creepName, jobId);
-        let job = this.Queen.JobBoard.GetJobRequest(jobId);
-        if (job.supplementalData == SPAWN_REFILLER) {
-            for (let i = 0; i < this.CreepData.length; i++) {
-                if (this.CreepData[i].creepName == creepName) {
-                    this.CreepData[i].prime = true;
-                    break;
-                }
-            }
+    AssignCreep(creepName: string, supplementalData: any) {
+        let newCreepData: DistributionConsul_CreepData = { creepName: creepName, active: true, }
+        if (supplementalData && supplementalData == SPAWN_REFILLER) {
+            newCreepData.prime = true;
         }
+        this.CreepData.push(newCreepData);
     }
     ValidateCreep(creepData: DistributionConsul_CreepData, creep: Creep) {
         if (!super.ValidateCreep(creepData, creep)) {
@@ -219,7 +214,7 @@ export class DistributionConsul extends CreepConsul {
     GetSupplementalData(): any {
         for (let i = 0; i < this.CreepData.length; i++) {
             if (this.CreepData[i].prime) {
-                return super.GetSupplementalData();
+                return undefined;
             }
         }
         return SPAWN_REFILLER;

@@ -8,6 +8,9 @@ const CONSUL_TYPE = 'Controller';
 const LAST_UPDATE = 'LAST_RCL';
 const CREEP_SUFFIX = 'Upg';
 export class ControllerConsul extends CreepConsul {
+    GetSupplementalData() {
+        return undefined;
+    }
     static get ConsulType(): string { return CONSUL_TYPE; }
     get consulType(): string { return CONSUL_TYPE }
 

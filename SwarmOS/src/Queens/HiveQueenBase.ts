@@ -82,7 +82,7 @@ export abstract class HiveQueenBase extends NestQueenBase implements IHiveQueen 
                     CreepCounter %= 10000;
                     let spawnResult = spawn.spawnCreep(nextSpawn.body, creepName);
                     if (spawnResult == OK) {
-                        this.CreepConsulList[nextIndex].AssignCreep(creepName, nextSpawn.requestID);
+                        this.CreepConsulList[nextIndex].AssignCreep(creepName, nextSpawn.supplementalData);
                     }
                 }
             }

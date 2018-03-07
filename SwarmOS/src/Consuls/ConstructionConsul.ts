@@ -9,6 +9,9 @@ const SITE_DATA = 'S_Data';
 const CREEP_SUFFIX = 'Bld';
 const SITE_UPDATE_FREQUENCY = 59;
 export class ConstructionConsul extends CreepConsul {
+    GetSupplementalData() {
+        return undefined;
+    }
     static get ConsulType(): string { return CONSUL_TYPE; }
     get consulType(): string { return CONSUL_TYPE }
     get _Imperator() {
@@ -27,6 +30,7 @@ export class ConstructionConsul extends CreepConsul {
 
         //this.CreepData = this.GetData(BUILDER_DATA) || [];
         this.siteData = this.GetData(SITE_DATA) || {};
+        this.ValidateConsulState();
         return true;
     }
     InitMemory() {
@@ -69,13 +73,16 @@ export class ConstructionConsul extends CreepConsul {
     }
 
     ValidateCreep(creepData: CreepConsul_Data, creep: Creep): boolean {
-        if (!super.ValidateCreep(creepData, creep)) {
-            return false;
-        }
         let request;// = this.siteData[creepData.targetID!]
         let target;
 
         do {
+            if (!creepData.targetID) {
+                for (let id in this.siteData) {
+                    creepData.targetID = this.siteData[id].siteId;
+                    break;
+                }
+            }
             request = this.siteData[creepData.targetID!];
             target = Game.getObjectById(request.siteId);
             if (!target && !!request) {

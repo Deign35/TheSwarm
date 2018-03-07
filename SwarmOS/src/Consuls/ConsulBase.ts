@@ -61,33 +61,12 @@ export abstract class CreepConsul extends ConsulBase implements ICreepConsul {
             }
         }
     }
-    AssignCreep(creepName: string, jobId: string) {
-        let jobExists = false;
-        for (let i = 0, length = this.CreepData.length; i < length; i++) {
-            if (this.CreepData[i].jobId == jobId) {
-                jobExists = true;
-                if (this.CreepData[i].creepName && Game.creeps[this.CreepData[i].creepName]) {
-                    if (this.CreepData[i].respawnedCreep) { throw 'Attempted to fill a job thats already overfilled' }
-                    this.CreepData[i].respawnedCreep = creepName;
-                } else {
-                    this.CreepData[i].creepName = creepName;
-                }
-
-                break;
-            }
-        }
-        if (!jobExists) {
-            this.JobIDs.push(jobId);
-            this.CreepData.push({ creepName: creepName, jobId: jobId, active: true });
-        }
+    AssignCreep(creepName: string, supplementalData: any) {
+        this.CreepData.push({ creepName: creepName, active: true, })
     }
 
     protected _ReleaseCreep(index: number) {
-        this.CreepData[index].creepName = '';
-        if (this.CreepData[index].respawnedCreep) {
-            this.CreepData[index].creepName = this.CreepData[index].respawnedCreep!;
-            delete this.CreepData[index].respawnedCreep;
-        }
+        this.CreepData.splice(index, 1);
     }
 
     ReleaseCreep(creepName: string) {
@@ -126,7 +105,7 @@ export abstract class CreepConsul extends ConsulBase implements ICreepConsul {
     protected JobIDs!: string[];
     abstract GetBodyTemplate(): BodyPartConstant[];
     abstract GetCreepSuffix(): string;
-    GetSupplementalData(): any { return undefined; };
+    abstract GetSupplementalData(): any;
     abstract GetSpawnPriority(): SpawnPriority;
     abstract GetNextSpawnTime(): number;
 

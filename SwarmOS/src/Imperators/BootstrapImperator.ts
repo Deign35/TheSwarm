@@ -5,11 +5,32 @@ import { MoveToPositionAction } from "Actions/MoveToPositionAction";
 import { ActionBase } from "Actions/ActionBase";
 import { HarvestAction } from "Actions/HarvestAction";
 import { BuildAction } from "Actions/BuildAction";
+import { FindStructureNextTo, FindNextTo } from "Tools/TheFinder";
 
 const CONSUL_TYPE = 'H_Consul';
 export class BootstrapImperator extends ImperatorBase {
-    ActivateCreep(creep: CreepConsul_Data): SwarmCodes.SwarmlingResponse {
-        throw new Error("Method not implemented.");
+    ActivateCreep(creepData: CollectorConsul_CreepData): SwarmCodes.SwarmlingResponse {
+        let creep = Game.creeps[creepData.creepName];
+        if (creep.spawning) { return SwarmCodes.C_NONE; }
+        let sourceTarget = Game.getObjectById(creepData.targetID) as Source;
+        let action: ActionBase = new HarvestAction(creep, sourceTarget);
+        let actionResult = action.ValidateAction();
+
+        switch (actionResult) {
+            case (SwarmCodes.C_NONE): break;
+            case (SwarmCodes.C_MOVE):
+                action = new MoveToPositionAction(creep, creepData.harvestPosition);
+            case (SwarmCodes.E_ACTION_UNNECESSARY):
+                let foundSites = FindNextTo(creep.pos, LOOK_CONSTRUCTION_SITES);
+                if (foundSites.length > 0 && foundSites[0].constructionSite) {
+                    action = new BuildAction(creep, foundSites[0].constructionSite! as ConstructionSite);
+                }
+                break;
+            case (SwarmCodes.E_TARGET_INELLIGIBLE):
+            default:
+                console.log('HarvestResult: ' + actionResult); // What happens i wonder?  
+        }
+        return action.Run();
     }
 
     // Activate temp worker as a different function

@@ -11,16 +11,15 @@ declare interface ICreepConsul extends IConsul {
 
 declare type CreepConsul_Data = {
     creepName: string;
-    jobId: string;
     active: boolean;
     targetID?: string;
-    respawnedCreep?: string;
 }
 declare type DistributionConsul_CreepData = CreepConsul_Data & {
     prime?: boolean;
 }
 declare type CollectorConsul_CreepData = CreepConsul_Data & {
     harvestPosition: RoomPosition;
+    constructionSite?: string;
 }
 
 declare type HarvestConsul_SourceData = {
@@ -57,8 +56,4 @@ declare type DistributionConsul_DeliveryRequest = {
     amount: number;
     time: number;
     resourceType?: ResourceConstant;
-}
-
-declare type CollectorData = CreepConsul_Data & {
-    sourceIndex: number,
 }
