@@ -23,21 +23,10 @@ export class ControllerConsul extends CreepConsul {
     Load() {
         if (!super.Load()) { return false }
         this.Controller = this.Queen.Nest.controller!;
-
-        if (this.Controller.progress < 1000 && this.GetData(LAST_UPDATE) != this.Controller.level) {
+        /*if (this.Controller.progress < 1000 && this.GetData(LAST_UPDATE) != this.Controller.level) {
             this.SetData(LAST_UPDATE, this.Controller.level);
-        }
+        }*/
         return true;
-    }
-
-    ValidateConsulState(): void { // spawn data managed from in here.
-        if (!this.Controller) { return; }
-        if (!this.Controller.my && // I dont control it
-            (!this.Controller.reservation ||
-                this.Controller.reservation.username != SwarmConsts.MY_USERNAME)) { // I dont have it reserved
-            console.log('Lost control of this nest');
-            // Need to update the NestQueen and on up.
-        }
     }
 
     InitMemory() {
@@ -45,6 +34,25 @@ export class ControllerConsul extends CreepConsul {
         if (!this.Queen.Nest.controller) {
             throw 'ATTEMPTING TO ADD CONTROLLERCONSUL TO A ROOM WITH NO CONTROLLER'
         }
+    }
+
+    ValidateConsulState(): void { // spawn data managed from in here.
+        if (!this.Controller) { return; }
+        if (!this.Controller.my && // I dont control it
+            (!this.Controller.reservation ||
+                this.Controller.reservation.username != SwarmConsts.MY_USERNAME)) { // I dont have it reserved
+            // console.log('Lost control of this nest');
+            // Need to update the NestQueen and on up.
+            // Needs to be reserved.
+        }
+    }
+    protected ValidateCreep(creepData: CreepConsul_Data, creep: Creep): boolean {
+        if (creep.ticksToLive < 100 && creep.carry[RESOURCE_ENERGY] == 0) {
+            creep.suicide();
+            return false;
+        }
+
+        return true;
     }
 
     GetBodyTemplate(): BodyPartConstant[] {

@@ -78,6 +78,7 @@ export abstract class CreepConsul extends ConsulBase implements ICreepConsul {
     }
 
     ValidateConsul() {
+        this.ValidateConsulState();
         for (let i = 0; i < this.CreepData.length; i++) {
             let creep = Game.creeps[this.CreepData[i].creepName];
             if (!creep) {
@@ -89,18 +90,8 @@ export abstract class CreepConsul extends ConsulBase implements ICreepConsul {
         }
     }
 
-    protected ValidateConsulState() { }
-    protected ValidateCreep(creepData: CreepConsul_Data, creep: Creep): boolean {
-        /*if(creepData.active) {
-            if (creep.carry[RESOURCE_ENERGY] == creep.carryCapacity) {
-                creepData.active = false;
-            }
-        } else if (creep.carry[RESOURCE_ENERGY] == 0) {
-            creepData.active = true;
-        }*/
-
-        return true;
-    }
+    protected abstract ValidateConsulState(): void;
+    protected abstract ValidateCreep(creepData: CreepConsul_Data, creep: Creep): boolean;
 
     protected JobIDs!: string[];
     abstract GetBodyTemplate(): BodyPartConstant[];

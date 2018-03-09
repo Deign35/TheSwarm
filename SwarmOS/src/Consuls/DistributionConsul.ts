@@ -50,16 +50,38 @@ export class DistributionConsul extends CreepConsul {
         }
         this.CreepData.push(newCreepData);
     }
-    ValidateCreep(creepData: DistributionConsul_CreepData, creep: Creep) {
-        if (!super.ValidateCreep(creepData, creep)) {
-            return false;
+    protected ValidateConsulState(): void {
+
+    }
+    protected ValidateCreep(creepData: DistributionConsul_CreepData, creep: Creep) {
+        if (creep.carry[RESOURCE_ENERGY] == 0) {
+            if (creep.ticksToLive < 50) {
+                creep.suicide();
+                return false;
+            }
+            let target = Game.getObjectById(creepData.targetID);
+            if (!target) {
+
+            }
         }
         let target = Game.getObjectById(creepData.targetID);
         if (!target) {
-            this.GetNextDeliveryTarget(creepData);
+            if (!this.GetNextDeliveryTarget(creepData) && this.Queen.Nest.storage) {
+                creepData.targetID = this.Queen.Nest.storage.id;
+            }
         }
 
         return true;
+    }
+
+    GetNextRetreivalTarget(creepData: DistributionConsul_CreepData): Resource | undefined | StructureContainer | StructureStorage {
+        let collectionTarget = this.Queen.Collector.GetCollectionTarget(creepData);
+        if (!collectionTarget) {
+            if (this.Queen.Nest.storage) {
+                return this.Queen.Nest.storage;
+            }
+        }
+        return collectionTarget;
     }
 
     GetNextDeliveryTarget(creepData: DistributionConsul_CreepData): RefillTarget | undefined {
@@ -81,25 +103,31 @@ export class DistributionConsul extends CreepConsul {
                 }
             }
             let spawnRequest = this.SpawnRefillRequests.length > 0 ? this.SpawnRefillRequests[0] : undefined;
-            let otherRequest = this.OtherRequests.length > 0 ? this.OtherRequests[0] : undefined;
-            if (!spawnRequest && !otherRequest) {
-                return;
-            } else if (spawnRequest && otherRequest) {
-                // find the closer one
-                let distA = creep.pos.getRangeTo(Game.getObjectById(spawnRequest.id) as RefillTarget);
-                let distB = creep.pos.getRangeTo(Game.getObjectById(otherRequest.id) as RefillTarget);
-                if (distA < distB) {
-                    req = this.SpawnRefillRequests.splice(0, 1)[0];
-                } else {
-                    req = otherRequest;
-                }
+            if (creepData.prime) {
+                // Must have a spawn request because otherwise we couldn't be here.
+                req = this.SpawnRefillRequests.splice(0, 1)[0];
             } else {
-                if (!!spawnRequest) {
-                    req = this.SpawnRefillRequests.splice(0, 1)[0];
+                let otherRequest = this.OtherRequests.length > 0 ? this.OtherRequests[0] : undefined;
+                if (!spawnRequest && !otherRequest) {
+                    return;
+                } else if (spawnRequest && otherRequest) {
+                    // find the closer one
+                    let distA = creep.pos.getRangeTo(Game.getObjectById(spawnRequest.id) as RefillTarget);
+                    let distB = creep.pos.getRangeTo(Game.getObjectById(otherRequest.id) as RefillTarget);
+                    if (distA < distB) {
+                        req = this.SpawnRefillRequests.splice(0, 1)[0];
+                    } else {
+                        req = otherRequest;
+                    }
                 } else {
-                    req = otherRequest;
+                    if (!!spawnRequest) {
+                        req = this.SpawnRefillRequests.splice(0, 1)[0];
+                    } else {
+                        req = otherRequest;
+                    }
                 }
             }
+
             if (!req) { return; }
             target = Game.getObjectById(req.id) as RefillTarget;
             if (!this.IsValidDeliveryTarget(target)) {
@@ -174,17 +202,23 @@ export class DistributionConsul extends CreepConsul {
         }
     }
 
-    protected IsValidDeliveryTarget(obj: RefillTarget) {
+    protected IsValidDeliveryTarget(obj: RefillTarget | StructureStorage) {
         if (!obj) { return false; }
         if ((obj as EnergyStructure).energyCapacity) {
             return (obj as EnergyStructure).energy < (obj as EnergyStructure).energyCapacity;
         } else if ((obj as Creep).carryCapacity) {
             return (obj as Creep).carry.energy < (obj as Creep).carryCapacity;
+        } else if ((obj as StructureStorage).storeCapacity) {
+            return true;
         }
         return false;
     }
 
     GetBodyTemplate(): BodyPartConstant[] {
+        if (this.Queen.Nest.energyCapacityAvailable > 1000) {
+            return [CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
+                MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE]
+        }
         return [CARRY, MOVE, CARRY, MOVE, CARRY, MOVE];
     }
     GetCreepSuffix(): string {
@@ -197,7 +231,7 @@ export class DistributionConsul extends CreepConsul {
         return SwarmConsts.SpawnPriority.High;
     }
     GetNextSpawnTime(): number {
-        if (this.CreepData.length < 2) {
+        if (this.CreepData.length < 4) {
             return Game.time;
         }
 

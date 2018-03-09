@@ -11,16 +11,7 @@ const CREEP_SUFFIX = 'Col';
 export class CollectionConsul extends CreepConsul {
     static get ConsulType(): string { return CONSUL_TYPE; }
     get consulType(): string { return CONSUL_TYPE }
-    get _Imperator() {
-        for (let i = 0; i < this.SourceData.length; i++) {
-            let source = Game.getObjectById(this.SourceData[i].sourceId) as Source;
-            let foundStructures = Finder.FindStructureNextTo(source.pos, STRUCTURE_CONTAINER, { distance: 1 });
-            if (foundStructures.length < 1) {
-                return new BootstrapImperator();
-            }
-        }
-        return new HarvestImperator()
-    }
+    get _Imperator() { return new HarvestImperator(); }
 
     protected CreepData!: CollectorConsul_CreepData[];
     protected SourceData!: SourceData[];
@@ -42,92 +33,112 @@ export class CollectionConsul extends CreepConsul {
             let newSource = {
                 sourceId: sources[i].id,
             } as SourceData;
-
-            let pos = sources[i].pos;
-            let foundStructures = Finder.FindStructureNextTo(pos, STRUCTURE_CONTAINER, { distance: 1 });
-            if (foundStructures.length > 0) {
-                // We have a container!
-                if (foundStructures.length > 1) {
-                    Game.notify('Somehow found multiple Containers near ID: ' + sources[i].id + ' in room: ' + this.Queen.id);
-                }
-                pos = foundStructures[0].structure!.pos;
-            } else {
-                let foundConstructionSites = Finder.FindNextTo(pos, LOOK_CONSTRUCTION_SITES, { distance: 1 });
-                foundConstructionSites.filter((a) => {
-                    return a.constructionSite && (a.constructionSite! as ConstructionSite<BuildableStructureConstant>).structureType == STRUCTURE_CONTAINER;
-                });
-                if (foundConstructionSites.length > 0) {
-                    // we have a construction site.  This should already be picked up by the StructurePlanner.
-                    if (foundConstructionSites.length > 1) {
-                        Game.notify('Somehow found multiple Containers near ID: ' + sources[i].id + ' in room: ' + this.Queen.id);
-                    }
-                    pos = (foundConstructionSites[0].constructionSite! as ConstructionSite<BuildableStructureConstant>).pos;
-                } else {
-                    // StructurePlanner.NewSite(STRUCTURE_CONTAINER);
-                }
+            let foundSupportStructure = this.FindCollectionContainer(sources[i]);
+            if (foundSupportStructure) {
+                newSource.container = foundSupportStructure.id;
             }
-
-            newSource.harvesterPositionX = pos.x;
-            newSource.harvesterPositionY = pos.y;
 
             this.SourceData.push(newSource);
         }
         super.InitMemory();
     }
+    GetCollectionTarget(creepData: CreepConsul_Data): StructureContainer | Resource | undefined {
+        for (let i = 0; i < this.SourceData.length; i++) {
+            if (this.SourceData[i].container) {
+                let container = Game.getObjectById(this.SourceData[i].container);
+                if ((container as ConstructionSite).progress) {
+                    continue;
+                }
+
+                return container as StructureContainer;
+            }
+        }
+
+        for (let i = 0; i < this.CreepData.length; i++) {
+            let creep = Game.creeps[this.CreepData[i].creepName];
+            if (creep.pos.lookFor(LOOK_RESOURCES)) {
+                return creep.pos.lookFor(LOOK_RESOURCES)[0];
+            }
+        }
+
+        return undefined;
+    }
+    protected FindCollectionContainer(source: Source): ConstructionSite | StructureContainer | undefined {
+        let pos = source.pos;
+        let foundStructures = Finder.FindStructureNextTo(pos, STRUCTURE_CONTAINER, { distance: 1 });
+        if (foundStructures.length > 0) {
+            // We have a container!
+            if (foundStructures.length > 1) {
+                Game.notify('Somehow found multiple Containers near ID: ' + source.id + ' in room: ' + this.Queen.id);
+            }
+            return foundStructures[0].structure! as StructureContainer;
+            //pos = foundStructures[0].structure!.pos;
+        } else {
+            let foundConstructionSites = Finder.FindNextTo(pos, LOOK_CONSTRUCTION_SITES, { distance: 1 });
+            foundConstructionSites.filter((a) => {
+                return a.constructionSite && (a.constructionSite! as ConstructionSite<BuildableStructureConstant>).structureType == STRUCTURE_CONTAINER;
+            });
+            if (foundConstructionSites.length > 0) {
+                // we have a construction site.  This should already be picked up by the StructurePlanner.
+                if (foundConstructionSites.length > 1) {
+                    Game.notify('Somehow found multiple Containers near ID: ' + source.id + ' in room: ' + this.Queen.id);
+                }
+                return foundConstructionSites[0].constructionSite! as ConstructionSite<BuildableStructureConstant>;
+                //pos = (foundConstructionSites[0].constructionSite! as ConstructionSite<BuildableStructureConstant>).pos;
+            }
+        }
+
+        return undefined;
+    }
     AssignCreep(creepName: string, supplementalData: any) {
         if (supplementalData != undefined && supplementalData < this.SourceData.length) {
             let sourceData = this.SourceData[supplementalData];
             let source = Game.getObjectById(sourceData.sourceId) as Source;
-            if (sourceData.harvesterPositionX == source.pos.x && sourceData.harvesterPositionY == source.pos.y) {
-                let pos = source.pos;
-                let foundStructures = Finder.FindStructureNextTo(pos, STRUCTURE_CONTAINER, { distance: 1 });
-                if (foundStructures.length > 0) {
-                    // We have a container!
-                    if (foundStructures.length > 1) {
-                        Game.notify('Somehow found multiple Containers near ID: ' + source.id + ' in room: ' + this.Queen.id);
-                    }
-                    pos = foundStructures[0].structure!.pos;
-                } else {
-                    let foundConstructionSites = Finder.FindNextTo(pos, LOOK_CONSTRUCTION_SITES, { distance: 1 });
-                    foundConstructionSites.filter((a) => {
-                        return a.constructionSite && (a.constructionSite! as ConstructionSite<BuildableStructureConstant>).structureType == STRUCTURE_CONTAINER;
-                    });
-                    if (foundConstructionSites.length > 0) {
-                        // we have a construction site.  This should already be picked up by the StructurePlanner.
-                        if (foundConstructionSites.length > 1) {
-                            Game.notify('Somehow found multiple Containers near ID: ' + source.id + ' in room: ' + this.Queen.id);
-                        }
-                        pos = (foundConstructionSites[0].constructionSite! as ConstructionSite<BuildableStructureConstant>).pos;
-                    } else {
-                        // StructurePlanner.NewSite(STRUCTURE_CONTAINER);
-                    }
-                }
-                this.SourceData[supplementalData].harvesterPositionX = pos.x;
-                this.SourceData[supplementalData].harvesterPositionY = pos.y;
-                this.SetData(SOURCE_DATA, this.SourceData);
-                sourceData = this.SourceData[supplementalData];
+            let pos = source.pos;
+            if (sourceData.container && Game.getObjectById(sourceData.container)) {
+                pos = (Game.getObjectById(sourceData.container) as StructureContainer).pos;
             }
             this.CreepData.push({
                 creepName: creepName, active: true, targetID: sourceData.sourceId,
-                harvestPosition: new RoomPosition(sourceData.harvesterPositionX, sourceData.harvesterPositionY, this.Queen.id)
+                harvestPosition: new RoomPosition(pos.x, pos.y, pos.roomName)
             })
+        } else {
+            this.ReleaseCreep(creepName);
         }
     }
-    ValidateCreep(creepData: CollectorConsul_CreepData, creep: Creep): boolean {
+    protected ValidateConsulState(): void {
+        for (let i = 0; i < this.SourceData.length; i++) {
+            if (!this.SourceData[i].container) {
+
+            }
+        }
+    }
+    protected ValidateCreep(creepData: CollectorConsul_CreepData, creep: Creep): boolean {
+        if (!creepData.containerID) {
+            for (let i = 0; i < this.SourceData.length; i++) {
+                if (this.SourceData[i].sourceId == creepData.targetID) {
+                    let foundObj = this.FindCollectionContainer(Game.getObjectById(this.SourceData[i].sourceId) as Source);
+                    if (foundObj) {
+                        this.SourceData[i].container = foundObj.id;
+                        creepData.harvestPosition = foundObj.pos;
+                        return true;
+                    }
+                }
+            }
+        }
         creepData.harvestPosition = new RoomPosition(creepData.harvestPosition.x,
             creepData.harvestPosition.y,
             creepData.harvestPosition.roomName);
 
         return true;
     }
-
     GetBodyTemplate(): BodyPartConstant[] {
-        if (this.Queen.Nest.energyCapacityAvailable < 550) {
+        if (this.Queen.Nest.energyCapacityAvailable <= 550) {
             return [WORK, WORK, CARRY, MOVE];
-        } else if (this.Queen.Nest.energyCapacityAvailable < 700) {
+        } else if (this.Queen.Nest.energyCapacityAvailable < 800) {
             return [WORK, WORK, WORK, WORK, WORK, MOVE]
         } else {
-            return [WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE];
+            return [WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE];
         }
     }
     GetCreepSuffix(): string {
@@ -141,15 +152,26 @@ export class CollectionConsul extends CreepConsul {
     }
     GetSupplementalData(): any {
         let sourceIds: { [id: string]: boolean } = {};
+        let index = -1;
+        let nextToDie = 1500;
         for (let i = 0; i < this.CreepData.length; i++) {
             if (this.CreepData[i].targetID) {
                 sourceIds[this.CreepData[i].targetID!] = true;
+            }
+            let creep = Game.creeps[this.CreepData[i].creepName];
+            if (creep.ticksToLive < nextToDie) {
+                index = i;
+                nextToDie = creep.ticksToLive;
             }
         }
         for (let i = 0; i < this.SourceData.length; i++) {
             if (!sourceIds[this.SourceData[i].sourceId]) {
                 return i;
             }
+        }
+
+        if (index >= 0 && nextToDie <= 100) {
+            return index;
         }
         return undefined;
     };
@@ -168,7 +190,7 @@ export class CollectionConsul extends CreepConsul {
                     nextSpawn = sourceStatus[this.SourceData[i].sourceId];
                 }
             } else {
-                return Game.time - 5;
+                return Game.time - 50;
             }
         }
 
@@ -178,7 +200,6 @@ export class CollectionConsul extends CreepConsul {
 
 declare type SourceData = {
     sourceId: string,
-    harvesterPositionX: number,
-    harvesterPositionY: number
+    container?: string,
     //room distance map for choosing predefined paths.
 }

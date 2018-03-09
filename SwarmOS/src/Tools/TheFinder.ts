@@ -15,7 +15,7 @@ export function FindStructureNextTo(position: RoomPosition, structureType: strin
             break;
     }
 
-    return lookResult.filter(filter);
+    return lookResult.filter(filter) as LookForAtAreaResultWithPos<Structure, "structure">[];
 }
 
 export function FindNextTo(position: RoomPosition, lookConstant: LookConstant, opts?: { [id: string]: any }) {
