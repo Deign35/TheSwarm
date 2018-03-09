@@ -30,7 +30,6 @@ export class ConstructionConsul extends CreepConsul {
 
         //this.CreepData = this.GetData(BUILDER_DATA) || [];
         this.siteData = this.GetData(SITE_DATA) || {};
-        this.ValidateConsulState();
         return true;
     }
     InitMemory() {
@@ -72,7 +71,7 @@ export class ConstructionConsul extends CreepConsul {
         }
     }
 
-    ValidateCreep(creepData: CreepConsul_Data, creep: Creep): boolean {
+    protected ValidateCreep(creepData: CreepConsul_Data, creep: Creep): boolean {
         let request;// = this.siteData[creepData.targetID!]
         let target;
 
@@ -92,12 +91,17 @@ export class ConstructionConsul extends CreepConsul {
 
         if (!request) {
             // no csites remaining, disperse
+            this.ReleaseCreep(creepData.creepName);
         }
         return true;
     }
 
     GetBodyTemplate(): BodyPartConstant[] {
-        return [WORK, CARRY, CARRY, CARRY, MOVE];
+        if (this.Queen.Nest.energyCapacityAvailable <= 1200) {
+            return [WORK, CARRY, CARRY, CARRY, MOVE];
+        } else {
+            return [WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE]
+        }
     }
     GetCreepSuffix(): string {
         return CREEP_SUFFIX;
@@ -109,7 +113,7 @@ export class ConstructionConsul extends CreepConsul {
         let nextSpawn = 0;
         if (this.Queen.Nest.find(FIND_CONSTRUCTION_SITES).length > 0) {
             if (this.CreepData.length < 3) {
-                return Game.time;
+                return Game.time + 10;
             }
 
             nextSpawn = Game.time + 1500;

@@ -1,5 +1,5 @@
 export const MY_USERNAME = 'Deign';
-export const MY_SIGNATURE = 'Do not stand in the way of The Swarm\nSwarmOS v0.7';
+export const MY_SIGNATURE = 'The Swarm shall rise -- SwarmOS v0.7.2';
 export const CREEP_COUNTER = 'CreepCounter';
 
 export enum SpawnPriority {

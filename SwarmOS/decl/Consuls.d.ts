@@ -19,7 +19,7 @@ declare type DistributionConsul_CreepData = CreepConsul_Data & {
 }
 declare type CollectorConsul_CreepData = CreepConsul_Data & {
     harvestPosition: RoomPosition;
-    constructionSite?: string;
+    containerID?: string;
 }
 
 declare type HarvestConsul_SourceData = {

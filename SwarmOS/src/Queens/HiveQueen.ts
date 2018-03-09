@@ -9,4 +9,6 @@ export class HiveQueen extends HiveQueenBase {
     }
     ReleaseControl(creep: string): void {
     }
+    InitializeNest() {
+    }
 }
