@@ -12,16 +12,12 @@ export abstract class NestQueenBase extends QueenMemory implements INestQueen {
 
     Collector!: CollectionConsul;
     Builder!: ConstructionConsul;
-    Distributor!: DistributionConsul;
-    Upgrader!: ControllerConsul;
     CreepConsulList!: CreepConsul[];
 
     AssignedCreeps!: string[];
     Save() {
         this.Collector.Save();
         this.Builder.Save();
-        this.Distributor.Save();
-        this.Upgrader.Save();
         this.SetData(ASSIGNED_CREEPS, this.AssignedCreeps);
         super.Save();
     }
@@ -48,14 +44,10 @@ export abstract class NestQueenBase extends QueenMemory implements INestQueen {
 
     protected LoadNestCouncil() {
         this.CreepConsulList = [];
-        this.Distributor = new DistributionConsul(DistributionConsul.ConsulType, this);
-        this.CreepConsulList.push(this.Distributor);
         this.Collector = new CollectionConsul(CollectionConsul.ConsulType, this);
         this.CreepConsulList.push(this.Collector);
         this.Builder = new ConstructionConsul(ConstructionConsul.ConsulType, this);
         this.CreepConsulList.push(this.Builder);
-        this.Upgrader = new ControllerConsul(ControllerConsul.ConsulType, this);
-        this.CreepConsulList.push(this.Upgrader);
     }
     protected ValidateCouncil() {
         for (let i = 0, length = this.CreepConsulList.length; i < length; i++) {
@@ -72,11 +64,9 @@ export abstract class NestQueenBase extends QueenMemory implements INestQueen {
     }
     protected ActivateRequiredConsuls() {
         this.Collector.ActivateConsul();
-        this.Distributor.ActivateConsul();
     }
     protected ActivateSupportConsuls() {
         this.Builder.ActivateConsul();
-        this.Upgrader.ActivateConsul();
     }
     protected abstract CheckForSpawnRequirements(): void;
 }

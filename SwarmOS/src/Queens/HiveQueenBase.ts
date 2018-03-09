@@ -10,6 +10,19 @@ import { SpawnPriority } from 'Consts/SwarmConsts';
 
 const ARBITRARY_SPAWN_CONSTANT = 100;
 export abstract class HiveQueenBase extends NestQueenBase implements IHiveQueen {
+    Distributor!: DistributionConsul;
+    Upgrader!: ControllerConsul;
+    Save() {
+        this.Distributor.Save();
+        this.Upgrader.Save();
+        super.Save();
+    }
+    LoadNestCouncil() {
+        this.Distributor = new DistributionConsul(DistributionConsul.ConsulType, this);
+        this.CreepConsulList.push(this.Distributor);
+        this.Upgrader = new ControllerConsul(ControllerConsul.ConsulType, this);
+        this.CreepConsulList.push(this.Upgrader);
+    }
     ActivateNest() {
         this.ActivateCouncil();
         let nextSpawnTime = Game.time + ARBITRARY_SPAWN_CONSTANT;
@@ -43,5 +56,14 @@ export abstract class HiveQueenBase extends NestQueenBase implements IHiveQueen 
                 }
             }
         }
+    }
+
+    ActivateRequiredConsuls() {
+        super.ActivateRequiredConsuls();
+        this.Distributor.ActivateConsul();
+    }
+    ActivateSupportConsuls() {
+        super.ActivateSupportConsuls();
+        this.Upgrader.ActivateConsul();
     }
 }
