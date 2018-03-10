@@ -1,10 +1,10 @@
 import * as SwarmCodes from "consts/SwarmCodes"
-import { ChildMemory } from "Tools/SwarmMemory";
+import { SwarmMemory } from "Tools/SwarmMemory";
 import { NestQueenBase } from "Queens/NestQueenBase";
 import { ImperatorBase } from "Imperators/ImperatorBase";
 import { SpawnPriority, SpawnRequest_TerminationType } from "Consts/SwarmConsts";
 
-export abstract class ConsulBase extends ChildMemory implements IConsul {
+export abstract class ConsulBase extends SwarmMemory implements IConsul {
     get Queen(): NestQueenBase { return this.Parent as NestQueenBase; }
     constructor(id: string, parent: NestQueenBase) {
         super(id, parent);

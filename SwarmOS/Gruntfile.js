@@ -12,10 +12,10 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-screeps');
     grunt.loadNpmTasks("grunt-ts");
 
-    let currentdate = new Date();
+    let startDate = new Date();
 
     // Output the current date and branch.
-    grunt.log.subhead('Task Start: ' + currentdate.toLocaleString());
+    grunt.log.subhead('Task Start: ' + startDate.toLocaleString());
     var gruntConfig = {};
     gruntConfig['pkg'] = grunt.file.readJSON('package.json');
     gruntConfig['screeps'] = InitGruntScreepsConfig();
@@ -78,11 +78,17 @@ module.exports = function (grunt) {
         output += '\ncompile(default): Compiles the Typescript';
         console.log(output);
     });
+    grunt.registerTask('time', 'Outputs the current time', function () {
+        let currentdate = new Date();
 
-    grunt.registerTask('commitMain', ['compile', 'replace', 'copy', 'screepsBranch:SwarmOS_Main', 'screeps']);
-    grunt.registerTask('commitSim', ['compile', 'replace', 'copy', 'screepsBranch:SwarmOS_Sim', 'screeps']);
-    grunt.registerTask('compile', ['clean', 'ts']);
-    grunt.registerTask('default', ['compile']);
+        // Output the current date and branch.
+        grunt.log.subhead('Task End: ' + currentdate.toLocaleString());
+    });
+
+    grunt.registerTask('commitMain', ['compile', 'replace', 'copy', 'screepsBranch:SwarmOS_Main', 'screeps', 'time']);
+    grunt.registerTask('commitSim', ['compile', 'replace', 'copy', 'screepsBranch:SwarmOS_Sim', 'screeps', 'time']);
+    grunt.registerTask('compile', ['clean', 'ts', 'time']);
+    grunt.registerTask('default', ['help']);
 }
 
 let InitGruntScreepsConfig = function () {

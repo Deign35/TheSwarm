@@ -1,5 +1,5 @@
-export abstract class _SwarmMemory implements IMemory {
-    constructor(public readonly id: string, public Parent?: IMemory) {
+export abstract class SwarmMemory implements IMemory {
+    constructor(public readonly id: string, public Parent: IMemory) {
         if (!this.Load()) {
             this.InitMemory();
             this.Save();
@@ -8,9 +8,29 @@ export abstract class _SwarmMemory implements IMemory {
     }
     protected _cache: { [id: string]: any } = {}; // this probably shouldn't be initialized like this
     protected _snapshot?: { [id: string]: any };
+    Save() {
+        if (this._snapshot) {
+            console.log('SNAPSHOT NOT RESET, RELOADING OLD DATA[' + this.id + ']');
+            this.ReloadSnapshot(true);
+        }
+        if (this.Parent) {
+            this.Parent.SetData(this.id, this._cache);
+        } else {
+            Memory[this.id] = this._cache;
+        }
+        delete this._cache;
+    }
+    Load() {
+        if (this.Parent) {
+            this._cache = this.Parent.GetData(this.id);
+        } else {
+            this._cache = Memory[this.id];
+        }
 
-    abstract Load(): void;
-    abstract Save(): void;
+        if (!this._cache) { return false; }
+
+        return true;
+    }
     GetData(id: string) {
         return this._cache[id];
     }
@@ -40,45 +60,5 @@ export abstract class _SwarmMemory implements IMemory {
 
     protected InitMemory() {
         this._cache = {};
-    }
-}
-
-export abstract class QueenMemory extends _SwarmMemory {
-    constructor(id: string) {
-        super(id);
-    }
-    Save() {
-        if (this._snapshot) {
-            console.log('SNAPSHOT NOT RESET, RELOADING OLD DATA[' + this.id + ']');
-            this.ReloadSnapshot(true);
-        }
-        Memory[this.id] = this._cache;
-        delete this._cache;
-    }
-    Load() {
-        this._cache = Memory[this.id];
-        if (!this._cache) { return false; }
-        return true;
-    }
-}
-
-export abstract class ChildMemory extends _SwarmMemory {
-    constructor(id: string, public Parent: _SwarmMemory) {
-        super(id, Parent);
-    }
-    Save() {
-        if (this._snapshot) {
-            console.log('SNAPSHOT NOT RESET, RELOADING OLD DATA[' + this.Parent.id + '.' + this.id + ']');
-            this.ReloadSnapshot(true);
-        }
-        this.Parent.SetData(this.id, this._cache);
-        delete this._cache;
-    }
-    Load() {
-        this._cache = this.Parent.GetData(this.id);
-
-        if (!this._cache) { return false; }
-
-        return true;
     }
 }

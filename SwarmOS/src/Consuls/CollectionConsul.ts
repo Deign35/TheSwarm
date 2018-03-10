@@ -133,9 +133,9 @@ export class CollectionConsul extends CreepConsul {
         return true;
     }
     GetBodyTemplate(): BodyPartConstant[] {
-        if (this.Queen.Nest.energyCapacityAvailable <= 550) {
+        if (this.Queen.SpawnCapacity <= 550) {
             return [WORK, WORK, CARRY, MOVE];
-        } else if (this.Queen.Nest.energyCapacityAvailable < 800) {
+        } else if (this.Queen.SpawnCapacity < 800) {
             return [WORK, WORK, WORK, WORK, WORK, MOVE]
         } else {
             return [WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE];

@@ -1,5 +1,5 @@
 import * as SwarmCodes from "Consts/SwarmCodes"
-import { QueenMemory } from "Tools/SwarmMemory";
+import { SwarmMemory } from "Tools/SwarmMemory";
 import { CollectionConsul } from "Consuls/CollectionConsul";
 import { ConstructionConsul } from "Consuls/ConstructionConsul";
 import { DistributionConsul } from "Consuls/DistributionConsul";
@@ -7,7 +7,7 @@ import { CreepConsul } from "Consuls/ConsulBase";
 import { ControllerConsul } from "Consuls/ControllerConsul";
 
 const ASSIGNED_CREEPS = 'A_DATA';
-export abstract class NestQueenBase extends QueenMemory implements INestQueen {
+export abstract class NestQueenBase extends SwarmMemory implements INestQueen {
     Nest!: Room;
 
     Collector!: CollectionConsul;
@@ -37,6 +37,7 @@ export abstract class NestQueenBase extends QueenMemory implements INestQueen {
         this.ValidateCouncil();
         this.InitializeNest();
     }
+    abstract get SpawnCapacity(): number;
     abstract InitializeNest(): void;
     abstract ActivateNest(): void;
 

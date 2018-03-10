@@ -7,9 +7,26 @@ import { DistributionConsul } from 'Consuls/DistributionConsul';
 import { NestJobs } from 'Consuls/NestJobs';
 import { CalculateBodyCost } from 'Tools/QuickCalculations';
 import { SpawnPriority } from 'Consts/SwarmConsts';
+import { HiveQueenBase } from './HiveQueenBase';
 
 const ARBITRARY_SPAWN_CONSTANT = 200;
-export abstract class HiveQueenBase extends NestQueenBase implements IHiveQueen {
+export class NestQueen extends NestQueenBase {
+    get ParentQueen() { return this.Parent as HiveQueenBase }
+    constructor(id: string, hiveQueen: HiveQueenBase) {
+        super(id, hiveQueen);
+    }
+    get SpawnCapacity(): number {
+        return this.ParentQueen.SpawnCapacity;
+    }
+    InitializeNest(): void {
+        throw new Error("Method not implemented.");
+    }
+    ReleaseControl(creep: string): void {
+        throw new Error("Method not implemented.");
+    }
+    protected CheckForSpawnRequirements(): void {
+        throw new Error("Method not implemented.");
+    }
     ActivateNest() {
         this.ActivateCouncil();
         let nextSpawnTime = Game.time + ARBITRARY_SPAWN_CONSTANT;

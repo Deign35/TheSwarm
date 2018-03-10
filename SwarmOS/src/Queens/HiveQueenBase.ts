@@ -17,7 +17,12 @@ export abstract class HiveQueenBase extends NestQueenBase implements IHiveQueen 
         this.Upgrader.Save();
         super.Save();
     }
+
+    get SpawnCapacity() {
+        return this.Nest.energyCapacityAvailable;
+    }
     LoadNestCouncil() {
+        super.LoadNestCouncil();
         this.Distributor = new DistributionConsul(DistributionConsul.ConsulType, this);
         this.CreepConsulList.push(this.Distributor);
         this.Upgrader = new ControllerConsul(ControllerConsul.ConsulType, this);
@@ -25,6 +30,7 @@ export abstract class HiveQueenBase extends NestQueenBase implements IHiveQueen 
     }
     ActivateNest() {
         this.ActivateCouncil();
+        debugger;
         let nextSpawnTime = Game.time + ARBITRARY_SPAWN_CONSTANT;
         let nextIndex = -1;
         for (let i = 0, length = this.CreepConsulList.length; i < length; i++) {
@@ -40,7 +46,7 @@ export abstract class HiveQueenBase extends NestQueenBase implements IHiveQueen 
 
         if (nextSpawnTime < Game.time + ARBITRARY_SPAWN_CONSTANT) {
             let nextSpawn = this.CreepConsulList[nextIndex].CreateDefaultJobTemplate('' + Game.time);
-            if (this.Nest.energyAvailable >= CalculateBodyCost(nextSpawn.body)) {
+            if (this.SpawnCapacity >= CalculateBodyCost(nextSpawn.body)) {
                 let spawns = this.Nest.find(FIND_MY_SPAWNS);
                 if (spawns.length == 0) {
                     console.log('All is lost Hive Queen ' + this.Nest.name + ' has lost a spawn!!!');
