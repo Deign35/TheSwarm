@@ -5,3 +5,4 @@ SwarmOS/screeps.json
 SwarmOS/dist/
 SwarmOS/build/
 npm*/
+SwarmOS/decl/SwarmConsts.d.ts

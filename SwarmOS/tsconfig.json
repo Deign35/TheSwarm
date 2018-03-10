@@ -13,10 +13,14 @@
         "allowSyntheticDefaultImports": true,
         "removeComments": false,
         "noImplicitAny": true,
-        "suppressImplicitAnyIndexErrors": true
+        "suppressImplicitAnyIndexErrors": true,
+        "inlineSourceMap": true,
+        "forceConsistentCasingInFileNames": true,
+        "allowJs": true
     },
     "include": [
         "src/**/*.ts",
+        "src/**/*.js",
         "decl/**/*.ts"
     ],
     "exclude": [

@@ -22,13 +22,12 @@ declare interface IMemory {
     RemoveData(id: string): any;
 }
 
-
-declare interface IDisposable {
-    dispose(): void;
-}
 declare type DisposableCallback<T extends IDisposable> = (disposableObject: T) => void;
 declare function using<T extends IDisposable>(disposableObject: T, disposableAction: DisposableCallback<T>): void;
 declare function DisposeAll(): void;
+declare interface IDisposable {
+    dispose(): void;
+}
 
 declare type RoomPositionData = {
     x: number,
@@ -36,4 +35,24 @@ declare type RoomPositionData = {
 }
 declare type RoomObjectWithID = RoomPositionData & {
     id: string
+}
+
+declare interface IImperator {
+    ActivateCreep(creep: Creep): void;
+}
+declare interface IConsul {
+    SetTarget(target: number): void;
+    NeedsCapacityIncreased: boolean;
+}
+declare interface CreepManager {
+
+}
+declare interface IQueen {
+    Council: IDictionary<IConsul>;
+    creepController: CreepManager;
+    ReceiveCommand(): never;
+}
+
+declare interface SwarmQueen {
+
 }

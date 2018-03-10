@@ -60,10 +60,81 @@ module.exports = function (grunt) {
         console.log('EndTime: ' + (endTime - startTime));
     });
     grunt.registerTask('replace', 'Replaces file paths with _', function () {
-        lineCount = 0;
         grunt.file.recurse('./build/compiled', ReplaceImports);
-        console.log('Line Count: ' + lineCount);
     });
+    grunt.registerTask('time', 'Outputs the current time', function () {
+        let currentdate = new Date();
+        // Output the current date and branch.
+        grunt.log.subhead('Task End: ' + currentdate.toLocaleString());
+    });
+
+    grunt.registerTask('generateGlobals', 'Outputs the needed files for screeps and declarations', function () {
+        let declarationsFile = [];
+        let globalsFile = [];
+        let declarations = require("./SwarmDeclarations.json");
+        let enums = declarations['Enums'];
+        globalsFile.push("// Begin Enums");
+        for (let enumName in enums) {
+            declarationsFile.push("declare enum " + enumName + " {");
+            globalsFile.push("const " + enumName + " = {");
+            let enumValues = enums[enumName];
+            for (let valueName in enumValues) {
+                declarationsFile.push("    " + valueName + " = " + enumValues[valueName] + ',');
+                globalsFile.push("    " + valueName + ": " + enumValues[valueName] + ',');
+            }
+
+            declarationsFile.push("}\n");
+            globalsFile.push("}");
+            globalsFile.push("global[\"" + enumName + "\"] = " + enumName + ";\n");
+        }
+        globalsFile.push("// End Enums\n");
+
+        let consts = declarations['Constants'];
+        globalsFile.push("// Begin Consts");
+        for (let constName in consts) {
+            let constType = consts[constName]['type'];
+            let constVal = consts[constName]['value'];
+
+            let fileValue = constVal;
+            if (constType == "string") {
+                fileValue = "\"" + constVal + "\"";
+            }
+            declarationsFile.push("declare const " + constName + " = " + fileValue + ";");
+            globalsFile.push("global[\"" + constName + "\"] = " + fileValue + ";");
+        }
+        globalsFile.push("// End Consts\n");
+        declarationsFile.push("");
+
+        let primitives = declarations['Primitives'];
+        globalsFile.push("// Begin Primitives");
+        for (let primName in primitives) {
+            declarationsFile.push("declare type " + primName + " = " + primitives[primName] + ";");
+            globalsFile.push("global[\"" + primName + "\"] = " + primitives[primName] + ";");
+        }
+        globalsFile.push("// End Primitives\n");
+        declarationsFile.push("");
+
+        let compoundTypes = declarations['CompoundTypes'];
+        for (let compoundName in compoundTypes) {
+            let compoundDeclaration = "declare type " + compoundName + " = ";
+            for (let i = 0; i < compoundTypes[compoundName].length; i++) {
+                compoundDeclaration += compoundTypes[compoundName][i] + " | ";
+            }
+            declarationsFile.push(compoundDeclaration.slice(0, -3) + ';');
+        }
+
+        let declarationContents = "";
+        for (let i = 0; i < declarationsFile.length; i++) {
+            declarationContents += declarationsFile[i] + '\n';
+        }
+        grunt.file.write("./decl/SwarmConsts.d.ts", declarationContents);
+        let globalContents = "";
+        for (let i = 0; i < globalsFile.length; i++) {
+            globalContents += globalsFile[i] + '\n';
+        }
+        grunt.file.write("./build/compiled/globalConstants.js", globalContents);
+    })
+
     grunt.registerTask('help', 'Help info', function () {
         let output = 'Grunt Help Menu *******************';
         output += '\nclean: Cleans the build and dist directories';
@@ -78,16 +149,10 @@ module.exports = function (grunt) {
         output += '\ncompile(default): Compiles the Typescript';
         console.log(output);
     });
-    grunt.registerTask('time', 'Outputs the current time', function () {
-        let currentdate = new Date();
-
-        // Output the current date and branch.
-        grunt.log.subhead('Task End: ' + currentdate.toLocaleString());
-    });
-
     grunt.registerTask('commitMain', ['compile', 'replace', 'copy', 'screepsBranch:SwarmOS_Main', 'screeps', 'time']);
     grunt.registerTask('commitSim', ['compile', 'replace', 'copy', 'screepsBranch:SwarmOS_Sim', 'screeps', 'time']);
-    grunt.registerTask('compile', ['clean', 'ts', 'time']);
+    grunt.registerTask('compile', ['clean', 'compileDefs', 'ts', 'time']);
+    grunt.registerTask('compileDefs', ['generateGlobals']);
     grunt.registerTask('default', ['help']);
 }
 
@@ -112,7 +177,7 @@ let InitGruntScreepsConfig = function () {
 let InitTSConfig = function () {
     return {
         default: {
-            tsconfig: true
+            tsconfig: true,
         }
     };
 }
@@ -202,7 +267,6 @@ let ReplaceImports = function (abspath, rootdir, subdir, filename) {
 
     //let path = subdir ? subdir.split('/') : [];
     let lines = file.split('\n');
-    lineCount += lines.length;
     for (let line of lines) {
         // Compiler: IgnoreLine
         if ((line).match(/[.]*\/\/ Compiler: IgnoreLine[.]*/)) {

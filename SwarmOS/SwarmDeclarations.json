@@ -1,0 +1,53 @@
+{
+    "Constants": {
+        "MY_USERNAME": {
+            "value": "Deign",
+            "type": "string"
+        },
+        "MY_SIGNATURE": {
+            "value": "The Swarm shall rise -- SwarmOS v0.7.2",
+            "type": "string"
+        }
+    },
+    "Primitives": {
+        "C_NONE": 0,
+        "C_MOVE": 1,
+        "E_INVALID": -1,
+        "E_MISSING_TARGET": -2,
+        "E_REQUIRES_ENERGY": -3,
+        "E_TARGET_INELLIGIBLE": -4,
+        "E_ACTION_UNNECESSARY": -5,
+        "E_NOT_IMPLEMENTED": -6
+    },
+    "Enums": {
+        "SpawnPriority": {
+            "Lowest": 0,
+            "Low": 2,
+            "Mid": 4,
+            "High": 6,
+            "Highest": 8,
+            "EMERGENCY": 10
+        },
+        "TerminationType": {
+            "Once": 0,
+            "Infinite": 1,
+            "RCL_Upgrade": 2,
+            "NumCount": 3
+        }
+    },
+    "CompoundTypes": {
+        "SwarmErrors": [
+            "E_INVALID",
+            "E_MISSING_TARGET",
+            "E_REQUIRES_ENERGY",
+            "E_TARGET_INELLIGIBLE",
+            "E_ACTION_UNNECESSARY",
+            "E_NOT_IMPLEMENTED"
+        ],
+        "SwarmlingResponse": [
+            "C_NONE",
+            "C_MOVE",
+            "SwarmErrors"
+        ]
+    }
+}
