@@ -1113,31 +1113,6 @@ interface Game {
      * In each case, ticks controls how long the profiler should run before stopping, 
      * and the optional functionFilter parameter will limit the scope of the profiler to a specific function.
     */
-    profiler: {
-        /** Will run for the given number of ticks then will output the gathered information to the console. */
-        profile(ticks: number, functionFilter?: string[]): void,
-        /** Will run for the given number of ticks, and will output the gathered information each tick to the console.
-         *  The can sometimes be useful for seeing spikes in performance.
-        */
-        stream(ticks: number, functionFilter?: string[]): void,
-        /** This will run for the given number of ticks, and will email the output to your registered Screeps email address. Very useful for long running profiles. */
-        email(ticks: number, functionFilter?: string[]): void,
-        /** This will run indefinitely, and will only output data when the output console command is run. Very useful for long running profiles with lots of function calls. */
-        background(functionFilter?: string[]): void,
-        /** Print a report based on the current tick. The profiler will continue to operate normally. This is currently the only way to get data from the background profile. */
-        output(lineCounter?: number): void;
-        /** Stops the profiler and resets its memory. This is currently the only way to stop a background profile. */
-        reset(): void,
-        /** Restarts the profiler using the same options previously used to start it. */
-        restart(): void,
-    }
-}
-
-
-declare const profiler: {
-    registerClass<T>(inVal: T, profileName: string): T,
-    registerObject<T>(inVal: T, profileName: string): T,
-    registerFN<T>(inVal: T, profileName: string): T,
 }
 
 declare let Game: Game;

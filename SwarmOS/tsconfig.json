@@ -16,7 +16,7 @@
         "suppressImplicitAnyIndexErrors": true,
         "inlineSourceMap": true,
         "forceConsistentCasingInFileNames": true,
-        "allowJs": true
+        "experimentalDecorators": true
     },
     "include": [
         "src/**/*.ts",
