@@ -2114,15 +2114,9 @@ interface Memory {
     creeps: { [name: string]: CreepMemory };
     flags: { [name: string]: FlagMemory };
     rooms: { [name: string]: RoomMemory };
-    spawns: { [name: string]: SpawnMemory };
+    spawns: { [name: string]: StructureMemory };
 }
 
-interface CreepMemory { [name: string]: any }
-interface FlagMemory { [name: string]: any }
-interface RoomMemory { [name: string]: any }
-interface SpawnMemory { [name: string]: any }
-
-declare var Memory: { [name: string]: any; };
 /**
  * A mineral deposit object. Can be harvested by creeps with a WORK body part using the extractor structure.
  * @see http://docs.screeps.com/api/#Mineral
@@ -3121,7 +3115,7 @@ interface StructureSpawn extends OwnedStructure<STRUCTURE_SPAWN> {
      *
      * @see http://docs.screeps.com/global-objects.html#Memory-object
      */
-    memory: SpawnMemory;
+    memory: StructureMemory;
     /**
      * Spawn's name. You choose the name upon creating a new spawn, and it cannot
      * be changed later. This name is a hash key to access the spawn via the

@@ -1,23 +1,6 @@
 declare const require: (module: string) => any;
 declare var global: { [id: string]: any };
 
-declare interface IMemory {
-    readonly id: string;
-    Save(): void;
-    Load(): void;
-    GetData(id: string): any;
-    SetData(id: string, data: any): void;
-    RemoveData(id: string): any;
-}
-
-declare interface ISwarmMemory {
-    readonly id: string;
-    Save(): void;
-    Load(): void;
-}
-
-
-
 
 
 

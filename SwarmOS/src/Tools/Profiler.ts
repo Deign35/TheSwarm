@@ -1,6 +1,6 @@
 import * as _ from "lodash";
+declare var Memory: { profiler: { [id: string]: any } }
 
-/* tslint:disable:ban-types */
 export function init(): Profiler {
     const defaults = {
         data: {},
