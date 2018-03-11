@@ -1,4 +1,9 @@
 export class SwarmException extends Error {
+    constructor(name: string, message?: string) {
+        super(message);
+        this.name = name + ' Exception';
+    }
+
     OutputToConsole() {
         console.log(this.name + ': ' + this.message);
         if (this.stack) {
@@ -8,8 +13,17 @@ export class SwarmException extends Error {
 }
 
 export class NotImplementedException extends SwarmException {
-    readonly name: string = "Not Implemented Exception";
+    constructor(message?: string) {
+        super("Not Implemented", message);
+    }
 }
 export class MemoryNotFoundException extends SwarmException {
-    readonly name: string = "Memory not found error";
+    constructor(message?: string) {
+        super("Memory Not Found", message);
+    }
+}
+export class AlreadyExistsException extends SwarmException {
+    constructor(message?: string) {
+        super("Already Exists", message);
+    }
 }

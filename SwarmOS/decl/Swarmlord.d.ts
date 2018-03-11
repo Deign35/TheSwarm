@@ -40,8 +40,6 @@ declare type StorageMemoryStructure = {
 
 declare interface ISwarmlord {
     InitializeMemory(): void;
-    CheckoutMemory(id: string, path: string[], memType: StorageMemoryType): IStorageMemory;
-    CreateNewStorageMemory(id: string, path: string[], memType: StorageMemoryType): IStorageMemory;
 }
 
 declare var Swarmlord: ISwarmlord;

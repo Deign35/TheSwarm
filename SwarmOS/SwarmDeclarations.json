@@ -7,6 +7,10 @@
         "MY_SIGNATURE": {
             "value": "The Swarm shall rise -- SwarmOS v0.7.2",
             "type": "string"
+        },
+        "MEM_TYPE": {
+            "value": "MEM_TYPE",
+            "type": "string"
         }
     },
     "Primitives": {
@@ -46,6 +50,11 @@
             "Flag": 3,
             "Consul": 4,
             "Creep": 5
+        },
+        "LogLevel": {
+            "Info": 0,
+            "Warn": 1,
+            "Error": 2
         }
     },
     "CompoundTypes": {

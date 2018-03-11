@@ -1,19 +1,5 @@
 import { profile } from "Tools/Profiler";
-import { SwarmException } from "Tools/SwarmExceptions";
 
-const MEM_TYPE = 'MEM_TYPE';
-export function ConvertDataToMemory(id: string, path: string[], data: any): StorageMemory {
-    let memoryType = data[MEM_TYPE] as StorageMemoryType;
-    switch (memoryType) {
-        case (StorageMemoryType.Creep): return new CreepMemory(id, path, data);
-        case (StorageMemoryType.Consul): return new ConsulMemory(id, path, data);
-        case (StorageMemoryType.Flag): return new FlagMemory(id, path, data);
-        case (StorageMemoryType.Room): return new RoomMemory(id, path, data);
-        case (StorageMemoryType.Structure): return new StructureMemory(id, path, data);
-    }
-
-    return new BasicMemory(id, path, data);
-}
 @profile
 export abstract class StorageMemory implements IStorageMemory {
     constructor(id: string, path: string[], data?: any) {
@@ -60,32 +46,43 @@ export abstract class StorageMemory implements IStorageMemory {
 
     }
 }
+
+@profile
 export class BasicMemory extends StorageMemory {
     GetMemoryType(): StorageMemoryType {
         return StorageMemoryType.None;
     }
 }
 
+@profile
 export class ConsulMemory extends StorageMemory implements ConsulData {
     GetMemoryType(): StorageMemoryType {
         return StorageMemoryType.Consul;
     }
 }
+
+@profile
 export class FlagMemory extends StorageMemory {
     GetMemoryType(): StorageMemoryType {
         return StorageMemoryType.Flag;
     }
 }
+
+@profile
 export class StructureMemory extends StorageMemory {
     GetMemoryType(): StorageMemoryType {
         return StorageMemoryType.Structure;
     }
 }
+
+@profile
 export class CreepMemory extends StorageMemory {
     GetMemoryType(): StorageMemoryType {
         return StorageMemoryType.Creep;
     }
 }
+
+@profile
 export class RoomMemory extends StorageMemory {
     GetMemoryType(): StorageMemoryType {
         return StorageMemoryType.Room;
