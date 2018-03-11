@@ -1,11 +1,11 @@
 export class SwarmLogger {
-    Log(message: string, level: LogLevel = LogLevel.Info): void {
+    static Log(message: string, level: LogLevel = LogLevel.Info): void {
         console.log(message);
     }
-    LogWarning(message: string) {
+    static LogWarning(message: string) {
         this.Log(message, LogLevel.Warn);
     }
-    LogError(message: string) {
+    static LogError(message: string) {
         this.Log(message, LogLevel.Error);
     }
 }

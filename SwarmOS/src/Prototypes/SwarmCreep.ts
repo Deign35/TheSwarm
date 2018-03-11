@@ -138,7 +138,7 @@ export class SwarmCreep extends OwnableSwarmObject<Creep> {
     UpgradeController(target: StructureController) { // ActionIntent
         return this._instance.upgradeController(target);
     }
-    Withdraw(target: EnergyStructure | StructureContainer | StructureStorage | StructureTerminal,
+    Withdraw(target: StructureContainer | StructureStorage | StructureTerminal,
         resourceType: ResourceConstant, amount?: number) { // ActionIntent
         return this._instance.withdraw(target, resourceType, amount);
     }

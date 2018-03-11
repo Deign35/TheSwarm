@@ -699,7 +699,7 @@ interface Creep extends RoomObject {
     /**
      * A shorthand to `Memory.creeps[creep.name]`. You can use it for quick access the creep’s specific memory data object.
      */
-    memory: CreepMemory;
+    memory: CreepData;
     /**
      * Whether it is your creep or foe.
      */
@@ -983,7 +983,7 @@ interface Flag extends RoomObject {
     /**
      * A shorthand to Memory.flags[flag.name]. You can use it for quick access the flag's specific memory data object.
      */
-    memory: FlagMemory;
+    memory: FlagData;
     /**
      * Flag’s name.
      *
@@ -2111,10 +2111,10 @@ interface OrderFilter {
 }
 interface Memory {
     [name: string]: any;
-    creeps: { [name: string]: CreepMemory };
-    flags: { [name: string]: FlagMemory };
-    rooms: { [name: string]: RoomMemory };
-    spawns: { [name: string]: StructureMemory };
+    creeps: { [name: string]: CreepData };
+    flags: { [name: string]: FlagData };
+    rooms: { [name: string]: RoomData };
+    spawns: { [name: string]: StructureData };
 }
 
 /**
@@ -2843,7 +2843,7 @@ interface Room {
     /**
      * A shorthand to `Memory.rooms[room.name]`. You can use it for quick access the room’s specific memory data object.
      */
-    memory: RoomMemory;
+    memory: RoomData;
     /**
      * One of the `MODE_*` constants.
      */
@@ -3115,7 +3115,7 @@ interface StructureSpawn extends OwnedStructure<STRUCTURE_SPAWN> {
      *
      * @see http://docs.screeps.com/global-objects.html#Memory-object
      */
-    memory: StructureMemory;
+    memory: StructureData;
     /**
      * Spawn's name. You choose the name upon creating a new spawn, and it cannot
      * be changed later. This name is a hash key to access the spawn via the
@@ -3142,7 +3142,7 @@ interface StructureSpawn extends OwnedStructure<STRUCTURE_SPAWN> {
      *  * TOUGH
      *  * CLAIM
      * @param {string} name The name of a new creep. It must be a unique creep name, i.e. the Game.creeps object should not contain another creep with the same name (hash key).
-     * @param {{memory?: CreepMemory; energyStructures?: (StructureSpawn | StructureExtension)[]; dryRun?: boolean}} opts An object with additional options for the spawning process.
+     * @param {{memory?: CreepData; energyStructures?: (StructureSpawn | StructureExtension)[]; dryRun?: boolean}} opts An object with additional options for the spawning process.
      * @returns {ScreepsReturnCode} One of the following codes:
      * ```
      * OK                       0   The operation has been scheduled successfully.
@@ -3154,7 +3154,7 @@ interface StructureSpawn extends OwnedStructure<STRUCTURE_SPAWN> {
      * ERR_RCL_NOT_ENOUGH       -14 Your Room Controller level is insufficient to use this spawn.
      * ```
      */
-    spawnCreep(body: BodyPartConstant[], name: string, opts?: { memory?: CreepMemory, energyStructures?: Array<(StructureSpawn | StructureExtension)>, dryRun?: boolean, directions?: DirectionConstant[] }): ScreepsReturnCode;
+    spawnCreep(body: BodyPartConstant[], name: string, opts?: { memory?: CreepData, energyStructures?: Array<(StructureSpawn | StructureExtension)>, dryRun?: boolean, directions?: DirectionConstant[] }): ScreepsReturnCode;
 
     /**
      * Destroy this spawn immediately.

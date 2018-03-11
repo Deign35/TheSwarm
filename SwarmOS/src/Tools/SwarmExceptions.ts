@@ -27,3 +27,8 @@ export class AlreadyExistsException extends SwarmException {
         super("Already Exists", message);
     }
 }
+export class MemoryLockException extends SwarmException {
+    constructor(wasLocked: boolean, message?: string) {
+        super("Memory Lock", "Lock was " + (wasLocked ? "locked" : "unlocked") + ".\n" + message);
+    }
+}
