@@ -1,4 +1,5 @@
 declare interface ISwarmMemory {
+    MemoryType: StorageMemoryType;
     GetData<T>(id: string): T;
     SetData<T>(id: string, data: T): void;
     RemoveData(id: string): void;
@@ -6,7 +7,7 @@ declare interface ISwarmMemory {
 declare type SwarmMemoryType = SegmentMemoryType | StorageMemoryType | CacheMemoryType;
 declare type SegmentMemoryType = {};
 declare interface ISegmentMemory extends ISwarmMemory {
-
+    segmentID: number
 }
 
 declare type CacheMemoryType = CostMatrixMemory;
@@ -20,22 +21,27 @@ declare type CacheMemoryStructure = {
     CostMatrices: { [id: string]: CostMatrixMemory }
 }
 
-declare type StorageMemoryType = ConsulData | CreepMemory | RoomMemory | FlagMemory | StructureMemory
-declare type ConsulData = {};
-declare type CreepMemory = {
+declare type ConsulData = IStorageMemory;
+declare type CreepData = IStorageMemory & {
     consulData: { [consulType: string]: ConsulData }
 }
-declare type RoomMemory = {}
-declare type FlagMemory = {}
-declare type StructureMemory = {}
-declare interface IStorageMemory extends ISwarmMemory {
+declare type RoomData = IStorageMemory
+declare type FlagData = IStorageMemory
+declare type StructureData = IStorageMemory
+declare interface IStorageMemory extends ISwarmMemory { }
 
-}
-
-declare type MemoryStructure = {
-    creeps: { [creepName: string]: CreepMemory }
-    rooms: { [roomId: string]: RoomMemory }
-    flags: { [flagName: string]: FlagMemory }
-    structures: { [structureName: string]: StructureMemory }
+declare type StorageMemoryStructure = {
+    creeps: { [creepName: string]: CreepData }
+    rooms: { [roomId: string]: RoomData }
+    flags: { [flagName: string]: FlagData }
+    structures: { [structureName: string]: StructureData }
     INIT: boolean
 }
+
+declare interface ISwarmlord {
+    InitializeMemory(): void;
+    CheckoutMemory(id: string, path: string[], memType: StorageMemoryType): IStorageMemory;
+    CreateNewStorageMemory(id: string, path: string[], memType: StorageMemoryType): IStorageMemory;
+}
+
+declare var Swarmlord: ISwarmlord;

@@ -8,7 +8,7 @@ declare interface IConsul {
 declare interface CreepManager {
 
 }
-declare interface IQueen extends IMemory {
+declare interface IQueen {
     Council: IDictionary<IConsul>;
     creepController: CreepManager;
     ReceiveCommand(): never;

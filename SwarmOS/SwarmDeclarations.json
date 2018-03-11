@@ -33,6 +33,19 @@
             "Infinite": 1,
             "RCL_Upgrade": 2,
             "NumCount": 3
+        },
+        "MemoryCategory": {
+            "Storage": 0,
+            "Cache": 1,
+            "Segment": 2
+        },
+        "StorageMemoryType": {
+            "None": 0,
+            "Structure": 1,
+            "Room": 2,
+            "Flag": 3,
+            "Consul": 4,
+            "Creep": 5
         }
     },
     "CompoundTypes": {

@@ -109,6 +109,7 @@ module.exports = function (grunt) {
         globalsFile.push("// Begin Primitives");
         for (let primName in primitives) {
             declarationsFile.push("declare type " + primName + " = " + primitives[primName] + ";");
+            declarationsFile.push("declare const " + primName + " = " + primitives[primName] + ";");
             globalsFile.push("global[\"" + primName + "\"] = " + primitives[primName] + ";");
         }
         globalsFile.push("// End Primitives\n");
