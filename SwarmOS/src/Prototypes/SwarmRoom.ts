@@ -1,30 +1,14 @@
 import { SwarmItem } from "Prototypes/SwarmObject";
 
 export class SwarmRoom extends SwarmItem<Room> {
-    get RoomLocation(): RoomLocationFormat {
-        return this.name;
-    }
-    get controller(): StructureController | undefined {
-        return this._instance.controller;
-    }
-    get energyAvailable(): number {
-        return 0;
-    }
-    get energyAvailableCapacity(): number {
-        return 0;
-    }
-    get name(): string {
-        return this._instance.name.slice();
-    }
-    get storage(): StructureStorage | undefined {
-        return this._instance.storage;
-    }
-    get terminal(): StructureTerminal | undefined {
-        return this._instance.terminal;
-    }
-    get visual(): RoomVisual {
-        return this._instance.visual;
-    }
+    get RoomLocation(): RoomLocationFormat { return this.name; }
+    get controller(): StructureController | undefined { return this._instance.controller; }
+    get energyAvailable(): number { return 0; }
+    get energyAvailableCapacity(): number { return 0; }
+    get name(): string { return this._instance.name.slice(); }
+    get storage(): StructureStorage | undefined { return this._instance.storage; }
+    get terminal(): StructureTerminal | undefined { return this._instance.terminal; }
+    get visual(): RoomVisual { return this._instance.visual; }
 
     createConstructionSite(pos: RoomPosition, structureType: StructureConstant, name?: string) {
         return this._instance.createConstructionSite(pos, structureType, name);
@@ -36,10 +20,10 @@ export class SwarmRoom extends SwarmItem<Room> {
         return this._instance.find(type, opts);
     }
     findExitTo(otherRoom: SwarmRoom) {
-        this._instance.findExitTo(otherRoom._instance);
+        return this._instance.findExitTo(otherRoom._instance);
     }
     findPath(fromPos: RoomPosition, toPos: RoomPosition, opts?: FindPathOpts) {
-        this._instance.findPath(fromPos, toPos, opts);
+        return this._instance.findPath(fromPos, toPos, opts);
     }
     getPositionAt(x: number, y: number) {
         return this._instance.getPositionAt(x, y);

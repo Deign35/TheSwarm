@@ -70,39 +70,19 @@ export class SwarmCreep extends OwnableSwarmObject<Creep> implements ICreepManag
      * Prototype properties
      *  
      */
-    get body() {
-        return this._instance.body;
-    }
-    get carry() {
-        return this._instance.carry;
-    }
-    get carryCapacity() {
-        return this._instance.carryCapacity
-    }
-    get fatigue() {
-        return this._instance.fatigue;
-    }
-    get hits() {
-        return this._instance.hits;
-    }
-    get hitsMax() {
-        return this._instance.hitsMax;
-    }
+    get body() { return this._instance.body; }
+    get carry() { return this._instance.carry; }
+    get carryCapacity() { return this._instance.carryCapacity }
+    get fatigue() { return this._instance.fatigue; }
+    get hits() { return this._instance.hits; }
+    get hitsMax() { return this._instance.hitsMax; }
     get memory() {
         throw "This should be allowed only once it has been properly integrated";
     }
-    get name() {
-        return this._instance.name;
-    }
-    get saying() {
-        return this._instance.hits;
-    }
-    get spawning() {
-        return this._instance.hits;
-    }
-    get ticksToLive() {
-        return this._instance.ticksToLive;
-    }
+    get name() { return this._instance.name; }
+    get saying() { return this._instance.hits; }
+    get spawning() { return this._instance.hits; }
+    get ticksToLive() { return this._instance.ticksToLive; }
 
     /**
      * Prototype methods

@@ -30,3 +30,24 @@ declare type QueenCensus = {
 }
 
 declare var MasterStructureController: any;
+
+declare type SwarmController<T extends StorageMemoryType, U> = {
+    PrepareTheSwarm(): void;
+    ActivateSwarm(): void;
+    FinalizeSwarmActivity(): void;
+
+    CreateSwarmObject(obj: U): void;
+}
+
+declare type SwarmQueen = SwarmController<StorageMemoryType.Room, Room> & {
+
+}
+declare type SwarmManager = SwarmController<StorageMemoryType.Creep, Creep> & {
+
+}
+declare type SwarmInfrastructure = SwarmController<StorageMemoryType.Structure, Structure> & {
+
+}
+declare type SwarmFlags = SwarmController<StorageMemoryType.Flag, Flag> & {
+
+}
