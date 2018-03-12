@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
         "allowUnreachableCode": false,
-        "target": "es6",
+        "target": "esnext",
         "module": "commonjs",
         "outDir": "build/compiled",
         "baseUrl": "src",

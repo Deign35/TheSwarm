@@ -59,8 +59,8 @@ export class Swarmlord implements ISwarmlord {
                 delete Memory[id];
             }
 
-            for (let id in newMemory) {
-                Memory[id] = newMemory[id];
+            for (const [id, memory] of Object.entries(newMemory)) {
+                Memory[id] = memory;
             }
             this.InitBaseMemoryFolders();
 
