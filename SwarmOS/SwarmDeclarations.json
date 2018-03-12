@@ -51,6 +51,17 @@
             "Consul": 4,
             "Creep": 5
         },
+        "QueenType": {
+            "Larva": 0,
+            "RCL1": 1,
+            "RCL2": 2,
+            "RCL3": 3,
+            "RCL4": 4,
+            "RCL5": 5,
+            "RCL6": 6,
+            "RCL7": 7,
+            "RCL8": 8
+        },
         "LogLevel": {
             "Info": 0,
             "Warn": 1,

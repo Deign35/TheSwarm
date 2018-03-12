@@ -26,4 +26,8 @@ export class Stopwatch {
             this.laps.push(lapTime);
         }
     }
+    ToString() {
+        this.Lap();
+        return this.cummulativeTime + 'cpu';
+    }
 }

@@ -1,6 +1,14 @@
 declare const require: (module: string) => any;
 declare var global: { [id: string]: any };
 
+declare function CopyObject<T>(obj: T): T;
+declare class Stopwatch {
+    Start(): void;
+    Stop(): void;
+    Reset(): void;
+    Lap(): void;
+    ToString(): string;
+}
 
 
 

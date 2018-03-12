@@ -5,7 +5,7 @@ declare interface ISwarmMemory {
     SetData<T>(id: string, data: T): void;
     RemoveData(id: string): void;
 }
-declare type SwarmData = SegmentMemoryType | StorageMemoryType | CacheMemoryType | EmptyData;
+declare type SwarmData = SegmentMemoryType | StorageMemoryTypes | CacheMemoryType | EmptyData;
 declare type EmptyData = {};
 declare type SegmentMemoryType = EmptyData;
 declare interface ISegmentMemory extends ISwarmMemory {
@@ -23,20 +23,23 @@ declare type CacheMemoryStructure = {
     CostMatrices: { [id: string]: CostMatrixMemory }
 }
 
+declare type StorageMemoryTypes = ConsulData | CreepData | RoomData | StructureData | EmptyData;
 declare type ConsulData = EmptyData;
 declare type CreepData = {
     consulData: { [consulType: string]: ConsulData }
 }
-declare type RoomData = EmptyData
+declare type RoomData = {
+    queenType: QueenType
+}
 declare type FlagData = EmptyData
 declare type StructureData = EmptyData
 declare interface IStorageMemory extends ISwarmMemory {
     MemoryType: StorageMemoryType;
     IsCheckedOut: boolean;
-    SavePath: string[];
-    SaveData: SwarmData;
-    SaveTo(parentObj: IStorageMemory | StorageMemoryStructure): void;
     ReserveMemory(): void;
+    GetSavePath(): string[];
+    GetSaveData(): SwarmData;
+    SaveTo(parentObj: SwarmData | StorageMemoryStructure): void;
 }
 
 declare type StorageMemoryStructure = {
@@ -50,7 +53,9 @@ declare type StorageMemoryStructure = {
 
 declare interface ISwarmlord {
     ValidateMemory(): void;
-    CreateNewStorageMemory(id: string, path: string[], memType: StorageMemoryType, data?: any): void;
+    CheckoutMemory<T extends ISwarmMemory>(id: string, path: string[]): IStorageMemory;
+    ReleaseMemory(memObject: IStorageMemory, save?: boolean): void;
+    StorageMemoryTypeToString(memType: StorageMemoryType): string
 }
 
 declare var Swarmlord: ISwarmlord;

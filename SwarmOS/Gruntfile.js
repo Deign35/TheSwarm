@@ -144,10 +144,12 @@ module.exports = function (grunt) {
         output += '\nreplace: Replaces marked lines with appropriate replacements.';
         output += '\nDirStats: Counts the files, lines and chars of the provided directory';
         output += '\n\tParams(srcDir,fileExt)';
+        output += '\ngenerateGlobals: Creates the consts, types, and enums for TheSwarm';
         output += '\n----------------------------------';
         output += '\ncommitMain: Commits to SwarmOS_Main';
         output += '\ncommitSim: Commits to SwarmOS_Sim';
-        output += '\ncompile(default): Compiles the Typescript';
+        output += '\ncompileDefs: Compiles all of the constants';
+        output += '\ncompile: Compiles the Typescript';
         console.log(output);
     });
     grunt.registerTask('commitMain', ['compile', 'replace', 'copy', 'screepsBranch:SwarmOS_Main', 'screeps', 'time']);

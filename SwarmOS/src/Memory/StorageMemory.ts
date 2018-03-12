@@ -6,7 +6,7 @@ export abstract class StorageMemory<T extends SwarmData> implements IStorageMemo
     constructor(id: string, path: string[], data?: any) {
         this._id = id;
         this._savePath = path;
-        this._cache = data || {};
+        this._cache = data || this.CreateEmptyMemory();
         this._checkedOut = false;
         if (!this._cache[MEM_TYPE]) {
             this.SetData(MEM_TYPE, this.GetMemoryType());
@@ -14,8 +14,6 @@ export abstract class StorageMemory<T extends SwarmData> implements IStorageMemo
     }
     get id() { return this._id };
     get IsCheckedOut() { return this._checkedOut };
-    get SavePath() { return this._savePath.slice(); }
-    get SaveData() { return this._cache; }
     get MemoryType(): StorageMemoryType { return this._cache[MEM_TYPE] as StorageMemoryType }
 
     private readonly _savePath: string[];
@@ -24,7 +22,10 @@ export abstract class StorageMemory<T extends SwarmData> implements IStorageMemo
     private _checkedOut: boolean;
 
     protected abstract GetMemoryType(): StorageMemoryType;
+    protected abstract CreateEmptyMemory(): T;
 
+    GetSaveData(): T { return CopyObject(this._cache); }
+    GetSavePath() { return this._savePath.slice(); }
     GetData<T>(id: string): T {
         return this._cache[id];
     }
@@ -37,13 +38,13 @@ export abstract class StorageMemory<T extends SwarmData> implements IStorageMemo
     /**
      * @throws MemoryLockException
      */
-    SaveTo(parentObj: IStorageMemory) {
-        if (!this._checkedOut) {
-            throw new MemoryLockException(this._checkedOut, "Memory not checked out");
-        }
+    SaveTo(parentObj: SwarmData | StorageMemoryStructure, keepReserved: boolean = false) {
+        this.ReleaseMemory(); // Check back in
 
-        parentObj.SetData(this._id, this._cache);
-        this._checkedOut = false;
+        parentObj[this._id] = this.GetSaveData();
+        if (keepReserved) {
+            this.ReserveMemory(); // Check out if caller wants to keep it.
+        }
     }
     /**
      * @throws MemoryLockException
@@ -56,14 +57,28 @@ export abstract class StorageMemory<T extends SwarmData> implements IStorageMemo
         this._checkedOut = true;
     }
 
-    CreateChildMemory(id: string, memType: StorageMemoryType, data?: any) {
-        if (this._cache[id]) {
-            throw new AlreadyExistsException("Child memory already exists: " + this.SavePath + " -- " + id);
+    ReleaseMemory() {
+        if (!this._checkedOut) {
+            throw new MemoryLockException(this._checkedOut, "Memory not checked out");
         }
 
-        let childPath = this.SavePath;
+        this._checkedOut = false;
+    }
+
+    TryAttachChildMemory<T>(id: string, childMemory: StorageMemory<T>) {
+        if (!this._cache[id]) {
+            this.AttachChildMemory(id, childMemory);
+        }
+    }
+
+    private AttachChildMemory<T>(id: string, childMemory: StorageMemory<T>) {
+        if (this._cache[id]) {
+            throw new AlreadyExistsException("Child memory already exists: " + this._savePath + " -- " + id);
+        }
+
+        let childPath = this.GetSavePath();
         childPath.push(this.id);
-        Swarmlord.CreateNewStorageMemory(id, childPath, memType, data);
+        this.SetData(id, childMemory.GetSaveData());
     }
 }
 
@@ -72,16 +87,21 @@ export class BasicMemory extends StorageMemory<EmptyData> {
     GetMemoryType(): StorageMemoryType {
         return StorageMemoryType.None;
     }
+    CreateEmptyMemory() {
+        return {} as EmptyData;
+    }
 }
 
 @profile
 export class ConsulMemory extends StorageMemory<ConsulData> {
-    get SavePath() {
-
+    /*get SavePath() {
         return super.SavePath;
-    }
+    }*/
     GetMemoryType(): StorageMemoryType {
         return StorageMemoryType.Consul;
+    }
+    CreateEmptyMemory() {
+        return {} as EmptyData;
     }
 }
 
@@ -90,12 +110,18 @@ export class FlagMemory extends StorageMemory<FlagData> {
     GetMemoryType(): StorageMemoryType {
         return StorageMemoryType.Flag;
     }
+    CreateEmptyMemory() {
+        return {} as EmptyData;
+    }
 }
 
 @profile
 export class StructureMemory extends StorageMemory<StructureData> {
     GetMemoryType(): StorageMemoryType {
         return StorageMemoryType.Structure;
+    }
+    CreateEmptyMemory() {
+        return {} as EmptyData;
     }
 }
 
@@ -104,11 +130,21 @@ export class CreepMemory extends StorageMemory<CreepData> {
     GetMemoryType(): StorageMemoryType {
         return StorageMemoryType.Creep;
     }
+    CreateEmptyMemory() {
+        return {
+            consulData: {}
+        }
+    }
 }
 
 @profile
 export class RoomMemory extends StorageMemory<RoomData> {
     GetMemoryType(): StorageMemoryType {
         return StorageMemoryType.Room;
+    }
+    CreateEmptyMemory() {
+        return {
+            queenType: QueenType.Larva
+        } as RoomData;
     }
 }
