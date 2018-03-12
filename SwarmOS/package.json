@@ -26,6 +26,7 @@
         "typescript": "^2.7.1"
     },
     "dependencies": {
-        "lodash": "3.10.1"
+        "lodash": "3.10.1",
+        "npm": "^5.7.1"
     }
 }
