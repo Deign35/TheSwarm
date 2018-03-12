@@ -2,41 +2,27 @@ import { RoomMemory, StorageMemory } from "Memory/StorageMemory";
 import { MemoryNotFoundException, SwarmException, NotImplementedException } from "Tools/SwarmExceptions";
 
 export abstract class NestQueen implements IQueen {
-    StartTick(): void {
-        this.InitForTick();
-    }
-    ProcessTick(): void {
-        //throw new Error("Method not implemented.");
-    }
-    EndTick(): void {
-        //throw new Error("Method not implemented.");
-    }
-    constructor(protected Nest: Room) {
-        this.InitForTick();
-        this.Council = this.LoadCouncil();
-        this.CreepController = this.LoadCreepController();
-    }
-    Council: IDictionary<IConsul>;
-    CreepController: CreepManager;
+    constructor(protected Nest: Room) { }
+    Council!: IDictionary<IConsul>;
+    CreepController!: ICreepManager;
     protected queenMemory!: RoomMemory;
     get QueenType() { return QueenType.Larva }
-    ReceiveCommand() {
-    }
     protected InitForTick() {
         try {
             this.queenMemory = Swarmlord.CheckoutMemory(this.Nest.name,
-                [Swarmlord.StorageMemoryTypeToString(StorageMemoryType.Room)]) as RoomMemory;
+                [Swarmlord.StorageMemoryTypeToString(StorageMemoryType.Room)], StorageMemoryType.Room);
         } catch (error) {
             if (error.name != MemoryNotFoundException.ErrorName) {
                 throw new SwarmException('InitForTick', error.name + '_' + error.message);
             }
             this.InitQueen();
             this.queenMemory = Swarmlord.CheckoutMemory(this.Nest.name,
-                [Swarmlord.StorageMemoryTypeToString(StorageMemoryType.Room)]) as RoomMemory;
+                [Swarmlord.StorageMemoryTypeToString(StorageMemoryType.Room)], StorageMemoryType.Room);
         }
     }
-
     protected abstract CreateQueenData(): RoomMemory;
+    protected abstract CheckForSpawnRequirements(): void;
+
     protected InitQueen(): void {
         this.queenMemory = this.CreateQueenData();
     }
@@ -44,11 +30,28 @@ export abstract class NestQueen implements IQueen {
         return {};
         //throw new NotImplementedException('Cannot load council yet');
     }
-    LoadCreepController(): CreepManager {
+    LoadCreepController(): ICreepManager {
         return {};
         //throw new NotImplementedException('CreepController doesnt exist');
     }
 
+    /** 
+     * Loads all the needed components with fresh data
+    */
+    StartTick(): void {
+        this.InitForTick();
+        this.CreepController = this.LoadCreepController();
+        this.Council = this.LoadCouncil();
+        this.CheckForSpawnRequirements();
+    }
+    ProcessTick(): void {
+    }
+    EndTick(): void {
+        Swarmlord.ReleaseMemory(this.queenMemory, true);
+    }
+
+    ReceiveCommand() {
+    }
     // Access to the normal room functions.
     get Controller(): StructureController | undefined {
         return this.Nest.controller;
@@ -62,6 +65,7 @@ export abstract class NestQueen implements IQueen {
     get QueenLocation(): RoomLocationFormat {
         return this.Nest.name;
     }
+
 }
 
 declare type RoomLocationFormat = string;

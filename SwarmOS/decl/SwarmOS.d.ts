@@ -5,12 +5,9 @@ declare interface IConsul {
     SetTarget(target: number): void;
     NeedsCapacityIncreased: boolean;
 }
-declare interface ISwarmQueen {
-
-}
 declare interface IQueen {
     Council: IDictionary<IConsul>;
-    CreepController: CreepManager;
+    CreepController: ICreepManager;
     QueenType: number
     ReceiveCommand(): void;
 
@@ -19,6 +16,8 @@ declare interface IQueen {
     EndTick(): void;
 }
 
-declare interface CreepManager {
+declare interface ICreepManager {
 
 }
+
+declare var MasterStructureController: any;

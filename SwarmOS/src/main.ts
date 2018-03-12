@@ -4,10 +4,12 @@ global.Profiler = Profiler.init();
 
 import "Tools/GlobalTools";
 import "Memory/Swarmlord";
+import { SwarmQueen } from "Queens/SwarmQueen";
 
 export const loop = function () {
+    debugger;
     Swarmlord.ValidateMemory();
-}
-
-const initSwarm = function () {
+    SwarmQueen.PrepareTheQueen();
+    SwarmQueen.ActivateSwarm();
+    SwarmQueen.FinalizeSwarmActivity();
 }

@@ -91,6 +91,8 @@ module.exports = function (grunt) {
 
         let consts = declarations['Constants'];
         globalsFile.push("// Begin Consts");
+        declarationsFile.push("declare const SWARM_VERSION_DATE = \"CURRENT_VERSION\";");
+        globalsFile.push("global[\"SWARM_VERSION_DATE\"] = \"" + new Date().toLocaleString() + "\";");
         for (let constName in consts) {
             let constType = consts[constName]['type'];
             let constVal = consts[constName]['value'];

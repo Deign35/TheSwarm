@@ -1,15 +1,27 @@
 import { NestQueen } from "./NestQueen";
 import { RCL1_HiveQueen } from "./HiveQueen";
 
-export class SwarmQueen implements ISwarmQueen {
+export class SwarmQueen {
     private constructor() { }
-    static InitSwarmQueen() {
+    static PrepareTheQueen() {
+        this.Queens = {};
         let newQueen = new SwarmQueen();
         for (const roomName in Game.rooms) {
-            CreateQueen(Game.rooms[roomName]);
+            this.Queens[roomName] = CreateQueen(Game.rooms[roomName]);
+            this.Queens[roomName].StartTick();
         }
     }
-    private Queens!: { [roomId: string]: IQueen };
+    static ActivateSwarm() {
+        for (let roomName in this.Queens) {
+            this.Queens[roomName].ProcessTick();
+        }
+    }
+    static FinalizeSwarmActivity() {
+        for (let roomName in this.Queens) {
+            this.Queens[roomName].EndTick();
+        }
+    }
+    private static Queens: { [roomName: string]: IQueen };
 }
 
 function CreateQueen(room: Room): IQueen {

@@ -2,15 +2,17 @@ import { profile } from "Tools/Profiler";
 import { SwarmException, MemoryLockException, AlreadyExistsException } from "Tools/SwarmExceptions";
 
 @profile
-export abstract class StorageMemory<T extends SwarmData> implements IStorageMemory {
-    constructor(id: string, path: string[], data?: any) {
+export abstract class StorageMemory<T extends StorageMemoryTypes> implements IStorageMemory<T> {
+    constructor(id: string, path: string[], data?: T) {
         this._id = id;
         this._savePath = path;
-        this._cache = data || this.CreateEmptyMemory();
-        this._checkedOut = false;
-        if (!this._cache[MEM_TYPE]) {
+        if (data) {
+            this._cache = data;
+        } else {
+            this._cache = this.CreateEmptyMemory();
             this.SetData(MEM_TYPE, this.GetMemoryType());
         }
+        this._checkedOut = false;
     }
     get id() { return this._id };
     get IsCheckedOut() { return this._checkedOut };
@@ -101,7 +103,7 @@ export class ConsulMemory extends StorageMemory<ConsulData> {
         return StorageMemoryType.Consul;
     }
     CreateEmptyMemory() {
-        return {} as EmptyData;
+        return {} as ConsulData;
     }
 }
 
@@ -111,7 +113,7 @@ export class FlagMemory extends StorageMemory<FlagData> {
         return StorageMemoryType.Flag;
     }
     CreateEmptyMemory() {
-        return {} as EmptyData;
+        return {} as FlagData;
     }
 }
 
@@ -121,7 +123,7 @@ export class StructureMemory extends StorageMemory<StructureData> {
         return StorageMemoryType.Structure;
     }
     CreateEmptyMemory() {
-        return {} as EmptyData;
+        return {} as StructureData;
     }
 }
 
@@ -133,7 +135,7 @@ export class CreepMemory extends StorageMemory<CreepData> {
     CreateEmptyMemory() {
         return {
             consulData: {}
-        }
+        } as CreepData;
     }
 }
 
