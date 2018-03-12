@@ -1,8 +1,15 @@
 import { SwarmCreep } from "Prototypes/SwarmCreep";
+import { profile } from "Tools/Profiler";
 
-export class SwarmManager {
-    private static Creeps: { [creepName: string]: ICreepManager }
-    static PrepareTheSwarm(): void {
+@profile
+export class SwarmManager implements ISwarmManager {
+    private Creeps!: { [creepName: string]: ICreepManager }
+    private static _instance: SwarmManager;
+    static PrepareTheSwarm() {
+        this._instance = new SwarmManager();
+        return this._instance.PrepareTheSwarm();
+    }
+    PrepareTheSwarm(): void {
         this.Creeps = {};
         let newManager = new SwarmManager();
 
@@ -12,12 +19,13 @@ export class SwarmManager {
             if (!Game.creeps[creepName]) {
                 // Creep died, do something with the memory?
             }
-            this.Creeps[creepName] = CreateSwarmCreep(Game.creeps[creepName]);
+            this.Creeps[creepName] = this.CreateSwarmObject(Game.creeps[creepName]);
             this.Creeps[creepName].StartTick();
         }
     }
 
-    static ActivateSwarm(): void {
+    static ActivateSwarm() { this._instance.ActivateSwarm(); }
+    ActivateSwarm(): void {
         for (let name in this.Creeps) {
             let creep = this.Creeps[name];
             creep.ProcessTick();
@@ -25,14 +33,16 @@ export class SwarmManager {
         }
     }
 
-    static FinalizeSwarmActivity(): void {
+    static FinalizeSwarmActivity() { return this._instance.FinalizeSwarmActivity(); }
+    FinalizeSwarmActivity(): void {
         for (let name in this.Creeps) {
             let creep = this.Creeps[name];
             creep.EndTick();
         }
     }
-}
 
-function CreateSwarmCreep(creep: Creep): SwarmCreep {
-    return new SwarmCreep(creep);
-}
+    static CreateSwarmObject(creep: Creep) { return this._instance.CreateSwarmObject(creep); }
+    CreateSwarmObject(creep: Creep): SwarmCreep {
+        return new SwarmCreep(creep);
+    }
+} global['SwarmManager'] = SwarmManager;

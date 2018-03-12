@@ -1,7 +1,9 @@
 import { RoomMemory, StorageMemory } from "Memory/StorageMemory";
 import { MemoryNotFoundException, SwarmException, NotImplementedException } from "Tools/SwarmExceptions";
 import { SwarmRoom } from "Prototypes/SwarmRoom";
+import { profile } from "Tools/Profiler";
 
+@profile
 export abstract class NestQueen implements IQueen {
     constructor(room: Room) {
         this.Nest = new SwarmRoom(room);

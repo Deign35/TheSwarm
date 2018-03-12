@@ -31,7 +31,7 @@ declare type QueenCensus = {
 
 declare var MasterStructureController: any;
 
-declare type SwarmController<T extends StorageMemoryType, U> = {
+declare interface ISwarmController<T extends StorageMemoryType, U> {
     PrepareTheSwarm(): void;
     ActivateSwarm(): void;
     FinalizeSwarmActivity(): void;
@@ -39,15 +39,15 @@ declare type SwarmController<T extends StorageMemoryType, U> = {
     CreateSwarmObject(obj: U): void;
 }
 
-declare type SwarmQueen = SwarmController<StorageMemoryType.Room, Room> & {
+declare interface ISwarmQueen extends ISwarmController<StorageMemoryType.Room, Room> {
+
+} declare var SwarmQueen: ISwarmQueen;
+declare interface ISwarmManager extends ISwarmController<StorageMemoryType.Creep, Creep> {
+
+} declare var SwarmManager: ISwarmManager;
+declare interface ISwarmInfrastructure extends ISwarmController<StorageMemoryType.Structure, Structure> {
 
 }
-declare type SwarmManager = SwarmController<StorageMemoryType.Creep, Creep> & {
-
-}
-declare type SwarmInfrastructure = SwarmController<StorageMemoryType.Structure, Structure> & {
-
-}
-declare type SwarmFlags = SwarmController<StorageMemoryType.Flag, Flag> & {
+declare interface ISwarmFlags extends ISwarmController<StorageMemoryType.Flag, Flag> {
 
 }

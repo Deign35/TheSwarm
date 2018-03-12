@@ -69,7 +69,7 @@ export class Swarmlord implements ISwarmlord {
             this.InitBaseMemoryFolders();
 
             // init stuff
-            SwarmQueen.PrepareTheQueen();
+            SwarmQueen.PrepareTheSwarm();
 
             SwarmQueen.FinalizeSwarmActivity();
             initTimer.Stop();
