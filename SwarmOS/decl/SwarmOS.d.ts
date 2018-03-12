@@ -17,7 +17,16 @@ declare interface IQueen {
 }
 
 declare interface ICreepManager {
+    StartTick(): void;
+    ProcessTick(): void;
+    EndTick(): void;
+}
 
+declare type ConsulCensus = {
+    currentRate: number
+}
+declare type QueenCensus = {
+    [consulName: string]: ConsulCensus;
 }
 
 declare var MasterStructureController: any;

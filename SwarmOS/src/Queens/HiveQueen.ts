@@ -5,20 +5,9 @@ export abstract class HiveQueen extends NestQueen implements IQueen {
     LoadCouncil(): IDictionary<IConsul> {
         return super.LoadCouncil();
     }
-    LoadCreepController(): ICreepManager {
+    /*LoadCreepController(): ICreepManager {
         return super.LoadCreepController();
-    }
-
-    // Room functions for hives
-    get Controller(): StructureController {
-        return this.Nest.controller!;
-    }
-    get EnergyAvailable(): number {
-        return this.Nest.energyAvailable;
-    }
-    get EnergyAvailableCapacity(): number {
-        return this.Nest.energyCapacityAvailable;
-    }
+    }*/
 }
 
 export class RCL1_HiveQueen extends HiveQueen {

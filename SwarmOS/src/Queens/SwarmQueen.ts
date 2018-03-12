@@ -2,10 +2,15 @@ import { NestQueen } from "./NestQueen";
 import { RCL1_HiveQueen } from "./HiveQueen";
 
 export class SwarmQueen {
-    private constructor() { }
+    private static Queens: { [roomName: string]: IQueen };
     static PrepareTheQueen() {
         this.Queens = {};
         let newQueen = new SwarmQueen();
+        for (const roomName in Swarmlord.GetMemoryEntries(StorageMemoryType.Room)) {
+            if (!Game.rooms[roomName]) {
+                // Room is no longer in view.  Need to figure out what this means.
+            }
+        }
         for (const roomName in Game.rooms) {
             this.Queens[roomName] = CreateQueen(Game.rooms[roomName]);
             this.Queens[roomName].StartTick();
@@ -21,7 +26,6 @@ export class SwarmQueen {
             this.Queens[roomName].EndTick();
         }
     }
-    private static Queens: { [roomName: string]: IQueen };
 }
 
 function CreateQueen(room: Room): IQueen {

@@ -1,12 +1,20 @@
 import { RoomMemory, StorageMemory } from "Memory/StorageMemory";
 import { MemoryNotFoundException, SwarmException, NotImplementedException } from "Tools/SwarmExceptions";
+import { SwarmRoom } from "Prototypes/SwarmRoom";
 
 export abstract class NestQueen implements IQueen {
-    constructor(protected Nest: Room) { }
+    constructor(room: Room) {
+        this.Nest = new SwarmRoom(room);
+    }
+    Nest: SwarmRoom;
     Council!: IDictionary<IConsul>;
     CreepController!: ICreepManager;
+
     protected queenMemory!: RoomMemory;
+
     get QueenType() { return QueenType.Larva }
+    protected abstract CreateQueenData(): RoomMemory;
+    protected abstract CheckForSpawnRequirements(): void;
     protected InitForTick() {
         try {
             this.queenMemory = Swarmlord.CheckoutMemory(this.Nest.name,
@@ -20,8 +28,6 @@ export abstract class NestQueen implements IQueen {
                 [Swarmlord.StorageMemoryTypeToString(StorageMemoryType.Room)], StorageMemoryType.Room);
         }
     }
-    protected abstract CreateQueenData(): RoomMemory;
-    protected abstract CheckForSpawnRequirements(): void;
 
     protected InitQueen(): void {
         this.queenMemory = this.CreateQueenData();
@@ -30,17 +36,17 @@ export abstract class NestQueen implements IQueen {
         return {};
         //throw new NotImplementedException('Cannot load council yet');
     }
-    LoadCreepController(): ICreepManager {
-        return {};
-        //throw new NotImplementedException('CreepController doesnt exist');
-    }
+    /*LoadCreepController(): ICreepManager {
+        //return {};
+        throw new NotImplementedException('CreepController doesnt exist');
+    }*/
 
     /** 
      * Loads all the needed components with fresh data
     */
     StartTick(): void {
         this.InitForTick();
-        this.CreepController = this.LoadCreepController();
+        //this.CreepController = this.LoadCreepController();
         this.Council = this.LoadCouncil();
         this.CheckForSpawnRequirements();
     }
@@ -52,20 +58,4 @@ export abstract class NestQueen implements IQueen {
 
     ReceiveCommand() {
     }
-    // Access to the normal room functions.
-    get Controller(): StructureController | undefined {
-        return this.Nest.controller;
-    }
-    get EnergyAvailable(): number {
-        return 0;
-    }
-    get EnergyAvailableCapacity(): number {
-        return 0;
-    }
-    get QueenLocation(): RoomLocationFormat {
-        return this.Nest.name;
-    }
-
 }
-
-declare type RoomLocationFormat = string;

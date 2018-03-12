@@ -1,3 +1,3 @@
-export class CreepManager implements ICreepManager {
+export class CreepManager {
 
 }

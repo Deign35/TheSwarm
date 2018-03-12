@@ -1,6 +1,8 @@
-export class SwarmObject<T extends Source | Creep | Structure | Mineral | Resource | ConstructionSite | Nuke> {
+export class SwarmItem<T> {
     constructor(protected _instance: T) { this.Init(); }
     protected Init() { }
+}
+export class SwarmObject<T extends Source | Creep | Structure | Mineral | Resource | ConstructionSite | Nuke> extends SwarmItem<T> {
     get pos() { return this._instance.pos; }
     get room() { return this._instance.room; }
     get id() { return this._instance.id; }

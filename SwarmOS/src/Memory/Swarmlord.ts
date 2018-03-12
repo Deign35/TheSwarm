@@ -45,8 +45,12 @@ export class Swarmlord implements ISwarmlord {
             global['Swarmlord'] = this;
 
             SwarmLogger.Log("Begin initialization of memory for entire Swarm");
+            let newCreepObject = {};
+            for (const creepName in Game.creeps) {
+                newCreepObject[creepName] = {};
+            }
             let newMemory = {
-                creeps: {},
+                creeps: newCreepObject,
                 flags: {},
                 structures: {},
                 rooms: {},
@@ -83,6 +87,11 @@ export class Swarmlord implements ISwarmlord {
         this.storageMemory[memType] = this.LoadDataFromMemory(memType, StorageMemoryType.Room);
         memType = this.StorageMemoryTypeToString(StorageMemoryType.Structure);
         this.storageMemory[memType] = this.LoadDataFromMemory(memType, StorageMemoryType.Structure);
+    }
+
+    GetMemoryEntries(memType: StorageMemoryType): string[] {
+        let storage = this.storageMemory[this.StorageMemoryTypeToString(memType)];
+        return Object.getOwnPropertyNames(storage);
     }
 
     StorageMemoryTypeToString(memType: StorageMemoryType): string {

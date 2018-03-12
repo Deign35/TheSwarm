@@ -1,11 +1,53 @@
 import { OwnableSwarmObject } from "./SwarmObject";
 import * as _ from "lodash";
+import { CreepMemory } from "Memory/StorageMemory";
+import { MemoryNotFoundException, SwarmException } from "Tools/SwarmExceptions";
 
 const CARRY_TOTAL = 'CT';
 const CURRENT_PATH = 'CP';
-export class SwarmCreep extends OwnableSwarmObject<Creep> {
-    // Instead of T extends Creep, what about different classes??
+export class SwarmCreep extends OwnableSwarmObject<Creep> implements ICreepManager {
+    StartTick(): void {
+        this.InitForTick();
+    }
+    ProcessTick(): void {
+        let oldValue = this.creepMemory.GetData<number>('Test') || 0;
+        this.creepMemory.SetData('Test', (oldValue + 1));
+        //throw new Error("Method not implemented.");
+    }
+    EndTick(): void {
+        Swarmlord.ReleaseMemory(this.creepMemory, true);
+    }
+
+    InitForTick(): void {
+        try {
+            this.creepMemory = Swarmlord.CheckoutMemory(this.name,
+                [Swarmlord.StorageMemoryTypeToString(StorageMemoryType.Creep)], StorageMemoryType.Creep);
+        } catch (error) {
+            if (error.name != MemoryNotFoundException.ErrorName) {
+                throw new SwarmException('InitForTick', error.name + '_' + error.message);
+            }
+            this.InitCreep();
+            this.creepMemory = Swarmlord.CheckoutMemory(this.name,
+                [Swarmlord.StorageMemoryTypeToString(StorageMemoryType.Creep)], StorageMemoryType.Creep);
+        }
+    }
+
+    InitCreep(): void {
+        this.creepMemory = this.CreateCreepData();
+    }
+
+    CreateCreepData() {
+        Swarmlord.CreateNewStorageMemory(this.name, [Swarmlord.StorageMemoryTypeToString(StorageMemoryType.Creep)], StorageMemoryType.Creep);
+        let newMem = Swarmlord.CheckoutMemory<CreepData, CreepMemory>(this.name, [Swarmlord.StorageMemoryTypeToString(StorageMemoryType.Creep)], StorageMemoryType.Creep);
+        return newMem;
+    }
+
+    ReceiveCommand() {
+
+    }
+
     protected data: { [id: string]: any } = {};
+    protected creepMemory!: CreepMemory;
     get carryTotal() {
         if (!this.data[CARRY_TOTAL]) {
             this.data[CARRY_TOTAL] = _.sum(this._instance.carry);
@@ -14,7 +56,7 @@ export class SwarmCreep extends OwnableSwarmObject<Creep> {
     }
     get curPath() {
         if (!this.data[CURRENT_PATH]) {
-            this.data[CURRENT_PATH] = 'NOT CONFIGURED';
+            this.data[CURRENT_PATH] = NOT_CONFIGURED;
         }
         return this.data[CURRENT_PATH];
     }
@@ -48,6 +90,9 @@ export class SwarmCreep extends OwnableSwarmObject<Creep> {
     }
     get memory() {
         throw "This should be allowed only once it has been properly integrated";
+    }
+    get name() {
+        return this._instance.name;
     }
     get saying() {
         return this._instance.hits;

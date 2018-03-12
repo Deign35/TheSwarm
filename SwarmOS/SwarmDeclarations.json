@@ -11,6 +11,10 @@
         "MEM_TYPE": {
             "value": "MEM_TYPE",
             "type": "string"
+        },
+        "NOT_CONFIGURED": {
+            "value": "NOT_CONFIGURED",
+            "type": "string"
         }
     },
     "Primitives": {
