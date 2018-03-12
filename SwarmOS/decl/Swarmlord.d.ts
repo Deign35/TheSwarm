@@ -55,7 +55,8 @@ declare interface ISwarmlord {
     ValidateMemory(): void;
     CheckoutMemory<T extends ISwarmMemory>(id: string, path: string[]): IStorageMemory;
     ReleaseMemory(memObject: IStorageMemory, save?: boolean): void;
-    StorageMemoryTypeToString(memType: StorageMemoryType): string
+    StorageMemoryTypeToString(memType: StorageMemoryType): string;
+    CreateNewStorageMemory(id: string, path: string[], memType: StorageMemoryType): void 
 }
 
 declare var Swarmlord: ISwarmlord;

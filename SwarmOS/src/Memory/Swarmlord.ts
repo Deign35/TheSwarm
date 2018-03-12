@@ -23,8 +23,8 @@ function ConvertDataToMemory(id: string, path: string[], data: SwarmData): IStor
 @profile
 export class Swarmlord implements ISwarmlord {
     constructor() {
-        this.InitializeMemory();
         this.storageMemory = {};
+        this.InitializeMemory();
     }
 
     private storageMemory: { [storagePath: string]: IStorageMemory }
@@ -32,6 +32,7 @@ export class Swarmlord implements ISwarmlord {
         if (!deserializedMemory.INIT) {
             let initTimer = new Stopwatch();
             initTimer.Start();
+            global['Swarmlord'] = this;
 
             SwarmLogger.Log("Begin initialization of memory for entire Swarm");
             deserializedMemory = {
@@ -72,15 +73,30 @@ export class Swarmlord implements ISwarmlord {
                 throw new InvalidArgumentException('Tried to retrieve invalid memory type [' + memType + ']');
         }
     }
-    
+
     ValidateMemory() {
         if (!Memory.INIT) {
             global['Swarmlord'] = new Swarmlord();
         }
     }
 
+    CreateNewStorageMemory(id: string, path: string[], memType: StorageMemoryType): void {
+        let mem = ConvertDataToMemory(id, path, {});
+        let targetObject = deserializedMemory;
+        for (let i = 0; i < path.length; i++) {
+            targetObject = targetObject[path[i]];
+            if (!targetObject) {
+                let targetObject = this.CreateNewStorageMemory(path[i], path.slice(0, i - 1), StorageMemoryType.None);
+            }
+        }
+        if (targetObject[id]) {
+            throw new AlreadyExistsException("CreateNewStorageMemory(" + id + ", " + JSON.stringify(path) + ", " + memType + ")");
+        }
+        targetObject[id] = mem;
+    }
+
     CheckoutMemory(id: string, path: string[]) {
-        let mem = this.LoadStorageMemory(id, path);
+        let mem = ConvertDataToMemory(id, path, this.LoadStorageMemory(id, path));
         mem.ReserveMemory();
 
         return mem;
@@ -112,6 +128,9 @@ export class Swarmlord implements ISwarmlord {
                 parentObj = this.LoadStorageMemory(path.slice(-1)[0], path.slice(0, -1));
             }
 
+            if (!parentObj || !parentObj[id]) {
+                throw new MemoryNotFoundException('Could not find memory at ' + storagePath);
+            }
             this.storageMemory[storagePath] = CopyObject(parentObj[id]);
         }
 

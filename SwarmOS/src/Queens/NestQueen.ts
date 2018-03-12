@@ -6,10 +6,10 @@ export abstract class NestQueen implements IQueen {
         this.InitForTick();
     }
     ProcessTick(): void {
-        throw new Error("Method not implemented.");
+        //throw new Error("Method not implemented.");
     }
     EndTick(): void {
-        throw new Error("Method not implemented.");
+        //throw new Error("Method not implemented.");
     }
     constructor(protected Nest: Room) {
         this.InitForTick();
@@ -41,10 +41,12 @@ export abstract class NestQueen implements IQueen {
         this.queenMemory = this.CreateQueenData();
     }
     LoadCouncil(): IDictionary<IConsul> {
-        throw new NotImplementedException('Cannot load council yet');
+        return {};
+        //throw new NotImplementedException('Cannot load council yet');
     }
     LoadCreepController(): CreepManager {
-        throw new NotImplementedException('CreepController doesnt exist');
+        return {};
+        //throw new NotImplementedException('CreepController doesnt exist');
     }
 
     // Access to the normal room functions.
