@@ -1,6 +1,6 @@
-import { OwnedSwarmStructure } from "Prototypes/SwarmStructure";
+import { OwnedSwarmStructure } from "./SwarmStructure";
 
-export class NestController extends OwnedSwarmStructure<StructureController> {
+export class SwarmController extends OwnedSwarmStructure<STRUCTURE_CONTROLLER, StructureController> implements ISwarmController, StructureController {
     get level() { return this._instance.level; }
     get progress() { return this._instance.progress; }
     get progressTotal() { return this._instance.progressTotal; }

@@ -1,4 +1,4 @@
-export class SwarmItem<T> implements ISwarmItem<T> {
+export abstract class SwarmItem<T> implements ISwarmItem<T> {
     constructor(instance: T) {
         this._instance = instance;
         this.Init();
@@ -7,13 +7,13 @@ export class SwarmItem<T> implements ISwarmItem<T> {
     protected Init() { }
     get Value() { return this._instance; }
 }
-export class SwarmObject<T extends Source | Creep
+export abstract class SwarmObject<T extends Source | Creep
     | Structure | Mineral | Resource
     | ConstructionSite | Nuke | Tombstone> extends SwarmItem<T> implements ISwarmObject<T> {
     get pos() { return this._instance.pos; }
     get room() { return this._instance.room; }
     get id() { return this._instance.id; }
-    get prototype() { return this._instance.prototype; }
+    get prototype(): T { return this._instance.prototype as T; }
 }
 
 export class SwarmTombstone extends SwarmObject<Tombstone> implements ISwarmTombstone, Tombstone {
