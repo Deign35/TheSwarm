@@ -15,7 +15,10 @@ export class SwarmItemBase<T extends ValidSwarmObjects> {
 
 const CARRY_TOTAL = 'CT';
 const CURRENT_PATH = 'CP';
-export class SwarmCreep extends SwarmItemBase<Creep> implements Creep {
+export function CreateCreep(): TSwarmCreep {
+    return new SwarmCreep(Game.creeps['poopy']!);
+}
+export class SwarmCreep extends SwarmItemBase<Creep> implements ISwarmCreep {
     protected data: { [id: string]: any } = {};
     protected creepMemory!: CreepMemory;
     get carryTotal() {

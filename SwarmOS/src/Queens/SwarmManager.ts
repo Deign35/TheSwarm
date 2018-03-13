@@ -1,6 +1,6 @@
 import { SwarmItem } from "Prototypes/SwarmObject";
 
-export abstract class SwarmManager<T extends StorageMemoryType, U> implements ISwarmController<T, U> {
+export abstract class SwarmManager<T extends StorageMemoryType, U> implements ISC_SwarmController<T, U> {
     get StorageType() { return this.getStorageType(); }
     protected get SwarmObjects(): { [itemID: string]: SwarmItem<U> } {
         return this.swarmObjects;
