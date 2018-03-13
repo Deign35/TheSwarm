@@ -2,16 +2,16 @@ import { SwarmCreep } from "Prototypes/SwarmCreep";
 import { profile } from "Tools/Profiler";
 
 @profile
-export class SwarmManager implements ISwarmManager {
+export class SwarmCreepManager implements ISwarmCreepManager {
     private Creeps!: { [creepName: string]: ICreepManager }
-    private static _instance: SwarmManager;
+    private static _instance: SwarmCreepManager;
     static PrepareTheSwarm() {
-        this._instance = new SwarmManager();
-        return this._instance.PrepareTheSwarm();
+        SwarmCreepManager._instance = new SwarmCreepManager();
+        return SwarmCreepManager._instance.PrepareTheSwarm();
     }
     PrepareTheSwarm(): void {
         this.Creeps = {};
-        let newManager = new SwarmManager();
+        let newManager = new SwarmCreepManager();
 
         let creepNames = Swarmlord.GetMemoryEntries(StorageMemoryType.Creep);
         for (let i = 0; i < creepNames.length; i++) {
@@ -24,7 +24,7 @@ export class SwarmManager implements ISwarmManager {
         }
     }
 
-    static ActivateSwarm() { this._instance.ActivateSwarm(); }
+    static ActivateSwarm() { SwarmCreepManager._instance.ActivateSwarm(); }
     ActivateSwarm(): void {
         for (let name in this.Creeps) {
             let creep = this.Creeps[name];
@@ -33,7 +33,7 @@ export class SwarmManager implements ISwarmManager {
         }
     }
 
-    static FinalizeSwarmActivity() { return this._instance.FinalizeSwarmActivity(); }
+    static FinalizeSwarmActivity() { return SwarmCreepManager._instance.FinalizeSwarmActivity(); }
     FinalizeSwarmActivity(): void {
         for (let name in this.Creeps) {
             let creep = this.Creeps[name];
@@ -41,8 +41,8 @@ export class SwarmManager implements ISwarmManager {
         }
     }
 
-    static CreateSwarmObject(creep: Creep) { return this._instance.CreateSwarmObject(creep); }
+    static CreateSwarmObject(creep: Creep) { return SwarmCreepManager._instance.CreateSwarmObject(creep); }
     CreateSwarmObject(creep: Creep): SwarmCreep {
         return new SwarmCreep(creep);
     }
-} global['SwarmManager'] = SwarmManager;
+} global['SwarmManager'] = SwarmCreepManager;

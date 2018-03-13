@@ -3,9 +3,6 @@ declare type Dictionary = IDictionary<any>
 interface Memory {
     profiler: ProfilerMemory;
 }
-
-
-
 interface ProfilerMemory {
     data: { [name: string]: ProfilerData };
     start?: number;

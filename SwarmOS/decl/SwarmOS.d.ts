@@ -42,9 +42,9 @@ declare interface ISwarmController<T extends StorageMemoryType, U> {
 declare interface ISwarmQueen extends ISwarmController<StorageMemoryType.Room, Room> {
 
 } declare var SwarmQueen: ISwarmQueen;
-declare interface ISwarmManager extends ISwarmController<StorageMemoryType.Creep, Creep> {
+declare interface ISwarmCreepManager extends ISwarmController<StorageMemoryType.Creep, Creep> {
 
-} declare var SwarmManager: ISwarmManager;
+} declare var SwarmManager: ISwarmCreepManager;
 declare interface ISwarmInfrastructure extends ISwarmController<StorageMemoryType.Structure, Structure> {
 
 }

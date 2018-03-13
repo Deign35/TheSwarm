@@ -1,5 +1,9 @@
-export class SwarmItem<T> {
-    constructor(protected _instance: T) { this.Init(); }
+export class SwarmItem<T> implements ISwarmItem<T> {
+    constructor(instance: T) {
+        this._instance = instance;
+        this.Init();
+    }
+    protected _instance: T;
     protected Init() { }
     get Value() { return this._instance; }
 }
