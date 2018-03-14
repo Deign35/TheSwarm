@@ -25,6 +25,11 @@ export class SwarmCreep extends OwnableSwarmObject<Creep, SwarmType.SwarmCreep> 
     }
     get swarmType(): SwarmType.SwarmCreep { return SwarmType.SwarmCreep; }
 
+
+    StartTick() { }
+    ProcessTick() { }
+    EndTick() { }
+
     /**
      * Prototype properties
      *  

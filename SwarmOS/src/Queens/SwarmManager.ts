@@ -1,12 +1,12 @@
 import { SwarmItem } from "SwarmObjects/SwarmObject";
 
-export abstract class SwarmManager<T extends StorageMemoryType, U, V extends SwarmType> implements ISC_SwarmController<T, U> {
+export abstract class SwarmManager<T extends StorageMemoryType, U extends PrimarySwarmTypes> implements SwarmController<T, U> {
     get StorageType() { return this.getStorageType(); }
-    protected get SwarmObjects(): { [itemID: string]: SwarmItem<U, V> } {
+    protected get SwarmObjects(): { [itemID: string]: U } {
         return this.swarmObjects;
     }
 
-    private swarmObjects!: { [itemID: string]: SwarmItem<U, V> };
+    private swarmObjects!: { [itemID: string]: U };
     PrepareTheSwarm(): void {
         this.swarmObjects = {};
         for (const swarmName in Swarmlord.GetMemoryEntries(this.StorageType)) {
@@ -26,7 +26,7 @@ export abstract class SwarmManager<T extends StorageMemoryType, U, V extends Swa
     FinalizeSwarmActivity(): void {
         throw new Error("Method not implemented.");
     }
-    CreateSwarmObject(obj: U): SwarmItem<U, V> {
+    CreateSwarmObject(obj: U): U {
         throw new Error("Method not implemented.");
     }
 

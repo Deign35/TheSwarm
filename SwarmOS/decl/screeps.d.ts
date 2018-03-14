@@ -1314,7 +1314,12 @@ interface LookAtResultMatrix<K extends LookConstant = LookConstant> {
     [coord: number]: LookAtResultMatrix<K> | Array<LookAtResult<K>>;
 }
 
-interface LookForAtAreaResultMatrix<T, K extends keyof LookAtTypes = keyof LookAtTypes> {
+interface LookForAtAreaResultMatrix2<T, K extends keyof LookAtTypes = keyof LookAtTypes> {
+    [x: number]: {
+        [y: number]: Array<LookForAtAreaResult<T, K>>;
+    };
+}
+type LookForAtAreaResultMatrix<T, K extends keyof LookAtTypes = keyof LookAtTypes> = {
     [x: number]: {
         [y: number]: Array<LookForAtAreaResult<T, K>>;
     };
@@ -1327,6 +1332,7 @@ type LookForAtAreaResult<T, K extends keyof LookAtTypes = keyof LookAtTypes> = {
 type LookForAtAreaResultWithPos<T, K extends keyof LookAtTypes = keyof LookAtTypes> = LookForAtAreaResult<T, K> & { x: number, y: number };
 
 type LookForAtAreaResultArray<T, K extends keyof LookAtTypes = keyof LookAtTypes> = Array<LookForAtAreaResultWithPos<T, K>>;
+type LookForAtAreaResultFinal<T, K extends keyof LookAtTypes = keyof LookAtTypes> = LookForAtAreaResultArray<T, K> | LookForAtAreaResultMatrix<T, K>
 
 interface FindTypes {
     [key: number]: RoomPosition | Creep | Source | Resource | Structure | Flag | ConstructionSite | Mineral | Nuke;
@@ -3008,7 +3014,7 @@ interface Room {
         bottom: number,
         right: number,
         asArray?: false
-    ): LookForAtAreaResultMatrix<LookAtTypes[T], T>;
+    ): LookForAtAreaResultFinal<T>//LookForAtAreaResultMatrix<LookAtTypes[T], T>;
     /**
      * Get the given objets in the supplied area.
      * @param type One of the LOOK_* constants
@@ -3026,7 +3032,7 @@ interface Room {
         bottom: number,
         right: number,
         asArray: true
-    ): LookForAtAreaResultArray<LookAtTypes[T], T>;
+    ): LookForAtAreaResultFinal<T>// LookForAtAreaResultArray<LookAtTypes[T], T>;
 
     /**
      * Serialize a path array into a short string representation, which is suitable to store in memory.

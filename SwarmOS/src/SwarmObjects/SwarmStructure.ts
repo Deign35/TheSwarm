@@ -9,6 +9,10 @@ export abstract class SwarmStructure<U extends StructureConstant, T extends Stru
 
     destroy() { return this._instance.destroy() }
     isActive() { return this._instance.isActive() }
+
+    StartTick() { }
+    ProcessTick() { }
+    EndTick() { }
 }
 
 export abstract class OwnedSwarmStructure<U extends StructureConstant, T extends OwnedStructure<U>, V extends SwarmType> extends SwarmStructure<U, T, V> implements IOwnableSwarmObject<T, V>, OwnedStructure {

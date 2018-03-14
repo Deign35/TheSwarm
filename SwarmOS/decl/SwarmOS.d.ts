@@ -30,24 +30,3 @@ declare type QueenCensus = {
 }
 
 declare var MasterStructureController: any;
-
-declare interface ISC_SwarmController<T extends StorageMemoryType, U> {
-    PrepareTheSwarm(): void;
-    ActivateSwarm(): void;
-    FinalizeSwarmActivity(): void;
-
-    CreateSwarmObject(obj: U): void;
-}
-
-declare interface ISwarmQueen extends ISC_SwarmController<StorageMemoryType.Room, Room> {
-
-} declare var SwarmQueen: ISwarmQueen;
-declare interface ISwarmCreepManager extends ISC_SwarmController<StorageMemoryType.Creep, Creep> {
-
-} declare var SwarmManager: ISwarmCreepManager;
-declare interface ISwarmInfrastructure extends ISC_SwarmController<StorageMemoryType.Structure, Structure> {
-
-}
-declare interface ISwarmFlags extends ISC_SwarmController<StorageMemoryType.Flag, Flag> {
-
-}
