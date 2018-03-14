@@ -15,3 +15,4 @@ export class SwarmController extends OwnedSwarmStructure<STRUCTURE_CONTROLLER, S
     activateSafeMode() { return this._instance.activateSafeMode(); }
     unclaim() { return this._instance.unclaim(); }
 }
+export function MakeSwarmController(controller: StructureController): TSwarmController { return new SwarmController(controller); }

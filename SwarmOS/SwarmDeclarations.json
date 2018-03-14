@@ -70,6 +70,11 @@
             "Info": 0,
             "Warn": 1,
             "Error": 2
+        },
+        "SwarmType": {
+            "SwarmSite": 0,
+            "SwarmCreep": 1,
+            "SwarmFlag": 2
         }
     },
     "CompoundTypes": {

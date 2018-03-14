@@ -17,15 +17,10 @@ export abstract class SwarmObject<T extends Source | Creep
 }
 
 export class SwarmTombstone extends SwarmObject<Tombstone> implements ISwarmTombstone, Tombstone {
-    didSuicide(): boolean {
-        throw new Error("Method not implemented.");
-    }
     get creep() { return this._instance.creep; }
     get deathTime() { return this._instance.deathTime; }
     get store() { return this._instance.store; }
     get ticksToDecay() { return this._instance.ticksToDecay; }
-
-
 }
 export function MakeSwarmTombstone(tombStone: Tombstone): TSwarmTombstone {
     return new SwarmTombstone(tombStone);
@@ -42,7 +37,7 @@ export class NotifiableSwarmObject<T extends Creep | Structure | ConstructionSit
     }
 }
 
-export class OwnableSwarmObject<T extends Creep | OwnedStructure> extends NotifiableSwarmObject<T> implements IOwnableSwarmObject<T> {
+export class OwnableSwarmObject<T extends Creep | OwnedStructure | ConstructionSite> extends NotifiableSwarmObject<T> implements IOwnableSwarmObject<T> {
     get my() { return this._instance.my; }
     get owner() { return this._instance.owner; }
 }
