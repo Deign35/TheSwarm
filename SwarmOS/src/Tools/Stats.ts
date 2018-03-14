@@ -47,7 +47,7 @@ put stuff like object ids in tags doing so ends up causing massive performance h
 as the tag indexes get too large too quickly. Good data for tags is more static stuff
 such as roomName, sectorName, etc, low overall spread.
 
-*/
+*
 import * as _ from "lodash"
 declare var Memory: any;
 export default function setup(): void {
@@ -188,7 +188,7 @@ export class Statistics {
             console.log('STATS;' + stats.replace(/\n/g, ';'));
     }
 
-    /** Adds some common stats. */
+    /** Adds some common stats. *
     private addBaseStats(): void {
         this.addStat('time', {}, {
             tick: Game.time,
@@ -279,4 +279,4 @@ export class Statistics {
     private kv(obj: any, sep = '='): string[] {
         return _.map(obj, (v, k) => `${k}${sep}${v}`)
     }
-}
+}*/

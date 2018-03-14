@@ -1,4 +1,4 @@
-export function FindStructureNextTo(position: RoomPosition, structureType: string, opts?: { [id: string]: any }) {
+/*export function FindStructureNextTo(position: RoomPosition, structureType: string, opts?: { [id: string]: any }) {
     let room = Game.rooms[position.roomName];
     if (!room) { throw 'Attempting to find a ' + LOOK_STRUCTURES + ' next to a position in ' + position.roomName + ', which we do not have access to' };
     let distance = opts ? opts['distance'] || 1 : 1;
@@ -25,4 +25,4 @@ export function FindNextTo(position: RoomPosition, lookConstant: LookConstant, o
     let lookResult = room.lookForAtArea(lookConstant, position.y - distance, position.x - distance, position.y + distance, position.x + distance, true);
 
     return lookResult;
-}
+}*/

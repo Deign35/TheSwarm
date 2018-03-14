@@ -5,17 +5,18 @@ global.Profiler = Profiler.init();
 import "Tools/GlobalTools";
 import "Memory/Swarmlord";
 import { SwarmQueen } from "Queens/SwarmQueen";
+import { SwarmCreepController } from "CreepManagers/SwarmCreepManager"
 
 export const loop = function () {
     debugger;
     Swarmlord.ValidateMemory();
 
     SwarmQueen.PrepareTheSwarm();
-    SwarmManager.PrepareTheSwarm();
+    SwarmCreepController.PrepareTheSwarm();
 
     SwarmQueen.ActivateSwarm();
-    SwarmManager.ActivateSwarm();
+    SwarmCreepController.ActivateSwarm();
 
     SwarmQueen.FinalizeSwarmActivity();
-    SwarmManager.FinalizeSwarmActivity();
+    SwarmCreepController.FinalizeSwarmActivity();
 }

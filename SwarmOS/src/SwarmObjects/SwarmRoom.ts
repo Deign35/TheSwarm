@@ -1,6 +1,9 @@
 import { SwarmItem } from "SwarmObjects/SwarmObject";
 
 export class SwarmRoom extends SwarmItem<Room, SwarmType.SwarmRoom> implements ISwarmRoom, Room {
+    StartTick() { }
+    ProcessTick() { }
+    EndTick() { }
     get swarmType(): SwarmType.SwarmRoom { return SwarmType.SwarmRoom; }
     get prototype(): Room { return this._instance.prototype as Room; }
     get RoomLocation(): RoomLocationFormat { return this.name; }
@@ -76,4 +79,5 @@ export class SwarmRoom extends SwarmItem<Room, SwarmType.SwarmRoom> implements I
         }
     }
 }
+export function MakeSwarmRoom(room: Room): TSwarmRoom { return new SwarmRoom(room); }
 declare type RoomLocationFormat = string;

@@ -1,17 +1,17 @@
-import { SwarmCreep } from "Prototypes/SwarmCreep";
+import { SwarmCreep } from "SwarmObjects/SwarmCreep";
 import { profile } from "Tools/Profiler";
 
 @profile
-export class SwarmCreepManager implements ISwarmCreepManager {
+export class SwarmCreepController implements ISwarmCreepController {
     private Creeps!: { [creepName: string]: ICreepManager }
-    private static _instance: SwarmCreepManager;
+    private static _instance: SwarmCreepController;
     static PrepareTheSwarm() {
-        SwarmCreepManager._instance = new SwarmCreepManager();
-        return SwarmCreepManager._instance.PrepareTheSwarm();
+        SwarmCreepController._instance = new SwarmCreepController();
+        return SwarmCreepController._instance.PrepareTheSwarm();
     }
     PrepareTheSwarm(): void {
         this.Creeps = {};
-        let newManager = new SwarmCreepManager();
+        //let newManager = new SwarmCreepManager();
 
         let creepNames = Swarmlord.GetMemoryEntries(StorageMemoryType.Creep);
         for (let i = 0; i < creepNames.length; i++) {
@@ -24,7 +24,7 @@ export class SwarmCreepManager implements ISwarmCreepManager {
         }
     }
 
-    static ActivateSwarm() { SwarmCreepManager._instance.ActivateSwarm(); }
+    static ActivateSwarm() { SwarmCreepController._instance.ActivateSwarm(); }
     ActivateSwarm(): void {
         for (let name in this.Creeps) {
             let creep = this.Creeps[name];
@@ -33,7 +33,7 @@ export class SwarmCreepManager implements ISwarmCreepManager {
         }
     }
 
-    static FinalizeSwarmActivity() { return SwarmCreepManager._instance.FinalizeSwarmActivity(); }
+    static FinalizeSwarmActivity() { return SwarmCreepController._instance.FinalizeSwarmActivity(); }
     FinalizeSwarmActivity(): void {
         for (let name in this.Creeps) {
             let creep = this.Creeps[name];
@@ -41,8 +41,8 @@ export class SwarmCreepManager implements ISwarmCreepManager {
         }
     }
 
-    static CreateSwarmObject(creep: Creep) { return SwarmCreepManager._instance.CreateSwarmObject(creep); }
+    static CreateSwarmObject(creep: Creep) { return SwarmCreepController._instance.CreateSwarmObject(creep); }
     CreateSwarmObject(creep: Creep): SwarmCreep {
         return new SwarmCreep(creep);
     }
-} global['SwarmManager'] = SwarmCreepManager;
+} global['SwarmCreepController'] = SwarmCreepController;
