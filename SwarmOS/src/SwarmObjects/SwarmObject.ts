@@ -43,3 +43,35 @@ export abstract class OwnableSwarmObject<T extends Creep | OwnedStructure | Cons
     get my() { return this._instance.my; }
     get owner() { return this._instance.owner; }
 }
+
+export class SwarmMineral extends SwarmObject<Mineral, SwarmType.SwarmMineral> implements ISwarmMineral, Mineral {
+    get swarmType(): SwarmType.SwarmMineral { return SwarmType.SwarmMineral; }
+    get density() { return this._instance.density; }
+    get mineralAmount() { return this._instance.mineralAmount; }
+    get mineralType() { return this._instance.mineralType; }
+    get ticksToRegeneration() { return this._instance.ticksToRegeneration; }
+}
+export function MakeSwarmMineral(mineral: Mineral): TSwarmMineral { return new SwarmMineral(mineral); }
+
+export class SwarmSource extends SwarmObject<Source, SwarmType.SwarmSource> implements ISwarmSource, Source {
+    get swarmType(): SwarmType.SwarmSource { return SwarmType.SwarmSource; }
+    get energy() { return this._instance.energy; }
+    get energyCapacity() { return this._instance.energyCapacity; }
+    get room() { return this._instance.room; }
+    get ticksToRegeneration() { return this._instance.ticksToRegeneration; }
+}
+export function MakeSwarmSource(source: Source): TSwarmSource { return new SwarmSource(source); }
+
+export class SwarmResource extends SwarmObject<Resource, SwarmType.SwarmResource> implements ISwarmResource, Resource {
+    get swarmType(): SwarmType.SwarmResource { return SwarmType.SwarmResource; }
+    get amount() { return this._instance.amount; }
+    get resourceType() { return this._instance.resourceType; }
+}
+export function MakeSwarmResource(resource: Resource): TSwarmResource { return new SwarmResource(resource); }
+
+export class SwarmNuke extends SwarmObject<Nuke, SwarmType.SwarmNuke> implements ISwarmNuke, Nuke {
+    get swarmType(): SwarmType.SwarmNuke { return SwarmType.SwarmNuke; }
+    get launchRoomName() { return this._instance.launchRoomName; }
+    get timeToLand() { return this._instance.timeToLand; }
+}
+export function MakeSwarmNuke(nuke: Nuke): TSwarmNuke { return new SwarmNuke(nuke); }

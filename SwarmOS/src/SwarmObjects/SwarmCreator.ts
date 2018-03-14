@@ -1,12 +1,13 @@
-import { SwarmItem, MakeSwarmTombstone } from "SwarmObjects/SwarmObject";
+import { SwarmItem, MakeSwarmTombstone, MakeSwarmMineral, MakeSwarmNuke, MakeSwarmResource, MakeSwarmSource } from "SwarmObjects/SwarmObject";
 import { SwarmCreep, MakeSwarmCreep } from "SwarmObjects/SwarmCreep";
 import "./SwarmStructure";
 import { MakeSwarmSite } from "./SwarmSite";
 import { InvalidArgumentException } from "Tools/SwarmExceptions";
-import { SwarmStructure, MakeSwarmExtension, MakeSwarmExtractor, MakeSwarmLink, MakeSwarmNuker, MakeSwarmObserver, MakeSwarmRampart, MakeSwarmRoad, MakeSwarmStorage, MakeSwarmTerminal, MakeSwarmWall } from "./SwarmStructure";
+import { SwarmStructure, MakeSwarmExtension, MakeSwarmExtractor, MakeSwarmLink, MakeSwarmNuker, MakeSwarmObserver, MakeSwarmRampart, MakeSwarmRoad, MakeSwarmStorage, MakeSwarmTerminal, MakeSwarmWall, MakeSwarmContainer } from "./SwarmStructure";
 import { MakeSwarmController } from "SwarmObjects/SwarmController";
 import { MakeSwarmLab } from "SwarmObjects/SwarmLab";
 import { MakeSwarmSpawn } from "SwarmObjects/SwarmSpawn";
+import { MakeSwarmTower } from "SwarmObjects/SwarmTower";
 
 export class SwarmCreator {
     CreateSwarmObject<T extends Source | Creep

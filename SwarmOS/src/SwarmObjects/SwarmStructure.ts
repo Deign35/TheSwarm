@@ -81,6 +81,7 @@ export class SwarmContainer extends SwarmStructure<STRUCTURE_CONTAINER, Structur
     get storeCapacity() { return this._instance.storeCapacity; }
     get ticksToDecay() { return this._instance.ticksToDecay; }
 }
+export function MakeSwarmContainer(container: StructureContainer): TSwarmContainer { return new SwarmContainer(container); }
 export class SwarmRoad extends SwarmStructure<STRUCTURE_ROAD, StructureRoad, SwarmType.SwarmRoad> implements ISwarmRoad, StructureRoad {
     get swarmType(): SwarmType.SwarmRoad { return SwarmType.SwarmRoad; }
     get ticksToDecay() { return this._instance.ticksToDecay };
