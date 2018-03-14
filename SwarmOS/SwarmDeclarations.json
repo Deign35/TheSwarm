@@ -74,7 +74,32 @@
         "SwarmType": {
             "SwarmSite": 0,
             "SwarmCreep": 1,
-            "SwarmFlag": 2
+            "SwarmFlag": 2,
+            "SwarmMineral": 3,
+            "SwarmNuke": 4,
+            "SwarmResource": 5,
+            "SwarmRoom": 6,
+            "SwarmSource": 7,
+            "SwarmContainer": 8,
+            "SwarmController": 9,
+            "SwarmExtension": 10,
+            "SwarmExtractor": 11,
+            "SwarmKeepersLair": 12,
+            "SwarmLab": 13,
+            "SwarmLink": 14,
+            "SwarmNuker": 15,
+            "SwarmObserver": 16,
+            "SwarmPowerBank": 17,
+            "SwarmPowerSpawn": 18,
+            "SwarmPortal": 19,
+            "SwarmRampart": 20,
+            "SwarmRoad": 21,
+            "SwarmSpawn": 22,
+            "SwarmStorage": 23,
+            "SwarmTerminal": 24,
+            "SwarmTower": 25,
+            "SwarmWall": 26,
+            "SwarmTombstone": 27
         }
     },
     "CompoundTypes": {

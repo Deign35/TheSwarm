@@ -1,6 +1,7 @@
 import { OwnedSwarmStructure } from "./SwarmStructure";
 
-export class SwarmController extends OwnedSwarmStructure<STRUCTURE_CONTROLLER, StructureController> implements ISwarmController, StructureController {
+export class SwarmController extends OwnedSwarmStructure<STRUCTURE_CONTROLLER, StructureController, SwarmType.SwarmController> implements ISwarmController, StructureController {
+    get swarmType(): SwarmType.SwarmController { return SwarmType.SwarmController; }
     get level() { return this._instance.level; }
     get progress() { return this._instance.progress; }
     get progressTotal() { return this._instance.progressTotal; }

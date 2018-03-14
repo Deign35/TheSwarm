@@ -3,7 +3,7 @@ import { CreepMemory } from "Memory/StorageMemory";
 
 const CARRY_TOTAL = 'CT';
 const CURRENT_PATH = 'CP';
-export class SwarmCreep extends OwnableSwarmObject<Creep> implements ISwarmCreep, Creep {
+export class SwarmCreep extends OwnableSwarmObject<Creep, SwarmType.SwarmCreep> implements ISwarmCreep, Creep {
     protected data: { [id: string]: any } = {};
     protected creepMemory!: CreepMemory;
     get carryTotal() {
@@ -23,6 +23,7 @@ export class SwarmCreep extends OwnableSwarmObject<Creep> implements ISwarmCreep
         // enacted as a result of being invalid next tick.
         return 0;
     }
+    get swarmType(): SwarmType.SwarmCreep { return SwarmType.SwarmCreep; }
 
     /**
      * Prototype properties
