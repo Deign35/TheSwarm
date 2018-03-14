@@ -136,3 +136,6 @@ declare function MakeSwarmTower(Tower: StructureTower): TSwarmTower;
 declare interface ISwarmTombstone extends ISwarmObjWithID<Tombstone, SwarmType.SwarmTombstone> { }
 declare type TSwarmTombstone = Tombstone & ISwarmTombstone & TSwarmObjWithID<Tombstone, SwarmType.SwarmTombstone>;
 declare function MakeSwarmTombstone(tombstone: Tombstone): TSwarmTombstone;
+
+
+declare type PrimarySwarmTypes<T extends Structure, U extends SwarmType> = TSwarmRoom | TSwarmCreep | TSwarmFlag | TSwarmStructure<T, U>;

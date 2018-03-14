@@ -11,22 +11,24 @@ import { MakeSwarmTower } from "SwarmObjects/SwarmTower";
 
 export class SwarmCreator {
     CreateSwarmObject<T extends Source | Creep
-        | Mineral | Resource
+        | Mineral | Resource | Room
         | ConstructionSite | Nuke | Tombstone, U extends SwarmType>(obj: T, type: U) {
         switch (type) {
             case (SwarmType.SwarmSite):
                 return (MakeSwarmSite(obj as ConstructionSite));
-            case (SwarmType.SwarmSite):
+            case (SwarmType.SwarmCreep):
                 return (MakeSwarmCreep(obj as Creep));
-            case (SwarmType.SwarmSite):
+            case (SwarmType.SwarmMineral):
                 return (MakeSwarmMineral(obj as Mineral));
-            case (SwarmType.SwarmSite):
+            case (SwarmType.SwarmNuke):
                 return (MakeSwarmNuke(obj as Nuke));
-            case (SwarmType.SwarmSite):
+            case (SwarmType.SwarmResource):
                 return (MakeSwarmResource(obj as Resource));
+            case (SwarmType.SwarmRoom):
+                return MakeSwarmRoom(obj as Room);
             case (SwarmType.SwarmSource):
                 return (MakeSwarmSource(obj as Source));
-            case (SwarmType.SwarmSite):
+            case (SwarmType.SwarmTombstone):
                 return (MakeSwarmTombstone(obj as Tombstone));
         }
 
