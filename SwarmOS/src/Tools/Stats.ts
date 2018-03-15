@@ -48,7 +48,6 @@ as the tag indexes get too large too quickly. Good data for tags is more static 
 such as roomName, sectorName, etc, low overall spread.
 
 *
-import * as _ from "lodash"
 declare var Memory: any;
 export default function setup(): void {
     global.stats = new Statistics();

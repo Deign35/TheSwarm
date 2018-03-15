@@ -1,30 +1,28 @@
 import { ActionWithTarget } from "Actions/ActionBase";
-import * as SwarmCodes from "Consts/SwarmCodes";
-import * as _ from "lodash";
 
 declare type PickupTargetType = Resource;
 export class PickupAction extends ActionWithTarget<PickupTargetType> {
     static SimultaneousActionValue = 0;
     protected get BlockValue() { return PickupAction.SimultaneousActionValue; }
-    protected ActionImplemented(): SwarmCodes.SwarmlingResponse {
+    protected ActionImplemented(): SwarmlingResponse {
         let result = this.AssignedCreep.pickup(this.Target);
-        let actionResponse: SwarmCodes.SwarmlingResponse = SwarmCodes.C_NONE;
+        let actionResponse: SwarmlingResponse = C_NONE;
         switch (result) {
-            case (OK): actionResponse = SwarmCodes.C_NONE; break;
+            case (OK): actionResponse = C_NONE; break;
             //case(ERR_NOT_OWNER): Not the owner of this object.
             //case(ERR_BUSY): Creep is still being spawned.
             //case(ERR_INVALID_TARGET): Target is not a valid constructionsite.
-            case (ERR_FULL): actionResponse = SwarmCodes.E_ACTION_UNNECESSARY; break;
-            case (ERR_NOT_IN_RANGE): actionResponse = SwarmCodes.C_MOVE; break;
+            case (ERR_FULL): actionResponse = E_ACTION_UNNECESSARY; break;
+            case (ERR_NOT_IN_RANGE): actionResponse = C_MOVE; break;
             default: console.log('FAILED ACTION[PickupAction] -- ' + result);
         }
 
         return actionResponse;
     }
-    ValidateAction(): SwarmCodes.SwarmlingResponse {
+    ValidateAction(): SwarmlingResponse {
         if (_.sum(this.AssignedCreep.carry) == this.AssignedCreep.carryCapacity) {
-            return SwarmCodes.E_ACTION_UNNECESSARY;
+            return E_ACTION_UNNECESSARY;
         }
-        return SwarmCodes.C_NONE;
+        return C_NONE;
     }
 }

@@ -1,14 +1,11 @@
-import * as SwarmCodes from "Consts/SwarmCodes"
-import * as _ from "lodash";
-
 export abstract class ActionBase {
     constructor(public AssignedCreep: Creep) { }
 
     protected get EnergyBlockValue() { return 0; }
-    Run(autoMove: boolean = true): SwarmCodes.SwarmlingResponse {
+    Run(autoMove: boolean = true): SwarmlingResponse {
         let jobResult = this.ActionImplemented();
 
-        if (autoMove && jobResult == SwarmCodes.C_MOVE) {
+        if (autoMove && jobResult == C_MOVE) {
             this.Move(this.GetMovePosition());
         }
 
@@ -22,9 +19,9 @@ export abstract class ActionBase {
     //                                 : rangedAttack / rangedMassAttack / build / repair / rangedHeal <-- Separate chart for ranged actions (minus upgrade)
 
     protected abstract get BlockValue(): number;
-    protected abstract ActionImplemented(): SwarmCodes.SwarmlingResponse;
+    protected abstract ActionImplemented(): SwarmlingResponse;
     protected abstract GetMovePosition(): RoomPosition;
-    abstract ValidateAction(): SwarmCodes.SwarmlingResponse;
+    abstract ValidateAction(): SwarmlingResponse;
 }
 export abstract class ActionWithPosition extends ActionBase {
     constructor(creep: Creep, protected TargetPos: RoomPosition) {

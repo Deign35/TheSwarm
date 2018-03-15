@@ -1,4 +1,3 @@
-import * as _ from "lodash";
 declare var Memory: { profiler: { [id: string]: any } }
 
 export function init(): Profiler {

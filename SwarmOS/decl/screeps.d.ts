@@ -3032,7 +3032,7 @@ interface Room {
         bottom: number,
         right: number,
         asArray: true
-    ): LookForAtAreaResultFinal<T>// LookForAtAreaResultArray<LookAtTypes[T], T>;
+    ): LookForAtAreaResultFinal<T> & { filter: any }// LookForAtAreaResultArray<LookAtTypes[T], T>;
 
     /**
      * Serialize a path array into a short string representation, which is suitable to store in memory.

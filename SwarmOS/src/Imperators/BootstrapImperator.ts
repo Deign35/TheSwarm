@@ -1,6 +1,4 @@
-import * as _ from "lodash";
-import * as SwarmCodes from "Consts/SwarmCodes";
-import { ImperatorBase } from "Imperators/ImperatorBase";
+/*import { ImperatorBase } from "Imperators/ImperatorBase";
 import { MoveToPositionAction } from "Actions/MoveToPositionAction";
 import { ActionBase } from "Actions/ActionBase";
 import { HarvestAction } from "Actions/HarvestAction";
@@ -9,24 +7,24 @@ import { FindStructureNextTo, FindNextTo } from "Tools/TheFinder";
 
 const CONSUL_TYPE = 'H_Consul';
 export class BootstrapImperator extends ImperatorBase {
-    ActivateCreep(creepData: CollectorConsul_CreepData): SwarmCodes.SwarmlingResponse {
+    ActivateCreep(creepData: CollectorConsul_CreepData): SwarmlingResponse {
         let creep = Game.creeps[creepData.creepName];
-        if (creep.spawning) { return SwarmCodes.C_NONE; }
+        if (creep.spawning) { return C_NONE; }
         let sourceTarget = Game.getObjectById(creepData.targetID) as Source;
         let action: ActionBase = new HarvestAction(creep, sourceTarget);
         let actionResult = action.ValidateAction();
 
         switch (actionResult) {
-            case (SwarmCodes.C_NONE): break;
-            case (SwarmCodes.C_MOVE):
+            case (C_NONE): break;
+            case (C_MOVE):
                 action = new MoveToPositionAction(creep, creepData.harvestPosition);
-            case (SwarmCodes.E_ACTION_UNNECESSARY):
+            case (E_ACTION_UNNECESSARY):
                 let foundSites = FindNextTo(creep.pos, LOOK_CONSTRUCTION_SITES);
                 if (foundSites.length > 0 && foundSites[0].constructionSite) {
                     action = new BuildAction(creep, foundSites[0].constructionSite! as ConstructionSite);
                 }
                 break;
-            case (SwarmCodes.E_TARGET_INELLIGIBLE):
+            case (E_TARGET_INELLIGIBLE):
             default:
                 console.log('HarvestResult: ' + actionResult); // What happens i wonder?  
         }
@@ -50,7 +48,7 @@ export class BootstrapImperator extends ImperatorBase {
         // Do a container check, where if it exists, do an express version that doesn't go through this logic.
         let harvestResult = harvestAction.ValidateAction();
         switch (harvestResult) {
-            case (SwarmCodes.C_NONE):
+            case (C_NONE):
                 if (!data.constructionSite && !data.containerID) {
                     let foundCS = harvester.pos.lookFor(LOOK_CONSTRUCTION_SITES);
                     if (foundCS && foundCS.length > 0) {
@@ -67,24 +65,24 @@ export class BootstrapImperator extends ImperatorBase {
                     }
                 }
                 break;
-            case (SwarmCodes.E_ACTION_UNNECESSARY):
+            case (E_ACTION_UNNECESSARY):
                 /*if (data.creepName == harvester.name) {
                     if (data.constructionSite) {
                         harvestAction = new BuildAction(harvester, Game.getObjectById(data.constructionSite) as ConstructionSite);
                     }
-                }*/
+                }***
                 break; // Creep's carry is full
-            case (SwarmCodes.E_TARGET_INELLIGIBLE): break; // Target is empty.
-            case (SwarmCodes.C_MOVE):
+            case (E_TARGET_INELLIGIBLE): break; // Target is empty.
+            case (C_MOVE):
                 if (!moveTarget) {
                     new MoveToPositionAction(harvester, sourceTarget.pos).Run(true);
                 }
                 break;
         }
 
-        if (harvestResult != SwarmCodes.C_MOVE) {
+        if (harvestResult != C_MOVE) {
             harvestResult = harvestAction.Run();
             // Dont care about the result
         }
     }
-}
+}*/
