@@ -150,11 +150,10 @@ declare type PrimaryTypeFunctions = {
 
 
 declare interface SwarmController<T extends StorageMemoryType, U extends PrimarySwarmTypes> {
+    StorageType: T;
     PrepareTheSwarm(): void;
     ActivateSwarm(): void;
     FinalizeSwarmActivity(): void;
-
-    CreateSwarmObject(obj: U): void;
 }
 
 declare interface ISwarmQueen extends SwarmController<StorageMemoryType.Room, TSwarmRoom> {

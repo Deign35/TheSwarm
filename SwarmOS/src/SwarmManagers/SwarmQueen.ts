@@ -1,9 +1,12 @@
 import { NestQueen } from "./NestQueen";
 import { RCL1_HiveQueen } from "./HiveQueen";
 import { profile } from "Tools/Profiler";
+import { SwarmManager } from "./SwarmManager";
+import { SwarmRoom } from "SwarmObjects/SwarmRoom";
+import { SwarmCreator } from "SwarmObjects/SwarmCreator";
 
 @profile
-export class SwarmQueen implements ISwarmQueen {
+export class SwarmQueen extends SwarmManager<StorageMemoryType.Room, SwarmRoom> implements ISwarmQueen {
     private Queens!: { [roomName: string]: IQueen };
     private static _instance: SwarmQueen;
     static PrepareTheSwarm() {
@@ -18,7 +21,7 @@ export class SwarmQueen implements ISwarmQueen {
             }
         }
         for (const roomName in Game.rooms) {
-            this.Queens[roomName] = this.CreateSwarmObject(Game.rooms[roomName]);
+            this.Queens[roomName] = new RCL1_HiveQueen(this.CreateSwarmObject(Game.rooms[roomName]));
             this.Queens[roomName].StartTick();
         }
     }
@@ -34,10 +37,19 @@ export class SwarmQueen implements ISwarmQueen {
             this.Queens[roomName].EndTick();
         }
     }
-    static CreateSwarmObject(room: Room): IQueen {
+    static CreateSwarmObject(room: Room): SwarmRoom {
         return this._instance.CreateSwarmObject(room);
     }
-    CreateSwarmObject(room: Room): IQueen {
-        return new RCL1_HiveQueen(room);
+    protected CreateSwarmObject(room: Room): SwarmRoom {
+        return SwarmCreator.CreateSwarmObject<Room, SwarmType.SwarmRoom>(room, SwarmType.SwarmRoom) as SwarmRoom;
+    }
+    protected getSwarmType(obj: any): SwarmType.SwarmRoom {
+        return SwarmType.SwarmRoom;
+    }
+    protected findAllGameObjects(): { [id: string]: SwarmRoom; } {
+        throw new Error("Method not implemented.");
+    }
+    protected getStorageType(): StorageMemoryType.Room {
+        throw new Error("Method not implemented.");
     }
 } global["SwarmQueen"] = SwarmQueen;

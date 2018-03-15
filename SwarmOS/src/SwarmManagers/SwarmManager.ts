@@ -1,4 +1,5 @@
 import { SwarmItem } from "SwarmObjects/SwarmObject";
+import { SwarmCreator } from "SwarmObjects/SwarmCreator";
 
 export abstract class SwarmManager<T extends StorageMemoryType, U extends PrimarySwarmTypes> implements SwarmController<T, U> {
     get StorageType() { return this.getStorageType(); }
@@ -8,12 +9,6 @@ export abstract class SwarmManager<T extends StorageMemoryType, U extends Primar
 
     private swarmObjects!: { [itemID: string]: U };
     PrepareTheSwarm(): void {
-        this.swarmObjects = {};
-        for (const swarmName in Swarmlord.GetMemoryEntries(this.StorageType)) {
-            if (!Game.rooms[swarmName]) {
-                // Room is no longer in view.  Need to figure out what this means.
-            }
-        }
         let allGameObjects = this.findAllGameObjects();
         for (const swarmName in allGameObjects) {
             this.swarmObjects[swarmName] = this.CreateSwarmObject(allGameObjects[swarmName]);
@@ -21,15 +16,17 @@ export abstract class SwarmManager<T extends StorageMemoryType, U extends Primar
         }
     }
     ActivateSwarm(): void {
-        throw new Error("Method not implemented.");
+        for (let swarmName in this.swarmObjects) {
+            this.swarmObjects[swarmName].ProcessTick();
+        }
     }
     FinalizeSwarmActivity(): void {
-        throw new Error("Method not implemented.");
+        for (let swarmName in this.swarmObjects) {
+            this.swarmObjects[swarmName].EndTick();
+        }
     }
-    CreateSwarmObject(obj: U): U {
-        throw new Error("Method not implemented.");
-    }
-
+    protected abstract CreateSwarmObject(obj: U): U;
+    protected abstract getSwarmType(obj: any): SwarmType;
     protected abstract findAllGameObjects(): { [id: string]: U }
     protected abstract getStorageType(): T;
 }

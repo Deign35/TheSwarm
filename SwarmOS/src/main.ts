@@ -4,8 +4,8 @@ global.Profiler = Profiler.init();
 
 import "Tools/GlobalTools";
 import "Memory/Swarmlord";
-import { SwarmQueen } from "Queens/SwarmQueen";
-import { SwarmCreepController } from "CreepManagers/SwarmCreepManager"
+import { SwarmQueen } from "SwarmManagers/SwarmQueen";
+import { SwarmCreepController } from "SwarmManagers/SwarmCreepManager"
 
 export const loop = function () {
     debugger;
