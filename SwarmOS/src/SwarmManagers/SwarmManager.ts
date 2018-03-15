@@ -66,5 +66,6 @@ export abstract class SwarmManager<T extends StorageMemoryType, U extends Primar
             let obj = allGameObjects[objID];
             Swarmlord.CreateNewStorageMemory<T>(objID, this.getManagerSavePath(), this.getStorageType());
         }
+        this.FinalizeSwarmActivity();
     }
 }

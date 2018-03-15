@@ -9,10 +9,11 @@ import { MakeSwarmLab } from "SwarmObjects/SwarmLab";
 import { MakeSwarmSpawn } from "SwarmObjects/SwarmSpawn";
 import { MakeSwarmTower } from "SwarmObjects/SwarmTower";
 import { MakeSwarmRoom } from "SwarmObjects/SwarmRoom";
+import { MakeSwarmFlag } from "SwarmObjects/SwarmFlag";
 
 export class SwarmCreator {
     static CreateSwarmObject<T extends Source | Creep
-        | Mineral | Resource | Room
+        | Mineral | Resource | Room | Flag
         | ConstructionSite | Nuke | Tombstone, U extends SwarmType>(obj: T, type: U) {
         switch (type) {
             case (SwarmType.SwarmSite):
@@ -31,6 +32,8 @@ export class SwarmCreator {
                 return (MakeSwarmSource(obj as Source));
             case (SwarmType.SwarmTombstone):
                 return (MakeSwarmTombstone(obj as Tombstone));
+            case (SwarmType.SwarmFlag):
+                return (MakeSwarmFlag(obj as Flag));
         }
 
         throw new InvalidArgumentException('Attempted to create an object that doesnt exist.  probably a structure.  ' + type);
