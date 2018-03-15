@@ -1,6 +1,8 @@
 import { SwarmItem } from "SwarmObjects/SwarmObject";
 import { SwarmCreator } from "SwarmObjects/SwarmCreator";
+import { profile } from "Tools/Profiler";
 
+@profile
 export abstract class SwarmManager<T extends StorageMemoryType, U extends PrimarySwarmTypes>
     implements SwarmController<T, U> {
     constructor() { this.swarmObjects = this.LoadSwarmObjects(); }
@@ -40,7 +42,7 @@ export abstract class SwarmManager<T extends StorageMemoryType, U extends Primar
                 Swarmlord.DeleteMemory(Swarmlord.CheckoutMemory(allSwarmEntries[i], this.getManagerSavePath(), this.getStorageType()));
                 continue;
             }
-            let swarmObj = SwarmCreator.CreateSwarmObject(obj, this.getSwarmType(obj)) as PrimarySwarmTypes;
+            let swarmObj = this.CreateSwarmObject(obj);
             swarmObj.memory = Swarmlord.CheckoutMemory(swarmObj.saveID, this.getManagerSavePath(), this.getStorageType());
             swarmObjects[allSwarmEntries[i]] = swarmObj;
         }
@@ -48,6 +50,9 @@ export abstract class SwarmManager<T extends StorageMemoryType, U extends Primar
         return swarmObjects;
     }
 
+    protected CreateSwarmObject(obj: any): PrimarySwarmTypes {
+        return SwarmCreator.CreateSwarmObject(obj, this.getSwarmType(obj)) as PrimarySwarmTypes;
+    }
     protected abstract getManagerSavePath(): string[];
     protected abstract getSwarmType(obj: any): SwarmType;
     protected abstract getStorageType(): T;
@@ -55,4 +60,11 @@ export abstract class SwarmManager<T extends StorageMemoryType, U extends Primar
     protected abstract OnPrepareSwarm(swarmObj: U): void;
     protected abstract OnActivateSwarm(swarmObj: U): void;
     protected abstract OnFinalizeSwarm(swarmObj: U): void;
+    InitSwarmManager(): void {
+        let allGameObjects = this.FindAllGameObjects();
+        for (let objID in allGameObjects) {
+            let obj = allGameObjects[objID];
+            Swarmlord.CreateNewStorageMemory<T>(objID, this.getManagerSavePath(), this.getStorageType());
+        }
+    }
 }

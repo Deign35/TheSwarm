@@ -3,6 +3,9 @@ import { NotImplementedException, SwarmException, MemoryNotFoundException, Alrea
 import { StorageMemory, CreepMemory, ConsulMemory, FlagMemory, RoomMemory, StructureMemory, BasicMemory } from "Memory/StorageMemory";
 import { SwarmLogger } from "Tools/SwarmLogger";
 import { SwarmQueen } from "SwarmManagers/SwarmQueen";
+import { SwarmCreepController } from "SwarmManagers/SwarmCreepManager"
+import { SwarmFlagController } from "SwarmManagers/SwarmFlagController"
+import { SwarmStructureController } from "SwarmManagers/SwarmStructureController"
 
 declare var Memory: StorageMemoryStructure;
 
@@ -69,9 +72,11 @@ export class Swarmlord implements ISwarmlord {
             this.InitBaseMemoryFolders();
 
             // init stuff
-            SwarmQueen.PrepareTheSwarm();
+            new SwarmQueen().InitSwarmManager();
+            new SwarmCreepController().InitSwarmManager();
+            new SwarmStructureController().InitSwarmManager();
+            new SwarmFlagController().InitSwarmManager();
 
-            SwarmQueen.FinalizeSwarmActivity();
             initTimer.Stop();
             SwarmLogger.Log("End initialization of memory.  Initialization took: " + initTimer.ToString());
         } else {

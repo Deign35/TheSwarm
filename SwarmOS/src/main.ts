@@ -13,10 +13,16 @@ export const loop = function () {
 
     SwarmQueen.PrepareTheSwarm();
     SwarmCreepController.PrepareTheSwarm();
+    SwarmFlagController.PrepareTheSwarm();
+    SwarmStructureController.PrepareTheSwarm();
 
     SwarmQueen.ActivateSwarm();
     SwarmCreepController.ActivateSwarm();
+    SwarmFlagController.ActivateSwarm();
+    SwarmStructureController.ActivateSwarm();
 
     SwarmQueen.FinalizeSwarmActivity();
     SwarmCreepController.FinalizeSwarmActivity();
+    SwarmFlagController.FinalizeSwarmActivity();
+    SwarmStructureController.FinalizeSwarmActivity();
 }

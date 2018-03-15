@@ -1,7 +1,11 @@
 import { SwarmItem } from "SwarmObjects/SwarmObject";
+import { RoomMemory } from "Memory/StorageMemory";
+import { profile } from "Tools/Profiler";
 
+@profile
 export class SwarmRoom extends SwarmItem<Room, SwarmType.SwarmRoom> implements ISwarmRoom, Room {
     get saveID() { return this.name; }
+    protected roomMemory!: RoomMemory;
     StartTick() { }
     ProcessTick() { }
     EndTick() { }
@@ -11,7 +15,8 @@ export class SwarmRoom extends SwarmItem<Room, SwarmType.SwarmRoom> implements I
     get controller(): StructureController | undefined { return this._instance.controller; }
     get energyAvailable(): number { return 0; }
     get energyCapacityAvailable(): number { return 0; }
-    get memory() { return this._instance.memory; }
+    get memory() { return this.roomMemory; }
+    set memory(mem: RoomMemory) { this.roomMemory = mem; }
     get mode() { return this._instance.mode; }
     get name(): string { return this._instance.name.slice(); }
     get storage(): StructureStorage | undefined { return this._instance.storage; }

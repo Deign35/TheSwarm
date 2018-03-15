@@ -1,6 +1,7 @@
 import { SwarmManager } from "./SwarmManager";
 import { InvalidArgumentException } from "Tools/SwarmExceptions";
 import { profile } from "Tools/Profiler";
+import { SwarmCreator } from "SwarmObjects/SwarmCreator";
 
 const STRUCTURE_SAVE_PATH = ["structures"];
 @profile
@@ -42,6 +43,10 @@ export class SwarmStructureController extends SwarmManager<StorageMemoryType.Str
     }
     protected OnFinalizeSwarm(swarmObj: TSwarmContainer | TSwarmController | TSwarmExtension | TSwarmExtractor | TSwarmLab | TSwarmLink | TSwarmNuker | TSwarmObserver | TSwarmRampart | TSwarmRoad | TSwarmSpawn | TSwarmStorage | TSwarmTerminal | TSwarmTower | TSwarmWall): void {
 
+    }
+
+    protected CreateSwarmObject(obj: any): PrimarySwarmTypes {
+        return SwarmCreator.CreateSwarmStructure(obj, this.getSwarmType(obj)) as PrimarySwarmTypes;
     }
     private static _instance: SwarmStructureController;
     static PrepareTheSwarm() {
