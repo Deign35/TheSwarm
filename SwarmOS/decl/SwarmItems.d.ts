@@ -137,15 +137,18 @@ declare interface ISwarmTombstone extends ISwarmObjWithID<Tombstone, SwarmType.S
 declare type TSwarmTombstone = Tombstone & ISwarmTombstone & TSwarmObjWithID<Tombstone, SwarmType.SwarmTombstone>;
 declare function MakeSwarmTombstone(tombstone: Tombstone): TSwarmTombstone;
 
-declare type SwarmStructures = TSwarmContainer | TSwarmController | TSwarmExtension | TSwarmExtractor |
+declare type SwarmStructureTypes = (TSwarmContainer | TSwarmController | TSwarmExtension | TSwarmExtractor |
     TSwarmLab | TSwarmLink | TSwarmNuker | TSwarmObserver | TSwarmRampart | TSwarmRoad |
-    TSwarmSpawn | TSwarmStorage | TSwarmTerminal | TSwarmTower | TSwarmWall;
-declare type PrimarySwarmTypes = (TSwarmRoom | TSwarmCreep | TSwarmFlag | SwarmStructures);
+    TSwarmSpawn | TSwarmStorage | TSwarmTerminal | TSwarmTower | TSwarmWall) & PrimaryTypeFunctions;
+declare type PrimarySwarmTypes = (TSwarmRoom | TSwarmCreep | TSwarmFlag | SwarmStructureTypes);
 
 declare type PrimaryTypeFunctions = {
     StartTick(): void;
     ProcessTick(): void;
     EndTick(): void;
+
+    memory: IStorageMemory<any>;
+    saveID: string;
 };
 
 
@@ -162,9 +165,9 @@ declare interface ISwarmQueen extends SwarmController<StorageMemoryType.Room, TS
 declare interface ISwarmCreepController extends SwarmController<StorageMemoryType.Creep, TSwarmCreep> {
 
 } declare var SwarmCreepController: ISwarmCreepController;
-declare interface ISwarmStructureController extends SwarmController<StorageMemoryType.Structure, SwarmStructures> {
+declare interface ISwarmStructureController extends SwarmController<StorageMemoryType.Structure, SwarmStructureTypes> {
 
 } declare var SwarmStructureController: ISwarmStructureController;
-declare interface ISwarmFlags extends SwarmController<StorageMemoryType.Flag, TSwarmFlag> {
+declare interface ISwarmFlagController extends SwarmController<StorageMemoryType.Flag, TSwarmFlag> {
 
-}declare var SwarmFlagController: ISwarmFlags;
+}declare var SwarmFlagController: ISwarmFlagController;

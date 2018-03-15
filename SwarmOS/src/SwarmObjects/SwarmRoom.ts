@@ -1,6 +1,7 @@
 import { SwarmItem } from "SwarmObjects/SwarmObject";
 
 export class SwarmRoom extends SwarmItem<Room, SwarmType.SwarmRoom> implements ISwarmRoom, Room {
+    get saveID() { return this.name; }
     StartTick() { }
     ProcessTick() { }
     EndTick() { }

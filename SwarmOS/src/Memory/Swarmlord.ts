@@ -2,7 +2,7 @@ import { profile } from "Tools/Profiler";
 import { NotImplementedException, SwarmException, MemoryNotFoundException, AlreadyExistsException, InvalidArgumentException } from "Tools/SwarmExceptions";
 import { StorageMemory, CreepMemory, ConsulMemory, FlagMemory, RoomMemory, StructureMemory, BasicMemory } from "Memory/StorageMemory";
 import { SwarmLogger } from "Tools/SwarmLogger";
-import { SwarmQueen } from "Queens/SwarmQueen";
+import { SwarmQueen } from "SwarmManagers/SwarmQueen";
 
 declare var Memory: StorageMemoryStructure;
 
@@ -149,6 +149,12 @@ export class Swarmlord implements ISwarmlord {
         delete this.storageMemory[storagePath];
     }
 
+    DeleteMemory<T extends StorageMemoryTypes>(mem: IStorageMemory<T>) {
+        this.ReleaseMemory(mem, false);
+        this.DeleteFromStorageMemory(mem);
+        this.DeleteFromMemoryStructure(mem);
+    }
+
     /**
      * Loads memory from the cached memory object.
      * @param id id of the memory object to retrieve
@@ -188,6 +194,16 @@ export class Swarmlord implements ISwarmlord {
     private LoadDataFromMemory<T extends StorageMemoryTypes>(id: string, memoryType: StorageMemoryType): IStorageMemory<T> {
         this.storageMemory[id] = Memory[id];
         return this.storageMemory[id];
+    }
+
+    private DeleteFromMemoryStructure<T extends StorageMemoryTypes>(memObject: IStorageMemory<T>) {
+        // Load parent and delete from there.
+    }
+    private DeleteFromStorageMemory<T extends StorageMemoryTypes>(memObject: IStorageMemory<T>) {
+        let memPath = memObject.GetSavePath();
+        let storagePath = this.MakeStoragePath(memObject.id, memPath);
+        delete this.storageMemory[storagePath];
+        // Need to recursively delete as well or it will just get saved back.
     }
 
     /**

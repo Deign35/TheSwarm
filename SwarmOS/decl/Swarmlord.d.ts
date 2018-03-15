@@ -56,6 +56,7 @@ declare interface ISwarmlord {
     ValidateMemory(): void;
     CheckoutMemory<T extends StorageMemoryTypes, U extends IStorageMemory<T>>(id: string, path: string[], memoryType: StorageMemoryType): U;
     ReleaseMemory<T extends StorageMemoryTypes>(memObject: IStorageMemory<T>, save?: boolean): void;
+    DeleteMemory<T extends StorageMemoryTypes>(memObject: IStorageMemory<T>): void;
     StorageMemoryTypeToString(memType: StorageMemoryType): string;
     GetMemoryEntries(memType: StorageMemoryType): string[];
     CreateNewStorageMemory<T extends StorageMemoryTypes>(id: string, path: string[], memType: StorageMemoryType): void

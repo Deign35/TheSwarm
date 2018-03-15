@@ -1,12 +1,16 @@
 import { SwarmObject, NotifiableSwarmObject } from "./SwarmObject";
+import { StructureMemory } from "Memory/StorageMemory";
 
 export abstract class SwarmStructure<U extends StructureConstant, T extends Structure<U>, V extends SwarmType> extends NotifiableSwarmObject<T, V> implements ISwarmStructure<T, V>, Structure {
-
+    protected structureMemory!: StructureMemory;
     get hits() { return this._instance.hits; }
     get hitsMax() { return this._instance.hitsMax; }
     get room() { return this._instance.room; }
     get structureType(): U { return this._instance.structureType; }
+    get saveID() { return this.id; }
 
+    get memory() { return this.structureMemory; }
+    set memory(mem: StructureMemory) { this.structureMemory = mem; }
     destroy() { return this._instance.destroy() }
     isActive() { return this._instance.isActive() }
 

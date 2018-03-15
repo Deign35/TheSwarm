@@ -24,7 +24,11 @@ export class SwarmCreep extends OwnableSwarmObject<Creep, SwarmType.SwarmCreep> 
         return 0;
     }
     get swarmType(): SwarmType.SwarmCreep { return SwarmType.SwarmCreep; }
+    get saveID(): string { return this.name; }
 
+    set memory(creepMemory: CreepMemory) {
+        this.creepMemory = creepMemory;
+    }
 
     StartTick() { }
     ProcessTick() { }
@@ -42,7 +46,7 @@ export class SwarmCreep extends OwnableSwarmObject<Creep, SwarmType.SwarmCreep> 
     get hitsMax() { return this._instance.hitsMax; }
     get memory() {
         //throw "This should be allowed only once it has been properly integrated";
-        return this._instance.memory;
+        return this.creepMemory;
     }
     get prototype() { return this._instance.prototype; }
     get name() { return this._instance.name; }
