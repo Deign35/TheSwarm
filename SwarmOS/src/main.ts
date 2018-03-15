@@ -8,7 +8,7 @@ import { SwarmQueen } from "SwarmManagers/SwarmQueen";
 import { SwarmCreepController } from "SwarmManagers/SwarmCreepManager"
 
 export const loop = function () {
-    debugger;
+    //debugger;
     Swarmlord.ValidateMemory();
 
     SwarmQueen.PrepareTheSwarm();

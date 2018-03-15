@@ -1,8 +1,10 @@
 import { OwnableSwarmObject } from "SwarmObjects/SwarmObject";
 import { CreepMemory } from "Memory/StorageMemory";
+import { profile } from "Tools/Profiler";
 
 const CARRY_TOTAL = 'CT';
 const CURRENT_PATH = 'CP';
+@profile
 export class SwarmCreep extends OwnableSwarmObject<Creep, SwarmType.SwarmCreep> implements ISwarmCreep, Creep {
     protected data: { [id: string]: any } = {};
     protected creepMemory!: CreepMemory;

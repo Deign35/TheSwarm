@@ -100,6 +100,16 @@
             "SwarmTower": 25,
             "SwarmWall": 26,
             "SwarmTombstone": 27
+        },
+        "CreepSuitTypes": {
+            "SourceHarvester": 0,
+            "Builder": 1,
+            "Retriever": 2,
+            "Deliverer": 3,
+            "Upgrader": 4,
+            "Repairer": 5,
+            "Scientist": 6,
+            "Defender": 7
         }
     },
     "CompoundTypes": {

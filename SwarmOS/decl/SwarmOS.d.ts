@@ -29,4 +29,8 @@ declare type QueenCensus = {
     [consulName: string]: ConsulCensus;
 }
 
-declare var MasterStructureController: any;
+declare var SwarmLogger: {
+    Log(message: string, level?: LogLevel): void;
+    LogWarning(message: string): void;
+    LogError(message: string): void;
+}

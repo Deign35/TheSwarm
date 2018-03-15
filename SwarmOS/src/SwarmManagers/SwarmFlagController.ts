@@ -6,7 +6,6 @@ import { SwarmFlag } from "SwarmObjects/SwarmFlag";
 const FLAG_SAVE_PATH = ['flags'];
 @profile
 export class SwarmFlagController extends SwarmManager<StorageMemoryType.Flag, SwarmFlag> implements ISwarmFlagController {
-
     protected getManagerSavePath(): string[] {
         return FLAG_SAVE_PATH;
     }

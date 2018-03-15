@@ -1,7 +1,6 @@
 import { profile } from "Tools/Profiler";
 import { NotImplementedException, SwarmException, MemoryNotFoundException, AlreadyExistsException, InvalidArgumentException } from "Tools/SwarmExceptions";
 import { StorageMemory, CreepMemory, ConsulMemory, FlagMemory, RoomMemory, StructureMemory, BasicMemory } from "Memory/StorageMemory";
-import { SwarmLogger } from "Tools/SwarmLogger";
 import { SwarmQueen } from "SwarmManagers/SwarmQueen";
 import { SwarmCreepController } from "SwarmManagers/SwarmCreepManager"
 import { SwarmFlagController } from "SwarmManagers/SwarmFlagController"
@@ -72,10 +71,10 @@ export class Swarmlord implements ISwarmlord {
             this.InitBaseMemoryFolders();
 
             // init stuff
-            new SwarmQueen().InitSwarmManager();
-            new SwarmCreepController().InitSwarmManager();
-            new SwarmStructureController().InitSwarmManager();
-            new SwarmFlagController().InitSwarmManager();
+            new SwarmQueen().FinalizeSwarmActivity();
+            new SwarmCreepController().FinalizeSwarmActivity();
+            new SwarmStructureController().FinalizeSwarmActivity();
+            new SwarmFlagController().FinalizeSwarmActivity();
 
             initTimer.Stop();
             SwarmLogger.Log("End initialization of memory.  Initialization took: " + initTimer.ToString());
@@ -166,7 +165,7 @@ export class Swarmlord implements ISwarmlord {
      * @param path the path to the parent object.
      */
     private LoadStorageMemory<T extends StorageMemoryTypes>(id: string, path: string[], memoryType: StorageMemoryType): IStorageMemory<T> {
-        debugger;
+        //debugger;
         let storagePath = this.MakeStoragePath(id, path);
         let parentObj: IStorageMemory<T>;
         if (!this.storageMemory[storagePath]) {

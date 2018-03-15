@@ -157,7 +157,6 @@ declare interface SwarmController<T extends StorageMemoryType, U extends Primary
     PrepareTheSwarm(): void;
     ActivateSwarm(): void;
     FinalizeSwarmActivity(): void;
-    InitSwarmManager(): void;
 }
 
 declare interface ISwarmQueen extends SwarmController<StorageMemoryType.Room, TSwarmRoom> {

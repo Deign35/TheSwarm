@@ -5,7 +5,7 @@ import { profile } from "Tools/Profiler";
 @profile
 export abstract class SwarmManager<T extends StorageMemoryType, U extends PrimarySwarmTypes>
     implements SwarmController<T, U> {
-    constructor() { this.swarmObjects = this.LoadSwarmObjects(); }
+    constructor() { this.LoadSwarmObjects(); }
     get StorageType() { return this.getStorageType(); }
 
     protected get SwarmObjects() { return this.swarmObjects; }
@@ -13,9 +13,8 @@ export abstract class SwarmManager<T extends StorageMemoryType, U extends Primar
 
     PrepareTheSwarm(): void {
         for (const swarmName in this.swarmObjects) {
-            let swarmObj = this.swarmObjects[swarmName];
-            this.OnPrepareSwarm(swarmObj)
-            swarmObj.StartTick();
+            this.OnPrepareSwarm(this.swarmObjects[swarmName])
+            this.swarmObjects[swarmName].StartTick();
         }
     }
     ActivateSwarm(): void {
@@ -32,7 +31,7 @@ export abstract class SwarmManager<T extends StorageMemoryType, U extends Primar
         }
     }
 
-    LoadSwarmObjects() {
+    private LoadSwarmObjects() {
         let allObjects = this.FindAllGameObjects();
         let allSwarmEntries = Swarmlord.GetMemoryEntries(this.getStorageType());
         let swarmObjects = {};
@@ -42,12 +41,21 @@ export abstract class SwarmManager<T extends StorageMemoryType, U extends Primar
                 Swarmlord.DeleteMemory(Swarmlord.CheckoutMemory(allSwarmEntries[i], this.getManagerSavePath(), this.getStorageType()));
                 continue;
             }
+            delete allObjects[allSwarmEntries[i]];
             let swarmObj = this.CreateSwarmObject(obj);
             swarmObj.memory = Swarmlord.CheckoutMemory(swarmObj.saveID, this.getManagerSavePath(), this.getStorageType());
             swarmObjects[allSwarmEntries[i]] = swarmObj;
         }
 
-        return swarmObjects;
+        // Anything left in this object is new and needs to be added
+        for (let objID in allObjects) {
+            debugger;
+            let swarmObj = this.CreateSwarmObject(allObjects[objID]);
+            swarmObj.memory = Swarmlord.CheckoutMemory<T, IStorageMemory<U>>(objID, this.getManagerSavePath(), this.getStorageType());
+            swarmObjects[objID] = swarmObj;
+        }
+
+        this.swarmObjects = swarmObjects;
     }
 
     protected CreateSwarmObject(obj: any): PrimarySwarmTypes {
@@ -61,11 +69,11 @@ export abstract class SwarmManager<T extends StorageMemoryType, U extends Primar
     protected abstract OnActivateSwarm(swarmObj: U): void;
     protected abstract OnFinalizeSwarm(swarmObj: U): void;
     InitSwarmManager(): void {
-        let allGameObjects = this.FindAllGameObjects();
+        /*let allGameObjects = this.FindAllGameObjects();
         for (let objID in allGameObjects) {
             let obj = allGameObjects[objID];
-            Swarmlord.CreateNewStorageMemory<T>(objID, this.getManagerSavePath(), this.getStorageType());
+            Swarmlord.CheckoutMemory<T, IStorageMemory<U>>(objID, this.getManagerSavePath(), this.getStorageType());
         }
-        this.FinalizeSwarmActivity();
+        this.FinalizeSwarmActivity();*/
     }
 }

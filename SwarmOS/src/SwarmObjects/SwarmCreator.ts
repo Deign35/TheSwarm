@@ -10,7 +10,9 @@ import { MakeSwarmSpawn } from "SwarmObjects/SwarmSpawn";
 import { MakeSwarmTower } from "SwarmObjects/SwarmTower";
 import { MakeSwarmRoom } from "SwarmObjects/SwarmRoom";
 import { MakeSwarmFlag } from "SwarmObjects/SwarmFlag";
+import { profile } from "Tools/Profiler";
 
+@profile
 export class SwarmCreator {
     static CreateSwarmObject<T extends Source | Creep
         | Mineral | Resource | Room | Flag
