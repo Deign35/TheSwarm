@@ -23,10 +23,10 @@ declare type CacheMemoryStructure = {
     CostMatrices: { [id: string]: CostMatrixMemory }
 }
 
-declare type StorageMemoryTypes = ConsulData | CreepData | RoomData | StructureData | FlagData;
-declare type ConsulData = EmptyData;
+declare type StorageMemoryTypes = CreepSuitData | CreepData | RoomData | StructureData | FlagData;
+declare type CreepSuitData = EmptyData;
 declare type CreepData = {
-    consulData: { [consulType: string]: ConsulData }
+    consulData: { [consulType: string]: CreepSuitData }
 }
 declare type RoomData = {
     queenType: QueenType

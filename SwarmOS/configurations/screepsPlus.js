@@ -6,7 +6,7 @@ module.exports = {
         method: 'memory.stats', // Valid Options: 'console' 'memory.stats'
         segment: 0,
         //		segment: 99, // Uncomment this line and specify segment id if you're placing stats into segment
-        shard: ['shard1'], // An array of shards to pull data from.
+        shard: ['shard2'], // An array of shards to pull data from.
     },
     service: {
         url: 'https://screepspl.us',

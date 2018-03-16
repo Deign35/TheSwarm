@@ -95,15 +95,15 @@ export class BasicMemory extends StorageMemory<EmptyData> {
 }
 
 @profile
-export class ConsulMemory extends StorageMemory<ConsulData> {
+export class CreepSuitMemory extends StorageMemory<CreepSuitData> {
     /*get SavePath() {
         return super.SavePath;
     }*/
     GetMemoryType(): StorageMemoryType {
-        return StorageMemoryType.Consul;
+        return StorageMemoryType.CreepSuitData;
     }
     CreateEmptyMemory() {
-        return {} as ConsulData;
+        return {} as CreepSuitData;
     }
 }
 

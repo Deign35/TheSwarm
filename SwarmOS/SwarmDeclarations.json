@@ -52,8 +52,8 @@
             "Structure": 1,
             "Room": 2,
             "Flag": 3,
-            "Consul": 4,
-            "Creep": 5
+            "Creep": 4,
+            "CreepSuitData": 5
         },
         "QueenType": {
             "Larva": 0,

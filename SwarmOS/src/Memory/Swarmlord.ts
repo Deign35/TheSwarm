@@ -1,6 +1,6 @@
 import { profile } from "Tools/Profiler";
 import { NotImplementedException, SwarmException, MemoryNotFoundException, AlreadyExistsException, InvalidArgumentException } from "Tools/SwarmExceptions";
-import { StorageMemory, CreepMemory, ConsulMemory, FlagMemory, RoomMemory, StructureMemory, BasicMemory } from "Memory/StorageMemory";
+import { StorageMemory, CreepMemory, CreepSuitMemory, FlagMemory, RoomMemory, StructureMemory, BasicMemory } from "Memory/StorageMemory";
 import { SwarmQueen } from "SwarmManagers/SwarmQueen";
 import { SwarmCreepController } from "SwarmManagers/SwarmCreepManager"
 import { SwarmFlagController } from "SwarmManagers/SwarmFlagController"
@@ -13,7 +13,7 @@ function ConvertDataToMemory<T extends StorageMemoryTypes>(id: string, path: str
     let memoryType = memCopy[MEM_TYPE] as StorageMemoryType;
     switch (memoryType) {
         case (StorageMemoryType.Creep): return new CreepMemory(id, path, memCopy as CreepData);
-        case (StorageMemoryType.Consul): return new ConsulMemory(id, path, memCopy as ConsulData);
+        case (StorageMemoryType.CreepSuitData): return new CreepSuitMemory(id, path, memCopy as CreepSuitData);
         case (StorageMemoryType.Flag): return new FlagMemory(id, path, memCopy as FlagData);
         case (StorageMemoryType.Room): return new RoomMemory(id, path, memCopy as RoomData);
         case (StorageMemoryType.Structure): return new StructureMemory(id, path, memCopy as StructureData);
@@ -24,7 +24,7 @@ function ConvertDataToMemory<T extends StorageMemoryTypes>(id: string, path: str
 function CreateNewMemory(id: string, path: string[], memoryType: StorageMemoryType) {
     switch (memoryType) {
         case (StorageMemoryType.Creep): return new CreepMemory(id, path);
-        case (StorageMemoryType.Consul): return new ConsulMemory(id, path);
+        case (StorageMemoryType.CreepSuitData): return new CreepSuitMemory(id, path);
         case (StorageMemoryType.Flag): return new FlagMemory(id, path);
         case (StorageMemoryType.Room): return new RoomMemory(id, path);
         case (StorageMemoryType.Structure): return new StructureMemory(id, path);
@@ -108,7 +108,7 @@ export class Swarmlord implements ISwarmlord {
                 return 'flags';
             case (StorageMemoryType.Structure):
                 return 'structures';
-            case (StorageMemoryType.Consul):
+            case (StorageMemoryType.CreepSuitData):
             default:
                 throw new InvalidArgumentException('Tried to retrieve invalid memory type [' + memType + ']');
         }
