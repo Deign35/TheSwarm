@@ -19,3 +19,6 @@ declare interface ICreepSuit2<T extends CreepSuitTypes> {
 declare interface IJobManager {
 
 }
+declare interface IJobDefinition {
+
+}
