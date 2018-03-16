@@ -15,3 +15,7 @@ declare interface ICreepSuit2<T extends CreepSuitTypes> {
     AssignCreepToSuit(creep: TSwarmCreep): void;
     OperateSuit(): void;
 }
+
+declare interface IJobManager {
+
+}
