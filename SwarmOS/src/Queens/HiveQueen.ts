@@ -4,7 +4,7 @@ import { profile } from "Tools/Profiler";
 
 @profile
 export abstract class HiveQueen extends NestQueen implements IQueen {
-    LoadCouncil(): IDictionary<IConsul> {
+    /*LoadCouncil(): IDictionary<IConsul> {
         return super.LoadCouncil();
     }
     /*LoadCreepController(): ICreepManager {
@@ -23,6 +23,6 @@ export class RCL1_HiveQueen extends HiveQueen {
         return newMem;
     }
     protected InitQueen(): void {
-        super.InitQueen();
+        //super.InitQueen();
     }
 }

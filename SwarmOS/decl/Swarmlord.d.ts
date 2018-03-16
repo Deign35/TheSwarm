@@ -6,7 +6,7 @@ declare interface ISwarmMemory {
     RemoveData(id: string): void;
 }
 declare type SwarmData = SegmentMemoryType | StorageMemoryTypes | CacheMemoryType | EmptyData;
-declare type EmptyData = {};
+declare type EmptyData = Dictionary;
 declare type SegmentMemoryType = EmptyData;
 declare interface ISegmentMemory extends ISwarmMemory {
     segmentID: number
@@ -26,13 +26,16 @@ declare type CacheMemoryStructure = {
 declare type StorageMemoryTypes = CreepSuitData | CreepData | RoomData | StructureData | FlagData;
 declare type CreepSuitData = EmptyData;
 declare type CreepData = {
-    consulData: { [consulType: string]: CreepSuitData }
+    suitData: CreepSuitData[]
 }
 declare type RoomData = {
     queenType: QueenType
 }
 declare type FlagData = EmptyData
-declare type StructureData = EmptyData
+declare type StructureModuleData = EmptyData;
+declare type StructureData = {
+    modules: { [moduleType: number]: StructureModuleData }
+}
 declare interface IStorageMemory<T> extends ISwarmMemory {
     MemoryType: StorageMemoryType;
     IsCheckedOut: boolean;

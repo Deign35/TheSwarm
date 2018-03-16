@@ -1,4 +1,4 @@
-export abstract class CreepSuit<T extends CreepSuitTypes> implements ICreepSuit<T> {
+export abstract class CreepSuit<T extends CreepSuitType> implements ICreepSuit<T> {
     constructor(creep: TSwarmCreep) {
         this.creep = creep;
     }

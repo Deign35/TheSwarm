@@ -1,6 +1,6 @@
 import { NotImplementedException } from "Tools/SwarmExceptions";
-import { SwarmCreep } from "./SwarmCreep";
-import { OwnedSwarmStructure } from "SwarmObjects/SwarmStructure";
+import { SwarmCreep } from "../SwarmCreep";
+import { OwnedSwarmStructure } from "./SwarmStructure";
 import { profile } from "Tools/Profiler";
 
 @profile

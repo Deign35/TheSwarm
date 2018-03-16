@@ -10,6 +10,12 @@ declare class Stopwatch {
     ToString(): string;
 }
 
+declare var SwarmLogger: {
+    Log(message: string, level?: LogLevel): void;
+    LogWarning(message: string): void;
+    LogError(message: string): void;
+}
+
 
 
 /*

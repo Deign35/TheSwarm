@@ -1,7 +1,7 @@
 import { CreepSuit } from "./CreepSuit";
 
-export class HarvestSuit extends CreepSuit<CreepSuitTypes.SourceHarvester> {
-    get CreepSuitType(): CreepSuitTypes.SourceHarvester { return CreepSuitTypes.SourceHarvester; }
+export class HarvestSuit extends CreepSuit<CreepSuitType.SourceHarvester> {
+    get CreepSuitType(): CreepSuitType.SourceHarvester { return CreepSuitType.SourceHarvester; }
     PrepSuit(): boolean {
         throw new Error("Method not implemented.");
     }

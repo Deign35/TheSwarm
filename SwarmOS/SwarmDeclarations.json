@@ -101,7 +101,7 @@
             "SwarmWall": 26,
             "SwarmTombstone": 27
         },
-        "CreepSuitTypes": {
+        "CreepSuitType": {
             "SourceHarvester": 0,
             "Builder": 1,
             "Retriever": 2,
@@ -109,7 +109,22 @@
             "Upgrader": 4,
             "Repairer": 5,
             "Scientist": 6,
-            "Defender": 7
+            "Defender": 7,
+            "MineralHarvester": 8
+        },
+        "Priority": {
+            "Hold": 0,
+            "Lowest": 1,
+            "Low": 3,
+            "Medium": 5,
+            "High": 7,
+            "Highest": 9,
+            "EMERGENCY": 10
+        },
+        "StructureModuleType": {
+            "NullModule": 0,
+            "Input": 1,
+            "Output": 2
         }
     },
     "CompoundTypes": {

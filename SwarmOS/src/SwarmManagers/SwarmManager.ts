@@ -51,7 +51,7 @@ export abstract class SwarmManager<T extends StorageMemoryType, U extends Primar
         for (let objID in allObjects) {
             debugger;
             let swarmObj = this.CreateSwarmObject(allObjects[objID]);
-            swarmObj.memory = Swarmlord.CheckoutMemory<T, IStorageMemory<U>>(objID, this.getManagerSavePath(), this.getStorageType());
+            swarmObj.memory = Swarmlord.CheckoutMemory(objID, this.getManagerSavePath(), this.getStorageType());
             swarmObjects[objID] = swarmObj;
         }
 

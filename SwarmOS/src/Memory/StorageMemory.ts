@@ -134,7 +134,7 @@ export class CreepMemory extends StorageMemory<CreepData> {
     }
     CreateEmptyMemory() {
         return {
-            consulData: {}
+            suitData: []
         } as CreepData;
     }
 }

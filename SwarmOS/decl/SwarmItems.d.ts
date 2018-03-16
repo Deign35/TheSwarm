@@ -60,7 +60,9 @@ declare type TSwarmSource = Source & ISwarmSource & TSwarmObjWithID<Source, Swar
 declare function MakeSwarmSource(source: Source): TSwarmSource;
 
 // SwarmStructures
-declare interface ISwarmStructure<T extends Structure, U extends SwarmType> extends INotifiableSwarmObject<T, U> { }
+declare interface ISwarmStructure<T extends Structure, U extends SwarmType> extends INotifiableSwarmObject<T, U> {
+    Modules: { [moduleType: number]: IStructureModule };
+}
 declare type TSwarmStructure<T extends Structure, U extends SwarmType> = T & TNotifiableSwarmObject<T, U> & ISwarmStructure<T, U> & PrimaryTypeFunctions;
 
 declare interface ISwarmContainer extends ISwarmStructure<StructureContainer, SwarmType.SwarmContainer> { }

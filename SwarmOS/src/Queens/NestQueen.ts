@@ -10,32 +10,16 @@ export abstract class NestQueen implements IQueen {
         this.Nest = SwarmCreator.CreateSwarmObject(room, SwarmType.SwarmRoom) as TSwarmRoom;
     }
     Nest: TSwarmRoom;
-    Council!: IDictionary<IConsul>;
-    CreepController!: ICreepManager;
+    //Council!: IDictionary<IConsul>;
+    //CreepController!: ICreepManager;
 
     protected queenMemory!: RoomMemory;
 
     get QueenType() { return QueenType.Larva }
-    protected abstract CreateQueenData(): RoomMemory;
     protected abstract CheckForSpawnRequirements(): void;
     protected InitForTick() {
-        try {
-            this.queenMemory = Swarmlord.CheckoutMemory(this.Nest.name,
-                [Swarmlord.StorageMemoryTypeToString(StorageMemoryType.Room)], StorageMemoryType.Room);
-        } catch (error) {
-            if (error.name != MemoryNotFoundException.ErrorName) {
-                throw new SwarmException('InitForTick', error.name + '_' + error.message);
-            }
-            this.InitQueen();
-            this.queenMemory = Swarmlord.CheckoutMemory(this.Nest.name,
-                [Swarmlord.StorageMemoryTypeToString(StorageMemoryType.Room)], StorageMemoryType.Room);
-        }
     }
-
-    protected InitQueen(): void {
-        this.queenMemory = this.CreateQueenData();
-    }
-    LoadCouncil(): IDictionary<IConsul> {
+    /*LoadCouncil(): IDictionary<IConsul> {
         return {};
         //throw new NotImplementedException('Cannot load council yet');
     }
@@ -50,13 +34,12 @@ export abstract class NestQueen implements IQueen {
     StartTick(): void {
         this.InitForTick();
         //this.CreepController = this.LoadCreepController();
-        this.Council = this.LoadCouncil();
+        //this.Council = this.LoadCouncil();
         this.CheckForSpawnRequirements();
     }
     ProcessTick(): void {
     }
     EndTick(): void {
-        Swarmlord.ReleaseMemory(this.queenMemory, true);
     }
 
     ReceiveCommand() {
