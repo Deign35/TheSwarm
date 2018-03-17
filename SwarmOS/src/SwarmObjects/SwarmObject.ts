@@ -12,9 +12,21 @@ export abstract class SwarmObject<T extends Source | Creep
     | Structure | Mineral | Resource
     | ConstructionSite | Nuke | Tombstone, U extends SwarmType> extends SwarmItem<T, U> implements ISwarmObject<T, U> {
     get pos() { return this._instance.pos; }
-    get room() { return this._instance.room; }
+    get room() { return this._instance.room; } // This should get the room object i created.
     get id() { return this._instance.id; }
     get prototype(): T { return this._instance.prototype as T; }
+
+    protected data!: any;
+    AssignData(data: any): void {
+        this.data = data;
+    }
+    Activate(): void { }
+    GetSpawnRequirements(): TEMP_SpawnReqType {
+        return {
+            minBody: [WORK, MOVE, CARRY],
+            priority: Priority.Low
+        };
+    }
 }
 
 export class SwarmTombstone extends SwarmObject<Tombstone, SwarmType.SwarmTombstone> implements ISwarmTombstone, Tombstone {
@@ -59,6 +71,17 @@ export class SwarmSource extends SwarmObject<Source, SwarmType.SwarmSource> impl
     get energyCapacity() { return this._instance.energyCapacity; }
     get room() { return this._instance.room; }
     get ticksToRegeneration() { return this._instance.ticksToRegeneration; }
+
+    protected data!: HarvesterData;
+    Activate() {
+        // Get the creep and control it from here to do what we want.
+    }
+    GetSpawnRequirements(): TEMP_SpawnReqType {
+        return {
+            minBody: [WORK, WORK, CARRY, MOVE],
+            priority: Priority.High
+        }
+    }
 }
 export function MakeSwarmSource(source: Source): TSwarmSource { return new SwarmSource(source); }
 

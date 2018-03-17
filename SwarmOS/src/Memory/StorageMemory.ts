@@ -144,10 +144,11 @@ export class RoomMemory extends StorageMemory<RoomData> {
     GetMemoryType(): StorageMemoryType {
         return StorageMemoryType.Room;
     }
-    CreateEmptyMemory() {
+    CreateEmptyMemory(): RoomData {
         return {
-            queenType: QueenType.Larva
-        } as RoomData;
+            queenType: QueenType.Larva,
+            harvestData: []
+        };
     }
 }
 

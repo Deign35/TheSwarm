@@ -15,5 +15,9 @@ export class SwarmTower extends OwnedSwarmStructure<STRUCTURE_TOWER, StructureTo
     repair<U extends StructureConstant, T extends Structure<U>, V extends SwarmType>(target: SwarmStructure<U, T, V>) {
         return this._instance.repair(target.Value);
     }
+
+    Activate() {
+        
+    }
 }
 export function MakeSwarmTower(tower: StructureTower): TSwarmTower { return new SwarmTower(tower); }

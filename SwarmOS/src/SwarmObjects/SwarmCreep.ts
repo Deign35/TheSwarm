@@ -46,10 +46,7 @@ export class SwarmCreep extends OwnableSwarmObject<Creep, SwarmType.SwarmCreep> 
     get fatigue() { return this._instance.fatigue; }
     get hits() { return this._instance.hits; }
     get hitsMax() { return this._instance.hitsMax; }
-    get memory() {
-        //throw "This should be allowed only once it has been properly integrated";
-        return this.creepMemory;
-    }
+    get memory() { return this.creepMemory; }
     get prototype() { return this._instance.prototype; }
     get name() { return this._instance.name; }
     get room() { return this._instance.room; }

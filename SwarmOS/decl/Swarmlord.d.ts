@@ -38,7 +38,17 @@ declare type CreepData = {
     suitData: CreepSuitData[]
 }
 declare type RoomData = {
-    queenType: QueenType
+    queenType: QueenType,
+    harvestData: HarvesterData[]
+}
+declare type ObjectData = EmptyDictionary | HarvesterData;
+declare type HarvesterData = {
+    sourceID: string;
+    nextSpawnRequiredBy: number;
+    creepID?: string;
+    containerID?: string;
+    linkID?: string;
+    pileID?: string;
 }
 declare type JobData = EmptyDictionary;
 declare type FlagData = EmptyDictionary;
