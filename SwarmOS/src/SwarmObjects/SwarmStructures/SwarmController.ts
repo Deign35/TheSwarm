@@ -1,8 +1,10 @@
 import { OwnedSwarmStructure } from "./SwarmStructure";
 import { StructureMemory } from "Memory/StorageMemory";
+import { profile } from "Tools/Profiler";
 
+@profile
 export class SwarmController extends OwnedSwarmStructure<STRUCTURE_CONTROLLER,
-    StructureController, SwarmType.SwarmController> implements ISwarmController, StructureController {
+StructureController, SwarmType.SwarmController> implements ISwarmController, StructureController {
     get swarmType(): SwarmType.SwarmController { return SwarmType.SwarmController; }
     get level() { return this._instance.level; }
     get progress() { return this._instance.progress; }

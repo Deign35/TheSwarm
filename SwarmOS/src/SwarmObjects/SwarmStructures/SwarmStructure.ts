@@ -1,7 +1,7 @@
 import { SwarmObject, NotifiableSwarmObject } from "../SwarmObject";
 import { StructureMemory } from "Memory/StorageMemory";
 
-export abstract class SwarmStructure<U extends StructureConstant, T extends Structure<U>, V extends SwarmType> extends NotifiableSwarmObject<T, V, StructureMemory> implements ISwarmStructure<T, V>, Structure {
+export abstract class SwarmStructure<U extends StructureConstant, T extends Structure<U>, V extends SwarmType> extends NotifiableSwarmObject<T, V, StructureData> implements ISwarmStructure<T, V>, Structure {
     protected structureMemory!: StructureMemory;
     StartTick() { }
     ProcessTick() { }
@@ -21,12 +21,14 @@ export abstract class SwarmStructure<U extends StructureConstant, T extends Stru
     isActive() { return this._instance.isActive() }
 }
 
-export abstract class OwnedSwarmStructure<U extends StructureConstant, T extends OwnedStructure<U>, V extends SwarmType> extends SwarmStructure<U, T, V> implements IOwnableSwarmObject<T, V>, OwnedStructure {
+export abstract class OwnedSwarmStructure<U extends StructureConstant, T extends OwnedStructure<U>, V extends SwarmType>
+    extends SwarmStructure<U, T, V> implements IOwnableSwarmObject<T, V, StructureData>, OwnedStructure {
     get my() { return this._instance.my; }
     get owner() { return this._instance.owner; }
 }
 
-export class SwarmExtension extends OwnedSwarmStructure<STRUCTURE_EXTENSION, StructureExtension, SwarmType.SwarmExtension> implements ISwarmExtension, StructureExtension {
+export class SwarmExtension extends OwnedSwarmStructure<STRUCTURE_EXTENSION, StructureExtension, SwarmType.SwarmExtension>
+    implements ISwarmExtension, StructureExtension {
     get swarmType(): SwarmType.SwarmExtension { return SwarmType.SwarmExtension; }
     get energy() { return this._instance.energy; }
     get energyCapacity() { return this._instance.energyCapacity; }

@@ -3,7 +3,7 @@ import { RoomMemory } from "Memory/StorageMemory";
 import { profile } from "Tools/Profiler";
 
 @profile
-export class SwarmRoom extends SwarmItemWithName<Room, SwarmType.SwarmRoom, RoomMemory> implements ISwarmRoom, Room {
+export class SwarmRoom extends SwarmItemWithName<Room, SwarmType.SwarmRoom, RoomData> implements ISwarmRoom, Room {
     get saveID() { return this.name; }
     get swarmType(): SwarmType.SwarmRoom { return SwarmType.SwarmRoom; }
     get prototype(): Room { return this._instance.prototype as Room; }

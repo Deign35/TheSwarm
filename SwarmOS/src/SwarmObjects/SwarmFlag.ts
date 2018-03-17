@@ -3,7 +3,7 @@ import { FlagMemory } from "Memory/StorageMemory";
 import { profile } from "Tools/Profiler";
 
 @profile
-export class SwarmFlag extends SwarmItemWithName<Flag, SwarmType.SwarmFlag, FlagMemory> implements ISwarmFlag, Flag {
+export class SwarmFlag extends SwarmItemWithName<Flag, SwarmType.SwarmFlag, FlagData> implements ISwarmFlag, Flag {
     get swarmType(): SwarmType.SwarmFlag { return SwarmType.SwarmFlag; };
     get pos() { return this._instance.pos; }
     get room() { return this._instance.room; }
@@ -11,7 +11,6 @@ export class SwarmFlag extends SwarmItemWithName<Flag, SwarmType.SwarmFlag, Flag
     get color() { return this._instance.color; }
     get secondaryColor() { return this._instance.secondaryColor; }
     get memory() { return this._memory; }
-    set memory(mem: FlagMemory) { this._memory = mem; }
     get name() { return this._instance.name; }
     get saveID() { return this.name; }
 

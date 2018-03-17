@@ -5,7 +5,7 @@ import { profile } from "Tools/Profiler";
 const CARRY_TOTAL = 'CT';
 const CURRENT_PATH = 'CP';
 @profile
-export class SwarmCreep extends OwnableSwarmObject<Creep, SwarmType.SwarmCreep, CreepMemory> implements ISwarmCreep, Creep {
+export class SwarmCreep extends OwnableSwarmObject<Creep, SwarmType.SwarmCreep, CreepData> implements ISwarmCreep, Creep {
     protected _cachedData: { [id: string]: any } = {};
     get carryTotal() {
         if (!this._cachedData[CARRY_TOTAL]) {

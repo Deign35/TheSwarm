@@ -12,10 +12,10 @@ export class SwarmLab extends OwnedSwarmStructure<STRUCTURE_LAB, StructureLab, S
     get mineralType() { return this._instance.mineralType; }
 
     boostCreep(creep: SwarmCreep, bodyPartsCount?: number) {
-        return this._instance.boostCreep(creep.Value, bodyPartsCount);
+        return this._instance.boostCreep(creep.value, bodyPartsCount);
     }
     runReaction(lab1: SwarmLab, lab2: SwarmLab) {
-        return this._instance.runReaction(lab1.Value, lab2.Value);
+        return this._instance.runReaction(lab1.value, lab2.value);
     }
 }
 export function MakeSwarmLab(lab: StructureLab, memory: StructureMemory): TSwarmLab {

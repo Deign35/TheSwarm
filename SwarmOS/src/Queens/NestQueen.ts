@@ -16,7 +16,7 @@ export abstract class NestQueen implements IQueen {
     Nest: TSwarmRoom;
 
     protected queenMemory!: RoomMemory;
-    protected roomObjects: { [id: string]: TSwarmObject<RoomObject, SwarmType> };
+    protected roomObjects: { [id: string]: TSwarmObject<RoomObject, SwarmType, RoomObjectData> };
 
     get QueenType() { return QueenType.Larva }
     protected abstract CheckForSpawnRequirements(): void;
