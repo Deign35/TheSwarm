@@ -9,9 +9,9 @@ declare type TSwarmItem<T, U> = T & {
 declare type SwarmPosition<T extends RoomPosition> = ISwarmPosition<T> & T;*/
 
 declare interface ISwarmObject<T extends RoomObject, U extends SwarmType> extends ISwarmItem<T, U> {
-    AssignData(data: ObjectData): void;
+    AssignData(data: SwarmData): void;
     Activate(): void;
-    GetSpawnRequirements(): TEMP_SpawnReqType;
+    GetSpawnRequirements(): TEMP_SpawnReqType | undefined;
 }
 declare type TSwarmObject<T extends RoomObject, U extends SwarmType> = TSwarmItem<T, U> & ISwarmObject<T, U> & T;
 
@@ -65,7 +65,7 @@ declare type TEMP_SpawnReqType = {
     priority: Priority
 }
 declare interface ISwarmSource extends ISwarmObjWithID<Source, SwarmType.SwarmSource> {
-    AssignData(harvesterData: HarvesterData): void;
+    AssignData(sourceData: SourceData): void;
 }
 declare type TSwarmSource = Source & ISwarmSource & TSwarmObjWithID<Source, SwarmType.SwarmSource>
 declare function MakeSwarmSource(source: Source): TSwarmSource;

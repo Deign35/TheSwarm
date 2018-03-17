@@ -21,7 +21,7 @@ export abstract class SwarmObject<T extends Source | Creep
         this.data = data;
     }
     Activate(): void { }
-    GetSpawnRequirements(): TEMP_SpawnReqType {
+    GetSpawnRequirements(): TEMP_SpawnReqType | undefined {
         return {
             minBody: [WORK, MOVE, CARRY],
             priority: Priority.Low
@@ -72,7 +72,7 @@ export class SwarmSource extends SwarmObject<Source, SwarmType.SwarmSource> impl
     get room() { return this._instance.room; }
     get ticksToRegeneration() { return this._instance.ticksToRegeneration; }
 
-    protected data!: HarvesterData;
+    protected data!: SourceData;
     Activate() {
         // Get the creep and control it from here to do what we want.
     }

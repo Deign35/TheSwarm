@@ -95,19 +95,6 @@ export class BasicMemory extends StorageMemory<EmptyDictionary> {
 }
 
 @profile
-export class CreepSuitMemory extends StorageMemory<CreepSuitData> {
-    /*get SavePath() {
-        return super.SavePath;
-    }*/
-    GetMemoryType(): StorageMemoryType {
-        return StorageMemoryType.CreepSuitData;
-    }
-    CreateEmptyMemory() {
-        return {} as CreepSuitData;
-    }
-}
-
-@profile
 export class FlagMemory extends StorageMemory<FlagData> {
     GetMemoryType(): StorageMemoryType {
         return StorageMemoryType.Flag;
@@ -147,17 +134,7 @@ export class RoomMemory extends StorageMemory<RoomData> {
     CreateEmptyMemory(): RoomData {
         return {
             queenType: QueenType.Larva,
-            harvestData: []
+            roomObjectData: {}
         };
-    }
-}
-
-@profile
-export class JobMemory extends StorageMemory<JobData> {
-    GetMemoryType(): StorageMemoryType {
-        return StorageMemoryType.JobData;
-    }
-    CreateEmptyMemory() {
-        return {} as JobData;
     }
 }

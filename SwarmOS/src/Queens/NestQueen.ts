@@ -20,7 +20,7 @@ export abstract class NestQueen implements IQueen {
     get QueenType() { return QueenType.Larva }
     protected abstract CheckForSpawnRequirements(): void;
     protected InitForTick() {
-        let harvestTargets = this.queenMemory.GetData<HarvesterData[]>(HARVESTER_JOBS);
+        let harvestTargets = this.queenMemory.GetData<SourceData[]>(HARVESTER_JOBS);
         for (let i = 0; i < harvestTargets.length; i++) {
             let target = Game.getObjectById(harvestTargets[i].sourceID)! as Source;
             let sourceObj = SwarmCreator.CreateSwarmObject(target, SwarmType.SwarmSource) as TSwarmSource;
@@ -32,7 +32,7 @@ export abstract class NestQueen implements IQueen {
         let harvesterJobs = [];
         let sources = this.Nest.find(FIND_SOURCES);
         for (let i = 0; i < sources.length; i++) {
-            let newSourceMemory: HarvesterData = {
+            let newSourceMemory: SourceData = {
                 sourceID: sources[i].id,
                 nextSpawnRequiredBy: 0,
             };

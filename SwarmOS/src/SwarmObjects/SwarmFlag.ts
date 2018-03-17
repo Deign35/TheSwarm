@@ -4,6 +4,15 @@ import { profile } from "Tools/Profiler";
 
 @profile
 export class SwarmFlag extends SwarmItem<Flag, SwarmType.SwarmFlag> implements ISwarmFlag, Flag {
+    protected data!: StorageMemoryTypes;
+    AssignData(data: StorageMemoryTypes): void {
+        this.data = data;
+    }
+    Activate(): void {
+    }
+    GetSpawnRequirements(): TEMP_SpawnReqType | undefined {
+        return undefined;
+    }
     protected flagMemory!: FlagMemory;
     get swarmType(): SwarmType.SwarmFlag { return SwarmType.SwarmFlag; };
     get pos() { return this._instance.pos; }

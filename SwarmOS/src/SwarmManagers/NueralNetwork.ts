@@ -18,7 +18,7 @@ function GetNewJobID() {
 export class NeuralNetwork {
     protected jobs!: { [jobID: string]: any };
 
-    CreateNewJob(job: IJobDefinition) {
+    CreateNewJob(job: any) {
         let newJobID;
         let lastIndex = CurIndex - 1;
         while (!newJobID) {
@@ -38,7 +38,7 @@ export class NeuralNetwork {
         return newJobID;
     }
 
-    protected ProcessNewJob(job: IJobDefinition, jobID: string) {
+    protected ProcessNewJob(job: any, jobID: string) {
         let jobObj = {
             job: job
         }
