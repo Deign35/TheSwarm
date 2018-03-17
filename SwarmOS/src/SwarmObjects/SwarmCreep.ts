@@ -5,20 +5,19 @@ import { profile } from "Tools/Profiler";
 const CARRY_TOTAL = 'CT';
 const CURRENT_PATH = 'CP';
 @profile
-export class SwarmCreep extends OwnableSwarmObject<Creep, SwarmType.SwarmCreep> implements ISwarmCreep, Creep {
-    protected data: { [id: string]: any } = {};
-    protected creepMemory!: CreepMemory;
+export class SwarmCreep extends OwnableSwarmObject<Creep, SwarmType.SwarmCreep, CreepMemory> implements ISwarmCreep, Creep {
+    protected _cachedData: { [id: string]: any } = {};
     get carryTotal() {
-        if (!this.data[CARRY_TOTAL]) {
-            this.data[CARRY_TOTAL] = _.sum(this._instance.carry);
+        if (!this._cachedData[CARRY_TOTAL]) {
+            this._cachedData[CARRY_TOTAL] = _.sum(this._instance.carry);
         }
-        return this.data[CARRY_TOTAL];
+        return this._cachedData[CARRY_TOTAL];
     }
     get curPath() {
-        if (!this.data[CURRENT_PATH]) {
-            this.data[CURRENT_PATH] = NOT_CONFIGURED;
+        if (!this._cachedData[CURRENT_PATH]) {
+            this._cachedData[CURRENT_PATH] = NOT_CONFIGURED;
         }
-        return this.data[CURRENT_PATH];
+        return this._cachedData[CURRENT_PATH];
     }
     get endTickEnergy() {
         // This should utilize calls to things like Drop/Harvest/Pickup etc... and calculate if reactions aught to be
@@ -27,14 +26,6 @@ export class SwarmCreep extends OwnableSwarmObject<Creep, SwarmType.SwarmCreep> 
     }
     get swarmType(): SwarmType.SwarmCreep { return SwarmType.SwarmCreep; }
     get saveID(): string { return this.name; }
-
-    set memory(creepMemory: CreepMemory) {
-        this.creepMemory = creepMemory;
-    }
-
-    StartTick() { }
-    ProcessTick() { }
-    EndTick() { }
 
     /**
      * Prototype properties
@@ -46,7 +37,7 @@ export class SwarmCreep extends OwnableSwarmObject<Creep, SwarmType.SwarmCreep> 
     get fatigue() { return this._instance.fatigue; }
     get hits() { return this._instance.hits; }
     get hitsMax() { return this._instance.hitsMax; }
-    get memory() { return this.creepMemory; }
+    get memory() { return this._memory; }
     get prototype() { return this._instance.prototype; }
     get name() { return this._instance.name; }
     get room() { return this._instance.room; }
@@ -147,4 +138,4 @@ export class SwarmCreep extends OwnableSwarmObject<Creep, SwarmType.SwarmCreep> 
         return this._instance.withdraw(target, resourceType, amount);
     }
 }
-export function MakeSwarmCreep(creep: Creep): TSwarmCreep { return new SwarmCreep(creep); }
+export function MakeSwarmCreep(creep: Creep, memory: CreepMemory): TSwarmCreep { return new SwarmCreep(creep, memory); }

@@ -1,13 +1,13 @@
 import { SwarmObject, NotifiableSwarmObject } from "../SwarmObject";
 import { StructureMemory } from "Memory/StorageMemory";
 
-export abstract class SwarmStructure<U extends StructureConstant, T extends Structure<U>, V extends SwarmType> extends NotifiableSwarmObject<T, V> implements ISwarmStructure<T, V>, Structure {
+export abstract class SwarmStructure<U extends StructureConstant, T extends Structure<U>, V extends SwarmType> extends NotifiableSwarmObject<T, V, StructureMemory> implements ISwarmStructure<T, V>, Structure {
     protected structureMemory!: StructureMemory;
     StartTick() { }
     ProcessTick() { }
     EndTick() { }
 
-    Modules!: { [moduleType: number]: IStructureModule };
+    Modules!: { [moduleType: number]: any };
 
     get hits() { return this._instance.hits; }
     get hitsMax() { return this._instance.hitsMax; }
@@ -31,19 +31,25 @@ export class SwarmExtension extends OwnedSwarmStructure<STRUCTURE_EXTENSION, Str
     get energy() { return this._instance.energy; }
     get energyCapacity() { return this._instance.energyCapacity; }
 }
-export function MakeSwarmExtension(extension: StructureExtension): TSwarmExtension { return new SwarmExtension(extension); }
+export function MakeSwarmExtension(extension: StructureExtension, memory: StructureMemory): TSwarmExtension {
+    return new SwarmExtension(extension, memory);
+}
 
 export class SwarmExtractor extends OwnedSwarmStructure<STRUCTURE_EXTRACTOR, StructureExtractor, SwarmType.SwarmExtractor> implements ISwarmExtractor, StructureExtractor {
     get swarmType(): SwarmType.SwarmExtractor { return SwarmType.SwarmExtractor; }
     get cooldown() { return this._instance.cooldown; }
 }
-export function MakeSwarmExtractor(extractor: StructureExtractor): TSwarmExtractor { return new SwarmExtractor(extractor); }
+export function MakeSwarmExtractor(extractor: StructureExtractor, memory: StructureMemory): TSwarmExtractor {
+    return new SwarmExtractor(extractor, memory);
+}
 
 export class SwarmObserver extends OwnedSwarmStructure<STRUCTURE_OBSERVER, StructureObserver, SwarmType.SwarmObserver> implements ISwarmObserver, StructureObserver {
     get swarmType(): SwarmType.SwarmObserver { return SwarmType.SwarmObserver; }
     observeRoom(roomName: string) { return this._instance.observeRoom(roomName); }
 }
-export function MakeSwarmObserver(observer: StructureObserver): TSwarmObserver { return new SwarmObserver(observer); }
+export function MakeSwarmObserver(observer: StructureObserver, memory: StructureMemory): TSwarmObserver {
+    return new SwarmObserver(observer, memory);
+}
 
 export class SwarmLink extends OwnedSwarmStructure<STRUCTURE_LINK, StructureLink, SwarmType.SwarmLink> implements ISwarmLink, StructureLink {
     get swarmType(): SwarmType.SwarmLink { return SwarmType.SwarmLink; }
@@ -55,7 +61,9 @@ export class SwarmLink extends OwnedSwarmStructure<STRUCTURE_LINK, StructureLink
         return this._instance.transferEnergy(target._instance, amount);
     }
 }
-export function MakeSwarmLink(link: StructureLink): TSwarmLink { return new SwarmLink(link); }
+export function MakeSwarmLink(link: StructureLink, memory: StructureMemory): TSwarmLink {
+    return new SwarmLink(link, memory);
+}
 
 export class SwarmRampart extends OwnedSwarmStructure<STRUCTURE_RAMPART, StructureRampart, SwarmType.SwarmRampart> implements ISwarmRampart, StructureRampart {
     get swarmType(): SwarmType.SwarmRampart { return SwarmType.SwarmRampart; }
@@ -64,14 +72,18 @@ export class SwarmRampart extends OwnedSwarmStructure<STRUCTURE_RAMPART, Structu
 
     setPublic(isPublic: boolean) { return this._instance.setPublic(isPublic); }
 }
-export function MakeSwarmRampart(rampart: StructureRampart): TSwarmRampart { return new SwarmRampart(rampart); }
+export function MakeSwarmRampart(rampart: StructureRampart, memory: StructureMemory): TSwarmRampart {
+    return new SwarmRampart(rampart, memory);
+}
 
 export class SwarmStorage extends OwnedSwarmStructure<STRUCTURE_STORAGE, StructureStorage, SwarmType.SwarmStorage> implements ISwarmStorage, StructureStorage {
     get swarmType(): SwarmType.SwarmStorage { return SwarmType.SwarmStorage; }
     get store() { return this._instance.store; }
     get storeCapacity() { return this._instance.storeCapacity; }
 }
-export function MakeSwarmStorage(storage: StructureStorage): TSwarmStorage { return new SwarmStorage(storage); }
+export function MakeSwarmStorage(storage: StructureStorage, memory: StructureMemory): TSwarmStorage {
+    return new SwarmStorage(storage, memory);
+}
 
 export class SwarmTerminal extends OwnedSwarmStructure<STRUCTURE_TERMINAL, StructureTerminal, SwarmType.SwarmTerminal> implements ISwarmTerminal, StructureTerminal {
     get swarmType(): SwarmType.SwarmTerminal { return SwarmType.SwarmTerminal; }
@@ -83,7 +95,9 @@ export class SwarmTerminal extends OwnedSwarmStructure<STRUCTURE_TERMINAL, Struc
         return this._instance.send(resourceType, amount, destination, description);
     }
 }
-export function MakeSwarmTerminal(terminal: StructureTerminal): TSwarmTerminal { return new SwarmTerminal(terminal); }
+export function MakeSwarmTerminal(terminal: StructureTerminal, memory: StructureMemory): TSwarmTerminal {
+    return new SwarmTerminal(terminal, memory);
+}
 
 export class SwarmContainer extends SwarmStructure<STRUCTURE_CONTAINER, StructureContainer, SwarmType.SwarmContainer> implements ISwarmContainer, StructureContainer {
     get swarmType(): SwarmType.SwarmContainer { return SwarmType.SwarmContainer; }
@@ -91,18 +105,24 @@ export class SwarmContainer extends SwarmStructure<STRUCTURE_CONTAINER, Structur
     get storeCapacity() { return this._instance.storeCapacity; }
     get ticksToDecay() { return this._instance.ticksToDecay; }
 }
-export function MakeSwarmContainer(container: StructureContainer): TSwarmContainer { return new SwarmContainer(container); }
+export function MakeSwarmContainer(container: StructureContainer, memory: StructureMemory): TSwarmContainer {
+    return new SwarmContainer(container, memory);
+}
 export class SwarmRoad extends SwarmStructure<STRUCTURE_ROAD, StructureRoad, SwarmType.SwarmRoad> implements ISwarmRoad, StructureRoad {
     get swarmType(): SwarmType.SwarmRoad { return SwarmType.SwarmRoad; }
     get ticksToDecay() { return this._instance.ticksToDecay };
 }
-export function MakeSwarmRoad(road: StructureRoad): TSwarmRoad { return new SwarmRoad(road); }
+export function MakeSwarmRoad(road: StructureRoad, memory: StructureMemory): TSwarmRoad {
+    return new SwarmRoad(road, memory);
+}
 
 export class SwarmWall extends SwarmStructure<STRUCTURE_WALL, StructureWall, SwarmType.SwarmWall> implements ISwarmWall, StructureWall {
     get swarmType(): SwarmType.SwarmWall { return SwarmType.SwarmWall; }
     get ticksToLive() { return this._instance.ticksToLive; }
 }
-export function MakeSwarmWall(wall: StructureWall): TSwarmWall { return new SwarmWall(wall); }
+export function MakeSwarmWall(wall: StructureWall, memory: StructureMemory): TSwarmWall {
+    return new SwarmWall(wall, memory);
+}
 
 export class SwarmNuker extends OwnedSwarmStructure<STRUCTURE_NUKER, StructureNuker, SwarmType.SwarmNuker> implements ISwarmNuker, StructureNuker {
     get swarmType(): SwarmType.SwarmNuker { return SwarmType.SwarmNuker; }
@@ -114,4 +134,6 @@ export class SwarmNuker extends OwnedSwarmStructure<STRUCTURE_NUKER, StructureNu
 
     launchNuke(pos: RoomPosition) { return this._instance.launchNuke(pos); }
 }
-export function MakeSwarmNuker(nuker: StructureNuker): TSwarmNuker { return new SwarmNuker(nuker); }
+export function MakeSwarmNuker(nuker: StructureNuker, memory: StructureMemory): TSwarmNuker {
+    return new SwarmNuker(nuker, memory);
+}

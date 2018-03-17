@@ -1,22 +1,17 @@
-import { SwarmItem } from "SwarmObjects/SwarmObject";
+import { SwarmItemWithName } from "SwarmObjects/SwarmObject";
 import { RoomMemory } from "Memory/StorageMemory";
 import { profile } from "Tools/Profiler";
 
 @profile
-export class SwarmRoom extends SwarmItem<Room, SwarmType.SwarmRoom> implements ISwarmRoom, Room {
+export class SwarmRoom extends SwarmItemWithName<Room, SwarmType.SwarmRoom, RoomMemory> implements ISwarmRoom, Room {
     get saveID() { return this.name; }
-    protected roomMemory!: RoomMemory;
-    StartTick() { }
-    ProcessTick() { }
-    EndTick() { }
     get swarmType(): SwarmType.SwarmRoom { return SwarmType.SwarmRoom; }
     get prototype(): Room { return this._instance.prototype as Room; }
     get RoomLocation(): RoomLocationFormat { return this.name; }
     get controller(): StructureController | undefined { return this._instance.controller; }
     get energyAvailable(): number { return 0; }
     get energyCapacityAvailable(): number { return 0; }
-    get memory() { return this.roomMemory; }
-    set memory(mem: RoomMemory) { this.roomMemory = mem; }
+    get memory() { return this._memory; }
     get mode() { return this._instance.mode; }
     get name(): string { return this._instance.name.slice(); }
     get storage(): StructureStorage | undefined { return this._instance.storage; }
@@ -85,5 +80,7 @@ export class SwarmRoom extends SwarmItem<Room, SwarmType.SwarmRoom> implements I
         }
     }
 }
-export function MakeSwarmRoom(room: Room): TSwarmRoom { return new SwarmRoom(room); }
+export function MakeSwarmRoom(room: Room, memory: RoomMemory): TSwarmRoom {
+    return new SwarmRoom(room, memory);
+}
 declare type RoomLocationFormat = string;

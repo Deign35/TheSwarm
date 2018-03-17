@@ -1,6 +1,7 @@
-import { SwarmItem } from "SwarmObjects/SwarmObject";
+import { SwarmItemWithName } from "SwarmObjects/SwarmObject";
 import { SwarmCreator } from "SwarmObjects/SwarmCreator";
 import { profile } from "Tools/Profiler";
+import { MemoryNotFoundException } from "Tools/SwarmExceptions";
 
 @profile
 export abstract class SwarmManager<T extends StorageMemoryType, U extends PrimarySwarmTypes>
@@ -14,20 +15,20 @@ export abstract class SwarmManager<T extends StorageMemoryType, U extends Primar
     PrepareTheSwarm(): void {
         for (const swarmName in this.swarmObjects) {
             this.OnPrepareSwarm(this.swarmObjects[swarmName])
-            this.swarmObjects[swarmName].StartTick();
+            //this.swarmObjects[swarmName].StartTick();
         }
     }
     ActivateSwarm(): void {
         for (let swarmName in this.swarmObjects) {
             this.OnActivateSwarm(this.swarmObjects[swarmName]);
-            this.swarmObjects[swarmName].ProcessTick();
+            //this.swarmObjects[swarmName].ProcessTick();
         }
     }
     FinalizeSwarmActivity(): void {
         for (let swarmName in this.swarmObjects) {
-            this.swarmObjects[swarmName].EndTick();
+            //this.swarmObjects[swarmName].EndTick();
             this.OnFinalizeSwarm(this.swarmObjects[swarmName]);
-            Swarmlord.ReleaseMemory(this.swarmObjects[swarmName].memory, true);
+            Swarmlord.ReleaseMemory(this.swarmObjects[swarmName].GetMemoryObject(), true);
         }
     }
 
@@ -42,29 +43,40 @@ export abstract class SwarmManager<T extends StorageMemoryType, U extends Primar
                 continue;
             }
             delete allObjects[allSwarmEntries[i]];
-            let swarmObj = this.CreateSwarmObject(obj);
-            swarmObj.memory = Swarmlord.CheckoutMemory(swarmObj.saveID, this.getManagerSavePath(), this.getStorageType());
+            let objID;
+            if ((obj as Source).id) {
+                objID = (obj as Source).id;
+            } else if ((obj as Flag).name) {
+                objID = (obj as Flag).name;
+            } else {
+                throw new MemoryNotFoundException('Could not find an ID to use for this obect: ' + JSON.stringify(obj));
+            }
+            let swarmObj = this.CreateSwarmObject(obj, Swarmlord.CheckoutMemory(objID, this.getManagerSavePath(), this.getStorageType()));
+            //swarmObj.memory = Swarmlord.CheckoutMemory(swarmObj.saveID, this.getManagerSavePath(), this.getStorageType());
             swarmObjects[allSwarmEntries[i]] = swarmObj;
         }
 
         // Anything left in this object is new and needs to be added
         for (let objID in allObjects) {
-            debugger;
-            let swarmObj = this.CreateSwarmObject(allObjects[objID]);
-            swarmObj.memory = Swarmlord.CheckoutMemory(objID, this.getManagerSavePath(), this.getStorageType());
+
+            let swarmObj = this.CreateSwarmObject(allObjects[objID], Swarmlord.CheckoutMemory(objID, this.getManagerSavePath(), this.getStorageType()));
             swarmObjects[objID] = swarmObj;
         }
 
         this.swarmObjects = swarmObjects;
     }
 
-    protected CreateSwarmObject(obj: any): PrimarySwarmTypes {
-        return SwarmCreator.CreateSwarmObject(obj, this.getSwarmType(obj)) as PrimarySwarmTypes;
+    protected CreateSwarmObject(obj: any, memory: ISwarmMemory): PrimarySwarmTypes {
+        return SwarmCreator.CreateSwarmObject(obj, this.getSwarmType(obj), memory) as PrimarySwarmTypes;
     }
     protected abstract getManagerSavePath(): string[];
     protected abstract getSwarmType(obj: any): SwarmType;
     protected abstract getStorageType(): T;
-    protected abstract FindAllGameObjects(): { [id: string]: any }
+    protected abstract FindAllGameObjects(): {
+        [id: string]: Source | Creep
+        | Mineral | Resource | Room | Flag
+        | ConstructionSite | Nuke | Tombstone | Structure
+    }
     protected abstract OnPrepareSwarm(swarmObj: U): void;
     protected abstract OnActivateSwarm(swarmObj: U): void;
     protected abstract OnFinalizeSwarm(swarmObj: U): void;

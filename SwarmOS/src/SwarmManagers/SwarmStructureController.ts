@@ -2,6 +2,7 @@ import { SwarmManager } from "./SwarmManager";
 import { InvalidArgumentException } from "Tools/SwarmExceptions";
 import { profile } from "Tools/Profiler";
 import { SwarmCreator } from "SwarmObjects/SwarmCreator";
+import { StructureMemory } from "Memory/StorageMemory";
 
 const STRUCTURE_SAVE_PATH = ["structures"];
 @profile
@@ -45,8 +46,8 @@ export class SwarmStructureController extends SwarmManager<StorageMemoryType.Str
 
     }
 
-    protected CreateSwarmObject(obj: any): PrimarySwarmTypes {
-        return SwarmCreator.CreateSwarmStructure(obj, this.getSwarmType(obj)) as PrimarySwarmTypes;
+    protected CreateSwarmObject(obj: Structure, memory: StructureMemory): PrimarySwarmTypes {
+        return SwarmCreator.CreateSwarmStructure(obj, this.getSwarmType(obj), memory) as PrimarySwarmTypes;
     }
     private static _instance: SwarmStructureController;
     static PrepareTheSwarm() {

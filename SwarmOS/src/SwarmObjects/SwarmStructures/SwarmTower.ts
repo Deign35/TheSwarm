@@ -1,5 +1,6 @@
 import { OwnedSwarmStructure, SwarmStructure } from "./SwarmStructure";
 import { SwarmCreep } from "SwarmObjects/SwarmCreep";
+import { StructureMemory } from "Memory/StorageMemory";
 
 export class SwarmTower extends OwnedSwarmStructure<STRUCTURE_TOWER, StructureTower, SwarmType.SwarmTower> implements ISwarmTower, StructureTower {
     get swarmType(): SwarmType.SwarmTower { return SwarmType.SwarmTower; }
@@ -17,7 +18,9 @@ export class SwarmTower extends OwnedSwarmStructure<STRUCTURE_TOWER, StructureTo
     }
 
     Activate() {
-        
+
     }
 }
-export function MakeSwarmTower(tower: StructureTower): TSwarmTower { return new SwarmTower(tower); }
+export function MakeSwarmTower(tower: StructureTower, memory: StructureMemory): TSwarmTower {
+    return new SwarmTower(tower, memory);
+}

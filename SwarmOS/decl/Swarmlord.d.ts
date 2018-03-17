@@ -13,15 +13,16 @@ declare interface IStorageMemory<T extends StorageMemoryTypes> extends ISwarmMem
     GetSaveData(): T;
     SaveTo(parentObj: SwarmData | StorageMemoryStructure): void;
 }
-declare type SwarmData = StorageMemoryTypes | EmptyDictionary //| SegmentMemoryType | CacheMemoryType
-declare type EmptyDictionary = Dictionary;
+
+declare type SwarmData = StorageMemoryTypes// | EmptyDictionary //| SegmentMemoryType | CacheMemoryType
+//declare type EmptyDictionary = Dictionary;
 
 declare type StorageMemoryTypes =
     CreepData |
     RoomData |
     StructureData |
     FlagData |
-    RoomObject |
+    RoomObject /*|
     EmptyDictionary;
 /**
  * Creep Data and associated memory
@@ -35,7 +36,7 @@ declare type RoomData = {
     queenType: QueenType;
     roomObjectData: { [id: string]: RoomObjectData };
 }
-declare type RoomObjectData = EmptyDictionary | SourceData;
+declare type RoomObjectData = SourceData// || EmptyDictionary;
 declare type SourceData = {
     sourceID: string;
     nextSpawnRequiredBy: number;
@@ -47,12 +48,12 @@ declare type SourceData = {
 /**
  * Flag Data and associated memory
  */
-declare type FlagData = EmptyDictionary;
+declare type FlagData = {} // EmptyDictionary;
 
 /**
  * Structure Data and associated memory
  */
-declare type StructureModuleData = EmptyDictionary;
+declare type StructureModuleData = {} //EmptyDictionary;
 declare type StructureData = {
     modules: { [moduleType: number]: StructureModuleData }
 }

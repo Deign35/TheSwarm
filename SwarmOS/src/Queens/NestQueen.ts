@@ -6,10 +6,11 @@ import { SwarmCreator } from "SwarmObjects/SwarmCreator";
 import { SwarmObject } from "SwarmObjects/SwarmObject";
 
 const HARVESTER_JOBS = 'HARVEST'
+const ROOMOBJECT_MEMPATH = ['rooms', 'roomObjects']
 @profile
 export abstract class NestQueen implements IQueen {
-    constructor(room: Room) {
-        this.Nest = SwarmCreator.CreateSwarmObject(room, SwarmType.SwarmRoom) as TSwarmRoom;
+    constructor(room: Room, roomData: RoomMemory) {
+        this.Nest = SwarmCreator.CreateSwarmObject(room, SwarmType.SwarmRoom, roomData) as TSwarmRoom;
         this.roomObjects = {};
     }
     Nest: TSwarmRoom;
@@ -23,8 +24,8 @@ export abstract class NestQueen implements IQueen {
         let harvestTargets = this.queenMemory.GetData<SourceData[]>(HARVESTER_JOBS);
         for (let i = 0; i < harvestTargets.length; i++) {
             let target = Game.getObjectById(harvestTargets[i].sourceID)! as Source;
-            let sourceObj = SwarmCreator.CreateSwarmObject(target, SwarmType.SwarmSource) as TSwarmSource;
-            sourceObj.AssignData(harvestTargets[i]);
+            let sourceMemory = Swarmlord.CheckoutMemory(target.id, ROOMOBJECT_MEMPATH, StorageMemoryType.RoomObject);
+            let sourceObj = SwarmCreator.CreateSwarmObject(target, SwarmType.SwarmSource, sourceMemory) as TSwarmSource;
             this.roomObjects[target.id] = sourceObj;
         }
     }
@@ -51,7 +52,6 @@ export abstract class NestQueen implements IQueen {
     ProcessTick(): void {
         for (let id in this.roomObjects) {
             let roomObj = this.roomObjects[id];
-            roomObj.Activate();
         }
     }
     EndTick(): void {

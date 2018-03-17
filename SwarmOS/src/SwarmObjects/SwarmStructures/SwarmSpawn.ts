@@ -2,6 +2,7 @@ import { NotImplementedException } from "Tools/SwarmExceptions";
 import { SwarmCreep } from "../SwarmCreep";
 import { OwnedSwarmStructure } from "./SwarmStructure";
 import { profile } from "Tools/Profiler";
+import { StructureMemory } from "Memory/StorageMemory";
 
 @profile
 export class SwarmSpawn extends OwnedSwarmStructure<STRUCTURE_SPAWN, StructureSpawn, SwarmType.SwarmSpawn> implements ISwarmSpawn, StructureSpawn {
@@ -26,4 +27,6 @@ export class SwarmSpawn extends OwnedSwarmStructure<STRUCTURE_SPAWN, StructureSp
     recycleCreep(target: SwarmCreep) { return this._instance.recycleCreep(target.Value); }
     renewCreep(target: SwarmCreep) { return this._instance.renewCreep(target.Value); }
 }
-export function MakeSwarmSpawn(spawn: StructureSpawn): TSwarmSpawn { return new SwarmSpawn(spawn); }
+export function MakeSwarmSpawn(spawn: StructureSpawn, memory: StructureMemory): TSwarmSpawn {
+    return new SwarmSpawn(spawn, memory);
+}

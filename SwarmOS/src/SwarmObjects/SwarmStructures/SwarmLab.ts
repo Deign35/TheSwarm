@@ -1,5 +1,6 @@
 import { OwnedSwarmStructure } from "./SwarmStructure";
 import { SwarmCreep } from "SwarmObjects/SwarmCreep";
+import { StructureMemory } from "Memory/StorageMemory";
 
 export class SwarmLab extends OwnedSwarmStructure<STRUCTURE_LAB, StructureLab, SwarmType.SwarmLab> implements ISwarmLab, StructureLab {
     get swarmType(): SwarmType.SwarmLab { return SwarmType.SwarmLab; }
@@ -17,4 +18,6 @@ export class SwarmLab extends OwnedSwarmStructure<STRUCTURE_LAB, StructureLab, S
         return this._instance.runReaction(lab1.Value, lab2.Value);
     }
 }
-export function MakeSwarmLab(lab: StructureLab): TSwarmLab { return new SwarmLab(lab); }
+export function MakeSwarmLab(lab: StructureLab, memory: StructureMemory): TSwarmLab {
+    return new SwarmLab(lab, memory);
+}

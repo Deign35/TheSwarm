@@ -85,12 +85,12 @@ export abstract class StorageMemory<T extends StorageMemoryTypes> implements ISt
 }
 
 @profile
-export class BasicMemory extends StorageMemory<EmptyDictionary> {
+export class BasicMemory extends StorageMemory<Dictionary> {
     GetMemoryType(): StorageMemoryType {
         return StorageMemoryType.None;
     }
     CreateEmptyMemory() {
-        return {} as EmptyDictionary;
+        return {} as Dictionary;
     }
 }
 
@@ -136,5 +136,15 @@ export class RoomMemory extends StorageMemory<RoomData> {
             queenType: QueenType.Larva,
             roomObjectData: {}
         };
+    }
+}
+
+@profile
+export class RoomObjectMemory extends StorageMemory<RoomObjectData> {
+    GetMemoryType(): StorageMemoryType {
+        return StorageMemoryType.RoomObject;
+    }
+    CreateEmptyMemory(): RoomObjectData {
+        return {} as RoomObjectData
     }
 }

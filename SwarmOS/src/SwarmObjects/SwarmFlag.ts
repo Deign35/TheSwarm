@@ -1,27 +1,17 @@
-import { SwarmItem } from "SwarmObjects/SwarmObject";
+import { SwarmItemWithName } from "SwarmObjects/SwarmObject";
 import { FlagMemory } from "Memory/StorageMemory";
 import { profile } from "Tools/Profiler";
 
 @profile
-export class SwarmFlag extends SwarmItem<Flag, SwarmType.SwarmFlag> implements ISwarmFlag, Flag {
-    protected data!: StorageMemoryTypes;
-    AssignData(data: StorageMemoryTypes): void {
-        this.data = data;
-    }
-    Activate(): void {
-    }
-    GetSpawnRequirements(): TEMP_SpawnReqType | undefined {
-        return undefined;
-    }
-    protected flagMemory!: FlagMemory;
+export class SwarmFlag extends SwarmItemWithName<Flag, SwarmType.SwarmFlag, FlagMemory> implements ISwarmFlag, Flag {
     get swarmType(): SwarmType.SwarmFlag { return SwarmType.SwarmFlag; };
     get pos() { return this._instance.pos; }
     get room() { return this._instance.room; }
     get prototype(): Flag { return this._instance.prototype as Flag; }
     get color() { return this._instance.color; }
     get secondaryColor() { return this._instance.secondaryColor; }
-    get memory() { return this.flagMemory; }
-    set memory(mem: FlagMemory) { this.flagMemory = mem; }
+    get memory() { return this._memory; }
+    set memory(mem: FlagMemory) { this._memory = mem; }
     get name() { return this._instance.name; }
     get saveID() { return this.name; }
 
@@ -36,10 +26,7 @@ export class SwarmFlag extends SwarmItem<Flag, SwarmType.SwarmFlag> implements I
             return this._instance.setPosition(args[0]);
         }
     }
-    StartTick() { }
-    ProcessTick() { }
-    EndTick() { }
 }
-export function MakeSwarmFlag(flag: Flag): TSwarmFlag {
-    return new SwarmFlag(flag);
+export function MakeSwarmFlag(flag: Flag, memory: FlagMemory): TSwarmFlag {
+    return new SwarmFlag(flag, memory);
 }
