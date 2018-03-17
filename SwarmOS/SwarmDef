@@ -31,7 +31,7 @@ HoneyBee: Each tick: Pickup(PosA), Drop(PosB), Move(PosC) -- PosA(last tick), Po
 
 
 Unused Words:
-Nueral
+Neural
 Node -- iffy
 Ravager
 Defiler

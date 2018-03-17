@@ -28,10 +28,10 @@ export abstract class StorageMemory<T extends StorageMemoryTypes> implements ISt
 
     GetSaveData(): T { return CopyObject(this._cache); }
     GetSavePath() { return this._savePath.slice(); }
-    GetData<T>(id: string): T {
+    GetData<Z>(id: string): Z {
         return this._cache[id];
     }
-    SetData<T>(id: string, data: T): void {
+    SetData<Z>(id: string, data: Z): void {
         this._cache[id] = data;
     }
     RemoveData(id: string): void {
@@ -85,12 +85,12 @@ export abstract class StorageMemory<T extends StorageMemoryTypes> implements ISt
 }
 
 @profile
-export class BasicMemory extends StorageMemory<EmptyData> {
+export class BasicMemory extends StorageMemory<EmptyDictionary> {
     GetMemoryType(): StorageMemoryType {
         return StorageMemoryType.None;
     }
     CreateEmptyMemory() {
-        return {} as EmptyData;
+        return {} as EmptyDictionary;
     }
 }
 
@@ -148,5 +148,15 @@ export class RoomMemory extends StorageMemory<RoomData> {
         return {
             queenType: QueenType.Larva
         } as RoomData;
+    }
+}
+
+@profile
+export class JobMemory extends StorageMemory<JobData> {
+    GetMemoryType(): StorageMemoryType {
+        return StorageMemoryType.JobData;
+    }
+    CreateEmptyMemory() {
+        return {} as JobData;
     }
 }

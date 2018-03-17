@@ -1,6 +1,6 @@
 import { profile } from "Tools/Profiler";
 import { NotImplementedException, SwarmException, MemoryNotFoundException, AlreadyExistsException, InvalidArgumentException } from "Tools/SwarmExceptions";
-import { StorageMemory, CreepMemory, CreepSuitMemory, FlagMemory, RoomMemory, StructureMemory, BasicMemory } from "Memory/StorageMemory";
+import { StorageMemory, CreepMemory, CreepSuitMemory, FlagMemory, RoomMemory, StructureMemory, BasicMemory, JobMemory } from "Memory/StorageMemory";
 import { SwarmQueen } from "SwarmManagers/SwarmQueen";
 import { SwarmCreepController } from "SwarmManagers/SwarmCreepManager"
 import { SwarmFlagController } from "SwarmManagers/SwarmFlagController"
@@ -8,7 +8,7 @@ import { SwarmStructureController } from "SwarmManagers/SwarmStructureController
 
 declare var Memory: StorageMemoryStructure;
 
-function ConvertDataToMemory<T extends StorageMemoryTypes>(id: string, path: string[], data: T): IStorageMemory<T> {
+function ConvertDataToMemory<T extends StorageMemoryTypes>(id: string, path: string[], data: T) {
     let memCopy = CopyObject(data);
     let memoryType = memCopy[MEM_TYPE] as StorageMemoryType;
     switch (memoryType) {
@@ -17,10 +17,12 @@ function ConvertDataToMemory<T extends StorageMemoryTypes>(id: string, path: str
         case (StorageMemoryType.Flag): return new FlagMemory(id, path, memCopy as FlagData);
         case (StorageMemoryType.Room): return new RoomMemory(id, path, memCopy as RoomData);
         case (StorageMemoryType.Structure): return new StructureMemory(id, path, memCopy as StructureData);
+        case (StorageMemoryType.JobData): return new JobMemory(id, path, memCopy as JobData);
     }
 
     return new BasicMemory(id, path, memCopy);
 }
+
 function CreateNewMemory(id: string, path: string[], memoryType: StorageMemoryType) {
     switch (memoryType) {
         case (StorageMemoryType.Creep): return new CreepMemory(id, path);
@@ -28,6 +30,7 @@ function CreateNewMemory(id: string, path: string[], memoryType: StorageMemoryTy
         case (StorageMemoryType.Flag): return new FlagMemory(id, path);
         case (StorageMemoryType.Room): return new RoomMemory(id, path);
         case (StorageMemoryType.Structure): return new StructureMemory(id, path);
+        case (StorageMemoryType.JobData): return new JobMemory(id, path);
     }
     return new BasicMemory(id, path);
 }
@@ -51,11 +54,14 @@ export class Swarmlord implements ISwarmlord {
             for (const creepName in Game.creeps) {
                 newCreepObject[creepName] = {};
             }
-            let newMemory = {
+            let newMemory: StorageMemoryStructure = {
                 creeps: newCreepObject,
                 flags: {},
                 structures: {},
                 rooms: {},
+                neuralNetwork: {
+                    Cluster: {}
+                },
                 profiler: Memory.profiler, // Hacky, but cleanest way to prevent the profiler from breaking because of deleting its memory.
                 SwarmVersionDate: SWARM_VERSION_DATE,
                 INIT: true
@@ -91,6 +97,8 @@ export class Swarmlord implements ISwarmlord {
         this.storageMemory[memType] = this.LoadDataFromMemory(memType, StorageMemoryType.Room);
         memType = this.StorageMemoryTypeToString(StorageMemoryType.Structure);
         this.storageMemory[memType] = this.LoadDataFromMemory(memType, StorageMemoryType.Structure);
+        memType = this.StorageMemoryTypeToString(StorageMemoryType.JobData);
+        this.storageMemory[memType] = this.LoadDataFromMemory(memType, StorageMemoryType.JobData);
     }
 
     GetMemoryEntries(memType: StorageMemoryType): string[] {
@@ -108,6 +116,8 @@ export class Swarmlord implements ISwarmlord {
                 return 'flags';
             case (StorageMemoryType.Structure):
                 return 'structures';
+            case (StorageMemoryType.JobData):
+                return 'neuralNetwork';
             case (StorageMemoryType.CreepSuitData):
             default:
                 throw new InvalidArgumentException('Tried to retrieve invalid memory type [' + memType + ']');

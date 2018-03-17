@@ -1,14 +1,23 @@
 declare interface ISwarmMemory {
     id: string;
     MemoryType: number;
-    GetData<T>(id: string): T;
-    SetData<T>(id: string, data: T): void;
+    GetData<Z>(id: string): Z;
+    SetData<Z>(id: string, data: Z): void;
     RemoveData(id: string): void;
 }
-declare type SwarmData = SegmentMemoryType | StorageMemoryTypes | CacheMemoryType | EmptyData;
-declare type EmptyData = Dictionary;
-declare type SegmentMemoryType = EmptyData;
-declare interface ISegmentMemory extends ISwarmMemory {
+declare interface IStorageMemory<T extends StorageMemoryTypes> extends ISwarmMemory {
+    MemoryType: StorageMemoryType;
+    IsCheckedOut: boolean;
+    ReserveMemory(): void;
+    GetSavePath(): string[];
+    GetSaveData(): T;
+    SaveTo(parentObj: SwarmData | StorageMemoryStructure): void;
+}
+declare type SwarmData = StorageMemoryTypes | EmptyDictionary //| SegmentMemoryType | CacheMemoryType
+declare type EmptyDictionary = Dictionary;
+/*
+declare type SegmentMemoryType = EmptyDictionary;
+declare interface ISegmentMemory<T> extends ISwarmMemory<T> {
     segmentID: number
 }
 
@@ -16,33 +25,26 @@ declare type CacheMemoryType = CostMatrixMemory;
 declare type CostMatrixMemory = {
     matrix: CostMatrix
 }
-declare interface ICacheMemory extends ISwarmMemory {
+declare interface ICacheMemory<T> extends ISwarmMemory<T> {
 
 }
 declare type CacheMemoryStructure = {
     CostMatrices: { [id: string]: CostMatrixMemory }
 }
-
-declare type StorageMemoryTypes = CreepSuitData | CreepData | RoomData | StructureData | FlagData;
-declare type CreepSuitData = EmptyData;
+*/
+declare type StorageMemoryTypes = CreepSuitData | CreepData | RoomData | StructureData | FlagData | JobData | EmptyDictionary;
+declare type CreepSuitData = EmptyDictionary;
 declare type CreepData = {
     suitData: CreepSuitData[]
 }
 declare type RoomData = {
     queenType: QueenType
 }
-declare type FlagData = EmptyData
-declare type StructureModuleData = EmptyData;
+declare type JobData = EmptyDictionary;
+declare type FlagData = EmptyDictionary;
+declare type StructureModuleData = EmptyDictionary;
 declare type StructureData = {
     modules: { [moduleType: number]: StructureModuleData }
-}
-declare interface IStorageMemory<T> extends ISwarmMemory {
-    MemoryType: StorageMemoryType;
-    IsCheckedOut: boolean;
-    ReserveMemory(): void;
-    GetSavePath(): string[];
-    GetSaveData(): SwarmData;
-    SaveTo(parentObj: SwarmData | StorageMemoryStructure): void;
 }
 
 declare type StorageMemoryStructure = {
@@ -50,9 +52,20 @@ declare type StorageMemoryStructure = {
     rooms: { [roomId: string]: RoomData }
     flags: { [flagName: string]: FlagData }
     structures: { [structureName: string]: StructureData }
+    neuralNetwork: JobMemoryDataStructure;
     profiler: any;
     SwarmVersionDate: string;
     INIT: boolean;
+}
+
+declare interface IJobDefinition {
+    GetJobLocation(): RoomPosition;
+    EvaluateCreepCompatability(creep: TSwarmCreep): number;
+    JobPriority: Priority;
+}
+
+declare type JobMemoryDataStructure = {
+    Cluster: { [roomID: string]: IJobDefinition[] }
 }
 
 declare interface ISwarmlord {

@@ -290,7 +290,8 @@ let ReplaceImports = function (abspath, rootdir, subdir, filename) {
                     reqPath.splice(reqPath.length - 1);
                 }
             } else {
-                if (!line.match(/\.\//gi)) {
+                let isRelative = line.match(/\.\//gi);
+                if (!isRelative || isRelative == "") {
                     // absolute path
                     reqPath = [];
                 }
@@ -298,8 +299,9 @@ let ReplaceImports = function (abspath, rootdir, subdir, filename) {
 
             let rePathed = "";
             if (reqPath && reqPath.length > 0) {
-                for (let folder of reqPath) {
-                    rePathed = folder + "_";
+                while (reqPath.length > 0) {
+
+                    rePathed += reqPath.shift() + "_";
                 }
             }
             line = line.replace(/require\("([\.\/]*)([^"]*)/, "require\(\"" + rePathed + "$2").replace(/\//gi, '_');

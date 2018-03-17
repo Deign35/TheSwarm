@@ -53,7 +53,8 @@
             "Room": 2,
             "Flag": 3,
             "Creep": 4,
-            "CreepSuitData": 5
+            "CreepSuitData": 5,
+            "JobData": 6
         },
         "QueenType": {
             "Larva": 0,

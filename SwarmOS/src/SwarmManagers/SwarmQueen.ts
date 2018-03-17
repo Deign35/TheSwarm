@@ -8,7 +8,6 @@ import { RCL1_HiveQueen } from "Queens/HiveQueen";
 const ROOM_SAVE_PATH = ['rooms'];
 @profile
 export class SwarmQueen extends SwarmManager<StorageMemoryType.Room, SwarmRoom> implements ISwarmQueen {
-
     protected getManagerSavePath(): string[] {
         return ROOM_SAVE_PATH;
     }

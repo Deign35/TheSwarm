@@ -17,10 +17,6 @@ declare interface ICreepSuit2<T extends CreepSuitType> {
 }
 
 declare interface INeuralNetwork {
-
-}
-declare interface IJobDefinition {
-    GetJobLocation(): RoomPosition;
-    EvaluateCreepCompatability(creep: TSwarmCreep): number;
-    JobPriority: Priority;
+    AddNewJob(job: IJobDefinition): void;
+    GetNewJob(creep: TSwarmCreep): IJobDefinition;
 }
