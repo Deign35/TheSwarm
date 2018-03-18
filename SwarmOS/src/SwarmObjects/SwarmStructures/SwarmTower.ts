@@ -4,7 +4,7 @@ import { StructureMemory } from "Memory/StorageMemory";
 import { profile } from "Tools/Profiler";
 
 @profile
-export class SwarmTower extends OwnedSwarmStructure<STRUCTURE_TOWER, StructureTower, SwarmType.SwarmTower> implements ISwarmTower, StructureTower {
+export class SwarmTower extends OwnedSwarmStructure<STRUCTURE_TOWER, StructureTower> implements ISwarmTower, StructureTower {
     get swarmType(): SwarmType.SwarmTower { return SwarmType.SwarmTower; }
     get energy() { return this._instance.energy; }
     get energyCapacity() { return this._instance.energyCapacity; }
@@ -15,7 +15,7 @@ export class SwarmTower extends OwnedSwarmStructure<STRUCTURE_TOWER, StructureTo
     heal(target: SwarmCreep) {
         return this._instance.heal(target.value);
     }
-    repair<U extends StructureConstant, T extends Structure<U>, V extends SwarmType>(target: SwarmStructure<U, T, V>) {
+    repair<U extends StructureConstant, T extends Structure<U>, V extends SwarmType>(target: SwarmStructure<U, T>) {
         return this._instance.repair(target.value);
     }
 
@@ -23,6 +23,6 @@ export class SwarmTower extends OwnedSwarmStructure<STRUCTURE_TOWER, StructureTo
 
     }
 }
-export function MakeSwarmTower(tower: StructureTower, memory: StructureMemory): TSwarmTower {
-    return new SwarmTower(tower, memory);
+export function MakeSwarmTower(tower: StructureTower, parentPath: string[]): TSwarmTower {
+    return new SwarmTower(tower, parentPath);
 }

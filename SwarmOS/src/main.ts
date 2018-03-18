@@ -6,9 +6,11 @@ import "Tools/GlobalTools";
 import "Memory/Swarmlord";
 import { SwarmQueen } from "SwarmManagers/SwarmQueen";
 import { SwarmCreepController } from "SwarmManagers/SwarmCreepManager"
+import { SwarmFlagController } from "SwarmManagers/SwarmFlagController"
+import { SwarmStructureController } from "SwarmManagers/SwarmStructureController"
 
 export const loop = function () {
-    //debugger;
+    debugger;
     Swarmlord.ValidateMemory();
 
     SwarmQueen.PrepareTheSwarm();

@@ -3,15 +3,18 @@ declare interface ISwarmMemory {
     MemoryType: number;
     GetData<Z>(id: string): Z;
     SetData<Z>(id: string, data: Z): void;
+    HasData(id: string): boolean;
     RemoveData(id: string): void;
 }
 declare interface IStorageMemory<T extends StorageMemoryTypes> extends ISwarmMemory {
     MemoryType: StorageMemoryType;
     IsCheckedOut: boolean;
     ReserveMemory(): void;
+    GetIDs(): string[];
     GetSavePath(): string[];
     GetSaveData(): T;
-    SaveTo(parentObj: SwarmData | StorageMemoryStructure): void;
+    ReleaseMemory(): void;
+    SaveChildMemory(childMemory: ISwarmMemory): void;
 }
 
 declare type SwarmData = StorageMemoryTypes// | EmptyDictionary //| SegmentMemoryType | CacheMemoryType
@@ -22,7 +25,7 @@ declare type StorageMemoryTypes =
     RoomData |
     StructureData |
     FlagData |
-    RoomObject /*|
+    RoomObjectData /*|
     EmptyDictionary;
 /**
  * Creep Data and associated memory
@@ -34,7 +37,7 @@ declare type CreepData = {}
  */
 declare type RoomData = {
     queenType: QueenType;
-    roomObjectData: { [id: string]: RoomObjectData };
+    OBJs: { [id: string]: RoomObjectData };
 }
 declare type RoomObjectData = SourceData// || EmptyDictionary;
 declare type SourceData = {
@@ -74,7 +77,7 @@ declare interface ISwarmlord {
     ReleaseMemory<T extends StorageMemoryTypes>(memObject: IStorageMemory<T>, save?: boolean): void;
     DeleteMemory<T extends StorageMemoryTypes>(memObject: IStorageMemory<T>): void;
     StorageMemoryTypeToString(memType: StorageMemoryType): string;
-    GetMemoryEntries(memType: StorageMemoryType): string[];
+    //GetMemoryEntries(memType: StorageMemoryType): string[];
     CreateNewStorageMemory<T extends StorageMemoryTypes>(id: string, path: string[], memType: StorageMemoryType): void
 } declare var Swarmlord: ISwarmlord;
 

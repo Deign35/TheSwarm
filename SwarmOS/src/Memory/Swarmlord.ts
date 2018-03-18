@@ -1,10 +1,6 @@
 import { profile } from "Tools/Profiler";
 import { NotImplementedException, SwarmException, MemoryNotFoundException, AlreadyExistsException, InvalidArgumentException } from "Tools/SwarmExceptions";
-import { StorageMemory, CreepMemory, FlagMemory, RoomMemory, StructureMemory, BasicMemory } from "Memory/StorageMemory";
-import { SwarmQueen } from "SwarmManagers/SwarmQueen";
-import { SwarmCreepController } from "SwarmManagers/SwarmCreepManager"
-import { SwarmFlagController } from "SwarmManagers/SwarmFlagController"
-import { SwarmStructureController } from "SwarmManagers/SwarmStructureController"
+import { StorageMemory, CreepMemory, FlagMemory, RoomMemory, StructureMemory, BasicMemory, RoomObjectMemory } from "Memory/StorageMemory";
 
 declare var Memory: StorageMemoryStructure;
 
@@ -16,6 +12,7 @@ function ConvertDataToMemory<T extends StorageMemoryTypes>(id: string, path: str
         case (StorageMemoryType.Flag): return new FlagMemory(id, path, memCopy as FlagData);
         case (StorageMemoryType.Room): return new RoomMemory(id, path, memCopy as RoomData);
         case (StorageMemoryType.Structure): return new StructureMemory(id, path, memCopy as StructureData);
+        case (StorageMemoryType.RoomObject): return new RoomObjectMemory(id, path, memCopy as RoomObjectData);
     }
 
     return new BasicMemory(id, path, memCopy);
@@ -27,6 +24,7 @@ function CreateNewMemory(id: string, path: string[], memoryType: StorageMemoryTy
         case (StorageMemoryType.Flag): return new FlagMemory(id, path);
         case (StorageMemoryType.Room): return new RoomMemory(id, path);
         case (StorageMemoryType.Structure): return new StructureMemory(id, path);
+        case (StorageMemoryType.RoomObject): return new RoomObjectMemory(id, path);
     }
     return new BasicMemory(id, path);
 }
@@ -45,19 +43,15 @@ export class Swarmlord implements ISwarmlord {
             initTimer.Start();
             global['Swarmlord'] = this;
 
-            SwarmLogger.Log("Begin initialization of memory for entire Swarm");
-            let newCreepObject = {};
-            for (const creepName in Game.creeps) {
-                newCreepObject[creepName] = {};
-            }
+            SwarmLogger.Log("Begin initialization of memory for entire Swarm(" + SWARM_VERSION_DATE + ")");
             let newMemory: StorageMemoryStructure = {
-                creeps: newCreepObject,
+                creeps: {},
                 flags: {},
                 structures: {},
                 rooms: {},
                 profiler: Memory.profiler, // Hacky, but cleanest way to prevent the profiler from breaking because of deleting its memory.
                 SwarmVersionDate: SWARM_VERSION_DATE,
-                INIT: true
+                INIT: false
             };
 
             for (let id in Memory) {
@@ -68,13 +62,14 @@ export class Swarmlord implements ISwarmlord {
                 Memory[id] = newMemory[id];
             }
             this.InitBaseMemoryFolders();
+            /*
+                        // init stuff
+                        new SwarmQueen().FinalizeSwarmActivity();
+                        new SwarmCreepController().FinalizeSwarmActivity();
+                        new SwarmStructureController().FinalizeSwarmActivity();
+                        new SwarmFlagController().FinalizeSwarmActivity();*/
 
-            // init stuff
-            new SwarmQueen().FinalizeSwarmActivity();
-            new SwarmCreepController().FinalizeSwarmActivity();
-            new SwarmStructureController().FinalizeSwarmActivity();
-            new SwarmFlagController().FinalizeSwarmActivity();
-
+            Memory['INIT'] = true;
             initTimer.Stop();
             SwarmLogger.Log("End initialization of memory.  Initialization took: " + initTimer.ToString());
         } else {
@@ -83,18 +78,13 @@ export class Swarmlord implements ISwarmlord {
     }
     private InitBaseMemoryFolders() {
         let memType = this.StorageMemoryTypeToString(StorageMemoryType.Creep);
-        this.storageMemory[memType] = this.LoadDataFromMemory(memType, StorageMemoryType.Creep);
+        this.storageMemory[memType] = this.LoadDataFromMemory(memType);
         memType = this.StorageMemoryTypeToString(StorageMemoryType.Flag);
-        this.storageMemory[memType] = this.LoadDataFromMemory(memType, StorageMemoryType.Flag);
+        this.storageMemory[memType] = this.LoadDataFromMemory(memType);
         memType = this.StorageMemoryTypeToString(StorageMemoryType.Room);
-        this.storageMemory[memType] = this.LoadDataFromMemory(memType, StorageMemoryType.Room);
+        this.storageMemory[memType] = this.LoadDataFromMemory(memType);
         memType = this.StorageMemoryTypeToString(StorageMemoryType.Structure);
-        this.storageMemory[memType] = this.LoadDataFromMemory(memType, StorageMemoryType.Structure);
-    }
-
-    GetMemoryEntries(memType: StorageMemoryType): string[] {
-        let storage = this.storageMemory[this.StorageMemoryTypeToString(memType)];
-        return Object.getOwnPropertyNames(storage);
+        this.storageMemory[memType] = this.LoadDataFromMemory(memType);
     }
 
     StorageMemoryTypeToString(memType: StorageMemoryType): string {
@@ -107,6 +97,8 @@ export class Swarmlord implements ISwarmlord {
                 return 'flags';
             case (StorageMemoryType.Structure):
                 return 'structures';
+            case (StorageMemoryType.RoomObject):
+                return 'OBJs';
             default:
                 throw new InvalidArgumentException('Tried to retrieve invalid memory type [' + memType + ']');
         }
@@ -119,39 +111,40 @@ export class Swarmlord implements ISwarmlord {
     }
 
     CreateNewStorageMemory(id: string, path: string[], memoryType: StorageMemoryType): void {
+        /** 
+         * This needs to be changed from using the path to just being given the parent object to
+         * save to. The parent object needs to be a Dictionary at minimum.
+        */
         let targetObject = Memory;
         for (let i = 0; i < path.length; i++) {
             if (!targetObject[path[i]]) {
                 throw new MemoryNotFoundException('Could not add ' + id + ' to ' + this.MakeStoragePath(path.slice(-i)[0], path.slice(0, -i)));
-                //this.CreateNewStorageMemory(path[i], path.slice(0, i - 1));
             }
             targetObject = targetObject[path[i]];
         }
         if (targetObject[id]) {
             return;
         }
-        let mem = CreateNewMemory(id, path, memoryType);
-        this.storageMemory[this.MakeStoragePath(id, path)] = mem;
-        targetObject[id] = mem.GetSaveData();
+        let newMem = CreateNewMemory(id, path, memoryType);
+        this.SaveStorageToMemory(newMem);
     }
 
-    CheckoutMemory<T extends StorageMemoryTypes, U extends IStorageMemory<T>>(id: string, path: string[], memoryType: StorageMemoryType): U {
-        let mem = this.LoadStorageMemory<T>(id, path, memoryType);
+    CheckoutMemory<T extends IStorageMemory<StorageMemoryTypes>>(id: string, path: string[], memoryType: StorageMemoryType): T {
+        let mem = this.LoadStorageMemory(id, path, memoryType);
         mem.ReserveMemory();
 
-        return mem as U;
+        return mem as T;
     }
 
-    ReleaseMemory<T extends StorageMemoryTypes>(mem: IStorageMemory<T>, save: boolean = true) {
+    ReleaseMemory(mem: IStorageMemory<StorageMemoryTypes>, save: boolean = true) {
         if (save) {
             this.SaveStorageToMemory(mem);
         }
-        let memPath = mem.GetSavePath();
-        let storagePath = this.MakeStoragePath(mem.id, memPath);
-        delete this.storageMemory[storagePath];
+
+        mem.ReleaseMemory();
     }
 
-    DeleteMemory<T extends StorageMemoryTypes>(mem: IStorageMemory<T>) {
+    DeleteMemory(mem: IStorageMemory<StorageMemoryTypes>) {
         this.ReleaseMemory(mem, false);
         this.DeleteFromStorageMemory(mem);
         this.DeleteFromMemoryStructure(mem);
@@ -162,26 +155,19 @@ export class Swarmlord implements ISwarmlord {
      * @param id id of the memory object to retrieve
      * @param path the path to the parent object.
      */
-    private LoadStorageMemory<T extends StorageMemoryTypes>(id: string, path: string[], memoryType: StorageMemoryType): IStorageMemory<T> {
+    private LoadStorageMemory(id: string, path: string[], memoryType: StorageMemoryType): IStorageMemory<StorageMemoryTypes> {
         //debugger;
         let storagePath = this.MakeStoragePath(id, path);
-        let parentObj: IStorageMemory<T>;
         if (!this.storageMemory[storagePath]) {
-            if (path.length == 0) {
-                return this.LoadDataFromMemory<T>(id, memoryType);
-            } else {
-                parentObj = this.LoadStorageMemory(path.slice(-1)[0], path.slice(0, -1), memoryType);
-            }
+            let parentObj = this.LoadStorageMemory(path.slice(-1)[0], path.slice(0, -1), memoryType);
 
             if (!parentObj || !memoryType) {
                 throw new MemoryNotFoundException('Could not add ' + id + ' to ' + this.MakeStoragePath(path.slice(-1)[0], path.slice(0, -1)));
-            } else if (!parentObj[id]) {
+            } else if (!parentObj.HasData(id)) {
                 this.CreateNewStorageMemory(id, path, memoryType);
-                let newMem = this.CheckoutMemory(id, path, memoryType);
-                newMem.SaveTo(parentObj);
-                this.storageMemory[storagePath] = newMem;
+                return this.LoadStorageMemory(id, path, memoryType);
             } else {
-                this.storageMemory[storagePath] = ConvertDataToMemory(id, path, parentObj[id]);
+                this.storageMemory[storagePath] = ConvertDataToMemory(id, path, parentObj.GetData(id));
             }
         }
 
@@ -193,15 +179,15 @@ export class Swarmlord implements ISwarmlord {
      * i.e. LoadStorageFromMemory("creeps");  LoadStorageFromMemory("rooms");
      * @param id The id of the ParentCache
      */
-    private LoadDataFromMemory<T extends StorageMemoryTypes>(id: string, memoryType: StorageMemoryType): IStorageMemory<T> {
-        this.storageMemory[id] = Memory[id];
+    private LoadDataFromMemory(id: string): IStorageMemory<StorageMemoryTypes> {
+        this.storageMemory[id] = ConvertDataToMemory(id, [], Memory[id]);
         return this.storageMemory[id];
     }
 
-    private DeleteFromMemoryStructure<T extends StorageMemoryTypes>(memObject: IStorageMemory<T>) {
+    private DeleteFromMemoryStructure(memObject: IStorageMemory<StorageMemoryTypes>) {
         // Load parent and delete from there.
     }
-    private DeleteFromStorageMemory<T extends StorageMemoryTypes>(memObject: IStorageMemory<T>) {
+    private DeleteFromStorageMemory(memObject: IStorageMemory<StorageMemoryTypes>) {
         let memPath = memObject.GetSavePath();
         let storagePath = this.MakeStoragePath(memObject.id, memPath);
         delete this.storageMemory[storagePath];
@@ -213,12 +199,18 @@ export class Swarmlord implements ISwarmlord {
      * the cached version of the memory object.
      * @param memObject The memory object to save.
      */
-    private SaveStorageMemoryToParentMemory<T extends StorageMemoryTypes>(memObject: IStorageMemory<T>) {
+    private SaveStorageMemoryToParentMemory(memObject: IStorageMemory<StorageMemoryTypes>) {
         let path = memObject.GetSavePath();
         if (path.length > 0) {
             // Need to copy changes up
-            let parentObj = this.storageMemory[this.MakeStoragePath(path.shift()!, path)]
-            memObject.SaveTo(parentObj);
+            let memId = path.pop()!;
+            let parentObj = this.storageMemory[this.MakeStoragePath(memId, path)];
+            if (!parentObj) {
+                parentObj = this.LoadStorageMemory(memId, path, StorageMemoryType.Other);
+                //let loadedParentMemory = this.CheckoutMemory(memId, path, StorageMemoryType.Other);
+            }
+
+            parentObj.SaveChildMemory(memObject);
         }
     }
 
@@ -226,7 +218,7 @@ export class Swarmlord implements ISwarmlord {
      * Saves the data to permanent storage (i.e. Memory[id] = memObject._cache)
      * @param memObject The memory object to save
      */
-    private SaveStorageToMemory<T extends StorageMemoryTypes>(memObject: IStorageMemory<T>) {
+    private SaveStorageToMemory(memObject: IStorageMemory<StorageMemoryTypes>) {
         this.SaveStorageMemoryToParentMemory(memObject);
         this.SaveToStorageMemoryStructure(memObject, Memory);
     }
@@ -236,7 +228,7 @@ export class Swarmlord implements ISwarmlord {
      * @param memObject The memory object to save
      * @param memStructure The memory structure to save to.
      */
-    private SaveToStorageMemoryStructure<T extends StorageMemoryTypes>(memObject: IStorageMemory<T>, memStructure: StorageMemoryStructure) {
+    private SaveToStorageMemoryStructure(memObject: IStorageMemory<StorageMemoryTypes>, memStructure: StorageMemoryStructure) {
         let memPath = memObject.GetSavePath();
         let parentObj: StorageMemoryStructure | SwarmData = memStructure;
         while (memPath.length > 0) {

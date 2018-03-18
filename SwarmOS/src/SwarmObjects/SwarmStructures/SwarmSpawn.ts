@@ -5,7 +5,7 @@ import { profile } from "Tools/Profiler";
 import { StructureMemory } from "Memory/StorageMemory";
 
 @profile
-export class SwarmSpawn extends OwnedSwarmStructure<STRUCTURE_SPAWN, StructureSpawn, SwarmType.SwarmSpawn> implements ISwarmSpawn, StructureSpawn {
+export class SwarmSpawn extends OwnedSwarmStructure<STRUCTURE_SPAWN, StructureSpawn> implements ISwarmSpawn, StructureSpawn {
     get swarmType(): SwarmType.SwarmSpawn { return SwarmType.SwarmSpawn; }
     get energy() { return this._instance.energy; }
     get energyCapacity() { return this._instance.energyCapacity; }
@@ -27,6 +27,6 @@ export class SwarmSpawn extends OwnedSwarmStructure<STRUCTURE_SPAWN, StructureSp
     recycleCreep(target: SwarmCreep) { return this._instance.recycleCreep(target.value); }
     renewCreep(target: SwarmCreep) { return this._instance.renewCreep(target.value); }
 }
-export function MakeSwarmSpawn(spawn: StructureSpawn, memory: StructureMemory): TSwarmSpawn {
-    return new SwarmSpawn(spawn, memory);
+export function MakeSwarmSpawn(spawn: StructureSpawn, parentPath: string[]): TSwarmSpawn {
+    return new SwarmSpawn(spawn, parentPath);
 }

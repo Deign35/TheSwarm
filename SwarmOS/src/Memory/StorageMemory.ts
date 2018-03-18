@@ -26,8 +26,13 @@ export abstract class StorageMemory<T extends StorageMemoryTypes> implements ISt
     protected abstract GetMemoryType(): StorageMemoryType;
     protected abstract CreateEmptyMemory(): T;
 
+    GetIDs() { return Object.getOwnPropertyNames(this._cache); }
     GetSaveData(): T { return CopyObject(this._cache); }
     GetSavePath() { return this._savePath.slice(); }
+
+    HasData(id: string): boolean {
+        return !!(this._cache[id]);
+    }
     GetData<Z>(id: string): Z {
         return this._cache[id];
     }
@@ -36,17 +41,6 @@ export abstract class StorageMemory<T extends StorageMemoryTypes> implements ISt
     }
     RemoveData(id: string): void {
         delete this._cache[id];
-    }
-    /**
-     * @throws MemoryLockException
-     */
-    SaveTo(parentObj: SwarmData | StorageMemoryStructure, keepReserved: boolean = false) {
-        this.ReleaseMemory(); // Check back in
-
-        parentObj[this._id] = this.GetSaveData();
-        if (keepReserved) {
-            this.ReserveMemory(); // Check out if caller wants to keep it.
-        }
     }
     /**
      * @throws MemoryLockException
@@ -67,59 +61,47 @@ export abstract class StorageMemory<T extends StorageMemoryTypes> implements ISt
         this._checkedOut = false;
     }
 
-    TryAttachChildMemory<T>(id: string, childMemory: StorageMemory<T>) {
-        if (!this._cache[id]) {
-            this.AttachChildMemory(id, childMemory);
-        }
-    }
-
-    private AttachChildMemory<T>(id: string, childMemory: StorageMemory<T>) {
-        if (this._cache[id]) {
-            throw new AlreadyExistsException("Child memory already exists: " + this._savePath + " -- " + id);
-        }
-
-        let childPath = this.GetSavePath();
-        childPath.push(this.id);
-        this.SetData(id, childMemory.GetSaveData());
+    SaveChildMemory(childMemory: StorageMemory<StorageMemoryTypes>) {
+        this.SetData(childMemory.id, childMemory.GetSaveData());
     }
 }
 
 @profile
 export class BasicMemory extends StorageMemory<Dictionary> {
-    GetMemoryType(): StorageMemoryType {
-        return StorageMemoryType.None;
+    protected GetMemoryType(): StorageMemoryType {
+        return StorageMemoryType.Other;
     }
-    CreateEmptyMemory() {
+    protected CreateEmptyMemory() {
         return {} as Dictionary;
     }
 }
 
 @profile
 export class FlagMemory extends StorageMemory<FlagData> {
-    GetMemoryType(): StorageMemoryType {
+    protected GetMemoryType(): StorageMemoryType {
         return StorageMemoryType.Flag;
     }
-    CreateEmptyMemory() {
+    protected CreateEmptyMemory() {
         return {} as FlagData;
     }
 }
 
 @profile
 export class StructureMemory extends StorageMemory<StructureData> {
-    GetMemoryType(): StorageMemoryType {
+    protected GetMemoryType(): StorageMemoryType {
         return StorageMemoryType.Structure;
     }
-    CreateEmptyMemory() {
+    protected CreateEmptyMemory() {
         return {} as StructureData;
     }
 }
 
 @profile
 export class CreepMemory extends StorageMemory<CreepData> {
-    GetMemoryType(): StorageMemoryType {
+    protected GetMemoryType(): StorageMemoryType {
         return StorageMemoryType.Creep;
     }
-    CreateEmptyMemory() {
+    protected CreateEmptyMemory() {
         return {
             suitData: []
         } as CreepData;
@@ -128,23 +110,25 @@ export class CreepMemory extends StorageMemory<CreepData> {
 
 @profile
 export class RoomMemory extends StorageMemory<RoomData> {
-    GetMemoryType(): StorageMemoryType {
+    protected GetMemoryType(): StorageMemoryType {
         return StorageMemoryType.Room;
     }
-    CreateEmptyMemory(): RoomData {
+    protected CreateEmptyMemory(): RoomData {
         return {
             queenType: QueenType.Larva,
-            roomObjectData: {}
+            OBJs: {
+
+            }
         };
     }
 }
 
 @profile
 export class RoomObjectMemory extends StorageMemory<RoomObjectData> {
-    GetMemoryType(): StorageMemoryType {
+    protected GetMemoryType(): StorageMemoryType {
         return StorageMemoryType.RoomObject;
     }
-    CreateEmptyMemory(): RoomObjectData {
+    protected CreateEmptyMemory(): RoomObjectData {
         return {} as RoomObjectData
     }
 }

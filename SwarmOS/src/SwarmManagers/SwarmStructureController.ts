@@ -1,12 +1,11 @@
 import { SwarmManager } from "./SwarmManager";
 import { InvalidArgumentException } from "Tools/SwarmExceptions";
 import { profile } from "Tools/Profiler";
-import { SwarmCreator } from "SwarmObjects/SwarmCreator";
 import { StructureMemory } from "Memory/StorageMemory";
 
 const STRUCTURE_SAVE_PATH = ["structures"];
 @profile
-export class SwarmStructureController extends SwarmManager<StorageMemoryType.Structure, SwarmStructureTypes> implements ISwarmStructureController {
+export class SwarmStructureController extends SwarmManager<TSwarmStructure> implements ISwarmStructureController {
     protected getManagerSavePath(): string[] {
         return STRUCTURE_SAVE_PATH;
     }
@@ -37,19 +36,22 @@ export class SwarmStructureController extends SwarmManager<StorageMemoryType.Str
     protected FindAllGameObjects(): { [id: string]: Structure; } {
         return Game.structures;
     }
-    protected OnPrepareSwarm(swarmObj: TSwarmContainer | TSwarmController | TSwarmExtension | TSwarmExtractor | TSwarmLab | TSwarmLink | TSwarmNuker | TSwarmObserver | TSwarmRampart | TSwarmRoad | TSwarmSpawn | TSwarmStorage | TSwarmTerminal | TSwarmTower | TSwarmWall): void {
+    protected OnPrepareSwarm(swarmObj: TSwarmStructure): void {
     }
-    protected OnActivateSwarm(swarmObj: TSwarmContainer | TSwarmController | TSwarmExtension | TSwarmExtractor | TSwarmLab | TSwarmLink | TSwarmNuker | TSwarmObserver | TSwarmRampart | TSwarmRoad | TSwarmSpawn | TSwarmStorage | TSwarmTerminal | TSwarmTower | TSwarmWall): void {
+    protected OnActivateSwarm(swarmObj: TSwarmStructure): void {
 
     }
-    protected OnFinalizeSwarm(swarmObj: TSwarmContainer | TSwarmController | TSwarmExtension | TSwarmExtractor | TSwarmLab | TSwarmLink | TSwarmNuker | TSwarmObserver | TSwarmRampart | TSwarmRoad | TSwarmSpawn | TSwarmStorage | TSwarmTerminal | TSwarmTower | TSwarmWall): void {
+    protected OnFinalizeSwarm(swarmObj: TSwarmStructure): void {
 
     }
 
-    protected CreateSwarmObject(obj: Structure, memory: StructureMemory): PrimarySwarmTypes {
-        return SwarmCreator.CreateSwarmStructure(obj, this.getSwarmType(obj), memory) as PrimarySwarmTypes;
+    protected CreateSwarmObject(obj: Structure): TSwarmStructure {
+        return SwarmCreator.CreateSwarmStructure(obj, this.getSwarmType(obj), STRUCTURE_SAVE_PATH) as TSwarmStructure;
     }
     private static _instance: SwarmStructureController;
+    static GetSwarmObject(id: string) {
+        return this._instance.GetSwarmObject(id);
+    }
     static PrepareTheSwarm() {
         this._instance = new SwarmStructureController();
         this._instance.PrepareTheSwarm();

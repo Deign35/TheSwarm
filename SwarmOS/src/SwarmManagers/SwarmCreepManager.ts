@@ -1,11 +1,10 @@
 import { SwarmCreep } from "SwarmObjects/SwarmCreep";
 import { profile } from "Tools/Profiler";
 import { SwarmManager } from "SwarmManagers/SwarmManager";
-import { SwarmCreator } from "SwarmObjects/SwarmCreator";
 
 const CREEP_SAVE_PATH = ['creeps'];
 @profile
-export class SwarmCreepController extends SwarmManager<StorageMemoryType.Creep, SwarmCreep> implements ISwarmCreepController {
+export class SwarmCreepController extends SwarmManager<SwarmCreep> implements ISwarmCreepController {
     protected getManagerSavePath(): string[] {
         return CREEP_SAVE_PATH;
     }
@@ -30,6 +29,9 @@ export class SwarmCreepController extends SwarmManager<StorageMemoryType.Creep, 
 
 
     private static _instance: SwarmCreepController;
+    static GetSwarmObject(creepName: string): TSwarmCreep {
+        return this._instance.GetSwarmObject(creepName);
+    }
     static PrepareTheSwarm() {
         SwarmCreepController._instance = new SwarmCreepController();
         return SwarmCreepController._instance.PrepareTheSwarm();

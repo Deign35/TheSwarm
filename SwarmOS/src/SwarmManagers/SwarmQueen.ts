@@ -2,12 +2,10 @@
 import { profile } from "Tools/Profiler";
 import { SwarmManager } from "./SwarmManager";
 import { SwarmRoom } from "SwarmObjects/SwarmRoom";
-import { SwarmCreator } from "SwarmObjects/SwarmCreator";
-import { RCL1_HiveQueen } from "Queens/HiveQueen";
 
 const ROOM_SAVE_PATH = ['rooms'];
 @profile
-export class SwarmQueen extends SwarmManager<StorageMemoryType.Room, SwarmRoom> implements ISwarmQueen {
+export class SwarmQueen extends SwarmManager<SwarmRoom> implements ISwarmQueen {
     protected getManagerSavePath(): string[] {
         return ROOM_SAVE_PATH;
     }
@@ -21,15 +19,18 @@ export class SwarmQueen extends SwarmManager<StorageMemoryType.Room, SwarmRoom> 
         return Game.rooms;
     }
     protected OnPrepareSwarm(swarmObj: SwarmRoom): void {
-
+        swarmObj.PrepareTheSwarm();
     }
     protected OnActivateSwarm(swarmObj: SwarmRoom): void {
-
+        swarmObj.ActivateSwarm();
     }
     protected OnFinalizeSwarm(swarmObj: SwarmRoom): void {
-
+        swarmObj.FinalizeSwarmActivity();
     }
     private static _instance: SwarmQueen;
+    static GetSwarmObject(roomName: string): TSwarmRoom {
+        return this._instance.GetSwarmObject(roomName);
+    }
     static PrepareTheSwarm() {
         this._instance = new SwarmQueen();
         this._instance.PrepareTheSwarm();

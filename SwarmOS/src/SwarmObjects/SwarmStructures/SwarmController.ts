@@ -1,10 +1,9 @@
 import { OwnedSwarmStructure } from "./SwarmStructure";
-import { StructureMemory } from "Memory/StorageMemory";
 import { profile } from "Tools/Profiler";
 
 @profile
 export class SwarmController extends OwnedSwarmStructure<STRUCTURE_CONTROLLER,
-StructureController, SwarmType.SwarmController> implements ISwarmController, StructureController {
+StructureController> implements ISwarmController, StructureController {
     get swarmType(): SwarmType.SwarmController { return SwarmType.SwarmController; }
     get level() { return this._instance.level; }
     get progress() { return this._instance.progress; }
@@ -20,6 +19,6 @@ StructureController, SwarmType.SwarmController> implements ISwarmController, Str
     activateSafeMode() { return this._instance.activateSafeMode(); }
     unclaim() { return this._instance.unclaim(); }
 }
-export function MakeSwarmController(controller: StructureController, memory: StructureMemory): TSwarmController {
-    return new SwarmController(controller, memory);
+export function MakeSwarmController(controller: StructureController, parentPath: string[]): TSwarmController {
+    return new SwarmController(controller, parentPath);
 }

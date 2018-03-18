@@ -2,8 +2,15 @@ import { SwarmItemWithName } from "SwarmObjects/SwarmObject";
 import { FlagMemory } from "Memory/StorageMemory";
 import { profile } from "Tools/Profiler";
 
+const FLAG_COUNTER = 'CNT';
 @profile
-export class SwarmFlag extends SwarmItemWithName<Flag, SwarmType.SwarmFlag, FlagData> implements ISwarmFlag, Flag {
+export class SwarmFlag extends SwarmItemWithName<Flag> implements ISwarmFlag, Flag {
+    get storageMemoryType() { return StorageMemoryType.Flag };
+    Activate() {
+        let curCount = this._memory.GetData<number>(FLAG_COUNTER) || 5;
+        this._memory.SetData(FLAG_COUNTER, curCount + 3)
+    }
+
     get swarmType(): SwarmType.SwarmFlag { return SwarmType.SwarmFlag; };
     get pos() { return this._instance.pos; }
     get room() { return this._instance.room; }
@@ -26,6 +33,6 @@ export class SwarmFlag extends SwarmItemWithName<Flag, SwarmType.SwarmFlag, Flag
         }
     }
 }
-export function MakeSwarmFlag(flag: Flag, memory: FlagMemory): TSwarmFlag {
-    return new SwarmFlag(flag, memory);
+export function MakeSwarmFlag(flag: Flag, parentPath: string[]): TSwarmFlag {
+    return new SwarmFlag(flag, parentPath);
 }

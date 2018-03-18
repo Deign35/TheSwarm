@@ -16,6 +16,12 @@ declare var SwarmLogger: {
     LogError(message: string): void;
 }
 
+declare var SwarmCreator: {
+    CreateSwarmObject(obj: Source | Creep | Mineral | Resource | Room | Flag |
+        ConstructionSite | Nuke | Tombstone | Structure, type: SwarmType, parentPath: string[]): TSwarmObjectTypes;
+    CreateSwarmStructure(obj: Structure, type: SwarmType, parentPath: string[]): TSwarmStructure;
+}
+
 
 
 /*

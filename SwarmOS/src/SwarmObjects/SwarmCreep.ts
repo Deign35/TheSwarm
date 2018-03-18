@@ -2,10 +2,16 @@ import { OwnableSwarmObject } from "SwarmObjects/SwarmObject";
 import { CreepMemory } from "Memory/StorageMemory";
 import { profile } from "Tools/Profiler";
 
+const CREEP_COUNTER = 'CNT';
 const CARRY_TOTAL = 'CT';
 const CURRENT_PATH = 'CP';
 @profile
-export class SwarmCreep extends OwnableSwarmObject<Creep, SwarmType.SwarmCreep, CreepData> implements ISwarmCreep, Creep {
+export class SwarmCreep extends OwnableSwarmObject<Creep> implements ISwarmCreep, Creep {
+    get storageMemoryType() { return StorageMemoryType.Creep };
+    Activate() {
+        let curCount = this._memory.GetData<number>(CREEP_COUNTER) || 7;
+        this._memory.SetData(CREEP_COUNTER, curCount + 5);
+    }
     protected _cachedData: { [id: string]: any } = {};
     get carryTotal() {
         if (!this._cachedData[CARRY_TOTAL]) {
@@ -138,4 +144,4 @@ export class SwarmCreep extends OwnableSwarmObject<Creep, SwarmType.SwarmCreep, 
         return this._instance.withdraw(target, resourceType, amount);
     }
 }
-export function MakeSwarmCreep(creep: Creep, memory: CreepMemory): TSwarmCreep { return new SwarmCreep(creep, memory); }
+export function MakeSwarmCreep(creep: Creep, parentPath: string[]): TSwarmCreep { return new SwarmCreep(creep, parentPath); }
