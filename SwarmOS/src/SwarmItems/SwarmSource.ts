@@ -23,7 +23,7 @@ export class SwarmSource extends SwarmObject<Source> implements ISwarmSource, So
     get ticksToRegeneration() { return this._instance.ticksToRegeneration; }
 
     protected data!: SourceData;
-    Activate() {
+    protected OnActivate() {
         console.log("Successfully activated a Source");
     }
 }

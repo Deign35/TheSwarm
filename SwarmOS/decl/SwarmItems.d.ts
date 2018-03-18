@@ -2,6 +2,7 @@ declare interface ISwarmItem<T> {
     value: T;
     swarmType: SwarmType;
     saveID: string;
+    IsActive: boolean;
     GetMemoryObject(): IStorageMemory<StorageMemoryTypes>
     Activate(): void;
     AssignMemory(mem: IStorageMemory<StorageMemoryTypes>): void;

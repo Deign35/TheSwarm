@@ -16,7 +16,7 @@ export class SwarmRoom extends SwarmItemWithName<Room> implements ISwarmRoom, Ro
     }
 
     get storageMemoryType() { return StorageMemoryType.Room };
-    Activate() {
+    protected OnActivate() {
         let curCount = this._memory.GetData<number>(ROOM_COUNTER) || 5;
         this._memory.SetData(ROOM_COUNTER, curCount + (curCount * 0.05));
 

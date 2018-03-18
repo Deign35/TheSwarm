@@ -18,7 +18,7 @@ export class SwarmTower extends OwnedSwarmStructure<STRUCTURE_TOWER, StructureTo
     repair<U extends StructureConstant, T extends Structure<U>, V extends SwarmType>(target: SwarmStructure<U, T>) {
         return this._instance.repair(target.value);
     }
-    Activate() {
+    protected OnActivate() {
         console.log("Successfully activated a Tower");
     }
 }

@@ -25,12 +25,10 @@ export abstract class SwarmManager<U extends TSwarmObjectTypes>
         }
     }
     FinalizeSwarmActivity(): void {
-        debugger;
         for (let swarmName in this.swarmObjects) {
             let obj = this.swarmObjects[swarmName];
             this.OnFinalizeSwarm(obj);
             this._primaryMemory.SaveChildMemory(obj.GetMemoryObject());
-            //Swarmlord.ReleaseMemory(this.swarmObjects[swarmName].memory, true);
         }
         Swarmlord.ReleaseMemory2(this._primaryMemory, true);
     }

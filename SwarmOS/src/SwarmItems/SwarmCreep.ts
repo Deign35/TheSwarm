@@ -8,7 +8,7 @@ const CURRENT_PATH = 'CP';
 @profile
 export class SwarmCreep extends OwnableSwarmObject<Creep> implements ISwarmCreep, Creep {
     get storageMemoryType() { return StorageMemoryType.Creep };
-    Activate() {
+    protected OnActivate() {
         console.log("Successfully activated a Creep");
     }
     protected _cachedData: { [id: string]: any } = {};

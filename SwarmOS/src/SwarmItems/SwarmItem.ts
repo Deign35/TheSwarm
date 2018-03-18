@@ -1,6 +1,14 @@
 import { RoomObjectMemory, RoomMemory, StorageMemory } from "Memory/StorageMemory";
 
 abstract class SwarmItem<T> implements ISwarmItem<T> {
+    get IsActive(): boolean {
+        return false;
+    }
+    Activate(): void {
+        if (this.IsActive) {
+            this.OnActivate();
+        }
+    }
     constructor(instance: T) {
         this._instance = instance;
     }
@@ -10,7 +18,7 @@ abstract class SwarmItem<T> implements ISwarmItem<T> {
     abstract get saveID(): string;
     abstract get swarmType(): SwarmType;
     abstract get storageMemoryType(): StorageMemoryType
-    abstract Activate(): void;
+    protected abstract OnActivate(): void;
     GetMemoryObject() { return this._memory; }
     AssignMemory(mem: IStorageMemory<StorageMemoryTypes>) {
         this._memory = mem;
@@ -19,6 +27,7 @@ abstract class SwarmItem<T> implements ISwarmItem<T> {
     GetSpawnRequirements(): SpawnRequirement {
         return SwarmItem.NoSpawnRequirement;
     }
+
 
     static readonly NoSpawnRequirement: SpawnRequirement = {
         priority: Priority.Lowest,
@@ -48,7 +57,7 @@ export class SwarmTombstone extends SwarmObject<Tombstone> implements ISwarmTomb
     get deathTime() { return this._instance.deathTime; }
     get store() { return this._instance.store; }
     get ticksToDecay() { return this._instance.ticksToDecay; }
-    Activate() {
+    protected OnActivate() {
         console.log("Successfully activated a Tombstone");
     }
 }
@@ -81,7 +90,7 @@ export class SwarmMineral extends SwarmObject<Mineral> implements ISwarmMineral,
     get mineralAmount() { return this._instance.mineralAmount; }
     get mineralType() { return this._instance.mineralType; }
     get ticksToRegeneration() { return this._instance.ticksToRegeneration; }
-    Activate() {
+    protected OnActivate() {
         console.log("Successfully activated a Mineral");
     }
 }
@@ -94,7 +103,7 @@ export class SwarmResource extends SwarmObject<Resource> implements ISwarmResour
     get swarmType(): SwarmType.SwarmResource { return SwarmType.SwarmResource; }
     get amount() { return this._instance.amount; }
     get resourceType() { return this._instance.resourceType; }
-    Activate() {
+    protected OnActivate() {
         console.log("Successfully activated a Resource");
     }
 }
@@ -107,7 +116,7 @@ export class SwarmNuke extends SwarmObject<Nuke> implements ISwarmNuke, Nuke {
     get swarmType(): SwarmType.SwarmNuke { return SwarmType.SwarmNuke; }
     get launchRoomName() { return this._instance.launchRoomName; }
     get timeToLand() { return this._instance.timeToLand; }
-    Activate() {
+    protected OnActivate() {
         console.log("Successfully activated a Nuke");
     }
 }

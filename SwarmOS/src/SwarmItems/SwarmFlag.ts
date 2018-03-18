@@ -27,7 +27,7 @@ export class SwarmFlag extends SwarmItemWithName<Flag> implements ISwarmFlag, Fl
             return this._instance.setPosition(args[0]);
         }
     }
-    Activate() {
+    protected OnActivate() {
         console.log("Successfully activated a Flag");
     }
 }
