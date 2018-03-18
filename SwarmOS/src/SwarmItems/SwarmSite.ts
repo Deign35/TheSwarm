@@ -9,6 +9,9 @@ export class SwarmSite extends OwnableSwarmObject<ConstructionSite> implements I
     get progressTotal() { return this._instance.progressTotal; }
     get structureType() { return this._instance.structureType; }
     remove() { return this._instance.remove(); }
+    Activate() {
+        console.log("Successfully activated a Site");
+    }
 }
 export function MakeSwarmSite(site: ConstructionSite): TSwarmSite {
     return new SwarmSite(site);

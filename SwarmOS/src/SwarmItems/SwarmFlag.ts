@@ -6,14 +6,6 @@ const FLAG_COUNTER = 'CNT';
 @profile
 export class SwarmFlag extends SwarmItemWithName<Flag> implements ISwarmFlag, Flag {
     get storageMemoryType() { return StorageMemoryType.Flag };
-    Activate() {
-        if (this._memory.HasData('CNT')) {
-            this.room!.visual.text(this._memory.GetData('CNT'), this.pos);
-        }
-        let curCount = this._memory.GetData<number>(FLAG_COUNTER) || 5;
-        this._memory.SetData(FLAG_COUNTER, curCount + 3)
-    }
-
     get swarmType(): SwarmType.SwarmFlag { return SwarmType.SwarmFlag; };
     get pos() { return this._instance.pos; }
     get room() { return this._instance.room; }
@@ -34,6 +26,9 @@ export class SwarmFlag extends SwarmItemWithName<Flag> implements ISwarmFlag, Fl
         } else {
             return this._instance.setPosition(args[0]);
         }
+    }
+    Activate() {
+        console.log("Successfully activated a Flag");
     }
 }
 export function MakeSwarmFlag(flag: Flag): TSwarmFlag {

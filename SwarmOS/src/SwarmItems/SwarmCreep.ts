@@ -9,9 +9,7 @@ const CURRENT_PATH = 'CP';
 export class SwarmCreep extends OwnableSwarmObject<Creep> implements ISwarmCreep, Creep {
     get storageMemoryType() { return StorageMemoryType.Creep };
     Activate() {
-        super.Activate();
-        let curCount = this._memory.GetData<number>(CREEP_COUNTER) || 7;
-        this._memory.SetData(CREEP_COUNTER, curCount + 5);
+        console.log("Successfully activated a Creep");
     }
     protected _cachedData: { [id: string]: any } = {};
     get carryTotal() {

@@ -18,6 +18,9 @@ StructureController> implements ISwarmController, StructureController {
 
     activateSafeMode() { return this._instance.activateSafeMode(); }
     unclaim() { return this._instance.unclaim(); }
+    Activate() {
+        console.log("Successfully activated a Controller");
+    }
 }
 export function MakeSwarmController(controller: StructureController): TSwarmController {
     return new SwarmController(controller);

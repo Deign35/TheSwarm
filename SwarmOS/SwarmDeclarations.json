@@ -1,21 +1,10 @@
 {
     "Constants": {
-        "MY_USERNAME": {
-            "value": "Deign",
-            "type": "string"
-        },
-        "MY_SIGNATURE": {
-            "value": "The Swarm shall rise -- SwarmOS v0.7.2",
-            "type": "string"
-        },
-        "MEM_TYPE": {
-            "value": "MEM_TYPE",
-            "type": "string"
-        },
-        "NOT_CONFIGURED": {
-            "value": "NOT_CONFIGURED",
-            "type": "string"
-        }
+        "MY_USERNAME": "Deign",
+        "MY_SIGNATURE": "The Swarm shall rise -- SwarmOS v0.7.2",
+        "MEM_TYPE": "MEM_TYPE",
+        "NOT_CONFIGURED": "NOT_CONFIGURED",
+        "NEXT_SPAWN": "NEXT_SPAWN"
     },
     "Primitives": {
         "C_NONE": 0,

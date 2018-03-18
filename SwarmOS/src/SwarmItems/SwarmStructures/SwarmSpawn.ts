@@ -26,6 +26,9 @@ export class SwarmSpawn extends OwnedSwarmStructure<STRUCTURE_SPAWN, StructureSp
         }) { return this._instance.spawnCreep(body, name, opts); }
     recycleCreep(target: SwarmCreep) { return this._instance.recycleCreep(target.value); }
     renewCreep(target: SwarmCreep) { return this._instance.renewCreep(target.value); }
+    Activate() {
+        console.log("Successfully activated a Spawn");
+    }
 }
 export function MakeSwarmSpawn(spawn: StructureSpawn): TSwarmSpawn {
     return new SwarmSpawn(spawn);

@@ -94,15 +94,8 @@ module.exports = function (grunt) {
         declarationsFile.push("declare const SWARM_VERSION_DATE = \"CURRENT_VERSION\";");
         globalsFile.push("global[\"SWARM_VERSION_DATE\"] = \"" + new Date().toLocaleString() + "\";");
         for (let constName in consts) {
-            let constType = consts[constName]['type'];
-            let constVal = consts[constName]['value'];
-
-            let fileValue = constVal;
-            if (constType == "string") {
-                fileValue = "\"" + constVal + "\"";
-            }
-            declarationsFile.push("declare const " + constName + " = " + fileValue + ";");
-            globalsFile.push("global[\"" + constName + "\"] = " + fileValue + ";");
+            declarationsFile.push("declare const " + constName + " = \"" + consts[constName] + "\";");
+            globalsFile.push("global[\"" + constName + "\"] = \"" + consts[constName] + "\";");
         }
         globalsFile.push("// End Consts\n");
         declarationsFile.push("");

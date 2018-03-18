@@ -34,11 +34,6 @@ export abstract class SwarmItemWithName<T extends Room | Flag> extends SwarmItem
 
 export abstract class SwarmObject<T extends Source | Creep | Structure | Mineral | Resource |
     ConstructionSite | Nuke | Tombstone> extends SwarmItem<T> implements ISwarmObject<T> {
-    Activate() {
-        if (this._memory.HasData('CNT')) {
-            this.room.visual.text(this._memory.GetData('CNT'), this.pos);
-        }
-    }
     get pos() { return this._instance.pos; }
     get room() { return this._instance.room!; } // This should get the room object i created.
     get id() { return this._instance.id; }
@@ -53,6 +48,9 @@ export class SwarmTombstone extends SwarmObject<Tombstone> implements ISwarmTomb
     get deathTime() { return this._instance.deathTime; }
     get store() { return this._instance.store; }
     get ticksToDecay() { return this._instance.ticksToDecay; }
+    Activate() {
+        console.log("Successfully activated a Tombstone");
+    }
 }
 export function MakeSwarmTombstone(tombStone: Tombstone): TSwarmTombstone {
     return new SwarmTombstone(tombStone);
@@ -83,6 +81,9 @@ export class SwarmMineral extends SwarmObject<Mineral> implements ISwarmMineral,
     get mineralAmount() { return this._instance.mineralAmount; }
     get mineralType() { return this._instance.mineralType; }
     get ticksToRegeneration() { return this._instance.ticksToRegeneration; }
+    Activate() {
+        console.log("Successfully activated a Mineral");
+    }
 }
 export function MakeSwarmMineral(mineral: Mineral): TSwarmMineral {
     return new SwarmMineral(mineral);
@@ -93,6 +94,9 @@ export class SwarmResource extends SwarmObject<Resource> implements ISwarmResour
     get swarmType(): SwarmType.SwarmResource { return SwarmType.SwarmResource; }
     get amount() { return this._instance.amount; }
     get resourceType() { return this._instance.resourceType; }
+    Activate() {
+        console.log("Successfully activated a Resource");
+    }
 }
 export function MakeSwarmResource(resource: Resource): TSwarmResource {
     return new SwarmResource(resource);
@@ -103,6 +107,9 @@ export class SwarmNuke extends SwarmObject<Nuke> implements ISwarmNuke, Nuke {
     get swarmType(): SwarmType.SwarmNuke { return SwarmType.SwarmNuke; }
     get launchRoomName() { return this._instance.launchRoomName; }
     get timeToLand() { return this._instance.timeToLand; }
+    Activate() {
+        console.log("Successfully activated a Nuke");
+    }
 }
 export function MakeSwarmNuke(nuke: Nuke): TSwarmNuke {
     return new SwarmNuke(nuke);
