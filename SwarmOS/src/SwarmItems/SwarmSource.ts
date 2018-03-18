@@ -1,4 +1,4 @@
-import { SwarmObject } from "SwarmObjects/SwarmObject";
+import { SwarmObject } from "SwarmItems/SwarmItem";
 import { RoomObjectMemory } from "Memory/StorageMemory";
 
 const SOURCE_COUNTER = 'CNT';

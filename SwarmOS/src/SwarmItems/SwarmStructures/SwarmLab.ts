@@ -1,5 +1,5 @@
 import { OwnedSwarmStructure } from "./SwarmStructure";
-import { SwarmCreep } from "SwarmObjects/SwarmCreep";
+import { SwarmCreep } from "SwarmItems/SwarmCreep";
 
 export class SwarmLab extends OwnedSwarmStructure<STRUCTURE_LAB, StructureLab> implements ISwarmLab, StructureLab {
     get swarmType(): SwarmType.SwarmLab { return SwarmType.SwarmLab; }

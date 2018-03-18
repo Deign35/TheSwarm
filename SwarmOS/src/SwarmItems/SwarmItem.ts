@@ -16,6 +16,16 @@ abstract class SwarmItem<T> implements ISwarmItem<T> {
         this._memory = mem;
     }
     InitNewObject() { }
+    GetSpawnRequirements(): SpawnRequirement {
+        return SwarmItem.NoSpawnRequirement;
+    }
+
+    static readonly NoSpawnRequirement: SpawnRequirement = {
+        priority: Priority.Lowest,
+        neededIn: 1500,
+        minBody: [],
+        growthTemplate: []
+    }
 }
 
 export abstract class SwarmItemWithName<T extends Room | Flag> extends SwarmItem<T> {

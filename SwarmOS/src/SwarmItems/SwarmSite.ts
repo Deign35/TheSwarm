@@ -1,4 +1,4 @@
-import { OwnableSwarmObject } from "./SwarmObject";
+import { OwnableSwarmObject } from "./SwarmItem";
 import { RoomObjectMemory } from "Memory/StorageMemory";
 
 export class SwarmSite extends OwnableSwarmObject<ConstructionSite> implements ISwarmSite, ConstructionSite {

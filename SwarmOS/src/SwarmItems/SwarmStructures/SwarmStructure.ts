@@ -1,4 +1,4 @@
-import { SwarmObject, NotifiableSwarmObject } from "../SwarmObject";
+import { SwarmObject, NotifiableSwarmObject } from "../SwarmItem";
 import { StructureMemory } from "Memory/StorageMemory";
 
 const STRUCTURE_COUNTER = 'CNT';

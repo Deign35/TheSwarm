@@ -1,16 +1,16 @@
 import { profile } from "Tools/Profiler";
-import { MakeSwarmSite } from "SwarmObjects/SwarmSite";
-import { MakeSwarmCreep } from "SwarmObjects/SwarmCreep";
-import { MakeSwarmMineral, MakeSwarmNuke, MakeSwarmResource, MakeSwarmTombstone, SwarmObject } from "SwarmObjects/SwarmObject";
-import { MakeSwarmRoom } from "SwarmObjects/SwarmRoom";
-import { MakeSwarmSource } from "SwarmObjects/SwarmSource";
-import { MakeSwarmFlag } from "SwarmObjects/SwarmFlag";
+import { MakeSwarmSite } from "SwarmItems/SwarmSite";
+import { MakeSwarmCreep } from "SwarmItems/SwarmCreep";
+import { MakeSwarmMineral, MakeSwarmNuke, MakeSwarmResource, MakeSwarmTombstone, SwarmObject } from "SwarmItems/SwarmItem";
+import { MakeSwarmRoom } from "SwarmItems/SwarmRoom";
+import { MakeSwarmSource } from "SwarmItems/SwarmSource";
+import { MakeSwarmFlag } from "SwarmItems/SwarmFlag";
 import { InvalidArgumentException } from "Tools/SwarmExceptions";
-import { MakeSwarmContainer, MakeSwarmExtension, MakeSwarmExtractor, MakeSwarmLink, MakeSwarmNuker, MakeSwarmObserver, MakeSwarmRampart, MakeSwarmRoad, MakeSwarmWall, MakeSwarmTerminal, MakeSwarmStorage } from "SwarmObjects/SwarmStructures/SwarmStructure";
-import { MakeSwarmController } from "SwarmObjects/SwarmStructures/SwarmController";
-import { MakeSwarmLab } from "SwarmObjects/SwarmStructures/SwarmLab";
-import { MakeSwarmSpawn } from "SwarmObjects/SwarmStructures/SwarmSpawn";
-import { MakeSwarmTower } from "SwarmObjects/SwarmStructures/SwarmTower";
+import { MakeSwarmContainer, MakeSwarmExtension, MakeSwarmExtractor, MakeSwarmLink, MakeSwarmNuker, MakeSwarmObserver, MakeSwarmRampart, MakeSwarmRoad, MakeSwarmWall, MakeSwarmTerminal, MakeSwarmStorage } from "SwarmItems/SwarmStructures/SwarmStructure";
+import { MakeSwarmController } from "SwarmItems/SwarmStructures/SwarmController";
+import { MakeSwarmLab } from "SwarmItems/SwarmStructures/SwarmLab";
+import { MakeSwarmSpawn } from "SwarmItems/SwarmStructures/SwarmSpawn";
+import { MakeSwarmTower } from "SwarmItems/SwarmStructures/SwarmTower";
 
 
 @profile

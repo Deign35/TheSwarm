@@ -6,6 +6,14 @@ declare interface ISwarmItem<T> {
     Activate(): void;
     AssignMemory(mem: IStorageMemory<StorageMemoryTypes>): void;
     InitNewObject(): void;
+    GetSpawnRequirements(): SpawnRequirement;
+}
+
+declare type SpawnRequirement = {
+    priority: Priority;
+    minBody: BodyPartConstant[];
+    growthTemplate: BodyPartConstant[];
+    neededIn: number;
 }
 
 declare interface ISwarmObject<T extends RoomObject> extends ISwarmItem<T> { }

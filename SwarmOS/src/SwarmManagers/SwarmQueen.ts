@@ -1,7 +1,7 @@
 
 import { profile } from "Tools/Profiler";
 import { SwarmManager } from "./SwarmManager";
-import { SwarmRoom } from "SwarmObjects/SwarmRoom";
+import { SwarmRoom } from "SwarmItems/SwarmRoom";
 
 const ROOM_SAVE_PATH = ['rooms'];
 @profile

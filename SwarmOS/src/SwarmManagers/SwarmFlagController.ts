@@ -1,7 +1,7 @@
 
 import { profile } from "Tools/Profiler";
 import { SwarmManager } from "./SwarmManager";
-import { SwarmFlag } from "SwarmObjects/SwarmFlag";
+import { SwarmFlag } from "SwarmItems/SwarmFlag";
 
 const FLAG_SAVE_PATH = ['flags'];
 @profile

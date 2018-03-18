@@ -1,4 +1,4 @@
-import { SwarmItemWithName } from "SwarmObjects/SwarmObject";
+import { SwarmItemWithName } from "SwarmItems/SwarmItem";
 import { FlagMemory } from "Memory/StorageMemory";
 import { profile } from "Tools/Profiler";
 

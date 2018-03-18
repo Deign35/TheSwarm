@@ -1,4 +1,4 @@
-import { SwarmCreep } from "SwarmObjects/SwarmCreep";
+import { SwarmCreep } from "SwarmItems/SwarmCreep";
 import { profile } from "Tools/Profiler";
 import { SwarmManager } from "SwarmManagers/SwarmManager";
 

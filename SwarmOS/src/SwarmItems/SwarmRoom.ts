@@ -1,6 +1,6 @@
 import { RoomMemory } from "Memory/StorageMemory";
 import { profile } from "Tools/Profiler";
-import { SwarmItemWithName } from "SwarmObjects/SwarmObject";
+import { SwarmItemWithName } from "SwarmItems/SwarmItem";
 
 const ROOM_COUNTER = 'CNT';
 const HARVESTER_JOBS = 'HARVEST';

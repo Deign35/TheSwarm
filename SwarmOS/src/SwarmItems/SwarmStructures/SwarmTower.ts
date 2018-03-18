@@ -1,5 +1,5 @@
 import { OwnedSwarmStructure, SwarmStructure } from "./SwarmStructure";
-import { SwarmCreep } from "SwarmObjects/SwarmCreep";
+import { SwarmCreep } from "SwarmItems/SwarmCreep";
 import { StructureMemory } from "Memory/StorageMemory";
 import { profile } from "Tools/Profiler";
 

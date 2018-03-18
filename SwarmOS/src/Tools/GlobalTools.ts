@@ -9,4 +9,4 @@ export class GlobalTools {
 global['CopyObject'] = GlobalTools.CopyObject;
 global['Stopwatch'] = Stopwatch;
 global['SwarmLogger'] = SwarmLogger;
-import "SwarmObjects/SwarmCreator"
+import "SwarmItems/SwarmCreator"
