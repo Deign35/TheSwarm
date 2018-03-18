@@ -1,7 +1,7 @@
 import { profile } from "Tools/Profiler";
 import { MakeSwarmSite } from "SwarmObjects/SwarmSite";
 import { MakeSwarmCreep } from "SwarmObjects/SwarmCreep";
-import { MakeSwarmMineral, MakeSwarmNuke, MakeSwarmResource, MakeSwarmTombstone } from "SwarmObjects/SwarmObject";
+import { MakeSwarmMineral, MakeSwarmNuke, MakeSwarmResource, MakeSwarmTombstone, SwarmObject } from "SwarmObjects/SwarmObject";
 import { MakeSwarmRoom } from "SwarmObjects/SwarmRoom";
 import { MakeSwarmSource } from "SwarmObjects/SwarmSource";
 import { MakeSwarmFlag } from "SwarmObjects/SwarmFlag";
@@ -16,65 +16,59 @@ import { MakeSwarmTower } from "SwarmObjects/SwarmStructures/SwarmTower";
 @profile
 export class SwarmCreator {
     static CreateSwarmObject<T extends Source | Creep
-        | Mineral | Resource | Room | Flag
-        | ConstructionSite | Nuke | Tombstone>(obj: T, type: SwarmType, parentPath: string[]) {
+        | Mineral | Resource | Room | Flag | AnyStructure
+        | ConstructionSite | Nuke | Tombstone>(obj: T, type: SwarmType): ISwarmItem<any> {
         switch (type) {
             case (SwarmType.SwarmSite):
-                return (MakeSwarmSite(obj as ConstructionSite, parentPath));
+                return (MakeSwarmSite(obj as ConstructionSite));
             case (SwarmType.SwarmCreep):
-                return (MakeSwarmCreep(obj as Creep, parentPath));
+                return (MakeSwarmCreep(obj as Creep));
             case (SwarmType.SwarmMineral):
-                return (MakeSwarmMineral(obj as Mineral, parentPath));
+                return (MakeSwarmMineral(obj as Mineral));
             case (SwarmType.SwarmNuke):
-                return (MakeSwarmNuke(obj as Nuke, parentPath));
+                return (MakeSwarmNuke(obj as Nuke));
             case (SwarmType.SwarmResource):
-                return (MakeSwarmResource(obj as Resource, parentPath));
+                return (MakeSwarmResource(obj as Resource));
             case (SwarmType.SwarmRoom):
-                return MakeSwarmRoom(obj as Room, parentPath);
+                return MakeSwarmRoom(obj as Room);
             case (SwarmType.SwarmSource):
-                return (MakeSwarmSource(obj as Source, parentPath));
+                return (MakeSwarmSource(obj as Source));
             case (SwarmType.SwarmTombstone):
-                return (MakeSwarmTombstone(obj as Tombstone, parentPath));
+                return (MakeSwarmTombstone(obj as Tombstone));
             case (SwarmType.SwarmFlag):
-                return (MakeSwarmFlag(obj as Flag, parentPath));
+                return (MakeSwarmFlag(obj as Flag));
+            case (SwarmType.SwarmContainer):
+                return MakeSwarmContainer(obj as StructureContainer);
+            case (SwarmType.SwarmController):
+                return MakeSwarmController(obj as StructureController);
+            case (SwarmType.SwarmExtension):
+                return MakeSwarmExtension(obj as StructureExtension);
+            case (SwarmType.SwarmExtractor):
+                return MakeSwarmExtractor(obj as StructureExtractor);
+            case (SwarmType.SwarmLab):
+                return MakeSwarmLab(obj as StructureLab);
+            case (SwarmType.SwarmLink):
+                return MakeSwarmLink(obj as StructureLink);
+            case (SwarmType.SwarmNuker):
+                return MakeSwarmNuker(obj as StructureNuker);
+            case (SwarmType.SwarmObserver):
+                return MakeSwarmObserver(obj as StructureObserver);
+            case (SwarmType.SwarmRampart):
+                return MakeSwarmRampart(obj as StructureRampart);
+            case (SwarmType.SwarmRoad):
+                return MakeSwarmRoad(obj as StructureRoad);
+            case (SwarmType.SwarmSpawn):
+                return MakeSwarmSpawn(obj as StructureSpawn);
+            case (SwarmType.SwarmStorage):
+                return MakeSwarmStorage(obj as StructureStorage);
+            case (SwarmType.SwarmTerminal):
+                return MakeSwarmTerminal(obj as StructureTerminal);
+            case (SwarmType.SwarmTower):
+                return MakeSwarmTower(obj as StructureTower);
+            case (SwarmType.SwarmWall):
+                return MakeSwarmWall(obj as StructureWall);
         }
 
         throw new InvalidArgumentException('Attempted to create an object that doesnt exist.  probably a structure.  ' + type);
-    }
-
-    static CreateSwarmStructure(obj: Structure, type: SwarmType, parentPath: string[]): TSwarmStructure {
-        switch (type) {
-            case (SwarmType.SwarmContainer):
-                return MakeSwarmContainer(obj as StructureContainer, parentPath);
-            case (SwarmType.SwarmController):
-                return MakeSwarmController(obj as StructureController, parentPath);
-            case (SwarmType.SwarmExtension):
-                return MakeSwarmExtension(obj as StructureExtension, parentPath);
-            case (SwarmType.SwarmExtractor):
-                return MakeSwarmExtractor(obj as StructureExtractor, parentPath);
-            case (SwarmType.SwarmLab):
-                return MakeSwarmLab(obj as StructureLab, parentPath);
-            case (SwarmType.SwarmLink):
-                return MakeSwarmLink(obj as StructureLink, parentPath);
-            case (SwarmType.SwarmNuker):
-                return MakeSwarmNuker(obj as StructureNuker, parentPath);
-            case (SwarmType.SwarmObserver):
-                return MakeSwarmObserver(obj as StructureObserver, parentPath);
-            case (SwarmType.SwarmRampart):
-                return MakeSwarmRampart(obj as StructureRampart, parentPath);
-            case (SwarmType.SwarmRoad):
-                return MakeSwarmRoad(obj as StructureRoad, parentPath);
-            case (SwarmType.SwarmSpawn):
-                return MakeSwarmSpawn(obj as StructureSpawn, parentPath);
-            case (SwarmType.SwarmStorage):
-                return MakeSwarmStorage(obj as StructureStorage, parentPath);
-            case (SwarmType.SwarmTerminal):
-                return MakeSwarmTerminal(obj as StructureTerminal, parentPath);
-            case (SwarmType.SwarmTower):
-                return MakeSwarmTower(obj as StructureTower, parentPath);
-            case (SwarmType.SwarmWall):
-                return MakeSwarmWall(obj as StructureWall, parentPath);
-        }
-        throw new InvalidArgumentException('Attempted to create a structure that doesnt exist.  probably another type.  ' + type);
     }
 } global['SwarmCreator'] = SwarmCreator;

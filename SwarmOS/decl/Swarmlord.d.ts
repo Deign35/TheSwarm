@@ -3,6 +3,7 @@ declare interface ISwarmMemory {
     MemoryType: number;
     GetData<Z>(id: string): Z;
     SetData<Z>(id: string, data: Z): void;
+    GetIDs(): string[];
     HasData(id: string): boolean;
     RemoveData(id: string): void;
 }
@@ -10,11 +11,9 @@ declare interface IStorageMemory<T extends StorageMemoryTypes> extends ISwarmMem
     MemoryType: StorageMemoryType;
     IsCheckedOut: boolean;
     ReserveMemory(): void;
-    GetIDs(): string[];
-    GetSavePath(): string[];
     GetSaveData(): T;
     ReleaseMemory(): void;
-    SaveChildMemory(childMemory: ISwarmMemory): void;
+    SaveChildMemory(childMemory: IStorageMemory<StorageMemoryTypes>): void;
 }
 
 declare type SwarmData = StorageMemoryTypes// | EmptyDictionary //| SegmentMemoryType | CacheMemoryType
@@ -25,8 +24,8 @@ declare type StorageMemoryTypes =
     RoomData |
     StructureData |
     FlagData |
-    RoomObjectData /*|
-    EmptyDictionary;
+    RoomObjectData |
+    Dictionary;
 /**
  * Creep Data and associated memory
  */
@@ -73,20 +72,11 @@ declare type StorageMemoryStructure = {
 
 declare interface ISwarmlord {
     ValidateMemory(): void;
-    CheckoutMemory<T extends StorageMemoryTypes, U extends IStorageMemory<T>>(id: string, path: string[], memoryType: StorageMemoryType): U;
-    ReleaseMemory<T extends StorageMemoryTypes>(memObject: IStorageMemory<T>, save?: boolean): void;
-    DeleteMemory<T extends StorageMemoryTypes>(memObject: IStorageMemory<T>): void;
+    CheckoutMemory(id: string, memoryType: StorageMemoryType, parentObj?: IStorageMemory<StorageMemoryTypes>): IStorageMemory<StorageMemoryTypes>;
+    ReleaseMemory2(memObject: IStorageMemory<StorageMemoryTypes>, save?: boolean): void;
     StorageMemoryTypeToString(memType: StorageMemoryType): string;
-    //GetMemoryEntries(memType: StorageMemoryType): string[];
-    CreateNewStorageMemory<T extends StorageMemoryTypes>(id: string, path: string[], memType: StorageMemoryType): void
+    CreateNewStorageMemory(id: string, memType: StorageMemoryType, parentObj?: IStorageMemory<StorageMemoryTypes>): void;
 } declare var Swarmlord: ISwarmlord;
-
-
-
-
-
-
-
 
 
 

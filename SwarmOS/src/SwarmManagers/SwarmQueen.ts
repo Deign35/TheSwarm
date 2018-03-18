@@ -19,13 +19,10 @@ export class SwarmQueen extends SwarmManager<SwarmRoom> implements ISwarmQueen {
         return Game.rooms;
     }
     protected OnPrepareSwarm(swarmObj: SwarmRoom): void {
-        swarmObj.PrepareTheSwarm();
     }
     protected OnActivateSwarm(swarmObj: SwarmRoom): void {
-        swarmObj.ActivateSwarm();
     }
     protected OnFinalizeSwarm(swarmObj: SwarmRoom): void {
-        swarmObj.FinalizeSwarmActivity();
     }
     private static _instance: SwarmQueen;
     static GetSwarmObject(roomName: string): TSwarmRoom {

@@ -3,9 +3,8 @@ import { SwarmException, MemoryLockException, AlreadyExistsException } from "Too
 
 @profile
 export abstract class StorageMemory<T extends StorageMemoryTypes> implements IStorageMemory<T> {
-    constructor(id: string, path: string[], data?: T) {
+    constructor(id: string, data?: T) {
         this._id = id;
-        this._savePath = path;
         if (data) {
             this._cache = data;
         } else {
@@ -18,7 +17,6 @@ export abstract class StorageMemory<T extends StorageMemoryTypes> implements ISt
     get IsCheckedOut() { return this._checkedOut };
     get MemoryType(): StorageMemoryType { return this._cache[MEM_TYPE] as StorageMemoryType }
 
-    private readonly _savePath: string[];
     private _id: string;
     protected _cache: T;
     private _checkedOut: boolean;
@@ -28,7 +26,6 @@ export abstract class StorageMemory<T extends StorageMemoryTypes> implements ISt
 
     GetIDs() { return Object.getOwnPropertyNames(this._cache); }
     GetSaveData(): T { return CopyObject(this._cache); }
-    GetSavePath() { return this._savePath.slice(); }
 
     HasData(id: string): boolean {
         return !!(this._cache[id]);
@@ -61,7 +58,8 @@ export abstract class StorageMemory<T extends StorageMemoryTypes> implements ISt
         this._checkedOut = false;
     }
 
-    SaveChildMemory(childMemory: StorageMemory<StorageMemoryTypes>) {
+    SaveChildMemory(childMemory: IStorageMemory<StorageMemoryTypes>) {
+        childMemory.ReleaseMemory();
         this.SetData(childMemory.id, childMemory.GetSaveData());
     }
 }

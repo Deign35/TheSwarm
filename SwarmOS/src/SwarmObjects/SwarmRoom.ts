@@ -1,72 +1,50 @@
-import { SwarmItemWithName } from "SwarmObjects/SwarmObject";
 import { RoomMemory } from "Memory/StorageMemory";
 import { profile } from "Tools/Profiler";
+import { SwarmItemWithName } from "SwarmObjects/SwarmObject";
 
 const ROOM_COUNTER = 'CNT';
 const HARVESTER_JOBS = 'HARVEST';
 const ROOMOBJECT_DATA = 'OBJs';
 @profile
-export class SwarmRoom extends SwarmItemWithName<Room> implements ISwarmRoom, Room, ISwarmRoomObjectController {
+export class SwarmRoom extends SwarmItemWithName<Room> implements ISwarmRoom, Room {
     get StorageType() { return StorageMemoryType.RoomObject };
+    protected roomObjectsMemory!: any;
     protected roomObjects: { [id: string]: TSwarmRoomObject } = {}
-    PrepareTheSwarm(): void {
-        let memPath = this._memory.GetSavePath();
-        memPath.push(this.saveID);
-        memPath.push(ROOMOBJECT_DATA);
 
-        let roomObjects = {};
-        let harvestTargets = this._memory.GetData<SourceData[]>(HARVESTER_JOBS);
-        if (!harvestTargets) {
-            debugger;
-            this.InitializeRoom();
-            harvestTargets = this._memory.GetData<SourceData[]>(HARVESTER_JOBS);
-        }
-        for (let i = 0; i < harvestTargets.length; i++) {
-            let target = Game.getObjectById(harvestTargets[i].sourceID) as Source;
-            let sourceObj = SwarmCreator.CreateSwarmObject(target, SwarmType.SwarmSource, memPath) as TSwarmSource;
-            roomObjects[target.id] = sourceObj;
-        }
-
-        this.roomObjects = roomObjects;
-    }
-    ActivateSwarm(): void {
-        let curCount = this._memory.GetData<number>(ROOM_COUNTER) || 5;
-        this._memory.SetData(ROOM_COUNTER, curCount + (curCount * 0.05));
-
-        for (let id in this.roomObjects) {
-            this.roomObjects[id].Activate();
-        }
-    }
-    FinalizeSwarmActivity(): void {
-        for (let id in this.roomObjects) {
-            Swarmlord.ReleaseMemory(this.roomObjects[id].GetMemoryObject(), true);
-        }
-    }
     GetSwarmObject(id: string): TSwarmSource | TSwarmMineral | TSwarmNuke | TSwarmTombstone | TSwarmSite | TSwarmResource {
         return this.roomObjects[id];
     }
 
     get storageMemoryType() { return StorageMemoryType.Room };
     Activate() {
-        let memPath = this._memory.GetSavePath();
-        memPath.push(this.saveID);
         let curCount = this._memory.GetData<number>(ROOM_COUNTER) || 5;
         this._memory.SetData(ROOM_COUNTER, curCount + (curCount * 0.05));
+
+        let roomObjectData = Swarmlord.CheckoutMemory(ROOMOBJECT_DATA, StorageMemoryType.Other, this._memory);
+        let harvesters = this._memory.GetData(HARVESTER_JOBS) as { sourceID: string, nextSpawnRequiredBy: number }[]
+        for (let i = 0; i < harvesters.length; i++) {
+            let sourceId = harvesters[i].sourceID;
+            let sourceObject = Game.getObjectById(sourceId)
+            let swarmObject = SwarmCreator.CreateSwarmObject(sourceObject as Source, SwarmType.SwarmSource);
+            swarmObject.AssignMemory(Swarmlord.CheckoutMemory(sourceId, StorageMemoryType.RoomObject, roomObjectData));
+            swarmObject.Activate();
+            roomObjectData.SaveChildMemory(swarmObject.GetMemoryObject());
+        }
+
+        this.memory.SaveChildMemory(roomObjectData);
     }
     /*OnSave() {
         for (let objID in this.roomObjects) {
             Swarmlord.ReleaseMemory(this.roomObjects[objID].GetMemoryObject(), true);
         }
     }*/
-    InitializeRoom() {
+    InitNewObject() {
         let harvesterJobs = [];
         let sources = this.find(FIND_SOURCES);
-        let memPath = this._memory.GetSavePath();
-        memPath.push(this.saveID);
-        Swarmlord.CreateNewStorageMemory(ROOMOBJECT_DATA, memPath, StorageMemoryType.Other);
-        memPath.push(ROOMOBJECT_DATA);
+        Swarmlord.CreateNewStorageMemory(ROOMOBJECT_DATA, StorageMemoryType.Other, this._memory);
+        let newMem = Swarmlord.CheckoutMemory(ROOMOBJECT_DATA, StorageMemoryType.Other, this._memory);
         for (let i = 0; i < sources.length; i++) {
-            Swarmlord.CreateNewStorageMemory(sources[i].id, memPath, StorageMemoryType.RoomObject);
+            Swarmlord.CreateNewStorageMemory(sources[i].id, StorageMemoryType.RoomObject, newMem);
             let newSourceMemory: SourceData = {
                 sourceID: sources[i].id,
                 nextSpawnRequiredBy: 0,
@@ -75,6 +53,7 @@ export class SwarmRoom extends SwarmItemWithName<Room> implements ISwarmRoom, Ro
         }
 
         this._memory.SetData(HARVESTER_JOBS, harvesterJobs);
+        this._memory.SaveChildMemory(newMem);
     }
     get saveID() { return this.name; }
     get swarmType(): SwarmType.SwarmRoom { return SwarmType.SwarmRoom; }
@@ -152,7 +131,7 @@ export class SwarmRoom extends SwarmItemWithName<Room> implements ISwarmRoom, Ro
         }
     }
 }
-export function MakeSwarmRoom(room: Room, parentPath: string[]): TSwarmRoom {
-    return new SwarmRoom(room, parentPath);
+export function MakeSwarmRoom(room: Room): TSwarmRoom {
+    return new SwarmRoom(room);
 }
 declare type RoomLocationFormat = string;

@@ -1,21 +1,21 @@
 import { RoomObjectMemory, RoomMemory, StorageMemory } from "Memory/StorageMemory";
 
 abstract class SwarmItem<T> implements ISwarmItem<T> {
-    constructor(instance: T, parentPath: string[]) {
+    constructor(instance: T) {
         this._instance = instance;
-        this.Init(parentPath);
     }
     protected _instance: T;
     protected _memory!: IStorageMemory<SwarmData>;
-    protected Init(parentPath: string[]) {
-        this._memory = Swarmlord.CheckoutMemory(this.saveID, parentPath, this.storageMemoryType);
-    }
     get value() { return this._instance; }
     abstract get saveID(): string;
     abstract get swarmType(): SwarmType;
     abstract get storageMemoryType(): StorageMemoryType
-    Activate() { }
+    abstract Activate(): void;
     GetMemoryObject() { return this._memory; }
+    AssignMemory(mem: IStorageMemory<StorageMemoryTypes>) {
+        this._memory = mem;
+    }
+    InitNewObject() { }
 }
 
 export abstract class SwarmItemWithName<T extends Room | Flag> extends SwarmItem<T> {
@@ -24,8 +24,13 @@ export abstract class SwarmItemWithName<T extends Room | Flag> extends SwarmItem
 
 export abstract class SwarmObject<T extends Source | Creep | Structure | Mineral | Resource |
     ConstructionSite | Nuke | Tombstone> extends SwarmItem<T> implements ISwarmObject<T> {
+    Activate() {
+        if (this._memory.HasData('CNT')) {
+            this.room.visual.text(this._memory.GetData('CNT'), this.pos);
+        }
+    }
     get pos() { return this._instance.pos; }
-    get room() { return this._instance.room; } // This should get the room object i created.
+    get room() { return this._instance.room!; } // This should get the room object i created.
     get id() { return this._instance.id; }
     get prototype(): T { return this._instance.prototype as T; }
     get saveID() { return this._instance.id; }
@@ -39,8 +44,8 @@ export class SwarmTombstone extends SwarmObject<Tombstone> implements ISwarmTomb
     get store() { return this._instance.store; }
     get ticksToDecay() { return this._instance.ticksToDecay; }
 }
-export function MakeSwarmTombstone(tombStone: Tombstone, parentPath: string[]): TSwarmTombstone {
-    return new SwarmTombstone(tombStone, parentPath);
+export function MakeSwarmTombstone(tombStone: Tombstone): TSwarmTombstone {
+    return new SwarmTombstone(tombStone);
 }
 
 export abstract class NotifiableSwarmObject<T extends Creep | Structure | ConstructionSite>
@@ -69,8 +74,8 @@ export class SwarmMineral extends SwarmObject<Mineral> implements ISwarmMineral,
     get mineralType() { return this._instance.mineralType; }
     get ticksToRegeneration() { return this._instance.ticksToRegeneration; }
 }
-export function MakeSwarmMineral(mineral: Mineral, parentPath: string[]): TSwarmMineral {
-    return new SwarmMineral(mineral, parentPath);
+export function MakeSwarmMineral(mineral: Mineral): TSwarmMineral {
+    return new SwarmMineral(mineral);
 }
 
 export class SwarmResource extends SwarmObject<Resource> implements ISwarmResource, Resource {
@@ -79,8 +84,8 @@ export class SwarmResource extends SwarmObject<Resource> implements ISwarmResour
     get amount() { return this._instance.amount; }
     get resourceType() { return this._instance.resourceType; }
 }
-export function MakeSwarmResource(resource: Resource, parentPath: string[]): TSwarmResource {
-    return new SwarmResource(resource, parentPath);
+export function MakeSwarmResource(resource: Resource): TSwarmResource {
+    return new SwarmResource(resource);
 }
 
 export class SwarmNuke extends SwarmObject<Nuke> implements ISwarmNuke, Nuke {
@@ -89,6 +94,6 @@ export class SwarmNuke extends SwarmObject<Nuke> implements ISwarmNuke, Nuke {
     get launchRoomName() { return this._instance.launchRoomName; }
     get timeToLand() { return this._instance.timeToLand; }
 }
-export function MakeSwarmNuke(nuke: Nuke, parentPath: string[]): TSwarmNuke {
-    return new SwarmNuke(nuke, parentPath);
+export function MakeSwarmNuke(nuke: Nuke): TSwarmNuke {
+    return new SwarmNuke(nuke);
 }

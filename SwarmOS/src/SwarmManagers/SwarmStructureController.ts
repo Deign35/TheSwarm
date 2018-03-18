@@ -46,7 +46,7 @@ export class SwarmStructureController extends SwarmManager<TSwarmStructure> impl
     }
 
     protected CreateSwarmObject(obj: Structure): TSwarmStructure {
-        return SwarmCreator.CreateSwarmStructure(obj, this.getSwarmType(obj), STRUCTURE_SAVE_PATH) as TSwarmStructure;
+        return SwarmCreator.CreateSwarmObject(obj, this.getSwarmType(obj)) as TSwarmStructure;
     }
     private static _instance: SwarmStructureController;
     static GetSwarmObject(id: string) {

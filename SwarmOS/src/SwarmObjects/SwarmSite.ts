@@ -10,6 +10,6 @@ export class SwarmSite extends OwnableSwarmObject<ConstructionSite> implements I
     get structureType() { return this._instance.structureType; }
     remove() { return this._instance.remove(); }
 }
-export function MakeSwarmSite(site: ConstructionSite, parentPath: string[]): TSwarmSite {
-    return new SwarmSite(site, parentPath);
+export function MakeSwarmSite(site: ConstructionSite): TSwarmSite {
+    return new SwarmSite(site);
 }

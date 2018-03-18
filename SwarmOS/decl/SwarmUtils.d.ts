@@ -17,9 +17,8 @@ declare var SwarmLogger: {
 }
 
 declare var SwarmCreator: {
-    CreateSwarmObject(obj: Source | Creep | Mineral | Resource | Room | Flag |
-        ConstructionSite | Nuke | Tombstone | Structure, type: SwarmType, parentPath: string[]): TSwarmObjectTypes;
-    CreateSwarmStructure(obj: Structure, type: SwarmType, parentPath: string[]): TSwarmStructure;
+    CreateSwarmObject(obj: Source | Creep | Mineral | Resource | Room | Flag | Structure |
+        ConstructionSite | Nuke | Tombstone | Structure, type: SwarmType): TSwarmObjectTypes;
 }
 
 

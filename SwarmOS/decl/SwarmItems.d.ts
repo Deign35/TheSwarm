@@ -4,6 +4,8 @@ declare interface ISwarmItem<T> {
     saveID: string;
     GetMemoryObject(): IStorageMemory<StorageMemoryTypes>
     Activate(): void;
+    AssignMemory(mem: IStorageMemory<StorageMemoryTypes>): void;
+    InitNewObject(): void;
 }
 
 declare interface ISwarmObject<T extends RoomObject> extends ISwarmItem<T> { }

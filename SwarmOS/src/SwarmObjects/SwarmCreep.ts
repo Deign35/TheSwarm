@@ -9,6 +9,7 @@ const CURRENT_PATH = 'CP';
 export class SwarmCreep extends OwnableSwarmObject<Creep> implements ISwarmCreep, Creep {
     get storageMemoryType() { return StorageMemoryType.Creep };
     Activate() {
+        super.Activate();
         let curCount = this._memory.GetData<number>(CREEP_COUNTER) || 7;
         this._memory.SetData(CREEP_COUNTER, curCount + 5);
     }
@@ -144,4 +145,4 @@ export class SwarmCreep extends OwnableSwarmObject<Creep> implements ISwarmCreep
         return this._instance.withdraw(target, resourceType, amount);
     }
 }
-export function MakeSwarmCreep(creep: Creep, parentPath: string[]): TSwarmCreep { return new SwarmCreep(creep, parentPath); }
+export function MakeSwarmCreep(creep: Creep): TSwarmCreep { return new SwarmCreep(creep); }

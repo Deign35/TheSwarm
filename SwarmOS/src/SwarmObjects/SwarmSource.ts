@@ -7,6 +7,7 @@ export class SwarmSource extends SwarmObject<Source> implements ISwarmSource, So
     Activate() {
         let curCount = this._memory.GetData<number>(SOURCE_COUNTER) || 0;
         this._memory.SetData(SOURCE_COUNTER, curCount - 1);
+        super.Activate();
     }
     get swarmType(): SwarmType.SwarmSource { return SwarmType.SwarmSource; }
     get energy() { return this._instance.energy; }
@@ -17,6 +18,6 @@ export class SwarmSource extends SwarmObject<Source> implements ISwarmSource, So
     protected data!: SourceData;
 }
 
-export function MakeSwarmSource(source: Source, parentPath: string[]): TSwarmSource {
-    return new SwarmSource(source, parentPath);
+export function MakeSwarmSource(source: Source): TSwarmSource {
+    return new SwarmSource(source);
 }

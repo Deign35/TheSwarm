@@ -19,6 +19,6 @@ StructureController> implements ISwarmController, StructureController {
     activateSafeMode() { return this._instance.activateSafeMode(); }
     unclaim() { return this._instance.unclaim(); }
 }
-export function MakeSwarmController(controller: StructureController, parentPath: string[]): TSwarmController {
-    return new SwarmController(controller, parentPath);
+export function MakeSwarmController(controller: StructureController): TSwarmController {
+    return new SwarmController(controller);
 }

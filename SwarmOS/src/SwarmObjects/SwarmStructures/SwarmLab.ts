@@ -17,6 +17,6 @@ export class SwarmLab extends OwnedSwarmStructure<STRUCTURE_LAB, StructureLab> i
         return this._instance.runReaction(lab1.value, lab2.value);
     }
 }
-export function MakeSwarmLab(lab: StructureLab, parentPath: string[]): TSwarmLab {
-    return new SwarmLab(lab, parentPath);
+export function MakeSwarmLab(lab: StructureLab): TSwarmLab {
+    return new SwarmLab(lab);
 }
