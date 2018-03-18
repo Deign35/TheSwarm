@@ -3,9 +3,9 @@ declare interface ISwarmItem<T> {
     swarmType: SwarmType;
     saveID: string;
     IsActive: boolean;
-    GetMemoryObject(): IStorageMemory<StorageMemoryTypes>
+    GetMemoryObject(): IStorageMemory<StorageMemoryType, StorageMemoryTypes>
     Activate(): void;
-    AssignMemory(mem: IStorageMemory<StorageMemoryTypes>): void;
+    AssignMemory(mem: IStorageMemory<StorageMemoryType, StorageMemoryTypes>): void;
     InitNewObject(): void;
     GetSpawnRequirements(): SpawnRequirement;
 }

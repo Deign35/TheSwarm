@@ -43,10 +43,18 @@ export class Swarmlord implements ISwarmlord {
 
             SwarmLogger.Log("Begin initialization of memory for entire Swarm(" + SWARM_VERSION_DATE + ")");
             let newMemory: StorageMemoryStructure = {
-                creeps: {},
-                flags: {},
-                structures: {},
-                rooms: {},
+                creeps: {
+                    MEM_TYPE: StorageMemoryType.Other
+                },
+                flags: {
+                    MEM_TYPE: StorageMemoryType.Other
+                },
+                structures: {
+                    MEM_TYPE: StorageMemoryType.Other
+                },
+                rooms: {
+                    MEM_TYPE: StorageMemoryType.Other
+                },
                 profiler: Memory.profiler, // Hacky, but cleanest way to prevent the profiler from breaking because of deleting its memory.
                 SwarmVersionDate: SWARM_VERSION_DATE,
                 INIT: false
@@ -105,7 +113,7 @@ export class Swarmlord implements ISwarmlord {
         }
         let mem;
         if (parentObj.HasData(id)) {
-            mem = ConvertDataToMemory(id, parentObj.GetData(id));//this.LoadStorageMemory(id, memoryType, parentObj);
+            mem = ConvertDataToMemory(id, parentObj.GetData(id));
         } else {
             mem = CreateNewMemory(id, memoryType);
         }

@@ -100,9 +100,7 @@ export class CreepMemory extends StorageMemory<CreepData> {
         return StorageMemoryType.Creep;
     }
     protected CreateEmptyMemory() {
-        return {
-            suitData: []
-        } as CreepData;
+        return {} as CreepData;
     }
 }
 
@@ -114,10 +112,8 @@ export class RoomMemory extends StorageMemory<RoomData> {
     protected CreateEmptyMemory(): RoomData {
         return {
             queenType: QueenType.Larva,
-            OBJs: {
-
-            }
-        };
+            OBJs: {}
+        } as RoomData;
     }
 }
 
