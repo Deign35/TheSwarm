@@ -4,7 +4,7 @@ import { profile } from "Tools/Profiler";
 @profile
 export class SwarmController extends OwnedSwarmStructure<SwarmType.SwarmController,
 StructureController, STRUCTURE_CONTROLLER> implements ISwarmController, StructureController {
-    get swarmType(): SwarmType.SwarmController { return SwarmType.SwarmController; }
+    get SwarmType(): SwarmType.SwarmController { return SwarmType.SwarmController; }
     get level() { return this._instance.level; }
     get progress() { return this._instance.progress; }
     get progressTotal() { return this._instance.progressTotal; }
@@ -22,6 +22,6 @@ StructureController, STRUCTURE_CONTROLLER> implements ISwarmController, Structur
         console.log("Successfully activated a Controller");
     }
 }
-export function MakeSwarmController(controller: StructureController): TSwarmController {
+export function MakeSwarmController(controller: StructureController): ISwarmController {
     return new SwarmController(controller);
 }

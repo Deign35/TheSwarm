@@ -52,3 +52,21 @@ SwarmCommands
 Military?
 MarketCommands?
 ResourceCommands?
+
+
+
+
+
+
+
+
+
+SwarmQueen = Entire Swarm Commands and evaluations.
+HiveQueen = A Hive Cluster -- A group of rooms (how to group them?)
+
+Objects will inform the HiveQueen of an available attachment point (spawn).
+The HiveQueen will wait for a suitable creep to become available.
+When a creep of that type is available, Grab the oldest (for now)
+request in the queue.  Throw the creep at it, and let it run on its own.
+Once mission is complete, it will either go back to a previous SwarmObject,
+or it will be released to allow it to get a new SwarmObject.

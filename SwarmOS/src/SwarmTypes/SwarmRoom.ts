@@ -6,16 +6,14 @@ const ROOM_COUNTER = 'CNT';
 const HARVESTER_JOBS = 'HARVEST';
 const ROOMOBJECT_DATA = 'OBJs';
 @profile
-export class SwarmRoom extends SwarmItemWithName<SwarmType.SwarmRoom, Room, SwarmDataType.Room> implements ISwarmRoom, Room {
-    get memType(): SwarmDataType.Room { return SwarmDataType.Room };
+export class SwarmRoom extends SwarmItemWithName<SwarmType.SwarmRoom, SwarmDataType.Room, Room> implements ISwarmRoom, Room {
+    get DataType(): SwarmDataType.Room { return SwarmDataType.Room };
     protected roomObjectsMemory!: any;
-    protected roomObjects: { [id: string]: TSwarmRoomObject } = {}
+    /*protected roomObjects: { [id: string]: ISwarmRoomObject } = {}
 
-    GetSwarmObject(id: string): TSwarmSource | TSwarmMineral | TSwarmNuke | TSwarmTombstone | TSwarmSite | TSwarmResource {
+    GetSwarmObject(id: string): ISwarmSource | ISwarmMineral | ISwarmNuke | ISwarmTombstone | ISwarmSite | ISwarmResource {
         return this.roomObjects[id];
-    }
-
-    get storageMemoryType() { return SwarmDataType.Room };
+    }*/
 
     protected OnActivate() {
         /*let curCount = this._memory.GetData<number>(ROOM_COUNTER) || 5;
@@ -59,7 +57,7 @@ export class SwarmRoom extends SwarmItemWithName<SwarmType.SwarmRoom, Room, Swar
         this._memory.SaveChildMemory(newMem);*/
     }
     get saveID() { return this.name; }
-    get swarmType(): SwarmType.SwarmRoom { return SwarmType.SwarmRoom; }
+    get SwarmType(): SwarmType.SwarmRoom { return SwarmType.SwarmRoom; }
     get RoomLocation(): RoomLocationFormat { return this.name; }
     get controller(): StructureController | undefined { return this._instance.controller; }
     get energyAvailable(): number { return 0; }
@@ -133,7 +131,7 @@ export class SwarmRoom extends SwarmItemWithName<SwarmType.SwarmRoom, Room, Swar
         }
     }
 }
-export function MakeSwarmRoom(room: Room): TSwarmRoom {
+export function MakeSwarmRoom(room: Room): ISwarmRoom {
     return new SwarmRoom(room);
 }
 declare type RoomLocationFormat = string;

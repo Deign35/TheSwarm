@@ -25,8 +25,8 @@ export class SwarmQueen extends SwarmManager<SwarmType.SwarmRoom, Room, SwarmDat
     protected OnFinalizeSwarm(swarmObj: SwarmRoom): void {
     }
     private static _instance: SwarmQueen;
-    static GetSwarmObject(roomName: string): TSwarmRoom {
-        return this._instance.GetSwarmObject(roomName) as TSwarmRoom;
+    static GetSwarmObject(roomName: string): ISwarmRoom {
+        return this._instance.GetSwarmObject(roomName) as ISwarmRoom;
     }
     static PrepareTheSwarm() {
         this._instance = new SwarmQueen();

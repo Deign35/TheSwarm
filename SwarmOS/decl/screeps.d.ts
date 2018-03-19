@@ -3262,7 +3262,7 @@ declare const Structure: StructureConstructor;
  * The base prototype for a structure that has an owner. Such structures can be
  * found using `FIND_MY_STRUCTURES` and `FIND_HOSTILE_STRUCTURES` constants.
  */
-interface OwnedStructure<T extends StructureConstant = StructureConstant> extends Structure<T> {
+interface OwnedStructure<T extends OwnableStructureConstant = OwnableStructureConstant> extends Structure<T> {
     readonly prototype: OwnedStructure;
 
     /**

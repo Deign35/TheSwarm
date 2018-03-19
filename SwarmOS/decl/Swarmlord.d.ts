@@ -123,8 +123,8 @@ declare interface ISwarmlord {
     //CheckoutMemory<T extends SwarmDataType, U extends TAllSwarmDataTypes, X extends ISwarmMemory<T, U>>(id: string, memoryType: T, parentObj?: TAllSwarmMemoryTypes): X;
     ReserveMem<T extends SwarmDataType>(id: string, memoryType: T, parentObj?: TAllSwarmMemoryTypes): TAllSwarmMemoryTypes
     SaveMemory<T extends TMasterMemoryTypes>(memObject: T, save?: boolean): void;
-    StorageMemoryTypeToString(memType: SwarmDataType): string;
-    CreateNewSwarmMemory<T extends SwarmDataType>(id: string, memType: T, parentObj?: TAllSwarmMemoryTypes): void;
+    StorageMemoryTypeToString(DataType: SwarmDataType): string;
+    CreateNewSwarmMemory<T extends SwarmDataType>(id: string, DataType: T, parentObj?: TAllSwarmMemoryTypes): void;
 } declare var Swarmlord: ISwarmlord;
 
 

@@ -78,8 +78,8 @@ export class Swarmlord implements ISwarmlord {
         }
     }
 
-    StorageMemoryTypeToString(memType: SwarmDataType): string {
-        switch (memType) {
+    StorageMemoryTypeToString(DataType: SwarmDataType): string {
+        switch (DataType) {
             case (SwarmDataType.Room):
                 return 'rooms';
             case (SwarmDataType.Creep):
@@ -91,7 +91,7 @@ export class Swarmlord implements ISwarmlord {
             case (SwarmDataType.RoomObject):
                 return 'OBJs';
             default:
-                throw new InvalidArgumentException('Tried to retrieve invalid base memory type [' + memType + ']');
+                throw new InvalidArgumentException('Tried to retrieve invalid base memory type [' + DataType + ']');
         }
     }
 
@@ -101,11 +101,11 @@ export class Swarmlord implements ISwarmlord {
         }
     }
 
-    CreateNewSwarmMemory<T extends SwarmDataType>(id: string, memType: T, parentObj?: TAllSwarmMemoryTypes) {
+    CreateNewSwarmMemory<T extends SwarmDataType>(id: string, DataType: T, parentObj?: TAllSwarmMemoryTypes) {
         if (!parentObj) {
-            parentObj = this.LoadDataFromMemory(memType);
+            parentObj = this.LoadDataFromMemory(DataType);
         }
-        let mem = CreateNewMemory(id, memType);
+        let mem = CreateNewMemory(id, DataType);
         parentObj!.SetData(id, mem.GetSwarmData());
     }
 

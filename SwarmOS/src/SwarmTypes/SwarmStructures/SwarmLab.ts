@@ -2,7 +2,7 @@ import { OwnedSwarmStructure } from "./SwarmStructure";
 import { SwarmCreep } from "SwarmTypes/SwarmCreep";
 
 export class SwarmLab extends OwnedSwarmStructure<SwarmType.SwarmLab, StructureLab, STRUCTURE_LAB> implements ISwarmLab, StructureLab {
-    get swarmType(): SwarmType.SwarmLab { return SwarmType.SwarmLab; }
+    get SwarmType(): SwarmType.SwarmLab { return SwarmType.SwarmLab; }
     get cooldown() { return this._instance.cooldown; }
     get energy() { return this._instance.energy; }
     get energyCapacity() { return this._instance.energyCapacity; }
@@ -20,6 +20,6 @@ export class SwarmLab extends OwnedSwarmStructure<SwarmType.SwarmLab, StructureL
         console.log("Successfully activated a Lab");
     }
 }
-export function MakeSwarmLab(lab: StructureLab): TSwarmLab {
+export function MakeSwarmLab(lab: StructureLab): ISwarmLab {
     return new SwarmLab(lab);
 }

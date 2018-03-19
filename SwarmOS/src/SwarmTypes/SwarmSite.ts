@@ -5,7 +5,7 @@ export class SwarmSite extends SwarmRoomObject<SwarmType.SwarmSite, Construction
     get owner() { return this._instance.owner; }
     get storageMemoryType() { return SwarmDataType.RoomObject };
     /** Implement ConstructionSite */
-    get swarmType(): SwarmType.SwarmSite { return SwarmType.SwarmSite; }
+    get SwarmType(): SwarmType.SwarmSite { return SwarmType.SwarmSite; }
     get progress() { return this._instance.progress; }
     get progressTotal() { return this._instance.progressTotal; }
     get structureType() { return this._instance.structureType; }
@@ -14,6 +14,6 @@ export class SwarmSite extends SwarmRoomObject<SwarmType.SwarmSite, Construction
         console.log("Successfully activated a Site");
     }
 }
-export function MakeSwarmSite(site: ConstructionSite): TSwarmSite {
+export function MakeSwarmSite(site: ConstructionSite): ISwarmSite {
     return new SwarmSite(site);
 }

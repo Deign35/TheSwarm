@@ -4,9 +4,9 @@ import { SwarmItemWithName } from "SwarmTypes/SwarmTypes";
 
 const FLAG_COUNTER = 'CNT';
 @profile
-export class SwarmFlag extends SwarmItemWithName<SwarmType.SwarmFlag, Flag, SwarmDataType.Flag> implements ISwarmFlag, Flag {
-    get memType(): SwarmDataType.Flag { return SwarmDataType.Flag };
-    get swarmType(): SwarmType.SwarmFlag { return SwarmType.SwarmFlag; };
+export class SwarmFlag extends SwarmItemWithName<SwarmType.SwarmFlag, SwarmDataType.Flag, Flag> implements ISwarmFlag, Flag {
+    get DataType(): SwarmDataType.Flag { return SwarmDataType.Flag };
+    get SwarmType(): SwarmType.SwarmFlag { return SwarmType.SwarmFlag; };
     get pos() { return this._instance.pos; }
     get room() { return this._instance.room; }
     get prototype(): Flag { return this._instance.prototype as Flag; }
@@ -31,6 +31,6 @@ export class SwarmFlag extends SwarmItemWithName<SwarmType.SwarmFlag, Flag, Swar
         console.log("Successfully activated a Flag");
     }
 }
-export function MakeSwarmFlag(flag: Flag): TSwarmFlag {
+export function MakeSwarmFlag(flag: Flag): ISwarmFlag {
     return new SwarmFlag(flag);
 }

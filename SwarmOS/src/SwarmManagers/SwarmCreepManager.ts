@@ -29,8 +29,8 @@ export class SwarmCreepController extends SwarmManager<SwarmType.SwarmCreep, Cre
 
 
     private static _instance: SwarmCreepController;
-    static GetSwarmObject(creepName: string): TSwarmCreep {
-        return this._instance.GetSwarmObject(creepName) as TSwarmCreep;
+    static GetSwarmObject(creepName: string): ISwarmCreep {
+        return this._instance.GetSwarmObject(creepName) as ISwarmCreep;
     }
     static PrepareTheSwarm() {
         SwarmCreepController._instance = new SwarmCreepController();

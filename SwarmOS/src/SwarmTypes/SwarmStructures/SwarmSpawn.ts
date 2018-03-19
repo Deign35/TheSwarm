@@ -5,8 +5,8 @@ import { profile } from "Tools/Profiler";
 import { StructureMemory } from "Memory/StorageMemory";
 
 @profile
-export class SwarmSpawn extends OwnedSwarmStructure<SwarmType.SwarmSpawn, StructureSpawn, STRUCTURE_SPAWN> implements ISwarmSpawn, StructureSpawn {
-    get swarmType(): SwarmType.SwarmSpawn { return SwarmType.SwarmSpawn; }
+export class SwarmSpawn extends OwnedSwarmStructure<SwarmType.SwarmSpawn, STRUCTURE_SPAWN, StructureSpawn> implements ISwarmSpawn, StructureSpawn {
+    get SwarmType(): SwarmType.SwarmSpawn { return SwarmType.SwarmSpawn; }
     get energy() { return this._instance.energy; }
     get energyCapacity() { return this._instance.energyCapacity; }
     get name() { return this._instance.name; }
@@ -24,12 +24,12 @@ export class SwarmSpawn extends OwnedSwarmStructure<SwarmType.SwarmSpawn, Struct
             dryRun?: boolean,
             directions?: DirectionConstant[]
         }) { return this._instance.spawnCreep(body, name, opts); }
-    recycleCreep(target: SwarmCreep) { return this._instance.recycleCreep(target.value); }
-    renewCreep(target: SwarmCreep) { return this._instance.renewCreep(target.value); }
+    recycleCreep(target: SwarmCreep) { return this._instance.recycleCreep(target); }
+    renewCreep(target: SwarmCreep) { return this._instance.renewCreep(target); }
     protected OnActivate() {
         console.log("Successfully activated a Spawn");
     }
 }
-export function MakeSwarmSpawn(spawn: StructureSpawn): TSwarmSpawn {
+export function MakeSwarmSpawn(spawn: StructureSpawn): ISwarmSpawn {
     return new SwarmSpawn(spawn);
 }

@@ -37,17 +37,17 @@ export class SwarmStructureController extends SwarmManager<SwarmStructureType, S
     protected FindAllGameObjects(): { [id: string]: Structure; } {
         return Game.structures
     }
-    protected OnPrepareSwarm(swarmObj: TSwarmStructure): void {
+    protected OnPrepareSwarm(swarmObj: ISwarmStructure): void {
     }
-    protected OnActivateSwarm(swarmObj: TSwarmStructure): void {
+    protected OnActivateSwarm(swarmObj: ISwarmStructure): void {
 
     }
-    protected OnFinalizeSwarm(swarmObj: TSwarmStructure): void {
+    protected OnFinalizeSwarm(swarmObj: ISwarmStructure): void {
 
     }
 
-    protected CreateSwarmObject(obj: Structure): TSwarmStructure {
-        return SwarmCreator.CreateSwarmObject(obj) as TSwarmStructure;
+    protected CreateSwarmObject(obj: Structure): ISwarmStructure {
+        return SwarmCreator.CreateSwarmObject(obj) as ISwarmStructure;
     }
     private static _instance: SwarmStructureController;
     static GetSwarmObject(id: string) {

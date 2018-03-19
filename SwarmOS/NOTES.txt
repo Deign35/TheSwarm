@@ -6,3 +6,88 @@ Update distributors to pickup off the ground first.  Huge energy saver!!!!!
 
 Make spawn room a nest queen until it is ready to be a HiveQueen
 (when the controller gets to level 2, there is 1 container per source, a container at the controller, and a spawn.)
+
+
+
+
+SwarmObjects should be loaded by their type as listed in memory.
+Multiple SwarmObjects can reference the same GameObject
+Memory will have a mapping for which SwarmObject is the active one.
+
+In this way, a creep can be controlled by a SwarmContainer and a SwarmLink.
+When Container is active, the creep is summoned to the container to retrieve energy.
+When the link is active, the creep is summoned to the link to deposit.
+
+Then each manager will load all their objects, run Activate on all of them, then the Object will check
+which SwarmObject is active for a given object, and only OnActivate that one.
+
+
+Have objects carry their SwarmObject ids in a Stack. 
+
+Extension13: "I need a creep with carry"
+CreepA: "Hi, I have carry parts"
+Extension13: "Cool, let's check you out"
+// Extension13 checks that the creep is suitable.
+if(!suitable) {
+    return "Go away"
+}
+Extension13: "I need 50 energy"
+//CreepA checks if it has 50 energy
+
+//CreepA has no money!
+Extension13: "CreepA, I need you to go look for a job from a WithdrawTarget"
+CreepA: "Alright..."
+Extension13: "Here take this ID so that when you come back, you'll know where to go"
+
+//CreepA goes back to the Queen.
+CreepA: "Hey Queenie, I need a new job, something from a WithdrawTarget"?
+SwarmQueen: "K, let me look, how much did you need? and how much can you carry?"
+CreepA: "I need at least 50"
+SwarmQueen: "How much can you carry and how fast are you?"
+CreepA: "I can carry up to 500, and I'm Medium speed"
+// Slow speed = 1 for every 3+ carry.
+// Medium speed = 1 for every 2 carry.
+// Fast speed = 1 for every 1 carry.
+SwarmQueen: "To do what?"
+CreepA: "Deliver to Extension13 in HiveClusterB"
+SwarmQueen: "And how long do you have to live?"
+CreepA: "800 ticks to go, almost middle aged lol"
+
+// Asks the local hive queen about similar jobs nearby
+SwarmQueen: "Hey QueenB, I have a request to deliver to Extension13."
+HiveQueenB: "I see, well, I have some  other jobs in that area.  How much energy and time can I get?"
+SwarmQueen: "You'll have access to 450 energy at a min speed of Medium."
+HiveQueenB: "Alright, here...package these tasks up with it"
+SwarmQueen: "You got it!  Now, where can my creep obtain the energy needed for this?"
+HiveQueenB: "Lessee, ah, here, use this container.
+
+//SwarmQueen goes back to creep
+SwarmQueen: "Ok, here we go, I have a list of jobs for you to go accomplish, including your original"
+CreepA: "No shit? Awesome!"
+SwarmQueen: "Here's the list of deliverys for you to do, and here's your retrieval code, go back to your queen with it"
+CreepA: "Thanks"
+
+CreepA: "Hi QueenB, I have a code to retrieve 500 energy?"
+HiveQueenB: "Yes, I've been expecting you.  Here, put on this SwarmObject."
+CreepA: "Oh, ok.  Yep, got it"
+HiveQueenB: "Now, before you get in, I'm going to have to ask you to step out of your current SwarmObject"
+CreepA: "Ok"
+
+// CreepA then puts on the SwarmObject for the creep located in the corresponding container.
+ContainerC: "Hi CreepA"
+CreepA: "What's that?  Who's there???"
+ContainerC: "It is I, containerC.  Come seek me out"
+CreepA: "Ok...I'm here, now what?"
+ContainerC: "Take the energy you require from me and leave your SwarmObject at the door."
+
+CreepA: "Hey QueenB, I'm done with that SwarmObject you gave me."
+HiveQueenB: "Excellent, now...here is your list of deliveries, please proceed"
+
+// CreepA then goes to each delivery target and asks how to get there, and then deposits upon arrival.
+// Once the creep is finished with all deliveries, it starts again by looking for a new job.
+
+
+
+
+
+

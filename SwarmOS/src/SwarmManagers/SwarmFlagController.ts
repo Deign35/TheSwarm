@@ -28,8 +28,8 @@ export class SwarmFlagController extends SwarmManager<SwarmType.SwarmFlag, Flag,
 
     }
     private static _instance: SwarmFlagController;
-    static GetSwarmObject(flagName: string): TSwarmFlag {
-        return this._instance.GetSwarmObject(flagName) as TSwarmFlag;
+    static GetSwarmObject(flagName: string): ISwarmFlag {
+        return this._instance.GetSwarmObject(flagName) as ISwarmFlag;
     }
     static PrepareTheSwarm() {
         this._instance = new SwarmFlagController();

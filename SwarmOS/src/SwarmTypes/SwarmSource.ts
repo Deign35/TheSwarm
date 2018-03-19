@@ -16,7 +16,7 @@ export class SwarmSource extends SwarmRoomObject<SwarmType.SwarmSource, Source> 
             neededIn: 0
         }
     }
-    get swarmType(): SwarmType.SwarmSource { return SwarmType.SwarmSource; }
+    get SwarmType(): SwarmType.SwarmSource { return SwarmType.SwarmSource; }
     get energy() { return this._instance.energy; }
     get energyCapacity() { return this._instance.energyCapacity; }
     get room() { return this._instance.room; }
@@ -28,6 +28,6 @@ export class SwarmSource extends SwarmRoomObject<SwarmType.SwarmSource, Source> 
     }
 }
 
-export function MakeSwarmSource(source: Source): TSwarmSource {
+export function MakeSwarmSource(source: Source): ISwarmSource {
     return new SwarmSource(source);
 }
