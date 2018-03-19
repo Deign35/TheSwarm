@@ -1,8 +1,9 @@
-import { OwnableSwarmObject } from "./SwarmItem";
-import { RoomObjectMemory } from "Memory/StorageMemory";
+import { SwarmRoomObject } from "./SwarmTypes";
 
-export class SwarmSite extends OwnableSwarmObject<ConstructionSite> implements ISwarmSite, ConstructionSite {
-    get storageMemoryType() { return StorageMemoryType.RoomObject };
+export class SwarmSite extends SwarmRoomObject<SwarmType.SwarmSite, ConstructionSite> implements ISwarmSite, ConstructionSite {
+    get my() { return this._instance.my; }
+    get owner() { return this._instance.owner; }
+    get storageMemoryType() { return SwarmDataType.RoomObject };
     /** Implement ConstructionSite */
     get swarmType(): SwarmType.SwarmSite { return SwarmType.SwarmSite; }
     get progress() { return this._instance.progress; }

@@ -1,9 +1,9 @@
-import { SwarmObject } from "SwarmItems/SwarmItem";
 import { RoomObjectMemory } from "Memory/StorageMemory";
+import { SwarmRoomObject } from "SwarmTypes/SwarmTypes";
 
-export class SwarmSource extends SwarmObject<Source> implements ISwarmSource, Source {
-    get storageMemoryType() { return StorageMemoryType.RoomObject };
-    GetSpawnRequirements(): SpawnRequirement {
+export class SwarmSource extends SwarmRoomObject<SwarmType.SwarmSource, Source> implements ISwarmSource, Source {
+    get storageMemoryType() { return SwarmDataType.RoomObject };
+    GetSpawnRequirements(): ISpawnRequirement {
         // find out how much energy I have available.  Adjust body accordingly
         let body = [WORK, WORK, CARRY, MOVE];
         // find out how soon my current one is going to die
@@ -22,7 +22,7 @@ export class SwarmSource extends SwarmObject<Source> implements ISwarmSource, So
     get room() { return this._instance.room; }
     get ticksToRegeneration() { return this._instance.ticksToRegeneration; }
 
-    protected data!: SourceData;
+    //protected data!: ISourceData;
     protected OnActivate() {
         console.log("Successfully activated a Source");
     }

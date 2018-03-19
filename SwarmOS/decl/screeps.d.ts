@@ -2117,10 +2117,10 @@ interface OrderFilter {
 }
 interface Memory {
     [name: string]: any;
-    creeps: { [name: string]: CreepData };
-    flags: { [name: string]: FlagData };
-    rooms: { [name: string]: RoomData };
-    spawns: { [name: string]: StructureData };
+    creeps: { [name: string]: ICreepData };
+    flags: { [name: string]: IFlagData };
+    rooms: { [name: string]: IRoomData };
+    spawns: { [name: string]: IStructureData };
 }
 
 /**
@@ -3160,7 +3160,7 @@ interface StructureSpawn extends OwnedStructure<STRUCTURE_SPAWN> {
      * ERR_RCL_NOT_ENOUGH       -14 Your Room Controller level is insufficient to use this spawn.
      * ```
      */
-    spawnCreep(body: BodyPartConstant[], name: string, opts?: { memory?: CreepData, energyStructures?: Array<(StructureSpawn | StructureExtension)>, dryRun?: boolean, directions?: DirectionConstant[] }): ScreepsReturnCode;
+    spawnCreep(body: BodyPartConstant[], name: string, opts?: { memory?: ICreepData, energyStructures?: Array<(StructureSpawn | StructureExtension)>, dryRun?: boolean, directions?: DirectionConstant[] }): ScreepsReturnCode;
 
     /**
      * Destroy this spawn immediately.

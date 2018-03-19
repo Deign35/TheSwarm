@@ -36,7 +36,7 @@
             "Cache": 1,
             "Segment": 2
         },
-        "StorageMemoryType": {
+        "SwarmDataType": {
             "None": 0,
             "Structure": 1,
             "Room": 2,

@@ -2,30 +2,28 @@ import { profile } from "Tools/Profiler";
 import { SwarmException, MemoryLockException, AlreadyExistsException } from "Tools/SwarmExceptions";
 
 @profile
-export abstract class StorageMemory<T extends StorageMemoryTypes> implements IStorageMemory<T> {
-    constructor(id: string, data?: T) {
+export abstract class StorageMemory<T extends SwarmDataType, U extends ISwarmData<T, any>> implements ISwarmMemory<T, U> {
+    constructor(id: string, data?: U) {
         this._id = id;
         if (data) {
             this._cache = data;
         } else {
-            this._cache = this.CreateEmptyMemory();
-            this.SetData(MEM_TYPE, this.GetMemoryType());
+            this._cache = this.CreateEmptyData();
         }
         this._checkedOut = false;
     }
     get id() { return this._id };
     get IsCheckedOut() { return this._checkedOut };
-    get MemoryType(): StorageMemoryType { return this._cache[MEM_TYPE] as StorageMemoryType }
+    get MemoryType(): T { return this._cache[MEM_TYPE] as T }
 
     private _id: string;
-    protected _cache: T;
+    protected _cache: U
     private _checkedOut: boolean;
 
-    protected abstract GetMemoryType(): StorageMemoryType;
-    protected abstract CreateEmptyMemory(): T;
+    protected abstract CreateEmptyData(): U;
 
     GetIDs() { return Object.getOwnPropertyNames(this._cache); }
-    GetSaveData(): T { return CopyObject(this._cache); }
+    GetSwarmData(): U { return CopyObject(this._cache) as U; }
 
     HasData(id: string): boolean {
         return !!(this._cache[id]);
@@ -58,71 +56,66 @@ export abstract class StorageMemory<T extends StorageMemoryTypes> implements ISt
         this._checkedOut = false;
     }
 
-    SaveChildMemory(childMemory: IStorageMemory<StorageMemoryTypes>) {
+    SaveChildMemory<A extends SwarmDataType, B extends ISwarmData<A, any>>(childMemory: ISwarmMemory<A, B>) {
         childMemory.ReleaseMemory();
-        this.SetData(childMemory.id, childMemory.GetSaveData());
+        this.SetData(childMemory.id, childMemory.GetSwarmData());
     }
 }
 
 @profile
-export class BasicMemory extends StorageMemory<Dictionary> {
-    protected GetMemoryType(): StorageMemoryType {
-        return StorageMemoryType.Other;
-    }
-    protected CreateEmptyMemory() {
-        return {} as Dictionary;
-    }
-}
-
-@profile
-export class FlagMemory extends StorageMemory<FlagData> {
-    protected GetMemoryType(): StorageMemoryType {
-        return StorageMemoryType.Flag;
-    }
-    protected CreateEmptyMemory() {
-        return {} as FlagData;
-    }
-}
-
-@profile
-export class StructureMemory extends StorageMemory<StructureData> {
-    protected GetMemoryType(): StorageMemoryType {
-        return StorageMemoryType.Structure;
-    }
-    protected CreateEmptyMemory() {
-        return {} as StructureData;
-    }
-}
-
-@profile
-export class CreepMemory extends StorageMemory<CreepData> {
-    protected GetMemoryType(): StorageMemoryType {
-        return StorageMemoryType.Creep;
-    }
-    protected CreateEmptyMemory() {
-        return {} as CreepData;
-    }
-}
-
-@profile
-export class RoomMemory extends StorageMemory<RoomData> {
-    protected GetMemoryType(): StorageMemoryType {
-        return StorageMemoryType.Room;
-    }
-    protected CreateEmptyMemory(): RoomData {
+export class BasicMemory<T> extends StorageMemory<SwarmDataType.Other, IOtherData<T>> implements IOtherMemory<T> {
+    protected CreateEmptyData(): IOtherData<T> {
         return {
-            queenType: QueenType.Larva,
-            OBJs: {}
-        } as RoomData;
+            MEM_TYPE: SwarmDataType.Other
+        };
     }
 }
 
 @profile
-export class RoomObjectMemory extends StorageMemory<RoomObjectData> {
-    protected GetMemoryType(): StorageMemoryType {
-        return StorageMemoryType.RoomObject;
+export class FlagMemory extends StorageMemory<SwarmDataType.Flag, IFlagData> implements IFlagMemory {
+    protected CreateEmptyData(): IFlagData {
+        return {
+            MEM_TYPE: SwarmDataType.Flag
+        };
     }
-    protected CreateEmptyMemory(): RoomObjectData {
-        return {} as RoomObjectData
+}
+
+@profile
+export class StructureMemory extends StorageMemory<SwarmDataType.Structure, IStructureData> implements IStructureMemory {
+    protected CreateEmptyData(): IStructureData {
+        return {
+            MEM_TYPE: SwarmDataType.Structure
+        };
+    }
+}
+
+@profile
+export class CreepMemory extends StorageMemory<SwarmDataType.Creep, ICreepData> implements ICreepMemory {
+    protected CreateEmptyData(): ICreepData {
+        return {
+            MEM_TYPE: SwarmDataType.Creep
+        };
+    }
+}
+
+@profile
+export class RoomMemory extends StorageMemory<SwarmDataType.Room, IRoomData> {
+    protected CreateEmptyData(): IRoomData {
+        return {
+            OBJs: {
+                MEM_TYPE: SwarmDataType.Other
+            },
+            queenType: 0,
+            MEM_TYPE: SwarmDataType.Room
+        };
+    }
+}
+
+@profile
+export class RoomObjectMemory extends StorageMemory<SwarmDataType.RoomObject, IRoomObjectData> implements IRoomObjectMemory {
+    protected CreateEmptyData(): IRoomObjectData {
+        return {
+            MEM_TYPE: SwarmDataType.RoomObject
+        };
     }
 }

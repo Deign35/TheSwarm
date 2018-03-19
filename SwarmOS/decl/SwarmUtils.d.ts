@@ -16,10 +16,6 @@ declare var SwarmLogger: {
     LogError(message: string): void;
 }
 
-declare var SwarmCreator: {
-    CreateSwarmObject(obj: Source | Creep | Mineral | Resource | Room | Flag | Structure |
-        ConstructionSite | Nuke | Tombstone | Structure, type: SwarmType): TSwarmObjectTypes;
-}
 
 
 

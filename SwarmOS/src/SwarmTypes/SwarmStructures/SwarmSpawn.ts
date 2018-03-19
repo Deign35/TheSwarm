@@ -5,7 +5,7 @@ import { profile } from "Tools/Profiler";
 import { StructureMemory } from "Memory/StorageMemory";
 
 @profile
-export class SwarmSpawn extends OwnedSwarmStructure<STRUCTURE_SPAWN, StructureSpawn> implements ISwarmSpawn, StructureSpawn {
+export class SwarmSpawn extends OwnedSwarmStructure<SwarmType.SwarmSpawn, StructureSpawn, STRUCTURE_SPAWN> implements ISwarmSpawn, StructureSpawn {
     get swarmType(): SwarmType.SwarmSpawn { return SwarmType.SwarmSpawn; }
     get energy() { return this._instance.energy; }
     get energyCapacity() { return this._instance.energyCapacity; }
@@ -19,7 +19,7 @@ export class SwarmSpawn extends OwnedSwarmStructure<STRUCTURE_SPAWN, StructureSp
 
     spawnCreep(body: BodyPartConstant[], name: string,
         opts?: {
-            memory?: CreepData,
+            memory?: ICreepData,
             energyStructures?: Array<(StructureSpawn | StructureExtension)>,
             dryRun?: boolean,
             directions?: DirectionConstant[]

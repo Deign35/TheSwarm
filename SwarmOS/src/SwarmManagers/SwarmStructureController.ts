@@ -2,10 +2,11 @@ import { SwarmManager } from "./SwarmManager";
 import { InvalidArgumentException } from "Tools/SwarmExceptions";
 import { profile } from "Tools/Profiler";
 import { StructureMemory } from "Memory/StorageMemory";
+import { SwarmCreator } from "SwarmTypes/SwarmCreator";
 
 const STRUCTURE_SAVE_PATH = ["structures"];
 @profile
-export class SwarmStructureController extends SwarmManager<TSwarmStructure> implements ISwarmStructureController {
+export class SwarmStructureController extends SwarmManager<SwarmStructureType, Structure, SwarmDataType.Structure> implements ISwarmStructureController {
     protected getManagerSavePath(): string[] {
         return STRUCTURE_SAVE_PATH;
     }
@@ -30,11 +31,11 @@ export class SwarmStructureController extends SwarmManager<TSwarmStructure> impl
 
         throw new InvalidArgumentException('Structure is not swarm configured: ' + JSON.stringify(obj));
     }
-    protected getStorageType(): StorageMemoryType.Structure {
-        return StorageMemoryType.Structure;
+    protected getStorageType(): SwarmDataType.Structure {
+        return SwarmDataType.Structure;
     }
     protected FindAllGameObjects(): { [id: string]: Structure; } {
-        return Game.structures;
+        return Game.structures
     }
     protected OnPrepareSwarm(swarmObj: TSwarmStructure): void {
     }
@@ -46,7 +47,7 @@ export class SwarmStructureController extends SwarmManager<TSwarmStructure> impl
     }
 
     protected CreateSwarmObject(obj: Structure): TSwarmStructure {
-        return SwarmCreator.CreateSwarmObject(obj, this.getSwarmType(obj)) as TSwarmStructure;
+        return SwarmCreator.CreateSwarmObject(obj) as TSwarmStructure;
     }
     private static _instance: SwarmStructureController;
     static GetSwarmObject(id: string) {

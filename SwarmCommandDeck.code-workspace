@@ -23,5 +23,6 @@
 			"**/Gruntfile.js": true,
 			"**/README.md": true
 		},
+		"mocha.enabled": false,
 	}
 }

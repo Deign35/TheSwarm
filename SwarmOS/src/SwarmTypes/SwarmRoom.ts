@@ -1,13 +1,13 @@
 import { RoomMemory } from "Memory/StorageMemory";
 import { profile } from "Tools/Profiler";
-import { SwarmItemWithName } from "SwarmItems/SwarmItem";
+import { SwarmItemWithName } from "SwarmTypes/SwarmTypes";
 
 const ROOM_COUNTER = 'CNT';
 const HARVESTER_JOBS = 'HARVEST';
 const ROOMOBJECT_DATA = 'OBJs';
 @profile
-export class SwarmRoom extends SwarmItemWithName<Room> implements ISwarmRoom, Room {
-    get StorageType() { return StorageMemoryType.RoomObject };
+export class SwarmRoom extends SwarmItemWithName<SwarmType.SwarmRoom, Room, SwarmDataType.Room> implements ISwarmRoom, Room {
+    get memType(): SwarmDataType.Room { return SwarmDataType.Room };
     protected roomObjectsMemory!: any;
     protected roomObjects: { [id: string]: TSwarmRoomObject } = {}
 
@@ -15,23 +15,26 @@ export class SwarmRoom extends SwarmItemWithName<Room> implements ISwarmRoom, Ro
         return this.roomObjects[id];
     }
 
-    get storageMemoryType() { return StorageMemoryType.Room };
+    get storageMemoryType() { return SwarmDataType.Room };
+
     protected OnActivate() {
-        let curCount = this._memory.GetData<number>(ROOM_COUNTER) || 5;
+        /*let curCount = this._memory.GetData<number>(ROOM_COUNTER) || 5;
         this._memory.SetData(ROOM_COUNTER, curCount + (curCount * 0.05));
 
-        let roomObjectData = Swarmlord.CheckoutMemory(ROOMOBJECT_DATA, StorageMemoryType.Other, this._memory);
+        let roomObjectData = Swarmlord.ReserveMem(ROOMOBJECT_DATA, SwarmDataType.RoomObject, this._memory);
+        //let roomObjectData = Swarmlord.CheckoutMemory(ROOMOBJECT_DATA, SwarmDataType.Other, this._memory);
         let harvesters = this._memory.GetData(HARVESTER_JOBS) as { sourceID: string, nextSpawnRequiredBy: number }[]
         for (let i = 0; i < harvesters.length; i++) {
             let sourceId = harvesters[i].sourceID;
             let sourceObject = Game.getObjectById(sourceId)
             let swarmObject = SwarmCreator.CreateSwarmObject(sourceObject as Source, SwarmType.SwarmSource);
-            swarmObject.AssignMemory(Swarmlord.CheckoutMemory(sourceId, StorageMemoryType.RoomObject, roomObjectData));
+            let objData = Swarmlord.ReserveMem(sourceId, SwarmDataType.RoomObject, roomObjectData);
+            swarmObject.AssignMemory(objData);
             swarmObject.Activate();
             roomObjectData.SaveChildMemory(swarmObject.GetMemoryObject());
         }
 
-        this.memory.SaveChildMemory(roomObjectData);
+        this.memory.SaveChildMemory(roomObjectData);*/
     }
     /*OnSave() {
         for (let objID in this.roomObjects) {
@@ -39,12 +42,12 @@ export class SwarmRoom extends SwarmItemWithName<Room> implements ISwarmRoom, Ro
         }
     }*/
     InitNewObject() {
-        let harvesterJobs = [];
+        /*let harvesterJobs = [];
         let sources = this.find(FIND_SOURCES);
-        Swarmlord.CreateNewStorageMemory(ROOMOBJECT_DATA, StorageMemoryType.Other, this._memory);
-        let newMem = Swarmlord.CheckoutMemory(ROOMOBJECT_DATA, StorageMemoryType.Other, this._memory);
+        Swarmlord.CreateNewStorageMemory(ROOMOBJECT_DATA, SwarmDataType.Other, this._memory);
+        let newMem = Swarmlord.CheckoutMemory(ROOMOBJECT_DATA, SwarmDataType.Other, this._memory);
         for (let i = 0; i < sources.length; i++) {
-            Swarmlord.CreateNewStorageMemory(sources[i].id, StorageMemoryType.RoomObject, newMem);
+            Swarmlord.CreateNewStorageMemory(sources[i].id, SwarmDataType.RoomObject, newMem);
             let newSourceMemory: SourceData = {
                 sourceID: sources[i].id,
                 nextSpawnRequiredBy: 0,
@@ -53,11 +56,10 @@ export class SwarmRoom extends SwarmItemWithName<Room> implements ISwarmRoom, Ro
         }
 
         this._memory.SetData(HARVESTER_JOBS, harvesterJobs);
-        this._memory.SaveChildMemory(newMem);
+        this._memory.SaveChildMemory(newMem);*/
     }
     get saveID() { return this.name; }
     get swarmType(): SwarmType.SwarmRoom { return SwarmType.SwarmRoom; }
-    get prototype(): Room { return this._instance.prototype as Room; }
     get RoomLocation(): RoomLocationFormat { return this.name; }
     get controller(): StructureController | undefined { return this._instance.controller; }
     get energyAvailable(): number { return 0; }

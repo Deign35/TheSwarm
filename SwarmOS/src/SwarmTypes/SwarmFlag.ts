@@ -1,11 +1,11 @@
-import { SwarmItemWithName } from "SwarmItems/SwarmItem";
 import { FlagMemory } from "Memory/StorageMemory";
 import { profile } from "Tools/Profiler";
+import { SwarmItemWithName } from "SwarmTypes/SwarmTypes";
 
 const FLAG_COUNTER = 'CNT';
 @profile
-export class SwarmFlag extends SwarmItemWithName<Flag> implements ISwarmFlag, Flag {
-    get storageMemoryType() { return StorageMemoryType.Flag };
+export class SwarmFlag extends SwarmItemWithName<SwarmType.SwarmFlag, Flag, SwarmDataType.Flag> implements ISwarmFlag, Flag {
+    get memType(): SwarmDataType.Flag { return SwarmDataType.Flag };
     get swarmType(): SwarmType.SwarmFlag { return SwarmType.SwarmFlag; };
     get pos() { return this._instance.pos; }
     get room() { return this._instance.room; }

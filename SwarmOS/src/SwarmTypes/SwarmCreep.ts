@@ -1,13 +1,13 @@
-import { OwnableSwarmObject } from "SwarmItems/SwarmItem";
 import { CreepMemory } from "Memory/StorageMemory";
 import { profile } from "Tools/Profiler";
+import { OwnableSwarmObject } from "SwarmTypes/SwarmTypes";
 
 const CREEP_COUNTER = 'CNT';
 const CARRY_TOTAL = 'CT';
 const CURRENT_PATH = 'CP';
 @profile
-export class SwarmCreep extends OwnableSwarmObject<Creep> implements ISwarmCreep, Creep {
-    get storageMemoryType() { return StorageMemoryType.Creep };
+export class SwarmCreep extends OwnableSwarmObject<SwarmType.SwarmCreep, Creep, SwarmDataType.Creep> implements ISwarmCreep, Creep {
+    get memType(): SwarmDataType.Creep { return SwarmDataType.Creep };
     protected OnActivate() {
         console.log("Successfully activated a Creep");
     }
