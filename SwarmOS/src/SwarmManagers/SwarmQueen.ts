@@ -1,11 +1,15 @@
 
 import { profile } from "Tools/Profiler";
-import { SwarmManager } from "./SwarmManager";
+import { SwarmManager, PrimeManager } from "./SwarmManager";
 import { SwarmRoom } from "SwarmTypes/SwarmRoom";
 
 const ROOM_SAVE_PATH = ['rooms'];
 @profile
-export class SwarmQueen extends SwarmManager<SwarmType.SwarmRoom, Room, SwarmDataType.Room> implements ISwarmRoomController {
+export class SwarmQueen extends PrimeManager<SwarmControllerDataTypes.Rooms, SwarmType.SwarmRoom>
+    implements ISwarmRoomController {
+    protected get _dataType(): SwarmControllerDataTypes.Rooms {
+        return SwarmControllerDataTypes.Rooms;
+    }
     protected getManagerSavePath(): string[] {
         return ROOM_SAVE_PATH;
     }

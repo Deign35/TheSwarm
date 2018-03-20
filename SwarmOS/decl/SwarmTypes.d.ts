@@ -5,29 +5,31 @@ declare interface ISpawnRequirement {
     growthTemplate: BodyPartConstant[];
     neededIn: number;
 }
-declare interface ISwarmType<T extends SwarmType, U extends SwarmDataType, V extends Room | RoomObject> extends _Constructor<V> {
+declare interface ISwarmType<T extends SwarmType, U extends SwarmDataType,
+    V extends Room | RoomObject> extends _Constructor<V> {
     SwarmType: T
-    Value: V;
-    DataType: U;
     saveID: string;
     IsActive: boolean;
-    GetMemoryObject(): IEmptyMemory<U>
     Activate(): void;
-    AssignMemory(mem: IEmptyMemory<U>): void;
+    GetMemoryObject(): ISwarmMemory<T, U>
+    AssignMemory(mem: ISwarmMemory<T, U>): void;
     InitNewObject(): void;
     GetSpawnRequirements(): ISpawnRequirement;
 }
 
+declare interface ISwarmRoomObjectBase<T extends SwarmType,
+    U extends SwarmDataType, V extends RoomObject> extends ISwarmType<T, U, V> {
 
+}
 declare interface ISwarmRoom extends ISwarmType<SwarmType.SwarmRoom, SwarmDataType.Room, Room> { }
-declare interface ISwarmCreep extends ISwarmType<SwarmType.SwarmCreep, SwarmDataType.Creep, Creep> { }
-declare interface ISwarmFlag extends ISwarmType<SwarmType.SwarmFlag, SwarmDataType.Flag, Flag> { }
+declare interface ISwarmCreep extends ISwarmRoomObjectBase<SwarmType.SwarmCreep, SwarmDataType.Creep, Creep> { }
+declare interface ISwarmFlag extends ISwarmRoomObjectBase<SwarmType.SwarmFlag, SwarmDataType.Flag, Flag> { }
 
 /** 
  *  Structures begin here.
 */
-declare interface ISwarmStructureType<T extends SwarmStructureType, U extends StructureConstant>
-    extends ISwarmType<T, SwarmDataType.Structure, Structure<U>> {
+declare interface ISwarmStructureType<T extends SwarmStructureType, V extends StructureConstant>
+    extends ISwarmRoomObjectBase<T, SwarmDataType.Structure, Structure<V>> {
 
 }
 
@@ -96,7 +98,7 @@ declare type IOwnableSwarmStructure = ISwarmController | ISwarmExtension | ISwar
     ISwarmLab | ISwarmLink | ISwarmNuker | ISwarmObserver | ISwarmPowerBank | ISwarmPowerSpawn |
     ISwarmRampart | ISwarmSpawn | ISwarmStorage | ISwarmTerminal | ISwarmTower
 
-declare interface ISwarmRoomObject<T extends SwarmType> extends ISwarmType<T, SwarmDataType.RoomObject, RoomObject> {
+declare interface ISwarmRoomObject<T extends SwarmType> extends ISwarmRoomObjectBase<T, SwarmDataType.RoomObject, RoomObject> {
 
 }
 declare interface ISwarmMineral extends ISwarmRoomObject<SwarmType.SwarmMineral> {
@@ -117,29 +119,27 @@ declare interface ISwarmSite extends ISwarmRoomObject<SwarmType.SwarmSite> {
 declare interface ISwarmTombstone extends ISwarmRoomObject<SwarmType.SwarmTombstone> {
 
 }
-declare type SwarmRoomObject = ISwarmStructure | ISwarmCreep | ISwarmFlag | ISwarmMineral | ISwarmNuke |
-    ISwarmResource | ISwarmSite | ISwarmTombstone;
-declare type AllSwarmTypes = ISwarmRoom | SwarmRoomObject
+declare type SwarmRoomObject = ISwarmRoomObject<SwarmRoomObjectType>;
+declare type AllSwarmTypes = ISwarmRoom | SwarmRoomObject | ISwarmCreep | ISwarmFlag | ISwarmRoom | ISwarmStructure
 
-declare interface IMasterSwarmController<T extends SwarmType, U extends AllSwarmTypes> {
-    StorageType: T;
+declare interface ISwarmObjectController<T extends SwarmControllerDataTypes, U extends SwarmType> {
+    DataType: T,
+    GetSwarmObject<V extends SwarmDataType, X extends Room | RoomObject>(id: string): ISwarmType<U, V, X>;
     ActivateSwarm(): void;
-    GetSwarmObject(id: string): U;
     FinalizeSwarmActivity(): void;
     PrepareTheSwarm(): void;
 }
 
 
-declare interface ISwarmRoomController extends IMasterSwarmController<SwarmType.SwarmRoom, ISwarmRoom> {
+declare interface ISwarmRoomController extends ISwarmObjectController<SwarmControllerDataTypes.Rooms, SwarmType.SwarmRoom> {
 } declare var SwarmQueen: ISwarmRoomController;
-declare interface ISwarmCreepController extends IMasterSwarmController<SwarmType.SwarmCreep, ISwarmCreep> {
+declare interface ISwarmCreepController extends ISwarmObjectController<SwarmControllerDataTypes.Creeps, SwarmType.SwarmCreep> {
 } declare var SwarmCreepController: ISwarmCreepController;
-declare interface ISwarmStructureController extends IMasterSwarmController<SwarmStructureType, ISwarmStructure> {
+declare interface ISwarmStructureController extends ISwarmObjectController<SwarmControllerDataTypes.Structures, SwarmStructureType> {
 } declare var SwarmStructureController: ISwarmStructureController;
-declare interface ISwarmFlagController extends IMasterSwarmController<SwarmType.SwarmFlag, ISwarmFlag> {
+declare interface ISwarmFlagController extends ISwarmObjectController<SwarmControllerDataTypes.Flags, SwarmType.SwarmFlag> {
 } declare var SwarmFlagController: ISwarmFlagController;
 
-declare interface ISwarmRoomObjectController<T extends SwarmRoomObjectType>
-    extends IMasterSwarmController<T, SwarmRoomObject> {
+declare interface ISwarmRoomObjectController extends ISwarmObjectController<SwarmControllerDataTypes.RoomObjects, SwarmRoomObjectType> {
 
 }

@@ -17,7 +17,7 @@ export class SwarmTower extends OwnedSwarmStructure<SwarmType.SwarmTower, STRUCT
     heal(target: SwarmCreep) {
         return this._instance.heal(target);
     }
-    repair(target: Structure<StructureConstant>) {
+    repair(target: SwarmStructure<SwarmStructureType, StructureConstant, Structure>) {
         return this._instance.repair(target);
     }
     protected OnActivate() {

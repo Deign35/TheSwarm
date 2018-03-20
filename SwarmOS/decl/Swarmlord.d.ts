@@ -39,7 +39,7 @@ declare interface IMineralData extends IRoomObjectData {
 declare type TBasicSwarmDataTypes = ICreepData | IStructureData | IBasicData |
     IFlagData | IRoomData | IRoomObjectData | IOtherData<any>;
 
-declare interface IMasterSwarmData<T extends TBasicSwarmDataTypes> extends IOtherData<T> {
+declare interface IMasterSwarmData<T extends TBasicSwarmDataTypes> extends ISwarmData<SwarmDataType.Master, T> {
     // Data common to all MasterSwarmDatas (including IRoomObjectData)
 }
 declare interface IMasterRoomObjectData extends IMasterSwarmData<IRoomObjectData> { }
@@ -52,11 +52,11 @@ declare type TAllMasterDataTypes = IMasterRoomObjectData | IMasterFlagData |
 
 declare type TAllSwarmDataTypes = TBasicSwarmDataTypes | TAllMasterDataTypes;
 
-declare interface ISwarmMemory<T extends SwarmDataType, U extends ISwarmData<T, any>> {
+declare interface ISwarmMemory<T extends SwarmType, U extends SwarmDataType> {
     // Doesn't ENFORCE that the MemoryType and GetSwarmData[MEM_TYPE] as the same, but can be manually kept up.
     id: string;
     IsCheckedOut: boolean;
-    MemoryType: T,
+    MemoryType: U,
     GetData<Z>(id: string): Z;
     SetData<Z>(id: string, data: Z): void;
     GetIDs(): string[];
@@ -64,51 +64,51 @@ declare interface ISwarmMemory<T extends SwarmDataType, U extends ISwarmData<T, 
     RemoveData(id: string): void;
     ReserveMemory(): void;
     ReleaseMemory(): void;
-    SaveChildMemory<A extends SwarmDataType, B extends ISwarmData<A, any>>(childMemory: ISwarmMemory<A, B>): void;
-    GetSwarmData(): U;
-    //AssignData(data: T): void;
 }
 
-declare interface IEmptyMemory<T extends SwarmDataType> extends ISwarmMemory<T, IEmptyData<T>> {
+declare interface IEmptyMemory<T extends SwarmDataType> extends ISwarmMemory<SwarmType, T> {
 
 }
 
-declare interface IOtherMemory<T extends any> extends IEmptyMemory<SwarmDataType.Other> {
+
+declare interface ICreepMemory extends ISwarmMemory<SwarmType.SwarmCreep, SwarmDataType.Creep> {
 
 }
-declare interface ICreepMemory extends IEmptyMemory<SwarmDataType.Creep> {
+declare interface IFlagMemory extends ISwarmMemory<SwarmType.SwarmFlag, SwarmDataType.Flag> {
 
 }
-declare interface IRoomObjectMemory extends IEmptyMemory<SwarmDataType.RoomObject> {
+declare interface IRoomMemory extends ISwarmMemory<SwarmType.SwarmRoom, SwarmDataType.Room> {
 
 }
-declare interface IStructureMemory extends IEmptyMemory<SwarmDataType.Structure> {
+declare interface IRoomObjectMemory<T extends SwarmRoomObjectType> extends ISwarmMemory<T, SwarmDataType.RoomObject> {
 
 }
-declare interface IFlagMemory extends IEmptyMemory<SwarmDataType.Flag> {
+
+declare interface IStructureMemory extends ISwarmMemory<SwarmStructureType, SwarmDataType.Structure> {
 
 }
-declare interface IRoomMemory extends IEmptyMemory<SwarmDataType.Room> {
 
+declare type BasicMemoryTypes = ICreepMemory | IFlagMemory | IRoomMemory | IRoomObjectMemory<SwarmRoomObjectType> | IStructureMemory
+
+declare interface IMasterSwarmMemory<T extends SwarmType>
+    extends ISwarmMemory<T, SwarmDataType.Master> {
+    CreateNewChildMemory(id: string): void;
+    CheckoutChildMemory<U extends SwarmDataType>(id: string): ISwarmMemory<T, U>;
+    SaveChildMemory<U extends SwarmDataType>(childMemory: IEmptyMemory<U>): void;
+    SaveToParent<U extends SwarmType>(parentMemory: IMasterSwarmMemory<U> | ISwarmMemoryStructure): void;
 }
-declare type TBasicSwarmMemoryTypes = ICreepMemory | IOtherMemory<any> |
-    IRoomObjectMemory | IStructureMemory | IFlagMemory | IRoomMemory;
+declare interface IMasterFlagMemory extends IMasterSwarmMemory<SwarmType.SwarmFlag> { }
+declare interface IMasterCreepMemory extends IMasterSwarmMemory<SwarmType.SwarmCreep> { }
+declare interface IMasterRoomMemory extends IMasterSwarmMemory<SwarmType.SwarmRoom> { }
+declare interface IMasterRoomObjectMemory extends IMasterSwarmMemory<SwarmRoomObjectType> { }
+declare interface IMasterStructureMemory extends IMasterSwarmMemory<SwarmStructureType> { }
 
-declare interface IMasterSwarmMemory<T extends SwarmDataType>
-    extends ISwarmMemory<SwarmDataType.Other, IOtherData<T>> {
+declare type TPrimeMemoryTypes = IMasterFlagMemory | IMasterCreepMemory | IMasterRoomMemory | IMasterStructureMemory
+declare type TMasterMemoryTypes = IMasterRoomObjectMemory | TPrimeMemoryTypes;
 
-}
-declare interface IMasterFlagMemory extends IMasterSwarmMemory<SwarmDataType.Flag> { }
-declare interface IMasterCreepMemory extends IMasterSwarmMemory<SwarmDataType.Creep> { }
-declare interface IMasterRoomMemory extends IMasterSwarmMemory<SwarmDataType.Room> { }
-declare interface IMasterRoomObjectMemory extends IMasterSwarmMemory<SwarmDataType.RoomObject> { }
-declare interface IMasterStructureMemory extends IMasterSwarmMemory<SwarmDataType.Structure> { }
+declare type TAllSwarmMemoryTypes = BasicMemoryTypes | TMasterMemoryTypes;
 
-declare type TMasterMemoryTypes = IMasterFlagMemory | IMasterCreepMemory | IMasterRoomMemory |
-    IMasterRoomObjectMemory | IMasterStructureMemory
-declare type TAllSwarmMemoryTypes = TBasicSwarmMemoryTypes | TMasterMemoryTypes;
-
-declare type TStorageMemoryStructure = {
+declare interface ISwarmMemoryStructure {
     creeps: IMasterCreepData;
     rooms: IMasterRoomData;
     flags: IMasterFlagData;
@@ -118,13 +118,13 @@ declare type TStorageMemoryStructure = {
     INIT: boolean;
 }
 
+declare type PrimeDataTypes = SwarmControllerDataTypes.Creeps | SwarmControllerDataTypes.Flags |
+    SwarmControllerDataTypes.Rooms | SwarmControllerDataTypes.Structures;
+
 declare interface ISwarmlord {
     ValidateMemory(): void;
-    //CheckoutMemory<T extends SwarmDataType, U extends TAllSwarmDataTypes, X extends ISwarmMemory<T, U>>(id: string, memoryType: T, parentObj?: TAllSwarmMemoryTypes): X;
-    ReserveMem<T extends SwarmDataType>(id: string, memoryType: T, parentObj?: TAllSwarmMemoryTypes): TAllSwarmMemoryTypes
-    SaveMemory<T extends TMasterMemoryTypes>(memObject: T, save?: boolean): void;
-    StorageMemoryTypeToString(DataType: SwarmDataType): string;
-    CreateNewSwarmMemory<T extends SwarmDataType>(id: string, DataType: T, parentObj?: TAllSwarmMemoryTypes): void;
+    SaveMemory<T extends TPrimeMemoryTypes>(memObject: T, save?: boolean): void;
+    CheckoutMasterMemory<T extends TPrimeMemoryTypes>(primeType: PrimeDataTypes): T; // Consequence of any i think.
 } declare var Swarmlord: ISwarmlord;
 
 

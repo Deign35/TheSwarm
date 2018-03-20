@@ -1,7 +1,7 @@
 import { OwnedSwarmStructure } from "./SwarmStructure";
 import { SwarmCreep } from "SwarmTypes/SwarmCreep";
 
-export class SwarmLab extends OwnedSwarmStructure<SwarmType.SwarmLab, StructureLab, STRUCTURE_LAB> implements ISwarmLab, StructureLab {
+export class SwarmLab extends OwnedSwarmStructure<SwarmType.SwarmLab, STRUCTURE_LAB, StructureLab> implements ISwarmLab, StructureLab {
     get SwarmType(): SwarmType.SwarmLab { return SwarmType.SwarmLab; }
     get cooldown() { return this._instance.cooldown; }
     get energy() { return this._instance.energy; }
@@ -11,10 +11,10 @@ export class SwarmLab extends OwnedSwarmStructure<SwarmType.SwarmLab, StructureL
     get mineralType() { return this._instance.mineralType; }
 
     boostCreep(creep: SwarmCreep, bodyPartsCount?: number) {
-        return this._instance.boostCreep(creep.value, bodyPartsCount);
+        return this._instance.boostCreep(creep, bodyPartsCount);
     }
     runReaction(lab1: SwarmLab, lab2: SwarmLab) {
-        return this._instance.runReaction(lab1.value, lab2.value);
+        return this._instance.runReaction(lab1.Value, lab2.Value);
     }
     protected OnActivate() {
         console.log("Successfully activated a Lab");

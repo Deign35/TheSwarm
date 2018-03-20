@@ -36,6 +36,13 @@
             "Cache": 1,
             "Segment": 2
         },
+        "SwarmControllerDataTypes": {
+            "Creeps": "\"creeps\"",
+            "Flags": "\"flags\"",
+            "Rooms": "\"rooms\"",
+            "Structures": "\"structures\"",
+            "RoomObjects": "\"roomObjects\""
+        },
         "SwarmDataType": {
             "None": 0,
             "Structure": 1,
@@ -43,7 +50,8 @@
             "Flag": 3,
             "Creep": 4,
             "RoomObject": 5,
-            "Other": 6
+            "Other": 6,
+            "Master": 7
         },
         "QueenType": {
             "Larva": 0,
@@ -70,7 +78,7 @@
             "SwarmResource": 5,
             "SwarmRoom": 6,
             "SwarmSource": 7,
-            "SwarmTombStone": 8,
+            "SwarmTombstone": 8,
             "SwarmContainer": 9,
             "SwarmController": 10,
             "SwarmExtension": 11,

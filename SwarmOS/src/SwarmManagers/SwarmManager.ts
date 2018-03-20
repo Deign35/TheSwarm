@@ -1,18 +1,18 @@
 import { profile } from "Tools/Profiler";
 import { MemoryNotFoundException } from "Tools/SwarmExceptions";
-import { BasicMemory } from "Memory/StorageMemory";
 import { SwarmCreator } from "SwarmTypes/SwarmCreator";
+import { MasterSwarmMemory } from "Memory/StorageMemory";
 
 const SWARMOBJECT_IDs = 'IDs';
 @profile
-export abstract class SwarmManager<T extends SwarmType, U extends Room | RoomObject, V extends SwarmDataType>
-    implements IMasterSwarmController<T, U, V> {
+export abstract class SwarmManager<T extends SwarmControllerDataTypes, U extends SwarmType>
+    implements ISwarmObjectController<T, U> {
+    get DataType(): T { return this._dataType; }
     constructor() { this.LoadSwarmObjects(); }
-    get StorageType() { return this.getStorageType(); }
 
-    protected get SwarmObjects() { return this.swarmObjects; }
-    private swarmObjects!: { [itemID: string]: ISwarmObj<T, U, V> };
-    private _primaryMemory!: TMasterMemoryTypes;
+    protected get SwarmMemory() { return this.swarmObjects; }
+    protected swarmObjects!: { [itemID: string]: ISwarmType<U, any, any> };
+    protected _primaryMemory!: MasterSwarmMemory<U>;
 
     PrepareTheSwarm(): void {
         for (const swarmName in this.swarmObjects) {
@@ -22,24 +22,41 @@ export abstract class SwarmManager<T extends SwarmType, U extends Room | RoomObj
     ActivateSwarm(): void {
         for (let swarmName in this.swarmObjects) {
             this.OnActivateSwarm(this.swarmObjects[swarmName]);
-            this.swarmObjects[swarmName];
         }
     }
     FinalizeSwarmActivity(): void {
         for (let swarmName in this.swarmObjects) {
             let obj = this.swarmObjects[swarmName];
             this.OnFinalizeSwarm(obj);
+            //obj.GetMemoryObject();
+
             this._primaryMemory.SaveChildMemory(obj.GetMemoryObject());
         }
-        Swarmlord.SaveMemory(this._primaryMemory);
+        //Swarmlord.SaveMemory(this._primaryMemory);
     }
-    GetSwarmObject(id: string) {
+    GetSwarmObject<V extends SwarmDataType, X extends Room | RoomObject>(id: string): ISwarmType<U, V, X> {
         return this.swarmObjects[id];
     }
 
-    private LoadSwarmObjects() {
+
+
+    protected CreateSwarmObject(obj: any) {
+        return SwarmCreator.CreateSwarmObject(obj);
+    }
+    protected abstract FindAllGameObjects(): IDictionary<Room | RoomObject>
+    protected abstract OnPrepareSwarm(swarmObj: ISwarmType<U, any, any>): void;
+    protected abstract OnActivateSwarm(swarmObj: ISwarmType<U, any, any>): void;
+    protected abstract OnFinalizeSwarm(swarmObj: ISwarmType<U, any, any>): void;
+    protected abstract LoadSwarmObjects(): any;
+
+    protected abstract get _dataType(): T;
+}
+
+export abstract class PrimeManager<T extends PrimeDataTypes, U extends SwarmType> extends SwarmManager<T, U> {
+    protected LoadSwarmObjects() {
         let allObjects = this.FindAllGameObjects();
-        this._primaryMemory = Swarmlord.ReserveMem(Swarmlord.StorageMemoryTypeToString(this.StorageType), this.StorageType) as TMasterMemoryTypes;
+        Swarmlord.CheckoutMasterMemory(this.DataType);
+        this._primaryMemory = Swarmlord.CheckoutMasterMemory(this._dataType);
 
         let allSwarmEntries = this._primaryMemory.GetIDs();
         let swarmObjects = {};
@@ -51,30 +68,19 @@ export abstract class SwarmManager<T extends SwarmType, U extends Room | RoomObj
             }
             delete allObjects[allSwarmEntries[i]];
             let swarmObj = this.CreateSwarmObject(obj);
-            swarmObj.AssignMemory(Swarmlord.ReserveMem(swarmObj.saveID, this.StorageType, this._primaryMemory));
+            swarmObj.AssignMemory(this._primaryMemory.CheckoutChildMemory(swarmObj.saveID));
             swarmObjects[allSwarmEntries[i]] = swarmObj;
         }
 
         // Anything left in this object is new and needs to be added
         for (let objID in allObjects) {
             let swarmObj = this.CreateSwarmObject(allObjects[objID]);
-            Swarmlord.CreateNewSwarmMemory(objID, SwarmDataType.RoomObject, this._primaryMemory);
-            swarmObj.AssignMemory(Swarmlord.ReserveMem(objID, this.StorageType, this._primaryMemory));
+            this._primaryMemory.CreateNewChildMemory(objID);
+            swarmObj.AssignMemory(this._primaryMemory.CheckoutChildMemory(objID));
             swarmObj.InitNewObject();
             swarmObjects[objID] = swarmObj;
         }
 
         this.swarmObjects = swarmObjects;
     }
-
-    protected CreateSwarmObject(obj: any) {
-        return SwarmCreator.CreateSwarmObject(obj);
-    }
-    protected abstract getManagerSavePath(): string[];
-    //protected abstract getSwarmType(obj: U): T;
-    protected abstract getStorageType(): V;
-    protected abstract FindAllGameObjects(): IDictionary<U>
-    protected abstract OnPrepareSwarm(swarmObj: ISwarmObj<T, U, V>): void;
-    protected abstract OnActivateSwarm(swarmObj: ISwarmObj<T, U, V>): void;
-    protected abstract OnFinalizeSwarm(swarmObj: ISwarmObj<T, U, V>): void;
 }

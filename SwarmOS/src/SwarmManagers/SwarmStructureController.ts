@@ -1,12 +1,17 @@
-import { SwarmManager } from "./SwarmManager";
+import { PrimeManager } from "./SwarmManager";
 import { InvalidArgumentException } from "Tools/SwarmExceptions";
 import { profile } from "Tools/Profiler";
 import { StructureMemory } from "Memory/StorageMemory";
 import { SwarmCreator } from "SwarmTypes/SwarmCreator";
 
 const STRUCTURE_SAVE_PATH = ["structures"];
+// PrimeManager<T extends PrimeDataTypes, U extends SwarmType> 
 @profile
-export class SwarmStructureController extends SwarmManager<SwarmStructureType, Structure, SwarmDataType.Structure> implements ISwarmStructureController {
+export class SwarmStructureController extends PrimeManager<SwarmControllerDataTypes.Structures, SwarmStructureType>
+    implements ISwarmStructureController {
+    protected get _dataType(): SwarmControllerDataTypes.Structures {
+        return SwarmControllerDataTypes.Structures;
+    }
     protected getManagerSavePath(): string[] {
         return STRUCTURE_SAVE_PATH;
     }
