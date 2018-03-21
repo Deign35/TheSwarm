@@ -2,9 +2,9 @@ import { profile } from "Tools/Profiler";
 import { SwarmException, MemoryLockException, AlreadyExistsException } from "Tools/SwarmExceptions";
 
 declare interface MemoryInitializationObj {
-    GetMemType(): number;
+    memType: number;
 }
-export abstract class MemoryBase<T extends number, U extends IData<T>> implements IMemory<U> {
+export abstract class MemoryBase<T extends number, U extends IData> implements IMemory<U> {
     constructor(id: string, data: U)
     constructor(id: string, data: false, initObj: MemoryInitializationObj)
     constructor(id: string, data?: U | false, initObj?: MemoryInitializationObj) {
@@ -23,7 +23,7 @@ export abstract class MemoryBase<T extends number, U extends IData<T>> implement
     protected InitMemory(id: string, initObj: MemoryInitializationObj): U {
         return {
             id: id,
-            MEM_TYPE: initObj.GetMemType()
+            MEM_TYPE: initObj.memType
         } as U
     }
     private _id!: string;
@@ -62,81 +62,41 @@ export abstract class MemoryBase<T extends number, U extends IData<T>> implement
 }
 
 
+declare type SwarmMemoryInitObject<T extends SwarmType> = MemoryInitializationObj & {
+    swarmType: T
+}
 @profile
-export abstract class SwarmMemory<T extends SwarmDataType, U extends ISwarmData<T, V>,
-    V extends SwarmType, X extends ISwarmObject<V, Room | RoomObject>> extends MemoryBase<T, U> {
-    protected abstract GetDataType(): T;
-    protected abstract GetSwarmType(initObj: X): V;
-    protected InitMemory(id: string, initObj: X) {
-        let dataType = this.GetDataType();
-        return {
-            id: id,
-            MEM_TYPE: dataType,
-            SWARM_TYPE: swarmType
-        } as U;
+export abstract class SwarmMemory<T extends SwarmDataType, U extends SwarmType, V extends ISwarmData<T, U>> extends MemoryBase<T, V> {
+    protected InitMemory(id: string, initObj: SwarmMemoryInitObject<U>): V {
+        let memObj = super.InitMemory(id, initObj)
+        memObj.SWARM_TYPE = initObj.swarmType;
+        return memObj;
     }
 }
 
 @profile
-export class OtherMemory<T extends SwarmType> extends SwarmMemory<SwarmDataType.Other, any, T> {
-    protected InitMemory(id: string) {
-        return {
-            id: id,
-            SWARM_TYPE: swarmType,
-            MEM_TYPE: SwarmDataType.Other
-        };
-    }
+export class OtherMemory<T extends SwarmType, U extends ISwarmData<SwarmDataType.Other, T>>
+    extends SwarmMemory<SwarmDataType.Other, T, U> { }
+
+@profile
+export class FlagMemory extends MemoryBase<SwarmType.SwarmFlag, TFlagData> implements IFlagMemory { }
+
+@profile
+export class StructureMemory<T extends SwarmStructureType> extends
+    MemoryBase<T, TStructureData> implements IStructureMemory {
 }
 
 @profile
-export class FlagMemory extends MemoryBase<SwarmDataType.Flag> implements IFlagMemory {
-    get MemoryType(): SwarmDataType.Flag { return SwarmDataType.Flag; }
-    protected CreateEmptyData(): IFlagData {
-        return {
-            MEM_TYPE: SwarmDataType.Flag
-        };
-    }
+export class CreepMemory extends MemoryBase<SwarmType.SwarmCreep, TCreepData> implements ICreepMemory { }
+
+declare type RoomMemoryInitObj = SwarmMemoryInitObject<SwarmType.SwarmRoom> & {
+
 }
+@profile
+export class RoomMemory extends MemoryBase<SwarmType.SwarmRoom, TRoomData> implements IRoomMemory { }
 
 @profile
-export class StructureMemory<T extends SwarmStructureType> extends StorageMemory<T, SwarmDataType.Structure> implements IStructureMemory {
-    protected CreateEmptyData(): IStructureData {
-        return {
-            MEM_TYPE: SwarmDataType.Structure
-        };
-    }
-}
-
-@profile
-export class CreepMemory extends StorageMemory<SwarmType.SwarmCreep, SwarmDataType.Creep> implements ICreepMemory {
-    protected CreateEmptyData(): ICreepData {
-        return {
-            MEM_TYPE: SwarmDataType.Creep
-        };
-    }
-}
-
-@profile
-export class RoomMemory extends StorageMemory<SwarmType.SwarmRoom, SwarmDataType.Room> implements IRoomMemory {
-    protected CreateEmptyData(): IRoomData {
-        return {
-            MEM_TYPE: SwarmDataType.Room,
-            queenType: 0,
-            OBJs: {
-                MEM_TYPE: SwarmDataType.Master
-            }
-        }
-    }
-}
-
-@profile
-export class RoomObjectMemory extends StorageMemory<SwarmRoomObjectType, SwarmDataType.RoomObject> implements RoomObjectMemory {
-    protected CreateEmptyData(): IRoomObjectData {
-        return {
-            MEM_TYPE: SwarmDataType.RoomObject
-        };
-    }
-}
+export class RoomObjectMemory extends MemoryBase<SwarmRoomObjectType, TRoomObjectData> implements RoomObjectMemory { }
 
 export class MasterSwarmMemory<T extends SwarmType, U extends SwarmDataType> extends
     StorageMemory<T, SwarmDataType.Master> implements IMasterSwarmMemory<T, U> {
