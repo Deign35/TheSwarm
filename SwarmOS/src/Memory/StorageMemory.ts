@@ -15,7 +15,7 @@ function ConvertDataToMemory<T extends SwarmDataType>(id: string, data: any): IE
 
     return new BasicMemory(id, memCopy);
 }
-
+*
 function CreateNewMemory(id: string, memoryType: SwarmDataType) {
     switch (memoryType) {
         case (SwarmDataType.Creep): return new CreepMemory(id);
@@ -27,21 +27,22 @@ function CreateNewMemory(id: string, memoryType: SwarmDataType) {
     }
     return new BasicMemory(id);
 }*/
-export abstract class MemoryBase<T extends SwarmDataType> implements IMemory<IData> {
-    constructor(id: string, data?: IData<U>) {
+export abstract class MemoryBase<T extends SwarmDataType, U extends IData<T>> implements IMemory<U> {
+    constructor(id: string, data?: U) {
         this._id = id;
         if (data) {
             // convert data to memory here.
             this._cache = data;
         } else {
-            this._cache = this.CreateEmptyData();
+            //this._cache = this.CreateEmptyData(id, this.MemoryType);
         }
     }
     get id() { return this._cache.id; };
     get IsCheckedOut() { return this._checkedOut };
     get MemoryType() { return this._cache.MEM_TYPE }
+    protected abstract CreateEmptyData(id: string, dataType: T): U
     private _id!: string;
-    protected _cache!: IData<T>
+    protected _cache!: U
     private _checkedOut!: boolean;
 
     GetDataIDs() { return Object.keys(this._cache); }
@@ -65,7 +66,7 @@ export abstract class MemoryBase<T extends SwarmDataType> implements IMemory<IDa
         this._checkedOut = true;
     }
 
-    ReleaseMemory(): IData<T> {
+    ReleaseMemory(): U {
         if (!this._checkedOut) {
             throw new MemoryLockException(this._checkedOut, "Memory not checked out");
         }
@@ -75,63 +76,30 @@ export abstract class MemoryBase<T extends SwarmDataType> implements IMemory<IDa
     }
 }
 @profile
-export abstract class StorageMemory<T extends SwarmDataType, U extends SwarmType> extends MemoryBase<T> {
-
-    get id() { return this._id };
-    get IsCheckedOut() { return this._checkedOut };
-    get MemoryType(): U { return this._cache[MEM_TYPE] as U }
-
-    private _id: string;
-    protected _cache: IData<U, any>
-    private _checkedOut: boolean;
-
-    protected abstract CreateEmptyData(): IData<U, T>;
-
-    GetIDs() { return Object.getOwnPropertyNames(this._cache); }
-    HasData(id: string): boolean {
-        return !!(this._cache[id]);
-    }
-    GetData<Z>(id: string): Z {
-        return this._cache[id];
-    }
-    SetData<Z>(id: string, data: Z): void {
-        this._cache[id] = data;
-    }
-    RemoveData(id: string): void {
-        delete this._cache[id];
-    }
-    /**
-     * @throws MemoryLockException
-     */
-    ReserveMemory() {
-        if (this._checkedOut) {
-            throw new MemoryLockException(this._checkedOut, "Memory already checked out");
-        }
-
-        this._checkedOut = true;
-    }
-
-    ReleaseMemory(): IData<U, any> {
-        if (!this._checkedOut) {
-            throw new MemoryLockException(this._checkedOut, "Memory not checked out");
-        }
-
-        this._checkedOut = false;
-
+export abstract class SwarmMemory<T extends SwarmDataType, U extends ISwarmData<T, V>, V extends SwarmType> extends MemoryBase<T, U> {
+    get MemoryType(): T { return this._cache.MEM_TYPE }
+    abstract GetSwarmType(obj: any): V;
+    protected CreateEmptyData(id: string, dataType: T) {
+        return {
+            id: id,
+            MEM_TYPE: dataType
+        };
     }
 }
 
 @profile
-export class OtherMemory<T extends SwarmType> extends StorageMemory<T, any> {
-    protected CreateEmptyData(): IOtherData<T> {
+export class OtherMemory<T extends SwarmType> extends MemoryBase<SwarmDataType.Other> {
+    protected CreateEmptyData(id: string, swarmType: T): ISwarmData<SwarmDataType.Other, T> {
         return {
+            id: id,
+            SWARM_TYPE: swarmType,
             MEM_TYPE: SwarmDataType.Other
         };
     }
 }
 
 @profile
-export class FlagMemory extends StorageMemory<SwarmType.SwarmFlag, SwarmDataType.Flag> implements IFlagMemory {
+export class FlagMemory extends MemoryBase<SwarmDataType.Flag> implements IFlagMemory {
     get MemoryType(): SwarmDataType.Flag { return SwarmDataType.Flag; }
     protected CreateEmptyData(): IFlagData {
         return {

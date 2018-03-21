@@ -1,8 +1,8 @@
-declare interface IData extends Dictionary {
+declare interface IData<T extends SwarmDataType> extends Dictionary {
     id: string;
-    MEM_TYPE: number;
-}
-declare interface ISwarmData<T extends SwarmDataType, U extends SwarmType> extends IData {
+    MEM_TYPE: T;
+} declare type TData = IData<SwarmDataType>;
+declare interface ISwarmData<T extends SwarmDataType, U extends SwarmType> extends IData<T> {
     MEM_TYPE: T;
     SWARM_TYPE: U;
 } declare type TSwarmData = ISwarmData<SwarmDataType, SwarmType>;
@@ -45,11 +45,11 @@ declare interface IMineralData extends IRoomObjectData<RoomObjectDataType.Minera
 
 declare type TBasicSwarmData = TRoomObjectData | TStructureData | TRoomData | TCreepData | TFlagData | IOtherData;
 
-declare interface IMasterData<T extends IData> extends IData {
+declare interface IMasterData<T extends TSwarmData> extends IData<SwarmDataType.Master> {
     ChildData: { [id: string]: T }
     MEM_TYPE: SwarmDataType.Master;
 }
-declare type TMasterData = IMasterData<IData>;
+declare type TMasterData = IMasterData<TSwarmData>;
 declare interface IMasterSwarmData<T extends TBasicSwarmData> extends IMasterData<T> {
 
     // Data common to all MasterSwarmDatas (including IRoomObjectData)
@@ -61,7 +61,7 @@ declare interface IMasterRoomData extends IMasterSwarmData<TRoomData> { }
 declare interface IMasterCreepData extends IMasterSwarmData<TCreepData> { }
 declare interface IMasterOtherData extends IMasterSwarmData<IOtherData> { }
 
-declare interface IMemory<T extends IData> {
+declare interface IMemory<T extends TData> {
     // Doesn't ENFORCE that the MemoryType and GetSwarmData[MEM_TYPE] as the same, but can be manually kept up.
     id: string;
     HasData(id: string): boolean;
@@ -73,7 +73,7 @@ declare interface IMemory<T extends IData> {
     IsCheckedOut: boolean;
     ReserveMemory(): void;
     ReleaseMemory(): T;
-} declare type TMemory = IMemory<IData>;
+} declare type TMemory = IMemory<TData>;
 
 declare interface ISwarmMemory<T extends TBasicSwarmData> extends IMemory<T> {
 } declare type TSwarmMemory = ISwarmMemory<TBasicSwarmData>;
