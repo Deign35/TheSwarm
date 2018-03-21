@@ -1,7 +1,9 @@
-declare interface IEmptyData<T extends SwarmDataType, U> extends IDictionary<T | U> {
+declare interface IData extends Dictionary {
+    id: string;
+    MEM_TYPE: number;
+}
+declare interface ISwarmData<T extends SwarmDataType, U extends SwarmType> extends IData {
     MEM_TYPE: T;
-} declare type TData = IEmptyData<SwarmDataType, any>;
-declare interface ISwarmData<T extends SwarmDataType, U extends SwarmType> extends IEmptyData<T, any> {
     SWARM_TYPE: U;
 } declare type TSwarmData = ISwarmData<SwarmDataType, SwarmType>;
 declare interface IOtherData extends ISwarmData<SwarmDataType.Other, SwarmType.Any> { }
@@ -41,19 +43,25 @@ declare interface IMineralData extends IRoomObjectData<RoomObjectDataType.Minera
     pileID?: string;
 }
 
-declare interface IMasterData<T extends TData> extends IEmptyData<SwarmDataType.Master, T> { }
-declare type TMasterData = IMasterData<TData>;
-declare interface IMasterSwarmData<T extends TSwarmData> extends IMasterData<T> {
+declare type TBasicSwarmData = TRoomObjectData | TStructureData | TRoomData | TCreepData | TFlagData | IOtherData;
+
+declare interface IMasterData<T extends IData> extends IData {
+    ChildData: { [id: string]: T }
+    MEM_TYPE: SwarmDataType.Master;
+}
+declare type TMasterData = IMasterData<IData>;
+declare interface IMasterSwarmData<T extends TBasicSwarmData> extends IMasterData<T> {
 
     // Data common to all MasterSwarmDatas (including IRoomObjectData)
-} declare type TMasterSwarmData = IMasterSwarmData<TSwarmData>;
+} declare type TMasterSwarmData = IMasterSwarmData<TBasicSwarmData>;
 declare interface IMasterRoomObjectData extends IMasterSwarmData<TRoomObjectData> { }
 declare interface IMasterFlagData extends IMasterSwarmData<TFlagData> { }
 declare interface IMasterStructureData extends IMasterSwarmData<TStructureData> { }
 declare interface IMasterRoomData extends IMasterSwarmData<TRoomData> { }
 declare interface IMasterCreepData extends IMasterSwarmData<TCreepData> { }
 declare interface IMasterOtherData extends IMasterSwarmData<IOtherData> { }
-declare interface IMemory<T extends TData> {
+
+declare interface IMemory<T extends IData> {
     // Doesn't ENFORCE that the MemoryType and GetSwarmData[MEM_TYPE] as the same, but can be manually kept up.
     id: string;
     HasData(id: string): boolean;
@@ -65,10 +73,10 @@ declare interface IMemory<T extends TData> {
     IsCheckedOut: boolean;
     ReserveMemory(): void;
     ReleaseMemory(): T;
-} declare type TMemory = IMemory<TData>;
+} declare type TMemory = IMemory<IData>;
 
-declare interface ISwarmMemory<T extends TSwarmData> extends IMemory<T> {
-} declare type TSwarmMemory = ISwarmMemory<TSwarmData>;
+declare interface ISwarmMemory<T extends TBasicSwarmData> extends IMemory<T> {
+} declare type TSwarmMemory = ISwarmMemory<TBasicSwarmData>;
 declare interface ICreepMemory extends ISwarmMemory<TCreepData> {
 
 }
@@ -119,5 +127,5 @@ declare type PrimeDataTypes = SwarmControllerDataTypes.Creeps | SwarmControllerD
 declare interface ISwarmlord {
     ValidateMemory(): void;
     SaveMasterMemory<T extends TMasterSwarmMemory>(memObject: T, save?: boolean): void;
-    CheckoutMasterMemory<T extends TMasterSwarmMemory, U extends TSwarmData>(dataType: U): T;
+    CheckoutMasterMemory<T extends TMasterSwarmMemory, U extends TBasicSwarmData>(dataType: U): T;
 } declare var Swarmlord: ISwarmlord;

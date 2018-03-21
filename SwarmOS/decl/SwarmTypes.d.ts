@@ -5,7 +5,7 @@ declare interface ISpawnRequirement {
     growthTemplate: BodyPartConstant[];
     neededIn: number;
 }
-declare interface IObject<T extends TData, U> extends _Constructor<U> {
+declare interface IObject<T extends TBasicSwarmData, U> extends _Constructor<U> {
     //ObjType: T;
     saveID: string;
     IsActive: boolean;
@@ -15,7 +15,7 @@ declare interface IObject<T extends TData, U> extends _Constructor<U> {
     GetCopyOfMemory(): IMemory<T>
     GetCopyOfObject(): U
 } declare type TObject = IObject<any, any>;
-declare interface ISwarmObject<T extends SwarmType, U extends Room | RoomObject> extends IObject<TSwarmData, U> {
+declare interface ISwarmObject<T extends SwarmType, U extends Room | RoomObject> extends IObject<TBasicSwarmData, U> {
     SwarmType: T;
 
     GetSpawnRequirements(): ISpawnRequirement;

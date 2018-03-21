@@ -27,9 +27,8 @@ function CreateNewMemory(id: string, memoryType: SwarmDataType) {
     }
     return new BasicMemory(id);
 }*/
-@profile
-export abstract class StorageMemory<T extends SwarmType, U extends SwarmDataType> implements ISwarmMemory<T, U> {
-    constructor(id: string, data?: IEmptyData<U>) {
+export abstract class MemoryBase<T extends SwarmDataType> implements IMemory<IData> {
+    constructor(id: string, data?: IData<U>) {
         this._id = id;
         if (data) {
             // convert data to memory here.
@@ -37,17 +36,56 @@ export abstract class StorageMemory<T extends SwarmType, U extends SwarmDataType
         } else {
             this._cache = this.CreateEmptyData();
         }
-        this._checkedOut = false;
     }
+    get id() { return this._cache.id; };
+    get IsCheckedOut() { return this._checkedOut };
+    get MemoryType() { return this._cache.MEM_TYPE }
+    private _id!: string;
+    protected _cache!: IData<T>
+    private _checkedOut!: boolean;
+
+    GetDataIDs() { return Object.keys(this._cache); }
+    HasData(id: string): boolean {
+        return !!(this._cache[id]);
+    }
+    GetData<Z>(id: string): Z {
+        return this._cache[id];
+    }
+    SetData<Z>(id: string, data: Z): void {
+        this._cache[id] = data;
+    }
+    RemoveData(id: string): void {
+        delete this._cache[id];
+    }
+    ReserveMemory() {
+        if (this._checkedOut) {
+            throw new MemoryLockException(this._checkedOut, "Memory already checked out");
+        }
+
+        this._checkedOut = true;
+    }
+
+    ReleaseMemory(): IData<T> {
+        if (!this._checkedOut) {
+            throw new MemoryLockException(this._checkedOut, "Memory not checked out");
+        }
+
+        this._checkedOut = false;
+        return CopyObject(this._cache);
+    }
+}
+@profile
+export abstract class StorageMemory<T extends SwarmDataType, U extends SwarmType> extends MemoryBase<T> {
+
     get id() { return this._id };
     get IsCheckedOut() { return this._checkedOut };
     get MemoryType(): U { return this._cache[MEM_TYPE] as U }
 
     private _id: string;
-    protected _cache: IEmptyData<U>
+    protected _cache: IData<U, any>
     private _checkedOut: boolean;
 
-    protected abstract CreateEmptyData(): IEmptyData<U>;
+    protected abstract CreateEmptyData(): IData<U, T>;
 
     GetIDs() { return Object.getOwnPropertyNames(this._cache); }
     HasData(id: string): boolean {
@@ -73,13 +111,13 @@ export abstract class StorageMemory<T extends SwarmType, U extends SwarmDataType
         this._checkedOut = true;
     }
 
-    ReleaseMemory() {
+    ReleaseMemory(): IData<U, any> {
         if (!this._checkedOut) {
             throw new MemoryLockException(this._checkedOut, "Memory not checked out");
         }
 
         this._checkedOut = false;
-        return CopyObject(this._cache);
+
     }
 }
 
@@ -154,7 +192,7 @@ export class MasterSwarmMemory<T extends SwarmType, U extends SwarmDataType> ext
         throw new Error("Method not implemented.");
     }
 
-    protected CreateEmptyData(): IEmptyData<SwarmDataType.Master> {
+    protected CreateEmptyData(): IData<SwarmDataType.Master> {
         return {
             MEM_TYPE: SwarmDataType.Master
         };
