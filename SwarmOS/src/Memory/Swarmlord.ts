@@ -1,5 +1,6 @@
 import { profile } from "Tools/Profiler";
-import { CreepMemory, FlagMemory, RoomMemory, StructureMemory, RoomObjectMemory, OtherMemory } from "Memory/StorageMemory";
+import { CreepMemory, FlagMemory, RoomMemory, StructureMemory, RoomObjectMemory, OtherMemory, MasterSwarmMemory } from "Memory/StorageMemory";
+import { InvalidArgumentException } from "Tools/SwarmExceptions";
 declare var Memory: ISwarmMemoryStructure;
 
 @profile
@@ -51,15 +52,24 @@ export class Swarmlord implements ISwarmlord {
             global['Swarmlord'] = new Swarmlord();
         }
     }
-    SaveMemory<T extends TPrimeMemoryTypes>(memObject: T, save?: boolean | undefined): void {
+    
+    SaveMemory<T extends MasterTypes>(memObject: T, save?: boolean): void {
         if (save) {
             memObject.SaveToParent(Memory);
         }
         memObject.ReleaseMemory();
     }
 
-    CheckoutMasterMemory<T extends TPrimeMemoryTypes>(primeType: PrimeDataTypes): T {
-        throw new Error("Method not implemented.");
+
+    CheckoutMasterMemory<T extends SwarmControllerDataTypes, U extends SwarmType>(dataType: T) {
+        switch (dataType) {
+            case (SwarmControllerDataTypes.Creeps): return new MasterSwarmMemory(dataType, CopyObject(Memory["creeps"]));
+            case (SwarmControllerDataTypes.Flags): return new MasterSwarmMemory(dataType, CopyObject(Memory["flags"]));
+            case (SwarmControllerDataTypes.Rooms): return new MasterSwarmMemory(dataType, CopyObject(Memory["rooms"]));
+            case (SwarmControllerDataTypes.Structures): return new MasterSwarmMemory(dataType, CopyObject(Memory["structures"]));
+        }
+
+        throw new InvalidArgumentException("Not a master type: " + dataType);
     }
     /*SaveMemory(memObject: TMasterMemoryTypes, save: boolean = true) {
         if (save) {

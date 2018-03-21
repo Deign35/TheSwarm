@@ -1,4 +1,4 @@
-abstract class SwarmTypeBase<T extends SwarmType, U extends SwarmDataType, V extends RoomObject | Room> implements ISwarmType<T, U, V> {
+abstract class SwarmTypeBase<T extends SwarmType, U extends SwarmDataType, V extends RoomObject | Room> implements ISwarmObject<T, U, V> {
     get prototype(): V {
         return this.prototype;
     }
@@ -28,7 +28,6 @@ abstract class SwarmTypeBase<T extends SwarmType, U extends SwarmDataType, V ext
     GetSpawnRequirements(): ISpawnRequirement {
         return SwarmTypeBase.NoSpawnRequirement;
     }
-
 
     static readonly NoSpawnRequirement: ISpawnRequirement = {
         priority: Priority.Lowest,

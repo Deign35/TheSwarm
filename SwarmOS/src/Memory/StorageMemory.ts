@@ -79,6 +79,7 @@ export abstract class StorageMemory<T extends SwarmType, U extends SwarmDataType
         }
 
         this._checkedOut = false;
+        return CopyObject(this._cache);
     }
 }
 
@@ -120,7 +121,7 @@ export class CreepMemory extends StorageMemory<SwarmType.SwarmCreep, SwarmDataTy
 }
 
 @profile
-export class RoomMemory extends StorageMemory<SwarmType.SwarmRoom, SwarmDataType.Room> {
+export class RoomMemory extends StorageMemory<SwarmType.SwarmRoom, SwarmDataType.Room> implements IRoomMemory {
     protected CreateEmptyData(): IRoomData {
         return {
             MEM_TYPE: SwarmDataType.Room,
@@ -133,7 +134,7 @@ export class RoomMemory extends StorageMemory<SwarmType.SwarmRoom, SwarmDataType
 }
 
 @profile
-export class RoomObjectMemory extends StorageMemory<SwarmRoomObjectType, SwarmDataType.RoomObject> {
+export class RoomObjectMemory extends StorageMemory<SwarmRoomObjectType, SwarmDataType.RoomObject> implements RoomObjectMemory {
     protected CreateEmptyData(): IRoomObjectData {
         return {
             MEM_TYPE: SwarmDataType.RoomObject
@@ -141,18 +142,15 @@ export class RoomObjectMemory extends StorageMemory<SwarmRoomObjectType, SwarmDa
     }
 }
 
-export class MasterSwarmMemory<T extends SwarmType> extends StorageMemory<T, SwarmDataType.Master> implements
-    IMasterSwarmMemory<T>    {
-    CreateNewChildMemory(id: string): void {
+export class MasterSwarmMemory<T extends SwarmType, U extends SwarmDataType> extends
+    StorageMemory<T, SwarmDataType.Master> implements IMasterSwarmMemory<T, U> {
+    CheckoutChildMemory<V extends SwarmType>(id: string, swarmType: V): ISwarmMemory<V, U> {
         throw new Error("Method not implemented.");
     }
-    CheckoutChildMemory<U extends SwarmDataType>(id: string): ISwarmMemory<T, U> {
-        throw new Error("Method not implemented.");
+    SaveChildMemory(childMemory: IEmptyMemory<U>): void {
+        this.SetData(childMemory.id, childMemory.ReleaseMemory());
     }
-    SaveChildMemory<U extends SwarmDataType>(childMemory: IEmptyMemory<U>): void {
-        throw new Error("Method not implemented.");
-    }
-    SaveToParent<U extends SwarmType>(parentMemory: ISwarmMemoryStructure | IMasterSwarmMemory<U>): void {
+    SaveToParent(parentMemory: IMasterSwarmMemory<T, SwarmDataType.Master> | ISwarmMemoryStructure): void {
         throw new Error("Method not implemented.");
     }
 

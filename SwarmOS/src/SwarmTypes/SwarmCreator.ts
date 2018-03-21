@@ -11,38 +11,39 @@ import { MakeSwarmLab } from "SwarmTypes/SwarmStructures/SwarmLab";
 import { MakeSwarmSpawn } from "SwarmTypes/SwarmStructures/SwarmSpawn";
 import { MakeSwarmTower } from "SwarmTypes/SwarmStructures/SwarmTower";
 
-var ObjTypeToSwarmType = {};
-ObjTypeToSwarmType[typeof ConstructionSite] = MakeSwarmSite;
-ObjTypeToSwarmType[typeof Creep] = MakeSwarmCreep;
-ObjTypeToSwarmType[typeof Flag] = MakeSwarmFlag;
-ObjTypeToSwarmType[typeof Mineral] = MakeSwarmMineral;
-ObjTypeToSwarmType[typeof Nuke] = MakeSwarmNuke;
-ObjTypeToSwarmType[typeof Resource] = MakeSwarmResource;
-ObjTypeToSwarmType[typeof Source] = MakeSwarmSource;
-ObjTypeToSwarmType[typeof StructureContainer] = MakeSwarmContainer;
-ObjTypeToSwarmType[typeof StructureExtension] = MakeSwarmExtension;
-ObjTypeToSwarmType[typeof StructureExtractor] = MakeSwarmExtractor;
-//ObjTypeToSwarmType[typeof StructureKeeperLair] =;
-ObjTypeToSwarmType[typeof StructureLab] = MakeSwarmLab;
-ObjTypeToSwarmType[typeof StructureLink] = MakeSwarmLink;
-ObjTypeToSwarmType[typeof StructureNuker] = MakeSwarmNuker;
-ObjTypeToSwarmType[typeof StructureObserver] = MakeSwarmObserver;
-//ObjTypeToSwarmType[typeof StructurePowerBank] = MakeSwarmPowerBank;
-//ObjTypeToSwarmType[typeof StructurePowerSpawn] = MakeSwarmPowerSpawn;
-//ObjTypeToSwarmType[typeof StructurePortal] = MakeSwarmPortal;
-ObjTypeToSwarmType[typeof StructureRampart] = MakeSwarmRampart;
-ObjTypeToSwarmType[typeof StructureRoad] = MakeSwarmRoad;
-ObjTypeToSwarmType[typeof StructureSpawn] = MakeSwarmSpawn;
-ObjTypeToSwarmType[typeof StructureStorage] = MakeSwarmStorage;
-ObjTypeToSwarmType[typeof StructureTerminal] = MakeSwarmTerminal;
-ObjTypeToSwarmType[typeof StructureTower] = MakeSwarmTower;
-ObjTypeToSwarmType[typeof StructureWall] = MakeSwarmWall;
+var ObjTypeToSwarmType: { [name: number]: (...args: any[]) => any } = {};
+ObjTypeToSwarmType[SwarmType.SwarmSite] = MakeSwarmSite;
+ObjTypeToSwarmType[SwarmType.SwarmCreep] = MakeSwarmCreep;
+ObjTypeToSwarmType[SwarmType.SwarmFlag] = MakeSwarmFlag;
+ObjTypeToSwarmType[SwarmType.SwarmMineral] = MakeSwarmMineral;
+ObjTypeToSwarmType[SwarmType.SwarmNuke] = MakeSwarmNuke;
+ObjTypeToSwarmType[SwarmType.SwarmResource] = MakeSwarmResource;
+ObjTypeToSwarmType[SwarmType.SwarmRoom] = MakeSwarmRoom;
+ObjTypeToSwarmType[SwarmType.SwarmSource] = MakeSwarmSource;
+ObjTypeToSwarmType[SwarmType.SwarmContainer] = MakeSwarmContainer;
+ObjTypeToSwarmType[SwarmType.SwarmExtension] = MakeSwarmExtension;
+ObjTypeToSwarmType[SwarmType.SwarmExtractor] = MakeSwarmExtractor;
+//ObjTypeToSwarmType[SwarmType.SwarmKeeperLair] =;
+ObjTypeToSwarmType[SwarmType.SwarmLab] = MakeSwarmLab;
+ObjTypeToSwarmType[SwarmType.SwarmLink] = MakeSwarmLink;
+ObjTypeToSwarmType[SwarmType.SwarmNuker] = MakeSwarmNuker;
+ObjTypeToSwarmType[SwarmType.SwarmObserver] = MakeSwarmObserver;
+//ObjTypeToSwarmType[SwarmType.SwarmPowerBank] = MakeSwarmPowerBank;
+//ObjTypeToSwarmType[SwarmType.SwarmPowerSpawn] = MakeSwarmPowerSpawn;
+//ObjTypeToSwarmType[SwarmType.SwarmPortal] = MakeSwarmPortal;
+ObjTypeToSwarmType[SwarmType.SwarmRampart] = MakeSwarmRampart;
+ObjTypeToSwarmType[SwarmType.SwarmRoad] = MakeSwarmRoad;
+ObjTypeToSwarmType[SwarmType.SwarmSpawn] = MakeSwarmSpawn;
+ObjTypeToSwarmType[SwarmType.SwarmStorage] = MakeSwarmStorage;
+ObjTypeToSwarmType[SwarmType.SwarmTerminal] = MakeSwarmTerminal;
+ObjTypeToSwarmType[SwarmType.SwarmTower] = MakeSwarmTower;
+ObjTypeToSwarmType[SwarmType.SwarmWall] = MakeSwarmWall;
 
 var SwarmTypeToSwarmObj = {}
 @profile
 export class SwarmCreator {
-    static CreateSwarmObject<T extends SwarmType>(obj: any): ISwarmObj<T, any, any> {
-        return ObjTypeToSwarmType[typeof obj](obj);
+    static CreateSwarmObject<T extends SwarmType, U extends Room | RoomObject>(obj: U, swarmType: T): ISwarmObject<T, any, U> {
+        return ObjTypeToSwarmType[swarmType](obj);
     }
     /*tatic CreateSwarmObject<T extends Source | Creep
         | Mineral | Resource | Room | Flag

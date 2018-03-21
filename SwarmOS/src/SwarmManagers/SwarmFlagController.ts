@@ -5,8 +5,11 @@ import { SwarmFlag } from "SwarmTypes/SwarmFlag";
 
 const FLAG_SAVE_PATH = ['flags'];
 @profile
-export class SwarmFlagController extends PrimeManager<SwarmControllerDataTypes.Flags, SwarmType.SwarmFlag>
+export class SwarmFlagController extends PrimeManager<SwarmControllerDataTypes.Flags, SwarmType.SwarmFlag, SwarmDataType.Flag, Flag>
     implements ISwarmFlagController {
+    protected GetTypeOf(obj: Flag): SwarmType.SwarmFlag {
+        return SwarmType.SwarmFlag;
+    }
     protected get _dataType(): SwarmControllerDataTypes.Flags {
         return SwarmControllerDataTypes.Flags;
     }

@@ -11,7 +11,7 @@ export class SayAction extends ActionBase {
         return C_NONE;
     }
     protected GetMovePosition(): RoomPosition {
-        throw new Error("Method not implemented.");
+        return this.AssignedCreep.pos;
     }
     ValidateAction(): SwarmlingResponse {
         return C_NONE;
