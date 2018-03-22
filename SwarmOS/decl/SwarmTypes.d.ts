@@ -93,11 +93,11 @@ declare interface ISwarmTower extends ISwarmStructureType<SwarmType.SwarmTower, 
 declare interface ISwarmWall extends ISwarmStructureType<SwarmType.SwarmWall, STRUCTURE_WALL> {
 
 }
-declare type ISwarmStructure = ISwarmContainer | ISwarmController | ISwarmExtension | ISwarmExtractor | ISwarmKeepersLair |
+declare type TSwarmStructure = ISwarmContainer | ISwarmController | ISwarmExtension | ISwarmExtractor | ISwarmKeepersLair |
     ISwarmLab | ISwarmLink | ISwarmNuker | ISwarmObserver | ISwarmPortal | ISwarmPowerBank | ISwarmPowerSpawn |
     ISwarmRampart | ISwarmRoad | ISwarmSpawn | ISwarmStorage | ISwarmTerminal | ISwarmTower | ISwarmWall;
 
-declare type IOwnableSwarmStructure = ISwarmController | ISwarmExtension | ISwarmExtractor | ISwarmKeepersLair |
+declare type TOwnableSwarmStructure = ISwarmController | ISwarmExtension | ISwarmExtractor | ISwarmKeepersLair |
     ISwarmLab | ISwarmLink | ISwarmNuker | ISwarmObserver | ISwarmPowerBank | ISwarmPowerSpawn |
     ISwarmRampart | ISwarmSpawn | ISwarmStorage | ISwarmTerminal | ISwarmTower
 
@@ -122,13 +122,9 @@ declare interface ISwarmSite extends ISwarmRoomObject<IRoomObjectMemory, Constru
 declare interface ISwarmTombstone extends ISwarmRoomObject<IRoomObjectMemory, Tombstone> {
 
 } declare type TSwarmRoomObject = ISwarmTombstone | ISwarmResource | ISwarmNuke | ISwarmSource | ISwarmMineral
-declare type AllSwarmTypes = ISwarmRoom | TSwarmRoomObject | ISwarmCreep | ISwarmFlag | ISwarmRoom | ISwarmStructure
+declare type AllSwarmTypes = ISwarmRoom | TSwarmRoomObject | ISwarmCreep | ISwarmFlag | ISwarmRoom | TSwarmStructure
 
-declare interface IMasterObject<T extends AllSwarmTypes> {
-    GetObject(id: string): T;
-}
-declare interface ISwarmObjectController<T extends SwarmControllerDataTypes, U extends SwarmObject>
-    extends IMasterObject<AllSwarmTypes> {
+declare interface ISwarmObjectController<T extends SwarmControllerDataTypes, U extends SwarmObject> {
     ControllerType: T,
     GetSwarmObject(id: string): U;
     GetSwarmTypeFromObject(obj: any): SwarmType; // These any need a fixin
@@ -143,7 +139,7 @@ declare interface ISwarmRoomController extends ISwarmObjectController<SwarmContr
 } declare var SwarmQueen: ISwarmRoomController;
 declare interface ISwarmCreepController extends ISwarmObjectController<SwarmControllerDataTypes.Creeps, ISwarmCreep> {
 } declare var SwarmCreepController: ISwarmCreepController;
-declare interface ISwarmStructureController extends ISwarmObjectController<SwarmControllerDataTypes.Structures, ISwarmStructure> {
+declare interface ISwarmStructureController extends ISwarmObjectController<SwarmControllerDataTypes.Structures, TSwarmStructure> {
 } declare var SwarmStructureController: ISwarmStructureController;
 declare interface ISwarmFlagController extends ISwarmObjectController<SwarmControllerDataTypes.Flags, ISwarmFlag> {
 } declare var SwarmFlagController: ISwarmFlagController;

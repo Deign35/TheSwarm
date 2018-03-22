@@ -97,7 +97,7 @@ declare type SwarmMemoryTypes = ICreepMemory | IFlagMemory | IRoomMemory |
 
 declare interface IMasterMemory<T extends TMasterData> extends IMemory<T> {
     CheckoutChildMemory(id: string): IMemory<T>;
-    SaveChildMemory(childMemory: T): void;
+    SaveChildMemory(childMemory: TMemory): void;
     SaveToParent(parentMemory: TMasterMemory | ISwarmMemoryStructure): void;
 } declare type TMasterMemory = IMasterMemory<TMasterData>;
 declare interface IMasterSwarmMemory<T extends TMasterSwarmData> extends IMasterMemory<T> {

@@ -5,8 +5,8 @@ import { MasterSwarmMemory } from "Memory/StorageMemory";
 
 const SWARMOBJECT_IDs = 'IDs';
 @profile
-export abstract class SwarmManager<T extends SwarmControllerDataTypes, U extends SwarmType,
-    V extends SwarmDataType, X extends Room | RoomObject> implements ISwarmObjectController<T, U, V, X> {
+export abstract class SwarmManager<T extends SwarmControllerDataTypes,
+    U extends SwarmObject> implements ISwarmObjectController<T, U> {
     constructor() {
         this.LoadSwarmObjects();
     }
@@ -14,8 +14,8 @@ export abstract class SwarmManager<T extends SwarmControllerDataTypes, U extends
     get DataType(): T { return this._dataType; }
 
     protected get SwarmMemory() { return this.swarmObjects; }
-    protected swarmObjects!: { [itemID: string]: ISwarmObject<U, V, X> };
-    protected _primaryMemory!: IMasterSwarmMemory<U>;
+    protected swarmObjects!: { [itemID: string]: U };
+    protected _primaryMemory!: TMasterSwarmMemory;
 
     PrepareTheSwarm(): void {
         for (const swarmName in this.swarmObjects) {
@@ -31,31 +31,28 @@ export abstract class SwarmManager<T extends SwarmControllerDataTypes, U extends
         for (let swarmName in this.swarmObjects) {
             let obj = this.swarmObjects[swarmName];
             this.OnFinalizeSwarm(obj);
-            this._primaryMemory.SaveMasterMemory(obj.GetMemoryObject());
+            this._primaryMemory.SaveChildMemory(obj.GetCopyOfMemory());
         }
-        Swarmlord.SaveMemory(this._primaryMemory);
+        Swarmlord.SaveMasterMemory(this._primaryMemory);
     }
 
-
-    GetSwarmObject(id: string): ISwarmObject<U, V, X> {
+    abstract ControllerType: T;
+    GetSwarmObject(id: string): U {
         return this.swarmObjects[id];
     }
 
-    GetSwarmTypeFromObject(obj: X): U {
+    GetSwarmTypeFromObject(obj: Room | RoomObject | AnyStructure | Creep | Flag) {
         return this.GetTypeOf(obj);
     }
-    protected CreateSwarmObject(obj: X, swarmType: U): ISwarmObject<U, V, X> {
-        return SwarmCreator.CreateSwarmObject(obj, swarmType);
-    }
-    protected abstract FindAllGameObjects(): IDictionary<X>
-    protected abstract OnPrepareSwarm(swarmObj: ISwarmObject<U, V, X>): void;
-    protected abstract OnActivateSwarm(swarmObj: ISwarmObject<U, V, X>): void;
-    protected abstract OnFinalizeSwarm(swarmObj: ISwarmObject<U, V, X>): void;
+    protected abstract FindAllGameObjects(): Dictionary
+    protected abstract OnPrepareSwarm(swarmObj: U): void;
+    protected abstract OnActivateSwarm(swarmObj: U): void;
+    protected abstract OnFinalizeSwarm(swarmObj: U): void;
     protected LoadSwarmObjects(): any {
         let allObjects = this.FindAllGameObjects();
         this._primaryMemory = Swarmlord.CheckoutMasterMemory(this.DataType);
 
-        let allSwarmEntries = this._primaryMemory.GetIDs();
+        let allSwarmEntries = this._primaryMemory.GetDataIDs();
         let swarmObjects = {};
         for (let i = 0; i < allSwarmEntries.length; i++) {
             let obj = allObjects[allSwarmEntries[i]];
@@ -64,27 +61,22 @@ export abstract class SwarmManager<T extends SwarmControllerDataTypes, U extends
                 continue;
             }
             delete allObjects[allSwarmEntries[i]];
-            let swarmObj = this.CreateSwarmObject(obj, this.GetSwarmTypeFromObject(obj));
-            swarmObj.AssignMemory(this._primaryMemory.CheckoutMasterMemory(swarmObj.saveID));
+            let swarmObj = SwarmCreator.CreateSwarmObject(obj, this._primaryMemory[allSwarmEntries[i]]);
             swarmObjects[allSwarmEntries[i]] = swarmObj;
         }
 
         // Anything left in this object is new and needs to be added
         for (let objID in allObjects) {
-            let swarmObj = this.CreateSwarmObject(allObjects[objID], this.GetSwarmTypeFromObject(allObjects[objID]));
-            this._primaryMemory.CreateNewChildMemory(objID);
-            swarmObj.AssignMemory(this._primaryMemory.CheckoutMasterMemory(objID));
-            swarmObj.InitNewObject();
+            let swarmObj = SwarmCreator.CreateNewSwarmObject(allObjects[objID], this.GetSwarmTypeFromObject(allObjects[objID]));
             swarmObjects[objID] = swarmObj;
         }
 
         this.swarmObjects = swarmObjects;
     }
-    protected abstract GetTypeOf(obj: X): U;
+    protected abstract GetTypeOf(obj: AnyStructure | Creep | Flag | Room | RoomObject): SwarmType;
 
     protected abstract get _dataType(): T;
 }
 
-export abstract class PrimeManager<T extends PrimeDataTypes, U extends SwarmType,
-    V extends SwarmDataType, X extends Room | RoomObject> extends SwarmManager<T, U, V, X> {
+export abstract class PrimeManager<T extends PrimeDataTypes, U extends SwarmObject> extends SwarmManager<T, U> {
 }

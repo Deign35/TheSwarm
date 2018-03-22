@@ -19,7 +19,7 @@ export class SwarmSpawn extends OwnedSwarmStructure<SwarmType.SwarmSpawn, STRUCT
 
     spawnCreep(body: BodyPartConstant[], name: string,
         opts?: {
-            memory?: ICreepMemory,
+            memory?: TCreepData,
             energyStructures?: Array<(StructureSpawn | StructureExtension)>,
             dryRun?: boolean,
             directions?: DirectionConstant[]

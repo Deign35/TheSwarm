@@ -98,7 +98,7 @@ export class MasterMemory<T extends number, U extends IData, V extends IMasterDa
         throw new Error("Method not implemented.");
         //create memory from the data in ID and return the memory.
     }
-    SaveChildMemory(childMemory: V): void {
+    SaveChildMemory(childMemory: TMemory): void {
         this.SetData(childMemory.id, childMemory.ReleaseMemory());
     }
     SaveToParent(parentMemory: IMasterMemory<IMasterData<IData>> | ISwarmMemoryStructure): void {

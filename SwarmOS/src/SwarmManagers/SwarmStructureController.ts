@@ -7,8 +7,9 @@ import { SwarmCreator } from "SwarmTypes/SwarmCreator";
 const STRUCTURE_SAVE_PATH = ["structures"];
 // PrimeManager<T extends PrimeDataTypes, U extends SwarmType> 
 @profile
-export class SwarmStructureController extends PrimeManager<SwarmControllerDataTypes.Structures, SwarmStructureType, SwarmDataType.Structure, Structure>
+export class SwarmStructureController extends PrimeManager<SwarmControllerDataTypes.Structures, TSwarmStructure>
     implements ISwarmStructureController {
+    get ControllerType(): SwarmControllerDataTypes.Structures { return SwarmControllerDataTypes.Structures; }
     protected get _dataType(): SwarmControllerDataTypes.Structures {
         return SwarmControllerDataTypes.Structures;
     }
@@ -42,12 +43,12 @@ export class SwarmStructureController extends PrimeManager<SwarmControllerDataTy
     protected FindAllGameObjects(): { [id: string]: Structure; } {
         return Game.structures
     }
-    protected OnPrepareSwarm(swarmObj: ISwarmStructure): void {
+    protected OnPrepareSwarm(swarmObj: TSwarmStructure): void {
     }
-    protected OnActivateSwarm(swarmObj: ISwarmStructure): void {
+    protected OnActivateSwarm(swarmObj: TSwarmStructure): void {
 
     }
-    protected OnFinalizeSwarm(swarmObj: ISwarmStructure): void {
+    protected OnFinalizeSwarm(swarmObj: TSwarmStructure): void {
 
     }
     private static _instance: SwarmStructureController;
