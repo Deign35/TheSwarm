@@ -29,9 +29,6 @@ abstract class SwarmTypeBase<T extends TSwarmMemory, U extends Room | RoomObject
     GetCopyOfObject(): U { return this._instance; }
     protected abstract OnActivate(): void;
     GetCopyOfMemory(): T { return this._memory; }
-    AssignMemory(mem: T) {
-        this._memory = mem;
-    }
     InitNewObject() { }
     GetSpawnRequirements(): ISpawnRequirement {
         return SwarmTypeBase.NoSpawnRequirement;
@@ -45,7 +42,7 @@ abstract class SwarmTypeBase<T extends TSwarmMemory, U extends Room | RoomObject
     }
 
     GetMemType(): SwarmType {
-        if (this._memory && this._memory.HasData(MEM_TYPE)) {
+        if (this._memory) {
             return this._memory!.GetData(MEM_TYPE); // This needs to be changed to expose the data members
         }
 

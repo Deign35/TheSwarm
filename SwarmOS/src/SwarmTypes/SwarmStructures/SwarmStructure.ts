@@ -1,10 +1,6 @@
 import { StructureMemory } from "Memory/StorageMemory";
 import { NotifiableSwarmObject } from "SwarmTypes/SwarmTypes";
 
-const STRUCTURE_COUNTER = 'CNT';
-/*
-<T extends SwarmType, U extends Structure>
-    extends INotifiableSwarmObject<T, U, IStructureMemory> {*/
 export abstract class SwarmStructure<T extends SwarmStructureType, U extends StructureConstant, V extends Structure<U>>
     extends NotifiableSwarmObject<IStructureMemory, V> implements ISwarmStructureType<T, U>, Structure<U> {
     get DataType(): SwarmDataType.Structure { return SwarmDataType.Structure };

@@ -5,8 +5,8 @@ declare interface MemoryInitializationObj {
     memType: number;
 }
 export abstract class MemoryBase<T extends number, U extends IData> implements IMemory<U> {
-    constructor(id: string, data: U) {
-        this._id = id;
+    constructor(data: U) {
+        this._id = data.id;
         this._cache = data || {};
     }
     get id() { return this._cache.id; };
