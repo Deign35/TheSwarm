@@ -6,7 +6,7 @@ const STRUCTURE_COUNTER = 'CNT';
 <T extends SwarmType, U extends Structure>
     extends INotifiableSwarmObject<T, U, IStructureMemory> {*/
 export abstract class SwarmStructure<T extends SwarmStructureType, U extends StructureConstant, V extends Structure<U>>
-    extends NotifiableSwarmObject<T, SwarmDataType.Structure, V> implements ISwarmStructureType<T, U>, Structure<U> {
+    extends NotifiableSwarmObject<IStructureMemory, V> implements ISwarmStructureType<T, U>, Structure<U> {
     get DataType(): SwarmDataType.Structure { return SwarmDataType.Structure };
     get storageMemoryType() { return SwarmDataType.Structure };
 
@@ -44,9 +44,6 @@ export class SwarmExtension extends OwnedSwarmStructure<SwarmType.SwarmExtension
         console.log("Successfully activated an Extension");
     }
 }
-export function MakeSwarmExtension(extension: StructureExtension): ISwarmExtension {
-    return new SwarmExtension(extension);
-}
 
 export class SwarmExtractor extends OwnedSwarmStructure<SwarmType.SwarmExtractor, STRUCTURE_EXTRACTOR, StructureExtractor> implements ISwarmExtractor, StructureExtractor {
     get SwarmType(): SwarmType.SwarmExtractor { return SwarmType.SwarmExtractor; }
@@ -55,9 +52,6 @@ export class SwarmExtractor extends OwnedSwarmStructure<SwarmType.SwarmExtractor
         console.log("Successfully activated an Extactor");
     }
 }
-export function MakeSwarmExtractor(extractor: StructureExtractor): ISwarmExtractor {
-    return new SwarmExtractor(extractor);
-}
 
 export class SwarmObserver extends OwnedSwarmStructure<SwarmType.SwarmObserver, STRUCTURE_OBSERVER, StructureObserver> implements ISwarmObserver, StructureObserver {
     get SwarmType(): SwarmType.SwarmObserver { return SwarmType.SwarmObserver; }
@@ -65,9 +59,6 @@ export class SwarmObserver extends OwnedSwarmStructure<SwarmType.SwarmObserver, 
     protected OnActivate() {
         console.log("Successfully activated an Observer");
     }
-}
-export function MakeSwarmObserver(observer: StructureObserver): ISwarmObserver {
-    return new SwarmObserver(observer);
 }
 
 export class SwarmLink extends OwnedSwarmStructure<SwarmType.SwarmLink, STRUCTURE_LINK, StructureLink> implements ISwarmLink, StructureLink {
@@ -83,9 +74,6 @@ export class SwarmLink extends OwnedSwarmStructure<SwarmType.SwarmLink, STRUCTUR
         console.log("Successfully activated a Link");
     }
 }
-export function MakeSwarmLink(link: StructureLink): ISwarmLink {
-    return new SwarmLink(link);
-}
 
 export class SwarmRampart extends OwnedSwarmStructure<SwarmType.SwarmRampart, STRUCTURE_RAMPART, StructureRampart> implements ISwarmRampart, StructureRampart {
     get SwarmType(): SwarmType.SwarmRampart { return SwarmType.SwarmRampart; }
@@ -97,9 +85,6 @@ export class SwarmRampart extends OwnedSwarmStructure<SwarmType.SwarmRampart, ST
         console.log("Successfully activated a Ramprt");
     }
 }
-export function MakeSwarmRampart(rampart: StructureRampart): ISwarmRampart {
-    return new SwarmRampart(rampart);
-}
 
 export class SwarmStorage extends OwnedSwarmStructure<SwarmType.SwarmStorage, STRUCTURE_STORAGE, StructureStorage> implements ISwarmStorage, StructureStorage {
     get SwarmType(): SwarmType.SwarmStorage { return SwarmType.SwarmStorage; }
@@ -108,9 +93,6 @@ export class SwarmStorage extends OwnedSwarmStructure<SwarmType.SwarmStorage, ST
     protected OnActivate() {
         console.log("Successfully activated a Storage");
     }
-}
-export function MakeSwarmStorage(storage: StructureStorage): ISwarmStorage {
-    return new SwarmStorage(storage);
 }
 
 export class SwarmTerminal extends OwnedSwarmStructure<SwarmType.SwarmTerminal, STRUCTURE_TERMINAL, StructureTerminal> implements ISwarmTerminal, StructureTerminal {
@@ -126,9 +108,6 @@ export class SwarmTerminal extends OwnedSwarmStructure<SwarmType.SwarmTerminal, 
         return this._instance.send(resourceType, amount, destination, description);
     }
 }
-export function MakeSwarmTerminal(terminal: StructureTerminal): ISwarmTerminal {
-    return new SwarmTerminal(terminal);
-}
 
 export class SwarmContainer extends SwarmStructure<SwarmType.SwarmContainer, STRUCTURE_CONTAINER, StructureContainer> implements ISwarmContainer, StructureContainer {
     get SwarmType(): SwarmType.SwarmContainer { return SwarmType.SwarmContainer; }
@@ -139,18 +118,12 @@ export class SwarmContainer extends SwarmStructure<SwarmType.SwarmContainer, STR
         console.log("Successfully activated a Container");
     }
 }
-export function MakeSwarmContainer(container: StructureContainer): ISwarmContainer {
-    return new SwarmContainer(container);
-}
 export class SwarmRoad extends SwarmStructure<SwarmType.SwarmRoad, STRUCTURE_ROAD, StructureRoad> implements ISwarmRoad, StructureRoad {
     get SwarmType(): SwarmType.SwarmRoad { return SwarmType.SwarmRoad; }
     get ticksToDecay() { return this._instance.ticksToDecay };
     protected OnActivate() {
         console.log("Successfully activated a Road");
     }
-}
-export function MakeSwarmRoad(road: StructureRoad): ISwarmRoad {
-    return new SwarmRoad(road);
 }
 
 export class SwarmWall extends SwarmStructure<SwarmType.SwarmWall, STRUCTURE_WALL, StructureWall> implements ISwarmWall, StructureWall {
@@ -159,9 +132,6 @@ export class SwarmWall extends SwarmStructure<SwarmType.SwarmWall, STRUCTURE_WAL
     protected OnActivate() {
         console.log("Successfully activated a Wall");
     }
-}
-export function MakeSwarmWall(wall: StructureWall): ISwarmWall {
-    return new SwarmWall(wall);
 }
 
 export class SwarmNuker extends OwnedSwarmStructure<SwarmType.SwarmNuker, STRUCTURE_NUKER, StructureNuker> implements ISwarmNuker, StructureNuker {
@@ -176,7 +146,4 @@ export class SwarmNuker extends OwnedSwarmStructure<SwarmType.SwarmNuker, STRUCT
     }
 
     launchNuke(pos: RoomPosition) { return this._instance.launchNuke(pos); }
-}
-export function MakeSwarmNuker(nuker: StructureNuker): ISwarmNuker {
-    return new SwarmNuker(nuker);
 }

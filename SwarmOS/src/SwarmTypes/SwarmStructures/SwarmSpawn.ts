@@ -19,7 +19,7 @@ export class SwarmSpawn extends OwnedSwarmStructure<SwarmType.SwarmSpawn, STRUCT
 
     spawnCreep(body: BodyPartConstant[], name: string,
         opts?: {
-            memory?: ICreepData,
+            memory?: ICreepMemory,
             energyStructures?: Array<(StructureSpawn | StructureExtension)>,
             dryRun?: boolean,
             directions?: DirectionConstant[]
@@ -29,7 +29,4 @@ export class SwarmSpawn extends OwnedSwarmStructure<SwarmType.SwarmSpawn, STRUCT
     protected OnActivate() {
         console.log("Successfully activated a Spawn");
     }
-}
-export function MakeSwarmSpawn(spawn: StructureSpawn): ISwarmSpawn {
-    return new SwarmSpawn(spawn);
 }

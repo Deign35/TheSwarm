@@ -6,7 +6,7 @@ const ROOM_COUNTER = 'CNT';
 const HARVESTER_JOBS = 'HARVEST';
 const ROOMOBJECT_DATA = 'OBJs';
 @profile
-export class SwarmRoom extends SwarmItemWithName<SwarmType.SwarmRoom, SwarmDataType.Room, Room> implements ISwarmRoom, Room {
+export class SwarmRoom extends SwarmItemWithName<IRoomMemory, Room> implements ISwarmRoom, Room {
     get DataType(): SwarmDataType.Room { return SwarmDataType.Room };
     protected roomObjectsMemory!: any;
     /*protected roomObjects: { [id: string]: ISwarmRoomObject } = {}
@@ -130,8 +130,5 @@ export class SwarmRoom extends SwarmItemWithName<SwarmType.SwarmRoom, SwarmDataT
             return this._instance.lookForAtArea<T>(type, top, left, bottom, right, false);
         }
     }
-}
-export function MakeSwarmRoom(room: Room): ISwarmRoom {
-    return new SwarmRoom(room);
 }
 declare type RoomLocationFormat = string;

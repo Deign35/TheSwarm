@@ -5,21 +5,12 @@ declare interface MemoryInitializationObj {
     memType: number;
 }
 export abstract class MemoryBase<T extends number, U extends IData> implements IMemory<U> {
-    constructor(id: string, data: U)
-    constructor(id: string, data: false, initObj: MemoryInitializationObj)
-    constructor(id: string, data?: U | false, initObj?: MemoryInitializationObj) {
+    constructor(id: string, data: U) {
         this._id = id;
-        if (data) {
-            // convert data to memory here.
-            this._cache = data;
-        } else {
-            this._cache = this.InitMemory(id, initObj!);
-            //this._cache = this.CreateEmptyData(id, this.MemoryType);
-        }
+        this._cache = data || {};
     }
     get id() { return this._cache.id; };
     get IsCheckedOut() { return this._checkedOut };
-    //get MemoryType() { return this._cache.MEM_TYPE };
     protected InitMemory(id: string, initObj: MemoryInitializationObj): U {
         return {
             id: id,
@@ -83,36 +74,39 @@ export class FlagMemory extends MemoryBase<SwarmType.SwarmFlag, TFlagData> imple
 
 @profile
 export class StructureMemory<T extends SwarmStructureType> extends
-    MemoryBase<T, TStructureData> implements IStructureMemory {
-}
+    MemoryBase<T, TStructureData> implements IStructureMemory { }
 
 @profile
 export class CreepMemory extends MemoryBase<SwarmType.SwarmCreep, TCreepData> implements ICreepMemory { }
 
-declare type RoomMemoryInitObj = SwarmMemoryInitObject<SwarmType.SwarmRoom> & {
-
-}
+declare type RoomMemoryInitObj = SwarmMemoryInitObject<SwarmType.SwarmRoom> & {}
 @profile
 export class RoomMemory extends MemoryBase<SwarmType.SwarmRoom, TRoomData> implements IRoomMemory { }
 
 @profile
 export class RoomObjectMemory extends MemoryBase<SwarmRoomObjectType, TRoomObjectData> implements RoomObjectMemory { }
-
-export class MasterSwarmMemory<T extends SwarmType, U extends SwarmDataType> extends
-    StorageMemory<T, SwarmDataType.Master> implements IMasterSwarmMemory<T, U> {
-    CheckoutChildMemory<V extends SwarmType>(id: string, swarmType: V): ISwarmMemory<V, U> {
+/**declare interface IMasterMemory<T extends TMasterData> extends IMemory<T> {
+    CheckoutChildMemory(id: string): IMemory<T>
+    SaveChildMemory(childMemory: T): void;
+    SaveToParent(parentMemory: TMasterMemory | ISwarmMemoryStructure): void;
+} declare type TMasterMemory = IMasterMemory<TMasterData>;
+ */
+export class MasterMemory<T extends number, U extends IData, V extends IMasterData<U>>
+    extends MemoryBase<T, V> implements IMasterMemory<V> {
+    get MEM_TYPE(): SwarmDataType.Master { return SwarmDataType.Master };
+    CheckoutChildMemory(id: string): IMemory<V> {
         throw new Error("Method not implemented.");
+        //create memory from the data in ID and return the memory.
     }
-    SaveChildMemory(childMemory: IEmptyMemory<U>): void {
+    SaveChildMemory(childMemory: V): void {
         this.SetData(childMemory.id, childMemory.ReleaseMemory());
     }
-    SaveToParent(parentMemory: IMasterSwarmMemory<T, SwarmDataType.Master> | ISwarmMemoryStructure): void {
-        throw new Error("Method not implemented.");
-    }
+    SaveToParent(parentMemory: IMasterMemory<IMasterData<IData>> | ISwarmMemoryStructure): void {
 
-    protected CreateEmptyData(): IData<SwarmDataType.Master> {
-        return {
-            MEM_TYPE: SwarmDataType.Master
-        };
     }
+}
+
+export abstract class MasterSwarmMemory<T extends SwarmType, U extends TSwarmData, V extends IMasterData<U>>
+    extends MasterMemory<SwarmDataType.Master, U, V> implements IMasterSwarmData<U> {
+    ChildData!: { [id: string]: U; };
 }

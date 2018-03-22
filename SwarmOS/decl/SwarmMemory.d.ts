@@ -45,13 +45,12 @@ declare interface IMineralData extends IRoomObjectData<RoomObjectDataType.Minera
 
 declare type TBasicSwarmData = TRoomObjectData | TStructureData | TRoomData | TCreepData | TFlagData | IOtherData;
 
-declare interface IMasterData<T extends TSwarmData> extends IData {
+declare interface IMasterData<T extends IData> extends IData {
     ChildData: { [id: string]: T }
-    MEM_TYPE: SwarmDataType.Master;
 }
-declare type TMasterData = IMasterData<TSwarmData>;
-declare interface IMasterSwarmData<T extends TBasicSwarmData> extends IMasterData<T> {
-
+declare type TMasterData = IMasterData<IData>;
+declare interface IMasterSwarmData<T extends TSwarmData> extends IMasterData<T> {
+    MEM_TYPE: SwarmDataType.Master;
     // Data common to all MasterSwarmDatas (including IRoomObjectData)
 } declare type TMasterSwarmData = IMasterSwarmData<TBasicSwarmData>;
 declare interface IMasterRoomObjectData extends IMasterSwarmData<TRoomObjectData> { }
@@ -98,14 +97,11 @@ declare type SwarmMemoryTypes = ICreepMemory | IFlagMemory | IRoomMemory |
     IRoomObjectMemory | IStructureMemory | TSwarmMemory;
 
 declare interface IMasterMemory<T extends TMasterData> extends IMemory<T> {
-    CheckoutChildMemory(id: string): IMemory<T>
+    CheckoutChildMemory(id: string): IMemory<T>;
     SaveChildMemory(childMemory: T): void;
     SaveToParent(parentMemory: TMasterMemory | ISwarmMemoryStructure): void;
 } declare type TMasterMemory = IMasterMemory<TMasterData>;
 declare interface IMasterSwarmMemory<T extends TMasterSwarmData> extends IMasterMemory<T> {
-    CheckoutChildMemory(id: string): IMasterMemory<T>
-    SaveChildMemory(childMemory: T): void;
-    SaveToParent(parentMemory: TMasterSwarmMemory | ISwarmMemoryStructure): void;
 } declare type TMasterSwarmMemory = IMasterSwarmMemory<TMasterSwarmData>;
 declare interface IMasterFlagMemory extends IMasterSwarmMemory<IMasterFlagData> { }
 declare interface IMasterCreepMemory extends IMasterSwarmMemory<IMasterCreepData> { }
@@ -126,9 +122,10 @@ declare interface ISwarmMemoryStructure {
 declare type PrimeMemoryTypes = IMasterFlagMemory | IMasterCreepMemory | IMasterRoomMemory | IMasterStructureMemory;
 declare type PrimeDataTypes = SwarmControllerDataTypes.Creeps | SwarmControllerDataTypes.Flags |
     SwarmControllerDataTypes.Rooms | SwarmControllerDataTypes.Structures;
+
 //IMasterSwarmMemory<T extends SwarmType>
 declare interface ISwarmlord {
     ValidateMemory(): void;
     SaveMasterMemory<T extends TMasterSwarmMemory>(memObject: T, save?: boolean): void;
-    CheckoutMasterMemory<T extends TMasterSwarmMemory, U extends TBasicSwarmData>(dataType: U): T;
+    CheckoutMasterMemory<T extends TMasterSwarmMemory>(dataType: string): T;
 } declare var Swarmlord: ISwarmlord;

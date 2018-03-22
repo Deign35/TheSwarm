@@ -1,6 +1,7 @@
 import { SwarmRoomObject } from "./SwarmTypes";
 
-export class SwarmSite extends SwarmRoomObject<SwarmType.SwarmSite, ConstructionSite> implements ISwarmSite, ConstructionSite {
+export class SwarmSite extends SwarmRoomObject<IRoomObjectMemory, ConstructionSite>
+    implements ISwarmSite, ConstructionSite {
     get my() { return this._instance.my; }
     get owner() { return this._instance.owner; }
     get storageMemoryType() { return SwarmDataType.RoomObject };
@@ -13,7 +14,4 @@ export class SwarmSite extends SwarmRoomObject<SwarmType.SwarmSite, Construction
     protected OnActivate() {
         console.log("Successfully activated a Site");
     }
-}
-export function MakeSwarmSite(site: ConstructionSite): ISwarmSite {
-    return new SwarmSite(site);
 }

@@ -1,27 +1,35 @@
-abstract class SwarmTypeBase<T extends SwarmType, U extends SwarmDataType, V extends RoomObject | Room> implements ISwarmObject<T, U, V> {
-    get prototype(): V {
+//ISwarmObject < T extends SwarmMemoryTypes, U extends Room | RoomObject >
+/**saveID: string;
+    IsActive: boolean;
+
+    GetMemType(): number;
+    Activate(): void;
+    AssignObject(obj: T): void;
+    GetCopyOfMemory(): T
+    GetCopyOfObject(): U */
+
+abstract class SwarmTypeBase<T extends TSwarmMemory, U extends RoomObject | Room>
+    implements ISwarmObject<T, U> {
+    get prototype(): U {
         return this.prototype;
     }
+    get saveID() {
+        return this._memory.id;
+    }
     get IsActive(): boolean {
-        return false;
+        return !!this._instance && !!this._memory;
     }
     Activate(): void {
         if (this.IsActive) {
             this.OnActivate();
         }
     }
-    constructor(instance: V) {
-        this._instance = instance;
-    }
-    protected _instance: V
-    protected _memory!: IEmptyMemory<U>;
-    abstract get DataType(): U;
-    abstract get SwarmType(): T;
-    get Value(): V { return this._instance; }
-    abstract get saveID(): string;
+    protected _instance!: U
+    protected _memory!: T;
+    GetCopyOfObject(): U { return this._instance; }
     protected abstract OnActivate(): void;
-    GetMemoryObject(): IEmptyMemory<U> { return this._memory; }
-    AssignMemory(mem: IEmptyMemory<U>) {
+    GetCopyOfMemory(): T { return this._memory; }
+    AssignMemory(mem: T) {
         this._memory = mem;
     }
     InitNewObject() { }
@@ -35,26 +43,38 @@ abstract class SwarmTypeBase<T extends SwarmType, U extends SwarmDataType, V ext
         minBody: [],
         growthTemplate: []
     }
+
+    GetMemType(): SwarmType {
+        if (this._memory && this._memory.HasData(MEM_TYPE)) {
+            return this._memory!.GetData(MEM_TYPE); // This needs to be changed to expose the data members
+        }
+
+        return SwarmType.Any;
+    }
+    AssignObject(obj: U, objMemory: T): void {
+        this._instance = obj;
+        this._memory = objMemory;
+    }
 }
 
-export abstract class SwarmItemWithName<T extends SwarmType.SwarmRoom | SwarmType.SwarmFlag,
-    U extends SwarmDataType.Room | SwarmDataType.Flag, V extends Room | Flag> extends SwarmTypeBase<T, U, V> {
+export abstract class SwarmItemWithName<T extends TSwarmMemory, U extends Room | Flag> extends SwarmTypeBase<T, U> {
     get name() { return this._instance.name }
     get saveID() { return this.name; }
 }
 
-export abstract class SwarmObject<T extends SwarmType, U extends SwarmDataType, V extends RoomObject> extends SwarmTypeBase<T, U, V> {
+export abstract class SwarmObject<T extends TSwarmMemory, U extends RoomObject> extends SwarmTypeBase<T, U> {
     get pos() { return this._instance.pos; }
     get room() { return this._instance.room!; } // This should get the room object i created.
 }
-export abstract class SwarmObjectWithID<T extends SwarmType, U extends SwarmDataType,
-    V extends Source | Creep | Structure | Mineral | Resource | ConstructionSite | Nuke | Tombstone> extends SwarmObject<T, U, V> {
+export abstract class SwarmObjectWithID<T extends TSwarmMemory,
+    U extends Source | Creep | Structure | Mineral | Resource | ConstructionSite | Nuke | Tombstone>
+    extends SwarmObject<T, U> {
     get id() { return this._instance.id; }
     get saveID() { return this.id; }
 }
 
-export abstract class NotifiableSwarmObject<T extends SwarmType, U extends SwarmDataType, V extends Creep | Structure>
-    extends SwarmObjectWithID<T, U, V> {
+export abstract class NotifiableSwarmObject<T extends TSwarmMemory, U extends Creep | Structure>
+    extends SwarmObjectWithID<T, U> {
     notifyWhenAttacked(enabled: boolean = false) { // ActionIntent
         if ((this._instance as Structure).notifyWhenAttacked) {
             // Using this to trick the compiler into letting me return the value because apparently,
@@ -65,34 +85,18 @@ export abstract class NotifiableSwarmObject<T extends SwarmType, U extends Swarm
     }
 }
 
-export abstract class OwnableSwarmObject<T extends SwarmType, U extends SwarmDataType,
-    V extends Creep | OwnedStructure> extends NotifiableSwarmObject<T, U, V> {
+export abstract class OwnableSwarmObject<T extends TSwarmMemory, U extends Creep | OwnedStructure> extends NotifiableSwarmObject<T, U> {
     get my() { return this._instance.my; }
     get owner() { return this._instance.owner; }
 }
-export abstract class SwarmRoomObject<T extends SwarmType,
+export abstract class SwarmRoomObject<T extends TSwarmMemory,
     U extends Mineral | Resource | Tombstone | Nuke | ConstructionSite | Source>
-    extends SwarmObjectWithID<T, SwarmDataType.RoomObject, U> {
+    extends SwarmObjectWithID<T, U> {
     get DataType(): SwarmDataType.RoomObject { return SwarmDataType.RoomObject }
     get room(): Room { return this._instance.room! }
 }
 
-export class SwarmMineral extends SwarmRoomObject<SwarmType.SwarmMineral, Mineral> {
-    GetMemoryObject(): IEmptyMemory<SwarmDataType.RoomObject> {
-        throw new Error("Method not implemented.");
-    }
-    Activate(): void {
-        throw new Error("Method not implemented.");
-    }
-    AssignMemory(mem: IEmptyMemory<SwarmDataType.RoomObject>): void {
-        throw new Error("Method not implemented.");
-    }
-    InitNewObject(): void {
-        throw new Error("Method not implemented.");
-    }
-    GetSpawnRequirements(): ISpawnRequirement {
-        throw new Error("Method not implemented.");
-    }
+export class SwarmMineral extends SwarmRoomObject<IRoomObjectMemory, Mineral> {
     get SwarmType(): SwarmType.SwarmMineral { return SwarmType.SwarmMineral; }
     get density() { return this._instance.density; }
     get mineralAmount() { return this._instance.mineralAmount; }
@@ -102,11 +106,8 @@ export class SwarmMineral extends SwarmRoomObject<SwarmType.SwarmMineral, Minera
         console.log("Successfully activated a Mineral");
     }
 }
-export function MakeSwarmMineral(mineral: Mineral): ISwarmMineral {
-    return new SwarmMineral(mineral);
-}
 
-export class SwarmTombstone extends SwarmRoomObject<SwarmType.SwarmTombstone, Tombstone> implements ISwarmTombstone, Tombstone {
+export class SwarmTombstone extends SwarmRoomObject<IRoomObjectMemory, Tombstone> implements ISwarmTombstone, Tombstone {
     get SwarmType(): SwarmType.SwarmTombstone { return SwarmType.SwarmTombstone }
     get creep() { return this._instance.creep; }
     get deathTime() { return this._instance.deathTime; }
@@ -116,11 +117,8 @@ export class SwarmTombstone extends SwarmRoomObject<SwarmType.SwarmTombstone, To
         console.log("Successfully activated a Tombstone");
     }
 }
-export function MakeSwarmTombstone(tombStone: Tombstone): ISwarmTombstone {
-    return new SwarmTombstone(tombStone);
-}
 
-export class SwarmResource extends SwarmRoomObject<SwarmType.SwarmResource, Resource> implements ISwarmResource, Resource {
+export class SwarmResource extends SwarmRoomObject<IRoomObjectMemory, Resource> implements ISwarmResource, Resource {
     get storageMemoryType() { return SwarmDataType.RoomObject; }
     get SwarmType(): SwarmType.SwarmResource { return SwarmType.SwarmResource; }
     get amount() { return this._instance.amount; }
@@ -129,11 +127,8 @@ export class SwarmResource extends SwarmRoomObject<SwarmType.SwarmResource, Reso
         console.log("Successfully activated a Resource");
     }
 }
-export function MakeSwarmResource(resource: Resource): ISwarmResource {
-    return new SwarmResource(resource);
-}
 
-export class SwarmNuke extends SwarmRoomObject<SwarmType.SwarmNuke, Nuke> implements ISwarmNuke, Nuke {
+export class SwarmNuke extends SwarmRoomObject<IRoomObjectMemory, Nuke> implements ISwarmNuke, Nuke {
     get storageMemoryType() { return SwarmDataType.RoomObject; }
     get SwarmType(): SwarmType.SwarmNuke { return SwarmType.SwarmNuke; }
     get launchRoomName() { return this._instance.launchRoomName; }
@@ -141,7 +136,4 @@ export class SwarmNuke extends SwarmRoomObject<SwarmType.SwarmNuke, Nuke> implem
     protected OnActivate() {
         console.log("Successfully activated a Nuke");
     }
-}
-export function MakeSwarmNuke(nuke: Nuke): ISwarmNuke {
-    return new SwarmNuke(nuke);
 }

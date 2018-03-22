@@ -1,6 +1,4 @@
 import { profile } from "Tools/Profiler";
-import { CreepMemory, FlagMemory, RoomMemory, StructureMemory, RoomObjectMemory, OtherMemory, MasterSwarmMemory } from "Memory/StorageMemory";
-import { InvalidArgumentException } from "Tools/SwarmExceptions";
 declare var Memory: ISwarmMemoryStructure;
 
 @profile
@@ -17,15 +15,23 @@ export class Swarmlord implements ISwarmlord {
             SwarmLogger.Log("Begin initialization of memory for entire Swarm(" + SWARM_VERSION_DATE + ")");
             let newMemory: ISwarmMemoryStructure = {
                 creeps: {
+                    id: "creeps",
+                    ChildData: {},
                     MEM_TYPE: SwarmDataType.Master
                 },
                 flags: {
+                    id: "flags",
+                    ChildData: {},
                     MEM_TYPE: SwarmDataType.Master
                 },
                 structures: {
+                    id: "structures",
+                    ChildData: {},
                     MEM_TYPE: SwarmDataType.Master
                 },
                 rooms: {
+                    id: "rooms",
+                    ChildData: {},
                     MEM_TYPE: SwarmDataType.Master
                 },
                 profiler: Memory.profiler, // Hacky, but cleanest way to prevent the profiler from breaking because of deleting its memory.
@@ -52,31 +58,17 @@ export class Swarmlord implements ISwarmlord {
             global['Swarmlord'] = new Swarmlord();
         }
     }
-    
-    SaveMemory<T extends MasterTypes>(memObject: T, save?: boolean): void {
+
+    SaveMasterMemory<T extends TMasterSwarmMemory>(memObject: T, save?: boolean): void {
         if (save) {
-            memObject.SaveToParent(Memory);
+            Memory[memObject.id] = memObject.ReleaseMemory();
         }
         memObject.ReleaseMemory();
     }
 
-
-    CheckoutMasterMemory<T extends SwarmControllerDataTypes, U extends SwarmType>(dataType: T) {
-        switch (dataType) {
-            case (SwarmControllerDataTypes.Creeps): return new MasterSwarmMemory(dataType, CopyObject(Memory["creeps"]));
-            case (SwarmControllerDataTypes.Flags): return new MasterSwarmMemory(dataType, CopyObject(Memory["flags"]));
-            case (SwarmControllerDataTypes.Rooms): return new MasterSwarmMemory(dataType, CopyObject(Memory["rooms"]));
-            case (SwarmControllerDataTypes.Structures): return new MasterSwarmMemory(dataType, CopyObject(Memory["structures"]));
-        }
-
-        throw new InvalidArgumentException("Not a master type: " + dataType);
+    CheckoutMasterMemory<T extends TMasterSwarmMemory>(id: string): T {
+        return CopyObject(Memory[id]);
     }
-    /*SaveMemory(memObject: TMasterMemoryTypes, save: boolean = true) {
-        if (save) {
-            memObject.SaveToParent(Memory);
-        }
-        memObject.ReleaseMemory();
-    }*/
 }
 
 global['Swarmlord'] = new Swarmlord();

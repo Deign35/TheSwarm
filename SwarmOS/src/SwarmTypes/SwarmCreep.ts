@@ -6,7 +6,7 @@ const CREEP_COUNTER = 'CNT';
 const CARRY_TOTAL = 'CT';
 const CURRENT_PATH = 'CP';
 @profile
-export class SwarmCreep extends OwnableSwarmObject<SwarmType.SwarmCreep, SwarmDataType.Creep, Creep> implements ISwarmCreep, Creep {
+export class SwarmCreep extends OwnableSwarmObject<ICreepMemory, Creep> implements ISwarmCreep, Creep {
     get DataType(): SwarmDataType.Creep { return SwarmDataType.Creep };
     protected OnActivate() {
         console.log("Successfully activated a Creep");
@@ -143,4 +143,3 @@ export class SwarmCreep extends OwnableSwarmObject<SwarmType.SwarmCreep, SwarmDa
         return this._instance.withdraw(target, resourceType, amount);
     }
 }
-export function MakeSwarmCreep(creep: Creep): ISwarmCreep { return new SwarmCreep(creep); }

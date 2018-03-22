@@ -1,7 +1,7 @@
 import { RoomObjectMemory } from "Memory/StorageMemory";
 import { SwarmRoomObject } from "SwarmTypes/SwarmTypes";
 
-export class SwarmSource extends SwarmRoomObject<SwarmType.SwarmSource, Source> implements ISwarmSource, Source {
+export class SwarmSource extends SwarmRoomObject<IRoomObjectMemory, Source> implements ISwarmSource, Source {
     get storageMemoryType() { return SwarmDataType.RoomObject };
     GetSpawnRequirements(): ISpawnRequirement {
         // find out how much energy I have available.  Adjust body accordingly
@@ -26,8 +26,4 @@ export class SwarmSource extends SwarmRoomObject<SwarmType.SwarmSource, Source> 
     protected OnActivate() {
         console.log("Successfully activated a Source");
     }
-}
-
-export function MakeSwarmSource(source: Source): ISwarmSource {
-    return new SwarmSource(source);
 }

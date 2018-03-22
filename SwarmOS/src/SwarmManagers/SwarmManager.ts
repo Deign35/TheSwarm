@@ -31,7 +31,7 @@ export abstract class SwarmManager<T extends SwarmControllerDataTypes, U extends
         for (let swarmName in this.swarmObjects) {
             let obj = this.swarmObjects[swarmName];
             this.OnFinalizeSwarm(obj);
-            this._primaryMemory.SaveChildMemory(obj.GetMemoryObject());
+            this._primaryMemory.SaveMasterMemory(obj.GetMemoryObject());
         }
         Swarmlord.SaveMemory(this._primaryMemory);
     }
@@ -65,7 +65,7 @@ export abstract class SwarmManager<T extends SwarmControllerDataTypes, U extends
             }
             delete allObjects[allSwarmEntries[i]];
             let swarmObj = this.CreateSwarmObject(obj, this.GetSwarmTypeFromObject(obj));
-            swarmObj.AssignMemory(this._primaryMemory.CheckoutChildMemory(swarmObj.saveID));
+            swarmObj.AssignMemory(this._primaryMemory.CheckoutMasterMemory(swarmObj.saveID));
             swarmObjects[allSwarmEntries[i]] = swarmObj;
         }
 
@@ -73,7 +73,7 @@ export abstract class SwarmManager<T extends SwarmControllerDataTypes, U extends
         for (let objID in allObjects) {
             let swarmObj = this.CreateSwarmObject(allObjects[objID], this.GetSwarmTypeFromObject(allObjects[objID]));
             this._primaryMemory.CreateNewChildMemory(objID);
-            swarmObj.AssignMemory(this._primaryMemory.CheckoutChildMemory(objID));
+            swarmObj.AssignMemory(this._primaryMemory.CheckoutMasterMemory(objID));
             swarmObj.InitNewObject();
             swarmObjects[objID] = swarmObj;
         }

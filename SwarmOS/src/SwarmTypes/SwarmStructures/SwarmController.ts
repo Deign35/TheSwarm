@@ -23,6 +23,3 @@ STRUCTURE_CONTROLLER, StructureController> implements ISwarmController, Structur
         console.log("Successfully activated a Controller");
     }
 }
-export function MakeSwarmController(controller: StructureController): ISwarmController {
-    return new SwarmController(controller);
-}

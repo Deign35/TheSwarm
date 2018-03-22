@@ -4,7 +4,8 @@ import { profile } from "Tools/Profiler";
 import { SwarmCreep } from "SwarmTypes/SwarmCreep";
 
 @profile
-export class SwarmTower extends OwnedSwarmStructure<SwarmType.SwarmTower, STRUCTURE_TOWER, StructureTower> implements ISwarmTower, StructureTower {
+export class SwarmTower extends OwnedSwarmStructure<SwarmType.SwarmTower, STRUCTURE_TOWER, StructureTower>
+    implements ISwarmTower, StructureTower {
 
 
     get SwarmType(): SwarmType.SwarmTower { return SwarmType.SwarmTower; }
@@ -23,7 +24,4 @@ export class SwarmTower extends OwnedSwarmStructure<SwarmType.SwarmTower, STRUCT
     protected OnActivate() {
         console.log("Successfully activated a Tower");
     }
-}
-export function MakeSwarmTower(tower: StructureTower): ISwarmTower {
-    return new SwarmTower(tower);
 }
