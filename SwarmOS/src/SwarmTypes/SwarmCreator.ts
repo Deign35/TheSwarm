@@ -1,9 +1,8 @@
 import { profile } from "Tools/Profiler";
 import { StructureMemory, CreepMemory, FlagMemory, RoomObjectMemory, RoomMemory } from "Memory/StorageMemory";
-import { NotImplementedException } from "Tools/SwarmExceptions";
 import { SwarmController } from "SwarmTypes/SwarmStructures/SwarmController";
 import { SwarmCreep } from "SwarmTypes/SwarmCreep";
-import { SwarmExtension, SwarmExtractor, SwarmLink, SwarmNuker, SwarmObserver, SwarmRampart, SwarmRoad, SwarmStorage, SwarmTerminal, SwarmWall } from "SwarmTypes/SwarmStructures/SwarmStructure";
+import { SwarmExtension, SwarmExtractor, SwarmLink, SwarmNuker, SwarmObserver, SwarmRampart, SwarmRoad, SwarmStorage, SwarmTerminal, SwarmWall, SwarmKeepersLair, SwarmPortal, SwarmPowerBank, SwarmPowerSpawn } from "SwarmTypes/SwarmStructures/SwarmStructure";
 import { SwarmFlag } from "SwarmTypes/SwarmFlag";
 import { SwarmLab } from "SwarmTypes/SwarmStructures/SwarmLab";
 import { SwarmMineral, SwarmNuke, SwarmResource, SwarmTombstone } from "SwarmTypes/SwarmTypes";
@@ -40,9 +39,8 @@ export class SwarmCreator {
                 newMemory = new FlagMemory(mem as TFlagData);
                 break;
             case (SwarmType.SwarmKeepersLair):
-                throw new NotImplementedException("SwarmKeepersLair not implemented");
-            /* newMemory = new StructureMemory<SwarmType.SwarmKeepersLair>(mem as TStructureData);
-            break;*/
+                newMemory = new StructureMemory<SwarmType.SwarmKeepersLair>(mem as TStructureData);
+                break;
             case (SwarmType.SwarmLab):
                 newMemory = new StructureMemory<SwarmType.SwarmLab>(mem as TStructureData);
                 break;
@@ -62,17 +60,14 @@ export class SwarmCreator {
                 newMemory = new StructureMemory<SwarmType.SwarmObserver>(mem as TStructureData);
                 break;
             case (SwarmType.SwarmPortal):
-                throw new NotImplementedException("SwarmPortal not implemented");
-            /* newMemory = new StructureMemory<SwarmType.SwarmPortal>(mem as TStructureData);
-            break;*/
+                newMemory = new StructureMemory<SwarmType.SwarmPortal>(mem as TStructureData);
+                break;
             case (SwarmType.SwarmPowerBank):
-                throw new NotImplementedException("SwarmPowerBank not implemented");
-            /*newMemory = new StructureMemory<SwarmType.SwarmPowerBank>(mem as TStructureData);
-            break;*/
+                newMemory = new StructureMemory<SwarmType.SwarmPowerBank>(mem as TStructureData);
+                break;
             case (SwarmType.SwarmPowerSpawn):
-                throw new NotImplementedException("SwarmPowerSpawn not implemented");
-            /*newMemory = new StructureMemory<SwarmType.SwarmPowerSpawn>(mem as TStructureData);
-            break;*/
+                newMemory = new StructureMemory<SwarmType.SwarmPowerSpawn>(mem as TStructureData);
+                break;
             case (SwarmType.SwarmRampart):
                 newMemory = new StructureMemory<SwarmType.SwarmRampart>(mem as TStructureData);
                 break;
@@ -134,9 +129,8 @@ export class SwarmCreator {
                 newObj = new SwarmFlag();
                 break;
             case (SwarmType.SwarmKeepersLair):
-                throw new NotImplementedException("SwarmKeepersLair not implemented");
-            /*newObj = new SwarmKeepersLair();
-            break;*/
+                newObj = new SwarmKeepersLair();
+                break;
             case (SwarmType.SwarmLab):
                 newObj = new SwarmLab();
                 break;
@@ -156,17 +150,14 @@ export class SwarmCreator {
                 newObj = new SwarmObserver();
                 break;
             case (SwarmType.SwarmPortal):
-                throw new NotImplementedException("SwarmPortal not implemented");
-            /*newObj = new SwarmPortal();
-            break;*/
+                newObj = new SwarmPortal();
+                break;
             case (SwarmType.SwarmPowerBank):
-                throw new NotImplementedException("SwarmPowerBank not implemented");
-            /*newObj = new SwarmPowerBank();
-            break;*/
+                newObj = new SwarmPowerBank();
+                break;
             case (SwarmType.SwarmPowerSpawn):
-                throw new NotImplementedException("SwarmPowerSpawn not implemented");
-            /*newObj = new SwarmPowerSpawn();
-            break;*/
+                newObj = new SwarmPowerSpawn();
+                break;
             case (SwarmType.SwarmRampart):
                 newObj = new SwarmRampart();
                 break;
@@ -254,12 +245,12 @@ export class SwarmCreator {
                 });
                 break;
             case (SwarmType.SwarmKeepersLair):
-                /*newMemory = new StructureMemory({
+                newMemory = new StructureMemory({
                     id: id,
                     MEM_TYPE: SwarmDataType.Structure,
-                    SWARM_TYPE: SwarmType.SwarmExtractor
-                });*/
-                throw new NotImplementedException("SwarmKeepersLair has not been set up yet.");
+                    SWARM_TYPE: SwarmType.SwarmKeepersLair
+                });
+                break;
             case (SwarmType.SwarmLab):
                 newMemory = new StructureMemory({
                     id: id,
@@ -305,26 +296,26 @@ export class SwarmCreator {
                 });
                 break;
             case (SwarmType.SwarmPortal):
-                /*newMemory = new StructureMemory({
+                newMemory = new StructureMemory({
                     id: id,
                     MEM_TYPE: SwarmDataType.Structure,
-                    SWARM_TYPE: SwarmType.SwarmExtractor
-                });*/
-                throw new NotImplementedException("SwarmPortal has not been set up yet.");
+                    SWARM_TYPE: SwarmType.SwarmPortal
+                });
+                break;
             case (SwarmType.SwarmPowerBank):
-                /*nnewMemory = new StructureMemory({
+                newMemory = new StructureMemory({
                     id: id,
                     MEM_TYPE: SwarmDataType.Structure,
-                    SWARM_TYPE: SwarmType.SwarmExtractor
-                });*/
-                throw new NotImplementedException("SwarmPowerBank has not been set up yet.");
+                    SWARM_TYPE: SwarmType.SwarmPowerBank
+                });
+                break;
             case (SwarmType.SwarmPowerSpawn):
-                /*newMemory = new StructureMemory({
+                newMemory = new StructureMemory({
                     id: id,
                     MEM_TYPE: SwarmDataType.Structure,
-                    SWARM_TYPE: SwarmType.SwarmExtractor
-                });*/
-                throw new NotImplementedException("SwarmPowerSpawn has not been set up yet.");
+                    SWARM_TYPE: SwarmType.SwarmPowerSpawn
+                });
+                break;
             case (SwarmType.SwarmRampart):
                 newMemory = new StructureMemory({
                     id: id,

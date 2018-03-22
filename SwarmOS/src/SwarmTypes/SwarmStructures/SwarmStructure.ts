@@ -1,5 +1,5 @@
 import { StructureMemory } from "Memory/StorageMemory";
-import { NotifiableSwarmObject } from "SwarmTypes/SwarmTypes";
+import { NotifiableSwarmObject, OwnableSwarmObject } from "SwarmTypes/SwarmTypes";
 
 export abstract class SwarmStructure<T extends SwarmStructureType, U extends StructureConstant, V extends Structure<U>>
     extends NotifiableSwarmObject<IStructureMemory, V> implements ISwarmStructureType<T, U>, Structure<U> {
@@ -142,4 +142,45 @@ export class SwarmNuker extends OwnedSwarmStructure<SwarmType.SwarmNuker, STRUCT
     }
 
     launchNuke(pos: RoomPosition) { return this._instance.launchNuke(pos); }
+}
+
+export class SwarmKeepersLair extends OwnedSwarmStructure<SwarmType.SwarmKeepersLair,
+    STRUCTURE_KEEPER_LAIR, StructureKeeperLair> implements ISwarmKeepersLair, StructureKeeperLair {
+    get ticksToSpawn(): number | undefined { return this._instance.ticksToSpawn; }
+    protected OnActivate() {
+        console.log("Successfully activated a KeepersLair");
+    }
+}
+export class SwarmPortal extends SwarmStructure<SwarmType.SwarmPortal, STRUCTURE_PORTAL, StructurePortal> implements ISwarmPortal, StructurePortal {
+    get destination(): RoomPosition { return this._instance.destination; }
+    get ticksToDecay(): number { return this._instance.ticksToDecay; }
+    protected OnActivate() {
+        console.log("Successfully activated a Portal");
+    }
+}
+
+export class SwarmPowerBank extends SwarmStructure<SwarmType.SwarmPowerBank, STRUCTURE_POWER_BANK,
+    StructurePowerBank> implements ISwarmPowerBank, StructurePowerBank {
+    get power() { return this._instance.power; }
+    get ticksToDecay() { return this._instance.ticksToDecay; }
+    protected OnActivate() {
+        console.log("Successfully activated a PowerBank");
+    }
+}
+
+export class SwarmPowerSpawn extends OwnedSwarmStructure<SwarmType.SwarmPowerSpawn, STRUCTURE_POWER_SPAWN,
+    StructurePowerSpawn> implements ISwarmPowerSpawn, StructurePowerSpawn {
+    get energy() { return this._instance.energy; }
+    get energyCapacity() { return this._instance.energyCapacity; }
+    get power() { return this._instance.power; }
+    get powerCapacity() { return this._instance.powerCapacity; }
+    createPowerCreep(name: string): ScreepsReturnCode {
+        return this._instance.createPowerCreep(name);
+    }
+    processPower(): ScreepsReturnCode {
+        return this._instance.processPower();
+    }
+    protected OnActivate() {
+        console.log("Successfully activated a PowerSpawn");
+    }
 }
