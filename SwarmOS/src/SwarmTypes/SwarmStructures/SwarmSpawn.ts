@@ -2,7 +2,7 @@ import { NotImplementedException } from "Tools/SwarmExceptions";
 import { SwarmCreep } from "../SwarmCreep";
 import { OwnedSwarmStructure } from "./SwarmStructure";
 import { profile } from "Tools/Profiler";
-import { StructureMemory } from "Memory/StorageMemory";
+import { StructureMemory } from "SwarmMemory/StorageMemory";
 
 @profile
 export class SwarmSpawn extends OwnedSwarmStructure<SwarmType.SwarmSpawn, STRUCTURE_SPAWN, StructureSpawn> implements ISwarmSpawn, StructureSpawn {

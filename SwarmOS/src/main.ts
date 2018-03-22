@@ -3,7 +3,7 @@ import * as Profiler from "Tools/Profiler";
 global.Profiler = Profiler.init();
 
 import "Tools/GlobalTools";
-import "Memory/Swarmlord";
+import "SwarmMemory/Swarmlord";
 import { SwarmQueen } from "SwarmManagers/SwarmQueen";
 import { SwarmCreepController } from "SwarmManagers/SwarmCreepManager"
 import { SwarmFlagController } from "SwarmManagers/SwarmFlagController"

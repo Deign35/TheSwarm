@@ -1,4 +1,4 @@
-import { RoomMemory } from "Memory/StorageMemory";
+import { RoomMemory } from "SwarmMemory/StorageMemory";
 import { profile } from "Tools/Profiler";
 import { SwarmItemWithName } from "SwarmTypes/SwarmTypes";
 

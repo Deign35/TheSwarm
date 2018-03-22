@@ -1,5 +1,5 @@
 import { profile } from "Tools/Profiler";
-import { StructureMemory, CreepMemory, FlagMemory, RoomObjectMemory, RoomMemory } from "Memory/StorageMemory";
+import { StructureMemory, CreepMemory, FlagMemory, RoomObjectMemory, RoomMemory } from "SwarmMemory/StorageMemory";
 import { SwarmController } from "SwarmTypes/SwarmStructures/SwarmController";
 import { SwarmCreep } from "SwarmTypes/SwarmCreep";
 import { SwarmExtension, SwarmExtractor, SwarmLink, SwarmNuker, SwarmObserver, SwarmRampart, SwarmRoad, SwarmStorage, SwarmTerminal, SwarmWall, SwarmKeepersLair, SwarmPortal, SwarmPowerBank, SwarmPowerSpawn } from "SwarmTypes/SwarmStructures/SwarmStructure";
@@ -219,7 +219,7 @@ export class SwarmCreator {
                     id: id,
                     MEM_TYPE: SwarmDataType.Creep,
                     SWARM_TYPE: SwarmType.SwarmCreep,
-                    CM_TYPE: CreepModule.Any
+                    CM_TYPE: CreepModuleType.NullModule
                 });
                 break;
             case (SwarmType.SwarmExtension):

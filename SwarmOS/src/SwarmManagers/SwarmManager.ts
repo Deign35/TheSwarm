@@ -1,6 +1,6 @@
 import { profile } from "Tools/Profiler";
 import { MemoryNotFoundException } from "Tools/SwarmExceptions";
-import { MasterSwarmMemory } from "Memory/StorageMemory";
+import { MasterSwarmMemory } from "SwarmMemory/StorageMemory";
 
 const SWARMOBJECT_IDs = 'IDs';
 @profile

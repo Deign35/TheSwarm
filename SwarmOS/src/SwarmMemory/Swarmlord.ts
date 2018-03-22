@@ -1,5 +1,5 @@
 import { profile } from "Tools/Profiler";
-import { MasterSwarmMemory, MasterCreepMemory, MasterFlagMemory, MasterRoomMemory, MasterStructureMemory } from "Memory/StorageMemory";
+import { MasterSwarmMemory, MasterCreepMemory, MasterFlagMemory, MasterRoomMemory, MasterStructureMemory } from "SwarmMemory/StorageMemory";
 import { NotImplementedException } from "Tools/SwarmExceptions";
 declare var Memory: ISwarmMemoryStructure;
 

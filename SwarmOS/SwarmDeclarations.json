@@ -100,18 +100,6 @@
             "SwarmTower": 27,
             "SwarmWall": 28
         },
-        "CreepModule": {
-            "Any": 0,
-            "Builder": 1,
-            "Retriever": 2,
-            "Deliverer": 3,
-            "Upgrader": 4,
-            "Repairer": 5,
-            "Scientist": 6,
-            "Defender": 7,
-            "SourceHarvester": 8,
-            "MineralHarvester": 9
-        },
         "RoomObjectDataType": {
             "Any": 0,
             "Source": 1,
@@ -134,6 +122,40 @@
             "NullModule": 0,
             "Input": 1,
             "Output": 2
+        },
+        "CreepModuleType": {
+            "NullModule": 0,
+            "Builder": 1,
+            "Retriever": 2,
+            "Deliverer": 3,
+            "Upgrader": 4,
+            "Repairer": 5,
+            "Scientist": 6,
+            "Defender": 7,
+            "SourceHarvester": 8,
+            "MineralHarvester": 9
+        },
+        "FlagModuleType": {
+            "NullModule": 0,
+            "Construct": 1,
+            "Position": 2
+        },
+        "RoomModuleType": {
+            "NuetralRoom": 0,
+            "RCL1": 1,
+            "RCL2": 2,
+            "RCL3": 3,
+            "RCL4": 4,
+            "RCL5": 5,
+            "RCL6": 6,
+            "RCL7": 7,
+            "RCL8": 8,
+            "HarvestSupport": 9,
+            "KeepersLair": 10
+        },
+        "MiscModuleType": {
+            "NullModule": 0,
+            "SomeExample": 1
         }
     },
     "CompoundTypes": {

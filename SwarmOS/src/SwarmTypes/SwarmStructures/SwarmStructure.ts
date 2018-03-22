@@ -1,4 +1,4 @@
-import { StructureMemory } from "Memory/StorageMemory";
+import { StructureMemory } from "SwarmMemory/StorageMemory";
 import { NotifiableSwarmObject, OwnableSwarmObject } from "SwarmTypes/SwarmTypes";
 
 export abstract class SwarmStructure<T extends SwarmStructureType, U extends StructureConstant, V extends Structure<U>>

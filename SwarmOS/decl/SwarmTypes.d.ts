@@ -136,18 +136,17 @@ declare interface ISwarmObjectController<T extends SwarmControllerDataTypes, U e
 
 
 declare interface ISwarmRoomController extends ISwarmObjectController<SwarmControllerDataTypes.Rooms, ISwarmRoom> {
-} declare var SwarmQueen: ISwarmRoomController;
+}
 declare interface ISwarmCreepController extends ISwarmObjectController<SwarmControllerDataTypes.Creeps, ISwarmCreep> {
-} declare var SwarmCreepController: ISwarmCreepController;
+}
 declare interface ISwarmStructureController extends ISwarmObjectController<SwarmControllerDataTypes.Structures, TSwarmStructure> {
-} declare var SwarmStructureController: ISwarmStructureController;
+}
 declare interface ISwarmFlagController extends ISwarmObjectController<SwarmControllerDataTypes.Flags, ISwarmFlag> {
-} declare var SwarmFlagController: ISwarmFlagController;
+}
 
 declare interface ISwarmRoomObjectController extends ISwarmObjectController<SwarmControllerDataTypes.RoomObjects, TSwarmRoomObject> {
 
 }
-
 
 declare var SwarmCreator: {
     CreateSwarmMemory(mem: TSwarmData): TSwarmMemory;

@@ -1,4 +1,4 @@
-import { RoomObjectMemory } from "Memory/StorageMemory";
+import { RoomObjectMemory } from "SwarmMemory/StorageMemory";
 import { SwarmRoomObject } from "SwarmTypes/SwarmTypes";
 
 export class SwarmSource extends SwarmRoomObject<IRoomObjectMemory, Source> implements ISwarmSource, Source {

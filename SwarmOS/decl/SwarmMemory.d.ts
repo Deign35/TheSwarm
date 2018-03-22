@@ -7,10 +7,10 @@ declare interface ISwarmData<T extends SwarmDataType, U extends SwarmType> exten
     SWARM_TYPE: U;
 } declare type TSwarmData = ISwarmData<SwarmDataType, SwarmType>;
 declare interface IOtherData extends ISwarmData<SwarmDataType.Other, SwarmType.Any> { }
-declare interface ICreepData<T extends CreepModule> extends ISwarmData<SwarmDataType.Creep, SwarmType.SwarmCreep> {
+declare interface ICreepData<T extends CreepModuleType> extends ISwarmData<SwarmDataType.Creep, SwarmType.SwarmCreep> {
     CM_TYPE: T;
     // Special info for creeps
-} declare type TCreepData = ICreepData<CreepModule>
+} declare type TCreepData = ICreepData<CreepModuleType>
 declare interface IStructureData<T extends SwarmStructureType> extends ISwarmData<SwarmDataType.Structure, SwarmStructureType> {
     // Special info for structure
 } declare type TStructureData = IStructureData<SwarmStructureType>
