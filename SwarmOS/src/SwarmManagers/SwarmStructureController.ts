@@ -2,7 +2,6 @@ import { PrimeManager } from "./SwarmManager";
 import { InvalidArgumentException } from "Tools/SwarmExceptions";
 import { profile } from "Tools/Profiler";
 import { StructureMemory } from "Memory/StorageMemory";
-import { SwarmCreator } from "SwarmTypes/SwarmCreator";
 
 const STRUCTURE_SAVE_PATH = ["structures"];
 // PrimeManager<T extends PrimeDataTypes, U extends SwarmType> 

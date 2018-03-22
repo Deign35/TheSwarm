@@ -91,22 +91,49 @@ export class RoomObjectMemory extends MemoryBase<SwarmRoomObjectType, TRoomObjec
     SaveToParent(parentMemory: TMasterMemory | ISwarmMemoryStructure): void;
 } declare type TMasterMemory = IMasterMemory<TMasterData>;
  */
-export class MasterMemory<T extends number, U extends IData, V extends IMasterData<U>>
-    extends MemoryBase<T, V> implements IMasterMemory<V> {
+export class MasterSwarmMemory<T extends SwarmType, U extends TSwarmData, V extends IMasterData<U>>
+    extends MemoryBase<T, V> implements IMasterMemory<T, U, V> {
+    constructor(data: V) {
+        super(data);
+        this.ChildData = this.GetData("ChildData");
+    }
     get MEM_TYPE(): SwarmDataType.Master { return SwarmDataType.Master };
-    CheckoutChildMemory(id: string): IMemory<V> {
-        throw new Error("Method not implemented.");
+    protected ChildData!: { [id: string]: U; }
+    CheckoutChildMemory(id: string): IMemory<U> {
+        let data = this.ChildData[id];
+        let newMem = SwarmCreator.CreateSwarmMemory(data);
+
+        newMem.ReserveMemory();
+        return newMem as IMemory<U>;
         //create memory from the data in ID and return the memory.
     }
-    SaveChildMemory(childMemory: TMemory): void {
-        this.SetData(childMemory.id, childMemory.ReleaseMemory());
+    SaveChildMemory(childData: U): void {
+        this.ChildData[childData.id] = childData;
     }
-    SaveToParent(parentMemory: IMasterMemory<IMasterData<IData>> | ISwarmMemoryStructure): void {
-
+    SaveToParent(parentMemory: TMasterMemory | ISwarmMemoryStructure): void {
+        if ((parentMemory as TMemory).IsCheckedOut) {
+            this.SetData('ChildData', this.ChildData);
+            (parentMemory as TMasterMemory).SaveChildMemory(this);
+        } else {
+            parentMemory[this.id] = this.ReleaseMemory();
+        }
     }
 }
 
-export abstract class MasterSwarmMemory<T extends SwarmType, U extends TSwarmData, V extends IMasterData<U>>
-    extends MasterMemory<SwarmDataType.Master, U, V> implements IMasterSwarmData<U> {
-    ChildData!: { [id: string]: U; };
+
+export class MasterCreepMemory extends MasterSwarmMemory<SwarmType.SwarmCreep, TCreepData, IMasterCreepData>
+    implements IMasterCreepMemory {
+
+}
+export class MasterFlagMemory extends MasterSwarmMemory<SwarmType.SwarmFlag, TFlagData, IMasterFlagData>
+    implements IMasterFlagMemory {
+
+}
+export class MasterRoomMemory extends MasterSwarmMemory<SwarmType.SwarmRoom, TRoomData, IMasterRoomData>
+    implements IMasterRoomMemory {
+
+}
+export class MasterStructureMemory extends MasterSwarmMemory<SwarmStructureType, TStructureData, IMasterStructureData>
+    implements IMasterStructureMemory {
+
 }

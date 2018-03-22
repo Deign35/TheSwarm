@@ -147,3 +147,10 @@ declare interface ISwarmFlagController extends ISwarmObjectController<SwarmContr
 declare interface ISwarmRoomObjectController extends ISwarmObjectController<SwarmControllerDataTypes.RoomObjects, TSwarmRoomObject> {
 
 }
+
+
+declare var SwarmCreator: {
+    CreateSwarmMemory(mem: TSwarmData): TSwarmMemory;
+    CreateSwarmObject(swarmType: SwarmType): TObject;
+    CreateNewSwarmMemory(id: string, swarmType: SwarmType): TSwarmMemory;
+}

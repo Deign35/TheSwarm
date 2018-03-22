@@ -1,4 +1,6 @@
 import { profile } from "Tools/Profiler";
+import { MasterSwarmMemory, MasterCreepMemory, MasterFlagMemory, MasterRoomMemory, MasterStructureMemory } from "Memory/StorageMemory";
+import { NotImplementedException } from "Tools/SwarmExceptions";
 declare var Memory: ISwarmMemoryStructure;
 
 @profile
@@ -59,15 +61,38 @@ export class Swarmlord implements ISwarmlord {
         }
     }
 
-    SaveMasterMemory<T extends TMasterSwarmMemory>(memObject: T, save?: boolean): void {
+    SaveMasterMemory<T extends MasterMemoryTypes>(memObject: T, save?: boolean): void {
+        let memData = memObject.ReleaseMemory();
         if (save) {
-            Memory[memObject.id] = memObject.ReleaseMemory();
+            Memory[memObject.id] = memData;
         }
-        memObject.ReleaseMemory();
     }
 
-    CheckoutMasterMemory<T extends TMasterSwarmMemory>(id: string): T {
-        return CopyObject(Memory[id]);
+    CheckoutMasterMemory(id: string) {
+        let data = CopyObject(Memory[id]);
+        let newMem: PrimeMemoryTypes | undefined;
+        switch (data.id) {
+            case (SwarmControllerDataTypes.Creeps):
+                newMem = new MasterCreepMemory(data);
+                break;
+            case (SwarmControllerDataTypes.Flags):
+                newMem = new MasterFlagMemory(data);
+                break;
+            case (SwarmControllerDataTypes.Rooms):
+                newMem = new MasterRoomMemory(data);
+                break;
+            case (SwarmControllerDataTypes.Structures):
+                newMem = new MasterStructureMemory(data);
+                break;
+        }
+
+        if (!newMem) {
+            throw new NotImplementedException("Attempted to checkout memory that isn't mastered correctly: " + id);
+        }
+
+        (newMem as TMasterMemory)
+            newMem.ReserveMemory();
+        return newMem;
     }
 }
 

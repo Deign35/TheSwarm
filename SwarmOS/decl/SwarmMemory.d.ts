@@ -51,13 +51,14 @@ declare type TMasterData = IMasterData<IData>;
 declare interface IMasterSwarmData<T extends TSwarmData> extends IMasterData<T> {
     MEM_TYPE: SwarmDataType.Master;
     // Data common to all MasterSwarmDatas (including IRoomObjectData)
-} declare type TMasterSwarmData = IMasterSwarmData<TBasicSwarmData>;
+}
 declare interface IMasterRoomObjectData extends IMasterSwarmData<TRoomObjectData> { }
 declare interface IMasterFlagData extends IMasterSwarmData<TFlagData> { }
 declare interface IMasterStructureData extends IMasterSwarmData<TStructureData> { }
 declare interface IMasterRoomData extends IMasterSwarmData<TRoomData> { }
 declare interface IMasterCreepData extends IMasterSwarmData<TCreepData> { }
 declare interface IMasterOtherData extends IMasterSwarmData<IOtherData> { }
+declare type MasterSwarmDataTypes = IMasterRoomObjectData | IMasterFlagData | IMasterStructureData | IMasterRoomData | IMasterOtherData
 
 declare interface IMemory<T extends IData> {
     // Doesn't ENFORCE that the MemoryType and GetSwarmData[MEM_TYPE] as the same, but can be manually kept up.
@@ -95,18 +96,22 @@ declare interface IStructureMemory extends ISwarmMemory<TStructureData> {
 declare type SwarmMemoryTypes = ICreepMemory | IFlagMemory | IRoomMemory |
     IRoomObjectMemory | IStructureMemory | TSwarmMemory;
 
-declare interface IMasterMemory<T extends TMasterData> extends IMemory<T> {
-    CheckoutChildMemory(id: string): IMemory<T>;
-    SaveChildMemory(childMemory: TMemory): void;
+declare interface IMasterMemory<T extends SwarmType, U extends IData, V extends IMasterData<U>> extends IMemory<V> {
+    CheckoutChildMemory(id: string): IMemory<U>;
+    SaveChildMemory(childMemory: U): void;
     SaveToParent(parentMemory: TMasterMemory | ISwarmMemoryStructure): void;
-} declare type TMasterMemory = IMasterMemory<TMasterData>;
-declare interface IMasterSwarmMemory<T extends TMasterSwarmData> extends IMasterMemory<T> {
-} declare type TMasterSwarmMemory = IMasterSwarmMemory<TMasterSwarmData>;
-declare interface IMasterFlagMemory extends IMasterSwarmMemory<IMasterFlagData> { }
-declare interface IMasterCreepMemory extends IMasterSwarmMemory<IMasterCreepData> { }
-declare interface IMasterRoomMemory extends IMasterSwarmMemory<IMasterRoomData> { }
-declare interface IMasterRoomObjectMemory extends IMasterSwarmMemory<IMasterRoomObjectData> { }
-declare interface IMasterStructureMemory extends IMasterSwarmMemory<IMasterStructureData> { }
+} declare type TMasterMemory = IMasterMemory<SwarmType, IData, TMasterData>;
+declare interface IMasterSwarmMemory<T extends SwarmType, U extends TBasicSwarmData,
+    V extends IMasterSwarmData<U>> extends IMasterMemory<T, U, V> {
+}
+declare interface IMasterFlagMemory extends IMasterSwarmMemory<SwarmType.SwarmFlag, TFlagData, IMasterFlagData> { }
+declare interface IMasterCreepMemory extends IMasterSwarmMemory<SwarmType.SwarmCreep, TCreepData, IMasterCreepData> { }
+declare interface IMasterRoomMemory extends IMasterSwarmMemory<SwarmType.SwarmRoom, TRoomData, IMasterRoomData> { }
+declare interface IMasterRoomObjectMemory extends IMasterSwarmMemory<SwarmRoomObjectType, TRoomObjectData, IMasterRoomObjectData> { }
+declare interface IMasterStructureMemory extends IMasterSwarmMemory<SwarmStructureType, TStructureData, IMasterStructureData> { }
+
+declare type MasterMemoryTypes = TMasterMemory | IMasterFlagMemory | IMasterCreepMemory |
+    IMasterRoomMemory | IMasterRoomObjectMemory | IMasterStructureMemory
 
 
 declare interface ISwarmMemoryStructure {
@@ -125,6 +130,6 @@ declare type PrimeDataTypes = SwarmControllerDataTypes.Creeps | SwarmControllerD
 //IMasterSwarmMemory<T extends SwarmType>
 declare interface ISwarmlord {
     ValidateMemory(): void;
-    SaveMasterMemory<T extends TMasterSwarmMemory>(memObject: T, save?: boolean): void;
-    CheckoutMasterMemory<T extends TMasterSwarmMemory>(dataType: string): T;
+    SaveMasterMemory<T extends MasterMemoryTypes>(memObject: T, save?: boolean): void;
+    CheckoutMasterMemory(dataType: string): MasterMemoryTypes;
 } declare var Swarmlord: ISwarmlord;
