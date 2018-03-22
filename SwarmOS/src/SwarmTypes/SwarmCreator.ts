@@ -6,13 +6,19 @@ import { SwarmContainer } from "./SwarmStructures/SwarmStructure";
 var SwarmTypeToSwarmObj = {}
 @profile
 export class SwarmCreator {
-    static CreateSwarmObject<T extends TSwarmMemory, U extends Room | RoomObject>(obj: U, swarmType: SwarmType): ISwarmObject<T, U> {
+    static CreateSwarmObject<T extends ISwarmMemory<ISwarmData<SwarmDataType, V>>, U extends Room | RoomObject | Creep | Flag | Structure<StructureConstant>, V extends SwarmType>
+        (obj: U, swarmType: SwarmType): ISwarmObject<T, U> {
         switch (swarmType) {
             case (SwarmType.SwarmContainer):
-                let newDataObj: IStructureData<StructureContainer>    
+                let theObj = obj as Structure<STRUCTURE_CONTAINER>
+                let newDataObj: IStructureData<SwarmType.SwarmContainer> = {
+                    id: obj['id'],
+                    MEM_TYPE: SwarmDataType.Structure,
+                    SWARM_TYPE: SwarmType.SwarmContainer
+                }
                 let newContainer = new SwarmContainer();
-                
-                
+                newContainer.AssignObject(theObj, newDataObj);
+                return newContainer;
         }
     }
     /*tatic CreateSwarmObject<T extends Source | Creep

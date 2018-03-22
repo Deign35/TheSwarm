@@ -8,7 +8,7 @@
     GetCopyOfMemory(): T
     GetCopyOfObject(): U */
 
-abstract class SwarmTypeBase<T extends TSwarmMemory, U extends RoomObject | Room>
+abstract class SwarmTypeBase<T extends TSwarmMemory, U extends Room | RoomObject | Creep | Flag | Structure<StructureConstant>>
     implements ISwarmObject<T, U> {
     get prototype(): U {
         return this.prototype;

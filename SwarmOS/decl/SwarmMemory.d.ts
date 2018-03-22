@@ -12,7 +12,6 @@ declare interface ICreepData<T extends CreepModule> extends ISwarmData<SwarmData
     // Special info for creeps
 } declare type TCreepData = ICreepData<CreepModule>
 declare interface IStructureData<T extends SwarmStructureType> extends ISwarmData<SwarmDataType.Structure, SwarmStructureType> {
-    STR_TYPE: T;
     // Special info for structure
 } declare type TStructureData = IStructureData<SwarmStructureType>
 declare interface IFlagData<T> extends ISwarmData<SwarmDataType.Flag, SwarmType.SwarmFlag> {
