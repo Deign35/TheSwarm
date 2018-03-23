@@ -4,26 +4,26 @@ global.Profiler = Profiler.init();
 
 import "Tools/GlobalTools";
 import "SwarmMemory/Swarmlord";
-import { SwarmQueen } from "SwarmManagers/SwarmQueen";
-import { SwarmCreepController } from "SwarmManagers/SwarmCreepManager"
-import { SwarmFlagController } from "SwarmManagers/SwarmFlagController"
-import { SwarmStructureController } from "SwarmManagers/SwarmStructureController"
+import { SwarmRoomController } from "SwarmControllers/SwarmRoomController";
+import { SwarmCreepController } from "SwarmControllers/SwarmCreepController"
+import { SwarmFlagController } from "SwarmControllers/SwarmFlagController"
+import { SwarmStructureController } from "SwarmControllers/SwarmStructureController"
 
 export const loop = function () {
     //debugger;
     Swarmlord.ValidateMemory();
 
-    SwarmQueen.PrepareTheSwarm();
+    SwarmRoomController.PrepareTheSwarm();
     SwarmCreepController.PrepareTheSwarm();
     SwarmFlagController.PrepareTheSwarm();
     SwarmStructureController.PrepareTheSwarm();
 
-    SwarmQueen.ActivateSwarm();
+    SwarmRoomController.ActivateSwarm();
     SwarmCreepController.ActivateSwarm();
     SwarmFlagController.ActivateSwarm();
     SwarmStructureController.ActivateSwarm();
 
-    SwarmQueen.FinalizeSwarmActivity();
+    SwarmRoomController.FinalizeSwarmActivity();
     SwarmCreepController.FinalizeSwarmActivity();
     SwarmFlagController.FinalizeSwarmActivity();
     SwarmStructureController.FinalizeSwarmActivity();

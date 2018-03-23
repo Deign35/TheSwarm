@@ -30,9 +30,6 @@ abstract class SwarmTypeBase<T extends TSwarmMemory, U extends Room | RoomObject
     protected abstract OnActivate(): void;
     GetCopyOfMemory(): T { return this._memory; }
     InitNewObject() { }
-    GetSpawnRequirements(): ISpawnRequirement {
-        return SwarmTypeBase.NoSpawnRequirement;
-    }
 
     static readonly NoSpawnRequirement: ISpawnRequirement = {
         priority: Priority.Lowest,

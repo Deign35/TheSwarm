@@ -4,7 +4,7 @@ import { MasterSwarmMemory } from "SwarmMemory/StorageMemory";
 
 const SWARMOBJECT_IDs = 'IDs';
 @profile
-export abstract class SwarmManager<T extends SwarmControllerDataTypes,
+export abstract class SwarmController<T extends SwarmControllerDataTypes,
     U extends SwarmObject> implements ISwarmObjectController<T, U> {
     constructor() {
         this.LoadSwarmObjects();
@@ -84,7 +84,4 @@ export abstract class SwarmManager<T extends SwarmControllerDataTypes,
     protected abstract GetTypeOf(obj: AnyStructure | Creep | Flag | Room | RoomObject): SwarmType;
     protected abstract get _dataType(): T;
 
-}
-
-export abstract class PrimeManager<T extends PrimeDataTypes, U extends SwarmObject> extends SwarmManager<T, U> {
 }

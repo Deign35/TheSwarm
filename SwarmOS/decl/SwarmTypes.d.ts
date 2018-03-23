@@ -18,7 +18,6 @@ declare interface IObject<T extends TMemory, U> extends _Constructor<U> {
 } declare type TObject = IObject<TMemory, any>;
 declare interface ISwarmObject<T extends TSwarmMemory, U extends Room | RoomObject | Creep | Flag | AnyStructure> extends IObject<T, U> {
     GetMemType(): SwarmType;
-    GetSpawnRequirements(): ISpawnRequirement;
 } declare type SwarmObject = ISwarmObject<SwarmMemoryTypes, Room | RoomObject | Creep | Flag | AnyStructure>;
 
 declare interface ISwarmRoomObject<T extends TSwarmMemory, U extends RoomObject | Creep | Flag | AnyStructure>

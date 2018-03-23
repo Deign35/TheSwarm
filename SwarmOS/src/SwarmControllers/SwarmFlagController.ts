@@ -1,11 +1,11 @@
 
 import { profile } from "Tools/Profiler";
-import { SwarmManager, PrimeManager } from "./SwarmManager";
+import { SwarmController } from "./SwarmController";
 import { SwarmFlag } from "SwarmTypes/SwarmFlag";
 
 const FLAG_SAVE_PATH = ['flags'];
 @profile
-export class SwarmFlagController extends PrimeManager<SwarmControllerDataTypes.Flags, SwarmFlag>
+export class SwarmFlagController extends SwarmController<SwarmControllerDataTypes.Flags, SwarmFlag>
     implements ISwarmFlagController {
     protected InitNewObj(swarmObj: SwarmFlag): void {
     }

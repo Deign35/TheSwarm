@@ -12,6 +12,7 @@ import { SwarmSource } from "SwarmTypes/SwarmSource";
 import { SwarmSpawn } from "SwarmTypes/SwarmStructures/SwarmSpawn";
 import { SwarmTower } from "SwarmTypes/SwarmStructures/SwarmTower";
 
+var SwarmObjectInstances = {}
 
 @profile
 export class SwarmCreator {
@@ -344,10 +345,10 @@ export class SwarmCreator {
                     MEM_TYPE: SwarmDataType.Room,
                     SWARM_TYPE: SwarmType.SwarmRoom,
                     RM_TYPE: 0,
-                    OBJs: {
+                    RoomObjects: {
                         MEM_TYPE: SwarmDataType.Master,
                         ChildData: {},
-                        id: 'roomObjects'
+                        id: 'RoomObjects'
                     }
                 });
                 break;

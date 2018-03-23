@@ -1,10 +1,10 @@
 import { SwarmCreep } from "SwarmTypes/SwarmCreep";
 import { profile } from "Tools/Profiler";
-import { SwarmManager, PrimeManager } from "SwarmManagers/SwarmManager";
+import { SwarmController } from "SwarmControllers/SwarmController";
 
 const CREEP_SAVE_PATH = ['creeps'];
 @profile
-export class SwarmCreepController extends PrimeManager<SwarmControllerDataTypes.Creeps, SwarmCreep>
+export class SwarmCreepController extends SwarmController<SwarmControllerDataTypes.Creeps, SwarmCreep>
     implements ISwarmCreepController {
     protected InitNewObj(swarmObj: SwarmCreep): void {
     }

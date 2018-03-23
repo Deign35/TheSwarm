@@ -1,11 +1,11 @@
 
 import { profile } from "Tools/Profiler";
-import { SwarmManager, PrimeManager } from "./SwarmManager";
+import { SwarmController } from "./SwarmController";
 import { SwarmRoom } from "SwarmTypes/SwarmRoom";
 
 const ROOM_SAVE_PATH = ['rooms'];
 @profile
-export class SwarmQueen extends PrimeManager<SwarmControllerDataTypes.Rooms, SwarmRoom>
+export class SwarmRoomController extends SwarmController<SwarmControllerDataTypes.Rooms, SwarmRoom>
     implements ISwarmRoomController {
     protected InitNewObj(swarmObj: SwarmRoom): void {
         swarmObj.InitNewObject();
@@ -38,14 +38,14 @@ export class SwarmQueen extends PrimeManager<SwarmControllerDataTypes.Rooms, Swa
     protected OnFinalizeSwarm(swarmObj: SwarmRoom): void {
         swarmObj.FinalizeSwarmActivity();
     }
-    private static _instance: SwarmQueen;
+    private static _instance: SwarmRoomController;
     static GetSwarmObject(roomName: string): ISwarmRoom {
         return this._instance.GetSwarmObject(roomName) as ISwarmRoom;
     }
     static PrepareTheSwarm() {
-        this._instance = new SwarmQueen();
+        this._instance = new SwarmRoomController();
         this._instance.PrepareTheSwarm();
     }
     static ActivateSwarm() { this._instance.ActivateSwarm() }
     static FinalizeSwarmActivity() { this._instance.FinalizeSwarmActivity(); }
-} global["SwarmQueen"] = SwarmQueen;
+} global["SwarmQueen"] = SwarmRoomController;

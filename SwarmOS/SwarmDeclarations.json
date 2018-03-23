@@ -60,8 +60,8 @@
             "Other": 6,
             "Master": 7
         },
-        "QueenType": {
-            "Larva": 0,
+        "RoomType": {
+            "Unowned": 0,
             "RCL1": 1,
             "RCL2": 2,
             "RCL3": 3,
@@ -69,7 +69,8 @@
             "RCL5": 5,
             "RCL6": 6,
             "RCL7": 7,
-            "RCL8": 8
+            "RCL8": 8,
+            "Hostile": 9
         },
         "LogLevel": {
             "Info": 0,
