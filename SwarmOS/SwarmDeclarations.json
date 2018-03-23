@@ -17,6 +17,13 @@
         "E_NOT_IMPLEMENTED": -6
     },
     "Enums": {
+        "CreepBodyType": {
+            "ANY": 0,
+            "HighCarry": 1,
+            "SourceMiner": 2,
+            "HighWork": 3,
+            "SpeedWorker": 4
+        },
         "SpawnPriority": {
             "Lowest": 0,
             "Low": 2,

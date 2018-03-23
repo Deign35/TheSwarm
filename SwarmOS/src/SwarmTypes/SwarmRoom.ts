@@ -7,7 +7,6 @@ import { SwarmContainer } from "SwarmTypes/SwarmStructures/SwarmStructure";
 
 const ROOM_COUNTER = 'CNT';
 const HARVESTER_JOBS = 'HARVEST';
-const ROOMOBJECT_DATA = 'OBJs';
 
 @profile
 export class SwarmRoom extends SwarmItemWithName<IRoomMemory, Room>
