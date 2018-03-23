@@ -3,6 +3,7 @@ import { profile } from "Tools/Profiler";
 import { SwarmItemWithName, SwarmObject, SwarmMineral } from "SwarmTypes/SwarmTypes";
 import { NotImplementedException } from "Tools/SwarmExceptions";
 import { SwarmSource } from "./SwarmSource";
+import { SwarmContainer } from "SwarmTypes/SwarmStructures/SwarmStructure";
 
 const ROOM_COUNTER = 'CNT';
 const HARVESTER_JOBS = 'HARVEST';
@@ -18,6 +19,21 @@ export class SwarmRoom extends SwarmItemWithName<IRoomMemory, Room>
         return SwarmControllerDataTypes.RoomObjects
     }
     GetSwarmTypeFromObject(obj: any): SwarmType {
+        if ((obj as AnyStructure).structureType) {
+            debugger;
+            if ((obj as ConstructionSite).progressTotal && !(obj as StructureController).reservation) {
+                return SwarmType.SwarmSite;
+            }
+            switch ((obj as AnyStructure).structureType) {
+                case (STRUCTURE_CONTAINER): return SwarmType.SwarmContainer;
+                case (STRUCTURE_KEEPER_LAIR): return SwarmType.SwarmKeepersLair;
+                case (STRUCTURE_PORTAL): return SwarmType.SwarmPortal;
+                case (STRUCTURE_POWER_BANK): return SwarmType.SwarmPowerBank;
+                case (STRUCTURE_POWER_SPAWN): return SwarmType.SwarmPowerSpawn;
+                case (STRUCTURE_ROAD): return SwarmType.SwarmRoad;
+                case (STRUCTURE_WALL): return SwarmType.SwarmWall;
+            }
+        }
         if ((obj as Mineral).mineralType) {
             return SwarmType.SwarmMineral;
         } else if ((obj as Source).energyCapacity) {
@@ -26,8 +42,6 @@ export class SwarmRoom extends SwarmItemWithName<IRoomMemory, Room>
             return SwarmType.SwarmNuke;
         } else if ((obj as Resource).resourceType) {
             return SwarmType.SwarmResource;
-        } else if ((obj as ConstructionSite).progressTotal) {
-            return SwarmType.SwarmSite;
         } else if ((obj as Tombstone).deathTime) {
             return SwarmType.SwarmTombstone;
         }
@@ -55,6 +69,20 @@ export class SwarmRoom extends SwarmItemWithName<IRoomMemory, Room>
             let nukes = this.find(FIND_NUKES);
             for (let i = 0; i < nukes.length; i++) {
                 roomObjects[nukes[i].id] = nukes[i];
+            }
+        }
+        if (Game.time % 103 == 0) {
+            let neutralStructures = this.find(FIND_STRUCTURES, {
+                filter: function (struct) {
+                    return struct.structureType == STRUCTURE_CONTAINER ||
+                        struct.structureType == STRUCTURE_PORTAL ||
+                        struct.structureType == STRUCTURE_ROAD ||
+                        struct.structureType == STRUCTURE_WALL
+                }
+            });
+
+            for (let i = 0; i < neutralStructures.length; i++) {
+                roomObjects[neutralStructures[i].id] = neutralStructures[i];
             }
         }
 
@@ -131,10 +159,27 @@ export class SwarmRoom extends SwarmItemWithName<IRoomMemory, Room>
             roomObjects[obj.saveID] = obj.GetCopyOfMemory().ReleaseMemory();
         }
 
+        let neutralStructures = this.find(FIND_STRUCTURES, {
+            filter: function (struct) {
+                return struct.structureType == STRUCTURE_KEEPER_LAIR ||
+                    struct.structureType == STRUCTURE_POWER_BANK ||
+                    struct.structureType == STRUCTURE_POWER_SPAWN;
+            }
+        })
+        for (let i = 0; i < neutralStructures.length; i++) {
+            let structure = neutralStructures[i];
+            let swarmType = this.GetSwarmTypeFromObject(structure);
+            let newObj = SwarmCreator.CreateSwarmObject(swarmType) as SwarmContainer;
+            let newMem = SwarmCreator.CreateNewSwarmMemory(structure.id, swarmType);
+            newMem.ReserveMemory();
+            newObj.AssignObject(structure as SwarmContainer, newMem as IStructureMemory);
+            newObj.InitNewObject();
+            roomObjects[newObj.saveID] = newObj.GetCopyOfMemory().ReleaseMemory();
+        }
+
         this._memory.SetData('RoomObjects', roomObjects);
     }
     get DataType(): SwarmDataType.Room { return SwarmDataType.Room };
-    protected roomObjectsMemory!: any;
     protected roomObjects: { [id: string]: TSwarmRoomObject } = {}
 
     GetSwarmObject(id: string): TSwarmRoomObject {

@@ -78,7 +78,7 @@ export class SwarmRampart extends OwnedSwarmStructure<SwarmType.SwarmRampart, ST
 
     setPublic(isPublic: boolean) { return this._instance.setPublic(isPublic); }
     protected OnActivate() {
-        console.log("Successfully activated a Ramprt");
+        console.log("Successfully activated a Rampart");
     }
 }
 

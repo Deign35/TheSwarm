@@ -3845,6 +3845,7 @@ type AnyOwnedStructure =
 type AnyStructure =
     AnyOwnedStructure |
     StructureContainer |
+    StructureKeeperLair |
     StructurePortal |
     StructurePowerBank |
     StructureRoad |

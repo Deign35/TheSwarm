@@ -2,7 +2,7 @@ import { profile } from "Tools/Profiler";
 import { StructureMemory, CreepMemory, FlagMemory, RoomObjectMemory, RoomMemory } from "SwarmMemory/StorageMemory";
 import { SwarmController } from "SwarmTypes/SwarmStructures/SwarmController";
 import { SwarmCreep } from "SwarmTypes/SwarmCreep";
-import { SwarmExtension, SwarmExtractor, SwarmLink, SwarmNuker, SwarmObserver, SwarmRampart, SwarmRoad, SwarmStorage, SwarmTerminal, SwarmWall, SwarmKeepersLair, SwarmPortal, SwarmPowerBank, SwarmPowerSpawn } from "SwarmTypes/SwarmStructures/SwarmStructure";
+import { SwarmExtension, SwarmExtractor, SwarmLink, SwarmNuker, SwarmObserver, SwarmRampart, SwarmRoad, SwarmStorage, SwarmTerminal, SwarmWall, SwarmKeepersLair, SwarmPortal, SwarmPowerBank, SwarmPowerSpawn, SwarmContainer } from "SwarmTypes/SwarmStructures/SwarmStructure";
 import { SwarmFlag } from "SwarmTypes/SwarmFlag";
 import { SwarmLab } from "SwarmTypes/SwarmStructures/SwarmLab";
 import { SwarmMineral, SwarmNuke, SwarmResource, SwarmTombstone } from "SwarmTypes/SwarmTypes";
@@ -21,7 +21,7 @@ export class SwarmCreator {
 
         switch (memType as SwarmType) {
             case (SwarmType.SwarmContainer):
-                newMemory = new StructureMemory<SwarmType.SwarmController>(mem as TStructureData);
+                newMemory = new StructureMemory<SwarmType.SwarmContainer>(mem as TStructureData);
                 break;
             case (SwarmType.SwarmController):
                 newMemory = new StructureMemory<SwarmType.SwarmController>(mem as TStructureData);
@@ -111,7 +111,7 @@ export class SwarmCreator {
         let newObj: TObject;
         switch (swarmType) {
             case (SwarmType.SwarmContainer):
-                newObj = new SwarmController();
+                newObj = new SwarmContainer();
                 break;
             case (SwarmType.SwarmController):
                 newObj = new SwarmController();
