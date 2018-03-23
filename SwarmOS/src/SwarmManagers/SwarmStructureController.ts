@@ -8,6 +8,9 @@ const STRUCTURE_SAVE_PATH = ["structures"];
 @profile
 export class SwarmStructureController extends PrimeManager<SwarmControllerDataTypes.Structures, TSwarmStructure>
     implements ISwarmStructureController {
+    protected InitNewObj(swarmObj: TSwarmStructure): void {
+        // add stuff to the memory for this obj.
+    }
     get ControllerType(): SwarmControllerDataTypes.Structures { return SwarmControllerDataTypes.Structures; }
     protected get _dataType(): SwarmControllerDataTypes.Structures {
         return SwarmControllerDataTypes.Structures;
@@ -21,10 +24,14 @@ export class SwarmStructureController extends PrimeManager<SwarmControllerDataTy
             case (STRUCTURE_CONTROLLER): return SwarmType.SwarmController;
             case (STRUCTURE_EXTENSION): return SwarmType.SwarmExtension;
             case (STRUCTURE_EXTRACTOR): return SwarmType.SwarmExtractor;
+            case (STRUCTURE_KEEPER_LAIR): return SwarmType.SwarmKeepersLair;
             case (STRUCTURE_LAB): return SwarmType.SwarmLab;
             case (STRUCTURE_LINK): return SwarmType.SwarmLink;
             case (STRUCTURE_NUKER): return SwarmType.SwarmNuker;
             case (STRUCTURE_OBSERVER): return SwarmType.SwarmObserver;
+            case (STRUCTURE_PORTAL): return SwarmType.SwarmPortal;
+            case (STRUCTURE_POWER_BANK): return SwarmType.SwarmPowerBank;
+            case (STRUCTURE_POWER_SPAWN): return SwarmType.SwarmPowerSpawn;
             case (STRUCTURE_RAMPART): return SwarmType.SwarmRampart;
             case (STRUCTURE_ROAD): return SwarmType.SwarmRoad;
             case (STRUCTURE_SPAWN): return SwarmType.SwarmSpawn;
@@ -45,7 +52,7 @@ export class SwarmStructureController extends PrimeManager<SwarmControllerDataTy
     protected OnPrepareSwarm(swarmObj: TSwarmStructure): void {
     }
     protected OnActivateSwarm(swarmObj: TSwarmStructure): void {
-
+        swarmObj.Activate();
     }
     protected OnFinalizeSwarm(swarmObj: TSwarmStructure): void {
 

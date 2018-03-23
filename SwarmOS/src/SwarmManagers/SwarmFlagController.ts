@@ -7,6 +7,8 @@ const FLAG_SAVE_PATH = ['flags'];
 @profile
 export class SwarmFlagController extends PrimeManager<SwarmControllerDataTypes.Flags, SwarmFlag>
     implements ISwarmFlagController {
+    protected InitNewObj(swarmObj: SwarmFlag): void {
+    }
     get ControllerType(): SwarmControllerDataTypes.Flags { return SwarmControllerDataTypes.Flags; }
     protected GetTypeOf(obj: Flag): SwarmType.SwarmFlag {
         return SwarmType.SwarmFlag;
@@ -27,7 +29,7 @@ export class SwarmFlagController extends PrimeManager<SwarmControllerDataTypes.F
 
     }
     protected OnActivateSwarm(swarmObj: SwarmFlag): void {
-
+        swarmObj.Activate();
     }
     protected OnFinalizeSwarm(swarmObj: SwarmFlag): void {
 

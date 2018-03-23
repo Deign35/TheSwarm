@@ -1,60 +1,144 @@
 import { RoomMemory } from "SwarmMemory/StorageMemory";
 import { profile } from "Tools/Profiler";
-import { SwarmItemWithName } from "SwarmTypes/SwarmTypes";
+import { SwarmItemWithName, SwarmObject, SwarmMineral } from "SwarmTypes/SwarmTypes";
+import { NotImplementedException } from "Tools/SwarmExceptions";
+import { SwarmSource } from "./SwarmSource";
 
 const ROOM_COUNTER = 'CNT';
 const HARVESTER_JOBS = 'HARVEST';
 const ROOMOBJECT_DATA = 'OBJs';
+
 @profile
-export class SwarmRoom extends SwarmItemWithName<IRoomMemory, Room> implements ISwarmRoom, Room {
+export class SwarmRoom extends SwarmItemWithName<IRoomMemory, Room>
+    implements ISwarmRoom, Room, ISwarmRoomObjectController {
+    protected OnActivate(): void {
+        // Do Room specific stuff here.
+    }
+    get ControllerType(): SwarmControllerDataTypes.RoomObjects {
+        return SwarmControllerDataTypes.RoomObjects
+    }
+    GetSwarmTypeFromObject(obj: any): SwarmType {
+        if ((obj as Mineral).mineralType) {
+            return SwarmType.SwarmMineral;
+        } else if ((obj as Source).energyCapacity) {
+            return SwarmType.SwarmSource;
+        } else if ((obj as Nuke).launchRoomName) {
+            return SwarmType.SwarmNuke;
+        } else if ((obj as Resource).resourceType) {
+            return SwarmType.SwarmResource;
+        } else if ((obj as ConstructionSite).progressTotal) {
+            return SwarmType.SwarmSite;
+        } else if ((obj as Tombstone).deathTime) {
+            return SwarmType.SwarmTombstone;
+        }
+
+        throw new NotImplementedException('Not an implemented RoomObject ' + JSON.stringify(obj));
+    }
+    ActivateSwarm(): void {
+        for (let id in this.roomObjects) {
+            this.roomObjects[id].Activate();
+        }
+    }
+    FinalizeSwarmActivity(): void {
+        let objMemory = {};
+        for (let id in this.roomObjects) {
+            let obj = this.roomObjects[id];
+            objMemory[id] = obj.GetCopyOfMemory().ReleaseMemory();
+        }
+
+        this._memory.SetData("RoomObjects", objMemory);
+    }
+
+    PrepareTheSwarm(): void {
+        let roomObjects = {};
+        if (Game.time % 1117 == 0) {
+            let nukes = this.find(FIND_NUKES);
+            for (let i = 0; i < nukes.length; i++) {
+                roomObjects[nukes[i].id] = nukes[i];
+            }
+        }
+
+        if (Game.time % 5 == 0) {
+            let resources = this.find(FIND_DROPPED_RESOURCES);
+            for (let i = 0; i < resources.length; i++) {
+                roomObjects[resources[i].id] = resources[i];
+            }
+        }
+
+        if (Game.time % 7 == 0) {
+            let tombstones = this.find(FIND_TOMBSTONES);
+            for (let i = 0; i < tombstones.length; i++) {
+                roomObjects[tombstones[i].id] = tombstones[i];
+            }
+        }
+
+        if (Game.time % 11 == 0) {
+            let constructionSites = this.find(FIND_CONSTRUCTION_SITES);
+            for (let i = 0; i < constructionSites.length; i++) {
+                roomObjects[constructionSites[i].id] = constructionSites[i];
+            }
+        }
+
+        let AllMemory = this._memory.GetData("RoomObjects");
+        let SwarmObjects = {};
+        for (let id in AllMemory) {
+            let obj = Game.getObjectById(id);
+            if (!obj) {
+                // object gone, remove it
+                delete AllMemory[id];
+                continue;
+            }
+            let swarmObj = SwarmCreator.CreateSwarmObject(AllMemory[id]['SWARM_TYPE']);
+            let swarmMem = SwarmCreator.CreateSwarmMemory(AllMemory[id]);
+            swarmMem.ReserveMemory();
+            swarmObj.AssignObject(obj, swarmMem);
+            SwarmObjects[id] = swarmObj;
+
+            if (roomObjects[id]) {
+                delete roomObjects[id];
+            }
+        }
+
+        for (let id in roomObjects) {
+            let swarmType = this.GetSwarmTypeFromObject(roomObjects[id]);
+            let newObj = SwarmCreator.CreateSwarmObject(swarmType);
+            let newMem = SwarmCreator.CreateNewSwarmMemory(id, swarmType);
+            newMem.ReserveMemory();
+            newObj.AssignObject(roomObjects[id], newMem);
+            SwarmObjects[id] = newObj;
+        }
+
+        this.roomObjects = SwarmObjects;
+    }
+    InitNewObject() {
+        let roomObjects = {};
+        let sources = this.find(FIND_SOURCES);
+        for (let i = 0; i < sources.length; i++) {
+            let obj = SwarmCreator.CreateSwarmObject(SwarmType.SwarmSource) as SwarmSource;
+            let newMem = SwarmCreator.CreateNewSwarmMemory(sources[i].id, SwarmType.SwarmSource);
+            newMem.ReserveMemory();
+            obj.AssignObject(sources[i], newMem as IRoomObjectMemory);
+            obj.InitNewObject();
+            roomObjects[obj.saveID] = obj.GetCopyOfMemory().ReleaseMemory();
+        }
+        let minerals = this.find(FIND_MINERALS);
+        for (let i = 0; i < minerals.length; i++) {
+            let obj = SwarmCreator.CreateSwarmObject(SwarmType.SwarmMineral) as SwarmMineral;
+            let newMem = SwarmCreator.CreateNewSwarmMemory(sources[i].id, SwarmType.SwarmMineral);
+            newMem.ReserveMemory();
+            obj.AssignObject(minerals[i], newMem as IRoomObjectMemory);
+            obj.InitNewObject();
+            roomObjects[obj.saveID] = obj.GetCopyOfMemory().ReleaseMemory();
+        }
+
+        this._memory.SetData('RoomObjects', roomObjects);
+    }
     get DataType(): SwarmDataType.Room { return SwarmDataType.Room };
     protected roomObjectsMemory!: any;
-    /*protected roomObjects: { [id: string]: ISwarmRoomObject } = {}
+    protected roomObjects: { [id: string]: TSwarmRoomObject } = {}
 
-    GetSwarmObject(id: string): ISwarmSource | ISwarmMineral | ISwarmNuke | ISwarmTombstone | ISwarmSite | ISwarmResource {
+    GetSwarmObject(id: string): TSwarmRoomObject {
         return this.roomObjects[id];
-    }*/
-
-    protected OnActivate() {
-        /*let curCount = this._memory.GetData<number>(ROOM_COUNTER) || 5;
-        this._memory.SetData(ROOM_COUNTER, curCount + (curCount * 0.05));
-
-        let roomObjectData = Swarmlord.ReserveMem(ROOMOBJECT_DATA, SwarmDataType.RoomObject, this._memory);
-        //let roomObjectData = Swarmlord.CheckoutMemory(ROOMOBJECT_DATA, SwarmDataType.Other, this._memory);
-        let harvesters = this._memory.GetData(HARVESTER_JOBS) as { sourceID: string, nextSpawnRequiredBy: number }[]
-        for (let i = 0; i < harvesters.length; i++) {
-            let sourceId = harvesters[i].sourceID;
-            let sourceObject = Game.getObjectById(sourceId)
-            let swarmObject = SwarmCreator.CreateSwarmObject(sourceObject as Source, SwarmType.SwarmSource);
-            let objData = Swarmlord.ReserveMem(sourceId, SwarmDataType.RoomObject, roomObjectData);
-            swarmObject.AssignMemory(objData);
-            swarmObject.Activate();
-            roomObjectData.SaveChildMemory(swarmObject.GetMemoryObject());
-        }
-
-        this.memory.SaveChildMemory(roomObjectData);*/
-    }
-    /*OnSave() {
-        for (let objID in this.roomObjects) {
-            Swarmlord.ReleaseMemory(this.roomObjects[objID].GetMemoryObject(), true);
-        }
-    }*/
-    InitNewObject() {
-        /*let harvesterJobs = [];
-        let sources = this.find(FIND_SOURCES);
-        Swarmlord.CreateNewStorageMemory(ROOMOBJECT_DATA, SwarmDataType.Other, this._memory);
-        let newMem = Swarmlord.CheckoutMemory(ROOMOBJECT_DATA, SwarmDataType.Other, this._memory);
-        for (let i = 0; i < sources.length; i++) {
-            Swarmlord.CreateNewStorageMemory(sources[i].id, SwarmDataType.RoomObject, newMem);
-            let newSourceMemory: SourceData = {
-                sourceID: sources[i].id,
-                nextSpawnRequiredBy: 0,
-            };
-            harvesterJobs.push(newSourceMemory);
-        }
-
-        this._memory.SetData(HARVESTER_JOBS, harvesterJobs);
-        this._memory.SaveChildMemory(newMem);*/
     }
     get saveID() { return this.name; }
     get SwarmType(): SwarmType.SwarmRoom { return SwarmType.SwarmRoom; }

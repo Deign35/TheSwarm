@@ -1,5 +1,6 @@
 import { Stopwatch } from "./Stopwatch";
 import { SwarmLogger } from "Tools/SwarmLogger";
+import { SwarmCreator } from "SwarmTypes/SwarmCreator"
 export class GlobalTools {
     static CopyObject<T>(obj: T): T {
         return JSON.parse(JSON.stringify(obj));
@@ -9,4 +10,4 @@ export class GlobalTools {
 global['CopyObject'] = GlobalTools.CopyObject;
 global['Stopwatch'] = Stopwatch;
 global['SwarmLogger'] = SwarmLogger;
-import "SwarmTypes/SwarmCreator"
+global['SwarmCreator'] = SwarmCreator;

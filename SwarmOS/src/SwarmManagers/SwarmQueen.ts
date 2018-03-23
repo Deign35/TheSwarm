@@ -5,8 +5,11 @@ import { SwarmRoom } from "SwarmTypes/SwarmRoom";
 
 const ROOM_SAVE_PATH = ['rooms'];
 @profile
-export class SwarmQueen extends PrimeManager<SwarmControllerDataTypes.Rooms,SwarmRoom>
+export class SwarmQueen extends PrimeManager<SwarmControllerDataTypes.Rooms, SwarmRoom>
     implements ISwarmRoomController {
+    protected InitNewObj(swarmObj: SwarmRoom): void {
+        swarmObj.InitNewObject();
+    }
     get ControllerType(): SwarmControllerDataTypes.Rooms { return SwarmControllerDataTypes.Rooms; }
     protected GetTypeOf(obj: Room): SwarmType.SwarmRoom {
         return SwarmType.SwarmRoom;
@@ -27,10 +30,13 @@ export class SwarmQueen extends PrimeManager<SwarmControllerDataTypes.Rooms,Swar
         return Game.rooms;
     }
     protected OnPrepareSwarm(swarmObj: SwarmRoom): void {
+        swarmObj.PrepareTheSwarm();
     }
     protected OnActivateSwarm(swarmObj: SwarmRoom): void {
+        swarmObj.ActivateSwarm();
     }
     protected OnFinalizeSwarm(swarmObj: SwarmRoom): void {
+        swarmObj.FinalizeSwarmActivity();
     }
     private static _instance: SwarmQueen;
     static GetSwarmObject(roomName: string): ISwarmRoom {

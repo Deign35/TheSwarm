@@ -6,6 +6,8 @@ const CREEP_SAVE_PATH = ['creeps'];
 @profile
 export class SwarmCreepController extends PrimeManager<SwarmControllerDataTypes.Creeps, SwarmCreep>
     implements ISwarmCreepController {
+    protected InitNewObj(swarmObj: SwarmCreep): void {
+    }
     get ControllerType(): SwarmControllerDataTypes.Creeps { return SwarmControllerDataTypes.Creeps; }
     protected GetTypeOf(obj: Creep): SwarmType.SwarmCreep {
         return SwarmType.SwarmCreep;
@@ -21,6 +23,7 @@ export class SwarmCreepController extends PrimeManager<SwarmControllerDataTypes.
     }
     protected OnActivateSwarm(swarmObj: SwarmCreep): void {
         // Prep the creep
+        swarmObj.Activate();
     }
     protected OnFinalizeSwarm(swarmObj: SwarmCreep): void {
         // Finalize any data

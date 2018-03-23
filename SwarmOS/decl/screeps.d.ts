@@ -1197,7 +1197,7 @@ interface HeapStatistics {
     "externally_allocated_size": number
 }
 
-interface Tombstone extends RoomObject {
+declare interface Tombstone extends RoomObject {
     creep: Creep,
     deathTime: number,
     id: string,
@@ -1301,6 +1301,7 @@ interface LookAtTypes {
     source?: Source;
     structure?: Structure;
     terrain?: Terrain;
+    tombstone?: Tombstone;
 }
 
 type LookAtResult<K extends LookConstant = LookConstant> = Pick<LookAtTypes, K> & { type: K };
@@ -1335,7 +1336,7 @@ type LookForAtAreaResultArray<T, K extends keyof LookAtTypes = keyof LookAtTypes
 type LookForAtAreaResultFinal<T, K extends keyof LookAtTypes = keyof LookAtTypes> = LookForAtAreaResultArray<T, K> | LookForAtAreaResultMatrix<T, K>
 
 interface FindTypes {
-    [key: number]: RoomPosition | Creep | Source | Resource | Structure | Flag | ConstructionSite | Mineral | Nuke;
+    [key: number]: RoomPosition | Creep | Source | Resource | Structure | Flag | ConstructionSite | Mineral | Nuke | Tombstone;
     1: RoomPosition; // FIND_EXIT_TOP
     3: RoomPosition; // FIND_EXIT_RIGHT
     5: RoomPosition; // FIND_EXIT_BOTTOM
@@ -1359,6 +1360,7 @@ interface FindTypes {
     115: ConstructionSite; // FIND_HOSTILE_CONSTRUCTION_SITES
     116: Mineral; // FIND_MINERALS
     117: Nuke; // FIND_NUKES
+    118: Tombstone
 }
 
 interface FindPathOpts {
@@ -1596,7 +1598,8 @@ type FindConstant =
     FIND_MY_CONSTRUCTION_SITES |
     FIND_HOSTILE_CONSTRUCTION_SITES |
     FIND_MINERALS |
-    FIND_NUKES;
+    FIND_NUKES |
+    FIND_TOMBSTONES;
 
 type FIND_EXIT_TOP = 1;
 type FIND_EXIT_RIGHT = 3;
@@ -1659,7 +1662,8 @@ type LookConstant =
     LOOK_FLAGS |
     LOOK_CONSTRUCTION_SITES |
     LOOK_NUKES |
-    LOOK_TERRAIN;
+    LOOK_TERRAIN |
+    LOOK_TOMBSTONES;
 
 type LOOK_CONSTRUCTION_SITES = "constructionSite";
 type LOOK_CREEPS = "creep";

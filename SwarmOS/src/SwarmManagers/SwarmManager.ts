@@ -69,17 +69,21 @@ export abstract class SwarmManager<T extends SwarmControllerDataTypes,
         // Anything left in this object is new and needs to be added
         for (let objID in allObjects) {
             let swarmMem = SwarmCreator.CreateNewSwarmMemory(objID, this.GetSwarmTypeFromObject(allObjects[objID]));
+
             swarmMem.ReserveMemory();
             let newSwarmObj = SwarmCreator.CreateSwarmObject(swarmMem.GetData('SWARM_TYPE'));
             newSwarmObj.AssignObject(allObjects[objID], swarmMem);
+            this.InitNewObj(newSwarmObj as U);
             swarmObjects[objID] = newSwarmObj;
         }
 
         this.swarmObjects = swarmObjects;
     }
-    protected abstract GetTypeOf(obj: AnyStructure | Creep | Flag | Room | RoomObject): SwarmType;
+    protected abstract InitNewObj(swarmObj: U): void;
 
+    protected abstract GetTypeOf(obj: AnyStructure | Creep | Flag | Room | RoomObject): SwarmType;
     protected abstract get _dataType(): T;
+
 }
 
 export abstract class PrimeManager<T extends PrimeDataTypes, U extends SwarmObject> extends SwarmManager<T, U> {

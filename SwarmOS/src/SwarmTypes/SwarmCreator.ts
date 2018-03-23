@@ -413,4 +413,4 @@ export class SwarmCreator {
         }
         return newMemory!;
     }
-} global['SwarmCreator'] = SwarmCreator;
+}

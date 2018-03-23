@@ -25,6 +25,7 @@ declare interface ISwarmRoomObject<T extends TSwarmMemory, U extends RoomObject 
     extends ISwarmObject<T, U> { }//extends ISwarmObject<IRoomObjectMemory, RoomObject, TRoomObjectData> {}
 
 declare interface ISwarmRoom extends ISwarmObject<IRoomMemory, Room> { }
+declare type SwarmRoom = ISwarmRoom & Room & IMasterRoomObjectMemory;
 declare interface ISwarmCreep extends ISwarmRoomObject<ICreepMemory, Creep> { }
 declare interface ISwarmFlag extends ISwarmRoomObject<IFlagMemory, Flag> { }
 

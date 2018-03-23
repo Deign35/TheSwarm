@@ -134,3 +134,4 @@ export class SwarmNuke extends SwarmRoomObject<IRoomObjectMemory, Nuke> implemen
         console.log("Successfully activated a Nuke");
     }
 }
+
