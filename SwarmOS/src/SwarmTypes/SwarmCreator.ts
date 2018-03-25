@@ -11,12 +11,56 @@ import { SwarmSite } from "SwarmTypes/SwarmSite";
 import { SwarmSource } from "SwarmTypes/SwarmSource";
 import { SwarmSpawn } from "SwarmTypes/SwarmStructures/SwarmSpawn";
 import { SwarmTower } from "SwarmTypes/SwarmStructures/SwarmTower";
+import { NotImplementedException } from "Tools/SwarmExceptions";
 
 var SwarmObjectInstances = {}
 
 @profile
 export class SwarmCreator {
-    static GetStructureSwarmType(structure: Structure) {
+    static CreateNewSwarmObject<T extends SwarmObject>(obj: Room | RoomObject): T {
+        let swarmType = this.GetSwarmType(obj);
+        let newObj = this.CreateSwarmObject(swarmType);
+        let newMem = this.CreateNewSwarmMemory((obj as Room).name || (obj as Structure).id, swarmType);
+        newObj.AssignObject(obj, newMem);
+
+        return newObj as T;
+    }
+
+    static GetSwarmType(obj: Room | RoomObject): SwarmType {
+        if ((obj as Room).name) {
+            if ((obj as Creep).getActiveBodyparts) {
+                return SwarmType.SwarmCreep;
+            } else if ((obj as Flag).setColor) {
+                return SwarmType.SwarmFlag;
+            } else if ((obj as Room).mode) {
+                return SwarmType.SwarmRoom;
+            } else if ((obj as Structure).structureType) {
+                return this.GetStructureSwarmType(obj as Structure);
+            }
+        }
+        if ((obj as AnyStructure).structureType) {
+            if ((obj as ConstructionSite).remove) {
+                return SwarmType.SwarmSite;
+            } else {
+                return this.GetStructureSwarmType(obj as Structure);
+            }
+        }
+        if ((obj as Source).energyCapacity) {
+            return SwarmType.SwarmSource;
+        } else if ((obj as Resource).resourceType) {
+            return SwarmType.SwarmResource;
+        } else if ((obj as Tombstone).deathTime) {
+            return SwarmType.SwarmTombstone;
+        } else if ((obj as Mineral).mineralType) {
+            return SwarmType.SwarmMineral;
+        } else if ((obj as Nuke).launchRoomName) {
+            return SwarmType.SwarmNuke;
+        }
+
+        throw new NotImplementedException('Not an implemented RoomObject ' + JSON.stringify(obj));
+    }
+
+    protected static GetStructureSwarmType(structure: Structure) {
         switch (structure.structureType) {
             case (STRUCTURE_CONTAINER): return SwarmType.SwarmContainer;
             case (STRUCTURE_CONTROLLER): return SwarmType.SwarmController;

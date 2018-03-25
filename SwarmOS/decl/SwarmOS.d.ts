@@ -40,6 +40,6 @@ declare var TheSwarm: {
     creeps: { [id: string]: ISwarmCreep },
     flags: { [id: string]: ISwarmFlag },
     rooms: { [id: string]: ISwarmRoom },
-    roomObjects: { [id: string]: TSwarmRoomObject },
+    // roomObjects: { [id: string]: TSwarmRoomObject },
     structures: { [id: string]: TSwarmStructure }
 }

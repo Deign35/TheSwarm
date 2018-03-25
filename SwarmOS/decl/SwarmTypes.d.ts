@@ -37,6 +37,7 @@ declare interface ISwarmRoom extends ISwarmObject<IRoomMemory, Room> {
 }
 declare type SwarmRoom = ISwarmRoom & Room & IMasterRoomObjectMemory;
 declare interface ISwarmCreep extends ISwarmRoomObject<ICreepMemory, Creep> { }
+declare type TSwarmCreep = ISwarmCreep & Creep;
 declare interface ISwarmFlag extends ISwarmRoomObject<IFlagMemory, Flag> { }
 
 /** 
@@ -160,4 +161,14 @@ declare var SwarmCreator: {
     CreateSwarmObject(swarmType: SwarmType): TObject;
     CreateNewSwarmMemory(id: string, swarmType: SwarmType): TSwarmMemory;
     GetStructureSwarmType(structure: Structure): SwarmStructureType;
+    GetSwarmType(obj: any): SwarmType;
+    CreateNewSwarmObject<T extends SwarmObject>(obj: Room | RoomObject): T
+}
+
+declare type RoomObjectDataStructure = {
+    minerals: IMineralData[],
+    nukes: IRoomObjectData<RoomObjectDataType.Nuke>[],
+    resources: IRoomObjectData<RoomObjectDataType.Resource>[],
+    sources: ISourceData[],
+    tombstones: IRoomObjectData<RoomObjectDataType.Tombstone>[],
 }
