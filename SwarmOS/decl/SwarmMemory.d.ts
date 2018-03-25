@@ -18,10 +18,10 @@ declare interface IFlagData<T> extends ISwarmData<SwarmDataType.Flag, SwarmType.
     FLG_TYPE: T;
     // Special info for flags
 } declare type TFlagData = IFlagData<any>
-declare interface IRoomData<T extends QueenType> extends ISwarmData<SwarmDataType.Room, SwarmType.SwarmRoom> {
+declare interface IRoomData<T extends RoomType> extends ISwarmData<SwarmDataType.Room, SwarmType.SwarmRoom> {
     RM_TYPE: T;
     RoomObjects: IMasterRoomObjectData;
-} declare type TRoomData = IRoomData<QueenType>;
+} declare type TRoomData = IRoomData<RoomType>;
 declare interface IRoomObjectData<T extends RoomObjectDataType> extends ISwarmData<SwarmDataType.RoomObject, SwarmType> {
     RO_TYPE: T;
     // Special info for RoomObjects.

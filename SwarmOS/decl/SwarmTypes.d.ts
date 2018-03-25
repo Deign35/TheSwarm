@@ -23,7 +23,18 @@ declare interface ISwarmObject<T extends TSwarmMemory, U extends Room | RoomObje
 declare interface ISwarmRoomObject<T extends TSwarmMemory, U extends RoomObject | Creep | Flag | AnyStructure>
     extends ISwarmObject<T, U> { }//extends ISwarmObject<IRoomObjectMemory, RoomObject, TRoomObjectData> {}
 
-declare interface ISwarmRoom extends ISwarmObject<IRoomMemory, Room> { }
+declare interface ISwarmRoom extends ISwarmObject<IRoomMemory, Room> {
+    my: boolean;
+    owner?: Owner;
+    /*GetStructures(): { [id: string]: TSwarmStructure }
+    SetStructures(structures: { [id: string]: TSwarmStructure }): void;
+    GetFlags(): IDictionary<ISwarmFlag>;
+    SetFlags(flags: IDictionary<ISwarmFlag>): void;
+    GetCreeps(): IDictionary<ISwarmCreep>;
+    SetCreeps(creeps: IDictionary<ISwarmCreep>): void;
+    GetRoomObjects(): IDictionary<TSwarmRoomObject>;
+    SetRoomObjects(objs: IDictionary<TSwarmRoomObject>): void;*/
+}
 declare type SwarmRoom = ISwarmRoom & Room & IMasterRoomObjectMemory;
 declare interface ISwarmCreep extends ISwarmRoomObject<ICreepMemory, Creep> { }
 declare interface ISwarmFlag extends ISwarmRoomObject<IFlagMemory, Flag> { }
@@ -128,10 +139,6 @@ declare interface ISwarmObjectController<T extends SwarmControllerDataTypes, U e
     ControllerType: T,
     GetSwarmObject(id: string): U;
     GetSwarmTypeFromObject(obj: any): SwarmType; // These any need a fixin
-
-    ActivateSwarm(): void;
-    FinalizeSwarmActivity(): void;
-    PrepareTheSwarm(): void;
 }
 
 
@@ -152,4 +159,5 @@ declare var SwarmCreator: {
     CreateSwarmMemory(mem: TSwarmData): TSwarmMemory;
     CreateSwarmObject(swarmType: SwarmType): TObject;
     CreateNewSwarmMemory(id: string, swarmType: SwarmType): TSwarmMemory;
+    GetStructureSwarmType(structure: Structure): SwarmStructureType;
 }

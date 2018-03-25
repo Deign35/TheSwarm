@@ -16,6 +16,29 @@ var SwarmObjectInstances = {}
 
 @profile
 export class SwarmCreator {
+    static GetStructureSwarmType(structure: Structure) {
+        switch (structure.structureType) {
+            case (STRUCTURE_CONTAINER): return SwarmType.SwarmContainer;
+            case (STRUCTURE_CONTROLLER): return SwarmType.SwarmController;
+            case (STRUCTURE_EXTENSION): return SwarmType.SwarmExtension;
+            case (STRUCTURE_EXTRACTOR): return SwarmType.SwarmExtractor;
+            case (STRUCTURE_KEEPER_LAIR): return SwarmType.SwarmKeepersLair;
+            case (STRUCTURE_LAB): return SwarmType.SwarmLab;
+            case (STRUCTURE_LINK): return SwarmType.SwarmLink;
+            case (STRUCTURE_NUKER): return SwarmType.SwarmNuker;
+            case (STRUCTURE_OBSERVER): return SwarmType.SwarmObserver;
+            case (STRUCTURE_PORTAL): return SwarmType.SwarmPortal;
+            case (STRUCTURE_POWER_BANK): return SwarmType.SwarmPowerBank;
+            case (STRUCTURE_POWER_SPAWN): return SwarmType.SwarmPowerSpawn;
+            case (STRUCTURE_RAMPART): return SwarmType.SwarmRampart;
+            case (STRUCTURE_ROAD): return SwarmType.SwarmRoad;
+            case (STRUCTURE_SPAWN): return SwarmType.SwarmSpawn;
+            case (STRUCTURE_STORAGE): return SwarmType.SwarmStorage;
+            case (STRUCTURE_TERMINAL): return SwarmType.SwarmTerminal;
+            case (STRUCTURE_TOWER): return SwarmType.SwarmTower;
+            case (STRUCTURE_WALL): return SwarmType.SwarmWall;
+        }
+    }
     static CreateSwarmMemory(mem: TSwarmData) {
         let memType = mem.SWARM_TYPE;
         let newMemory: TMemory;

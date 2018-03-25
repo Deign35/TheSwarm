@@ -29,23 +29,9 @@ export class SwarmRoomController extends SwarmController<SwarmControllerDataType
     protected FindAllGameObjects(): { [id: string]: Room; } {
         return Game.rooms;
     }
-    protected OnPrepareSwarm(swarmObj: SwarmRoom): void {
-        swarmObj.PrepareTheSwarm();
-    }
-    protected OnActivateSwarm(swarmObj: SwarmRoom): void {
-        swarmObj.ActivateSwarm();
-    }
-    protected OnFinalizeSwarm(swarmObj: SwarmRoom): void {
-        swarmObj.FinalizeSwarmActivity();
-    }
+
     private static _instance: SwarmRoomController;
     static GetSwarmObject(roomName: string): ISwarmRoom {
         return this._instance.GetSwarmObject(roomName) as ISwarmRoom;
     }
-    static PrepareTheSwarm() {
-        this._instance = new SwarmRoomController();
-        this._instance.PrepareTheSwarm();
-    }
-    static ActivateSwarm() { this._instance.ActivateSwarm() }
-    static FinalizeSwarmActivity() { this._instance.FinalizeSwarmActivity(); }
 } global["SwarmQueen"] = SwarmRoomController;

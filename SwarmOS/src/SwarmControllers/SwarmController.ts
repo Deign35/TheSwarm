@@ -15,21 +15,10 @@ export abstract class SwarmController<T extends SwarmControllerDataTypes,
     protected get SwarmMemory() { return this.swarmObjects; }
     protected swarmObjects!: { [itemID: string]: U };
     protected _primaryMemory!: TMasterMemory;
-
-    PrepareTheSwarm(): void {
-        for (const swarmName in this.swarmObjects) {
-            this.OnPrepareSwarm(this.swarmObjects[swarmName])
-        }
-    }
-    ActivateSwarm(): void {
-        for (let swarmName in this.swarmObjects) {
-            this.OnActivateSwarm(this.swarmObjects[swarmName]);
-        }
-    }
     FinalizeSwarmActivity(): void {
         for (let swarmName in this.swarmObjects) {
             let obj = this.swarmObjects[swarmName];
-            this.OnFinalizeSwarm(obj);
+            //this.OnFinalizeSwarm(obj);
             this._primaryMemory.SaveChildMemory(obj.GetCopyOfMemory().ReleaseMemory());
         }
         Swarmlord.SaveMasterMemory(this._primaryMemory, true);
@@ -44,9 +33,6 @@ export abstract class SwarmController<T extends SwarmControllerDataTypes,
         return this.GetTypeOf(obj);
     }
     protected abstract FindAllGameObjects(): Dictionary
-    protected abstract OnPrepareSwarm(swarmObj: U): void;
-    protected abstract OnActivateSwarm(swarmObj: U): void;
-    protected abstract OnFinalizeSwarm(swarmObj: U): void;
     protected LoadSwarmObjects(): any {
         let allObjects = this.FindAllGameObjects();
         this._primaryMemory = Swarmlord.CheckoutMasterMemory(this.DataType);
