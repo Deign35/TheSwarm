@@ -39,7 +39,7 @@ export class SwarmCreepController extends SwarmController<SwarmControllerDataTyp
     }
 
 
-    private static _instance: SwarmCreepController;
+    /*private static _instance: SwarmCreepController;
     static GetSwarmObject(creepName: string): ISwarmCreep {
         return this._instance.GetSwarmObject(creepName) as ISwarmCreep;
     }
@@ -48,5 +48,5 @@ export class SwarmCreepController extends SwarmController<SwarmControllerDataTyp
         return SwarmCreepController._instance.PrepareTheSwarm();
     }
     static ActivateSwarm() { SwarmCreepController._instance.ActivateSwarm(); }
-    static FinalizeSwarmActivity() { return SwarmCreepController._instance.FinalizeSwarmActivity(); }
+    static FinalizeSwarmActivity() { return SwarmCreepController._instance.FinalizeSwarmActivity(); }*/
 } global['SwarmCreepController'] = SwarmCreepController;

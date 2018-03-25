@@ -10,14 +10,11 @@ const HARVESTER_JOBS = 'HARVEST';
 
 @profile
 export class SwarmRoom extends SwarmItemWithName<IRoomMemory, Room>
-    implements ISwarmRoom, Room, ISwarmRoomObjectController {
+    implements ISwarmRoom, Room {
     protected OnActivate(): void {
         // Do Room specific stuff here.
     }
-    get ControllerType(): SwarmControllerDataTypes.RoomObjects {
-        return SwarmControllerDataTypes.RoomObjects
-    }
-    GetSwarmTypeFromObject(obj: any): SwarmType {
+    /*GetSwarmTypeFromObject(obj: any): SwarmType {
         if ((obj as AnyStructure).structureType) {
             debugger;
             if ((obj as ConstructionSite).progressTotal && !(obj as StructureController).reservation) {
@@ -46,20 +43,6 @@ export class SwarmRoom extends SwarmItemWithName<IRoomMemory, Room>
         }
 
         throw new NotImplementedException('Not an implemented RoomObject ' + JSON.stringify(obj));
-    }
-    ActivateSwarm(): void {
-        for (let id in this.roomObjects) {
-            this.roomObjects[id].Activate();
-        }
-    }
-    FinalizeSwarmActivity(): void {
-        let objMemory = {};
-        for (let id in this.roomObjects) {
-            let obj = this.roomObjects[id];
-            objMemory[id] = obj.GetCopyOfMemory().ReleaseMemory();
-        }
-
-        this._memory.SetData("RoomObjects", objMemory);
     }
 
     PrepareTheSwarm(): void {
@@ -177,7 +160,7 @@ export class SwarmRoom extends SwarmItemWithName<IRoomMemory, Room>
         }
 
         this._memory.SetData('RoomObjects', roomObjects);
-    }
+    }*/
     get DataType(): SwarmDataType.Room { return SwarmDataType.Room };
     protected roomObjects: { [id: string]: TSwarmRoomObject } = {}
 

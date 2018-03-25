@@ -34,7 +34,7 @@ export class SwarmFlagController extends SwarmController<SwarmControllerDataType
     protected OnFinalizeSwarm(swarmObj: SwarmFlag): void {
 
     }
-    private static _instance: SwarmFlagController;
+    /*private static _instance: SwarmFlagController;
     static GetSwarmObject(flagName: string): ISwarmFlag {
         return this._instance.GetSwarmObject(flagName) as ISwarmFlag;
     }
@@ -43,5 +43,5 @@ export class SwarmFlagController extends SwarmController<SwarmControllerDataType
         this._instance.PrepareTheSwarm();
     }
     static ActivateSwarm() { this._instance.ActivateSwarm() }
-    static FinalizeSwarmActivity() { this._instance.FinalizeSwarmActivity(); }
+    static FinalizeSwarmActivity() { this._instance.FinalizeSwarmActivity(); }*/
 } global["SwarmFlagController"] = SwarmFlagController;

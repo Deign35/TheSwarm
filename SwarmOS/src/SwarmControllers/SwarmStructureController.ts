@@ -57,7 +57,7 @@ export class SwarmStructureController extends SwarmController<SwarmControllerDat
     protected OnFinalizeSwarm(swarmObj: TSwarmStructure): void {
 
     }
-    private static _instance: SwarmStructureController;
+    /*private static _instance: SwarmStructureController;
     static GetSwarmObject(id: string) {
         return this._instance.GetSwarmObject(id);
     }
@@ -66,5 +66,5 @@ export class SwarmStructureController extends SwarmController<SwarmControllerDat
         this._instance.PrepareTheSwarm();
     }
     static ActivateSwarm() { this._instance.ActivateSwarm() }
-    static FinalizeSwarmActivity() { this._instance.FinalizeSwarmActivity(); }
+    static FinalizeSwarmActivity() { this._instance.FinalizeSwarmActivity(); }*/
 } global["SwarmStructureController"] = SwarmStructureController;

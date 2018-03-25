@@ -39,7 +39,7 @@ export class SwarmLoader {
         roomObjects: IMasterRoomObjectMemory,
         structures: MasterStructureMemory
     }
-    protected TheWholeSwarm = {
+    TheSwarm = {
         creeps: {} as { [id: string]: ISwarmCreep },
         flags: {} as { [id: string]: ISwarmFlag },
         rooms: {} as { [id: string]: ISwarmRoom },
@@ -60,6 +60,8 @@ export class SwarmLoader {
         for (let i = 0; i < keys.length; i++) {
             this.LoadRoom(Game.rooms[keys[i]]);
         }
+
+        global['TheSwarm'] = this.TheSwarm;
     }
 
     protected LoadCreeps() {
@@ -83,7 +85,7 @@ export class SwarmLoader {
             swarmObject.AssignObject(newCreep, newMem);
             // Validate current actions
             // If no action available, put in queue.
-            this.TheWholeSwarm.creeps[swarmObject.saveID] = swarmObject;
+            this.TheSwarm.creeps[swarmObject.saveID] = swarmObject;
         }
     }
 
@@ -100,13 +102,13 @@ export class SwarmLoader {
             // load stuff
             this.LoadStructures(roomObj);
             this.LoadFlags(roomObj);
+            this.LoadMisc(roomObj);
+        } else if (roomObj.owner) {
+            // Look for enemy stuff.  To be added later.
+            // Check if roomObj.owner is even reliable to use...
         }
-        let flags = this.MasterMemory.flags[roomObj.name];
-        let curRoomObjectMem = this.MasterMemory.roomObjects[roomObj.name];
 
-        // Look for enemy stuff.  To be added later.
-
-
+        this.TheSwarm.rooms[roomObj.saveID] = roomObj;
     }
     protected LoadStructures(room: SwarmRoom) {
         let structureMem = this.MasterMemory.structures.CheckoutChildMemory(room.saveID);
@@ -122,12 +124,12 @@ export class SwarmLoader {
             let mem = this.MasterMemory.structures.CheckoutChildMemory(structure.id);
             let swarmStructure = SwarmCreator.CreateSwarmObject(swarmType);
             swarmStructure.AssignObject(structure, mem);
-            this.TheWholeSwarm.structures[swarmStructure.saveID] = swarmStructure as TSwarmStructure;
+            this.TheSwarm.structures[swarmStructure.saveID] = swarmStructure as TSwarmStructure;
         }
 
         let ids = structureMem.GetDataIDs();
         for (let i = 0; i < ids.length; i++) {
-            if (!this.TheWholeSwarm.structures[ids[i]]) {
+            if (!this.TheSwarm.structures[ids[i]]) {
                 // Structure has disappeared
                 structureMem.RemoveData(ids[i]);
             }
@@ -149,12 +151,12 @@ export class SwarmLoader {
             let mem = this.MasterMemory.flags.CheckoutChildMemory(flag.name);
             let swarmFlag = SwarmCreator.CreateSwarmObject(SwarmType.SwarmFlag);
             swarmFlag.AssignObject(swarmFlag, mem);
-            this.TheWholeSwarm.flags[swarmFlag.saveID] = swarmFlag as ISwarmFlag;
+            this.TheSwarm.flags[swarmFlag.saveID] = swarmFlag as ISwarmFlag;
         }
 
         let ids = flagMem.GetDataIDs();
         for (let i = 0; i < ids.length; i++) {
-            if (!this.TheWholeSwarm.flags[ids[i]]) {
+            if (!this.TheSwarm.flags[ids[i]]) {
                 flagMem.RemoveData(ids[i]);
             }
         }
@@ -162,11 +164,15 @@ export class SwarmLoader {
         this.MasterMemory.flags.SaveChildMemory(flagMem.ReleaseMemory());
     }
 
-    protected SaveTheSwarm() {
+    protected LoadMisc(room: SwarmRoom) {
+
+    }
+
+    SaveTheSwarm() {
         this.SaveCreeps();
-        let keys = Object.keys(this.TheWholeSwarm.rooms);
+        let keys = Object.keys(this.TheSwarm.rooms);
         for (let i = 0; i < keys.length; i++) {
-            this.SaveRoom(this.TheWholeSwarm.rooms[keys[i]] as ISwarmRoom);
+            this.SaveRoom(this.TheSwarm.rooms[keys[i]] as ISwarmRoom);
         }
 
         for (let id in this.MasterMemory) {

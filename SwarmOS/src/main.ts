@@ -8,12 +8,14 @@ import { SwarmRoomController } from "SwarmControllers/SwarmRoomController";
 import { SwarmCreepController } from "SwarmControllers/SwarmCreepController"
 import { SwarmFlagController } from "SwarmControllers/SwarmFlagController"
 import { SwarmStructureController } from "SwarmControllers/SwarmStructureController"
+import { SwarmLoader } from "SwarmControllers/SwarmLoader";
 
 export const loop = function () {
     //debugger;
     Swarmlord.ValidateMemory();
+    let theSwarm = new SwarmLoader();
 
-    SwarmRoomController.PrepareTheSwarm();
+    /*SwarmRoomController.PrepareTheSwarm();
     SwarmCreepController.PrepareTheSwarm();
     SwarmFlagController.PrepareTheSwarm();
     SwarmStructureController.PrepareTheSwarm();
@@ -26,5 +28,7 @@ export const loop = function () {
     SwarmRoomController.FinalizeSwarmActivity();
     SwarmCreepController.FinalizeSwarmActivity();
     SwarmFlagController.FinalizeSwarmActivity();
-    SwarmStructureController.FinalizeSwarmActivity();
+    SwarmStructureController.FinalizeSwarmActivity();*/
+
+    theSwarm.SaveTheSwarm();
 }
