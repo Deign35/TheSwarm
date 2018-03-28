@@ -2853,7 +2853,7 @@ interface Room {
     /**
      * A shorthand to `Memory.rooms[room.name]`. You can use it for quick access the room’s specific memory data object.
      */
-    memory: any;
+    memory: IRoomMemory;
     /**
      * One of the `MODE_*` constants.
      */

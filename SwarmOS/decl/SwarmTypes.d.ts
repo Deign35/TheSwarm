@@ -35,7 +35,7 @@ declare interface ISwarmRoom extends ISwarmObject<IRoomMemory, Room> {
     GetRoomObjects(): IDictionary<TSwarmRoomObject>;
     SetRoomObjects(objs: IDictionary<TSwarmRoomObject>): void;*/
 }
-declare type SwarmRoom = ISwarmRoom & Room & IMasterRoomObjectMemory;
+declare type SwarmRoom = ISwarmRoom & Room;
 declare interface ISwarmCreep extends ISwarmRoomObject<ICreepMemory, Creep> { }
 declare type TSwarmCreep = ISwarmCreep & Creep;
 declare interface ISwarmFlag extends ISwarmRoomObject<IFlagMemory, Flag> { }
@@ -162,7 +162,8 @@ declare var SwarmCreator: {
     CreateNewSwarmMemory(id: string, swarmType: SwarmType): TSwarmMemory;
     GetStructureSwarmType(structure: Structure): SwarmStructureType;
     GetSwarmType(obj: any): SwarmType;
-    CreateNewSwarmObject<T extends SwarmObject>(obj: Room | RoomObject): T
+    CreateNewSwarmObject<T extends SwarmObject>(obj: Room | RoomObject): T;
+    GetObjSaveID(obj: Room | RoomObject): string;
 }
 
 declare type RoomObjectDataStructure = {

@@ -2,6 +2,7 @@ import { MasterCreepMemory, MasterFlagMemory, MasterRoomMemory, MasterStructureM
 
 const STATIC_OBJECTS = 'static_objects';
 const ROOM_OBJECTS = 'room_objects';
+const STRUCTURE_OBJECTS = 'structure_objects'
 export class SwarmLoader {
     //protected SwarmObjectInstances = {}
     constructor() {
@@ -110,19 +111,49 @@ export class SwarmLoader {
 
         if (roomObj.my) {
             // load stuff
+            let csites = this.LoadObjectsInRoom(roomObj, roomObj.memory, FIND_CONSTRUCTION_SITES);
+
             this.LoadStructures(roomObj);
             this.LoadFlags(roomObj);
             this.LoadMisc(roomObj);
         } else if (roomObj.owner) {
             // Look for enemy stuff.  To be added later.
-            // Check if roomObj.owner is even reliable to use...
+            // Check if roomObj.owner is even reliable to use in this way...
         }
 
         this.TheSwarm.rooms[roomObj.saveID] = roomObj;
     }
 
+    protected LoadObjectsInRoom(room: SwarmRoom, curMem: TSwarmMemory, find: FindConstant, filter?: (a: any) => boolean) {
+        let objs = room.find(find, filter);
+        let swarmObjs = {};
+
+        for (let i = 0; i < objs.length; i++) {
+            let obj = objs[i] as RoomObject;
+            let swarmType = SwarmCreator.GetSwarmType(obj);
+            let swarmObj = SwarmCreator.CreateSwarmObject(swarmType);
+            let saveID = SwarmCreator.GetObjSaveID(obj);
+
+            if (!curMem.HasData(saveID)) {
+                let newMem = SwarmCreator.CreateNewSwarmMemory(saveID, swarmType);
+                newMem.ReserveMemory();
+                swarmObj.AssignObject(obj, newMem);
+                curMem.SetData(saveID, swarmObj.GetCopyOfMemory().ReleaseMemory());
+            }
+
+            let swarmMem = SwarmCreator.CreateSwarmMemory(curMem.GetData(saveID));
+            swarmObj.AssignObject(obj, swarmMem);
+            swarmObjs[saveID] = swarmObj;
+        }
+
+
+        return swarmObjs;
+    }
+
+
+
     protected LoadStructures(room: SwarmRoom) {
-        let structureMem = this.MasterMemory.structures.CheckoutChildMemory(room.saveID);
+        let structureIDs = room.memory.GetDataIDs();
         let structuresList = {};
         let objs = room.find(FIND_STRUCTURES);
 
@@ -185,8 +216,8 @@ export class SwarmLoader {
     }
 
     protected LoadMisc(room: SwarmRoom) {
-        let staticData = room.GetData(STATIC_OBJECTS);
-        let roomData = room.GetData(ROOM_OBJECTS);
+        let staticData = room.memory.GetData(STATIC_OBJECTS);
+        let roomData = room.memory.GetData(ROOM_OBJECTS);
 
         let foundObjects = {};
         if (Game.time % 5 == 0) {
@@ -279,7 +310,7 @@ export class SwarmLoader {
             staticObjects.push(obj.GetCopyOfMemory().ReleaseMemory() as IMineralData);
         }
 
-        room.SetData(STATIC_OBJECTS, staticObjects);
-        room.SetData(ROOM_OBJECTS, {});
+        room.memory.SetData(STATIC_OBJECTS, staticObjects);
+        room.memory.SetData(ROOM_OBJECTS, {});
     }
 }

@@ -162,11 +162,6 @@ export class SwarmRoom extends SwarmItemWithName<IRoomMemory, Room>
         this._memory.SetData('RoomObjects', roomObjects);
     }*/
     get DataType(): SwarmDataType.Room { return SwarmDataType.Room };
-    protected roomObjects: { [id: string]: TSwarmRoomObject } = {}
-
-    GetSwarmObject(id: string): TSwarmRoomObject {
-        return this.roomObjects[id];
-    }
     get saveID() { return this.name; }
     get SwarmType(): SwarmType.SwarmRoom { return SwarmType.SwarmRoom; }
     get RoomLocation(): RoomLocationFormat { return this.name; }
@@ -193,6 +188,7 @@ export class SwarmRoom extends SwarmItemWithName<IRoomMemory, Room>
     }
     //createFlag(pos: RoomPosition, color?: ColorConstant, secondaryColor?: ColorConstant, name?: string, ) {
     createFlag(...args: any[]) {
+        console.log('{SEARCH FOR ME}');
         if (args.length == 4) {
             return this._instance.createFlag(args[0], args[1], args[2], args[3]);
         } else if (args.length == 3) {
@@ -206,11 +202,11 @@ export class SwarmRoom extends SwarmItemWithName<IRoomMemory, Room>
     find<T extends FindConstant>(type: T, opts?: FilterOptions<T>) {
         return this._instance.find(type, opts);
     }
-    findExitTo(room: SwarmRoom | string) {
+    findExitTo(room: Room | string) {
         if (typeof room == "string") {
             return this._instance.findExitTo(room as string);
         }
-        return this._instance.findExitTo(room._instance);
+        return this._instance.findExitTo(room);
     }
     findPath(fromPos: RoomPosition, toPos: RoomPosition, opts?: FindPathOpts) {
         return this._instance.findPath(fromPos, toPos, opts);

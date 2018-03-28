@@ -20,10 +20,20 @@ export class SwarmCreator {
     static CreateNewSwarmObject<T extends SwarmObject>(obj: Room | RoomObject): T {
         let swarmType = this.GetSwarmType(obj);
         let newObj = this.CreateSwarmObject(swarmType);
-        let newMem = this.CreateNewSwarmMemory((obj as Room).name || (obj as Structure).id, swarmType);
+        let newMem = this.CreateNewSwarmMemory(this.GetObjSaveID(obj), swarmType);
         newObj.AssignObject(obj, newMem);
 
         return newObj as T;
+    }
+
+    static GetObjSaveID(obj: Room | RoomObject): string {
+        if ((obj as Room).name) {
+            if (!(obj as StructureSpawn).structureType) {// Spawns are special case that have a name
+                return (obj as Room).name; // Flags, Creeps, and Rooms
+            }
+        }
+
+        return (obj as Structure).id;
     }
 
     static GetSwarmType(obj: Room | RoomObject): SwarmType {
