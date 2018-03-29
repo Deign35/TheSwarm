@@ -1,9 +1,6 @@
 declare type IDictionary<T> = { [id: string]: T };
 declare type Dictionary = IDictionary<any>
-interface Memory {
-    profiler: ProfilerMemory;
-}
-interface ProfilerMemory {
+declare interface ProfilerMemory {
     data: { [name: string]: ProfilerData };
     start?: number;
     total: number;

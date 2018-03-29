@@ -48,7 +48,8 @@
             "Flags": "\"flags\"",
             "Rooms": "\"rooms\"",
             "Structures": "\"structures\"",
-            "RoomObjects": "\"roomObjects\""
+            "RoomObjects": "\"roomObjects\"",
+            "Other": "\"otherData\""
         },
         "SwarmDataType": {
             "None": 0,
