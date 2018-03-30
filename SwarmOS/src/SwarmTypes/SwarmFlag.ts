@@ -12,7 +12,6 @@ export class SwarmFlag extends SwarmItemWithName<IFlagMemory, Flag> implements I
     get prototype(): Flag { return this._instance.prototype as Flag; }
     get color() { return this._instance.color; }
     get secondaryColor() { return this._instance.secondaryColor; }
-    get memory() { return this._memory; }
     get name() { return this._instance.name; }
     get saveID() { return this.name; }
 

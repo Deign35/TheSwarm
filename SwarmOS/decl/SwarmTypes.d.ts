@@ -1,22 +1,22 @@
-declare interface IObject<T extends SwarmMemoryTypes, U> extends _Constructor<U> {
+declare interface IObject<T extends SwarmDataType, U> extends _Constructor<U> {
     saveID: string;
     IsActive: boolean;
 
     Activate(): void;
-    AssignObject(obj: U, objMemory: T): void;
+    AssignObject(obj: U, objMemory: IMemory<IData<T>, T>): void;
 
     GetMemType(): number;
-    ReleaseMemory(): T
+    ReleaseMemory(): IMemory<IData<T>, T>
     GetObjectInstance(): U
 }
-declare interface IOtherObject extends IObject<IOtherMemory, any> {
+declare interface IOtherObject extends IObject<SwarmDataType.Other, any> {
 
 }
-declare interface ISwarmObject<T extends SwarmMemoryTypes, U extends Room | RoomObject | Creep | Flag | AnyStructure> extends IObject<T, U> {
-    GetMemType(): SwarmType;
+declare interface ISwarmObject<T extends SwarmMemoryTypes, U extends Room | RoomObject | Creep | Flag | AnyStructure> extends IObject<SwarmDataType, U> {
+    GetMemType(): SwarmDataType;
 }
 
-declare interface ISwarmRoomObject<T extends IRoomObjectMemory, U extends RoomObject> extends ISwarmObject<T, U> { }
+declare interface ISwarmRoomObject<T extends TRoomObjectMemory, U extends RoomObject> extends ISwarmObject<T, U> { }
 
 declare interface ISwarmRoom extends ISwarmObject<IRoomMemory, Room> {
     my: boolean;
@@ -28,7 +28,7 @@ declare interface ISwarmFlag extends ISwarmObject<IFlagMemory, Flag> { }
 /** 
  *  Structures begin here.
 */
-declare interface ISwarmStructureType<T extends StructureConstant> extends ISwarmObject<IStructureMemory, Structure<T>> {
+declare interface ISwarmStructureType<T extends StructureConstant> extends ISwarmObject<TStructureMemory, Structure<T>> {
 
 }
 
@@ -100,22 +100,22 @@ declare type TOwnableSwarmStructure = ISwarmController | ISwarmExtension | ISwar
 /*declare interface ISwarmRoomObject<T extends IMemory<U>, U extends TRoomObjectData> extends ISwarmObject<T, RoomObject, U> {
 
 }*/
-declare interface ISwarmMineral extends ISwarmRoomObject<IRoomObjectMemory, Mineral> {
+declare interface ISwarmMineral extends ISwarmRoomObject<IMineralMemory, Mineral> {
 
 }
-declare interface ISwarmSource extends ISwarmRoomObject<IRoomObjectMemory, Source> {
+declare interface ISwarmSource extends ISwarmRoomObject<ISourceMemory, Source> {
 
 }
-declare interface ISwarmNuke extends ISwarmRoomObject<IRoomObjectMemory, Nuke> {
+declare interface ISwarmNuke extends ISwarmRoomObject<INukeMemory, Nuke> {
 
 }
-declare interface ISwarmResource extends ISwarmRoomObject<IRoomObjectMemory, Resource> {
+declare interface ISwarmResource extends ISwarmRoomObject<IResourceMemory, Resource> {
 
 }
-declare interface ISwarmSite extends ISwarmRoomObject<IRoomObjectMemory, ConstructionSite> {
+declare interface ISwarmSite extends ISwarmRoomObject<ISiteMemory, ConstructionSite> {
 
 }
-declare interface ISwarmTombstone extends ISwarmRoomObject<IRoomObjectMemory, Tombstone> {
+declare interface ISwarmTombstone extends ISwarmRoomObject<ITombstoneMemory, Tombstone> {
 
 } declare type TSwarmRoomObject = ISwarmTombstone | ISwarmResource | ISwarmNuke | ISwarmSource | ISwarmMineral
 declare type TSwarmObject = IOtherObject | ISwarmRoom | TSwarmRoomObject | ISwarmCreep | ISwarmFlag | ISwarmRoom | TSwarmStructure
@@ -141,7 +141,7 @@ declare interface IOtherObjectController extends ISwarmObjectController<SwarmCon
 }
 
 declare var SwarmCreator: {
-    CreateSwarmMemory(mem: TBasicSwarmData): SwarmMemoryTypes;
+    CreateSwarmMemory(mem: IData<SwarmDataType>): SwarmMemoryTypes;
     CreateSwarmObject(swarmType: SwarmType): TSwarmObject;
     CreateNewSwarmMemory(id: string, swarmType: SwarmType): SwarmMemoryTypes;
     GetStructureSwarmType(structure: Structure): SwarmStructureType;

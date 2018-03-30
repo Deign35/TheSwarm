@@ -168,7 +168,6 @@ export class SwarmRoom extends SwarmItemWithName<IRoomMemory, Room>
     get controller(): StructureController | undefined { return this._instance.controller; }
     get energyAvailable(): number { return 0; }
     get energyCapacityAvailable(): number { return 0; }
-    get memory() { return this._memory; }
     get my() { return !!(this.controller && this.controller.my); }
     get mode() { return this._instance.mode; }
     get owner() { return this.controller && this.controller.owner; }

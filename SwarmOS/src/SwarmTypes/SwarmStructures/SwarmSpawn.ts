@@ -12,10 +12,6 @@ export class SwarmSpawn extends OwnedSwarmStructure<SwarmType.SwarmSpawn, STRUCT
     get name() { return this._instance.name; }
     get spawning() { return this._instance.spawning; }
     get Spawning() { return this._instance.Spawning; }
-    get memory() {
-        return this._instance.memory;
-        //throw new NotImplementedException('Spawn memory is not hooked up');
-    }
 
     spawnCreep(body: BodyPartConstant[], name: string,
         opts?: {

@@ -3,7 +3,7 @@ import { SwarmRoomObject } from "SwarmTypes/SwarmTypes";
 import { SwarmCreepController } from "SwarmControllers/SwarmCreepController";
 import { SwarmCreep } from "SwarmTypes/SwarmCreep";
 
-export class SwarmSource extends SwarmRoomObject<IRoomObjectMemory, Source> implements ISwarmSource, Source {
+export class SwarmSource extends SwarmRoomObject<ISourceMemory, Source> implements ISwarmSource, Source {
     get storageMemoryType() { return SwarmDataType.RoomObject };
     get SwarmType(): SwarmType.SwarmSource { return SwarmType.SwarmSource; }
     get energy() { return this._instance.energy; }

@@ -5,11 +5,12 @@ export abstract class MemoryBase<T extends SwarmDataType, U extends IData<T>> im
     constructor(data: U) {
         this._cache = data;
     }
+    get isActive() { return this._cache.isActive; }
     get id() { return this._cache.id; }
     get IsCheckedOut() { return this._checkedOut }
     get MEM_TYPE(): T { return this._cache.MEM_TYPE; }
 
-    private _cache!: U;
+    protected _cache!: U;
     private _checkedOut!: boolean;
 
     GetDataIDs() { return Object.keys(this._cache); }
@@ -44,79 +45,88 @@ export abstract class MemoryBase<T extends SwarmDataType, U extends IData<T>> im
 }
 
 @profile
-export class BasicMemory extends MemoryBase<SwarmDataType.Other, IOtherData> implements IOtherMemory {
+export class BasicMemory extends MemoryBase<SwarmDataType.Other, IOtherData> implements IOtherMemory, IOtherData {
 
 }
 @profile
 export abstract class SwarmMemory<T extends SwarmDataType, U extends SwarmType, V extends ISwarmData<T, U>>
-    extends MemoryBase<T, V> { }
+    extends MemoryBase<T, V> implements ISwarmData<T, U> {
+    get SWARM_TYPE(): U { return this._cache.SWARM_TYPE; }
+}
 
 @profile
 export class FlagMemory extends SwarmMemory<SwarmDataType.Flag, SwarmType.SwarmFlag, IFlagData>
-    implements IFlagMemory { }
+    implements IFlagMemory, IFlagData {
+    get FLG_TYPE(): number { return this._cache.FLG_TYPE; }
+}
 
 @profile
-export class StructureMemory<T extends TStructureData>
-    extends SwarmMemory<SwarmDataType.Structure, SwarmStructureType, T>
-    implements IStructureMemory { }
-
-@profile
-export class CreepMemory extends SwarmMemory<SwarmDataType.Creep, SwarmType.SwarmCreep, ICreepData>
-    implements ICreepMemory { }
-
-@profile
-export class RoomMemory extends SwarmMemory<SwarmDataType.Room, SwarmType.SwarmRoom, IRoomData>
-    implements IRoomMemory { }
-
-@profile
-export class RoomObjectMemory<T extends TRoomObjectData>
-    extends SwarmMemory<SwarmDataType.RoomObject, SwarmRoomObjectType, T> implements IRoomObjectMemory {
+export class StructureMemory<T extends SwarmStructureType>
+    extends SwarmMemory<SwarmDataType.Structure, T, IStructureData<T>>
+    implements IStructureMemory<T>, IStructureData<T> {
 
 }
 
-export class MasterSwarmMemory<T extends MasterSwarmDataTypes, U extends SwarmMemoryTypes>
-    extends MemoryBase<SwarmDataType.Master, T> implements IMasterMemory<T, U> {
+@profile
+export class CreepMemory extends SwarmMemory<SwarmDataType.Creep, SwarmType.SwarmCreep, ICreepData>
+    implements ICreepMemory, ICreepData {
+    get CREEP_TYPE(): number { return this._cache.CREEP_TYPE; }
+}
+
+@profile
+export class RoomMemory extends SwarmMemory<SwarmDataType.Room, SwarmType.SwarmRoom, IRoomData>
+    implements IRoomMemory, IRoomData {
+    get RM_TYPE() { return this._cache.RM_TYPE; }
+}
+
+@profile
+export class RoomObjectMemory<T extends SwarmRoomObjectType>
+    extends SwarmMemory<SwarmDataType.RoomObject, T, IRoomObjectData<T>>
+    implements IRoomObjectMemory<T>, IRoomObjectData<T> {
+
+}
+
+export class MasterSwarmMemory<T extends MasterSwarmDataTypes>
+    extends MemoryBase<SwarmDataType.Master, T> implements IMasterMemory<T> {
     constructor(data: T) {
         super(data);
         this.ChildData = this.GetData("ChildData");
     }
-    protected ChildData!: { [id: string]: TBasicSwarmData; }
-    CheckoutMemory(id: string): U {
+    protected ChildData!: { [id: string]: IData<SwarmDataType>; }
+    CheckoutMemory(id: string): SwarmMemoryTypes {
         let data = this.ChildData[id];
         let newMem = SwarmCreator.CreateSwarmMemory(data);
 
         newMem.ReserveMemory();
-        return newMem as U;
+        return newMem;
         //create memory from the data in ID and return the memory.
     }
-    SaveMemory(childData: U): void {
+    SaveMemory(childData: SwarmMemoryTypes): void {
         this.ChildData[childData.id] = childData.ReleaseMemory();
     }
 }
 
 
-export class MasterCreepMemory extends MasterSwarmMemory<IMasterCreepData, ICreepMemory>
-    implements IMasterCreepMemory {
-
+export class MasterCreepMemory extends MasterSwarmMemory<IMasterCreepData> implements IMasterCreepMemory {
 }
-export class MasterFlagMemory extends MasterSwarmMemory<IMasterFlagData, IFlagMemory>
+export class MasterFlagMemory extends MasterSwarmMemory<IMasterFlagData>
     implements IMasterFlagMemory {
 
 }
-export class MasterRoomMemory extends MasterSwarmMemory<IMasterRoomData, IRoomMemory>
+export class MasterRoomMemory extends MasterSwarmMemory<IMasterRoomData>
     implements IMasterRoomMemory {
 
 }
-export class MasterStructureMemory extends MasterSwarmMemory<IMasterStructureData, IStructureMemory>
+export class MasterStructureMemory extends MasterSwarmMemory<IMasterStructureData>
     implements IMasterStructureMemory {
 
 }
-export class MasterRoomObjectMemory extends MasterSwarmMemory<IMasterRoomObjectData, IRoomObjectMemory>
+export class MasterRoomObjectMemory extends MasterSwarmMemory<IMasterRoomObjectData>
     implements IMasterRoomObjectMemory {
 
 }
 
-export class MasterOtherMemory extends MasterSwarmMemory<IMasterOtherData, IOtherMemory>
+export class MasterOtherMemory extends MasterSwarmMemory<IMasterOtherData>
     implements IMasterOtherMemory {
 
 }

@@ -42,7 +42,6 @@ export class SwarmCreep extends OwnableSwarmObject<ICreepMemory, Creep> implemen
     get fatigue() { return this._instance.fatigue; }
     get hits() { return this._instance.hits; }
     get hitsMax() { return this._instance.hitsMax; }
-    get memory() { return this._memory; }
     get prototype() { return this._instance.prototype; }
     get name() { return this._instance.name; }
     get room() { return this._instance.room; }
