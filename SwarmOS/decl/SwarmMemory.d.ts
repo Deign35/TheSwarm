@@ -47,26 +47,28 @@ declare interface IFlagData extends ISwarmData<SwarmDataType.Flag, SwarmType.Swa
 declare interface IRoomData extends ISwarmData<SwarmDataType.Room, SwarmType.SwarmRoom> {
     RM_TYPE: number;
 }
-declare interface IRoomObjectData<T extends RoomObjectDataType> extends ISwarmData<SwarmDataType.RoomObject, SwarmType> {
-    RO_TYPE: T;
+declare interface IRoomObjectData<T extends SwarmRoomObjectType> extends ISwarmData<SwarmDataType.RoomObject, T> {
     // Special info for RoomObjects.
 }
-declare interface ISourceData extends IRoomObjectData<RoomObjectDataType.Source> {
-    sourceID: string;
+declare interface ISourceData extends IRoomObjectData<SwarmType.SwarmSource> {
     nextSpawnRequiredBy: number;
     creepID?: string;
     containerID?: string;
     linkID?: string;
     pileID?: string;
 }
-declare interface IMineralData extends IRoomObjectData<RoomObjectDataType.Mineral> {
-    mineralID: string;
+declare interface IMineralData extends IRoomObjectData<SwarmType.SwarmMineral> {
     nextSpawnRequiredBy: number;
     creepID?: string;
     containerID?: string;
     pileID?: string;
 }
-declare type TRoomObjectData = IMineralData | ISourceData;
+declare type TNukeData = IRoomObjectData<SwarmType.SwarmNuke>;
+declare type TResourceData = IRoomObjectData<SwarmType.SwarmResource>;
+declare type TTombstoneData = IRoomObjectData<SwarmType.SwarmTombstone>;
+declare type TConstructionSite = IRoomObjectData<SwarmType.SwarmSite>;
+declare type TRoomObjectData = IMineralData | ISourceData | TNukeData |
+    TResourceData | TTombstoneData | TConstructionSite;
 
 declare type TBasicSwarmData = TRoomObjectData | TStructureData | IRoomData | ICreepData | IFlagData | IOtherData;
 
@@ -120,8 +122,8 @@ declare type SwarmMemoryTypes = ICreepMemory | IFlagMemory | IRoomMemory |
     IRoomObjectMemory | IStructureMemory | IOtherMemory;
 
 declare interface IMasterMemory<T extends MasterSwarmDataTypes, U extends SwarmMemoryTypes> extends IMemory<T, SwarmDataType.Master> {
-    CheckoutChildMemory(id: string): U;
-    SaveChildMemory(childMemory: U): void;
+    CheckoutMemory(id: string): U;
+    SaveMemory(childMemory: U): void;
 }
 declare interface IMasterCreepMemory extends IMasterMemory<IMasterCreepData, ICreepMemory> { }
 declare interface IMasterFlagMemory extends IMasterMemory<IMasterFlagData, IFlagMemory> { }

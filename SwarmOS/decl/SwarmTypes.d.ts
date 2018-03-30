@@ -1,10 +1,3 @@
-declare interface ISpawnRequirement {
-    [id: string]: any;
-    priority: Priority;
-    minBody: BodyPartConstant[];
-    growthTemplate: BodyPartConstant[];
-    neededIn: number;
-}
 declare interface IObject<T extends SwarmMemoryTypes, U> extends _Constructor<U> {
     saveID: string;
     IsActive: boolean;
@@ -159,8 +152,8 @@ declare var SwarmCreator: {
 
 declare type RoomObjectDataStructure = {
     minerals: IMineralData[],
-    nukes: IRoomObjectData<RoomObjectDataType.Nuke>[],
-    resources: IRoomObjectData<RoomObjectDataType.Resource>[],
+    nukes: IRoomObjectData<SwarmType.SwarmNuke>[],
+    resources: IRoomObjectData<SwarmType.SwarmResource>[],
     sources: ISourceData[],
-    tombstones: IRoomObjectData<RoomObjectDataType.Tombstone>[],
+    tombstones: IRoomObjectData<SwarmType.SwarmTombstone>[],
 }

@@ -1,5 +1,5 @@
 import { profile } from "Tools/Profiler";
-import { MasterSwarmMemory, MasterCreepMemory, MasterFlagMemory, MasterRoomMemory, MasterStructureMemory } from "SwarmMemory/StorageMemory";
+import { MasterSwarmMemory, MasterCreepMemory, MasterFlagMemory, MasterRoomMemory, MasterStructureMemory, MasterRoomObjectMemory, MasterOtherMemory } from "SwarmMemory/StorageMemory";
 import { NotImplementedException } from "Tools/SwarmExceptions";
 declare var Memory: ISwarmMemoryStructure;
 
@@ -36,6 +36,21 @@ export class Swarmlord implements ISwarmlord {
                     ChildData: {},
                     MEM_TYPE: SwarmDataType.Master
                 },
+                roomObjects: {
+                    id: "roomObjects",
+                    ChildData: {},
+                    MEM_TYPE: SwarmDataType.Master
+                },
+                otherData: {
+                    id: "otherData",
+                    ChildData: {},
+                    MEM_TYPE: SwarmDataType.Master
+                },
+                stats: {
+                    rooms: {},
+                    market: {},
+                    totalGCL: 0
+                },
                 profiler: Memory.profiler, // Hacky, but cleanest way to prevent the profiler from breaking because of deleting its memory.
                 SwarmVersionDate: SWARM_VERSION_DATE,
                 INIT: false
@@ -70,7 +85,7 @@ export class Swarmlord implements ISwarmlord {
 
     CheckoutMasterMemory(id: string) {
         let data = CopyObject(Memory[id]);
-        let newMem: PrimeMemoryTypes | undefined;
+        let newMem: MasterMemoryTypes | undefined = undefined;
         switch (data.id) {
             case (SwarmControllerDataTypes.Creeps):
                 newMem = new MasterCreepMemory(data);
@@ -84,14 +99,18 @@ export class Swarmlord implements ISwarmlord {
             case (SwarmControllerDataTypes.Structures):
                 newMem = new MasterStructureMemory(data);
                 break;
+            case (SwarmControllerDataTypes.RoomObjects):
+                newMem = new MasterRoomObjectMemory(data);
+                break;
+            case (SwarmControllerDataTypes.Other):
+                newMem = new MasterOtherMemory(data);
         }
 
         if (!newMem) {
             throw new NotImplementedException("Attempted to checkout memory that isn't mastered correctly: " + id);
         }
 
-        (newMem as TMasterMemory)
-            newMem.ReserveMemory();
+        newMem.ReserveMemory();
         return newMem;
     }
 }

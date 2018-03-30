@@ -25,9 +25,8 @@ declare type SwarmStructureType = SwarmType.SwarmContainer | SwarmType.SwarmCont
     SwarmType.SwarmPowerSpawn | SwarmType.SwarmRampart | SwarmType.SwarmRoad | SwarmType.SwarmSpawn |
     SwarmType.SwarmStorage | SwarmType.SwarmTerminal | SwarmType.SwarmTower | SwarmType.SwarmWall
 
-declare type SwarmRoomObjectType = SwarmType.SwarmSite | SwarmType.SwarmCreep | SwarmType.SwarmFlag |
-    SwarmType.SwarmMineral | SwarmType.SwarmNuke | SwarmType.SwarmResource |
-    SwarmType.SwarmTombstone | SwarmStructureType
+declare type SwarmRoomObjectType = SwarmType.SwarmSite | SwarmType.SwarmMineral | SwarmType.SwarmNuke |
+    SwarmType.SwarmResource | SwarmType.SwarmSource | SwarmType.SwarmTombstone
 
 declare type OwnableStructureConstant = STRUCTURE_CONTROLLER | STRUCTURE_EXTENSION | STRUCTURE_EXTRACTOR |
     STRUCTURE_KEEPER_LAIR | STRUCTURE_LAB | STRUCTURE_LINK | STRUCTURE_NUKER | STRUCTURE_OBSERVER | STRUCTURE_POWER_BANK |
