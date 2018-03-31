@@ -1,10 +1,8 @@
 import { MemoryBase } from "SwarmMemory/StorageMemory";
 import { InvalidArgumentException } from "Tools/SwarmExceptions";
 
-export abstract class ObjectBase<T extends SwarmDataType, U> implements IObject<T, U> {
-    constructor(memObject: MemoryBase<T, IData<T>>, objInst: U) {
-        this._memory = memObject;
-        this._instance = objInst;
+export abstract class ObjectBase<T extends SwarmMemoryTypes, U> implements IObject<T, U> {
+    constructor() {
     }
 
     abstract get IsActive(): boolean;
@@ -17,26 +15,27 @@ export abstract class ObjectBase<T extends SwarmDataType, U> implements IObject<
 
     abstract get prototype(): U;
     InitNewObject() { }
-    AssignObject(obj: U, objMemory: MemoryBase<T, IData<T>>): void {
+    AssignObject(obj: U, objMemory: T): void {
         this._instance = obj;
         this._memory = objMemory;
     }
 
-    protected _instance: U;
+    protected _instance!: U;
     GetObjectInstance(): U { return this._instance; }
 
     get memory(): any { throw new InvalidArgumentException("Do not access memory directly from any object"); }
-    protected _memory: MemoryBase<T, IData<T>>;
+    protected _memory!: T;
     get saveID(): string { return this._memory.id; }
-    ReleaseMemory(): MemoryBase<T, IData<T>> { return this._memory; }
-    GetMemType(): T | SwarmDataType.None {
+    ReleaseMemory(): T { return this._memory; }
+    GetMemType() {
         if (this._memory) {
             return this._memory.MEM_TYPE;
         }
         return SwarmDataType.None;
     }
 }
-abstract class SwarmTypeBase<T extends SwarmMemoryTypes, U extends Room | RoomObject | Creep | Flag | Structure<StructureConstant>> extends ObjectBase<SwarmDataType, U>
+abstract class SwarmTypeBase<T extends SwarmMemoryTypes, U extends Room | RoomObject | Creep | Flag | Structure<StructureConstant>>
+    extends ObjectBase<T, U>
     implements ISwarmObject<T, U> {
     get IsActive() { return this._memory.isActive; }
     get prototype(): U { return this._instance.prototype as U }
@@ -58,7 +57,7 @@ export abstract class SwarmObjectWithID<T extends SwarmMemoryTypes,
     get saveID() { return this.id; }
 }
 
-export abstract class NotifiableSwarmObject<T extends ICreepMemory | TStructureMemory, U extends Creep | Structure>
+export abstract class NotifiableSwarmObject<T extends ICreepMemory | IStructureMemory<any>, U extends Creep | Structure>
     extends SwarmObjectWithID<T, U> {
     notifyWhenAttacked(enabled: boolean = false) { // ActionIntent
         if ((this._instance as Structure).notifyWhenAttacked) {
@@ -70,7 +69,7 @@ export abstract class NotifiableSwarmObject<T extends ICreepMemory | TStructureM
     }
 }
 
-export abstract class OwnableSwarmObject<T extends ICreepMemory | TStructureMemory, U extends Creep | OwnedStructure>
+export abstract class OwnableSwarmObject<T extends ICreepMemory | IStructureMemory<any>, U extends Creep | OwnedStructure>
     extends NotifiableSwarmObject<T, U> {
     get my() { return this._instance.my; }
     get owner() { return this._instance.owner; }

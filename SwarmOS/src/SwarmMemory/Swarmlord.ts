@@ -19,32 +19,38 @@ export class Swarmlord implements ISwarmlord {
                 creeps: {
                     id: "creeps",
                     ChildData: {},
-                    MEM_TYPE: SwarmDataType.Master
+                    MEM_TYPE: SwarmDataType.Master,
+                    SWARM_TYPE: SwarmType.Any
                 },
                 flags: {
                     id: "flags",
                     ChildData: {},
-                    MEM_TYPE: SwarmDataType.Master
+                    MEM_TYPE: SwarmDataType.Master,
+                    SWARM_TYPE: SwarmType.Any
                 },
                 structures: {
                     id: "structures",
                     ChildData: {},
-                    MEM_TYPE: SwarmDataType.Master
+                    MEM_TYPE: SwarmDataType.Master,
+                    SWARM_TYPE: SwarmType.Any
                 },
                 rooms: {
                     id: "rooms",
                     ChildData: {},
-                    MEM_TYPE: SwarmDataType.Master
+                    MEM_TYPE: SwarmDataType.Master,
+                    SWARM_TYPE: SwarmType.Any
                 },
                 roomObjects: {
                     id: "roomObjects",
                     ChildData: {},
-                    MEM_TYPE: SwarmDataType.Master
+                    MEM_TYPE: SwarmDataType.Master,
+                    SWARM_TYPE: SwarmType.Any
                 },
                 otherData: {
                     id: "otherData",
                     ChildData: {},
-                    MEM_TYPE: SwarmDataType.Master
+                    MEM_TYPE: SwarmDataType.Master,
+                    SWARM_TYPE: SwarmType.Any
                 },
                 stats: {
                     rooms: {},

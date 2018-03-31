@@ -1,6 +1,7 @@
 declare interface IData<T extends SwarmDataType> extends Dictionary {
     id: string;
     MEM_TYPE: T;
+    SWARM_TYPE: SwarmType;
 }
 declare interface IOtherData extends IData<SwarmDataType.Other> {
     isActive: boolean;
@@ -52,14 +53,12 @@ declare interface IRoomObjectData<T extends SwarmRoomObjectType> extends ISwarmD
     // Special info for RoomObjects.
 }
 declare interface ISourceData extends IRoomObjectData<SwarmType.SwarmSource> {
-    nextSpawnRequiredBy: number;
     creepID?: string;
     containerID?: string;
     linkID?: string;
     pileID?: string;
 }
 declare interface IMineralData extends IRoomObjectData<SwarmType.SwarmMineral> {
-    nextSpawnRequiredBy: number;
     creepID?: string;
     containerID?: string;
     pileID?: string;
@@ -67,9 +66,9 @@ declare interface IMineralData extends IRoomObjectData<SwarmType.SwarmMineral> {
 declare type TNukeData = IRoomObjectData<SwarmType.SwarmNuke>;
 declare type TResourceData = IRoomObjectData<SwarmType.SwarmResource>;
 declare type TTombstoneData = IRoomObjectData<SwarmType.SwarmTombstone>;
-declare type TConstructionSite = IRoomObjectData<SwarmType.SwarmSite>;
+declare type TConstructionSiteData = IRoomObjectData<SwarmType.SwarmSite>;
 declare type TRoomObjectData = IMineralData | ISourceData | TNukeData |
-    TResourceData | TTombstoneData | TConstructionSite;
+    TResourceData | TTombstoneData | TConstructionSiteData;
 
 declare type TBasicSwarmData = TRoomObjectData | TStructureData | IRoomData | ICreepData | IFlagData | IOtherData;
 
@@ -86,7 +85,9 @@ declare interface IMasterOtherData extends IMasterData<IOtherData> { }
 declare type MasterSwarmDataTypes = IMasterRoomObjectData | IMasterFlagData | IMasterStructureData |
     IMasterRoomData | IMasterOtherData
 
-declare interface IMemory<T extends IData<U>, U extends SwarmDataType> {
+declare type SwarmDataTypes = MasterSwarmDataTypes | TBasicSwarmData;
+
+declare interface IMemory<T extends SwarmDataTypes, U extends SwarmDataType> extends IData<U> {
     id: string;
     HasData(id: string): boolean;
     GetData<Z>(id: string): Z;
@@ -96,7 +97,7 @@ declare interface IMemory<T extends IData<U>, U extends SwarmDataType> {
 
     IsCheckedOut: boolean;
     ReserveMemory(): void;
-    ReleaseMemory(): T;
+    ReleaseData(): T;
 }
 declare interface ICreepMemory extends IMemory<ICreepData, SwarmDataType.Creep> {
 
@@ -107,42 +108,42 @@ declare interface IFlagMemory extends IMemory<IFlagData, SwarmDataType.Flag> {
 declare interface IRoomMemory extends IMemory<IRoomData, SwarmDataType.Room> {
 
 }
-declare interface IRoomObjectMemory<T extends SwarmRoomObjectType>
-    extends IMemory<IRoomObjectData<T>, SwarmDataType.RoomObject> {
+declare interface IRoomObjectMemory<T extends TRoomObjectData>
+    extends IMemory<T, SwarmDataType.RoomObject> {
 
 }
-declare type IMineralMemory = IRoomObjectMemory<SwarmType.SwarmMineral>;
-declare type INukeMemory = IRoomObjectMemory<SwarmType.SwarmNuke>;
-declare type IResourceMemory = IRoomObjectMemory<SwarmType.SwarmResource>;
-declare type ISiteMemory = IRoomObjectMemory<SwarmType.SwarmSite>;
-declare type ISourceMemory = IRoomObjectMemory<SwarmType.SwarmSource>;
-declare type ITombstoneMemory = IRoomObjectMemory<SwarmType.SwarmTombstone>;
+declare type IMineralMemory = IRoomObjectMemory<IMineralData>;
+declare type INukeMemory = IRoomObjectMemory<TNukeData>;
+declare type IResourceMemory = IRoomObjectMemory<TResourceData>;
+declare type ISiteMemory = IRoomObjectMemory<TConstructionSiteData>;
+declare type ISourceMemory = IRoomObjectMemory<ISourceData>;
+declare type ITombstoneMemory = IRoomObjectMemory<TTombstoneData>;
 
 declare type TRoomObjectMemory = IMineralMemory | INukeMemory | IResourceMemory | ISiteMemory | ISourceMemory | ITombstoneMemory;
 
-declare interface IStructureMemory<T extends SwarmStructureType>
-    extends IMemory<IStructureData<T>, SwarmDataType.Structure> {
+declare interface IStructureMemory<T extends TStructureData>
+    extends IMemory<T, SwarmDataType.Structure> {
 
 }
-declare type IContainerMemory = IStructureMemory<SwarmType.SwarmContainer>;
-declare type IControllerMemory = IStructureMemory<SwarmType.SwarmController>;
-declare type IExtensionMemory = IStructureMemory<SwarmType.SwarmExtension>;
-declare type IExtractorMemory = IStructureMemory<SwarmType.SwarmExtractor>;
-declare type IKeepersLairMemory = IStructureMemory<SwarmType.SwarmKeepersLair>;
-declare type ILabMemory = IStructureMemory<SwarmType.SwarmLab>;
-declare type ILinkMemory = IStructureMemory<SwarmType.SwarmLink>;
-declare type INukerMemory = IStructureMemory<SwarmType.SwarmNuker>;
-declare type IObserverMemory = IStructureMemory<SwarmType.SwarmObserver>;
-declare type IPortalMemory = IStructureMemory<SwarmType.SwarmPortal>;
-declare type IPowerBankMemory = IStructureMemory<SwarmType.SwarmPowerBank>;
-declare type IPowerSpawnMemory = IStructureMemory<SwarmType.SwarmPowerSpawn>;
-declare type IRampartMemory = IStructureMemory<SwarmType.SwarmRampart>;
-declare type IRoadMemory = IStructureMemory<SwarmType.SwarmRoad>;
-declare type ISpawnMemory = IStructureMemory<SwarmType.SwarmSpawn>;
-declare type IStorageMemory = IStructureMemory<SwarmType.SwarmStorage>;
-declare type ITerminalMemory = IStructureMemory<SwarmType.SwarmTerminal>;
-declare type ITowerMemory = IStructureMemory<SwarmType.SwarmTower>;
-declare type IWallMemory = IStructureMemory<SwarmType.SwarmWall>;
+declare type IContainerMemory = IStructureMemory<IContainerData>;
+declare type IControllerMemory = IStructureMemory<IControllerData>;
+declare type IExtensionMemory = IStructureMemory<IExtensionData>;
+declare type IExtractorMemory = IStructureMemory<IExtractorData>;
+declare type IKeepersLairMemory = IStructureMemory<IKeepersLairData>;
+declare type ILabMemory = IStructureMemory<ILabData>;
+declare type ILinkMemory = IStructureMemory<ILinkData>;
+declare type INukerMemory = IStructureMemory<INukerData>;
+declare type IObserverMemory = IStructureMemory<IObserverData>;
+declare type IPortalMemory = IStructureMemory<IPortalData>;
+declare type IPowerBankMemory = IStructureMemory<IPowerBankData>;
+declare type IPowerSpawnMemory = IStructureMemory<IPowerSpawnData>;
+declare type IRampartMemory = IStructureMemory<IRampartData>;
+declare type IRoadMemory = IStructureMemory<IRoadData>;
+declare type ISpawnMemory = IStructureMemory<ISpawnData>;
+declare type IStorageMemory = IStructureMemory<IStorageData>;
+declare type ITerminalMemory = IStructureMemory<ITerminalData>;
+declare type ITowerMemory = IStructureMemory<ITowerData>;
+declare type IWallMemory = IStructureMemory<IWallData>;
 
 declare type TStructureMemory = IContainerMemory | IControllerMemory | IExtensionMemory | IExtractorMemory |
     IKeepersLairMemory | ILabMemory | ILinkMemory | INukerMemory | IObserverMemory | IPortalMemory |
@@ -154,18 +155,19 @@ declare interface IOtherMemory extends IMemory<IOtherData, SwarmDataType.Other> 
 }
 
 declare type SwarmMemoryTypes = ICreepMemory | IFlagMemory | IRoomMemory |
-    TRoomObjectMemory | TStructureMemory | IOtherMemory;
+    TRoomObjectMemory | TStructureMemory | IOtherMemory | MasterMemoryTypes;
 
-declare interface IMasterMemory<T extends MasterSwarmDataTypes> extends IMemory<T, SwarmDataType.Master> {
-    CheckoutMemory(id: string): SwarmMemoryTypes;
-    SaveMemory(childMemory: SwarmMemoryTypes): void;
+declare interface IMasterMemory<T extends MasterSwarmDataTypes, U extends SwarmMemoryTypes>
+    extends IMemory<T, SwarmDataType.Master> {
+    CheckoutMemory(id: string): U;
+    SaveMemory(childMemory: U): void;
 }
-declare interface IMasterCreepMemory extends IMasterMemory<IMasterCreepData> { }
-declare interface IMasterFlagMemory extends IMasterMemory<IMasterFlagData> { }
-declare interface IMasterRoomMemory extends IMasterMemory<IMasterRoomData> { }
-declare interface IMasterRoomObjectMemory extends IMasterMemory<IMasterRoomObjectData> { }
-declare interface IMasterStructureMemory extends IMasterMemory<IMasterStructureData> { }
-declare interface IMasterOtherMemory extends IMasterMemory<IMasterOtherData> { }
+declare interface IMasterCreepMemory extends IMasterMemory<IMasterCreepData, ICreepMemory> { }
+declare interface IMasterFlagMemory extends IMasterMemory<IMasterFlagData, IFlagMemory> { }
+declare interface IMasterRoomMemory extends IMasterMemory<IMasterRoomData, IRoomMemory> { }
+declare interface IMasterRoomObjectMemory extends IMasterMemory<IMasterRoomObjectData, TRoomObjectMemory> { }
+declare interface IMasterStructureMemory extends IMasterMemory<IMasterStructureData, TStructureMemory> { }
+declare interface IMasterOtherMemory extends IMasterMemory<IMasterOtherData, IOtherMemory> { }
 
 declare type MasterMemoryTypes = IMasterCreepMemory | IMasterFlagMemory | IMasterRoomMemory |
     IMasterRoomObjectMemory | IMasterStructureMemory | IMasterOtherMemory;

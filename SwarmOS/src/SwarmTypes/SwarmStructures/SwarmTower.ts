@@ -4,7 +4,7 @@ import { profile } from "Tools/Profiler";
 import { SwarmCreep } from "SwarmTypes/SwarmCreep";
 
 @profile
-export class SwarmTower extends OwnedSwarmStructure<SwarmType.SwarmTower, STRUCTURE_TOWER, StructureTower>
+export class SwarmTower extends OwnedSwarmStructure<STRUCTURE_TOWER, StructureTower>
     implements ISwarmTower, StructureTower {
 
 
@@ -18,7 +18,7 @@ export class SwarmTower extends OwnedSwarmStructure<SwarmType.SwarmTower, STRUCT
     heal(target: SwarmCreep) {
         return this._instance.heal(target);
     }
-    repair(target: SwarmStructure<SwarmStructureType, StructureConstant, Structure>) {
+    repair(target: SwarmStructure<StructureConstant, Structure>) {
         return this._instance.repair(target);
     }
     protected OnActivate() {
