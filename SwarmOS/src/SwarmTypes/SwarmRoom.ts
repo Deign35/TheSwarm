@@ -4,16 +4,55 @@ import { SwarmItemWithName, SwarmObject, SwarmMineral } from "SwarmTypes/SwarmTy
 import { NotImplementedException } from "Tools/SwarmExceptions";
 import { SwarmSource } from "./SwarmSource";
 import { SwarmContainer } from "SwarmTypes/SwarmStructures/SwarmStructure";
+import { SwarmLoader } from "./SwarmLoader";
 
 const ROOM_COUNTER = 'CNT';
 const HARVESTER_JOBS = 'HARVEST';
 
 @profile
-export class SwarmRoom extends SwarmItemWithName<IRoomMemory, Room>
+export class SwarmRoom extends SwarmItemWithName<RoomMemory, Room>
     implements ISwarmRoom, Room {
+
     protected OnActivate(): void {
-        // Do Room specific stuff here.
+        if (this._memory.LastUpdated == 0) {
+            this.InitNewObject();
+        }
+        if (Game.time % 5 == 0) {
+            let foundResources = this.find(FIND_DROPPED_RESOURCES);
+            for (let j = 0; j < foundResources.length; j++) {
+                if (!SwarmLoader.TheSwarm.roomObjects[foundResources[j].id]) {
+                    SwarmLoader.LoadObject<Resource>(foundResources[j].id, foundResources[j], SwarmControllerDataTypes.RoomObjects);
+                }
+            }
+        }
+
+        if (Game.time % 11 == 0) {
+            let foundTombstones = this.find(FIND_TOMBSTONES);
+            for (let j = 0; j < foundTombstones.length; j++) {
+                if (!SwarmLoader.TheSwarm.roomObjects[foundTombstones[j].id]) {
+                    SwarmLoader.LoadObject<Tombstone>(foundTombstones[j].id, foundTombstones[j], SwarmControllerDataTypes.RoomObjects);
+                }
+            }
+        }
+        if (Game.time % 23 == 0) {
+            let foundSites = this.find(FIND_CONSTRUCTION_SITES);
+            for (let j = 0; j < foundSites.length; j++) {
+                if (!SwarmLoader.TheSwarm.roomObjects[foundSites[j].id]) {
+                    SwarmLoader.LoadObject<ConstructionSite>(foundSites[j].id, foundSites[j], SwarmControllerDataTypes.RoomObjects);
+                }
+            }
+        }
+
+        if (Game.time % 233 == 0) {
+            let foundNukes = this.find(FIND_NUKES);
+            for (let j = 0; j < foundNukes.length; j++) {
+                if (!SwarmLoader.TheSwarm.roomObjects[foundNukes[j].id]) {
+                    SwarmLoader.LoadObject<Nuke>(foundNukes[j].id, foundNukes[j], SwarmControllerDataTypes.RoomObjects);
+                }
+            }
+        }
     }
+    // Do Room specific stuff here.
     /*GetSwarmTypeFromObject(obj: any): SwarmType {
         if ((obj as AnyStructure).structureType) {
             debugger;
@@ -161,6 +200,18 @@ export class SwarmRoom extends SwarmItemWithName<IRoomMemory, Room>
 
         this._memory.SetData('RoomObjects', roomObjects);
     }*/
+    InitNewObject() {
+        // Would love to add a pathfinding.
+        let sources = this.find(FIND_SOURCES);
+        for (let i = 0; i < sources.length; i++) {
+            SwarmLoader.LoadObject(sources[i].id, sources[i], SwarmControllerDataTypes.RoomObjects);
+        }
+        let minerals = this.find(FIND_MINERALS);
+        for (let i = 0; i < minerals.length; i++) {
+            SwarmLoader.LoadObject(minerals[i].id, minerals[i], SwarmControllerDataTypes.RoomObjects);
+        }
+    }
+
     get DataType(): SwarmDataType.Room { return SwarmDataType.Room };
     get saveID() { return this.name; }
     get SwarmType(): SwarmType.SwarmRoom { return SwarmType.SwarmRoom; }

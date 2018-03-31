@@ -441,7 +441,7 @@ export class SwarmCreator {
                     SWARM_TYPE: SwarmType.SwarmRoom,
                     RM_TYPE: 0,
                     isActive: true,
-                    LastUpdated: Game.time
+                    LastUpdated: 0
                 });
                 break;
             case (SwarmType.SwarmSite):
