@@ -189,6 +189,6 @@ declare interface ISwarmMemoryStructure {
 
 declare interface ISwarmlord {
     ValidateMemory(): void;
-    SaveMasterMemory<T extends MasterMemoryTypes>(memObject: T, save?: boolean): void;
+    SaveMasterMemory<T extends MasterMemoryTypes>(memObject: T, save: boolean): void;
     CheckoutMasterMemory(dataType: string): MasterMemoryTypes;
 } declare var Swarmlord: ISwarmlord;

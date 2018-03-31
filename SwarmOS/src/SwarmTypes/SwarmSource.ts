@@ -12,5 +12,6 @@ export class SwarmSource extends SwarmRoomObject<ISourceMemory, Source> implemen
 
     //protected data!: ISourceData;
     protected OnActivate() {
+        console.log('Successfully activated a source');
     }
 }

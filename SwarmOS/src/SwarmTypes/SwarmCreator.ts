@@ -42,7 +42,7 @@ export class SwarmCreator {
                 return SwarmType.SwarmCreep;
             } else if ((obj as Flag).setColor) {
                 return SwarmType.SwarmFlag;
-            } else if ((obj as Room).mode) {
+            } else if ((obj as Room).visual) {
                 return SwarmType.SwarmRoom;
             } else if ((obj as Structure).structureType) {
                 return this.GetStructureSwarmType(obj as Structure);

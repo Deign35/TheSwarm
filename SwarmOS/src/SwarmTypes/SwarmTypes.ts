@@ -14,7 +14,7 @@ export abstract class ObjectBase<T extends SwarmMemoryTypes, U> implements IObje
     }
 
     abstract get prototype(): U;
-    InitNewObject() { }
+    InitAsNew() { }
     AssignObject(obj: U, objMemory: T): void {
         this._instance = obj;
         this._memory = objMemory;
@@ -23,7 +23,7 @@ export abstract class ObjectBase<T extends SwarmMemoryTypes, U> implements IObje
     protected _instance!: U;
     GetObjectInstance(): U { return this._instance; }
 
-    get memory(): any { throw new InvalidArgumentException("Do not access memory directly from any object"); }
+    get memory(): T { return this._memory; }
     protected _memory!: T;
     get saveID(): string { return this._memory.id; }
     ReleaseMemory(): T { return this._memory; }

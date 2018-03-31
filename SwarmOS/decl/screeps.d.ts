@@ -299,11 +299,6 @@ declare const GCL_POW: number;
 declare const GCL_MULTIPLY: number;
 declare const GCL_NOVICE: number;
 
-declare const MODE_SIMULATION: string;
-declare const MODE_SURVIVAL: string;
-declare const MODE_WORLD: string;
-declare const MODE_ARENA: string;
-
 declare const TERRAIN_MASK_WALL: number;
 declare const TERRAIN_MASK_SWAMP: number;
 declare const TERRAIN_MASK_LAVA: number;
@@ -2854,10 +2849,6 @@ interface Room {
      * A shorthand to `Memory.rooms[room.name]`. You can use it for quick access the room’s specific memory data object.
      */
     memory: IRoomMemory;
-    /**
-     * One of the `MODE_*` constants.
-     */
-    mode: string;
     /**
      * The name of the room.
      */

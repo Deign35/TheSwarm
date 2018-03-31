@@ -82,8 +82,8 @@ export class Swarmlord implements ISwarmlord {
         }
     }
 
-    SaveMasterMemory<T extends MasterMemoryTypes>(memObject: T, save?: boolean): void {
-        let memData = memObject.ReleaseMemory();
+    SaveMasterMemory<T extends MasterMemoryTypes>(memObject: T, save: boolean): void {
+        let memData = memObject.ReleaseData();
         if (save) {
             Memory[memObject.id] = memData;
         }

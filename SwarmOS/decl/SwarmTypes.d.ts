@@ -4,6 +4,7 @@ declare interface IObject<T extends SwarmMemoryTypes, U> extends _Constructor<U>
 
     Activate(): void;
     AssignObject(obj: U, objMemory: T): void;
+    InitAsNew(): void;
 
     GetMemType(): number;
     ReleaseMemory(): T
