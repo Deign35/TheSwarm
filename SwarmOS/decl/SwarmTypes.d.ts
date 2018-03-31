@@ -17,8 +17,6 @@ declare interface ISwarmObject<T extends SwarmMemoryTypes, U extends Room | Room
     GetMemType(): SwarmDataType;
 }
 
-declare interface ISwarmRoomObject<T extends TRoomObjectMemory, U extends RoomObject> extends ISwarmObject<T, U> { }
-
 declare interface ISwarmRoom extends ISwarmObject<IRoomMemory, Room> {
     my: boolean;
     owner?: Owner;
@@ -98,9 +96,10 @@ declare type TOwnableSwarmStructure = ISwarmController | ISwarmExtension | ISwar
     ISwarmLab | ISwarmLink | ISwarmNuker | ISwarmObserver | ISwarmPowerBank | ISwarmPowerSpawn |
     ISwarmRampart | ISwarmSpawn | ISwarmStorage | ISwarmTerminal | ISwarmTower
 
-/*declare interface ISwarmRoomObject<T extends IMemory<U>, U extends TRoomObjectData> extends ISwarmObject<T, RoomObject, U> {
+declare interface ISwarmRoomObject<T extends SwarmMemoryTypes, U extends RoomObjectType> extends ISwarmObject<T, U> {
 
-}*/
+}
+declare type RoomObjectType = Mineral | Source | Nuke | Resource | ConstructionSite | Tombstone;
 declare interface ISwarmMineral extends ISwarmRoomObject<IMineralMemory, Mineral> {
 
 }

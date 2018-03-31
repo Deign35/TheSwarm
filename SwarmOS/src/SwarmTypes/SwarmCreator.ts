@@ -17,14 +17,14 @@ var SwarmObjectInstances = {}
 
 @profile
 export class SwarmCreator {
-    /*static CreateNewSwarmObject<T extends Room | RoomObject, U extends SwarmMemoryTypes>(obj: T) {
+    static CreateNewSwarmObject<T extends Room | RoomObject, U extends SwarmMemoryTypes>(obj: T) {
         let swarmType = this.GetSwarmType(obj);
-        let newObj = this.CreateSwarmObject(swarmType);
+        let newObj = this.CreateSwarmObject(swarmType) as ISwarmObject<U, T>;
         let newMem = this.CreateNewSwarmMemory(this.GetObjSaveID(obj), swarmType);
-        newObj.AssignObject(obj, newMem);
+        newObj.AssignObject(obj, newMem as U);
 
         return newObj;
-    }*/
+    }
 
     static GetObjSaveID(obj: Room | RoomObject): string {
         if ((obj as Room).name) {

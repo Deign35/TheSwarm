@@ -1,52 +1,32 @@
-import { MasterCreepMemory, MasterFlagMemory, MasterRoomMemory, MasterStructureMemory } from "SwarmMemory/StorageMemory";
+import { MasterCreepMemory, MasterFlagMemory, MasterRoomMemory, MasterStructureMemory, MasterRoomObjectMemory, MasterOtherMemory, RoomObjectMemory } from "SwarmMemory/StorageMemory";
+import { SwarmCreep } from "SwarmTypes/SwarmCreep";
+import { SwarmRoom } from "SwarmTypes/SwarmRoom";
+import { SwarmFlag } from "SwarmTypes/SwarmFlag";
+import { SwarmObject, SwarmRoomObject, SwarmMineral } from "SwarmTypes/SwarmTypes";
+import { SwarmSource } from "SwarmTypes/SwarmSource";
 
 const STATIC_OBJECTS = 'static_objects';
 const ROOM_OBJECTS = 'room_objects';
 const STRUCTURE_OBJECTS = 'structure_objects'
 export class SwarmLoader {
-    //protected SwarmObjectInstances = {}
     constructor() {
-        /*this.SwarmObjectInstances[SwarmType.SwarmContainer] = SwarmCreator.CreateSwarmObject(SwarmType.SwarmContainer);
-        this.SwarmObjectInstances[SwarmType.SwarmController] = SwarmCreator.CreateSwarmObject(SwarmType.SwarmController);
-        this.SwarmObjectInstances[SwarmType.SwarmCreep] = SwarmCreator.CreateSwarmObject(SwarmType.SwarmCreep);
-        this.SwarmObjectInstances[SwarmType.SwarmSite] = SwarmCreator.CreateSwarmObject(SwarmType.SwarmSite);
-        this.SwarmObjectInstances[SwarmType.SwarmFlag] = SwarmCreator.CreateSwarmObject(SwarmType.SwarmFlag);
-        this.SwarmObjectInstances[SwarmType.SwarmMineral] = SwarmCreator.CreateSwarmObject(SwarmType.SwarmMineral);
-        this.SwarmObjectInstances[SwarmType.SwarmNuke] = SwarmCreator.CreateSwarmObject(SwarmType.SwarmNuke);
-        this.SwarmObjectInstances[SwarmType.SwarmResource] = SwarmCreator.CreateSwarmObject(SwarmType.SwarmResource);
-        this.SwarmObjectInstances[SwarmType.SwarmRoom] = SwarmCreator.CreateSwarmObject(SwarmType.SwarmRoom);
-        this.SwarmObjectInstances[SwarmType.SwarmSource] = SwarmCreator.CreateSwarmObject(SwarmType.SwarmSource);
-        this.SwarmObjectInstances[SwarmType.SwarmTombstone] = SwarmCreator.CreateSwarmObject(SwarmType.SwarmTombstone);
-        this.SwarmObjectInstances[SwarmType.SwarmExtension] = SwarmCreator.CreateSwarmObject(SwarmType.SwarmExtension);
-        this.SwarmObjectInstances[SwarmType.SwarmExtractor] = SwarmCreator.CreateSwarmObject(SwarmType.SwarmExtractor);
-        this.SwarmObjectInstances[SwarmType.SwarmKeepersLair] = SwarmCreator.CreateSwarmObject(SwarmType.SwarmKeepersLair);
-        this.SwarmObjectInstances[SwarmType.SwarmLab] = SwarmCreator.CreateSwarmObject(SwarmType.SwarmLab);
-        this.SwarmObjectInstances[SwarmType.SwarmLink] = SwarmCreator.CreateSwarmObject(SwarmType.SwarmLink);
-        this.SwarmObjectInstances[SwarmType.SwarmNuker] = SwarmCreator.CreateSwarmObject(SwarmType.SwarmNuker);
-        this.SwarmObjectInstances[SwarmType.SwarmObserver] = SwarmCreator.CreateSwarmObject(SwarmType.SwarmObserver);
-        this.SwarmObjectInstances[SwarmType.SwarmPowerBank] = SwarmCreator.CreateSwarmObject(SwarmType.SwarmPowerBank);
-        this.SwarmObjectInstances[SwarmType.SwarmPowerSpawn] = SwarmCreator.CreateSwarmObject(SwarmType.SwarmPowerSpawn);
-        this.SwarmObjectInstances[SwarmType.SwarmPortal] = SwarmCreator.CreateSwarmObject(SwarmType.SwarmPortal);
-        this.SwarmObjectInstances[SwarmType.SwarmRampart] = SwarmCreator.CreateSwarmObject(SwarmType.SwarmRampart);
-        this.SwarmObjectInstances[SwarmType.SwarmRoad] = SwarmCreator.CreateSwarmObject(SwarmType.SwarmRoad);
-        this.SwarmObjectInstances[SwarmType.SwarmSpawn] = SwarmCreator.CreateSwarmObject(SwarmType.SwarmSpawn);
-        this.SwarmObjectInstances[SwarmType.SwarmTerminal] = SwarmCreator.CreateSwarmObject(SwarmType.SwarmTerminal);
-        this.SwarmObjectInstances[SwarmType.SwarmTower] = SwarmCreator.CreateSwarmObject(SwarmType.SwarmTower);
-        this.SwarmObjectInstances[SwarmType.SwarmWall] = SwarmCreator.CreateSwarmObject(SwarmType.SwarmWall);*/
         this.LoadTheSwarm();
     }
     protected MasterMemory!: {
         creeps: MasterCreepMemory,
         flags: MasterFlagMemory,
         rooms: MasterRoomMemory,
-        structures: MasterStructureMemory
+        structures: MasterStructureMemory,
+        roomObjects: MasterRoomObjectMemory,
+        other: MasterOtherMemory
     }
     TheSwarm = {
         creeps: {} as { [id: string]: ISwarmCreep },
         flags: {} as { [id: string]: ISwarmFlag },
         rooms: {} as { [id: string]: ISwarmRoom },
         roomObjects: {} as { [id: string]: TSwarmRoomObject },
-        structures: {} as { [id: string]: TSwarmStructure }
+        structures: {} as { [id: string]: TSwarmStructure },
+        other: {} as { [id: string]: IOtherObject }
     }
     TheSwarmByRoom = {
         // this is not correctly implemented.  Need to separate the different objects into different groupings.
@@ -58,7 +38,9 @@ export class SwarmLoader {
         this.MasterMemory = {
             creeps: Swarmlord.CheckoutMasterMemory('creeps') as MasterCreepMemory,
             flags: Swarmlord.CheckoutMasterMemory('flags') as MasterFlagMemory,
+            other: Swarmlord.CheckoutMasterMemory('otherData') as MasterOtherMemory,
             rooms: Swarmlord.CheckoutMasterMemory('rooms') as MasterRoomMemory,
+            roomObjects: Swarmlord.CheckoutMasterMemory('roomObjects') as MasterRoomObjectMemory,
             structures: Swarmlord.CheckoutMasterMemory('structures') as MasterStructureMemory
         };
         let keys = Object.keys(Game.rooms);
@@ -68,6 +50,7 @@ export class SwarmLoader {
         }
         // Load the memory!
         this.LoadCreeps();
+        this.LoadFlags();
 
         global['TheSwarm'] = this.TheSwarm;
     }
@@ -77,7 +60,7 @@ export class SwarmLoader {
         let keys = Object.keys(this.MasterMemory.creeps.GetDataIDs());
 
         for (let i = 0; i < keys.length; i++) {
-            let curCreep = this.MasterMemory.creeps.CheckoutChildMemory(keys[i]);
+            let curCreep = this.MasterMemory.creeps.CheckoutMemory(keys[i]);
             if (!Game.creeps[curCreep.id]) {
                 this.MasterMemory.creeps.RemoveData(curCreep.id);
             }
@@ -86,10 +69,10 @@ export class SwarmLoader {
         keys = Object.keys(allCreeps);
         for (let i = 0; i < keys.length; i++) {
             let newCreep = Game.creeps[keys[i]];
-            let newMem = SwarmCreator.CreateNewSwarmMemory(keys[i], SwarmType.SwarmCreep) as ICreepMemory;
-            this.MasterMemory.creeps.SaveChildMemory(newMem.ReleaseMemory() as TCreepData);
-            newMem = this.MasterMemory.creeps.CheckoutChildMemory(keys[i]);
-            let swarmObject = SwarmCreator.CreateSwarmObject(SwarmType.SwarmCreep) as TSwarmCreep;
+            let newMem = SwarmCreator.CreateNewSwarmMemory(keys[i], SwarmType.SwarmCreep);
+            this.MasterMemory.creeps.SaveMemory(newMem.ReleaseMemory());
+            newMem = this.MasterMemory.creeps.CheckoutMemory(keys[i]);
+            let swarmObject = SwarmCreator.CreateSwarmObject(SwarmType.SwarmCreep) as SwarmCreep;
             swarmObject.AssignObject(newCreep, newMem);
             // Validate current actions
             // If no action available, put in queue.
@@ -104,17 +87,16 @@ export class SwarmLoader {
             let newMem = SwarmCreator.CreateNewSwarmMemory(room.name, SwarmType.SwarmRoom);
             roomObj.AssignObject(room, newMem as IRoomMemory);
             this.InitRoom(roomObj);
-            this.MasterMemory.rooms.SaveChildMemory(roomObj.GetCopyOfMemory().ReleaseMemory() as TRoomData);
+            this.MasterMemory.rooms.SaveMemory(roomObj.ReleaseMemory());
         }
-        let roomMem = this.MasterMemory.rooms.CheckoutChildMemory(room.name);
+        let roomMem = this.MasterMemory.rooms.CheckoutMemory(room.name);
         roomObj.AssignObject(room, roomMem);
 
         if (roomObj.my) {
             // load stuff
-            let csites = this.LoadObjectsInRoom(roomObj, roomObj.memory, FIND_CONSTRUCTION_SITES);
+            //let csites = this.LoadObjectsInRoom(roomObj, roomObj.memory, FIND_CONSTRUCTION_SITES);
 
             this.LoadStructures(roomObj);
-            this.LoadFlags(roomObj);
             this.LoadMisc(roomObj);
         } else if (roomObj.owner) {
             // Look for enemy stuff.  To be added later.
@@ -124,7 +106,7 @@ export class SwarmLoader {
         this.TheSwarm.rooms[roomObj.saveID] = roomObj;
     }
 
-    protected LoadObjectsInRoom(room: SwarmRoom, curMem: TSwarmMemory, find: FindConstant, filter?: (a: any) => boolean) {
+    /*protected LoadObjectsInRoom(room: SwarmRoom, curMem: TSwarmMemory, find: FindConstant, filter?: (a: any) => boolean) {
         let objs = room.find(find, filter);
         let swarmObjs = {};
 
@@ -148,12 +130,12 @@ export class SwarmLoader {
 
 
         return swarmObjs;
-    }
+    }*/
 
 
 
     protected LoadStructures(room: SwarmRoom) {
-        let structureIDs = room.memory.GetDataIDs();
+        let structureIDs = this.MasterMemory.structures.GetDataIDs();
         let structuresList = {};
         let objs = room.find(FIND_STRUCTURES);
 
@@ -166,53 +148,49 @@ export class SwarmLoader {
             structuresList[structure.structureType].push(structure.id);
 
             let swarmType = SwarmCreator.GetStructureSwarmType(structure);
-            if (!structureMem.HasData(structure.id)) {
+            if (!this.MasterMemory.structures.HasData(structure.id)) {
                 let newMem = SwarmCreator.CreateNewSwarmMemory(structure.id, swarmType);
-                this.MasterMemory.structures.SaveChildMemory(newMem.ReleaseMemory() as TStructureData);
+                this.MasterMemory.structures.SaveMemory(newMem.ReleaseMemory());
             }
-            let mem = this.MasterMemory.structures.CheckoutChildMemory(structure.id);
-            let swarmStructure = SwarmCreator.CreateSwarmObject(swarmType);
+            let mem = this.MasterMemory.structures.CheckoutMemory(structure.id);
+            let swarmStructure = SwarmCreator.CreateSwarmObject(swarmType) as ISwarmStructureType<StructureConstant>;
             swarmStructure.AssignObject(structure, mem);
             this.TheSwarm.structures[swarmStructure.saveID] = swarmStructure as TSwarmStructure;
             this.TheSwarmByRoom[room.saveID][swarmStructure.saveID] = this.TheSwarm.structures[swarmStructure.saveID];
         }
 
-        let ids = structureMem.GetDataIDs();
+        let ids = this.MasterMemory.structures.GetDataIDs();
         for (let i = 0; i < ids.length; i++) {
             if (!this.TheSwarm.structures[ids[i]]) {
                 // Structure has disappeared
-                structureMem.RemoveData(ids[i]);
+                this.MasterMemory.structures.RemoveData(ids[i]);
             }
         }
-
-        this.MasterMemory.structures.SaveChildMemory(structureMem.ReleaseMemory());
     }
+    protected LoadFlags() {
+        let allCreeps = Game.flags;
+        let keys = Object.keys(this.MasterMemory.flags.GetDataIDs());
 
-    protected LoadFlags(room: SwarmRoom) {
-        let flagMem = this.MasterMemory.flags.CheckoutChildMemory(room.saveID);
-        let objs = room.find(FIND_FLAGS);
-
-        for (let i = 0; i < objs.length; i++) {
-            let flag = objs[i];
-            if (!flagMem.HasData(flag.name)) {
-                let newMem = SwarmCreator.CreateNewSwarmMemory(flag.name, SwarmType.SwarmFlag);
-                this.MasterMemory.flags.SaveChildMemory(newMem.ReleaseMemory() as TFlagData);
-            }
-            let mem = this.MasterMemory.flags.CheckoutChildMemory(flag.name);
-            let swarmFlag = SwarmCreator.CreateSwarmObject(SwarmType.SwarmFlag);
-            swarmFlag.AssignObject(swarmFlag, mem);
-            this.TheSwarm.flags[swarmFlag.saveID] = swarmFlag as ISwarmFlag;
-            this.TheSwarmByRoom[room.saveID][swarmFlag.saveID] = this.TheSwarm.flags[swarmFlag.saveID];
-        }
-
-        let ids = flagMem.GetDataIDs();
-        for (let i = 0; i < ids.length; i++) {
-            if (!this.TheSwarm.flags[ids[i]]) {
-                flagMem.RemoveData(ids[i]);
+        for (let i = 0; i < keys.length; i++) {
+            let curFlag = this.MasterMemory.flags.CheckoutMemory(keys[i]);
+            if (!Game.flags[curFlag.id]) {
+                this.MasterMemory.flags.RemoveData(curFlag.id);
             }
         }
 
-        this.MasterMemory.flags.SaveChildMemory(flagMem.ReleaseMemory());
+        keys = Object.keys(allCreeps);
+        for (let i = 0; i < keys.length; i++) {
+            let newFlag = Game.flags[keys[i]];
+            let newMem = SwarmCreator.CreateNewSwarmMemory(keys[i], SwarmType.SwarmFlag);
+            this.MasterMemory.flags.SaveMemory(newMem.ReleaseMemory());
+            newMem = this.MasterMemory.flags.CheckoutMemory(keys[i]);
+            let swarmObject = SwarmCreator.CreateSwarmObject(SwarmType.SwarmCreep) as SwarmFlag;
+            swarmObject.AssignObject(newFlag, newMem);
+            // Validate current actions
+            // If no action available, put in queue.
+            this.TheSwarm.flags[swarmObject.saveID] = swarmObject;
+            this.TheSwarmByRoom[swarmObject.room!.name][swarmObject.saveID] = this.TheSwarm.creeps[swarmObject.saveID];
+        }
     }
 
     protected LoadMisc(room: SwarmRoom) {
@@ -244,14 +222,14 @@ export class SwarmLoader {
         let keys = Object.keys(roomData);
         for (let i = 0; i < keys.length; i++) {
             let data = roomData[keys[i]] as TRoomObjectData;
-            let obj = Game.getObjectById(data.id);
+            let obj = Game.getObjectById(data.id) as RoomObjectType;
             if (!obj) {
                 delete roomData[keys[i]];
                 continue;
             }
             let swarmMem = SwarmCreator.CreateSwarmMemory(data);
-            let swarmObj = SwarmCreator.CreateSwarmObject(swarmMem.GetData('SWARM_TYPE'));
-            swarmObj.AssignObject(obj, swarmMem);
+            let swarmObj = SwarmCreator.CreateSwarmObject(swarmMem.GetData('SWARM_TYPE')) as SwarmRoomObject<TRoomObjectMemory, RoomObjectType>
+            swarmObj.AssignObject(obj, swarmMem as TRoomObjectMemory);
             this.TheSwarm.roomObjects[swarmObj.saveID] = swarmObj as TSwarmRoomObject;
             this.TheSwarmByRoom[room.saveID][swarmObj.saveID] = this.TheSwarm.roomObjects[swarmObj.saveID];
         }
@@ -261,11 +239,11 @@ export class SwarmLoader {
             if (this.TheSwarm.roomObjects[keys[i]]) {
                 continue;
             }
-            let obj = foundObjects[keys[i]];
-            let swarmObj = SwarmCreator.CreateNewSwarmObject(obj);
-            roomData[swarmObj.saveID] = swarmObj.GetCopyOfMemory().ReleaseMemory();
+            let obj = foundObjects[keys[i]] as RoomObjectType;
+            let swarmObj = SwarmCreator.CreateNewSwarmObject(obj) as SwarmRoomObject<TRoomObjectMemory, RoomObjectType>;
+            roomData[swarmObj.saveID] = swarmObj.ReleaseMemory();
             let mem = SwarmCreator.CreateSwarmMemory(roomData[swarmObj.saveID]);
-            swarmObj.AssignObject(obj, mem);
+            swarmObj.AssignObject(obj, mem as TRoomObjectMemory);
             this.TheSwarm.roomObjects[swarmObj.saveID] = swarmObj as TSwarmRoomObject;
             this.TheSwarmByRoom[room.saveID][swarmObj.saveID] = this.TheSwarm.roomObjects[swarmObj.saveID];
         }
@@ -294,20 +272,20 @@ export class SwarmLoader {
         let staticObjects = [];
         let sources = room.find(FIND_SOURCES);
         for (let i = 0; i < sources.length; i++) {
-            let obj = SwarmCreator.CreateSwarmObject(SwarmType.SwarmSource);
+            let obj = SwarmCreator.CreateSwarmObject(SwarmType.SwarmSource) as SwarmSource;
             let newMem = SwarmCreator.CreateNewSwarmMemory(sources[i].id, SwarmType.SwarmSource);
             newMem.ReserveMemory();
-            obj.AssignObject(sources[i], newMem as IRoomObjectMemory);
-            staticObjects.push(obj.GetCopyOfMemory().ReleaseMemory() as ISourceData);
+            obj.AssignObject(sources[i], newMem as ISourceMemory);
+            staticObjects.push(obj.ReleaseMemory());
         }
         let mineralObjects = [];
         let minerals = room.find(FIND_MINERALS);
         for (let i = 0; i < minerals.length; i++) {
-            let obj = SwarmCreator.CreateSwarmObject(SwarmType.SwarmMineral);
+            let obj = SwarmCreator.CreateSwarmObject(SwarmType.SwarmMineral) as SwarmMineral;
             let newMem = SwarmCreator.CreateNewSwarmMemory(sources[i].id, SwarmType.SwarmMineral);
             newMem.ReserveMemory();
-            obj.AssignObject(minerals[i], newMem as IRoomObjectMemory);
-            staticObjects.push(obj.GetCopyOfMemory().ReleaseMemory() as IMineralData);
+            obj.AssignObject(minerals[i], newMem as IMineralMemory);
+            staticObjects.push(obj.ReleaseMemory());
         }
 
         room.memory.SetData(STATIC_OBJECTS, staticObjects);
