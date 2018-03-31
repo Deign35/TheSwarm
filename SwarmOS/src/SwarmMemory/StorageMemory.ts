@@ -78,6 +78,7 @@ export class CreepMemory extends SwarmMemory<SwarmDataType.Creep, SwarmType.Swar
 export class RoomMemory extends SwarmMemory<SwarmDataType.Room, SwarmType.SwarmRoom, IRoomData>
     implements IRoomMemory, IRoomData {
     get RM_TYPE() { return this._cache.RM_TYPE; }
+    get LastUpdated() { return this._cache.LastUpdated; }
 }
 
 @profile

@@ -1,6 +1,5 @@
 import { RoomObjectMemory } from "SwarmMemory/StorageMemory";
 import { SwarmRoomObject } from "SwarmTypes/SwarmTypes";
-import { SwarmCreepController } from "SwarmControllers/SwarmCreepController";
 import { SwarmCreep } from "SwarmTypes/SwarmCreep";
 
 export class SwarmSource extends SwarmRoomObject<ISourceMemory, Source> implements ISwarmSource, Source {

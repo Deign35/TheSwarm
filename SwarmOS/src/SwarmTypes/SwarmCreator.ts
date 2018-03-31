@@ -188,6 +188,8 @@ export class SwarmCreator {
     static CreateSwarmObject<T extends TSwarmObject>(swarmType: SwarmType): T {
         let newObj: IObject<any, any>;
         switch (swarmType) {
+            case (SwarmType.Any):
+                throw new NotImplementedException("Other data types have not yet been implemented");
             case (SwarmType.SwarmContainer):
                 newObj = new SwarmContainer();
                 break;
@@ -438,7 +440,8 @@ export class SwarmCreator {
                     MEM_TYPE: SwarmDataType.Room,
                     SWARM_TYPE: SwarmType.SwarmRoom,
                     RM_TYPE: 0,
-                    isActive: true
+                    isActive: true,
+                    LastUpdated: Game.time
                 });
                 break;
             case (SwarmType.SwarmSite):

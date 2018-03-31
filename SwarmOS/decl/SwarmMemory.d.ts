@@ -48,6 +48,7 @@ declare interface IFlagData extends ISwarmData<SwarmDataType.Flag, SwarmType.Swa
 }
 declare interface IRoomData extends ISwarmData<SwarmDataType.Room, SwarmType.SwarmRoom> {
     RM_TYPE: number;
+    LastUpdated: number;
 }
 declare interface IRoomObjectData<T extends SwarmRoomObjectType> extends ISwarmData<SwarmDataType.RoomObject, T> {
     // Special info for RoomObjects.
