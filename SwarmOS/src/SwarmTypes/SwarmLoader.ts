@@ -1,24 +1,25 @@
-import { MasterCreepMemory, MasterFlagMemory, MasterRoomMemory, MasterStructureMemory, MasterRoomObjectMemory, MasterOtherMemory, RoomObjectMemory } from "SwarmMemory/StorageMemory";
-import { SwarmCreep } from "SwarmTypes/SwarmCreep";
-import { SwarmRoom } from "SwarmTypes/SwarmRoom";
-import { SwarmFlag } from "SwarmTypes/SwarmFlag";
-import { SwarmObject, SwarmRoomObject, SwarmMineral, ObjectBase } from "SwarmTypes/SwarmTypes";
-import { SwarmSource } from "SwarmTypes/SwarmSource";
+import {
+    MasterCreepMemory, MasterFlagMemory, MasterRoomMemory, MasterStructureMemory,
+    MasterRoomObjectMemory, MasterOtherMemory, RoomObjectMemory
+} from "SwarmMemory/StorageMemory";
 
 const STATIC_OBJECTS = 'static_objects';
 const ROOM_OBJECTS = 'room_objects';
 const STRUCTURE_OBJECTS = 'structure_objects'
 export class SwarmLoader {
     protected static MasterMemory: { [dataType: string]: IMasterMemory<MasterSwarmDataTypes, SwarmMemoryTypes> }
-    static TheSwarm: { [dataType: string]: { [id: string]: ISwarmObject<SwarmMemoryTypes, any> } } = {
-        creeps: {} as { [id: string]: ISwarmCreep },
-        flags: {} as { [id: string]: ISwarmFlag },
-        rooms: {} as { [id: string]: ISwarmRoom },
-        roomObjects: {} as { [id: string]: TSwarmRoomObject },
-        structures: {} as { [id: string]: TSwarmStructure },
-        otherData: {} as { [id: string]: IOtherObject }
-    }
+    static TheSwarm: { [dataType: string]: { [id: string]: ISwarmObject<SwarmMemoryTypes, any> } };
     static LoadTheSwarm() {
+        this.TheSwarm = {
+            creeps: {} as { [id: string]: ISwarmCreep },
+            flags: {} as { [id: string]: ISwarmFlag },
+            rooms: {} as { [id: string]: ISwarmRoom },
+            roomObjects: {} as { [id: string]: TSwarmRoomObject },
+            structures: {} as { [id: string]: TSwarmStructure },
+            otherData: {} as { [id: string]: IOtherObject }
+        }
+        global['TheSwarm'] = this.TheSwarm;
+
         this.MasterMemory = {
             creeps: Swarmlord.CheckoutMasterMemory(SwarmControllerDataTypes.Creeps) as MasterCreepMemory,
             flags: Swarmlord.CheckoutMasterMemory(SwarmControllerDataTypes.Flags) as MasterFlagMemory,
@@ -49,16 +50,16 @@ export class SwarmLoader {
         for (let i = 0; i < keys.length; i++) {
             if (!this.TheSwarm[SwarmControllerDataTypes.Creeps][keys[i]]) {
                 this.LoadObject(keys[i], Game.creeps[keys[i]], SwarmControllerDataTypes.Creeps);
+                this.TheSwarm[SwarmControllerDataTypes.Creeps][keys[i]].InitAsNew();
             }
         }
         keys = Object.keys(Game.flags);
         for (let i = 0; i < keys.length; i++) {
             if (!this.TheSwarm[SwarmControllerDataTypes.Flags][keys[i]]) {
                 this.LoadObject(keys[i], Game.flags[keys[i]], SwarmControllerDataTypes.Flags);
+                this.TheSwarm[SwarmControllerDataTypes.Flags][keys[i]].InitAsNew();
             }
         }
-
-        global['TheSwarm'] = this.TheSwarm;
     }
 
     static LoadObjectsWithID<T extends RoomObject>(dataType: SwarmControllerDataTypes) {
@@ -89,7 +90,6 @@ export class SwarmLoader {
             newMem.ReserveMemory();
             swarmObj.AssignObject(obj, newMem);
             this.MasterMemory[swarmDataType].SaveMemory(swarmObj.ReleaseMemory());
-            // When this happens, queue it up for activation as it was not default added (if swarmObj.isActive)
         }
 
         let objMem = this.MasterMemory[swarmDataType].CheckoutMemory(saveID);

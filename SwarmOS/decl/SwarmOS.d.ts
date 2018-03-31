@@ -33,9 +33,11 @@ declare type OwnableStructureConstant = STRUCTURE_CONTROLLER | STRUCTURE_EXTENSI
     STRUCTURE_POWER_SPAWN | STRUCTURE_RAMPART | STRUCTURE_SPAWN | STRUCTURE_STORAGE | STRUCTURE_TERMINAL | STRUCTURE_TOWER
 
 declare var TheSwarm: {
+    [id: string]: { [id: string]: TSwarmObject },
     creeps: { [id: string]: ISwarmCreep },
     flags: { [id: string]: ISwarmFlag },
     rooms: { [id: string]: ISwarmRoom },
-    // roomObjects: { [id: string]: TSwarmRoomObject },
-    structures: { [id: string]: TSwarmStructure }
+    roomObjects: { [id: string]: TSwarmRoomObject },
+    structures: { [id: string]: TSwarmStructure },
+    otherData: { [id: string]: IOtherObject }
 }
