@@ -96,7 +96,7 @@ export class MasterSwarmMemory<T extends MasterSwarmDataTypes, U extends SwarmMe
     }
     protected ChildData!: { [id: string]: TBasicSwarmData; }
     GetDataIDs() { return Object.keys(this.ChildData); }
-    HasData(id: string) { return !!this.ChildData[id]}
+    HasData(id: string) { return !!this.ChildData[id] }
     CheckoutMemory(id: string): U {
         let data = this.ChildData[id];
         let newMem = SwarmCreator.CreateSwarmMemory(data);
@@ -107,6 +107,11 @@ export class MasterSwarmMemory<T extends MasterSwarmDataTypes, U extends SwarmMe
     }
     SaveMemory(childData: SwarmMemoryTypes): void {
         this.ChildData[childData.id] = childData.ReleaseData() as TBasicSwarmData;
+    }
+    RemoveData(saveID: string): void {
+        if (!!this.ChildData[saveID]) {
+            delete this.ChildData[saveID];
+        }
     }
 }
 
