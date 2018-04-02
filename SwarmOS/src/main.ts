@@ -12,39 +12,22 @@ export const loop = function () {
     Swarmlord.ValidateMemory();
     SwarmLoader.LoadTheSwarm();
 
-    /*DoTheSwarm((obj) => {
+    DoTheSwarm((obj, controllerType) => {
         let swarmType = obj.GetSwarmType();
         if (swarmType == SwarmType.Any) {
             return;
         }
-        /*if (swarmType != SwarmType.SwarmRoom) {
-            let roomName = (obj as SwarmObject<SwarmMemoryTypes, RoomObject>).room.name;
-            TheSwarm.rooms[roomName].
-        }
-    })*/
-    console.log(JSON.stringify(SwarmRoomIDs));
-    let activatedObjects: { [id: string]: boolean } = {};
-    let unactivatedObjects = GatherUnactivatedObjects(activatedObjects);
-    do {
-        let nextObjData = unactivatedObjects.shift()!;
-        let nextObj = TheSwarm[nextObjData[1]][nextObjData[0]] as ObjectBase<SwarmMemoryTypes, any>
-        nextObj.Activate();
-        activatedObjects[nextObjData[0]] = true;
-        if (unactivatedObjects.length == 0) {
-            unactivatedObjects = GatherUnactivatedObjects(activatedObjects);
-            
-        }
-    } while (unactivatedObjects.length > 0)
-
+        obj.Activate();
+    });
     SwarmLoader.SaveTheSwarm();
 }
 
-const DoTheSwarm = function (swarmAction: (obj: TSwarmObject) => void) {
+const DoTheSwarm = function (swarmAction: (obj: TSwarmObject, controllerType: SwarmControllerDataTypes) => void) {
     let typeKeys = Object.keys(TheSwarm);
     for (let i = 0; i < typeKeys.length; i++) {
         let ids = Object.keys(TheSwarm[typeKeys[i]]);
         for (let j = 0; j < ids.length; j++) {
-            swarmAction(TheSwarm[typeKeys[i]][ids[j]]);
+            swarmAction(TheSwarm[typeKeys[i]][ids[j]], typeKeys[i] as SwarmControllerDataTypes);
         }
     }
 }
