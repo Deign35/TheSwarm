@@ -70,17 +70,17 @@ declare type TRoomObjectData = IMineralData | ISourceData | TNukeData |
 
 declare type TBasicSwarmData = TRoomObjectData | TStructureData | IRoomData | ICreepData | IFlagData | IOtherData;
 
-declare interface IMasterData<T extends SwarmDataType> extends IData<SwarmDataType.Master> {
-    ChildData: { [id: string]: IData<T> }
+declare interface IMasterData<T extends SwarmDataTypes> extends IData<SwarmDataType.Master> {
+    ChildData: { [id: string]: T }
     MEM_TYPE: SwarmDataType.Master;
 }
-declare interface IMasterRoomObjectData extends IMasterData<SwarmDataType.RoomObject> { }
-declare interface IMasterFlagData extends IMasterData<SwarmDataType.Flag> { }
-declare interface IMasterStructureData extends IMasterData<SwarmDataType.Structure> { }
-declare interface IMasterRoomData extends IMasterData<SwarmDataType.Room> { }
-declare interface IMasterCreepData extends IMasterData<SwarmDataType.Creep> { }
-declare interface IMasterOtherData extends IMasterData<SwarmDataType.Other> { }
+declare interface IMasterRoomObjectData extends IMasterData<TRoomObjectData> { }
+declare interface IMasterFlagData extends IMasterData<IFlagData> { }
+declare interface IMasterStructureData extends IMasterData<TStructureData> { }
+declare interface IMasterRoomData extends IMasterData<IRoomData> { }
+declare interface IMasterCreepData extends IMasterData<ICreepData> { }
+declare interface IMasterOtherData extends IMasterData<IOtherData> { }
 declare type MasterSwarmDataTypes = IMasterRoomObjectData | IMasterFlagData | IMasterStructureData |
-    IMasterRoomData | IMasterOtherData
+    IMasterRoomData | IMasterOtherData | IMasterCreepData
 
 declare type SwarmDataTypes = MasterSwarmDataTypes | TBasicSwarmData;

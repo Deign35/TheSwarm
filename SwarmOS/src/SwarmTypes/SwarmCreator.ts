@@ -1,5 +1,5 @@
 import { profile } from "Tools/Profiler";
-import { StructureMemory, CreepMemory, FlagMemory, RoomObjectMemory, RoomMemory, MemoryBase } from "SwarmMemory/StorageMemory";
+import { StructureMemory, CreepMemory, FlagMemory, RoomObjectMemory, RoomMemory, MemoryBase, SwarmMemoryTypes } from "SwarmMemory/StorageMemory";
 import { SwarmController } from "SwarmTypes/SwarmStructures/SwarmController";
 import { SwarmCreep } from "SwarmTypes/SwarmCreep";
 import { SwarmExtension, SwarmExtractor, SwarmLink, SwarmNuker, SwarmObserver, SwarmRampart, SwarmRoad, SwarmStorage, SwarmTerminal, SwarmWall, SwarmKeepersLair, SwarmPortal, SwarmPowerBank, SwarmPowerSpawn, SwarmContainer } from "SwarmTypes/SwarmStructures/SwarmStructure";
@@ -17,11 +17,11 @@ var SwarmObjectInstances = {}
 
 @profile
 export class SwarmCreator {
-    static CreateNewSwarmObject<T extends Room | RoomObject, U extends SwarmDataType>(obj: T) {
+    static CreateNewSwarmObject<T extends Room | RoomObject, U extends SwarmMemoryTypes>(obj: T) {
         let swarmType = this.GetSwarmType(obj);
         let newObj = this.CreateSwarmObject(swarmType) as ObjectBase<U, T>;
         let newMem = this.CreateNewSwarmMemory(this.GetObjSaveID(obj), swarmType);
-        newObj.AssignObject(obj, newMem as MemoryBase<U>);
+        newObj.AssignObject(obj, newMem as U);
 
         return newObj;
     }
@@ -95,7 +95,7 @@ export class SwarmCreator {
     }
     static CreateSwarmMemory<T extends SwarmDataType>(mem: any) {
         let memType = mem.SWARM_TYPE;
-        let newMemory: MemoryBase<SwarmDataType>;
+        let newMemory: SwarmMemoryTypes;
 
         switch (memType as SwarmType) {
             case (SwarmType.SwarmContainer):
@@ -185,7 +185,7 @@ export class SwarmCreator {
 
         return newMemory!;
     }
-    static CreateSwarmObject<T extends SwarmDataType>(swarmType: SwarmType): ObjectBase<T, any> {
+    static CreateSwarmObject<T extends SwarmMemoryTypes>(swarmType: SwarmType): ObjectBase<T, any> {
         let newObj: ObjectBase<any, any>;
         switch (swarmType) {
             case (SwarmType.Any):
@@ -278,7 +278,7 @@ export class SwarmCreator {
         return newObj!;
     }
     static CreateNewSwarmMemory(id: string, swarmType: SwarmType) {
-        let newMemory: MemoryBase<SwarmDataType>;
+        let newMemory: SwarmMemoryTypes;
         switch (swarmType) {
             case (SwarmType.SwarmContainer):
                 newMemory = new StructureMemory({

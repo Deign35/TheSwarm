@@ -31,6 +31,11 @@ declare type SwarmRoomObjectType = SwarmType.SwarmSite | SwarmType.SwarmMineral 
 declare type OwnableStructureConstant = STRUCTURE_CONTROLLER | STRUCTURE_EXTENSION | STRUCTURE_EXTRACTOR |
     STRUCTURE_KEEPER_LAIR | STRUCTURE_LAB | STRUCTURE_LINK | STRUCTURE_NUKER | STRUCTURE_OBSERVER | STRUCTURE_POWER_BANK |
     STRUCTURE_POWER_SPAWN | STRUCTURE_RAMPART | STRUCTURE_SPAWN | STRUCTURE_STORAGE | STRUCTURE_TERMINAL | STRUCTURE_TOWER
+declare type SwarmOwnableStructureType = SwarmType.SwarmController | SwarmType.SwarmExtension | SwarmType.SwarmExtractor |
+    SwarmType.SwarmKeepersLair | SwarmType.SwarmLab | SwarmType.SwarmLink | SwarmType.SwarmNuker | SwarmType.SwarmObserver |
+    SwarmType.SwarmPowerBank | SwarmType.SwarmPowerSpawn | SwarmType.SwarmRampart | SwarmType.SwarmSpawn |
+    SwarmType.SwarmStorage | SwarmType.SwarmTerminal | SwarmType.SwarmTower
+
 
 
 declare interface ISwarmlord {

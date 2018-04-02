@@ -1,5 +1,6 @@
 import { SwarmLoader } from "SwarmTypes/SwarmLoader";
 import { ObjectBase } from "SwarmTypes/SwarmTypes";
+import { SwarmMemoryTypes } from "SwarmMemory/StorageMemory";
 
 export class SwarmQueen {
     static ActivateTheSwarm() {
@@ -13,7 +14,7 @@ export class SwarmQueen {
     }
 }
 
-const DoTheSwarm = function (swarmAction: (obj: ObjectBase<SwarmDataType, any>, controllerType: SwarmControllerDataTypes) => void) {
+const DoTheSwarm = function (swarmAction: (obj: ObjectBase<SwarmMemoryTypes, any>, controllerType: SwarmControllerDataTypes) => void) {
     let typeKeys = Object.keys(SwarmLoader.TheSwarm);
     for (let i = 0; i < typeKeys.length; i++) {
         let ids = Object.keys(SwarmLoader.TheSwarm[typeKeys[i]]);

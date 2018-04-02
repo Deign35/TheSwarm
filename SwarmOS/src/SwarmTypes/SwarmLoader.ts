@@ -1,6 +1,6 @@
 import {
     MasterCreepMemory, MasterFlagMemory, MasterRoomMemory, MasterStructureMemory,
-    MasterRoomObjectMemory, MasterOtherMemory, RoomObjectMemory, MasterSwarmMemory, SwarmMemory
+    MasterRoomObjectMemory, MasterOtherMemory, RoomObjectMemory, MasterSwarmMemory, SwarmMemory, SwarmMemoryTypes, TStructureMemory, TRoomObjectMemory
 } from "SwarmMemory/StorageMemory";
 import { SwarmObject, SwarmTypeBase, ObjectBase, SwarmRoomObject } from "./SwarmTypes";
 import { SwarmCreep } from "./SwarmCreep";
@@ -8,15 +8,9 @@ import { SwarmStructure } from "./SwarmStructures/SwarmStructure";
 import { SwarmFlag } from "SwarmTypes/SwarmFlag";
 import { SwarmRoom } from "SwarmTypes/SwarmRoom";
 
-const STATIC_OBJECTS = 'static_objects';
-const ROOM_OBJECTS = 'room_objects';
-const STRUCTURE_OBJECTS = 'structure_objects'
-
-/*declare type SwarmRoomObjects = SwarmCreep | SwarmStructure<StructureConstant, Structure> |
-    SwarmObject<SwarmDataType, RoomObject>*/
 export class SwarmLoader {
-    protected static MasterMemory: { [dataType: string]: MasterSwarmMemory<MasterSwarmDataTypes, SwarmDataType> }
-    static TheSwarm: { [dataType: string]: { [id: string]: ObjectBase<SwarmDataType, any> } };
+    protected static MasterMemory: { [dataType: string]: MasterSwarmMemory<MasterSwarmDataTypes, SwarmDataTypes> }
+    static TheSwarm: { [dataType: string]: { [id: string]: ObjectBase<SwarmMemoryTypes, any> } };
 
     static SwarmRoomIDs: {
         [roomID: string]: {
@@ -41,8 +35,8 @@ export class SwarmLoader {
             creeps: {} as { [id: string]: SwarmCreep },
             flags: {} as { [id: string]: SwarmFlag },
             rooms: {} as { [id: string]: SwarmRoom },
-            roomObjects: {} as { [id: string]: SwarmRoomObject<Source | Mineral | Nuke | Tombstone | Resource | ConstructionSite> },
-            structures: {} as { [id: string]: SwarmStructure<StructureConstant, Structure> },
+            roomObjects: {} as { [id: string]: SwarmRoomObject<Source | Mineral | Nuke | Tombstone | Resource | ConstructionSite, TRoomObjectMemory> },
+            structures: {} as { [id: string]: SwarmStructure<StructureConstant, Structure, TStructureMemory> },
             otherData: {} as { [id: string]: any }
         }
         global['TheSwarm'] = this.TheSwarm;
@@ -104,20 +98,20 @@ export class SwarmLoader {
         }
     }
 
-    static LoadObjectsWithID<T extends RoomObject>(dataType: SwarmControllerDataTypes) {
+    static LoadObjectsWithID<T extends RoomObject, U extends SwarmMemoryTypes>(dataType: SwarmControllerDataTypes) {
         let keys = this.MasterMemory[dataType].GetDataIDs();
         for (let i = 0; i < keys.length; i++) {
-            this.LoadObject<T>(keys[i], Game.getObjectById(keys[i]) as T, dataType);
+            this.LoadObject<T, U>(keys[i], Game.getObjectById(keys[i]) as T, dataType);
         }
     }
-    static LoadObjectsWithName<T extends Room | Creep | Flag>(dataType: SwarmControllerDataTypes) {
+    static LoadObjectsWithName<T extends Room | Creep | Flag, U extends SwarmMemoryTypes>(dataType: SwarmControllerDataTypes) {
         let keys = this.MasterMemory[dataType].GetDataIDs();
         for (let i = 0; i < keys.length; i++) {
-            this.LoadObject<T>(keys[i], Game[dataType][keys[i]], dataType);
+            this.LoadObject<T, U>(keys[i], Game[dataType][keys[i]], dataType);
         }
     }
 
-    static LoadObject<T extends Room | RoomObject>(saveID: string, obj: T, swarmDataType: SwarmControllerDataTypes) {
+    static LoadObject<T extends Room | RoomObject, U extends SwarmMemoryTypes>(saveID: string, obj: T, swarmDataType: SwarmControllerDataTypes) {
         if (!obj) {
             if (this.MasterMemory[swarmDataType].HasData(saveID) && swarmDataType != SwarmControllerDataTypes.Rooms
                 && swarmDataType != SwarmControllerDataTypes.Other) {
@@ -128,7 +122,7 @@ export class SwarmLoader {
             return;
         }
         let swarmType = SwarmCreator.GetSwarmType(obj);
-        let swarmObj = SwarmCreator.CreateSwarmObject(swarmType) as SwarmTypeBase<SwarmDataType, T>;
+        let swarmObj = SwarmCreator.CreateSwarmObject(swarmType) as SwarmTypeBase<U, T>;
         if (!this.MasterMemory[swarmDataType].HasData(saveID)) {
             let newMem = SwarmCreator.CreateNewSwarmMemory(saveID, swarmType);
             newMem.ReserveMemory();
@@ -137,7 +131,7 @@ export class SwarmLoader {
         }
 
         let objMem = this.MasterMemory[swarmDataType].CheckoutMemory(saveID);
-        swarmObj.AssignObject(obj, objMem as SwarmMemory<SwarmDataType, any>);
+        swarmObj.AssignObject(obj, objMem);
 
         this.TheSwarm[swarmDataType][saveID] = swarmObj;
         if (swarmDataType != SwarmControllerDataTypes.Rooms && swarmDataType != SwarmControllerDataTypes.Other) {

@@ -1,9 +1,9 @@
-import { StructureMemory } from "SwarmMemory/StorageMemory";
+import { StructureMemory, TStructureMemory } from "SwarmMemory/StorageMemory";
 import { NotifiableSwarmObject, OwnableSwarmObject } from "SwarmTypes/SwarmTypes";
 
 //<T extends StructureConstant > extends ISwarmObject < TStructureMemory, Structure < T >>
-export abstract class SwarmStructure<T extends StructureConstant, U extends Structure<T>>
-    extends NotifiableSwarmObject<U> implements Structure<T> {
+export abstract class SwarmStructure<T extends StructureConstant, U extends Structure<T>, V extends TStructureMemory>
+    extends NotifiableSwarmObject<U, V> implements Structure<T> {
     get hits() { return this._instance.hits; }
     get hitsMax() { return this._instance.hitsMax; }
     get room() { return this._instance.room; }
@@ -14,14 +14,14 @@ export abstract class SwarmStructure<T extends StructureConstant, U extends Stru
     isActive() { return this._instance.isActive() }
 }
 
-export abstract class OwnedSwarmStructure<T extends OwnableStructureConstant, U extends OwnedStructure<T>>
-    extends SwarmStructure<T, U> {
+export abstract class OwnedSwarmStructure<T extends OwnableStructureConstant, U extends OwnedStructure<T>, V extends TStructureMemory>
+    extends SwarmStructure<T, U, V> {
     get my() { return this._instance.my; }
     get owner() { return this._instance.owner; }
 }
 
-export class SwarmExtension extends OwnedSwarmStructure<STRUCTURE_EXTENSION, StructureExtension>
-    implements StructureExtension {
+export class SwarmExtension extends OwnedSwarmStructure<STRUCTURE_EXTENSION, StructureExtension,
+    StructureMemory<SwarmType.SwarmExtension>> implements StructureExtension {
     get SwarmType(): SwarmType.SwarmExtension { return SwarmType.SwarmExtension; }
     get energy() { return this._instance.energy; }
     get energyCapacity() { return this._instance.energyCapacity; }
@@ -30,8 +30,8 @@ export class SwarmExtension extends OwnedSwarmStructure<STRUCTURE_EXTENSION, Str
     }
 }
 
-export class SwarmExtractor extends OwnedSwarmStructure<STRUCTURE_EXTRACTOR, StructureExtractor>
-    implements StructureExtractor {
+export class SwarmExtractor extends OwnedSwarmStructure<STRUCTURE_EXTRACTOR, StructureExtractor,
+    StructureMemory<SwarmType.SwarmExtractor>> implements StructureExtractor {
     get SwarmType(): SwarmType.SwarmExtractor { return SwarmType.SwarmExtractor; }
     get cooldown() { return this._instance.cooldown; }
     protected OnActivate() {
@@ -39,8 +39,8 @@ export class SwarmExtractor extends OwnedSwarmStructure<STRUCTURE_EXTRACTOR, Str
     }
 }
 
-export class SwarmObserver extends OwnedSwarmStructure<STRUCTURE_OBSERVER, StructureObserver>
-    implements StructureObserver {
+export class SwarmObserver extends OwnedSwarmStructure<STRUCTURE_OBSERVER, StructureObserver,
+    StructureMemory<SwarmType.SwarmObserver>> implements StructureObserver {
     get SwarmType(): SwarmType.SwarmObserver { return SwarmType.SwarmObserver; }
     observeRoom(roomName: string) { return this._instance.observeRoom(roomName); }
     protected OnActivate() {
@@ -48,7 +48,8 @@ export class SwarmObserver extends OwnedSwarmStructure<STRUCTURE_OBSERVER, Struc
     }
 }
 
-export class SwarmLink extends OwnedSwarmStructure<STRUCTURE_LINK, StructureLink> implements StructureLink {
+export class SwarmLink extends OwnedSwarmStructure<STRUCTURE_LINK, StructureLink,
+    StructureMemory<SwarmType.SwarmLink>> implements StructureLink {
     get SwarmType(): SwarmType.SwarmLink { return SwarmType.SwarmLink; }
     get cooldown() { return this._instance.cooldown; }
     get energy() { return this._instance.energy; }
@@ -62,8 +63,8 @@ export class SwarmLink extends OwnedSwarmStructure<STRUCTURE_LINK, StructureLink
     }
 }
 
-export class SwarmRampart extends OwnedSwarmStructure<STRUCTURE_RAMPART, StructureRampart>
-    implements StructureRampart {
+export class SwarmRampart extends OwnedSwarmStructure<STRUCTURE_RAMPART, StructureRampart,
+    StructureMemory<SwarmType.SwarmRampart>> implements StructureRampart {
     get SwarmType(): SwarmType.SwarmRampart { return SwarmType.SwarmRampart; }
     get isPublic() { return this._instance.isPublic; }
     get ticksToDecay() { return this._instance.ticksToDecay; }
@@ -74,8 +75,8 @@ export class SwarmRampart extends OwnedSwarmStructure<STRUCTURE_RAMPART, Structu
     }
 }
 
-export class SwarmStorage extends OwnedSwarmStructure<STRUCTURE_STORAGE, StructureStorage>
-    implements StructureStorage {
+export class SwarmStorage extends OwnedSwarmStructure<STRUCTURE_STORAGE, StructureStorage,
+    StructureMemory<SwarmType.SwarmStorage>> implements StructureStorage {
     get SwarmType(): SwarmType.SwarmStorage { return SwarmType.SwarmStorage; }
     get store() { return this._instance.store; }
     get storeCapacity() { return this._instance.storeCapacity; }
@@ -84,7 +85,8 @@ export class SwarmStorage extends OwnedSwarmStructure<STRUCTURE_STORAGE, Structu
     }
 }
 
-export class SwarmTerminal extends OwnedSwarmStructure<STRUCTURE_TERMINAL, StructureTerminal> implements StructureTerminal {
+export class SwarmTerminal extends OwnedSwarmStructure<STRUCTURE_TERMINAL, StructureTerminal,
+    StructureMemory<SwarmType.SwarmTerminal>> implements StructureTerminal {
     get SwarmType(): SwarmType.SwarmTerminal { return SwarmType.SwarmTerminal; }
     get cooldown() { return this._instance.cooldown; }
     get store() { return this._instance.store; }
@@ -98,7 +100,8 @@ export class SwarmTerminal extends OwnedSwarmStructure<STRUCTURE_TERMINAL, Struc
     }
 }
 
-export class SwarmContainer extends SwarmStructure<STRUCTURE_CONTAINER, StructureContainer> implements StructureContainer {
+export class SwarmContainer extends SwarmStructure<STRUCTURE_CONTAINER, StructureContainer,
+    StructureMemory<SwarmType.SwarmContainer>> implements StructureContainer {
     get SwarmType(): SwarmType.SwarmContainer { return SwarmType.SwarmContainer; }
     get store() { return this._instance.store; }
     get storeCapacity() { return this._instance.storeCapacity; }
@@ -107,7 +110,8 @@ export class SwarmContainer extends SwarmStructure<STRUCTURE_CONTAINER, Structur
         console.log("Successfully activated a Container");
     }
 }
-export class SwarmRoad extends SwarmStructure<STRUCTURE_ROAD, StructureRoad> implements StructureRoad {
+export class SwarmRoad extends SwarmStructure<STRUCTURE_ROAD, StructureRoad,
+    StructureMemory<SwarmType.SwarmRoad>> implements StructureRoad {
     get SwarmType(): SwarmType.SwarmRoad { return SwarmType.SwarmRoad; }
     get ticksToDecay() { return this._instance.ticksToDecay };
     protected OnActivate() {
@@ -115,7 +119,8 @@ export class SwarmRoad extends SwarmStructure<STRUCTURE_ROAD, StructureRoad> imp
     }
 }
 
-export class SwarmWall extends SwarmStructure<STRUCTURE_WALL, StructureWall> implements StructureWall {
+export class SwarmWall extends SwarmStructure<STRUCTURE_WALL, StructureWall,
+    StructureMemory<SwarmType.SwarmWall>> implements StructureWall {
     get SwarmType(): SwarmType.SwarmWall { return SwarmType.SwarmWall; }
     get ticksToLive() { return this._instance.ticksToLive; }
     protected OnActivate() {
@@ -123,7 +128,8 @@ export class SwarmWall extends SwarmStructure<STRUCTURE_WALL, StructureWall> imp
     }
 }
 
-export class SwarmNuker extends OwnedSwarmStructure<STRUCTURE_NUKER, StructureNuker> implements StructureNuker {
+export class SwarmNuker extends OwnedSwarmStructure<STRUCTURE_NUKER, StructureNuker,
+    StructureMemory<SwarmType.SwarmNuker>> implements StructureNuker {
     get SwarmType(): SwarmType.SwarmNuker { return SwarmType.SwarmNuker; }
     get energy() { return this._instance.energy; }
     get energyCapacity() { return this._instance.energyCapacity; }
@@ -137,14 +143,15 @@ export class SwarmNuker extends OwnedSwarmStructure<STRUCTURE_NUKER, StructureNu
     launchNuke(pos: RoomPosition) { return this._instance.launchNuke(pos); }
 }
 
-export class SwarmKeepersLair extends OwnedSwarmStructure<STRUCTURE_KEEPER_LAIR, StructureKeeperLair>
-    implements StructureKeeperLair {
+export class SwarmKeepersLair extends OwnedSwarmStructure<STRUCTURE_KEEPER_LAIR, StructureKeeperLair,
+    StructureMemory<SwarmType.SwarmKeepersLair>> implements StructureKeeperLair {
     get ticksToSpawn(): number | undefined { return this._instance.ticksToSpawn; }
     protected OnActivate() {
         console.log("Successfully activated a KeepersLair");
     }
 }
-export class SwarmPortal extends SwarmStructure<STRUCTURE_PORTAL, StructurePortal> implements StructurePortal {
+export class SwarmPortal extends SwarmStructure<STRUCTURE_PORTAL, StructurePortal,
+    StructureMemory<SwarmType.SwarmPortal>> implements StructurePortal {
     get destination(): RoomPosition { return this._instance.destination; }
     get ticksToDecay(): number { return this._instance.ticksToDecay; }
     protected OnActivate() {
@@ -152,8 +159,8 @@ export class SwarmPortal extends SwarmStructure<STRUCTURE_PORTAL, StructurePorta
     }
 }
 
-export class SwarmPowerBank extends SwarmStructure<STRUCTURE_POWER_BANK,
-    StructurePowerBank> implements StructurePowerBank {
+export class SwarmPowerBank extends SwarmStructure<STRUCTURE_POWER_BANK, StructurePowerBank,
+    StructureMemory<SwarmType.SwarmPowerBank>> implements StructurePowerBank {
     get power() { return this._instance.power; }
     get ticksToDecay() { return this._instance.ticksToDecay; }
     protected OnActivate() {
@@ -161,8 +168,8 @@ export class SwarmPowerBank extends SwarmStructure<STRUCTURE_POWER_BANK,
     }
 }
 
-export class SwarmPowerSpawn extends OwnedSwarmStructure<STRUCTURE_POWER_SPAWN,
-    StructurePowerSpawn> implements StructurePowerSpawn {
+export class SwarmPowerSpawn extends OwnedSwarmStructure<STRUCTURE_POWER_SPAWN, StructurePowerSpawn,
+    StructureMemory<SwarmType.SwarmPowerSpawn>> implements StructurePowerSpawn {
     get energy() { return this._instance.energy; }
     get energyCapacity() { return this._instance.energyCapacity; }
     get power() { return this._instance.power; }

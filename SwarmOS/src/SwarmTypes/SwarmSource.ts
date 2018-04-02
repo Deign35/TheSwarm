@@ -2,7 +2,7 @@ import { RoomObjectMemory } from "SwarmMemory/StorageMemory";
 import { SwarmRoomObject } from "SwarmTypes/SwarmTypes";
 import { SwarmCreep } from "SwarmTypes/SwarmCreep";
 
-export class SwarmSource extends SwarmRoomObject<Source> implements Source {
+export class SwarmSource extends SwarmRoomObject<Source, RoomObjectMemory<SwarmType.SwarmSource>> implements Source {
     get storageMemoryType() { return SwarmDataType.RoomObject };
     get SwarmType(): SwarmType.SwarmSource { return SwarmType.SwarmSource; }
     get energy() { return this._instance.energy; }
