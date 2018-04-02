@@ -10,7 +10,6 @@ export class SwarmSource extends SwarmRoomObject<ISourceMemory, Source> implemen
     get room() { return this._instance.room; }
     get ticksToRegeneration() { return this._instance.ticksToRegeneration; }
 
-    //protected data!: ISourceData;
     protected OnActivate() {
         console.log('Successfully activated a source');
     }

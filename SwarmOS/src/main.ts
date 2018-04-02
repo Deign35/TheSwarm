@@ -6,19 +6,14 @@ import "Tools/GlobalTools";
 import "SwarmMemory/Swarmlord";
 import { SwarmLoader } from "SwarmTypes/SwarmLoader";
 import { SwarmObject, ObjectBase } from "SwarmTypes/SwarmTypes";
+import { SwarmQueen } from "SwarmBehaviour/SwarmQueen";
 
 export const loop = function () {
     debugger;
     Swarmlord.ValidateMemory();
     SwarmLoader.LoadTheSwarm();
 
-    DoTheSwarm((obj, controllerType) => {
-        let swarmType = obj.GetSwarmType();
-        if (swarmType == SwarmType.Any) {
-            return;
-        }
-        obj.Activate();
-    });
+    SwarmQueen.ActivateTheSwarm();
     SwarmLoader.SaveTheSwarm();
 }
 
@@ -30,19 +25,4 @@ const DoTheSwarm = function (swarmAction: (obj: TSwarmObject, controllerType: Sw
             swarmAction(TheSwarm[typeKeys[i]][ids[j]], typeKeys[i] as SwarmControllerDataTypes);
         }
     }
-}
-const GatherUnactivatedObjects = function (activatedIDs: { [id: string]: boolean }): [string, SwarmControllerDataTypes][] {
-    let unactivatedObjects: [string, SwarmControllerDataTypes][] = [];
-    let typeKeys = Object.keys(TheSwarm);
-    for (let i = 0; i < typeKeys.length; i++) {
-        let controllerType = typeKeys[i];
-        let ids = Object.keys(TheSwarm[controllerType]);
-        for (let j = 0; j < ids.length; j++) {
-            if (!activatedIDs[ids[j]]) {
-                unactivatedObjects.push([ids[j], controllerType as SwarmControllerDataTypes]);
-            }
-        }
-    }
-
-    return unactivatedObjects;
 }
