@@ -1,8 +1,13 @@
 import { SwarmLoader } from "SwarmTypes/SwarmLoader";
 import { ObjectBase } from "SwarmTypes/SwarmTypes";
-import { SwarmMemoryTypes } from "SwarmMemory/StorageMemory";
+import { SwarmMemoryTypes } from "SwarmMemory/SwarmMemory";
 
 export class SwarmQueen {
+    static PrepTheSwarm() {
+        DoTheSwarm((obj, controllerType) => {
+            obj.PrepObject();
+        });
+    }
     static ActivateTheSwarm() {
         DoTheSwarm((obj, controllerType) => {
             let swarmType = obj.GetSwarmType();

@@ -1,4 +1,4 @@
-import { CreepMemory } from "SwarmMemory/StorageMemory";
+import { CreepMemory } from "SwarmMemory/SwarmMemory";
 import { profile } from "Tools/Profiler";
 import { OwnableSwarmObject } from "SwarmTypes/SwarmTypes";
 

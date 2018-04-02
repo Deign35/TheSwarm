@@ -1,10 +1,13 @@
-import { MemoryBase, RoomMemory, FlagMemory, SwarmMemoryTypes, CreepMemory, StructureMemory, RoomObjectMemory, TStructureMemory } from "SwarmMemory/StorageMemory";
+import { MemoryBase, RoomMemory, FlagMemory, SwarmMemoryTypes, CreepMemory, StructureMemory, RoomObjectMemory, TStructureMemory, TRoomObjectMemory } from "SwarmMemory/SwarmMemory";
 import { InvalidArgumentException } from "Tools/SwarmExceptions";
 
 export abstract class ObjectBase<T extends SwarmMemoryTypes, U> {
     constructor() {
     }
 
+    PrepObject() {
+
+    }
     abstract get IsActive(): boolean;
     protected abstract OnActivate(): void;
     Activate(): void {
@@ -80,13 +83,13 @@ export abstract class OwnableSwarmObject<T extends Creep | OwnedStructure, U ext
     get my() { return this._instance.my; }
     get owner() { return this._instance.owner; }
 }
-export abstract class SwarmRoomObject<T extends Mineral | Resource | Tombstone | Nuke | ConstructionSite | Source, U extends RoomObjectMemory<SwarmRoomObjectType>>
+export abstract class SwarmRoomObject<T extends Mineral | Resource | Tombstone | Nuke | ConstructionSite | Source, U extends TRoomObjectMemory>
     extends SwarmObjectWithID<U, T> {
     get DataType(): SwarmDataType.RoomObject { return SwarmDataType.RoomObject }
     get room(): Room { return this._instance.room! }
 }
 
-export class SwarmMineral extends SwarmRoomObject<Mineral, RoomObjectMemory<SwarmType.SwarmMineral>> implements Mineral {
+export class SwarmMineral extends SwarmRoomObject<Mineral, RoomObjectMemory<IMineralData, SwarmType.SwarmMineral>> implements Mineral {
     get SwarmType(): SwarmType.SwarmMineral { return SwarmType.SwarmMineral; }
     get density() { return this._instance.density; }
     get mineralAmount() { return this._instance.mineralAmount; }
@@ -97,7 +100,8 @@ export class SwarmMineral extends SwarmRoomObject<Mineral, RoomObjectMemory<Swar
     }
 }
 
-export class SwarmTombstone extends SwarmRoomObject<Tombstone, RoomObjectMemory<SwarmType.SwarmMineral>> implements Tombstone {
+export class SwarmTombstone extends SwarmRoomObject<Tombstone,
+    RoomObjectMemory<IRoomObjectData<SwarmType.SwarmTombstone>, SwarmType.SwarmTombstone>> implements Tombstone {
     get SwarmType(): SwarmType.SwarmTombstone { return SwarmType.SwarmTombstone }
     get creep() { return this._instance.creep; }
     get deathTime() { return this._instance.deathTime; }
@@ -108,7 +112,8 @@ export class SwarmTombstone extends SwarmRoomObject<Tombstone, RoomObjectMemory<
     }
 }
 
-export class SwarmResource extends SwarmRoomObject<Resource, RoomObjectMemory<SwarmType.SwarmResource>> implements Resource {
+export class SwarmResource extends SwarmRoomObject<Resource,
+    RoomObjectMemory<IRoomObjectData<SwarmType.SwarmResource>, SwarmType.SwarmResource>> implements Resource {
     get storageMemoryType() { return SwarmDataType.RoomObject; }
     get SwarmType(): SwarmType.SwarmResource { return SwarmType.SwarmResource; }
     get amount() { return this._instance.amount; }
@@ -118,7 +123,8 @@ export class SwarmResource extends SwarmRoomObject<Resource, RoomObjectMemory<Sw
     }
 }
 
-export class SwarmNuke extends SwarmRoomObject<Nuke, RoomObjectMemory<SwarmType.SwarmNuke>> implements Nuke {
+export class SwarmNuke extends SwarmRoomObject<Nuke,
+    RoomObjectMemory<IRoomObjectData<SwarmType.SwarmNuke>, SwarmType.SwarmNuke>> implements Nuke {
     get storageMemoryType() { return SwarmDataType.RoomObject; }
     get SwarmType(): SwarmType.SwarmNuke { return SwarmType.SwarmNuke; }
     get launchRoomName() { return this._instance.launchRoomName; }

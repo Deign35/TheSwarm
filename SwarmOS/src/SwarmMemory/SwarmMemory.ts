@@ -118,14 +118,20 @@ export class RoomMemory extends SwarmMemory<IRoomData, SwarmType.SwarmRoom>
 }
 
 @profile
-export class RoomObjectMemory<T extends SwarmRoomObjectType>
-    extends SwarmMemory<TRoomObjectData, T>
-    implements IRoomObjectData<T> {
+export class RoomObjectMemory<T extends TRoomObjectData, U extends SwarmRoomObjectType>
+    extends SwarmMemory<T, U> implements IRoomObjectData<U> {
     get MEM_TYPE(): SwarmDataType.RoomObject { return SwarmDataType.RoomObject }
 }
+export class SourceMemory extends RoomObjectMemory<ISourceData, SwarmType.SwarmSource> implements ISourceData {
+    get creepID() { return this._cache.creepID; }
+    get containerID() { return this._cache.containerID; }
+    get linkID() { return this._cache.linkID; }
+    get pileID() { return this._cache.pileID; }
+}
 
-export type TRoomObjectMemory = RoomObjectMemory<SwarmType.SwarmMineral | SwarmType.SwarmNuke | SwarmType.SwarmResource |
-    SwarmType.SwarmSite | SwarmType.SwarmSource | SwarmType.SwarmTombstone>
+export type TRoomObjectMemory = SourceMemory | RoomObjectMemory<IMineralData, SwarmType.SwarmMineral> |
+    RoomObjectMemory<IRoomObjectData<SwarmType.SwarmNuke>, SwarmType.SwarmNuke> | RoomObjectMemory<IRoomObjectData<SwarmType.SwarmSite>, SwarmType.SwarmSite> |
+    RoomObjectMemory<IRoomObjectData<SwarmType.SwarmResource>, SwarmType.SwarmResource> | RoomObjectMemory<IRoomObjectData<SwarmType.SwarmTombstone>, SwarmType.SwarmTombstone>
 export type TStructureMemory = StructureMemory<SwarmType.SwarmController> | StructureMemory<SwarmType.SwarmContainer> |
     StructureMemory<SwarmType.SwarmExtension> | StructureMemory<SwarmType.SwarmExtractor> |
     StructureMemory<SwarmType.SwarmKeepersLair> | StructureMemory<SwarmType.SwarmLab> | StructureMemory<SwarmType.SwarmLink> |
@@ -133,8 +139,8 @@ export type TStructureMemory = StructureMemory<SwarmType.SwarmController> | Stru
     StructureMemory<SwarmType.SwarmPowerBank> | StructureMemory<SwarmType.SwarmPowerSpawn> | StructureMemory<SwarmType.SwarmRampart> |
     StructureMemory<SwarmType.SwarmRoad> | StructureMemory<SwarmType.SwarmSpawn> | StructureMemory<SwarmType.SwarmStorage> |
     StructureMemory<SwarmType.SwarmTerminal> | StructureMemory<SwarmType.SwarmTower> | StructureMemory<SwarmType.SwarmWall>
-export type SwarmMemoryTypes = RoomMemory | RoomObjectMemory<SwarmRoomObjectType> | CreepMemory |
-    FlagMemory | StructureMemory<SwarmStructureType> | BasicMemory
+export type SwarmMemoryTypes = RoomMemory | TRoomObjectMemory | CreepMemory |
+    FlagMemory | TStructureMemory | BasicMemory
 
 export class MasterSwarmMemory<T extends MasterSwarmDataTypes, U extends SwarmDataTypes>
     extends MemoryBase<T> implements IMasterData<U> {

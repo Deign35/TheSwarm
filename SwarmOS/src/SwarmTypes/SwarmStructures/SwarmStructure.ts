@@ -1,4 +1,4 @@
-import { StructureMemory, TStructureMemory } from "SwarmMemory/StorageMemory";
+import { StructureMemory, TStructureMemory } from "SwarmMemory/SwarmMemory";
 import { NotifiableSwarmObject, OwnableSwarmObject } from "SwarmTypes/SwarmTypes";
 
 //<T extends StructureConstant > extends ISwarmObject < TStructureMemory, Structure < T >>

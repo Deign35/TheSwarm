@@ -51,15 +51,15 @@ declare interface IRoomObjectData<T extends SwarmRoomObjectType> extends ISwarmD
     // Special info for RoomObjects.
 }
 declare interface ISourceData extends IRoomObjectData<SwarmType.SwarmSource> {
-    creepID?: string;
-    containerID?: string;
-    linkID?: string;
-    pileID?: string;
+    creepID: string | undefined;
+    containerID: string | undefined;
+    linkID: string | undefined;
+    pileID: string | undefined;
 }
 declare interface IMineralData extends IRoomObjectData<SwarmType.SwarmMineral> {
-    creepID?: string;
-    containerID?: string;
-    pileID?: string;
+    creepID: string | undefined;
+    containerID: string | undefined;
+    pileID: string | undefined;
 }
 declare type TNukeData = IRoomObjectData<SwarmType.SwarmNuke>;
 declare type TResourceData = IRoomObjectData<SwarmType.SwarmResource>;

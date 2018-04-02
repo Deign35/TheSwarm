@@ -1,6 +1,6 @@
 import { OwnedSwarmStructure } from "./SwarmStructure";
 import { SwarmCreep } from "SwarmTypes/SwarmCreep";
-import { StructureMemory } from "SwarmMemory/StorageMemory";
+import { StructureMemory } from "SwarmMemory/SwarmMemory";
 
 export class SwarmLab extends OwnedSwarmStructure<STRUCTURE_LAB, StructureLab,
     StructureMemory<SwarmType.SwarmLab>> implements StructureLab {

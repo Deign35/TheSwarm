@@ -1,7 +1,7 @@
 import {
     MasterCreepMemory, MasterFlagMemory, MasterRoomMemory, MasterStructureMemory,
     MasterRoomObjectMemory, MasterOtherMemory, RoomObjectMemory, MasterSwarmMemory, SwarmMemory, SwarmMemoryTypes, TStructureMemory, TRoomObjectMemory
-} from "SwarmMemory/StorageMemory";
+} from "SwarmMemory/SwarmMemory";
 import { SwarmObject, SwarmTypeBase, ObjectBase, SwarmRoomObject } from "./SwarmTypes";
 import { SwarmCreep } from "./SwarmCreep";
 import { SwarmStructure } from "./SwarmStructures/SwarmStructure";
