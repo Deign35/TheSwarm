@@ -1,5 +1,4 @@
 import { profile } from "Tools/Profiler";
-import { StructureMemory, CreepMemory, FlagMemory, RoomObjectMemory, RoomMemory, MemoryBase, SwarmMemoryTypes, SourceMemory } from "SwarmMemory/SwarmMemory";
 import { SwarmController } from "SwarmTypes/SwarmStructures/SwarmController";
 import { SwarmCreep } from "SwarmTypes/SwarmCreep";
 import { SwarmExtension, SwarmExtractor, SwarmLink, SwarmNuker, SwarmObserver, SwarmRampart, SwarmRoad, SwarmStorage, SwarmTerminal, SwarmWall, SwarmKeepersLair, SwarmPortal, SwarmPowerBank, SwarmPowerSpawn, SwarmContainer } from "SwarmTypes/SwarmStructures/SwarmStructure";
@@ -12,9 +11,13 @@ import { SwarmSource } from "SwarmTypes/SwarmSource";
 import { SwarmSpawn } from "SwarmTypes/SwarmStructures/SwarmSpawn";
 import { SwarmTower } from "SwarmTypes/SwarmStructures/SwarmTower";
 import { NotImplementedException } from "Tools/SwarmExceptions";
+import { StructureMemory, ContainerMemory, ControllerMemory, ExtensionMemory, ExtractorMemory, KeepersLairMemory, LabMemory, LinkMemory, NukerMemory, ObserverMemory, PortalMemory, PowerBankMemory, PowerSpawnMemory, RampartMemory, RoadMemory, SpawnMemory, StorageMemory, TerminalMemory, TowerMemory, WallMemory } from "SwarmMemory/StructureMemory";
+import { RoomObjectMemory, MineralMemory, NukeMemory, ResourceMemory, ConstructionSiteMemory, SourceMemory, TombstoneMemory } from "SwarmMemory/RoomObjectMemory";
+import { CreepMemory, FlagMemory, RoomMemory, BasicMemory, MemoryBase } from "SwarmMemory/SwarmMemory";
 
 var SwarmObjectInstances = {}
 
+export type SwarmMemoryTypes = StructureMemory | RoomObjectMemory | CreepMemory | FlagMemory | RoomMemory | BasicMemory
 @profile
 export class SwarmCreator {
     static CreateNewSwarmObject<T extends Room | RoomObject, U extends SwarmMemoryTypes>(obj: T) {
@@ -99,87 +102,88 @@ export class SwarmCreator {
 
         switch (memType as SwarmType) {
             case (SwarmType.SwarmContainer):
-                newMemory = new StructureMemory(mem as IContainerData);
+                newMemory = new ContainerMemory(mem as IContainerData);
                 break;
             case (SwarmType.SwarmController):
-                newMemory = new StructureMemory(mem as IControllerData);
+                newMemory = new ControllerMemory(mem as IControllerData);
                 break;
             case (SwarmType.SwarmCreep):
                 newMemory = new CreepMemory(mem as ICreepData);
                 break;
             case (SwarmType.SwarmExtension):
-                newMemory = new StructureMemory(mem as IExtensionData);
+                newMemory = new ExtensionMemory(mem as IExtensionData);
                 break;
             case (SwarmType.SwarmExtractor):
-                newMemory = new StructureMemory(mem as IExtractorData);
+                newMemory = new ExtractorMemory(mem as IExtractorData);
                 break;
             case (SwarmType.SwarmFlag):
                 newMemory = new FlagMemory(mem as IFlagData);
                 break;
             case (SwarmType.SwarmKeepersLair):
-                newMemory = new StructureMemory(mem as IKeepersLairData);
+                newMemory = new KeepersLairMemory(mem as IKeepersLairData);
                 break;
             case (SwarmType.SwarmLab):
-                newMemory = new StructureMemory(mem as ILabData);
+                newMemory = new LabMemory(mem as ILabData);
                 break;
             case (SwarmType.SwarmLink):
-                newMemory = new StructureMemory(mem as ILinkData);
+                newMemory = new LinkMemory(mem as ILinkData);
                 break;
             case (SwarmType.SwarmMineral):
-                newMemory = new RoomObjectMemory(mem as IMineralData)
+                newMemory = new MineralMemory(mem as IMineralData)
                 break;
             case (SwarmType.SwarmNuke):
-                newMemory = new RoomObjectMemory(mem as TNukeData)
+                newMemory = new NukeMemory(mem as TNukeData)
                 break;
             case (SwarmType.SwarmNuker):
-                newMemory = new StructureMemory(mem as INukerData);
+                newMemory = new NukerMemory(mem as INukerData);
                 break;
             case (SwarmType.SwarmObserver):
-                newMemory = new StructureMemory(mem as IObserverData);
+                newMemory = new ObserverMemory(mem as IObserverData);
                 break;
             case (SwarmType.SwarmPortal):
-                newMemory = new StructureMemory(mem as IPortalData);
+                newMemory = new PortalMemory(mem as IPortalData);
                 break;
             case (SwarmType.SwarmPowerBank):
-                newMemory = new StructureMemory(mem as IPowerBankData);
+                newMemory = new PowerBankMemory(mem as IPowerBankData);
                 break;
             case (SwarmType.SwarmPowerSpawn):
-                newMemory = new StructureMemory(mem as IPowerSpawnData);
+                newMemory = new PowerSpawnMemory(mem as IPowerSpawnData);
                 break;
             case (SwarmType.SwarmRampart):
-                newMemory = new StructureMemory(mem as IRampartData);
+                newMemory = new RampartMemory(mem as IRampartData);
                 break;
             case (SwarmType.SwarmResource):
-                newMemory = new RoomObjectMemory(mem as TResourceData);
+                newMemory = new ResourceMemory(mem as TResourceData);
+                break;
             case (SwarmType.SwarmRoad):
-                newMemory = new StructureMemory<SwarmType.SwarmRoad>(mem as IRoadData);
+                newMemory = new RoadMemory(mem as IRoadData);
                 break;
             case (SwarmType.SwarmRoom):
                 newMemory = new RoomMemory(mem as IRoomData);
                 break;
             case (SwarmType.SwarmSite):
-                newMemory = new RoomObjectMemory(mem as TConstructionSiteData);
+                newMemory = new ConstructionSiteMemory(mem as TConstructionSiteData);
                 break;
             case (SwarmType.SwarmSource):
                 newMemory = new SourceMemory(mem as ISourceData);
                 break;
             case (SwarmType.SwarmSpawn):
-                newMemory = new StructureMemory<SwarmType.SwarmSpawn>(mem as ISpawnData);
+                newMemory = new SpawnMemory(mem as ISpawnData);
                 break;
             case (SwarmType.SwarmStorage):
-                newMemory = new StructureMemory<SwarmType.SwarmStorage>(mem as IStorageData);
+                newMemory = new StorageMemory(mem as IStorageData);
                 break;
             case (SwarmType.SwarmTerminal):
-                newMemory = new StructureMemory<SwarmType.SwarmTerminal>(mem as ITerminalData);
+                newMemory = new TerminalMemory(mem as ITerminalData);
                 break;
             case (SwarmType.SwarmTombstone):
-                newMemory = new RoomObjectMemory(mem as TTombstoneData);
+                newMemory = new TombstoneMemory(mem as TTombstoneData);
                 break;
             case (SwarmType.SwarmTower):
-                newMemory = new StructureMemory<SwarmType.SwarmTower>(mem as ITowerData);
+                newMemory = new TowerMemory(mem as ITowerData);
                 break;
             case (SwarmType.SwarmWall):
-                newMemory = new StructureMemory(mem as IWallData);
+                newMemory = new WallMemory(mem as IWallData);
                 break;
         }
 
@@ -281,7 +285,7 @@ export class SwarmCreator {
         let newMemory: MemoryBase<SwarmDataTypes>;
         switch (swarmType) {
             case (SwarmType.SwarmContainer):
-                newMemory = new StructureMemory({
+                newMemory = new ContainerMemory({
                     id: id,
                     MEM_TYPE: SwarmDataType.Structure,
                     SWARM_TYPE: SwarmType.SwarmContainer,
@@ -290,7 +294,7 @@ export class SwarmCreator {
                 });
                 break;
             case (SwarmType.SwarmController):
-                newMemory = new StructureMemory({
+                newMemory = new ControllerMemory({
                     id: id,
                     MEM_TYPE: SwarmDataType.Structure,
                     SWARM_TYPE: SwarmType.SwarmController,
@@ -308,7 +312,7 @@ export class SwarmCreator {
                 });
                 break;
             case (SwarmType.SwarmExtension):
-                newMemory = new StructureMemory({
+                newMemory = new ExtensionMemory({
                     id: id,
                     MEM_TYPE: SwarmDataType.Structure,
                     SWARM_TYPE: SwarmType.SwarmExtension,
@@ -317,7 +321,7 @@ export class SwarmCreator {
                 });
                 break;
             case (SwarmType.SwarmExtractor):
-                newMemory = new StructureMemory({
+                newMemory = new ExtractorMemory({
                     id: id,
                     MEM_TYPE: SwarmDataType.Structure,
                     SWARM_TYPE: SwarmType.SwarmExtractor,
@@ -335,7 +339,7 @@ export class SwarmCreator {
                 });
                 break;
             case (SwarmType.SwarmKeepersLair):
-                newMemory = new StructureMemory({
+                newMemory = new KeepersLairMemory({
                     id: id,
                     MEM_TYPE: SwarmDataType.Structure,
                     SWARM_TYPE: SwarmType.SwarmKeepersLair,
@@ -344,7 +348,7 @@ export class SwarmCreator {
                 });
                 break;
             case (SwarmType.SwarmLab):
-                newMemory = new StructureMemory({
+                newMemory = new LabMemory({
                     id: id,
                     MEM_TYPE: SwarmDataType.Structure,
                     SWARM_TYPE: SwarmType.SwarmLab,
@@ -353,7 +357,7 @@ export class SwarmCreator {
                 });
                 break;
             case (SwarmType.SwarmLink):
-                newMemory = new StructureMemory({
+                newMemory = new LinkMemory({
                     id: id,
                     MEM_TYPE: SwarmDataType.Structure,
                     SWARM_TYPE: SwarmType.SwarmLink,
@@ -362,7 +366,7 @@ export class SwarmCreator {
                 });
                 break;
             case (SwarmType.SwarmMineral):
-                newMemory = new RoomObjectMemory<IMineralData, SwarmType.SwarmMineral>({
+                newMemory = new MineralMemory({
                     id: id,
                     MEM_TYPE: SwarmDataType.RoomObject,
                     SWARM_TYPE: SwarmType.SwarmMineral,
@@ -375,7 +379,7 @@ export class SwarmCreator {
                 });
                 break;
             case (SwarmType.SwarmNuke):
-                newMemory = new RoomObjectMemory({
+                newMemory = new NukeMemory({
                     id: id,
                     MEM_TYPE: SwarmDataType.RoomObject,
                     SWARM_TYPE: SwarmType.SwarmNuke,
@@ -384,7 +388,7 @@ export class SwarmCreator {
                 });
                 break;
             case (SwarmType.SwarmNuker):
-                newMemory = new StructureMemory({
+                newMemory = new NukerMemory({
                     id: id,
                     MEM_TYPE: SwarmDataType.Structure,
                     SWARM_TYPE: SwarmType.SwarmNuker,
@@ -393,7 +397,7 @@ export class SwarmCreator {
                 });
                 break;
             case (SwarmType.SwarmObserver):
-                newMemory = new StructureMemory({
+                newMemory = new ObserverMemory({
                     id: id,
                     MEM_TYPE: SwarmDataType.Structure,
                     SWARM_TYPE: SwarmType.SwarmObserver,
@@ -402,7 +406,7 @@ export class SwarmCreator {
                 });
                 break;
             case (SwarmType.SwarmPortal):
-                newMemory = new StructureMemory({
+                newMemory = new PortalMemory({
                     id: id,
                     MEM_TYPE: SwarmDataType.Structure,
                     SWARM_TYPE: SwarmType.SwarmPortal,
@@ -411,7 +415,7 @@ export class SwarmCreator {
                 });
                 break;
             case (SwarmType.SwarmPowerBank):
-                newMemory = new StructureMemory({
+                newMemory = new PowerBankMemory({
                     id: id,
                     MEM_TYPE: SwarmDataType.Structure,
                     SWARM_TYPE: SwarmType.SwarmPowerBank,
@@ -420,7 +424,7 @@ export class SwarmCreator {
                 });
                 break;
             case (SwarmType.SwarmPowerSpawn):
-                newMemory = new StructureMemory({
+                newMemory = new PowerSpawnMemory({
                     id: id,
                     MEM_TYPE: SwarmDataType.Structure,
                     SWARM_TYPE: SwarmType.SwarmPowerSpawn,
@@ -429,7 +433,7 @@ export class SwarmCreator {
                 });
                 break;
             case (SwarmType.SwarmRampart):
-                newMemory = new StructureMemory({
+                newMemory = new RampartMemory({
                     id: id,
                     MEM_TYPE: SwarmDataType.Structure,
                     SWARM_TYPE: SwarmType.SwarmRampart,
@@ -438,7 +442,7 @@ export class SwarmCreator {
                 });
                 break;
             case (SwarmType.SwarmResource):
-                newMemory = new RoomObjectMemory({
+                newMemory = new ResourceMemory({
                     id: id,
                     MEM_TYPE: SwarmDataType.RoomObject,
                     SWARM_TYPE: SwarmType.SwarmResource,
@@ -447,7 +451,7 @@ export class SwarmCreator {
                 });
                 break;
             case (SwarmType.SwarmRoad):
-                newMemory = new StructureMemory({
+                newMemory = new RoadMemory({
                     id: id,
                     MEM_TYPE: SwarmDataType.Structure,
                     SWARM_TYPE: SwarmType.SwarmRoad,
@@ -465,7 +469,7 @@ export class SwarmCreator {
                 });
                 break;
             case (SwarmType.SwarmSite):
-                newMemory = new RoomObjectMemory({
+                newMemory = new ConstructionSiteMemory({
                     id: id,
                     MEM_TYPE: SwarmDataType.RoomObject,
                     SWARM_TYPE: SwarmType.SwarmSite,
@@ -474,7 +478,7 @@ export class SwarmCreator {
                 });
                 break;
             case (SwarmType.SwarmSource):
-                newMemory = new RoomObjectMemory<ISourceData, SwarmType.SwarmSource>({
+                newMemory = new SourceMemory({
                     id: id,
                     MEM_TYPE: SwarmDataType.RoomObject,
                     SWARM_TYPE: SwarmType.SwarmSource,
@@ -488,7 +492,7 @@ export class SwarmCreator {
                 });
                 break;
             case (SwarmType.SwarmSpawn):
-                newMemory = new StructureMemory({
+                newMemory = new SpawnMemory({
                     id: id,
                     MEM_TYPE: SwarmDataType.Structure,
                     SWARM_TYPE: SwarmType.SwarmSpawn,
@@ -497,7 +501,7 @@ export class SwarmCreator {
                 });
                 break;
             case (SwarmType.SwarmStorage):
-                newMemory = new StructureMemory({
+                newMemory = new StorageMemory({
                     id: id,
                     MEM_TYPE: SwarmDataType.Structure,
                     SWARM_TYPE: SwarmType.SwarmStorage,
@@ -506,7 +510,7 @@ export class SwarmCreator {
                 });
                 break;
             case (SwarmType.SwarmTerminal):
-                newMemory = new StructureMemory({
+                newMemory = new TerminalMemory({
                     id: id,
                     MEM_TYPE: SwarmDataType.Structure,
                     SWARM_TYPE: SwarmType.SwarmTerminal,
@@ -515,7 +519,7 @@ export class SwarmCreator {
                 });
                 break;
             case (SwarmType.SwarmTombstone):
-                newMemory = new RoomObjectMemory({
+                newMemory = new TombstoneMemory({
                     id: id,
                     MEM_TYPE: SwarmDataType.RoomObject,
                     SWARM_TYPE: SwarmType.SwarmTombstone,
@@ -524,7 +528,7 @@ export class SwarmCreator {
                 });
                 break;
             case (SwarmType.SwarmTower):
-                newMemory = new StructureMemory({
+                newMemory = new TowerMemory({
                     id: id,
                     MEM_TYPE: SwarmDataType.Structure,
                     SWARM_TYPE: SwarmType.SwarmTower,
@@ -533,7 +537,7 @@ export class SwarmCreator {
                 });
                 break;
             case (SwarmType.SwarmWall):
-                newMemory = new StructureMemory({
+                newMemory = new WallMemory({
                     id: id,
                     MEM_TYPE: SwarmDataType.Structure,
                     SWARM_TYPE: SwarmType.SwarmWall,

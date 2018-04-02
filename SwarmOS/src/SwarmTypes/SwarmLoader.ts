@@ -1,12 +1,15 @@
 import {
     MasterCreepMemory, MasterFlagMemory, MasterRoomMemory, MasterStructureMemory,
-    MasterRoomObjectMemory, MasterOtherMemory, RoomObjectMemory, MasterSwarmMemory, SwarmMemory, SwarmMemoryTypes, TStructureMemory, TRoomObjectMemory
+    MasterRoomObjectMemory, MasterOtherMemory, MasterSwarmMemory, SwarmMemory
 } from "SwarmMemory/SwarmMemory";
 import { SwarmObject, SwarmTypeBase, ObjectBase, SwarmRoomObject } from "./SwarmTypes";
 import { SwarmCreep } from "./SwarmCreep";
 import { SwarmStructure } from "./SwarmStructures/SwarmStructure";
 import { SwarmFlag } from "SwarmTypes/SwarmFlag";
 import { SwarmRoom } from "SwarmTypes/SwarmRoom";
+import { SwarmMemoryTypes } from "SwarmTypes/SwarmCreator";
+import { RoomObjectMemory } from "SwarmMemory/RoomObjectMemory";
+import { StructureMemory } from "SwarmMemory/StructureMemory";
 
 export class SwarmLoader {
     protected static MasterMemory: { [dataType: string]: MasterSwarmMemory<MasterSwarmDataTypes, SwarmDataTypes> }
@@ -35,8 +38,8 @@ export class SwarmLoader {
             creeps: {} as { [id: string]: SwarmCreep },
             flags: {} as { [id: string]: SwarmFlag },
             rooms: {} as { [id: string]: SwarmRoom },
-            roomObjects: {} as { [id: string]: SwarmRoomObject<Source | Mineral | Nuke | Tombstone | Resource | ConstructionSite, TRoomObjectMemory> },
-            structures: {} as { [id: string]: SwarmStructure<StructureConstant, Structure, TStructureMemory> },
+            roomObjects: {} as { [id: string]: SwarmRoomObject<Source | Mineral | Nuke | Tombstone | Resource | ConstructionSite, RoomObjectMemory> },
+            structures: {} as { [id: string]: SwarmStructure<StructureConstant, Structure, StructureMemory> },
             otherData: {} as { [id: string]: any }
         }
         global['TheSwarm'] = this.TheSwarm;

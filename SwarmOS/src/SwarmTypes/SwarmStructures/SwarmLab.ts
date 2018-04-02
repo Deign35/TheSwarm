@@ -1,10 +1,9 @@
 import { OwnedSwarmStructure } from "./SwarmStructure";
 import { SwarmCreep } from "SwarmTypes/SwarmCreep";
-import { StructureMemory } from "SwarmMemory/SwarmMemory";
+import { LabMemory } from "SwarmMemory/StructureMemory";
 
 export class SwarmLab extends OwnedSwarmStructure<STRUCTURE_LAB, StructureLab,
-    StructureMemory<SwarmType.SwarmLab>> implements StructureLab {
-    get SwarmType(): SwarmType.SwarmLab { return SwarmType.SwarmLab; }
+    LabMemory> implements StructureLab {
     get cooldown() { return this._instance.cooldown; }
     get energy() { return this._instance.energy; }
     get energyCapacity() { return this._instance.energyCapacity; }

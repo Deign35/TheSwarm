@@ -1,6 +1,6 @@
 import { SwarmLoader } from "SwarmTypes/SwarmLoader";
 import { ObjectBase } from "SwarmTypes/SwarmTypes";
-import { SwarmMemoryTypes } from "SwarmMemory/SwarmMemory";
+import { SwarmMemoryTypes } from "SwarmTypes/SwarmCreator";
 
 export class SwarmQueen {
     static PrepTheSwarm() {

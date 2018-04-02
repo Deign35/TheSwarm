@@ -2,13 +2,11 @@ import { NotImplementedException } from "Tools/SwarmExceptions";
 import { SwarmCreep } from "../SwarmCreep";
 import { OwnedSwarmStructure } from "./SwarmStructure";
 import { profile } from "Tools/Profiler";
-import { StructureMemory } from "SwarmMemory/SwarmMemory";
+import { SpawnMemory } from "SwarmMemory/StructureMemory";
 
 @profile
 export class SwarmSpawn extends OwnedSwarmStructure<STRUCTURE_SPAWN, StructureSpawn,
-StructureMemory<SwarmType.SwarmSpawn>>
-    implements StructureSpawn {
-    get SwarmType(): SwarmType.SwarmSpawn { return SwarmType.SwarmSpawn; }
+SpawnMemory> implements StructureSpawn {
     get energy() { return this._instance.energy; }
     get energyCapacity() { return this._instance.energyCapacity; }
     get name() { return this._instance.name; }

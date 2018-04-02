@@ -1,10 +1,12 @@
-import { RoomMemory, RoomObjectMemory, StructureMemory, TStructureMemory } from "SwarmMemory/SwarmMemory";
+import { RoomMemory } from "SwarmMemory/SwarmMemory";
 import { profile } from "Tools/Profiler";
 import { SwarmItemWithName, SwarmObject, SwarmMineral } from "SwarmTypes/SwarmTypes";
 import { NotImplementedException } from "Tools/SwarmExceptions";
 import { SwarmSource } from "./SwarmSource";
 import { SwarmContainer } from "SwarmTypes/SwarmStructures/SwarmStructure";
 import { SwarmLoader } from "./SwarmLoader";
+import { ResourceMemory, TombstoneMemory, ConstructionSiteMemory, NukeMemory } from "SwarmMemory/RoomObjectMemory";
+import { StructureMemory } from "SwarmMemory/StructureMemory";
 
 const ROOM_COUNTER = 'CNT';
 const HARVESTER_JOBS = 'HARVEST';
@@ -43,7 +45,7 @@ export class SwarmRoom extends SwarmItemWithName<Room>
             let foundResources = this.find(FIND_DROPPED_RESOURCES);
             for (let j = 0; j < foundResources.length; j++) {
                 if (!SwarmLoader.TheSwarm.roomObjects[foundResources[j].id]) {
-                    SwarmLoader.LoadObject<Resource, RoomObjectMemory<IRoomObjectData<SwarmType.SwarmResource>, SwarmType.SwarmResource>>(
+                    SwarmLoader.LoadObject<Resource, ResourceMemory>(
                         foundResources[j].id, foundResources[j], SwarmControllerDataTypes.RoomObjects);
                 }
             }
@@ -53,9 +55,8 @@ export class SwarmRoom extends SwarmItemWithName<Room>
             let foundTombstones = this.find(FIND_TOMBSTONES);
             for (let j = 0; j < foundTombstones.length; j++) {
                 if (!SwarmLoader.TheSwarm.roomObjects[foundTombstones[j].id]) {
-                    SwarmLoader.LoadObject<Tombstone,
-                        RoomObjectMemory<IRoomObjectData<SwarmType.SwarmTombstone>, SwarmType.SwarmTombstone>>(
-                            foundTombstones[j].id, foundTombstones[j], SwarmControllerDataTypes.RoomObjects);
+                    SwarmLoader.LoadObject<Tombstone, TombstoneMemory>(
+                        foundTombstones[j].id, foundTombstones[j], SwarmControllerDataTypes.RoomObjects);
                 }
             }
         }
@@ -64,7 +65,7 @@ export class SwarmRoom extends SwarmItemWithName<Room>
             let foundStructures = this.find(FIND_STRUCTURES);
             for (let j = 0; j < foundStructures.length; j++) {
                 if (!SwarmLoader.TheSwarm.structures[foundStructures[j].id]) {
-                    SwarmLoader.LoadObject<Structure, TStructureMemory>(
+                    SwarmLoader.LoadObject<Structure, StructureMemory>(
                         foundStructures[j].id, foundStructures[j], SwarmControllerDataTypes.Structures);
                 }
             }
@@ -74,7 +75,7 @@ export class SwarmRoom extends SwarmItemWithName<Room>
             let foundSites = this.find(FIND_CONSTRUCTION_SITES);
             for (let j = 0; j < foundSites.length; j++) {
                 if (!SwarmLoader.TheSwarm.roomObjects[foundSites[j].id]) {
-                    SwarmLoader.LoadObject<ConstructionSite, RoomObjectMemory<IRoomObjectData<SwarmType.SwarmSite>, SwarmType.SwarmSite>>(
+                    SwarmLoader.LoadObject<ConstructionSite, ConstructionSiteMemory>(
                         foundSites[j].id, foundSites[j], SwarmControllerDataTypes.RoomObjects);
                 }
             }
@@ -84,7 +85,7 @@ export class SwarmRoom extends SwarmItemWithName<Room>
             let foundNukes = this.find(FIND_NUKES);
             for (let j = 0; j < foundNukes.length; j++) {
                 if (!SwarmLoader.TheSwarm.roomObjects[foundNukes[j].id]) {
-                    SwarmLoader.LoadObject<Nuke, RoomObjectMemory<IRoomObjectData<SwarmType.SwarmNuke>, SwarmType.SwarmNuke>>(
+                    SwarmLoader.LoadObject<Nuke, NukeMemory>(
                         foundNukes[j].id, foundNukes[j], SwarmControllerDataTypes.RoomObjects);
                 }
             }

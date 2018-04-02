@@ -1,6 +1,6 @@
-import { RoomObjectMemory, SourceMemory } from "SwarmMemory/SwarmMemory";
 import { SwarmRoomObject } from "SwarmTypes/SwarmTypes";
 import { SwarmCreep } from "SwarmTypes/SwarmCreep";
+import { SourceMemory } from "SwarmMemory/RoomObjectMemory";
 
 export class SwarmSource extends SwarmRoomObject<Source, SourceMemory> implements Source {
     get storageMemoryType() { return SwarmDataType.RoomObject };
@@ -15,7 +15,7 @@ export class SwarmSource extends SwarmRoomObject<Source, SourceMemory> implement
 
     PrepObject() {
         if (!this._memory.creepID) {
-            
+
         }
     }
 }

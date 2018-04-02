@@ -1,14 +1,11 @@
 import { OwnedSwarmStructure, SwarmStructure } from "./SwarmStructure";
-import { StructureMemory, TStructureMemory } from "SwarmMemory/SwarmMemory";
 import { profile } from "Tools/Profiler";
 import { SwarmCreep } from "SwarmTypes/SwarmCreep";
+import { StructureMemory, TowerMemory } from "SwarmMemory/StructureMemory";
 
 @profile
 export class SwarmTower extends OwnedSwarmStructure<STRUCTURE_TOWER, StructureTower,
-StructureMemory<SwarmType.SwarmTower>> implements StructureTower {
-
-
-    get SwarmType(): SwarmType.SwarmTower { return SwarmType.SwarmTower; }
+TowerMemory> implements StructureTower {
     get energy() { return this._instance.energy; }
     get energyCapacity() { return this._instance.energyCapacity; }
 
@@ -18,7 +15,7 @@ StructureMemory<SwarmType.SwarmTower>> implements StructureTower {
     heal(target: SwarmCreep) {
         return this._instance.heal(target);
     }
-    repair(target: SwarmStructure<StructureConstant, Structure, TStructureMemory>) {
+    repair(target: SwarmStructure<StructureConstant, Structure, StructureMemory>) {
         return this._instance.repair(target);
     }
     protected OnActivate() {

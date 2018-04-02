@@ -1,39 +1,6 @@
 import { profile } from "Tools/Profiler";
 import { SwarmException, MemoryLockException, AlreadyExistsException } from "Tools/SwarmExceptions";
 
-/*export abstract class MemBase {
-    constructor(data: Dictionary) {
-        this._cache = data;
-    }
-    private _checkedOut!: boolean;
-    protected _cache!: Dictionary;
-    GetData<Z>(id: string): Z {
-        return this._cache[id];
-    }
-    SetData<Z>(id: string, data: Z): void {
-        this._cache[id] = data;
-    }
-    RemoveData(id: string): void {
-        delete this._cache[id];
-    }
-    ReserveMemory() {
-        if (this._checkedOut) {
-            throw new MemoryLockException(this._checkedOut, "Memory already checked out");
-        }
-
-        this._checkedOut = true;
-    }
-
-    ReleaseData() {
-        if (!this._checkedOut) {
-            throw new MemoryLockException(this._checkedOut, "Memory not checked out");
-        }
-
-        this._checkedOut = false;
-        return CopyObject(this._cache);
-    }
-}*/
-
 export abstract class MemoryBase<T extends SwarmDataTypes> {
     constructor(data: T) {
         this._cache = data;
@@ -97,13 +64,6 @@ export class FlagMemory extends SwarmMemory<IFlagData, SwarmType.SwarmFlag> impl
     get MEM_TYPE(): SwarmDataType.Flag { return SwarmDataType.Flag }
 }
 
-@profile
-export class StructureMemory<T extends SwarmStructureType>
-    extends SwarmMemory<TStructureData, T>
-    implements IStructureData<T> {
-    get MEM_TYPE(): SwarmDataType.Structure { return SwarmDataType.Structure }
-
-}
 
 @profile
 export class CreepMemory extends SwarmMemory<ICreepData, SwarmType.SwarmCreep>
@@ -116,31 +76,6 @@ export class RoomMemory extends SwarmMemory<IRoomData, SwarmType.SwarmRoom>
     implements IRoomData {
     get MEM_TYPE(): SwarmDataType.Room { return SwarmDataType.Room }
 }
-
-@profile
-export class RoomObjectMemory<T extends TRoomObjectData, U extends SwarmRoomObjectType>
-    extends SwarmMemory<T, U> implements IRoomObjectData<U> {
-    get MEM_TYPE(): SwarmDataType.RoomObject { return SwarmDataType.RoomObject }
-}
-export class SourceMemory extends RoomObjectMemory<ISourceData, SwarmType.SwarmSource> implements ISourceData {
-    get creepID() { return this._cache.creepID; }
-    get containerID() { return this._cache.containerID; }
-    get linkID() { return this._cache.linkID; }
-    get pileID() { return this._cache.pileID; }
-}
-
-export type TRoomObjectMemory = SourceMemory | RoomObjectMemory<IMineralData, SwarmType.SwarmMineral> |
-    RoomObjectMemory<IRoomObjectData<SwarmType.SwarmNuke>, SwarmType.SwarmNuke> | RoomObjectMemory<IRoomObjectData<SwarmType.SwarmSite>, SwarmType.SwarmSite> |
-    RoomObjectMemory<IRoomObjectData<SwarmType.SwarmResource>, SwarmType.SwarmResource> | RoomObjectMemory<IRoomObjectData<SwarmType.SwarmTombstone>, SwarmType.SwarmTombstone>
-export type TStructureMemory = StructureMemory<SwarmType.SwarmController> | StructureMemory<SwarmType.SwarmContainer> |
-    StructureMemory<SwarmType.SwarmExtension> | StructureMemory<SwarmType.SwarmExtractor> |
-    StructureMemory<SwarmType.SwarmKeepersLair> | StructureMemory<SwarmType.SwarmLab> | StructureMemory<SwarmType.SwarmLink> |
-    StructureMemory<SwarmType.SwarmNuker> | StructureMemory<SwarmType.SwarmObserver> | StructureMemory<SwarmType.SwarmPortal> |
-    StructureMemory<SwarmType.SwarmPowerBank> | StructureMemory<SwarmType.SwarmPowerSpawn> | StructureMemory<SwarmType.SwarmRampart> |
-    StructureMemory<SwarmType.SwarmRoad> | StructureMemory<SwarmType.SwarmSpawn> | StructureMemory<SwarmType.SwarmStorage> |
-    StructureMemory<SwarmType.SwarmTerminal> | StructureMemory<SwarmType.SwarmTower> | StructureMemory<SwarmType.SwarmWall>
-export type SwarmMemoryTypes = RoomMemory | TRoomObjectMemory | CreepMemory |
-    FlagMemory | TStructureMemory | BasicMemory
 
 export class MasterSwarmMemory<T extends MasterSwarmDataTypes, U extends SwarmDataTypes>
     extends MemoryBase<T> implements IMasterData<U> {
