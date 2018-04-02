@@ -5,7 +5,7 @@ import { SwarmCreep } from "SwarmTypes/SwarmCreep";
 
 @profile
 export class SwarmTower extends OwnedSwarmStructure<STRUCTURE_TOWER, StructureTower>
-    implements ISwarmTower, StructureTower {
+    implements StructureTower {
 
 
     get SwarmType(): SwarmType.SwarmTower { return SwarmType.SwarmTower; }

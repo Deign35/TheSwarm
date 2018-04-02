@@ -3,7 +3,7 @@ import { profile } from "Tools/Profiler";
 
 @profile
 export class SwarmController extends OwnedSwarmStructure<STRUCTURE_CONTROLLER, StructureController>
-    implements ISwarmController, StructureController {
+    implements StructureController {
 
     get SwarmType(): SwarmType.SwarmController { return SwarmType.SwarmController; }
     get level() { return this._instance.level; }

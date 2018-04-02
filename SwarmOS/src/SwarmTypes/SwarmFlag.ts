@@ -4,7 +4,7 @@ import { SwarmItemWithName } from "SwarmTypes/SwarmTypes";
 
 const FLAG_COUNTER = 'CNT';
 @profile
-export class SwarmFlag extends SwarmItemWithName<IFlagMemory, Flag> implements ISwarmFlag, Flag {
+export class SwarmFlag extends SwarmItemWithName<Flag> implements Flag {
     get DataType(): SwarmDataType.Flag { return SwarmDataType.Flag };
     get SwarmType(): SwarmType.SwarmFlag { return SwarmType.SwarmFlag; };
     get pos() { return this._instance.pos; }

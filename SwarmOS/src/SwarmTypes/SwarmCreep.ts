@@ -6,7 +6,8 @@ const CREEP_COUNTER = 'CNT';
 const CARRY_TOTAL = 'CT';
 const CURRENT_PATH = 'CP';
 @profile
-export class SwarmCreep extends OwnableSwarmObject<CreepMemory, Creep> implements ISwarmCreep, Creep {
+export class SwarmCreep extends OwnableSwarmObject<Creep> implements Creep {
+    protected _memory!: CreepMemory;
     get DataType(): SwarmDataType.Creep { return SwarmDataType.Creep };
     protected OnActivate() {
         console.log("Successfully activated a Creep");

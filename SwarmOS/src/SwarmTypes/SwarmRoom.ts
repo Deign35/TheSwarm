@@ -10,8 +10,8 @@ const ROOM_COUNTER = 'CNT';
 const HARVESTER_JOBS = 'HARVEST';
 
 @profile
-export class SwarmRoom extends SwarmItemWithName<RoomMemory, Room>
-    implements ISwarmRoom, Room {
+export class SwarmRoom extends SwarmItemWithName<Room>
+    implements Room {
 
     protected OnActivate(): void {
         console.log('Successfully activated a Room');
@@ -42,43 +42,43 @@ export class SwarmRoom extends SwarmItemWithName<RoomMemory, Room>
         if (!filterByTime || Game.time % 5 == 0) {
             let foundResources = this.find(FIND_DROPPED_RESOURCES);
             for (let j = 0; j < foundResources.length; j++) {
-                if (!TheSwarm.roomObjects[foundResources[j].id]) {
+                if (!SwarmLoader.TheSwarm.roomObjects[foundResources[j].id]) {
                     SwarmLoader.LoadObject<Resource>(foundResources[j].id, foundResources[j], SwarmControllerDataTypes.RoomObjects);
                 }
             }
         }
 
-        if (!filterByTime ||Game.time % 11 == 0) {
+        if (!filterByTime || Game.time % 11 == 0) {
             let foundTombstones = this.find(FIND_TOMBSTONES);
             for (let j = 0; j < foundTombstones.length; j++) {
-                if (!TheSwarm.roomObjects[foundTombstones[j].id]) {
+                if (!SwarmLoader.TheSwarm.roomObjects[foundTombstones[j].id]) {
                     SwarmLoader.LoadObject<Tombstone>(foundTombstones[j].id, foundTombstones[j], SwarmControllerDataTypes.RoomObjects);
                 }
             }
         }
 
-        if (!filterByTime ||Game.time % 17 == 0) {
+        if (!filterByTime || Game.time % 17 == 0) {
             let foundStructures = this.find(FIND_STRUCTURES);
             for (let j = 0; j < foundStructures.length; j++) {
-                if (!TheSwarm.structures[foundStructures[j].id]) {
+                if (!SwarmLoader.TheSwarm.structures[foundStructures[j].id]) {
                     SwarmLoader.LoadObject<Structure>(foundStructures[j].id, foundStructures[j], SwarmControllerDataTypes.Structures);
                 }
             }
         }
 
-        if (!filterByTime ||Game.time % 29 == 0) {
+        if (!filterByTime || Game.time % 29 == 0) {
             let foundSites = this.find(FIND_CONSTRUCTION_SITES);
             for (let j = 0; j < foundSites.length; j++) {
-                if (!TheSwarm.roomObjects[foundSites[j].id]) {
+                if (!SwarmLoader.TheSwarm.roomObjects[foundSites[j].id]) {
                     SwarmLoader.LoadObject<ConstructionSite>(foundSites[j].id, foundSites[j], SwarmControllerDataTypes.RoomObjects);
                 }
             }
         }
 
-        if (!filterByTime ||Game.time % 233 == 0) {
+        if (!filterByTime || Game.time % 233 == 0) {
             let foundNukes = this.find(FIND_NUKES);
             for (let j = 0; j < foundNukes.length; j++) {
-                if (!TheSwarm.roomObjects[foundNukes[j].id]) {
+                if (!SwarmLoader.TheSwarm.roomObjects[foundNukes[j].id]) {
                     SwarmLoader.LoadObject<Nuke>(foundNukes[j].id, foundNukes[j], SwarmControllerDataTypes.RoomObjects);
                 }
             }

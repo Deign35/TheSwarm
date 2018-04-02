@@ -32,28 +32,19 @@ declare type OwnableStructureConstant = STRUCTURE_CONTROLLER | STRUCTURE_EXTENSI
     STRUCTURE_KEEPER_LAIR | STRUCTURE_LAB | STRUCTURE_LINK | STRUCTURE_NUKER | STRUCTURE_OBSERVER | STRUCTURE_POWER_BANK |
     STRUCTURE_POWER_SPAWN | STRUCTURE_RAMPART | STRUCTURE_SPAWN | STRUCTURE_STORAGE | STRUCTURE_TERMINAL | STRUCTURE_TOWER
 
-declare var TheSwarm: {
-    [id: string]: { [id: string]: TSwarmObject },
-    creeps: { [id: string]: ISwarmCreep },
-    flags: { [id: string]: ISwarmFlag },
-    rooms: { [id: string]: ISwarmRoom },
-    roomObjects: { [id: string]: TSwarmRoomObject },
-    structures: { [id: string]: TSwarmStructure },
-    otherData: { [id: string]: IOtherObject }
-}
-declare var SwarmRoomIDs: {
-    [roomID: string]: {
-        structures: {
-            [structureType: string]: string[],
-        }
-        creeps: {
-            [creepType: string]: string[]
-        }
-        flags: {
-            [flagType: string]: string[]
-        }
-        roomObjects: {
-            [roomObjectTypes: string]: string[]
-        }
-    }
+
+declare interface ISwarmlord {
+    ValidateMemory(): void;
+    SaveMasterMemory<T extends any>(memObject: T, save: boolean): void;
+    CheckoutMasterMemory(dataType: string): any;
+} declare var Swarmlord: ISwarmlord;
+
+declare var SwarmCreator: {
+    CreateSwarmMemory(mem: IData<SwarmDataType>): any;
+    CreateSwarmObject(swarmType: SwarmType): any;
+    CreateNewSwarmMemory(id: string, swarmType: SwarmType): any;
+    GetStructureSwarmType(structure: Structure): SwarmStructureType;
+    GetSwarmType(obj: any): SwarmType;
+    CreateNewSwarmObject<T extends any>(obj: Room | RoomObject): T;
+    GetObjSaveID(obj: Room | RoomObject): string;
 }

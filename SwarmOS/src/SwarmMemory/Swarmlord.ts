@@ -1,10 +1,20 @@
 import { profile } from "Tools/Profiler";
-import { MasterSwarmMemory, MasterCreepMemory, MasterFlagMemory, MasterRoomMemory, MasterStructureMemory, MasterRoomObjectMemory, MasterOtherMemory } from "SwarmMemory/StorageMemory";
+import { MasterSwarmMemory, MasterCreepMemory, MasterFlagMemory, MasterRoomMemory, MasterStructureMemory, MasterRoomObjectMemory, MasterOtherMemory, MemoryBase } from "SwarmMemory/StorageMemory";
 import { NotImplementedException } from "Tools/SwarmExceptions";
-declare var Memory: ISwarmMemoryStructure;
+declare var Memory: {
+    creeps: IMasterCreepData,
+    flags: IMasterFlagData,
+    otherData: IMasterOtherData,
+    rooms: IMasterRoomData,
+    roomObjects: IMasterRoomObjectData,
+    Structures: IMasterStructureData,
+    INIT: boolean,
+    SwarmVersionDate: string,
+    profiler: any
+};
 
 @profile
-export class Swarmlord implements ISwarmlord {
+export class Swarmlord {
     constructor() {
         this.InitializeMemory();
     }
@@ -15,7 +25,7 @@ export class Swarmlord implements ISwarmlord {
             global['Swarmlord'] = this;
 
             SwarmLogger.Log("Begin initialization of memory for entire Swarm(" + SWARM_VERSION_DATE + ")");
-            let newMemory: ISwarmMemoryStructure = {
+            let newMemory = {
                 creeps: {
                     id: "creeps",
                     ChildData: {},
@@ -82,7 +92,7 @@ export class Swarmlord implements ISwarmlord {
         }
     }
 
-    SaveMasterMemory<T extends MasterMemoryTypes>(memObject: T, save: boolean): void {
+    SaveMasterMemory<T extends SwarmDataType>(memObject: MasterSwarmMemory<IMasterData<T>, T>, save: boolean): void {
         let memData = memObject.ReleaseData();
         if (save) {
             Memory[memObject.id] = memData;
@@ -91,7 +101,7 @@ export class Swarmlord implements ISwarmlord {
 
     CheckoutMasterMemory(id: string) {
         let data = CopyObject(Memory[id]);
-        let newMem: MasterMemoryTypes | undefined = undefined;
+        let newMem: MasterSwarmMemory<IMasterData<any>, any> | undefined = undefined;
         switch (data.id) {
             case (SwarmControllerDataTypes.Creeps):
                 newMem = new MasterCreepMemory(data);
