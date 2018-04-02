@@ -41,3 +41,19 @@ declare var TheSwarm: {
     structures: { [id: string]: TSwarmStructure },
     otherData: { [id: string]: IOtherObject }
 }
+declare var SwarmRoomIDs: {
+    [roomID: string]: {
+        structures: {
+            [structureType: string]: string[],
+        }
+        creeps: {
+            [creepType: string]: string[]
+        }
+        flags: {
+            [flagType: string]: string[]
+        }
+        roomObjects: {
+            [roomObjectTypes: string]: string[]
+        }
+    }
+}

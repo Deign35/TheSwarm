@@ -9,10 +9,10 @@ declare interface IOtherData extends IData<SwarmDataType.Other> {
 }
 declare interface ISwarmData<T extends SwarmDataType, U extends SwarmType> extends IData<T> {
     SWARM_TYPE: U;
+    SUB_TYPE: number | string;
     isActive: boolean;
 }
 declare interface ICreepData extends ISwarmData<SwarmDataType.Creep, SwarmType.SwarmCreep> {
-    CREEP_TYPE: number;
     // Special info for creeps
 }
 declare interface IStructureData<T extends SwarmStructureType> extends ISwarmData<SwarmDataType.Structure, T> {
@@ -43,12 +43,9 @@ declare type TStructureData = IContainerData | IControllerData | IExtensionData 
     IRoadData | ISpawnData | IStorageData | ITerminalData | ITowerData | IWallData;
 
 declare interface IFlagData extends ISwarmData<SwarmDataType.Flag, SwarmType.SwarmFlag> {
-    FLG_TYPE: number;
     // Special info for flags
 }
 declare interface IRoomData extends ISwarmData<SwarmDataType.Room, SwarmType.SwarmRoom> {
-    RM_TYPE: number;
-    LastUpdated: number;
 }
 declare interface IRoomObjectData<T extends SwarmRoomObjectType> extends ISwarmData<SwarmDataType.RoomObject, T> {
     // Special info for RoomObjects.

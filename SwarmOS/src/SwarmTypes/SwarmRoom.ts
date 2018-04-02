@@ -15,16 +15,17 @@ export class SwarmRoom extends SwarmItemWithName<RoomMemory, Room>
 
     protected OnActivate(): void {
         console.log('Successfully activated a Room');
-        if (this._memory.LastUpdated == 0) {
+        /*if (this._memory.LastUpdated == 0) {
             console.log('Init new room');
-            this.InitNewObject();
+            this.InitAsNew();
             this._memory.SetData('LastUpdated', Game.time);
-        }
+        }*/
 
         this.TryFindNewObjects();
 
     }
-    InitNewObject() {
+    InitAsNew() {
+        SwarmLogger.Log("Initializing a new room");
         // Would love to add a pathfinding.
         let sources = this.find(FIND_SOURCES);
         for (let i = 0; i < sources.length; i++) {
@@ -34,10 +35,11 @@ export class SwarmRoom extends SwarmItemWithName<RoomMemory, Room>
         for (let i = 0; i < minerals.length; i++) {
             SwarmLoader.LoadObject(minerals[i].id, minerals[i], SwarmControllerDataTypes.RoomObjects);
         }
+        this.TryFindNewObjects(false);
     }
 
-    TryFindNewObjects() {
-        if (Game.time % 5 == 0) {
+    TryFindNewObjects(filterByTime: boolean = true) {
+        if (!filterByTime || Game.time % 5 == 0) {
             let foundResources = this.find(FIND_DROPPED_RESOURCES);
             for (let j = 0; j < foundResources.length; j++) {
                 if (!TheSwarm.roomObjects[foundResources[j].id]) {
@@ -46,7 +48,7 @@ export class SwarmRoom extends SwarmItemWithName<RoomMemory, Room>
             }
         }
 
-        if (Game.time % 11 == 0) {
+        if (!filterByTime ||Game.time % 11 == 0) {
             let foundTombstones = this.find(FIND_TOMBSTONES);
             for (let j = 0; j < foundTombstones.length; j++) {
                 if (!TheSwarm.roomObjects[foundTombstones[j].id]) {
@@ -55,7 +57,7 @@ export class SwarmRoom extends SwarmItemWithName<RoomMemory, Room>
             }
         }
 
-        if (Game.time % 17 == 0) {
+        if (!filterByTime ||Game.time % 17 == 0) {
             let foundStructures = this.find(FIND_STRUCTURES);
             for (let j = 0; j < foundStructures.length; j++) {
                 if (!TheSwarm.structures[foundStructures[j].id]) {
@@ -64,7 +66,7 @@ export class SwarmRoom extends SwarmItemWithName<RoomMemory, Room>
             }
         }
 
-        if (Game.time % 29 == 0) {
+        if (!filterByTime ||Game.time % 29 == 0) {
             let foundSites = this.find(FIND_CONSTRUCTION_SITES);
             for (let j = 0; j < foundSites.length; j++) {
                 if (!TheSwarm.roomObjects[foundSites[j].id]) {
@@ -73,7 +75,7 @@ export class SwarmRoom extends SwarmItemWithName<RoomMemory, Room>
             }
         }
 
-        if (Game.time % 233 == 0) {
+        if (!filterByTime ||Game.time % 233 == 0) {
             let foundNukes = this.find(FIND_NUKES);
             for (let j = 0; j < foundNukes.length; j++) {
                 if (!TheSwarm.roomObjects[foundNukes[j].id]) {

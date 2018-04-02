@@ -20,7 +20,7 @@ export class Swarmlord implements ISwarmlord {
                     id: "creeps",
                     ChildData: {},
                     MEM_TYPE: SwarmDataType.Master,
-                    SWARM_TYPE: SwarmType.Any
+                    SWARM_TYPE: SwarmType.Any,
                 },
                 flags: {
                     id: "flags",

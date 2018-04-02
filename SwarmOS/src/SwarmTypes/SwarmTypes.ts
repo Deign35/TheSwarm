@@ -33,8 +33,15 @@ export abstract class ObjectBase<T extends SwarmMemoryTypes, U> implements IObje
         }
         return SwarmDataType.None;
     }
+    GetSwarmType() {
+        if (this._memory) {
+            return this._memory.SWARM_TYPE;
+        }
+
+        return SwarmType.Any;
+    }
 }
-abstract class SwarmTypeBase<T extends SwarmMemoryTypes, U extends Room | RoomObject | Creep | Flag | Structure<StructureConstant>>
+export abstract class SwarmTypeBase<T extends SwarmMemoryTypes, U extends Room | RoomObject | Creep | Flag | Structure<StructureConstant>>
     extends ObjectBase<T, U>
     implements ISwarmObject<T, U> {
     get IsActive() { return this._memory.isActive; }
@@ -48,7 +55,7 @@ export abstract class SwarmItemWithName<T extends IRoomMemory | IFlagMemory, U e
 
 export abstract class SwarmObject<T extends SwarmMemoryTypes, U extends RoomObject> extends SwarmTypeBase<T, U> {
     get pos() { return this._instance.pos; }
-    get room() { return this._instance.room!; } // This should get the room object i created.
+    get room() { return this._instance.room; } // This should get the room object i created.
 }
 export abstract class SwarmObjectWithID<T extends SwarmMemoryTypes,
     U extends Source | Creep | Structure | Mineral | Resource | ConstructionSite | Nuke | Tombstone>

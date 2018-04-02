@@ -285,6 +285,7 @@ export class SwarmCreator {
                     id: id,
                     MEM_TYPE: SwarmDataType.Structure,
                     SWARM_TYPE: SwarmType.SwarmContainer,
+                    SUB_TYPE: STRUCTURE_CONTAINER,
                     isActive: true
                 });
                 break;
@@ -293,6 +294,7 @@ export class SwarmCreator {
                     id: id,
                     MEM_TYPE: SwarmDataType.Structure,
                     SWARM_TYPE: SwarmType.SwarmController,
+                    SUB_TYPE: STRUCTURE_CONTROLLER,
                     isActive: true
                 });
                 break;
@@ -302,7 +304,7 @@ export class SwarmCreator {
                     MEM_TYPE: SwarmDataType.Creep,
                     SWARM_TYPE: SwarmType.SwarmCreep,
                     isActive: true,
-                    CREEP_TYPE: 0
+                    SUB_TYPE: 0,
                 });
                 break;
             case (SwarmType.SwarmExtension):
@@ -310,6 +312,7 @@ export class SwarmCreator {
                     id: id,
                     MEM_TYPE: SwarmDataType.Structure,
                     SWARM_TYPE: SwarmType.SwarmExtension,
+                    SUB_TYPE: STRUCTURE_EXTENSION,
                     isActive: true
                 });
                 break;
@@ -318,6 +321,7 @@ export class SwarmCreator {
                     id: id,
                     MEM_TYPE: SwarmDataType.Structure,
                     SWARM_TYPE: SwarmType.SwarmExtractor,
+                    SUB_TYPE: STRUCTURE_EXTRACTOR,
                     isActive: true,
                 });
                 break;
@@ -326,7 +330,7 @@ export class SwarmCreator {
                     id: id,
                     MEM_TYPE: SwarmDataType.Flag,
                     SWARM_TYPE: SwarmType.SwarmFlag,
-                    FLG_TYPE: 0,
+                    SUB_TYPE: 0,
                     isActive: true
                 });
                 break;
@@ -335,6 +339,7 @@ export class SwarmCreator {
                     id: id,
                     MEM_TYPE: SwarmDataType.Structure,
                     SWARM_TYPE: SwarmType.SwarmKeepersLair,
+                    SUB_TYPE: STRUCTURE_KEEPER_LAIR,
                     isActive: true
                 });
                 break;
@@ -343,6 +348,7 @@ export class SwarmCreator {
                     id: id,
                     MEM_TYPE: SwarmDataType.Structure,
                     SWARM_TYPE: SwarmType.SwarmLab,
+                    SUB_TYPE: STRUCTURE_LAB,
                     isActive: true
                 });
                 break;
@@ -351,6 +357,7 @@ export class SwarmCreator {
                     id: id,
                     MEM_TYPE: SwarmDataType.Structure,
                     SWARM_TYPE: SwarmType.SwarmLink,
+                    SUB_TYPE: STRUCTURE_LINK,
                     isActive: true
                 });
                 break;
@@ -359,6 +366,7 @@ export class SwarmCreator {
                     id: id,
                     MEM_TYPE: SwarmDataType.RoomObject,
                     SWARM_TYPE: SwarmType.SwarmMineral,
+                    SUB_TYPE: 0,
                     isActive: true
                 });
                 break;
@@ -367,6 +375,7 @@ export class SwarmCreator {
                     id: id,
                     MEM_TYPE: SwarmDataType.RoomObject,
                     SWARM_TYPE: SwarmType.SwarmNuke,
+                    SUB_TYPE: 0,
                     isActive: true
                 });
                 break;
@@ -375,6 +384,7 @@ export class SwarmCreator {
                     id: id,
                     MEM_TYPE: SwarmDataType.Structure,
                     SWARM_TYPE: SwarmType.SwarmNuker,
+                    SUB_TYPE: STRUCTURE_NUKER,
                     isActive: true
                 });
                 break;
@@ -383,6 +393,7 @@ export class SwarmCreator {
                     id: id,
                     MEM_TYPE: SwarmDataType.Structure,
                     SWARM_TYPE: SwarmType.SwarmObserver,
+                    SUB_TYPE: STRUCTURE_OBSERVER,
                     isActive: true
                 });
                 break;
@@ -391,6 +402,7 @@ export class SwarmCreator {
                     id: id,
                     MEM_TYPE: SwarmDataType.Structure,
                     SWARM_TYPE: SwarmType.SwarmPortal,
+                    SUB_TYPE: STRUCTURE_PORTAL,
                     isActive: true
                 });
                 break;
@@ -399,6 +411,7 @@ export class SwarmCreator {
                     id: id,
                     MEM_TYPE: SwarmDataType.Structure,
                     SWARM_TYPE: SwarmType.SwarmPowerBank,
+                    SUB_TYPE: STRUCTURE_POWER_BANK,
                     isActive: true
                 });
                 break;
@@ -407,6 +420,7 @@ export class SwarmCreator {
                     id: id,
                     MEM_TYPE: SwarmDataType.Structure,
                     SWARM_TYPE: SwarmType.SwarmPowerSpawn,
+                    SUB_TYPE: STRUCTURE_POWER_SPAWN,
                     isActive: true
                 });
                 break;
@@ -415,6 +429,7 @@ export class SwarmCreator {
                     id: id,
                     MEM_TYPE: SwarmDataType.Structure,
                     SWARM_TYPE: SwarmType.SwarmRampart,
+                    SUB_TYPE: STRUCTURE_RAMPART,
                     isActive: true
                 });
                 break;
@@ -423,6 +438,7 @@ export class SwarmCreator {
                     id: id,
                     MEM_TYPE: SwarmDataType.RoomObject,
                     SWARM_TYPE: SwarmType.SwarmResource,
+                    SUB_TYPE: 0,
                     isActive: true
                 });
                 break;
@@ -431,6 +447,7 @@ export class SwarmCreator {
                     id: id,
                     MEM_TYPE: SwarmDataType.Structure,
                     SWARM_TYPE: SwarmType.SwarmRoad,
+                    SUB_TYPE: STRUCTURE_ROAD,
                     isActive: true
                 });
                 break;
@@ -439,9 +456,8 @@ export class SwarmCreator {
                     id: id,
                     MEM_TYPE: SwarmDataType.Room,
                     SWARM_TYPE: SwarmType.SwarmRoom,
-                    RM_TYPE: 0,
-                    isActive: true,
-                    LastUpdated: 0
+                    SUB_TYPE: 0,
+                    isActive: true
                 });
                 break;
             case (SwarmType.SwarmSite):
@@ -449,6 +465,7 @@ export class SwarmCreator {
                     id: id,
                     MEM_TYPE: SwarmDataType.RoomObject,
                     SWARM_TYPE: SwarmType.SwarmSite,
+                    SUB_TYPE: 0,
                     isActive: true
                 });
                 break;
@@ -457,6 +474,7 @@ export class SwarmCreator {
                     id: id,
                     MEM_TYPE: SwarmDataType.RoomObject,
                     SWARM_TYPE: SwarmType.SwarmSource,
+                    SUB_TYPE: 0,
                     isActive: true
                 });
                 break;
@@ -465,6 +483,7 @@ export class SwarmCreator {
                     id: id,
                     MEM_TYPE: SwarmDataType.Structure,
                     SWARM_TYPE: SwarmType.SwarmSpawn,
+                    SUB_TYPE: STRUCTURE_SPAWN,
                     isActive: true
                 });
                 break;
@@ -473,6 +492,7 @@ export class SwarmCreator {
                     id: id,
                     MEM_TYPE: SwarmDataType.Structure,
                     SWARM_TYPE: SwarmType.SwarmStorage,
+                    SUB_TYPE: STRUCTURE_STORAGE,
                     isActive: true
                 });
                 break;
@@ -481,6 +501,7 @@ export class SwarmCreator {
                     id: id,
                     MEM_TYPE: SwarmDataType.Structure,
                     SWARM_TYPE: SwarmType.SwarmTerminal,
+                    SUB_TYPE: STRUCTURE_TERMINAL,
                     isActive: true
                 });
                 break;
@@ -489,6 +510,7 @@ export class SwarmCreator {
                     id: id,
                     MEM_TYPE: SwarmDataType.RoomObject,
                     SWARM_TYPE: SwarmType.SwarmTombstone,
+                    SUB_TYPE: 0,
                     isActive: true
                 });
                 break;
@@ -497,6 +519,7 @@ export class SwarmCreator {
                     id: id,
                     MEM_TYPE: SwarmDataType.Structure,
                     SWARM_TYPE: SwarmType.SwarmTower,
+                    SUB_TYPE: STRUCTURE_TOWER,
                     isActive: true
                 });
                 break;
@@ -505,6 +528,7 @@ export class SwarmCreator {
                     id: id,
                     MEM_TYPE: SwarmDataType.Structure,
                     SWARM_TYPE: SwarmType.SwarmWall,
+                    SUB_TYPE: STRUCTURE_WALL,
                     isActive: true
                 });
                 break;

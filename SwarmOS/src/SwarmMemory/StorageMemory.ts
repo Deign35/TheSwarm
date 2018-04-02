@@ -53,12 +53,12 @@ export abstract class SwarmMemory<T extends SwarmDataType, U extends SwarmType, 
     extends MemoryBase<T, V> implements ISwarmData<T, U> {
     [id: string]: any;
     get SWARM_TYPE() { return this._cache.SWARM_TYPE as U; }
+    get SUB_TYPE() { return this._cache.SUB_TYPE; }
 }
 
 @profile
 export class FlagMemory extends SwarmMemory<SwarmDataType.Flag, SwarmType.SwarmFlag, IFlagData>
     implements IFlagMemory {
-    get FLG_TYPE(): number { return this._cache.FLG_TYPE; }
 }
 
 @profile
@@ -71,14 +71,11 @@ export class StructureMemory<T extends SwarmStructureType, U extends TStructureD
 @profile
 export class CreepMemory extends SwarmMemory<SwarmDataType.Creep, SwarmType.SwarmCreep, ICreepData>
     implements ICreepMemory, ICreepData {
-    get CREEP_TYPE(): number { return this._cache.CREEP_TYPE; }
 }
 
 @profile
 export class RoomMemory extends SwarmMemory<SwarmDataType.Room, SwarmType.SwarmRoom, IRoomData>
     implements IRoomMemory, IRoomData {
-    get RM_TYPE() { return this._cache.RM_TYPE; }
-    get LastUpdated() { return this._cache.LastUpdated; }
 }
 
 @profile
