@@ -10,7 +10,9 @@ import { SwarmRoom } from "SwarmTypes/SwarmRoom";
 import { SwarmMemoryTypes } from "SwarmTypes/SwarmCreator";
 import { RoomObjectMemory } from "SwarmMemory/RoomObjectMemory";
 import { StructureMemory } from "SwarmMemory/StructureMemory";
+import { profile } from "Tools/Profiler";
 
+@profile
 export class SwarmLoader {
     protected static MasterMemory: { [dataType: string]: MasterSwarmMemory<MasterSwarmDataTypes, SwarmDataTypes> }
     static TheSwarm: { [dataType: string]: { [id: string]: ObjectBase<SwarmMemoryTypes, any> } };
