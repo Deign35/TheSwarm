@@ -79,7 +79,7 @@ export class RoomMemory extends SwarmMemory<IRoomData, SwarmType.SwarmRoom>
 }
 
 @profile
-export class MasterSwarmMemory<T extends MasterSwarmDataTypes, U extends SwarmDataTypes>
+export class MasterSwarmMemory<T extends MasterSwarmDataTypes, U extends TBasicSwarmData>
     extends MemoryBase<T> implements IMasterData<U> {
     constructor(data: T) {
         super(data);

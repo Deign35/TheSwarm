@@ -14,7 +14,7 @@ import { profile } from "Tools/Profiler";
 
 @profile
 export class SwarmLoader {
-    protected static MasterMemory: { [dataType: string]: MasterSwarmMemory<MasterSwarmDataTypes, SwarmDataTypes> }
+    protected static MasterMemory: { [dataType: string]: MasterSwarmMemory<MasterSwarmDataTypes, TBasicSwarmData> }
     static TheSwarm: {
         [dataType: string]: {
             [id: string]: ObjectBase<SwarmMemoryTypes, any>

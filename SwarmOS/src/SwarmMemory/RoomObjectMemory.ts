@@ -23,12 +23,12 @@ export class MineralMemory extends RoomObjectMemoryBase<IMineralData, SwarmType.
 }
 
 @profile
-export class NukeMemory extends RoomObjectMemoryBase<TNukeData, SwarmType.SwarmNuke> implements TNukeData { }
+export class NukeMemory extends RoomObjectMemoryBase<INukeData, SwarmType.SwarmNuke> implements INukeData { }
 @profile
-export class TombstoneMemory extends RoomObjectMemoryBase<TTombstoneData, SwarmType.SwarmTombstone> implements TTombstoneData { }
+export class TombstoneMemory extends RoomObjectMemoryBase<ITombstoneData, SwarmType.SwarmTombstone> implements ITombstoneData { }
 @profile
-export class ConstructionSiteMemory extends RoomObjectMemoryBase<TConstructionSiteData, SwarmType.SwarmSite> implements TConstructionSiteData { }
+export class ConstructionSiteMemory extends RoomObjectMemoryBase<ISiteData, SwarmType.SwarmSite> implements ISiteData { }
 @profile
-export class ResourceMemory extends RoomObjectMemoryBase<TResourceData, SwarmType.SwarmResource> implements TResourceData { }
+export class ResourceMemory extends RoomObjectMemoryBase<IResourceData, SwarmType.SwarmResource> implements IResourceData { }
 
 export type RoomObjectMemory = SourceMemory | MineralMemory | NukeMemory | TombstoneMemory | ConstructionSiteMemory | ResourceMemory;

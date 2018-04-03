@@ -132,7 +132,7 @@ export class SwarmCreator {
                 newMemory = new MineralMemory(mem as IMineralData)
                 break;
             case (SwarmType.SwarmNuke):
-                newMemory = new NukeMemory(mem as TNukeData)
+                newMemory = new NukeMemory(mem as INukeData)
                 break;
             case (SwarmType.SwarmNuker):
                 newMemory = new NukerMemory(mem as INukerData);
@@ -153,7 +153,7 @@ export class SwarmCreator {
                 newMemory = new RampartMemory(mem as IRampartData);
                 break;
             case (SwarmType.SwarmResource):
-                newMemory = new ResourceMemory(mem as TResourceData);
+                newMemory = new ResourceMemory(mem as IResourceData);
                 break;
             case (SwarmType.SwarmRoad):
                 newMemory = new RoadMemory(mem as IRoadData);
@@ -162,7 +162,7 @@ export class SwarmCreator {
                 newMemory = new RoomMemory(mem as IRoomData);
                 break;
             case (SwarmType.SwarmSite):
-                newMemory = new ConstructionSiteMemory(mem as TConstructionSiteData);
+                newMemory = new ConstructionSiteMemory(mem as ISiteData);
                 break;
             case (SwarmType.SwarmSource):
                 newMemory = new SourceMemory(mem as ISourceData);
@@ -177,7 +177,7 @@ export class SwarmCreator {
                 newMemory = new TerminalMemory(mem as ITerminalData);
                 break;
             case (SwarmType.SwarmTombstone):
-                newMemory = new TombstoneMemory(mem as TTombstoneData);
+                newMemory = new TombstoneMemory(mem as ITombstoneData);
                 break;
             case (SwarmType.SwarmTower):
                 newMemory = new TowerMemory(mem as ITowerData);
