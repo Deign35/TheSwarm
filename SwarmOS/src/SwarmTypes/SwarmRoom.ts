@@ -49,7 +49,7 @@ export class SwarmRoom extends SwarmItemWithName<Room>
             }
         }
 
-        this.memory.SetData("SUB_TYPE", roomType);
+        this.memory.SetData(SUB_TYPE, roomType);
 
         // Would love to add a pathfinding.
         let sources = this.find(FIND_SOURCES);

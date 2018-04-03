@@ -1,8 +1,9 @@
 {
     "Constants": {
         "MY_USERNAME": "Deign",
-        "MY_SIGNATURE": "The dawn of the Swarm -- SwarmOS v1.0",
-        "NOT_CONFIGURED": "NOT_CONFIGURED"
+        "MY_SIGNATURE": "The dawn of the Swarm -- SwarmOS v1.0.2",
+        "NOT_CONFIGURED": "NOT_CONFIGURED",
+        "SUB_TYPE": "SUB_TYPE"
     },
     "Primitives": {
         "C_NONE": 0,
