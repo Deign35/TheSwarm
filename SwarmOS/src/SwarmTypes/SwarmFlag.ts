@@ -2,7 +2,6 @@ import { FlagMemory } from "SwarmMemory/SwarmMemory";
 import { profile } from "Tools/Profiler";
 import { SwarmItemWithName } from "SwarmTypes/SwarmTypes";
 
-const FLAG_COUNTER = 'CNT';
 @profile
 export class SwarmFlag extends SwarmItemWithName<Flag> implements Flag {
     get DataType(): SwarmDataType.Flag { return SwarmDataType.Flag };
@@ -26,7 +25,9 @@ export class SwarmFlag extends SwarmItemWithName<Flag> implements Flag {
             return this._instance.setPosition(args[0]);
         }
     }
-    protected OnActivate() {
-        console.log("Successfully activated a Flag");
+    PrepObject(unused: boolean) {
+        return super.PrepObject(true);
     }
+    protected OnPrepObject() { }
+    protected OnActivate() { }
 }

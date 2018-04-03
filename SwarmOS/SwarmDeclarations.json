@@ -2,9 +2,7 @@
     "Constants": {
         "MY_USERNAME": "Deign",
         "MY_SIGNATURE": "The dawn of the Swarm -- SwarmOS v1.0",
-        "MEM_TYPE": "MEM_TYPE",
-        "NOT_CONFIGURED": "NOT_CONFIGURED",
-        "NEXT_SPAWN": "NEXT_SPAWN"
+        "NOT_CONFIGURED": "NOT_CONFIGURED"
     },
     "Primitives": {
         "C_NONE": 0,
@@ -17,32 +15,6 @@
         "E_NOT_IMPLEMENTED": -6
     },
     "Enums": {
-        "CreepBodyType": {
-            "ANY": 0,
-            "HighCarry": 1,
-            "SourceMiner": 2,
-            "HighWork": 3,
-            "SpeedWorker": 4
-        },
-        "SpawnPriority": {
-            "Lowest": 0,
-            "Low": 2,
-            "Mid": 4,
-            "High": 6,
-            "Highest": 8,
-            "EMERGENCY": 10
-        },
-        "TerminationType": {
-            "Once": 0,
-            "Infinite": 1,
-            "RCL_Upgrade": 2,
-            "NumCount": 3
-        },
-        "MemoryCategory": {
-            "Storage": 0,
-            "Cache": 1,
-            "Segment": 2
-        },
         "SwarmControllerDataTypes": {
             "Creeps": "\"creeps\"",
             "Flags": "\"flags\"",
@@ -60,18 +32,6 @@
             "RoomObject": 5,
             "Other": 6,
             "Master": 7
-        },
-        "RoomType": {
-            "Unowned": 0,
-            "RCL1": 1,
-            "RCL2": 2,
-            "RCL3": 3,
-            "RCL4": 4,
-            "RCL5": 5,
-            "RCL6": 6,
-            "RCL7": 7,
-            "RCL8": 8,
-            "Hostile": 9
         },
         "LogLevel": {
             "Info": 0,
@@ -109,15 +69,6 @@
             "SwarmTower": 27,
             "SwarmWall": 28
         },
-        "RoomObjectDataType": {
-            "Any": 0,
-            "Source": 1,
-            "Mineral": 2,
-            "Nuke": 3,
-            "ConstructionSite": 4,
-            "Resource": 5,
-            "Tombstone": 6
-        },
         "Priority": {
             "Hold": 0,
             "Lowest": 1,
@@ -127,12 +78,7 @@
             "Highest": 9,
             "EMERGENCY": 10
         },
-        "StructureModuleType": {
-            "NullModule": 0,
-            "Input": 1,
-            "Output": 2
-        },
-        "CreepModuleType": {
+        "CreepType": {
             "NullModule": 0,
             "Builder": 1,
             "Retriever": 2,
@@ -144,13 +90,13 @@
             "SourceHarvester": 8,
             "MineralHarvester": 9
         },
-        "FlagModuleType": {
+        "FlagType": {
             "NullModule": 0,
             "Construct": 1,
             "Position": 2
         },
-        "RoomModuleType": {
-            "NuetralRoom": 0,
+        "RoomType": {
+            "NeutralRoom": 0,
             "RCL1": 1,
             "RCL2": 2,
             "RCL3": 3,
@@ -160,11 +106,10 @@
             "RCL7": 7,
             "RCL8": 8,
             "HarvestSupport": 9,
-            "KeepersLair": 10
-        },
-        "MiscModuleType": {
-            "NullModule": 0,
-            "SomeExample": 1
+            "KeepersLair": 10,
+            "Hostile": 11,
+            "Ally": 12,
+            "NonHostile": 13
         }
     },
     "CompoundTypes": {

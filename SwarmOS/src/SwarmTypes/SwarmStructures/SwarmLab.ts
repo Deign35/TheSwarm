@@ -17,7 +17,6 @@ export class SwarmLab extends OwnedSwarmStructure<STRUCTURE_LAB, StructureLab,
     runReaction(lab1: StructureLab, lab2: StructureLab) {
         return this._instance.runReaction(lab1, lab2);
     }
-    protected OnActivate() {
-        console.log("Successfully activated a Lab");
-    }
+    protected OnPrepObject() { }
+    protected OnActivate() { }
 }

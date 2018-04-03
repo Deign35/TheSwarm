@@ -1288,7 +1288,7 @@ interface LookAtTypes {
     constructionSite?: ConstructionSite;
     creep?: Creep;
     energy?: Resource<RESOURCE_ENERGY>;
-    exit?: any;  // TODO what type is this?
+    exit?: any;
     flag?: Flag;
     mineral?: Mineral;
     nuke?: Nuke;

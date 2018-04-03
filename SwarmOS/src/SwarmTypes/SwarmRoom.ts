@@ -1,33 +1,55 @@
-import { RoomMemory } from "SwarmMemory/SwarmMemory";
 import { profile } from "Tools/Profiler";
-import { SwarmItemWithName, SwarmObject, SwarmMineral } from "SwarmTypes/SwarmTypes";
-import { NotImplementedException } from "Tools/SwarmExceptions";
-import { SwarmSource } from "./SwarmSource";
-import { SwarmContainer } from "SwarmTypes/SwarmStructures/SwarmStructure";
-import { SwarmLoader } from "./SwarmLoader";
+import { SwarmItemWithName } from "SwarmTypes/SwarmTypes";
+import { SwarmLoader } from "SwarmTypes/SwarmLoader";
 import { ResourceMemory, TombstoneMemory, ConstructionSiteMemory, NukeMemory } from "SwarmMemory/RoomObjectMemory";
 import { StructureMemory } from "SwarmMemory/StructureMemory";
 
-const ROOM_COUNTER = 'CNT';
-const HARVESTER_JOBS = 'HARVEST';
 
 @profile
 export class SwarmRoom extends SwarmItemWithName<Room>
     implements Room {
-
-    protected OnActivate(): void {
-        console.log('Successfully activated a Room');
-        /*if (this._memory.LastUpdated == 0) {
-            console.log('Init new room');
-            this.InitAsNew();
-            this._memory.SetData('LastUpdated', Game.time);
-        }*/
-
+    PrepObject(unused: boolean) {
+        return super.PrepObject(true);
+    }
+    protected OnPrepObject() {
         this.TryFindNewObjects();
 
     }
+    protected OnActivate() {
+    }
     InitAsNew() {
         SwarmLogger.Log("Initializing a new room");
+        let roomType = this.controller && this.controller.owner && this.controller.owner.username == MY_USERNAME &&
+            this.controller.level;// RCL1 - RCL8 if I own the room
+
+        if (!roomType) {
+            roomType = RoomType.NeutralRoom;
+            // Not mine, what is it?
+            if (this.controller) {
+                if (this.controller.owner) {
+                    roomType = RoomType.Hostile;
+                } else if (this.controller.reservation) {
+                    if (this.controller.reservation.username == MY_USERNAME) {
+                        roomType = RoomType.HarvestSupport;
+                    } else {
+                        roomType = RoomType.NonHostile;
+                    }
+                }
+            } else {
+                let hasKeeperLair = this.find(FIND_STRUCTURES, {
+                    filter: function (struct) {
+                        return struct.structureType == STRUCTURE_KEEPER_LAIR;
+                    }
+                });
+
+                if (hasKeeperLair) {
+                    roomType = RoomType.KeepersLair;
+                }
+            }
+        }
+
+        this.memory.SetData("SUB_TYPE", roomType);
+
         // Would love to add a pathfinding.
         let sources = this.find(FIND_SOURCES);
         for (let i = 0; i < sources.length; i++) {
@@ -37,11 +59,12 @@ export class SwarmRoom extends SwarmItemWithName<Room>
         for (let i = 0; i < minerals.length; i++) {
             SwarmLoader.LoadObject(minerals[i].id, minerals[i], SwarmControllerDataTypes.RoomObjects);
         }
-        this.TryFindNewObjects(false);
+        // (TODO): Instead of TryFindNewObjects, use a single LookAtArea and find all objects for the new room.
+        this.TryFindNewObjects(true);
     }
 
-    TryFindNewObjects(filterByTime: boolean = true) {
-        if (!filterByTime || Game.time % 5 == 0) {
+    TryFindNewObjects(force: boolean = false) {
+        if (force || Game.time % 5 == 0) {
             let foundResources = this.find(FIND_DROPPED_RESOURCES);
             for (let j = 0; j < foundResources.length; j++) {
                 if (!SwarmLoader.TheSwarm.roomObjects[foundResources[j].id]) {
@@ -51,7 +74,7 @@ export class SwarmRoom extends SwarmItemWithName<Room>
             }
         }
 
-        if (!filterByTime || Game.time % 11 == 0) {
+        if (force || Game.time % 11 == 0) {
             let foundTombstones = this.find(FIND_TOMBSTONES);
             for (let j = 0; j < foundTombstones.length; j++) {
                 if (!SwarmLoader.TheSwarm.roomObjects[foundTombstones[j].id]) {
@@ -61,7 +84,7 @@ export class SwarmRoom extends SwarmItemWithName<Room>
             }
         }
 
-        if (!filterByTime || Game.time % 17 == 0) {
+        if (force || Game.time % 17 == 0) {
             let foundStructures = this.find(FIND_STRUCTURES);
             for (let j = 0; j < foundStructures.length; j++) {
                 if (!SwarmLoader.TheSwarm.structures[foundStructures[j].id]) {
@@ -71,7 +94,7 @@ export class SwarmRoom extends SwarmItemWithName<Room>
             }
         }
 
-        if (!filterByTime || Game.time % 29 == 0) {
+        if (force || Game.time % 29 == 0) {
             let foundSites = this.find(FIND_CONSTRUCTION_SITES);
             for (let j = 0; j < foundSites.length; j++) {
                 if (!SwarmLoader.TheSwarm.roomObjects[foundSites[j].id]) {
@@ -81,7 +104,7 @@ export class SwarmRoom extends SwarmItemWithName<Room>
             }
         }
 
-        if (!filterByTime || Game.time % 233 == 0) {
+        if (force || Game.time % 233 == 0) {
             let foundNukes = this.find(FIND_NUKES);
             for (let j = 0; j < foundNukes.length; j++) {
                 if (!SwarmLoader.TheSwarm.roomObjects[foundNukes[j].id]) {
@@ -107,6 +130,7 @@ export class SwarmRoom extends SwarmItemWithName<Room>
     get visual(): RoomVisual { return this._instance.visual; }
 
     createConstructionSite(...args: any[]) {
+        console.log('createConstructionSite has been called with ' + args.length + ' args');
         if (args.length == 4) {
             return this._instance.createConstructionSite(args[0], args[1], args[2], args[3]);
         } else if (args.length == 3) {
@@ -117,7 +141,7 @@ export class SwarmRoom extends SwarmItemWithName<Room>
     }
     //createFlag(pos: RoomPosition, color?: ColorConstant, secondaryColor?: ColorConstant, name?: string, ) {
     createFlag(...args: any[]) {
-        console.log('{SEARCH FOR ME}');
+        console.log('createFlag has been called with ' + args.length + ' args');
         if (args.length == 4) {
             return this._instance.createFlag(args[0], args[1], args[2], args[3]);
         } else if (args.length == 3) {

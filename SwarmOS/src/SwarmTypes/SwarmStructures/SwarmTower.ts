@@ -18,7 +18,6 @@ TowerMemory> implements StructureTower {
     repair(target: SwarmStructure<StructureConstant, Structure, StructureMemory>) {
         return this._instance.repair(target);
     }
-    protected OnActivate() {
-        console.log("Successfully activated a Tower");
-    }
+    protected OnPrepObject() { }
+    protected OnActivate() { }
 }

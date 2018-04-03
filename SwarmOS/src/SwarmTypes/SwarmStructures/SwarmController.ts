@@ -18,7 +18,6 @@ ControllerMemory> implements StructureController {
 
     activateSafeMode() { return this._instance.activateSafeMode(); }
     unclaim() { return this._instance.unclaim(); }
-    protected OnActivate() {
-        console.log("Successfully activated a Controller");
-    }
+    protected OnPrepObject() { }
+    protected OnActivate() { }
 }

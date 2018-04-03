@@ -1,6 +1,7 @@
 import { profile } from "Tools/Profiler";
 import { SwarmException, MemoryLockException, AlreadyExistsException } from "Tools/SwarmExceptions";
 
+@profile
 export abstract class MemoryBase<T extends SwarmDataTypes> {
     constructor(data: T) {
         this._cache = data;
@@ -77,6 +78,7 @@ export class RoomMemory extends SwarmMemory<IRoomData, SwarmType.SwarmRoom>
     get MEM_TYPE(): SwarmDataType.Room { return SwarmDataType.Room }
 }
 
+@profile
 export class MasterSwarmMemory<T extends MasterSwarmDataTypes, U extends SwarmDataTypes>
     extends MemoryBase<T> implements IMasterData<U> {
     constructor(data: T) {
@@ -105,27 +107,28 @@ export class MasterSwarmMemory<T extends MasterSwarmDataTypes, U extends SwarmDa
     }
 }
 
-
+@profile
 export class MasterCreepMemory extends MasterSwarmMemory<IMasterCreepData, ICreepData>
     implements IMasterCreepData {
 }
+@profile
 export class MasterFlagMemory extends MasterSwarmMemory<IMasterFlagData, IFlagData>
     implements IMasterFlagData {
-
 }
+@profile
 export class MasterRoomMemory extends MasterSwarmMemory<IMasterRoomData, IRoomData>
     implements IMasterRoomData {
-
 }
+@profile
 export class MasterStructureMemory extends MasterSwarmMemory<IMasterStructureData, TStructureData>
     implements IMasterStructureData {
-
 }
+@profile
 export class MasterRoomObjectMemory extends MasterSwarmMemory<IMasterRoomObjectData, TRoomObjectData>
     implements IMasterRoomObjectData {
-
 }
 
+@profile
 export class MasterOtherMemory extends MasterSwarmMemory<IMasterOtherData, IOtherData>
     implements IMasterOtherData {
 

@@ -22,7 +22,6 @@ SpawnMemory> implements StructureSpawn {
         }) { return this._instance.spawnCreep(body, name, opts); }
     recycleCreep(target: SwarmCreep) { return this._instance.recycleCreep(target); }
     renewCreep(target: SwarmCreep) { return this._instance.renewCreep(target); }
-    protected OnActivate() {
-        console.log("Successfully activated a Spawn");
-    }
+    protected OnPrepObject() { }
+    protected OnActivate() { }
 }

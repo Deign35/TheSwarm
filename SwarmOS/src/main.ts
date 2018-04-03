@@ -9,7 +9,7 @@ import { SwarmObject, ObjectBase } from "SwarmTypes/SwarmTypes";
 import { SwarmQueen } from "SwarmBehaviour/SwarmQueen";
 
 export const loop = function () {
-    debugger;
+    //debugger;
     Swarmlord.ValidateMemory();
     SwarmLoader.LoadTheSwarm();
 

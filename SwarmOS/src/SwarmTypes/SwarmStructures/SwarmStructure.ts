@@ -24,25 +24,22 @@ export class SwarmExtension extends OwnedSwarmStructure<STRUCTURE_EXTENSION, Str
     ExtensionMemory> implements StructureExtension {
     get energy() { return this._instance.energy; }
     get energyCapacity() { return this._instance.energyCapacity; }
-    protected OnActivate() {
-        console.log("Successfully activated an Extension");
-    }
+    protected OnPrepObject() { }
+    protected OnActivate() { }
 }
 
 export class SwarmExtractor extends OwnedSwarmStructure<STRUCTURE_EXTRACTOR, StructureExtractor,
     ExtractorMemory> implements StructureExtractor {
     get cooldown() { return this._instance.cooldown; }
-    protected OnActivate() {
-        console.log("Successfully activated an Extactor");
-    }
+    protected OnPrepObject() { }
+    protected OnActivate() { }
 }
 
 export class SwarmObserver extends OwnedSwarmStructure<STRUCTURE_OBSERVER, StructureObserver,
     ObserverMemory> implements StructureObserver {
     observeRoom(roomName: string) { return this._instance.observeRoom(roomName); }
-    protected OnActivate() {
-        console.log("Successfully activated an Observer");
-    }
+    protected OnPrepObject() { }
+    protected OnActivate() { }
 }
 
 export class SwarmLink extends OwnedSwarmStructure<STRUCTURE_LINK, StructureLink,
@@ -54,9 +51,8 @@ export class SwarmLink extends OwnedSwarmStructure<STRUCTURE_LINK, StructureLink
     transferEnergy(target: SwarmLink, amount: number) {
         return this._instance.transferEnergy(target._instance, amount);
     }
-    protected OnActivate() {
-        console.log("Successfully activated a Link");
-    }
+    protected OnPrepObject() { }
+    protected OnActivate() { }
 }
 
 export class SwarmRampart extends OwnedSwarmStructure<STRUCTURE_RAMPART, StructureRampart,
@@ -65,18 +61,16 @@ export class SwarmRampart extends OwnedSwarmStructure<STRUCTURE_RAMPART, Structu
     get ticksToDecay() { return this._instance.ticksToDecay; }
 
     setPublic(isPublic: boolean) { return this._instance.setPublic(isPublic); }
-    protected OnActivate() {
-        console.log("Successfully activated a Rampart");
-    }
+    protected OnPrepObject() { }
+    protected OnActivate() { }
 }
 
 export class SwarmStorage extends OwnedSwarmStructure<STRUCTURE_STORAGE, StructureStorage,
     StorageMemory> implements StructureStorage {
     get store() { return this._instance.store; }
     get storeCapacity() { return this._instance.storeCapacity; }
-    protected OnActivate() {
-        console.log("Successfully activated a Storage");
-    }
+    protected OnPrepObject() { }
+    protected OnActivate() { }
 }
 
 export class SwarmTerminal extends OwnedSwarmStructure<STRUCTURE_TERMINAL, StructureTerminal,
@@ -84,9 +78,8 @@ export class SwarmTerminal extends OwnedSwarmStructure<STRUCTURE_TERMINAL, Struc
     get cooldown() { return this._instance.cooldown; }
     get store() { return this._instance.store; }
     get storeCapacity() { return this._instance.storeCapacity; }
-    protected OnActivate() {
-        console.log("Successfully activated a Terminal");
-    }
+    protected OnPrepObject() { }
+    protected OnActivate() { }
 
     send(resourceType: ResourceConstant, amount: number, destination: string, description?: string) {
         return this._instance.send(resourceType, amount, destination, description);
@@ -98,24 +91,21 @@ export class SwarmContainer extends SwarmStructure<STRUCTURE_CONTAINER, Structur
     get store() { return this._instance.store; }
     get storeCapacity() { return this._instance.storeCapacity; }
     get ticksToDecay() { return this._instance.ticksToDecay; }
-    protected OnActivate() {
-        console.log("Successfully activated a Container");
-    }
+    protected OnPrepObject() { }
+    protected OnActivate() { }
 }
 export class SwarmRoad extends SwarmStructure<STRUCTURE_ROAD, StructureRoad,
     RoadMemory> implements StructureRoad {
     get ticksToDecay() { return this._instance.ticksToDecay };
-    protected OnActivate() {
-        console.log("Successfully activated a Road");
-    }
+    protected OnPrepObject() { }
+    protected OnActivate() { }
 }
 
 export class SwarmWall extends SwarmStructure<STRUCTURE_WALL, StructureWall,
     WallMemory> implements StructureWall {
     get ticksToLive() { return this._instance.ticksToLive; }
-    protected OnActivate() {
-        console.log("Successfully activated a Wall");
-    }
+    protected OnPrepObject() { }
+    protected OnActivate() { }
 }
 
 export class SwarmNuker extends OwnedSwarmStructure<STRUCTURE_NUKER, StructureNuker,
@@ -125,9 +115,8 @@ export class SwarmNuker extends OwnedSwarmStructure<STRUCTURE_NUKER, StructureNu
     get ghodium() { return this._instance.ghodium; }
     get ghodiumCapacity() { return this._instance.ghodiumCapacity; }
     get cooldown() { return this._instance.cooldown; }
-    protected OnActivate() {
-        console.log("Successfully activated a Nuker");
-    }
+    protected OnPrepObject() { }
+    protected OnActivate() { }
 
     launchNuke(pos: RoomPosition) { return this._instance.launchNuke(pos); }
 }
@@ -135,26 +124,23 @@ export class SwarmNuker extends OwnedSwarmStructure<STRUCTURE_NUKER, StructureNu
 export class SwarmKeepersLair extends OwnedSwarmStructure<STRUCTURE_KEEPER_LAIR, StructureKeeperLair,
     KeepersLairMemory> implements StructureKeeperLair {
     get ticksToSpawn(): number | undefined { return this._instance.ticksToSpawn; }
-    protected OnActivate() {
-        console.log("Successfully activated a KeepersLair");
-    }
+    protected OnPrepObject() { }
+    protected OnActivate() { }
 }
 export class SwarmPortal extends SwarmStructure<STRUCTURE_PORTAL, StructurePortal,
     PortalMemory> implements StructurePortal {
     get destination(): RoomPosition { return this._instance.destination; }
     get ticksToDecay(): number { return this._instance.ticksToDecay; }
-    protected OnActivate() {
-        console.log("Successfully activated a Portal");
-    }
+    protected OnPrepObject() { }
+    protected OnActivate() { }
 }
 
 export class SwarmPowerBank extends SwarmStructure<STRUCTURE_POWER_BANK, StructurePowerBank,
     PowerBankMemory> implements StructurePowerBank {
     get power() { return this._instance.power; }
     get ticksToDecay() { return this._instance.ticksToDecay; }
-    protected OnActivate() {
-        console.log("Successfully activated a PowerBank");
-    }
+    protected OnPrepObject() { }
+    protected OnActivate() { }
 }
 
 export class SwarmPowerSpawn extends OwnedSwarmStructure<STRUCTURE_POWER_SPAWN, StructurePowerSpawn,
@@ -169,7 +155,6 @@ export class SwarmPowerSpawn extends OwnedSwarmStructure<STRUCTURE_POWER_SPAWN, 
     processPower(): ScreepsReturnCode {
         return this._instance.processPower();
     }
-    protected OnActivate() {
-        console.log("Successfully activated a PowerSpawn");
-    }
+    protected OnPrepObject() { }
+    protected OnActivate() { }
 }

@@ -5,7 +5,7 @@ import { SwarmMemoryTypes } from "SwarmTypes/SwarmCreator";
 export class SwarmQueen {
     static PrepTheSwarm() {
         DoTheSwarm((obj, controllerType) => {
-            obj.PrepObject();
+            obj.PrepObject(false);
         });
     }
     static ActivateTheSwarm() {

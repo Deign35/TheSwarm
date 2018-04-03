@@ -1,6 +1,8 @@
 import { SwarmRoomObject } from "./SwarmTypes";
 import { ConstructionSiteMemory } from "SwarmMemory/RoomObjectMemory";
+import { profile } from "Tools/Profiler";
 
+@profile
 export class SwarmSite extends SwarmRoomObject<ConstructionSite, ConstructionSiteMemory>
     implements ConstructionSite {
     get my() { return this._instance.my; }
@@ -13,6 +15,8 @@ export class SwarmSite extends SwarmRoomObject<ConstructionSite, ConstructionSit
     get structureType() { return this._instance.structureType; }
     remove() { return this._instance.remove(); }
     protected OnActivate() {
-        console.log("Successfully activated a Site");
+    }
+    protected OnPrepObject() {
+
     }
 }
