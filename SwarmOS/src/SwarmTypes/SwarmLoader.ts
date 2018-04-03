@@ -15,7 +15,17 @@ import { profile } from "Tools/Profiler";
 @profile
 export class SwarmLoader {
     protected static MasterMemory: { [dataType: string]: MasterSwarmMemory<MasterSwarmDataTypes, SwarmDataTypes> }
-    static TheSwarm: { [dataType: string]: { [id: string]: ObjectBase<SwarmMemoryTypes, any> } };
+    static TheSwarm: {
+        [dataType: string]: {
+            [id: string]: ObjectBase<SwarmMemoryTypes, any>
+        }
+        creeps: { [id: string]: SwarmCreep },
+        flags: { [id: string]: SwarmFlag },
+        rooms: { [id: string]: SwarmRoom },
+        roomObjects: { [id: string]: SwarmRoomObject<Source | Mineral | Nuke | Tombstone | Resource | ConstructionSite, RoomObjectMemory> },
+        structures: { [id: string]: SwarmStructure<StructureConstant, Structure, StructureMemory> },
+        otherData: { [id: string]: any }
+    };
 
     static SwarmRoomIDs: {
         [roomID: string]: {

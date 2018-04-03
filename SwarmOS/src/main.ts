@@ -13,6 +13,7 @@ export const loop = function () {
     Swarmlord.ValidateMemory();
     SwarmLoader.LoadTheSwarm();
 
+    SwarmQueen.PrepTheSwarm();
     SwarmQueen.ActivateTheSwarm();
     SwarmLoader.SaveTheSwarm();
 }

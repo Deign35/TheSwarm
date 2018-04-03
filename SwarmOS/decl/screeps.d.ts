@@ -3129,7 +3129,15 @@ interface StructureSpawn extends OwnedStructure<STRUCTURE_SPAWN> {
      * @param needTime Time needed in total to complete the spawning.
      * @param remainingTime Remaining time to go.
      */
-    spawning: { name: string, needTime: number, remainingTime: number };
+    spawning: {
+        directions: DirectionConstant[];
+        name: string;
+        needTime: string;
+        remainingTime: number;
+        spawn: StructureSpawn;
+        cancel(): OK | ERR_NOT_OWNER;
+        setDirections(directions: DirectionConstant[]): OK | ERR_NOT_OWNER | ERR_INVALID_ARGS;
+    };
     /**
      * Start the creep spawning process. The required energy amount can be withdrawn from all spawns and extensions in the room.
      *
@@ -3188,16 +3196,6 @@ interface StructureSpawn extends OwnedStructure<STRUCTURE_SPAWN> {
      * @param target The target creep object.
      */
     recycleCreep(target: Creep): ScreepsReturnCode;
-
-    Spawning: {
-        directions: DirectionConstant[];
-        name: string;
-        needTime: string;
-        remainingTime: number;
-        spawn: StructureSpawn;
-        cancel(): OK | ERR_NOT_OWNER;
-        setDirections(directions: DirectionConstant[]): OK | ERR_NOT_OWNER | ERR_INVALID_ARGS;
-    }
 }
 
 interface StructureSpawnConstructor extends _Constructor<StructureSpawn>, _ConstructorById<StructureSpawn> {

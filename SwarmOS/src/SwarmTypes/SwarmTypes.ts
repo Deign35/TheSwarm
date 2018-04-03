@@ -37,7 +37,7 @@ export abstract class ObjectBase<T extends SwarmMemoryTypes, U> {
     GetObjectInstance(): U { return this._instance; }
 
     get memory(): T { return this._memory; }
-    protected _memory!: T;
+    private _memory!: T;
     get saveID(): string { return this._memory.id; }
     ReleaseMemory(): T { return this._memory; }
     GetMemType() {
@@ -57,7 +57,7 @@ export abstract class ObjectBase<T extends SwarmMemoryTypes, U> {
 @profile
 export abstract class SwarmTypeBase<T extends SwarmMemoryTypes, U extends Room | RoomObject | Creep | Flag | Structure<StructureConstant>>
     extends ObjectBase<T, U> {
-    get IsActive() { return this._memory.isActive; }
+    get IsActive() { return this.memory.isActive; }
     get prototype(): U { return this._instance.prototype as U }
 }
 

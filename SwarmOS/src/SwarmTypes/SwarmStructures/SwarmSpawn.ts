@@ -11,7 +11,6 @@ SpawnMemory> implements StructureSpawn {
     get energyCapacity() { return this._instance.energyCapacity; }
     get name() { return this._instance.name; }
     get spawning() { return this._instance.spawning; }
-    get Spawning() { return this._instance.Spawning; }
 
     spawnCreep(body: BodyPartConstant[], name: string,
         opts?: {

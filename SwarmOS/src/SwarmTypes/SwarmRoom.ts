@@ -3,20 +3,58 @@ import { SwarmItemWithName } from "SwarmTypes/SwarmTypes";
 import { SwarmLoader } from "SwarmTypes/SwarmLoader";
 import { ResourceMemory, TombstoneMemory, ConstructionSiteMemory, NukeMemory } from "SwarmMemory/RoomObjectMemory";
 import { StructureMemory } from "SwarmMemory/StructureMemory";
-
+import { SwarmSpawn } from "./SwarmStructures/SwarmSpawn";
 
 @profile
-export class SwarmRoom extends SwarmItemWithName<Room>
-    implements Room {
+export class SwarmRoom extends SwarmItemWithName<Room> implements Room {
+    protected availableSpawns: string[] = [];
+
     PrepObject(unused: boolean) {
         return super.PrepObject(true);
     }
     protected OnPrepObject() {
         this.TryFindNewObjects();
-
+        let ids = SwarmLoader.SwarmRoomIDs[this.saveID].structures[STRUCTURE_SPAWN];
+        if (ids) {
+            for (let i = 0; i < ids.length; i++) {
+                let spawn = SwarmLoader.TheSwarm.structures[ids[i]] as SwarmSpawn;
+                if (!spawn.spawning) {
+                    this.availableSpawns.push(ids[i]);
+                }
+            }
+        }
     }
     protected OnActivate() {
     }
+
+    TrySpawn(body: BodyPartConstant[], name: string,
+        opts?: {
+            memory?: ICreepData,
+            energyStructures?: Array<(StructureSpawn | StructureExtension)>,
+            directions?: DirectionConstant[],
+            spawnID?: string
+        }) {
+        let spawnToUse: SwarmSpawn | undefined;
+        if (opts && opts.spawnID) {
+            // get spawn this way instead
+            spawnToUse = SwarmLoader.TheSwarm.structures[opts.spawnID] as SwarmSpawn;
+        } else if (this.availableSpawns.length > 0) {
+            if (GetSpawnCost(body) <= this.energyAvailable) {
+                spawnToUse = SwarmLoader.TheSwarm.structures[this.availableSpawns.shift()!] as SwarmSpawn;
+            } else {
+                return E_REQUIRES_ENERGY;
+            }
+        } else {
+            return E_MISSING_TARGET;
+        }
+
+        if (spawnToUse) {
+            return spawnToUse.spawnCreep(body, name, opts);
+        }
+
+        return E_MISSING_TARGET;
+    }
+
     InitAsNew() {
         SwarmLogger.Log("Initializing a new room");
         let roomType = this.controller && this.controller.owner && this.controller.owner.username == MY_USERNAME &&
@@ -121,8 +159,8 @@ export class SwarmRoom extends SwarmItemWithName<Room>
     get SwarmType(): SwarmType.SwarmRoom { return SwarmType.SwarmRoom; }
     get RoomLocation(): RoomLocationFormat { return this.name; }
     get controller(): StructureController | undefined { return this._instance.controller; }
-    get energyAvailable(): number { return 0; }
-    get energyCapacityAvailable(): number { return 0; }
+    get energyAvailable(): number { return this._instance.energyAvailable; }
+    get energyCapacityAvailable(): number { return this._instance.energyCapacityAvailable; }
     get my() { return !!(this.controller && this.controller.my); }
     get owner() { return this.controller && this.controller.owner; }
     get name(): string { return this._instance.name.slice(); }

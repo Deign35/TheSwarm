@@ -6,7 +6,6 @@ const CARRY_TOTAL = 'CT';
 const CURRENT_PATH = 'CP';
 @profile
 export class SwarmCreep extends OwnableSwarmObject<Creep, CreepMemory> implements Creep {
-    protected _memory!: CreepMemory;
     get DataType(): SwarmDataType.Creep { return SwarmDataType.Creep };
     PrepObject(unused: boolean) {
         return super.PrepObject(true);
