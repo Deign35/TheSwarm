@@ -23,24 +23,25 @@ export class SwarmRoom extends SwarmItemWithName<Room>
             this.controller.level;// RCL1 - RCL8 if I own the room
 
         if (!roomType) {
-            roomType = RoomType.NeutralRoom;
             // Not mine, what is it?
             if (this.controller) {
+                roomType = RoomType.NonHostile;
                 if (this.controller.owner) {
                     roomType = RoomType.Hostile;
                 } else if (this.controller.reservation) {
                     if (this.controller.reservation.username == MY_USERNAME) {
                         roomType = RoomType.HarvestSupport;
                     } else {
-                        roomType = RoomType.NonHostile;
+                        roomType = RoomType.Hostile;
                     }
                 }
             } else {
+                roomType = RoomType.NeutralRoom;
                 let hasKeeperLair = this.find(FIND_STRUCTURES, {
                     filter: function (struct) {
                         return struct.structureType == STRUCTURE_KEEPER_LAIR;
                     }
-                });
+                }).length > 0;
 
                 if (hasKeeperLair) {
                     roomType = RoomType.KeepersLair;
