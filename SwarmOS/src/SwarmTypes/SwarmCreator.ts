@@ -14,6 +14,7 @@ import { NotImplementedException } from "Tools/SwarmExceptions";
 import { StructureMemory, ContainerMemory, ControllerMemory, ExtensionMemory, ExtractorMemory, KeepersLairMemory, LabMemory, LinkMemory, NukerMemory, ObserverMemory, PortalMemory, PowerBankMemory, PowerSpawnMemory, RampartMemory, RoadMemory, SpawnMemory, StorageMemory, TerminalMemory, TowerMemory, WallMemory } from "SwarmMemory/StructureMemory";
 import { RoomObjectMemory, MineralMemory, NukeMemory, ResourceMemory, ConstructionSiteMemory, SourceMemory, TombstoneMemory } from "SwarmMemory/RoomObjectMemory";
 import { CreepMemory, FlagMemory, RoomMemory, BasicMemory, MemoryBase } from "SwarmMemory/SwarmMemory";
+import { OtherObject } from "./OtherObjects";
 
 export type SwarmRoomObjectTypes = SwarmMineral | SwarmNuke | SwarmResource | SwarmSite | SwarmSource | SwarmTombstone;
 export type SwarmOwnableStructureTypes = SwarmController | SwarmExtension | SwarmExtractor | SwarmKeepersLair |
@@ -21,8 +22,8 @@ export type SwarmOwnableStructureTypes = SwarmController | SwarmExtension | Swar
     SwarmTerminal | SwarmTower;
 export type SwarmStructureTypes = SwarmOwnableStructureTypes | SwarmContainer | SwarmPortal | SwarmPowerBank |
     SwarmRoad | SwarmWall;
-export type SwarmObjectTypes = SwarmStructureType | SwarmRoomObjectTypes | SwarmCreep | SwarmRoom | SwarmFlag;
-
+export type SwarmObjectTypes = SwarmStructureType | SwarmRoomObjectTypes | SwarmCreep | SwarmRoom | SwarmFlag | OtherObject;
+export type AllObjectTypes = SwarmObjectTypes | OtherObject;
 export type SwarmMemoryTypes = StructureMemory | RoomObjectMemory | CreepMemory | FlagMemory | RoomMemory | BasicMemory
 @profile
 export class SwarmCreator {

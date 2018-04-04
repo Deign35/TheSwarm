@@ -90,6 +90,8 @@ export class SwarmSource extends SwarmRoomObject<Source, SourceMemory> implement
                             if (this.memory.containerID) {
                                 if (SwarmLoader.TheSwarm.structures[this.memory.containerID]) {
                                     SwarmLoader.TheSwarm.structures[this.memory.containerID].destroy();
+                                } else if (SwarmLoader.TheSwarm.roomObjects[this.memory.containerID]) {
+                                    (SwarmLoader.TheSwarm.roomObjects[this.memory.containerID] as SwarmSite).remove();
                                 }
 
                                 this.memory.RemoveData("containerID");

@@ -11,10 +11,13 @@ import { SwarmMemoryTypes } from "SwarmTypes/SwarmCreator";
 import { RoomObjectMemory } from "SwarmMemory/RoomObjectMemory";
 import { StructureMemory } from "SwarmMemory/StructureMemory";
 import { profile } from "Tools/Profiler";
+import { OtherObject } from "./OtherObjects";
 
 @profile
 export class SwarmLoader {
-    protected static MasterMemory: { [dataType: string]: MasterSwarmMemory<MasterSwarmDataTypes, TBasicSwarmData> }
+    protected static MasterMemory: {
+        [dataType: string]: MasterSwarmMemory<MasterSwarmDataTypes, TBasicSwarmData>
+    }
     static TheSwarm: {
         [dataType: string]: {
             [id: string]: ObjectBase<SwarmMemoryTypes, any>
@@ -111,6 +114,11 @@ export class SwarmLoader {
                 this.TheSwarm[SwarmControllerDataTypes.Flags][keys[i]].InitAsNew();
             }
         }
+
+        keys = this.MasterMemory.otherData.GetDataIDs();
+        for (let i = 0; i < keys.length; i++) {
+            this.LoadObject(keys[i], {}, SwarmControllerDataTypes.Other);
+        }
     }
 
     static LoadObjectsWithID<T extends RoomObject, U extends SwarmMemoryTypes>(dataType: SwarmControllerDataTypes) {
@@ -126,7 +134,8 @@ export class SwarmLoader {
         }
     }
 
-    static LoadObject<T extends Room | RoomObject, U extends SwarmMemoryTypes>(saveID: string, obj: T, swarmDataType: SwarmControllerDataTypes) {
+    static LoadObject<T extends any, U extends SwarmMemoryTypes>(saveID: string,
+        obj: T, swarmDataType: SwarmControllerDataTypes) {
         if (!obj) {
             if (this.MasterMemory[swarmDataType].HasData(saveID) && swarmDataType != SwarmControllerDataTypes.Rooms
                 && swarmDataType != SwarmControllerDataTypes.Other) {
@@ -137,7 +146,7 @@ export class SwarmLoader {
             return;
         }
         let swarmType = SwarmCreator.GetSwarmType(obj);
-        let swarmObj = SwarmCreator.CreateSwarmObject(swarmType) as SwarmTypeBase<U, T>;
+        let swarmObj = SwarmCreator.CreateSwarmObject(swarmType) as ObjectBase<U, T>;
         if (!this.MasterMemory[swarmDataType].HasData(saveID)) {
             let newMem = SwarmCreator.CreateNewSwarmMemory(saveID, swarmType);
             newMem.ReserveMemory();
