@@ -17,3 +17,4 @@ declare var SwarmLogger: {
 
 declare function CopyObject<T>(obj: T): T;
 declare function GetSpawnCost(body: BodyPartConstant[]): number;
+declare function ConstructBodyArray(bodyPartsList: [BodyPartConstant, number][]): BodyPartConstant[]

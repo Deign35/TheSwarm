@@ -18,6 +18,17 @@ export class GlobalTools {
 
         return bodyCost;
     }
+    static ConstructBodyArray(bodyPartsList: [BodyPartConstant, number][]): BodyPartConstant[] {
+        let body: BodyPartConstant[] = [];
+        for (let i = 0; i < bodyPartsList.length; i++) {
+            for (let j = 0; j < bodyPartsList[i][1]; j++) {
+                body.push(bodyPartsList[i][0]);
+            }
+        }
+
+        return body;
+    }
 }
 global['CopyObject'] = GlobalTools.CopyObject;
 global['GetSpawnCost'] = GlobalTools.GetSpawnCost;
+global['ConstructBodyArray'] = GlobalTools.ConstructBodyArray;

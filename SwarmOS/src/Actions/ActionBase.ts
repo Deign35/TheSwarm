@@ -39,3 +39,16 @@ export abstract class ActionWithTarget<T extends RoomObject> extends ActionBase 
         return this.Target.pos;
     }
 }
+
+export class NoOpAction extends ActionBase {
+    protected BlockValue = 0;
+    protected ActionImplemented(): SwarmlingResponse {
+        return C_NONE;
+    }
+    protected GetMovePosition(): RoomPosition {
+        return this.AssignedCreep.pos;
+    }
+    ValidateAction(): SwarmlingResponse {
+        return C_NONE;
+    }
+}

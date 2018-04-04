@@ -15,7 +15,13 @@ import { StructureMemory, ContainerMemory, ControllerMemory, ExtensionMemory, Ex
 import { RoomObjectMemory, MineralMemory, NukeMemory, ResourceMemory, ConstructionSiteMemory, SourceMemory, TombstoneMemory } from "SwarmMemory/RoomObjectMemory";
 import { CreepMemory, FlagMemory, RoomMemory, BasicMemory, MemoryBase } from "SwarmMemory/SwarmMemory";
 
-var SwarmObjectInstances = {}
+export type SwarmRoomObjectTypes = SwarmMineral | SwarmNuke | SwarmResource | SwarmSite | SwarmSource | SwarmTombstone;
+export type SwarmOwnableStructureTypes = SwarmController | SwarmExtension | SwarmExtractor | SwarmKeepersLair |
+    SwarmLab | SwarmLink | SwarmNuker | SwarmObserver | SwarmPowerSpawn | SwarmRampart | SwarmSpawn | SwarmStorage |
+    SwarmTerminal | SwarmTower;
+export type SwarmStructureTypes = SwarmOwnableStructureTypes | SwarmContainer | SwarmPortal | SwarmPowerBank |
+    SwarmRoad | SwarmWall;
+export type SwarmObjectTypes = SwarmStructureType | SwarmRoomObjectTypes | SwarmCreep | SwarmRoom | SwarmFlag;
 
 export type SwarmMemoryTypes = StructureMemory | RoomObjectMemory | CreepMemory | FlagMemory | RoomMemory | BasicMemory
 @profile
