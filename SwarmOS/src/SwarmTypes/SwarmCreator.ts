@@ -15,6 +15,9 @@ import { StructureMemory, ContainerMemory, ControllerMemory, ExtensionMemory, Ex
 import { RoomObjectMemory, MineralMemory, NukeMemory, ResourceMemory, ConstructionSiteMemory, SourceMemory, TombstoneMemory } from "SwarmMemory/RoomObjectMemory";
 import { CreepMemory, FlagMemory, RoomMemory, BasicMemory, MemoryBase } from "SwarmMemory/SwarmMemory";
 import { OtherObject } from "./OtherObjects";
+import { TConsulMemory, HarvestMemory } from "SwarmMemory/ConsulMemory";
+import { HarvestConsul } from "Consuls/HarvestConsul";
+import { SwarmConsul } from "Consuls/ConsulBase";
 
 export type SwarmRoomObjectTypes = SwarmMineral | SwarmNuke | SwarmResource | SwarmSite | SwarmSource | SwarmTombstone;
 export type SwarmOwnableStructureTypes = SwarmController | SwarmExtension | SwarmExtractor | SwarmKeepersLair |
@@ -24,7 +27,8 @@ export type SwarmStructureTypes = SwarmOwnableStructureTypes | SwarmContainer | 
     SwarmRoad | SwarmWall;
 export type SwarmObjectTypes = SwarmStructureType | SwarmRoomObjectTypes | SwarmCreep | SwarmRoom | SwarmFlag | OtherObject<BasicMemory>;
 export type AllObjectTypes = SwarmObjectTypes | OtherObject<BasicMemory>;
-export type SwarmMemoryTypes = StructureMemory | RoomObjectMemory | CreepMemory | FlagMemory | RoomMemory | BasicMemory
+export type SwarmMemoryTypes = StructureMemory | RoomObjectMemory | CreepMemory | FlagMemory | RoomMemory | BasicMemory;
+export type AllMemoryTypes = SwarmMemoryTypes | TConsulMemory;
 @profile
 export class SwarmCreator {
     static CreateNewSwarmObject<T extends Room | RoomObject, U extends SwarmMemoryTypes>(obj: T) {
@@ -103,9 +107,18 @@ export class SwarmCreator {
             case (STRUCTURE_WALL): return SwarmType.SwarmWall;
         }
     }
+    static CreateConsulMemory(mem: TConsulData) {
+        let newConsul: HarvestMemory | undefined;
+        switch (mem.CONSUL_TYPE) {
+            case (ConsulType.Harvest):
+                newConsul = new HarvestMemory(mem);
+        }
+
+        return newConsul!;
+    }
     static CreateSwarmMemory(mem: any) {
         let memType = mem.SWARM_TYPE;
-        let newMemory: MemoryBase<SwarmDataTypes>;
+        let newMemory: MemoryBase<TBasicData>;
 
         switch (memType as SwarmType) {
             case (SwarmType.SwarmContainer):
@@ -192,6 +205,8 @@ export class SwarmCreator {
             case (SwarmType.SwarmWall):
                 newMemory = new WallMemory(mem as IWallData);
                 break;
+            case (SwarmType.SwarmConsul):
+                newMemory = this.CreateConsulMemory(mem);
         }
 
         return newMemory!;
@@ -286,6 +301,19 @@ export class SwarmCreator {
                 newObj = new SwarmWall();
                 break;
         }
+        return newObj!;
+    }
+
+    static CreateNewConsulObject(consulType: ConsulType) {
+        let newObj: SwarmConsul<TConsulMemory>;
+        switch (consulType) {
+            case (ConsulType.None):
+                throw new NotImplementedException("Other data types have not yet been implemented");
+            case (ConsulType.Harvest):
+                newObj = new HarvestConsul();
+                break;
+        }
+
         return newObj!;
     }
     static CreateNewSwarmMemory(id: string, swarmType: SwarmType) {

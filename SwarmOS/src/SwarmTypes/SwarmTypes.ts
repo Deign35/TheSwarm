@@ -1,12 +1,12 @@
 import { MemoryBase, RoomMemory, FlagMemory, CreepMemory } from "SwarmMemory/SwarmMemory";
 import { InvalidArgumentException } from "Tools/SwarmExceptions";
-import { SwarmMemoryTypes } from "SwarmTypes/SwarmCreator";
+import { AllMemoryTypes, SwarmMemoryTypes } from "SwarmTypes/SwarmCreator";
 import { StructureMemory } from "SwarmMemory/StructureMemory";
 import { RoomObjectMemory, MineralMemory, TombstoneMemory, ResourceMemory, NukeMemory } from "SwarmMemory/RoomObjectMemory";
 import { profile } from "Tools/Profiler";
 
 @profile
-export abstract class ObjectBase<T extends SwarmMemoryTypes, U> {
+export abstract class ObjectBase<T extends AllMemoryTypes, U> {
     private hasPreped: boolean = false;
     protected OnPrepObject() {
 

@@ -7,7 +7,7 @@ import { SwarmCreep } from "./SwarmCreep";
 import { SwarmStructure } from "./SwarmStructures/SwarmStructure";
 import { SwarmFlag } from "SwarmTypes/SwarmFlag";
 import { SwarmRoom } from "SwarmTypes/SwarmRoom";
-import { SwarmMemoryTypes } from "SwarmTypes/SwarmCreator";
+import { AllMemoryTypes, SwarmMemoryTypes } from "SwarmTypes/SwarmCreator";
 import { RoomObjectMemory } from "SwarmMemory/RoomObjectMemory";
 import { StructureMemory } from "SwarmMemory/StructureMemory";
 import { profile } from "Tools/Profiler";
@@ -16,11 +16,11 @@ import { OtherObject } from "./OtherObjects";
 @profile
 export class SwarmLoader {
     protected static MasterMemory: {
-        [dataType: string]: MasterSwarmMemory<MasterSwarmDataTypes, TBasicSwarmData>
+        [dataType: string]: MasterSwarmMemory<MasterSwarmDataTypes, TBasicData>
     }
     static TheSwarm: {
         [dataType: string]: {
-            [id: string]: ObjectBase<SwarmMemoryTypes, any>
+            [id: string]: ObjectBase<AllMemoryTypes, any>
         }
         creeps: { [id: string]: SwarmCreep },
         flags: { [id: string]: SwarmFlag },
@@ -134,7 +134,7 @@ export class SwarmLoader {
         }
     }
 
-    static LoadObject<T extends any, U extends SwarmMemoryTypes>(saveID: string,
+    static LoadObject<T extends any, U extends AllMemoryTypes>(saveID: string,
         obj: T, swarmDataType: SwarmControllerDataTypes) {
         if (!obj) {
             if (this.MasterMemory[swarmDataType].HasData(saveID) && swarmDataType != SwarmControllerDataTypes.Rooms

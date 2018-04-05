@@ -3,9 +3,27 @@ declare interface IData<T extends SwarmDataType> extends Dictionary {
     MEM_TYPE: T;
     SWARM_TYPE: SwarmType;
 }
+declare interface IConsulData<T extends ConsulType> extends ISwarmData<SwarmDataType.Consul, SwarmType.SwarmConsul> {
+    isActive: boolean;
+    SUB_TYPE: T;
+}
+
+declare type HarvestConsul_SourceData = {
+    creepID: string | undefined;
+    containerID: string | undefined;
+    linkID: string | undefined;
+    pileID: string | undefined;
+    constructionID: string | undefined;
+}
+declare interface HarvestConsulData extends IConsulData<ConsulType.Harvest> {
+    sourceData: { [id: string]: HarvestConsul_SourceData }
+}
+declare type TConsulData = HarvestConsulData;
+
 declare interface IOtherData extends IData<SwarmDataType.Other> {
     isActive: boolean;
 }
+
 declare interface ISwarmData<T extends SwarmDataType, U extends SwarmType> extends IData<T> {
     SWARM_TYPE: U;
     SUB_TYPE: number | string;
@@ -49,10 +67,6 @@ declare interface IRoomObjectData<T extends SwarmRoomObjectType> extends ISwarmD
     // Special info for RoomObjects.
 }
 declare interface ISourceData extends IRoomObjectData<SwarmType.SwarmSource> {
-    creepID: string | undefined;
-    containerID: string | undefined;
-    linkID: string | undefined;
-    pileID: string | undefined;
 }
 declare interface IMineralData extends IRoomObjectData<SwarmType.SwarmMineral> {
     creepID: string | undefined;
@@ -68,8 +82,8 @@ declare type TRoomObjectData = IMineralData | ISourceData | INukeData |
     IResourceData | ITombstoneData | ISiteData;
 
 declare type TBasicSwarmData = TRoomObjectData | TStructureData | IRoomData | ICreepData | IFlagData | IOtherData;
-
-declare interface IMasterData<T extends TBasicSwarmData> extends IData<SwarmDataType.Master> {
+declare type TBasicData = TBasicSwarmData | TConsulData;
+declare interface IMasterData<T extends TBasicData> extends IData<SwarmDataType.Master> {
     ChildData: { [id: string]: T }
     MEM_TYPE: SwarmDataType.Master;
 }
@@ -79,8 +93,9 @@ declare interface IMasterStructureData extends IMasterData<TStructureData> { }
 declare interface IMasterRoomData extends IMasterData<IRoomData> { }
 declare interface IMasterCreepData extends IMasterData<ICreepData> { }
 declare interface IMasterOtherData extends IMasterData<IOtherData> { }
+declare interface IMasterConsulData extends IMasterData<TConsulData> { }
 
 declare type MasterSwarmDataTypes = IMasterRoomObjectData | IMasterFlagData | IMasterStructureData |
-    IMasterRoomData | IMasterOtherData | IMasterCreepData
+    IMasterRoomData | IMasterOtherData | IMasterCreepData | IMasterConsulData
 
-declare type SwarmDataTypes = MasterSwarmDataTypes | TBasicSwarmData;
+declare type SwarmDataTypes = MasterSwarmDataTypes | TBasicData;

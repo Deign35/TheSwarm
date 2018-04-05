@@ -9,8 +9,8 @@ export abstract class MemoryBase<T extends SwarmDataTypes> {
     get isActive() { return this._cache.isActive; }
     get id() { return this._cache.id; }
     get IsCheckedOut() { return this._checkedOut }
-    get MEM_TYPE() { return this._cache.MEM_TYPE; }
-    get SWARM_TYPE() { return this._cache.SWARM_TYPE; }
+    //get MEM_TYPE() { return this._cache.MEM_TYPE; }
+    //get SWARM_TYPE() { return this._cache.SWARM_TYPE; }
 
     protected _cache!: T;
     private _checkedOut!: boolean;
@@ -49,6 +49,7 @@ export abstract class MemoryBase<T extends SwarmDataTypes> {
 @profile
 export class BasicMemory extends MemoryBase<IOtherData> implements IOtherData {
     get MEM_TYPE(): SwarmDataType.Other { return SwarmDataType.Other; }
+    get SWARM_TYPE() { return 0; }
 }
 
 @profile
@@ -79,12 +80,13 @@ export class RoomMemory extends SwarmMemory<IRoomData, SwarmType.SwarmRoom>
 }
 
 @profile
-export class MasterSwarmMemory<T extends MasterSwarmDataTypes, U extends TBasicSwarmData>
+export class MasterSwarmMemory<T extends MasterSwarmDataTypes, U extends TBasicData>
     extends MemoryBase<T> implements IMasterData<U> {
     constructor(data: T) {
         super(data);
         this.ChildData = this.GetData("ChildData");
     }
+    get SWARM_TYPE() { return 0; }
     get MEM_TYPE(): SwarmDataType.Master { return SwarmDataType.Master }
     ChildData!: { [id: string]: U; }
     GetDataIDs() { return Object.keys(this.ChildData); }
@@ -126,6 +128,11 @@ export class MasterStructureMemory extends MasterSwarmMemory<IMasterStructureDat
 @profile
 export class MasterRoomObjectMemory extends MasterSwarmMemory<IMasterRoomObjectData, TRoomObjectData>
     implements IMasterRoomObjectData {
+}
+@profile
+export class MasterConsulMemory extends MasterSwarmMemory<IMasterConsulData, TConsulData>
+    implements IMasterConsulData {
+
 }
 
 @profile

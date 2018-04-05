@@ -3,17 +3,14 @@ import { BasicMemory } from "SwarmMemory/SwarmMemory";
 import { SwarmLoader } from "SwarmTypes/SwarmLoader";
 import { ActionBase } from "Actions/ActionBase";
 import { HarvestAction } from "Actions/HarvestAction";
+import { HarvestMemory } from "SwarmMemory/ConsulMemory";
+import { NotImplementedException } from "Tools/SwarmExceptions";
 
-export class HarvestConsul extends SwarmConsul<BasicMemory> {
-    private sourceData = {
-        hasHarvester: false,
-        hasLink: false,
-        hasContainer: false,
-        hasResourcePile: false,
-        constructionSite: undefined as string | undefined
-    };
+export class HarvestConsul extends SwarmConsul<HarvestMemory> {
+    get IsActive() { return this.memory.isActive; }
+    get prototype() { throw new NotImplementedException('OtherObjects do not have prototypes'); }
     protected OnActivate() {
-        if (this.sourceData.hasHarvester) {
+        /*if (this.sourceData.hasHarvester) {
             let creep = SwarmLoader.TheSwarm.creeps[this.memory.creepID!];
             if (!creep.spawning) {
                 let action: ActionBase = new HarvestAction(creep, this._instance);
@@ -47,10 +44,10 @@ export class HarvestConsul extends SwarmConsul<BasicMemory> {
 
                 action.Run();
             }
-        }
+        }*/
     }
     protected OnPrepObject() {
-        let hasLink = this.memory.linkID && SwarmLoader.TheSwarm.structures[this.memory.linkID];
+        /*let hasLink = this.memory.linkID && SwarmLoader.TheSwarm.structures[this.memory.linkID];
         if (hasLink) {
             this.sourceData.hasLink = true;
         } else {
@@ -170,6 +167,6 @@ export class HarvestConsul extends SwarmConsul<BasicMemory> {
                     this.sourceData.hasResourcePile = true;
                 }
             }
-        }
+        }*/
     }
 }

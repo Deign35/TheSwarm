@@ -1,7 +1,8 @@
 import { SwarmLoader } from "SwarmTypes/SwarmLoader";
-import { OtherObject } from "SwarmTypes/OtherObjects";
 import { BasicMemory } from "SwarmMemory/SwarmMemory";
+import { ObjectBase } from "SwarmTypes/SwarmTypes";
+import { TConsulMemory } from "SwarmMemory/ConsulMemory";
 
-export abstract class SwarmConsul<T extends BasicMemory> extends OtherObject<T> {
+export abstract class SwarmConsul<T extends TConsulMemory> extends ObjectBase<T, any> {
 
 }
