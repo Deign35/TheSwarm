@@ -1,12 +1,7 @@
-import { BasicMemory } from "SwarmMemory/SwarmMemory";
 import { SwarmLoader } from "SwarmTypes/SwarmLoader";
+import { OtherObject } from "SwarmTypes/OtherObjects";
+import { BasicMemory } from "SwarmMemory/SwarmMemory";
 
-export class ConsulBase {
-    consulMemory!: BasicMemory;
-    constructor(id: string) {
-        this.consulMemory = SwarmLoader.TheSwarm.otherData[id];
-    }
-    Activate() {
+export abstract class SwarmConsul<T extends BasicMemory> extends OtherObject<T> {
 
-    }
 }

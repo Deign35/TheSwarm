@@ -22,8 +22,8 @@ export type SwarmOwnableStructureTypes = SwarmController | SwarmExtension | Swar
     SwarmTerminal | SwarmTower;
 export type SwarmStructureTypes = SwarmOwnableStructureTypes | SwarmContainer | SwarmPortal | SwarmPowerBank |
     SwarmRoad | SwarmWall;
-export type SwarmObjectTypes = SwarmStructureType | SwarmRoomObjectTypes | SwarmCreep | SwarmRoom | SwarmFlag | OtherObject;
-export type AllObjectTypes = SwarmObjectTypes | OtherObject;
+export type SwarmObjectTypes = SwarmStructureType | SwarmRoomObjectTypes | SwarmCreep | SwarmRoom | SwarmFlag | OtherObject<BasicMemory>;
+export type AllObjectTypes = SwarmObjectTypes | OtherObject<BasicMemory>;
 export type SwarmMemoryTypes = StructureMemory | RoomObjectMemory | CreepMemory | FlagMemory | RoomMemory | BasicMemory
 @profile
 export class SwarmCreator {
