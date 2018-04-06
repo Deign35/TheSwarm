@@ -2,7 +2,8 @@ import { MemoryBase, SwarmMemory } from "./SwarmMemory";
 
 export type TConsulMemory = HarvestMemory | ControlMemory;
 
-export abstract class ConsulMemory<T extends ConsulType, U extends IData<SwarmDataType.Consul, T>> extends SwarmMemory<SwarmDataType.Consul, SwarmType.SwarmConsul, T, U> {
+export abstract class ConsulMemory<T extends ConsulType, U extends ISwarmData<SwarmDataType.Consul, SwarmType.SwarmConsul, T>>
+    extends SwarmMemory<SwarmDataType.Consul, SwarmType.SwarmConsul, T, U> {
     get SWARM_TYPE(): SwarmType.SwarmConsul { return SwarmType.SwarmConsul; }
 }
 export class HarvestMemory extends ConsulMemory<ConsulType.Harvest, HarvestConsulData> implements HarvestConsulData {

@@ -3,8 +3,6 @@ import { SwarmException, MemoryLockException, AlreadyExistsException, NotImpleme
 import { SwarmMemoryTypes, SwarmStructureTypes } from "SwarmTypes/SwarmCreator";
 
 declare type SwarmData<T extends SwarmDataTypeSansMaster> = ISwarmData<T, SwarmType, string | number>;
-declare type SwarmDataTypeSansMaster = SwarmDataType.Consul | SwarmDataType.Creep | SwarmDataType.Flag |
-    SwarmDataType.Room | SwarmDataType.RoomObject | SwarmDataType.Structure;
 @profile
 export abstract class MemoryBase<T extends SwarmDataType, U extends IData<T, string | number>> implements IData<T, string | number> {
     constructor(data: U) {
@@ -148,16 +146,18 @@ IMasterRoomData> implements IMasterRoomData {
     get SUB_TYPE(): SwarmDataType.Room { return SwarmDataType.Room; }
 }
 @profile
-export class MasterStructureMemory extends MasterSwarmMemory<SwarmDataType.Structure, Structure,
+export class MasterStructureMemory extends MasterSwarmMemory<SwarmDataType.Structure, SwarmStructureType,
 TStructureData, IMasterStructureData> implements IMasterStructureData {
     get SUB_TYPE(): SwarmDataType.Structure { return SwarmDataType.Structure; }
 }
 @profile
-export class MasterRoomObjectMemory extends MasterSwarmMemory<SwarmDataType.RoomObject, TRoomObjectData> implements IMasterRoomObjectData {
+export class MasterRoomObjectMemory extends MasterSwarmMemory<SwarmDataType.RoomObject, SwarmRoomObjectType,
+TRoomObjectData, IMasterRoomObjectData> implements IMasterRoomObjectData {
     get SUB_TYPE(): SwarmDataType.RoomObject { return SwarmDataType.RoomObject; }
 }
 @profile
-export class MasterConsulMemory extends MasterSwarmMemory<SwarmDataType.Consul, TConsulData> implements IMasterConsulData {
+export class MasterConsulMemory extends MasterSwarmMemory<SwarmDataType.Consul, SwarmType.SwarmConsul,
+TConsulData, IMasterConsulData> implements IMasterConsulData {
     get SUB_TYPE(): SwarmDataType.Consul { return SwarmDataType.Consul; }
 
 }

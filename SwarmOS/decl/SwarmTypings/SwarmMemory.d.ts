@@ -10,3 +10,6 @@ declare interface ISwarmData<T extends SwarmDataType, U extends SwarmType, V ext
 declare type TBasicSwarmData = TRoomObjectData | TStructureData | TRoomData | TCreepData | TFlagData | TConsulData;
 
 declare type SwarmDataTypes = MasterSwarmDataTypes | TBasicSwarmData;
+
+declare type SwarmDataTypeSansMaster = SwarmDataType.Consul | SwarmDataType.Creep | SwarmDataType.Flag |
+    SwarmDataType.Room | SwarmDataType.RoomObject | SwarmDataType.Structure;

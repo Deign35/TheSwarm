@@ -1,18 +1,19 @@
 import { profile } from "Tools/Profiler";
 import { MasterSwarmMemory, MasterCreepMemory, MasterFlagMemory, MasterRoomMemory, MasterStructureMemory, MasterRoomObjectMemory, MemoryBase, MasterConsulMemory } from "SwarmMemory/SwarmMemory";
 import { NotImplementedException } from "Tools/SwarmExceptions";
-declare var Memory: {
+declare interface IMemory {
     consuls: IMasterConsulData,
     creeps: IMasterCreepData,
     flags: IMasterFlagData,
     rooms: IMasterRoomData,
     roomObjects: IMasterRoomObjectData,
-    Structures: IMasterStructureData,
+    structures: IMasterStructureData,
 
     INIT: boolean,
     SwarmVersionDate: string,
     profiler: any
 };
+declare var Memory: IMemory;
 
 @profile
 export class Swarmlord {
@@ -31,43 +32,37 @@ export class Swarmlord {
                     id: "consuls",
                     ChildData: {},
                     MEM_TYPE: SwarmDataType.Master,
-                    SWARM_TYPE: SwarmType.Any,
+                    SUB_TYPE: SwarmDataType.Consul,
                 },
                 creeps: {
                     id: "creeps",
                     ChildData: {},
                     MEM_TYPE: SwarmDataType.Master,
-                    SWARM_TYPE: SwarmType.Any,
+                    SUB_TYPE: SwarmDataType.Creep,
                 },
                 flags: {
                     id: "flags",
                     ChildData: {},
                     MEM_TYPE: SwarmDataType.Master,
-                    SWARM_TYPE: SwarmType.Any
+                    SUB_TYPE: SwarmDataType.Flag,
                 },
                 structures: {
                     id: "structures",
                     ChildData: {},
                     MEM_TYPE: SwarmDataType.Master,
-                    SWARM_TYPE: SwarmType.Any
+                    SUB_TYPE: SwarmDataType.Structure,
                 },
                 rooms: {
                     id: "rooms",
                     ChildData: {},
                     MEM_TYPE: SwarmDataType.Master,
-                    SWARM_TYPE: SwarmType.Any
+                    SUB_TYPE: SwarmDataType.Room,
                 },
                 roomObjects: {
                     id: "roomObjects",
                     ChildData: {},
                     MEM_TYPE: SwarmDataType.Master,
-                    SWARM_TYPE: SwarmType.Any
-                },
-                otherData: {
-                    id: "otherData",
-                    ChildData: {},
-                    MEM_TYPE: SwarmDataType.Master,
-                    SWARM_TYPE: SwarmType.Any
+                    SUB_TYPE: SwarmDataType.RoomObject,
                 },
                 stats: {
                     rooms: {},
@@ -77,7 +72,7 @@ export class Swarmlord {
                 profiler: Memory.profiler, // Hacky, but cleanest way to prevent the profiler from breaking because of deleting its memory.
                 SwarmVersionDate: SWARM_VERSION_DATE,
                 INIT: false
-            }
+            } as IMemory;
 
             for (let id in Memory) {
                 delete Memory[id];
@@ -99,33 +94,36 @@ export class Swarmlord {
         }
     }
 
-    SaveMasterMemory(memObject: MasterSwarmMemory<MasterSwarmDataTypes, TBasicSwarmData>, save: boolean): void {
+    SaveMasterMemory<T extends SwarmDataTypeSansMaster,
+        U extends SwarmType>(memObject: MasterSwarmMemory<T, U, ISwarmData<T, U, number | string>,
+            IMasterData<T>>, save: boolean): void {
         let memData = memObject.ReleaseData();
         if (save) {
             Memory[memObject.id] = memData;
         }
     }
 
-    CheckoutMasterMemory(id: string) {
+    CheckoutMasterMemory<T extends SwarmDataTypeSansMaster,
+        U extends SwarmType>(id: string) {
         let data = CopyObject(Memory[id]);
-        let newMem: MasterSwarmMemory<IMasterData<any>, any> | undefined = undefined;
+        let newMem;
         switch (data.id) {
-            case (SwarmControllerDataTypes.Consuls):
+            case ("consuls"):
                 newMem = new MasterConsulMemory(data);
                 break;
-            case (SwarmControllerDataTypes.Creeps):
+            case ("creeps"):
                 newMem = new MasterCreepMemory(data);
                 break;
-            case (SwarmControllerDataTypes.Flags):
+            case ("flags"):
                 newMem = new MasterFlagMemory(data);
                 break;
-            case (SwarmControllerDataTypes.Rooms):
+            case ("rooms"):
                 newMem = new MasterRoomMemory(data);
                 break;
-            case (SwarmControllerDataTypes.Structures):
+            case ("structures"):
                 newMem = new MasterStructureMemory(data);
                 break;
-            case (SwarmControllerDataTypes.RoomObjects):
+            case ("roomObjects"):
                 newMem = new MasterRoomObjectMemory(data);
                 break;
         }
@@ -133,8 +131,6 @@ export class Swarmlord {
         if (!newMem) {
             throw new NotImplementedException("[Swarmlord.CheckoutMasterMemory] -- Attempted to checkout memory that isn't mastered correctly: " + id);
         }
-
-        newMem.ReserveMemory();
         return newMem;
     }
 }
