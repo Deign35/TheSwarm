@@ -116,7 +116,7 @@ export class SwarmCreator {
 
         return newConsul!;
     }
-    static CreateSwarmMemory(mem: any) {
+    static CreateSwarmMemory(mem: TBasicData) {
         let memType = mem.SWARM_TYPE;
         let newMemory: MemoryBase<TBasicData>;
 
@@ -206,7 +206,7 @@ export class SwarmCreator {
                 newMemory = new WallMemory(mem as IWallData);
                 break;
             case (SwarmType.SwarmConsul):
-                newMemory = this.CreateConsulMemory(mem);
+                newMemory = this.CreateConsulMemory(mem as TConsulData);
         }
 
         return newMemory!;
@@ -523,7 +523,8 @@ export class SwarmCreator {
                     pileID: undefined,
                     creepID: undefined,
                     containerID: undefined,
-                    linkID: undefined
+                    linkID: undefined,
+                    constructionID: undefined,
                 });
                 break;
             case (SwarmType.SwarmSpawn):

@@ -13,6 +13,7 @@ export class SourceMemory extends RoomObjectMemoryBase<ISourceData, SwarmType.Sw
     get containerID() { return this._cache.containerID; }
     get linkID() { return this._cache.linkID; }
     get pileID() { return this._cache.pileID; }
+    get constructionID() { return this._cache.constructionID; }
 }
 
 @profile

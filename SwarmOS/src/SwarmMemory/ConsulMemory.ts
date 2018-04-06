@@ -8,6 +8,6 @@ export abstract class ConsulMemory<T extends ConsulType> extends MemoryBase<TCon
     abstract get SUB_TYPE(): T;
 }
 export class HarvestMemory extends ConsulMemory<ConsulType.Harvest> implements HarvestConsulData {
-    get sourceData(): { [id: string]: HarvestConsul_SourceData; } { return this._cache.sourceData; }
+    get sourceIDs() { return this._cache.sourceIDs; }
     get SUB_TYPE(): ConsulType.Harvest { return ConsulType.Harvest; }
 }

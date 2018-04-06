@@ -8,15 +8,8 @@ declare interface IConsulData<T extends ConsulType> extends ISwarmData<SwarmData
     SUB_TYPE: T;
 }
 
-declare type HarvestConsul_SourceData = {
-    creepID: string | undefined;
-    containerID: string | undefined;
-    linkID: string | undefined;
-    pileID: string | undefined;
-    constructionID: string | undefined;
-}
 declare interface HarvestConsulData extends IConsulData<ConsulType.Harvest> {
-    sourceData: { [id: string]: HarvestConsul_SourceData }
+    sourceIDs: string[];
 }
 declare type TConsulData = HarvestConsulData;
 
@@ -67,6 +60,11 @@ declare interface IRoomObjectData<T extends SwarmRoomObjectType> extends ISwarmD
     // Special info for RoomObjects.
 }
 declare interface ISourceData extends IRoomObjectData<SwarmType.SwarmSource> {
+    creepID: string | undefined;
+    containerID: string | undefined;
+    linkID: string | undefined;
+    pileID: string | undefined;
+    constructionID: string | undefined;
 }
 declare interface IMineralData extends IRoomObjectData<SwarmType.SwarmMineral> {
     creepID: string | undefined;
