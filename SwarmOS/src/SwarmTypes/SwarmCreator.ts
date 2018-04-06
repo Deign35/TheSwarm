@@ -18,6 +18,7 @@ import { OtherObject } from "./OtherObjects";
 import { TConsulMemory, HarvestMemory } from "SwarmMemory/ConsulMemory";
 import { HarvestConsul } from "Consuls/HarvestConsul";
 import { SwarmConsul, ConsulObject } from "Consuls/ConsulBase";
+import { ControlConsul } from "Consuls/ControlConsul";
 
 export type SwarmRoomObjectTypes = SwarmMineral | SwarmNuke | SwarmResource | SwarmSite | SwarmSource | SwarmTombstone;
 export type SwarmOwnableStructureTypes = SwarmController | SwarmExtension | SwarmExtractor | SwarmKeepersLair |
@@ -26,7 +27,7 @@ export type SwarmOwnableStructureTypes = SwarmController | SwarmExtension | Swar
 export type SwarmStructureTypes = SwarmOwnableStructureTypes | SwarmContainer | SwarmPortal | SwarmPowerBank |
     SwarmRoad | SwarmWall;
 export type SwarmObjectTypes = SwarmStructureType | SwarmRoomObjectTypes | SwarmCreep | SwarmRoom | SwarmFlag | OtherObject<BasicMemory>;
-export type TConsulTypes = HarvestConsul;
+export type TConsulTypes = HarvestConsul | ControlConsul;
 export type AllObjectTypes = SwarmObjectTypes | OtherObject<BasicMemory> | TConsulTypes;
 export type SwarmMemoryTypes = StructureMemory | RoomObjectMemory | CreepMemory | FlagMemory | RoomMemory | BasicMemory;
 export type AllMemoryTypes = SwarmMemoryTypes | TConsulMemory;
@@ -126,6 +127,9 @@ export class SwarmCreator {
         switch (consulType) {
             case (ConsulType.Harvest):
                 consul = new HarvestConsul();
+                break;
+            case (ConsulType.Control):
+                consul = new ControlConsul();
                 break;
             default:
                 throw new NotImplementedException('Consul type not implemented.');

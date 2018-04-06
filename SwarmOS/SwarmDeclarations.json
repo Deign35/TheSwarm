@@ -22,8 +22,7 @@
             "Rooms": "\"rooms\"",
             "Structures": "\"structures\"",
             "RoomObjects": "\"roomObjects\"",
-            "Consuls": "\"consuls\"",
-            "Other": "\"otherData\""
+            "Consuls": "\"consuls\""
         },
         "SwarmDataType": {
             "None": 0,
@@ -33,7 +32,6 @@
             "Creep": 4,
             "RoomObject": 5,
             "Consul": 6,
-            "Other": 7,
             "Master": 8
         },
         "LogLevel": {
