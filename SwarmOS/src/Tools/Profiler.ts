@@ -93,7 +93,7 @@ export function profile(
     key?: string | symbol,
     _descriptor?: TypedPropertyDescriptor<Function>,
 ): void {
-    //if (!false) { return; }
+    if (!false) { return; }
 
     if (key) {
         // case of method decorator

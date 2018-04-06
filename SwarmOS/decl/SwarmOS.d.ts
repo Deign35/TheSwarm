@@ -43,6 +43,8 @@ declare interface ISwarmlord {
 } declare var Swarmlord: ISwarmlord;
 
 declare var SwarmCreator: {
+    CreateConsulMemory(mem: TConsulData): any;
+    CreateConsulObject(consulType: ConsulType): any;
     CreateSwarmMemory(mem: IData<SwarmDataType>): any;
     CreateSwarmObject(swarmType: SwarmType): any;
     CreateNewSwarmMemory(id: string, swarmType: SwarmType): any;
@@ -50,4 +52,5 @@ declare var SwarmCreator: {
     GetSwarmType(obj: any): SwarmType;
     CreateNewSwarmObject<T extends any>(obj: Room | RoomObject): T;
     GetObjSaveID(obj: Room | RoomObject): string;
+
 }

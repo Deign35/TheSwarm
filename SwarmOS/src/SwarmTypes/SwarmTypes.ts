@@ -4,6 +4,7 @@ import { AllMemoryTypes, SwarmMemoryTypes } from "SwarmTypes/SwarmCreator";
 import { StructureMemory } from "SwarmMemory/StructureMemory";
 import { RoomObjectMemory, MineralMemory, TombstoneMemory, ResourceMemory, NukeMemory } from "SwarmMemory/RoomObjectMemory";
 import { profile } from "Tools/Profiler";
+import { TConsulMemory } from "SwarmMemory/ConsulMemory";
 
 @profile
 export abstract class ObjectBase<T extends AllMemoryTypes, U> {

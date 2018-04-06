@@ -4,6 +4,9 @@ import { SwarmLoader } from "SwarmTypes/SwarmLoader";
 import { ResourceMemory, TombstoneMemory, ConstructionSiteMemory, NukeMemory } from "SwarmMemory/RoomObjectMemory";
 import { StructureMemory } from "SwarmMemory/StructureMemory";
 import { SwarmSpawn } from "./SwarmStructures/SwarmSpawn";
+import { HarvestMemory } from "SwarmMemory/ConsulMemory";
+import { HarvestConsul } from "Consuls/HarvestConsul";
+import { ConsulObject } from "Consuls/ConsulBase";
 
 @profile
 export class SwarmRoom extends SwarmItemWithName<Room> implements Room {
@@ -56,6 +59,7 @@ export class SwarmRoom extends SwarmItemWithName<Room> implements Room {
     }
 
     InitAsNew() {
+        debugger;
         SwarmLogger.Log("Initializing a new room");
         let roomType = this.controller && this.controller.owner && this.controller.owner.username == MY_USERNAME &&
             this.controller.level;// RCL1 - RCL8 if I own the room
@@ -100,6 +104,25 @@ export class SwarmRoom extends SwarmItemWithName<Room> implements Room {
         }
         // (TODO): Instead of TryFindNewObjects, use a single LookAtArea and find all objects for the new room.
         this.TryFindNewObjects(true);
+        this.CreateHarvestConsul(sources);
+    }
+
+    CreateHarvestConsul(sources: Source[]) {
+        // Find an existing harvest consul at some point, for now, one per room.
+        let newHarvesterData: HarvestConsulData = {
+            id: this.name + '_harvest',
+            isActive: true,
+            MEM_TYPE: SwarmDataType.Consul,
+            sourceIDs: CopyObject(SwarmLoader.SwarmRoomIDs[this.name].roomObjects[SwarmType.SwarmSource]),
+            SUB_TYPE: ConsulType.Harvest,
+            SWARM_TYPE: SwarmType.SwarmConsul
+        }
+        let newHarvesterMem = new HarvestMemory(newHarvesterData);
+        newHarvesterMem.ReserveMemory();
+
+        let consul = SwarmCreator.CreateConsulObject(ConsulType.Harvest);
+        consul.AssignObject(new ConsulObject(), newHarvesterMem);
+        SwarmLoader.SaveAnObject(consul);
     }
 
     TryFindNewObjects(force: boolean = false) {

@@ -1,8 +1,19 @@
 import { ObjectBase } from "SwarmTypes/SwarmTypes";
-import { TConsulMemory } from "SwarmMemory/ConsulMemory";
+import { TConsulMemory, HarvestMemory } from "SwarmMemory/ConsulMemory";
 import { NotImplementedException } from "Tools/SwarmExceptions";
 
-export abstract class SwarmConsul<T extends TConsulMemory> extends ObjectBase<T, any> {
+export class ConsulObject {
+    GetSwarmType(): SwarmType.SwarmConsul {
+        return SwarmType.SwarmConsul;
+    }
+}
+
+
+export abstract class SwarmConsul<T extends TConsulMemory> extends ObjectBase<T, ConsulObject> {
     get IsActive() { return this.memory.isActive; }
-    get prototype() { throw new NotImplementedException('OtherObjects do not have prototypes'); }
+    get prototype() { return this._instance }
+}
+
+export class HarvestConsul extends SwarmConsul<HarvestMemory> {
+
 }

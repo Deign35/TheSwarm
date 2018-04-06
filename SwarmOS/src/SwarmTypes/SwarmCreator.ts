@@ -17,7 +17,7 @@ import { CreepMemory, FlagMemory, RoomMemory, BasicMemory, MemoryBase } from "Sw
 import { OtherObject } from "./OtherObjects";
 import { TConsulMemory, HarvestMemory } from "SwarmMemory/ConsulMemory";
 import { HarvestConsul } from "Consuls/HarvestConsul";
-import { SwarmConsul } from "Consuls/ConsulBase";
+import { SwarmConsul, ConsulObject } from "Consuls/ConsulBase";
 
 export type SwarmRoomObjectTypes = SwarmMineral | SwarmNuke | SwarmResource | SwarmSite | SwarmSource | SwarmTombstone;
 export type SwarmOwnableStructureTypes = SwarmController | SwarmExtension | SwarmExtractor | SwarmKeepersLair |
@@ -51,7 +51,11 @@ export class SwarmCreator {
         return (obj as Structure).id;
     }
 
-    static GetSwarmType(obj: Room | RoomObject): SwarmType {
+    static GetSwarmType(obj: Room | RoomObject | ConsulObject): SwarmType {
+        if ((obj as ConsulObject).GetSwarmType) {
+            return (obj as ConsulObject).GetSwarmType();
+        }
+
         if ((obj as Room).name) {
             if ((obj as Creep).getActiveBodyparts) {
                 return SwarmType.SwarmCreep;
@@ -108,14 +112,26 @@ export class SwarmCreator {
             case (STRUCTURE_WALL): return SwarmType.SwarmWall;
         }
     }
-    static CreateConsulMemory(mem: TConsulData) {
+    static CreateConsulMemory(mem: TConsulData): TConsulMemory {
         let newConsul: HarvestMemory | undefined;
-        switch (mem.CONSUL_TYPE) {
+        switch (mem.SUB_TYPE) {
             case (ConsulType.Harvest):
                 newConsul = new HarvestMemory(mem);
         }
 
         return newConsul!;
+    }
+    static CreateConsulObject(consulType: ConsulType): TConsulTypes {
+        let consul: TConsulTypes;
+        switch (consulType) {
+            case (ConsulType.Harvest):
+                consul = new HarvestConsul();
+                break;
+            default:
+                throw new NotImplementedException('Consul type not implemented.');
+        }
+
+        return consul;
     }
     static CreateSwarmMemory(mem: TBasicData) {
         let memType = mem.SWARM_TYPE;
@@ -305,14 +321,15 @@ export class SwarmCreator {
         return newObj!;
     }
 
-    static CreateNewConsulObject(consulType: ConsulType) {
-        let newObj: SwarmConsul<TConsulMemory>;
+    static CreateNewConsulObject(consulType: ConsulType): TConsulTypes {
+        let newObj: TConsulTypes;
         switch (consulType) {
-            case (ConsulType.None):
-                throw new NotImplementedException("Other data types have not yet been implemented");
             case (ConsulType.Harvest):
                 newObj = new HarvestConsul();
                 break;
+            //case (ConsulType.None):
+            default:
+                throw new NotImplementedException("Other data types have not yet been implemented");
         }
 
         return newObj!;
