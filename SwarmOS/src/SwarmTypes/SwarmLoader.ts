@@ -123,11 +123,11 @@ export class SwarmLoader {
                 this.TheSwarm[SwarmControllerDataTypes.Flags][keys[i]].InitAsNew();
             }
         }
-
-        keys = this.MasterMemory.otherData.GetDataIDs();
-        for (let i = 0; i < keys.length; i++) {
-            this.LoadObject(keys[i], {}, SwarmControllerDataTypes.Other);
-        }
+        /*
+                keys = this.MasterMemory.otherData.GetDataIDs();
+                for (let i = 0; i < keys.length; i++) {
+                    this.LoadObject(keys[i], {}, SwarmControllerDataTypes.Other);
+                }*/
 
         keys = this.MasterMemory.consuls.GetDataIDs();
         for (let i = 0; i < keys.length; i++) {
@@ -168,15 +168,26 @@ export class SwarmLoader {
             return;
         }
         let swarmType = SwarmCreator.GetSwarmType(obj);
-        let swarmObj = SwarmCreator.CreateSwarmObject(swarmType) as ObjectBase<U, T>;
         if (!this.MasterMemory[swarmDataType].HasData(saveID)) {
             let newMem = SwarmCreator.CreateNewSwarmMemory(saveID, swarmType);
             newMem.ReserveMemory();
+            let swarmObj;
+            if (swarmType == SwarmType.SwarmConsul) {
+                swarmObj = SwarmCreator.CreateConsulObject((newMem as TConsulMemory).SUB_TYPE);
+            } else {
+                swarmObj = SwarmCreator.CreateSwarmObject(swarmType) as ObjectBase<U, T>;
+            }
             swarmObj.AssignObject(obj, newMem);
             this.MasterMemory[swarmDataType].SaveMemory(swarmObj.ReleaseMemory());
         }
 
         let objMem = this.MasterMemory[swarmDataType].CheckoutMemory(saveID);
+        let swarmObj;
+        if (swarmType == SwarmType.SwarmConsul) {
+            swarmObj = SwarmCreator.CreateConsulObject((objMem as TConsulMemory).SUB_TYPE);
+        } else {
+            swarmObj = SwarmCreator.CreateSwarmObject(swarmType) as ObjectBase<U, T>;
+        }
         swarmObj.AssignObject(obj, objMem);
 
         this.TheSwarm[swarmDataType][saveID] = swarmObj;
@@ -222,14 +233,14 @@ export class SwarmLoader {
         }
     }
 
-    static SaveAnObject(obj: ObjectBase<any, any>) {
+    /*static SaveAnObject(obj: ObjectBase<any, any>) {
         let id = obj.saveID;
         let internalObj = obj.GetObjectInstance();
         let objMemory = obj.ReleaseMemory() as AllMemoryTypes;
         let controllerType = this.GetSwarmControllerDataTypeFromObject(objMemory.SWARM_TYPE);
         this.MasterMemory[controllerType].SaveMemory(objMemory);
         this.TheSwarm[controllerType][id] = this.LoadObject(id, internalObj, controllerType);
-    }
+    }*/
 
     static SaveTheSwarm() {
         this.SaveObjects(SwarmControllerDataTypes.Consuls);

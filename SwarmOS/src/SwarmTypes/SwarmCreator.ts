@@ -320,20 +320,6 @@ export class SwarmCreator {
         }
         return newObj!;
     }
-
-    static CreateNewConsulObject(consulType: ConsulType): TConsulTypes {
-        let newObj: TConsulTypes;
-        switch (consulType) {
-            case (ConsulType.Harvest):
-                newObj = new HarvestConsul();
-                break;
-            //case (ConsulType.None):
-            default:
-                throw new NotImplementedException("Other data types have not yet been implemented");
-        }
-
-        return newObj!;
-    }
     static CreateNewSwarmMemory(id: string, swarmType: SwarmType) {
         let newMemory: MemoryBase<SwarmDataTypes>;
         switch (swarmType) {
@@ -361,7 +347,7 @@ export class SwarmCreator {
                     MEM_TYPE: SwarmDataType.Creep,
                     SWARM_TYPE: SwarmType.SwarmCreep,
                     isActive: true,
-                    SUB_TYPE: 0,
+                    SUB_TYPE: CreepType.NullModule,
                 });
                 break;
             case (SwarmType.SwarmExtension):
@@ -387,7 +373,7 @@ export class SwarmCreator {
                     id: id,
                     MEM_TYPE: SwarmDataType.Flag,
                     SWARM_TYPE: SwarmType.SwarmFlag,
-                    SUB_TYPE: 0,
+                    SUB_TYPE: FlagType.NullModule,
                     isActive: true
                 });
                 break;
@@ -423,7 +409,7 @@ export class SwarmCreator {
                     id: id,
                     MEM_TYPE: SwarmDataType.RoomObject,
                     SWARM_TYPE: SwarmType.SwarmMineral,
-                    SUB_TYPE: 0,
+                    SUB_TYPE: SwarmType.SwarmMineral,
                     isActive: true,
 
                     pileID: undefined,
@@ -436,7 +422,7 @@ export class SwarmCreator {
                     id: id,
                     MEM_TYPE: SwarmDataType.RoomObject,
                     SWARM_TYPE: SwarmType.SwarmNuke,
-                    SUB_TYPE: 0,
+                    SUB_TYPE: SwarmType.SwarmNuke,
                     isActive: true
                 });
                 break;
@@ -499,7 +485,7 @@ export class SwarmCreator {
                     id: id,
                     MEM_TYPE: SwarmDataType.RoomObject,
                     SWARM_TYPE: SwarmType.SwarmResource,
-                    SUB_TYPE: 0,
+                    SUB_TYPE: SwarmType.SwarmResource,
                     isActive: true
                 });
                 break;
@@ -517,7 +503,7 @@ export class SwarmCreator {
                     id: id,
                     MEM_TYPE: SwarmDataType.Room,
                     SWARM_TYPE: SwarmType.SwarmRoom,
-                    SUB_TYPE: 0,
+                    SUB_TYPE: RoomType.NeutralRoom,
                     isActive: true
                 });
                 break;
@@ -526,7 +512,7 @@ export class SwarmCreator {
                     id: id,
                     MEM_TYPE: SwarmDataType.RoomObject,
                     SWARM_TYPE: SwarmType.SwarmSite,
-                    SUB_TYPE: 0,
+                    SUB_TYPE: SwarmType.SwarmSite,
                     isActive: true
                 });
                 break;
@@ -535,7 +521,7 @@ export class SwarmCreator {
                     id: id,
                     MEM_TYPE: SwarmDataType.RoomObject,
                     SWARM_TYPE: SwarmType.SwarmSource,
-                    SUB_TYPE: 0,
+                    SUB_TYPE: SwarmType.SwarmSource,
                     isActive: true,
 
                     pileID: undefined,
@@ -577,7 +563,7 @@ export class SwarmCreator {
                     id: id,
                     MEM_TYPE: SwarmDataType.RoomObject,
                     SWARM_TYPE: SwarmType.SwarmTombstone,
-                    SUB_TYPE: 0,
+                    SUB_TYPE: SwarmType.SwarmTombstone,
                     isActive: true
                 });
                 break;

@@ -24,7 +24,6 @@ export class HarvestConsul extends SwarmConsul<HarvestMemory> {
         }
     }
     protected OnActivate() {
-        this.SourceData = {};
         for (let i = 0; i < this.memory.sourceIDs.length; i++) {
             let source = SwarmLoader.TheSwarm.roomObjects[this.memory.sourceIDs[i]] as SwarmSource;
             if (this.SourceData[source.id].hasCreep) {
@@ -150,6 +149,8 @@ export class HarvestConsul extends SwarmConsul<HarvestMemory> {
                     source.memory.SetData('creepID', creepName);
                 }
             }
+
+            this.SourceData[source.id] = newData;
         }
     }
 }

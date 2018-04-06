@@ -7,6 +7,7 @@ import { SwarmSpawn } from "./SwarmStructures/SwarmSpawn";
 import { HarvestMemory } from "SwarmMemory/ConsulMemory";
 import { HarvestConsul } from "Consuls/HarvestConsul";
 import { ConsulObject } from "Consuls/ConsulBase";
+import { TConsulTypes } from "SwarmTypes/SwarmCreator";
 
 @profile
 export class SwarmRoom extends SwarmItemWithName<Room> implements Room {
@@ -59,7 +60,6 @@ export class SwarmRoom extends SwarmItemWithName<Room> implements Room {
     }
 
     InitAsNew() {
-        debugger;
         SwarmLogger.Log("Initializing a new room");
         let roomType = this.controller && this.controller.owner && this.controller.owner.username == MY_USERNAME &&
             this.controller.level;// RCL1 - RCL8 if I own the room
@@ -120,9 +120,9 @@ export class SwarmRoom extends SwarmItemWithName<Room> implements Room {
         let newHarvesterMem = new HarvestMemory(newHarvesterData);
         newHarvesterMem.ReserveMemory();
 
-        let consul = SwarmCreator.CreateConsulObject(ConsulType.Harvest);
+        let consul: TConsulTypes = SwarmCreator.CreateConsulObject(ConsulType.Harvest);
         consul.AssignObject(new ConsulObject(), newHarvesterMem);
-        SwarmLoader.SaveAnObject(consul);
+        SwarmLoader.TheSwarm.consuls[consul.saveID] = consul;
     }
 
     TryFindNewObjects(force: boolean = false) {
