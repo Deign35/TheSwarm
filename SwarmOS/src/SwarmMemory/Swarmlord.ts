@@ -1,13 +1,15 @@
 import { profile } from "Tools/Profiler";
-import { MasterSwarmMemory, MasterCreepMemory, MasterFlagMemory, MasterRoomMemory, MasterStructureMemory, MasterRoomObjectMemory, MasterOtherMemory, MemoryBase } from "SwarmMemory/SwarmMemory";
+import { MasterSwarmMemory, MasterCreepMemory, MasterFlagMemory, MasterRoomMemory, MasterStructureMemory, MasterRoomObjectMemory, MasterOtherMemory, MemoryBase, MasterConsulMemory } from "SwarmMemory/SwarmMemory";
 import { NotImplementedException } from "Tools/SwarmExceptions";
 declare var Memory: {
+    consuls: IMasterConsulData,
     creeps: IMasterCreepData,
     flags: IMasterFlagData,
     otherData: IMasterOtherData,
     rooms: IMasterRoomData,
     roomObjects: IMasterRoomObjectData,
     Structures: IMasterStructureData,
+
     INIT: boolean,
     SwarmVersionDate: string,
     profiler: any
@@ -26,6 +28,12 @@ export class Swarmlord {
 
             SwarmLogger.Log("Begin initialization of memory for entire Swarm(" + SWARM_VERSION_DATE + ")");
             let newMemory = {
+                consuls: {
+                    id: "consuls",
+                    ChildData: {},
+                    MEM_TYPE: SwarmDataType.Master,
+                    SWARM_TYPE: SwarmType.Any,
+                },
                 creeps: {
                     id: "creeps",
                     ChildData: {},
@@ -70,7 +78,7 @@ export class Swarmlord {
                 profiler: Memory.profiler, // Hacky, but cleanest way to prevent the profiler from breaking because of deleting its memory.
                 SwarmVersionDate: SWARM_VERSION_DATE,
                 INIT: false
-            };
+            }
 
             for (let id in Memory) {
                 delete Memory[id];
@@ -103,6 +111,8 @@ export class Swarmlord {
         let data = CopyObject(Memory[id]);
         let newMem: MasterSwarmMemory<IMasterData<any>, any> | undefined = undefined;
         switch (data.id) {
+            case (SwarmControllerDataTypes.Consuls):
+                newMem = new MasterConsulMemory(data);
             case (SwarmControllerDataTypes.Creeps):
                 newMem = new MasterCreepMemory(data);
                 break;

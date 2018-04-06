@@ -26,7 +26,8 @@ export type SwarmOwnableStructureTypes = SwarmController | SwarmExtension | Swar
 export type SwarmStructureTypes = SwarmOwnableStructureTypes | SwarmContainer | SwarmPortal | SwarmPowerBank |
     SwarmRoad | SwarmWall;
 export type SwarmObjectTypes = SwarmStructureType | SwarmRoomObjectTypes | SwarmCreep | SwarmRoom | SwarmFlag | OtherObject<BasicMemory>;
-export type AllObjectTypes = SwarmObjectTypes | OtherObject<BasicMemory>;
+export type TConsulTypes = HarvestConsul;
+export type AllObjectTypes = SwarmObjectTypes | OtherObject<BasicMemory> | TConsulTypes;
 export type SwarmMemoryTypes = StructureMemory | RoomObjectMemory | CreepMemory | FlagMemory | RoomMemory | BasicMemory;
 export type AllMemoryTypes = SwarmMemoryTypes | TConsulMemory;
 @profile
