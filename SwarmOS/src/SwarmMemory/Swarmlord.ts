@@ -1,11 +1,10 @@
 import { profile } from "Tools/Profiler";
-import { MasterSwarmMemory, MasterCreepMemory, MasterFlagMemory, MasterRoomMemory, MasterStructureMemory, MasterRoomObjectMemory, MasterOtherMemory, MemoryBase, MasterConsulMemory } from "SwarmMemory/SwarmMemory";
+import { MasterSwarmMemory, MasterCreepMemory, MasterFlagMemory, MasterRoomMemory, MasterStructureMemory, MasterRoomObjectMemory, MemoryBase, MasterConsulMemory } from "SwarmMemory/SwarmMemory";
 import { NotImplementedException } from "Tools/SwarmExceptions";
 declare var Memory: {
     consuls: IMasterConsulData,
     creeps: IMasterCreepData,
     flags: IMasterFlagData,
-    otherData: IMasterOtherData,
     rooms: IMasterRoomData,
     roomObjects: IMasterRoomObjectData,
     Structures: IMasterStructureData,
@@ -100,7 +99,7 @@ export class Swarmlord {
         }
     }
 
-    SaveMasterMemory(memObject: MasterSwarmMemory<MasterSwarmDataTypes, TBasicData>, save: boolean): void {
+    SaveMasterMemory(memObject: MasterSwarmMemory<MasterSwarmDataTypes, TBasicSwarmData>, save: boolean): void {
         let memData = memObject.ReleaseData();
         if (save) {
             Memory[memObject.id] = memData;
@@ -113,6 +112,7 @@ export class Swarmlord {
         switch (data.id) {
             case (SwarmControllerDataTypes.Consuls):
                 newMem = new MasterConsulMemory(data);
+                break;
             case (SwarmControllerDataTypes.Creeps):
                 newMem = new MasterCreepMemory(data);
                 break;
@@ -128,12 +128,10 @@ export class Swarmlord {
             case (SwarmControllerDataTypes.RoomObjects):
                 newMem = new MasterRoomObjectMemory(data);
                 break;
-            case (SwarmControllerDataTypes.Other):
-                newMem = new MasterOtherMemory(data);
         }
 
         if (!newMem) {
-            throw new NotImplementedException("Attempted to checkout memory that isn't mastered correctly: " + id);
+            throw new NotImplementedException("[Swarmlord.CheckoutMasterMemory] -- Attempted to checkout memory that isn't mastered correctly: " + id);
         }
 
         newMem.ReserveMemory();

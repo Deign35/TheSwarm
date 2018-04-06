@@ -1,12 +1,10 @@
-declare interface IData<T extends SwarmDataType> extends Dictionary {
+declare interface IData<T extends SwarmDataType, U extends number | string> {
     id: string;
     MEM_TYPE: T;
-    SWARM_TYPE: SwarmType;
+    SUB_TYPE: U;
 }
 
-declare interface ISwarmData<T extends SwarmDataType, U extends SwarmType, V extends number | string> extends IData<T> {
-    SWARM_TYPE: U;
-    SUB_TYPE: V;
+declare interface ISwarmData<T extends SwarmDataType, U extends SwarmType, V extends number | string> extends IData<T, V> {
     isActive: boolean;
 }
 declare type TBasicSwarmData = TRoomObjectData | TStructureData | TRoomData | TCreepData | TFlagData | TConsulData;

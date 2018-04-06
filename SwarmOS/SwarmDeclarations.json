@@ -16,14 +16,6 @@
         "E_NOT_IMPLEMENTED": -6
     },
     "Enums": {
-        "SwarmControllerDataTypes": {
-            "Creeps": "\"creeps\"",
-            "Flags": "\"flags\"",
-            "Rooms": "\"rooms\"",
-            "Structures": "\"structures\"",
-            "RoomObjects": "\"roomObjects\"",
-            "Consuls": "\"consuls\""
-        },
         "SwarmDataType": {
             "None": 0,
             "Structure": 1,
@@ -40,7 +32,7 @@
             "Error": 2
         },
         "SwarmType": {
-            "Any": 0,
+            "None": 0,
             "SwarmSite": 1,
             "SwarmCreep": 2,
             "SwarmFlag": 3,
@@ -81,7 +73,7 @@
             "EMERGENCY": 10
         },
         "CreepType": {
-            "NullModule": 0,
+            "None": 0,
             "Builder": 1,
             "Retriever": 2,
             "Deliverer": 3,
@@ -100,7 +92,7 @@
             "Infrastructure": 4
         },
         "FlagType": {
-            "NullModule": 0,
+            "None": 0,
             "Construct": 1,
             "Position": 2
         },

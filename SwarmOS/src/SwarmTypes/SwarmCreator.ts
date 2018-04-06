@@ -29,7 +29,7 @@ export type SwarmStructureTypes = SwarmOwnableStructureTypes | SwarmContainer | 
 export type SwarmObjectTypes = SwarmStructureType | SwarmRoomObjectTypes | SwarmCreep | SwarmRoom | SwarmFlag | OtherObject<BasicMemory>;
 export type TConsulTypes = HarvestConsul | ControlConsul;
 export type AllObjectTypes = SwarmObjectTypes | OtherObject<BasicMemory> | TConsulTypes;
-export type SwarmMemoryTypes = StructureMemory | RoomObjectMemory | CreepMemory | FlagMemory | RoomMemory | BasicMemory;
+export type SwarmMemoryTypes = StructureMemory | RoomObjectMemory | CreepMemory | FlagMemory | RoomMemory;
 export type AllMemoryTypes = SwarmMemoryTypes | TConsulMemory;
 @profile
 export class SwarmCreator {
