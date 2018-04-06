@@ -50,6 +50,7 @@ export abstract class MemoryBase<T extends SwarmDataTypes> {
 export class BasicMemory extends MemoryBase<IOtherData> implements IOtherData {
     get MEM_TYPE(): SwarmDataType.Other { return SwarmDataType.Other; }
     get SWARM_TYPE() { return 0; }
+    get SUB_TYPE(): number { return 0 }
 }
 
 @profile

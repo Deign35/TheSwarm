@@ -15,6 +15,7 @@ declare type TConsulData = HarvestConsulData;
 
 declare interface IOtherData extends IData<SwarmDataType.Other> {
     isActive: boolean;
+    SUB_TYPE: number;
 }
 
 declare interface ISwarmData<T extends SwarmDataType, U extends SwarmType> extends IData<T> {

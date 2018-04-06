@@ -169,25 +169,15 @@ export class SwarmLoader {
         }
         let swarmType = SwarmCreator.GetSwarmType(obj);
         if (!this.MasterMemory[swarmDataType].HasData(saveID)) {
-            let newMem = SwarmCreator.CreateNewSwarmMemory(saveID, swarmType);
+            let newMem = SwarmCreator.CreateNewSwarmMemory(saveID, swarmType) as AllMemoryTypes;
             newMem.ReserveMemory();
-            let swarmObj;
-            if (swarmType == SwarmType.SwarmConsul) {
-                swarmObj = SwarmCreator.CreateConsulObject((newMem as TConsulMemory).SUB_TYPE);
-            } else {
-                swarmObj = SwarmCreator.CreateSwarmObject(swarmType) as ObjectBase<U, T>;
-            }
+            let swarmObj = SwarmCreator.CreateSwarmObject(swarmType, newMem.SUB_TYPE);
             swarmObj.AssignObject(obj, newMem);
             this.MasterMemory[swarmDataType].SaveMemory(swarmObj.ReleaseMemory());
         }
 
         let objMem = this.MasterMemory[swarmDataType].CheckoutMemory(saveID);
-        let swarmObj;
-        if (swarmType == SwarmType.SwarmConsul) {
-            swarmObj = SwarmCreator.CreateConsulObject((objMem as TConsulMemory).SUB_TYPE);
-        } else {
-            swarmObj = SwarmCreator.CreateSwarmObject(swarmType) as ObjectBase<U, T>;
-        }
+        let swarmObj = SwarmCreator.CreateSwarmObject(swarmType, objMem.SUB_TYPE);
         swarmObj.AssignObject(obj, objMem);
 
         this.TheSwarm[swarmDataType][saveID] = swarmObj;

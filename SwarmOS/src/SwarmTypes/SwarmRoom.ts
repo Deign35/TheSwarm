@@ -11,22 +11,29 @@ import { TConsulTypes } from "SwarmTypes/SwarmCreator";
 
 @profile
 export class SwarmRoom extends SwarmItemWithName<Room> implements Room {
-    protected availableSpawns: string[] = [];
+    private _availableSpawns!: string[];
+    protected get spawns(): string[] {
+        if (!this._availableSpawns) {
+            this._availableSpawns = [];
+            let ids = SwarmLoader.SwarmRoomIDs[this.saveID].structures[STRUCTURE_SPAWN];
+            if (ids) {
+                for (let i = 0; i < ids.length; i++) {
+                    let spawn = SwarmLoader.TheSwarm.structures[ids[i]] as SwarmSpawn;
+                    if (!spawn.spawning) {
+                        this._availableSpawns.push(ids[i]);
+                    }
+                }
+            }
+        }
+        return this._availableSpawns;
+    }
 
     PrepObject(unused: boolean) {
         return super.PrepObject(true);
     }
     protected OnPrepObject() {
         this.TryFindNewObjects();
-        let ids = SwarmLoader.SwarmRoomIDs[this.saveID].structures[STRUCTURE_SPAWN];
-        if (ids) {
-            for (let i = 0; i < ids.length; i++) {
-                let spawn = SwarmLoader.TheSwarm.structures[ids[i]] as SwarmSpawn;
-                if (!spawn.spawning) {
-                    this.availableSpawns.push(ids[i]);
-                }
-            }
-        }
+
     }
     protected OnActivate() {
     }
@@ -42,9 +49,9 @@ export class SwarmRoom extends SwarmItemWithName<Room> implements Room {
         if (opts && opts.spawnID) {
             // get spawn this way instead
             spawnToUse = SwarmLoader.TheSwarm.structures[opts.spawnID] as SwarmSpawn;
-        } else if (this.availableSpawns.length > 0) {
+        } else if (this.spawns.length > 0) {
             if (GetSpawnCost(body) <= this.energyAvailable) {
-                spawnToUse = SwarmLoader.TheSwarm.structures[this.availableSpawns.shift()!] as SwarmSpawn;
+                spawnToUse = SwarmLoader.TheSwarm.structures[this.spawns.shift()!] as SwarmSpawn;
             } else {
                 return E_REQUIRES_ENERGY;
             }

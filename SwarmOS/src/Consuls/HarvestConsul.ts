@@ -66,11 +66,11 @@ export class HarvestConsul extends SwarmConsul<HarvestMemory> {
         for (let i = 0; i < this.memory.sourceIDs.length; i++) {
             let source = SwarmLoader.TheSwarm.roomObjects[this.memory.sourceIDs[i]] as SwarmSource;
             let sourceObjects = {
-                constructionSite: source.memory.constructionID && SwarmLoader.TheSwarm.structures[source.memory.constructionID],
+                constructionSite: source.memory.constructionID && SwarmLoader.TheSwarm.roomObjects[source.memory.constructionID],
                 container: source.memory.containerID && SwarmLoader.TheSwarm.structures[source.memory.containerID],
-                creep: source.memory.creepID && SwarmLoader.TheSwarm.structures[source.memory.creepID],
+                creep: source.memory.creepID && SwarmLoader.TheSwarm.creeps[source.memory.creepID],
                 link: source.memory.linkID && SwarmLoader.TheSwarm.structures[source.memory.linkID],
-                pile: source.memory.pileID && SwarmLoader.TheSwarm.structures[source.memory.pileID]
+                pile: source.memory.pileID && SwarmLoader.TheSwarm.roomObjects[source.memory.pileID]
             }
             let newData = {
                 hasCreep: !!sourceObjects.creep,
@@ -145,6 +145,7 @@ export class HarvestConsul extends SwarmConsul<HarvestMemory> {
                 } else if (source.room.energyCapacityAvailable > 550) {
                     creepBody = ConstructBodyArray([[WORK, 5], [MOVE, 1]]);
                 }
+                debugger;
                 if (SwarmLoader.TheSwarm.rooms[source.room.name].TrySpawn(creepBody, creepName) == OK) {
                     source.memory.SetData('creepID', creepName);
                 }

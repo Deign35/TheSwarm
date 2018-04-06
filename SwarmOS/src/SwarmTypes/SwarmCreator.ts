@@ -228,7 +228,7 @@ export class SwarmCreator {
 
         return newMemory!;
     }
-    static CreateSwarmObject<T extends SwarmMemoryTypes>(swarmType: SwarmType): ObjectBase<T, any> {
+    static CreateSwarmObject<T extends SwarmMemoryTypes>(swarmType: SwarmType, subType?: string | number): ObjectBase<T, any> {
         let newObj: ObjectBase<any, any>;
         switch (swarmType) {
             case (SwarmType.Any):
@@ -316,6 +316,10 @@ export class SwarmCreator {
                 break;
             case (SwarmType.SwarmWall):
                 newObj = new SwarmWall();
+                break;
+            case (SwarmType.SwarmConsul):
+                if (!subType) { throw new NotImplementedException('Consul subtype not implemented or something'); }
+                newObj = this.CreateConsulObject(subType as ConsulType);
                 break;
         }
         return newObj!;

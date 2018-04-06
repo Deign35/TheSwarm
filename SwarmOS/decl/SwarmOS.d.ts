@@ -46,7 +46,7 @@ declare var SwarmCreator: {
     CreateConsulMemory(mem: TConsulData): any;
     CreateConsulObject(consulType: ConsulType): any;
     CreateSwarmMemory(mem: IData<SwarmDataType>): any;
-    CreateSwarmObject(swarmType: SwarmType): any;
+    CreateSwarmObject(swarmType: SwarmType, subType?: string | number): any;
     CreateNewSwarmMemory(id: string, swarmType: SwarmType): any;
     GetStructureSwarmType(structure: Structure): SwarmStructureType;
     GetSwarmType(obj: any): SwarmType;
