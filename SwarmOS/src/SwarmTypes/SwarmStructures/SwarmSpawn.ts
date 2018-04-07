@@ -5,8 +5,8 @@ import { profile } from "Tools/Profiler";
 import { SpawnMemory } from "SwarmMemory/StructureMemory";
 
 @profile
-export class SwarmSpawn extends OwnedSwarmStructure<STRUCTURE_SPAWN, StructureSpawn,
-SpawnMemory> implements StructureSpawn {
+export class SwarmSpawn extends OwnedSwarmStructure<SwarmType.SwarmSpawn, STRUCTURE_SPAWN, ISpawnData,
+SpawnMemory, StructureSpawn> implements StructureSpawn {
     get energy() { return this._instance.energy; }
     get energyCapacity() { return this._instance.energyCapacity; }
     get name() { return this._instance.name; }
@@ -14,13 +14,13 @@ SpawnMemory> implements StructureSpawn {
 
     spawnCreep(body: BodyPartConstant[], name: string,
         opts?: {
-            memory?: ICreepData,
+            memory?: TCreepData,
             energyStructures?: Array<(StructureSpawn | StructureExtension)>,
             dryRun?: boolean,
             directions?: DirectionConstant[]
         }) { return this._instance.spawnCreep(body, name, opts); }
-    recycleCreep(target: SwarmCreep) { return this._instance.recycleCreep(target); }
-    renewCreep(target: SwarmCreep) { return this._instance.renewCreep(target); }
+    recycleCreep(target: Creep) { return this._instance.recycleCreep(target); }
+    renewCreep(target: Creep) { return this._instance.renewCreep(target); }
     protected OnPrepObject() { }
     protected OnActivate() { }
 }

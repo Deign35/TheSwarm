@@ -1,38 +1,66 @@
-import { profile } from "Tools/Profiler";
-import { SwarmController } from "SwarmTypes/SwarmStructures/SwarmController";
 import { SwarmCreep } from "SwarmTypes/SwarmCreep";
-import { SwarmExtension, SwarmExtractor, SwarmLink, SwarmNuker, SwarmObserver, SwarmRampart, SwarmRoad, SwarmStorage, SwarmTerminal, SwarmWall, SwarmKeepersLair, SwarmPortal, SwarmPowerBank, SwarmPowerSpawn, SwarmContainer } from "SwarmTypes/SwarmStructures/SwarmStructure";
-import { SwarmFlag } from "SwarmTypes/SwarmFlag";
-import { SwarmLab } from "SwarmTypes/SwarmStructures/SwarmLab";
-import { SwarmMineral, SwarmNuke, SwarmResource, SwarmTombstone, ObjectBase, SwarmObject } from "SwarmTypes/SwarmTypes";
-import { SwarmRoom } from "SwarmTypes/SwarmRoom";
-import { SwarmSite } from "SwarmTypes/SwarmSite";
-import { SwarmSource } from "SwarmTypes/SwarmSource";
-import { SwarmSpawn } from "SwarmTypes/SwarmStructures/SwarmSpawn";
-import { SwarmTower } from "SwarmTypes/SwarmStructures/SwarmTower";
-import { NotImplementedException } from "Tools/SwarmExceptions";
-import { StructureMemory, ContainerMemory, ControllerMemory, ExtensionMemory, ExtractorMemory, KeepersLairMemory, LabMemory, LinkMemory, NukerMemory, ObserverMemory, PortalMemory, PowerBankMemory, PowerSpawnMemory, RampartMemory, RoadMemory, SpawnMemory, StorageMemory, TerminalMemory, TowerMemory, WallMemory } from "SwarmMemory/StructureMemory";
-import { RoomObjectMemory, MineralMemory, NukeMemory, ResourceMemory, ConstructionSiteMemory, SourceMemory, TombstoneMemory } from "SwarmMemory/RoomObjectMemory";
-import { CreepMemory, FlagMemory, RoomMemory, BasicMemory, MemoryBase } from "SwarmMemory/SwarmMemory";
-import { OtherObject } from "./OtherObjects";
-import { TConsulMemory, HarvestMemory } from "SwarmMemory/ConsulMemory";
-import { HarvestConsul } from "Consuls/HarvestConsul";
-import { SwarmConsul, ConsulObject } from "Consuls/ConsulBase";
-import { ControlConsul } from "Consuls/ControlConsul";
+import { StructureMemoryBase } from "SwarmMemory/StructureMemory";
+import { SwarmStructure } from "SwarmTypes/SwarmStructures/SwarmStructure";
+import { RoomObjectMemoryBase } from "SwarmMemory/RoomObjectMemory";
+import { SwarmRoomObject, SwarmTypeBase } from "SwarmTypes/SwarmTypes";
+import { profile } from "Tools/Profiler";
+import { SwarmRoom } from "./SwarmRoom";
+import { SwarmFlag } from "./SwarmFlag";
+import { ConsulObject } from "Consuls/ConsulBase";
+import { SwarmMemory } from "SwarmMemory/SwarmMemory";
 
-export type SwarmRoomObjectTypes = SwarmMineral | SwarmNuke | SwarmResource | SwarmSite | SwarmSource | SwarmTombstone;
-export type SwarmOwnableStructureTypes = SwarmController | SwarmExtension | SwarmExtractor | SwarmKeepersLair |
-    SwarmLab | SwarmLink | SwarmNuker | SwarmObserver | SwarmPowerSpawn | SwarmRampart | SwarmSpawn | SwarmStorage |
-    SwarmTerminal | SwarmTower;
-export type SwarmStructureTypes = SwarmOwnableStructureTypes | SwarmContainer | SwarmPortal | SwarmPowerBank |
-    SwarmRoad | SwarmWall;
-export type SwarmObjectTypes = SwarmStructureType | SwarmRoomObjectTypes | SwarmCreep | SwarmRoom | SwarmFlag | OtherObject<BasicMemory>;
-export type TConsulTypes = HarvestConsul | ControlConsul;
-export type AllObjectTypes = SwarmObjectTypes | OtherObject<BasicMemory> | TConsulTypes;
-export type SwarmMemoryTypes = StructureMemory | RoomObjectMemory | CreepMemory | FlagMemory | RoomMemory;
-export type AllMemoryTypes = SwarmMemoryTypes | TConsulMemory;
+
+export type TSwarmCreep_1<T extends CreepType> = SwarmCreep<T, ICreepData<T>>;
+export type SwarmCreep_Type = TSwarmCreep_1<CreepType>;
+
+export type TSwarmStructure_1<T extends SwarmStructureType, U extends StructureConstant,
+    V extends IStructureData<T, U>, W extends StructureMemoryBase<T, U, V>> = SwarmStructure<T, U, V, W, Structure<U>>;
+export type TSwarmStructure_2<T extends SwarmStructureType, U extends StructureConstant,
+    V extends IStructureData<T, U>> = TSwarmStructure_1<T, U, V, StructureMemoryBase<T, U, V>>;
+export type TSwarmStructure_3<T extends SwarmStructureType, U extends StructureConstant> =
+    TSwarmStructure_2<T, U, IStructureData<T, U>>;
+export type TSwarmStructure_4<T extends SwarmStructureType> = TSwarmStructure_3<T, StructureConstant>;
+export type SwarmStructure_Type = TSwarmStructure_4<SwarmStructureType>;
+
+export type TRoomObject_1<T extends SwarmRoomObjectType, U extends IRoomObjectData<T>, V extends RoomObjectMemoryBase<T, U>,
+    W extends Mineral | Resource | Tombstone | Nuke | ConstructionSite | Source> = SwarmRoomObject<T, U, V, W>;
+export type TRoomObject_2<T extends SwarmRoomObjectType, U extends IRoomObjectData<T>,
+    V extends RoomObjectMemoryBase<T, U>> = TRoomObject_1<T, U, V, Mineral | Resource | Tombstone | Nuke | ConstructionSite | Source>;
+export type TRoomObject_3<T extends SwarmRoomObjectType, U extends IRoomObjectData<T>> =
+    TRoomObject_2<T, U, RoomObjectMemoryBase<T, U>>
+export type TRoomObject_4<T extends SwarmRoomObjectType> = TRoomObject_3<T, IRoomObjectData<T>>;
+export type SwarmRoomObject_Type = TRoomObject_4<SwarmRoomObjectType>;
+
+export type TSwarmRoom_1<T extends RoomType, U extends IRoomData<T>> = SwarmRoom<T, U>
+export type TSwarmRoom_2<T extends RoomType> = TSwarmRoom_1<T, IRoomData<T>>;
+export type SwarmRoom_Type = TSwarmRoom_2<RoomType>;
+
+export type TSwarmFlag_1<T extends FlagType, U extends IFlagData<T>> = SwarmFlag<T, U>;
+export type TSwarmFlag_2<T extends FlagType> = TSwarmFlag_1<T, IFlagData<T>>;
+export type SwarmFlag_Type = TSwarmFlag_2<FlagType>;
+
+export type TSwarmObject_1<T extends SwarmDataTypeSansMaster, U extends SwarmType, V extends string | number,
+    W extends ISwarmData<T, U, V>, X extends SwarmMemory<T, U, V, W>, Y extends Room | RoomObject | ConsulObject> =
+    SwarmTypeBase<T, U, V, W, X, Y>;
+export type TSwarmObject_2<T extends SwarmDataTypeSansMaster, U extends SwarmType, V extends string | number,
+    W extends ISwarmData<T, U, V>, Y extends Room | RoomObject | ConsulObject> =
+    TSwarmObject_1<T, U, V, W, SwarmMemory<T, U, V, W>, Y>;
+export type TSwarmObject_3<T extends SwarmDataTypeSansMaster, U extends SwarmType, V extends string | number,
+    W extends ISwarmData<T, U, V>, Y extends Room | RoomObject | ConsulObject> = TSwarmObject_2<T, U, V, W, Y>;
+export type TSwarmObject_4<T extends SwarmDataTypeSansMaster, U extends SwarmType, V extends string | number,
+    Y extends Room | RoomObject | ConsulObject> = TSwarmObject_2<T, U, V, ISwarmData<T, U, V>, Y>;
+
+
+
+
+
 @profile
 export class SwarmCreator {
+    static CreateSwarmObject<T extends SwarmDataType, U extends SwarmType,
+        V extends string | number>(): SwarmObject_Type {
+
+    }
+    /*
     static CreateNewSwarmObject<T extends Room | RoomObject, U extends SwarmMemoryTypes>(obj: T) {
         let swarmType = this.GetSwarmType(obj);
         let newObj = this.CreateSwarmObject(swarmType) as ObjectBase<U, T>;
@@ -595,5 +623,5 @@ export class SwarmCreator {
                 break;
         }
         return newMemory!;
-    }
+    }*/
 }

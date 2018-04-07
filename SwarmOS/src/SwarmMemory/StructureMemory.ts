@@ -5,8 +5,8 @@ import { NotImplementedException } from "Tools/SwarmExceptions";
 
 
 @profile
-export abstract class StructureMemoryBase<T extends SwarmStructureType, U extends StructureConstant,
-    V extends IStructureData<T, U>> extends SwarmMemory<SwarmDataType.Structure, T, U, V> implements IStructureData<T, U> {
+export abstract class StructureMemoryBase<T extends SwarmStructureType, U extends StructureConstant>
+    extends SwarmMemory<SwarmDataType.Structure, T, U> implements IStructureData<T, U> {
     get SUB_TYPE(): U {
         switch (this.SWARM_TYPE) {
             case (SwarmType.SwarmContainer): return STRUCTURE_CONTAINER as U;
@@ -36,97 +36,86 @@ export abstract class StructureMemoryBase<T extends SwarmStructureType, U extend
 
 @profile
 export class ContainerMemory extends StructureMemoryBase<SwarmType.SwarmContainer,
-STRUCTURE_CONTAINER, IContainerData> implements IContainerData {
+STRUCTURE_CONTAINER> implements IContainerData {
     get SWARM_TYPE(): SwarmType.SwarmContainer { return SwarmType.SwarmContainer; }
 }
 @profile
 export class ControllerMemory extends StructureMemoryBase<SwarmType.SwarmController,
-STRUCTURE_CONTROLLER, IControllerData> implements IControllerData {
+STRUCTURE_CONTROLLER> implements IControllerData {
     get SWARM_TYPE(): SwarmType.SwarmController { return SwarmType.SwarmController; }
 }
 @profile
 export class ExtensionMemory extends StructureMemoryBase<SwarmType.SwarmExtension,
-STRUCTURE_EXTENSION, IExtensionData> implements IExtensionData {
+STRUCTURE_EXTENSION> implements IExtensionData {
     get SWARM_TYPE(): SwarmType.SwarmExtension { return SwarmType.SwarmExtension; }
 }
 @profile
 export class ExtractorMemory extends StructureMemoryBase<SwarmType.SwarmExtractor,
-STRUCTURE_EXTRACTOR, IExtractorData> implements IExtractorData {
+STRUCTURE_EXTRACTOR> implements IExtractorData {
     get SWARM_TYPE(): SwarmType.SwarmExtractor { return SwarmType.SwarmExtractor; }
 }
 @profile
 export class KeepersLairMemory extends StructureMemoryBase<SwarmType.SwarmKeepersLair,
-STRUCTURE_KEEPER_LAIR, IKeepersLairData> implements IKeepersLairData {
+STRUCTURE_KEEPER_LAIR> implements IKeepersLairData {
     get SWARM_TYPE(): SwarmType.SwarmKeepersLair { return SwarmType.SwarmKeepersLair; }
 }
 @profile
-export class LabMemory extends StructureMemoryBase<SwarmType.SwarmLab,
-STRUCTURE_LAB, ILabData> implements ILabData {
+export class LabMemory extends StructureMemoryBase<SwarmType.SwarmLab, STRUCTURE_LAB> implements ILabData {
     get SWARM_TYPE(): SwarmType.SwarmLab { return SwarmType.SwarmLab; }
 }
 @profile
-export class LinkMemory extends StructureMemoryBase<SwarmType.SwarmLink,
-STRUCTURE_LINK, ILinkData> implements ILinkData {
+export class LinkMemory extends StructureMemoryBase<SwarmType.SwarmLink, STRUCTURE_LINK> implements ILinkData {
     get SWARM_TYPE(): SwarmType.SwarmLink { return SwarmType.SwarmLink; }
 }
 @profile
-export class NukerMemory extends StructureMemoryBase<SwarmType.SwarmNuker,
-STRUCTURE_NUKER, INukerData> implements INukerData {
+export class NukerMemory extends StructureMemoryBase<SwarmType.SwarmNuker, STRUCTURE_NUKER> implements INukerData {
     get SWARM_TYPE(): SwarmType.SwarmNuker { return SwarmType.SwarmNuker; }
 }
 @profile
-export class ObserverMemory extends StructureMemoryBase<SwarmType.SwarmObserver,
-STRUCTURE_OBSERVER, IObserverData> implements IObserverData {
+export class ObserverMemory extends StructureMemoryBase<SwarmType.SwarmObserver, STRUCTURE_OBSERVER> implements IObserverData {
     get SWARM_TYPE(): SwarmType.SwarmObserver { return SwarmType.SwarmObserver; }
 }
 @profile
-export class PortalMemory extends StructureMemoryBase<SwarmType.SwarmPortal,
-STRUCTURE_PORTAL, IPortalData> implements IPortalData {
+export class PortalMemory extends StructureMemoryBase<SwarmType.SwarmPortal, STRUCTURE_PORTAL> implements IPortalData {
     get SWARM_TYPE(): SwarmType.SwarmPortal { return SwarmType.SwarmPortal; }
 }
 @profile
 export class PowerBankMemory extends StructureMemoryBase<SwarmType.SwarmPowerBank,
-STRUCTURE_POWER_BANK, IPowerBankData> implements IPowerBankData {
+STRUCTURE_POWER_BANK> implements IPowerBankData {
     get SWARM_TYPE(): SwarmType.SwarmPowerBank { return SwarmType.SwarmPowerBank; }
 }
 @profile
 export class PowerSpawnMemory extends StructureMemoryBase<SwarmType.SwarmPowerSpawn,
-STRUCTURE_POWER_SPAWN, IPowerSpawnData> implements IPowerSpawnData {
+STRUCTURE_POWER_SPAWN> implements IPowerSpawnData {
     get SWARM_TYPE(): SwarmType.SwarmPowerSpawn { return SwarmType.SwarmPowerSpawn; }
 }
 @profile
 export class RampartMemory extends StructureMemoryBase<SwarmType.SwarmRampart,
-STRUCTURE_RAMPART, IRampartData> implements IRampartData {
+STRUCTURE_RAMPART> implements IRampartData {
     get SWARM_TYPE(): SwarmType.SwarmRampart { return SwarmType.SwarmRampart; }
 }
 @profile
-export class RoadMemory extends StructureMemoryBase<SwarmType.SwarmRoad,
-STRUCTURE_ROAD, IRoadData> implements IRoadData {
+export class RoadMemory extends StructureMemoryBase<SwarmType.SwarmRoad, STRUCTURE_ROAD> implements IRoadData {
     get SWARM_TYPE(): SwarmType.SwarmRoad { return SwarmType.SwarmRoad; }
 }
 @profile
-export class SpawnMemory extends StructureMemoryBase<SwarmType.SwarmSpawn,
-STRUCTURE_SPAWN, ISpawnData> implements ISpawnData {
+export class SpawnMemory extends StructureMemoryBase<SwarmType.SwarmSpawn, STRUCTURE_SPAWN> implements ISpawnData {
     get SWARM_TYPE(): SwarmType.SwarmSpawn { return SwarmType.SwarmSpawn; }
 }
 @profile
-export class StorageMemory extends StructureMemoryBase<SwarmType.SwarmStorage,
-STRUCTURE_STORAGE, IStorageData> implements IStorageData {
+export class StorageMemory extends StructureMemoryBase<SwarmType.SwarmStorage, STRUCTURE_STORAGE> implements IStorageData {
     get SWARM_TYPE(): SwarmType.SwarmStorage { return SwarmType.SwarmStorage; }
 }
 @profile
-export class TerminalMemory extends StructureMemoryBase<SwarmType.SwarmTerminal,
-STRUCTURE_TERMINAL, ITerminalData> implements ITerminalData {
+export class TerminalMemory extends StructureMemoryBase<SwarmType.SwarmTerminal, STRUCTURE_TERMINAL> implements ITerminalData {
     get SWARM_TYPE(): SwarmType.SwarmTerminal { return SwarmType.SwarmTerminal; }
 }
 @profile
-export class TowerMemory extends StructureMemoryBase<SwarmType.SwarmTower,
-STRUCTURE_TOWER, ITowerData> implements ITowerData {
+export class TowerMemory extends StructureMemoryBase<SwarmType.SwarmTower, STRUCTURE_TOWER> implements ITowerData {
     get SWARM_TYPE(): SwarmType.SwarmTower { return SwarmType.SwarmTower; }
 }
 @profile
-export class WallMemory extends StructureMemoryBase<SwarmType.SwarmWall,
-STRUCTURE_WALL, IWallData> implements IWallData {
+export class WallMemory extends StructureMemoryBase<SwarmType.SwarmWall, STRUCTURE_WALL> implements IWallData {
     get SWARM_TYPE(): SwarmType.SwarmWall { return SwarmType.SwarmWall; }
 }
 
