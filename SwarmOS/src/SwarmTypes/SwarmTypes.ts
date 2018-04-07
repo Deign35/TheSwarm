@@ -2,13 +2,17 @@ import { profile } from "Tools/Profiler";
 import { MemoryBase, SwarmMemory } from "SwarmMemory/SwarmMemory";
 import { RoomObjectMemoryBase, MineralMemory, TombstoneMemory, ResourceMemory, NukeMemory } from "SwarmMemory/RoomObjectMemory";
 import { ConsulObject } from "Consuls/ConsulBase";
-import { TSwarmObject_1 } from "SwarmTypes/SwarmCreator";
 
 
 const HAS_PREPPED = 'hasPrepped';
+abstract class ObjectBaseWithMemory<T extends SwarmDataType, U extends SwarmSubType, V extends IData<T, U>,
+    W extends MemoryBase<T, U, V>, X extends SwarmObjectType> {
+
+}
 @profile
 export abstract class ObjectBase<T extends SwarmDataType, U extends SwarmSubType,
-    V extends IData<T, U>, W extends MemoryBase<T, U, V>, X extends any> {
+    W extends MemoryBase<T, U, IData<T, U>>, X extends SwarmObjectType>
+    extends ObjectBaseWithMemory<T, U, IData<T, U>, W, X>{
     protected OnPrepObject() {
 
     }
@@ -47,7 +51,7 @@ export abstract class ObjectBase<T extends SwarmDataType, U extends SwarmSubType
 @profile
 export abstract class SwarmTypeBase<T extends SwarmDataTypeSansMaster, U extends SwarmType,
     V extends SwarmSubType, W extends SwarmMemory<T, U, V>, Y extends SwarmObjectType>
-    extends ObjectBase<T, V, ISwarmData<T, U, V>, W, Y> implements TSwarmObject_1<T, U, V, Y> {
+    extends ObjectBase<T, V, W, Y> {
     get SWARM_TYPE(): U { return this.memory.SWARM_TYPE; }
     get IsActive() { return this.memory.isActive; }
 }

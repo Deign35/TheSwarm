@@ -1,47 +1,145 @@
 import { SwarmCreep } from "SwarmTypes/SwarmCreep";
 import { StructureMemoryBase } from "SwarmMemory/StructureMemory";
-import { SwarmStructure } from "SwarmTypes/SwarmStructures/SwarmStructure";
+import { SwarmStructure, SwarmContainer, SwarmExtractor, SwarmExtension, SwarmKeepersLair, SwarmLink, SwarmNuker, SwarmObserver, SwarmPortal, SwarmPowerBank, SwarmPowerSpawn, SwarmRampart, SwarmRoad, SwarmStorage, SwarmTerminal, SwarmWall } from "SwarmTypes/SwarmStructures/SwarmStructure";
 import { RoomObjectMemoryBase } from "SwarmMemory/RoomObjectMemory";
-import { SwarmRoomObject, SwarmTypeBase } from "SwarmTypes/SwarmTypes";
+import { SwarmRoomObject, SwarmTypeBase, ObjectBase, SwarmMineral, SwarmTombstone, SwarmResource, SwarmNuke } from "SwarmTypes/SwarmTypes";
 import { profile } from "Tools/Profiler";
 import { SwarmRoom } from "./SwarmRoom";
 import { SwarmFlag } from "./SwarmFlag";
 import { ConsulObject, SwarmConsul } from "Consuls/ConsulBase";
 import { SwarmMemory } from "SwarmMemory/SwarmMemory";
+import { HarvestConsul } from "Consuls/HarvestConsul";
+import { ControlConsul } from "Consuls/ControlConsul";
+import { NotImplementedException } from "Tools/SwarmExceptions";
+import { SwarmSite } from "SwarmTypes/SwarmSite";
+import { SwarmSource } from "SwarmTypes/SwarmSource";
+import { SwarmController } from "SwarmTypes/SwarmStructures/SwarmController";
+import { SwarmLab } from "SwarmTypes/SwarmStructures/SwarmLab";
+import { SwarmSpawn } from "SwarmTypes/SwarmStructures/SwarmSpawn";
+import { SwarmTower } from "SwarmTypes/SwarmStructures/SwarmTower";
+
+const SWARM_OBJECTS: {
+    [id: number]: {
+        [id: number]: {
+        }
+    }
+} = {}
+SWARM_OBJECTS[SwarmDataType.Consul] = {};
+SWARM_OBJECTS[SwarmDataType.Consul][ConsulType.Control] = ControlConsul;
+SWARM_OBJECTS[SwarmDataType.Consul][ConsulType.Harvest] = HarvestConsul;
 
 
-export type TSwarmObject_1<T extends SwarmDataTypeSansMaster, U extends SwarmType, V extends SwarmSubType,
-    Y extends Room | RoomObject | ConsulObject> = SwarmTypeBase<T, U, V, SwarmMemory<T, U, V>, Y>;
+SWARM_OBJECTS[SwarmDataType.Creep] = {};
+SWARM_OBJECTS[SwarmDataType.Creep][CreepType.Builder] = SwarmCreep;
+SWARM_OBJECTS[SwarmDataType.Creep][CreepType.Defender] = SwarmCreep;
+SWARM_OBJECTS[SwarmDataType.Creep][CreepType.Deliverer] = SwarmCreep;
+SWARM_OBJECTS[SwarmDataType.Creep][CreepType.MineralHarvester] = SwarmCreep;
+SWARM_OBJECTS[SwarmDataType.Creep][CreepType.None] = SwarmCreep;
+SWARM_OBJECTS[SwarmDataType.Creep][CreepType.Repairer] = SwarmCreep;
+SWARM_OBJECTS[SwarmDataType.Creep][CreepType.Retriever] = SwarmCreep;
+SWARM_OBJECTS[SwarmDataType.Creep][CreepType.Scientist] = SwarmCreep;
+SWARM_OBJECTS[SwarmDataType.Creep][CreepType.SourceHarvester] = SwarmCreep;
+SWARM_OBJECTS[SwarmDataType.Creep][CreepType.Upgrader] = SwarmCreep;
 
-export type SwarmCreep_Type = SwarmCreep<CreepType>;
+SWARM_OBJECTS[SwarmDataType.Flag] = {};
+SWARM_OBJECTS[SwarmDataType.Flag][FlagType.Construct] = SwarmFlag;
+SWARM_OBJECTS[SwarmDataType.Flag][FlagType.None] = SwarmFlag;
+SWARM_OBJECTS[SwarmDataType.Flag][FlagType.Position] = SwarmFlag;
 
-export type TSwarmStructure_1<T extends SwarmStructureType, U extends StructureConstant> =
-    SwarmStructure<T, U, StructureMemoryBase<T, U>, Structure<U>>;
-export type TSwarmStructure_2<T extends SwarmStructureType> = TSwarmStructure_1<T, StructureConstant>;
-export type SwarmStructure_Type = TSwarmStructure_2<SwarmStructureType>;
+SWARM_OBJECTS[SwarmDataType.Room] = {};
+SWARM_OBJECTS[SwarmDataType.Room][RoomType.Ally] = SwarmRoom;
+SWARM_OBJECTS[SwarmDataType.Room][RoomType.HarvestSupport] = SwarmRoom;
+SWARM_OBJECTS[SwarmDataType.Room][RoomType.Hostile] = SwarmRoom;
+SWARM_OBJECTS[SwarmDataType.Room][RoomType.KeepersLair] = SwarmRoom;
+SWARM_OBJECTS[SwarmDataType.Room][RoomType.NeutralRoom] = SwarmRoom;
+SWARM_OBJECTS[SwarmDataType.Room][RoomType.NonHostile] = SwarmRoom;
+SWARM_OBJECTS[SwarmDataType.Room][RoomType.RCL1] = SwarmRoom;
+SWARM_OBJECTS[SwarmDataType.Room][RoomType.RCL2] = SwarmRoom;
+SWARM_OBJECTS[SwarmDataType.Room][RoomType.RCL3] = SwarmRoom;
+SWARM_OBJECTS[SwarmDataType.Room][RoomType.RCL4] = SwarmRoom;
+SWARM_OBJECTS[SwarmDataType.Room][RoomType.RCL5] = SwarmRoom;
+SWARM_OBJECTS[SwarmDataType.Room][RoomType.RCL6] = SwarmRoom;
+SWARM_OBJECTS[SwarmDataType.Room][RoomType.RCL7] = SwarmRoom;
+SWARM_OBJECTS[SwarmDataType.Room][RoomType.RCL8] = SwarmRoom;
 
-export type TRoomObject_1<T extends SwarmRoomObjectType, U extends RoomObjectMemoryBase<T>,
-    V extends _rmType> = SwarmRoomObject<T, U, V>;
-export type TRoomObject_2<T extends SwarmRoomObjectType, U extends _rmType> =
-    TRoomObject_1<T, RoomObjectMemoryBase<T>, U>;
-export type SwarmRoomObject_Type = TRoomObject_2<SwarmRoomObjectType, _rmType>;
+SWARM_OBJECTS[SwarmDataType.RoomObject] = {};
+SWARM_OBJECTS[SwarmDataType.RoomObject][SwarmType.SwarmMineral] = SwarmMineral;
+SWARM_OBJECTS[SwarmDataType.RoomObject][SwarmType.SwarmNuke] = SwarmNuke;
+SWARM_OBJECTS[SwarmDataType.RoomObject][SwarmType.SwarmResource] = SwarmResource;
+SWARM_OBJECTS[SwarmDataType.RoomObject][SwarmType.SwarmSite] = SwarmSite;
+SWARM_OBJECTS[SwarmDataType.RoomObject][SwarmType.SwarmSource] = SwarmSource;
+SWARM_OBJECTS[SwarmDataType.RoomObject][SwarmType.SwarmTombstone] = SwarmTombstone;
 
-export type SwarmRoom_Type = SwarmRoom<RoomType>;
-export type SwarmFlag_Type = SwarmFlag<FlagType>;
-//export type SwarmConsul_Type = SwarmConsul<ConsulType>;
-export type SwarmObject_Type = SwarmCreep_Type | SwarmStructure_Type | SwarmRoom_Type | SwarmFlag_Type |
-    SwarmRoomObject_Type;
-
-
-
-/*
+SWARM_OBJECTS[SwarmDataType.Structure] = {};
+SWARM_OBJECTS[SwarmDataType.Structure][STRUCTURE_CONTAINER] = SwarmContainer;
+SWARM_OBJECTS[SwarmDataType.Structure][STRUCTURE_CONTROLLER] = SwarmController;
+SWARM_OBJECTS[SwarmDataType.Structure][STRUCTURE_EXTRACTOR] = SwarmExtractor;
+SWARM_OBJECTS[SwarmDataType.Structure][STRUCTURE_EXTENSION] = SwarmExtension;
+SWARM_OBJECTS[SwarmDataType.Structure][STRUCTURE_KEEPER_LAIR] = SwarmKeepersLair;
+SWARM_OBJECTS[SwarmDataType.Structure][STRUCTURE_LAB] = SwarmLab;
+SWARM_OBJECTS[SwarmDataType.Structure][STRUCTURE_LINK] = SwarmLink;
+SWARM_OBJECTS[SwarmDataType.Structure][STRUCTURE_NUKER] = SwarmNuker;
+SWARM_OBJECTS[SwarmDataType.Structure][STRUCTURE_OBSERVER] = SwarmObserver;
+SWARM_OBJECTS[SwarmDataType.Structure][STRUCTURE_PORTAL] = SwarmPortal;
+SWARM_OBJECTS[SwarmDataType.Structure][STRUCTURE_POWER_BANK] = SwarmPowerBank;
+SWARM_OBJECTS[SwarmDataType.Structure][STRUCTURE_POWER_SPAWN] = SwarmPowerSpawn;
+SWARM_OBJECTS[SwarmDataType.Structure][STRUCTURE_RAMPART] = SwarmRampart;
+SWARM_OBJECTS[SwarmDataType.Structure][STRUCTURE_ROAD] = SwarmRoad;
+SWARM_OBJECTS[SwarmDataType.Structure][STRUCTURE_SPAWN] = SwarmSpawn;
+SWARM_OBJECTS[SwarmDataType.Structure][STRUCTURE_STORAGE] = SwarmStorage;
+SWARM_OBJECTS[SwarmDataType.Structure][STRUCTURE_TERMINAL] = SwarmTerminal;
+SWARM_OBJECTS[SwarmDataType.Structure][STRUCTURE_TOWER] = SwarmTower;
+SWARM_OBJECTS[SwarmDataType.Structure][STRUCTURE_WALL] = SwarmWall;
 
 @profile
 export class SwarmCreator {
-    static CreateSwarmObject<T extends SwarmDataType, U extends SwarmType,
-        V extends string | number>(): SwarmObject_Type {
+    static CreateSwarmObject(dataType: SwarmDataTypeSansMaster, swarmType: SwarmType, subType: SwarmSubType) {
+        switch (dataType) {
+            case (SwarmDataType.Consul):
+                switch (subType as ConsulType) {
+                    case (ConsulType.Harvest): return new HarvestConsul();
+                    case (ConsulType.Control): return new ControlConsul();
+                }
+            case (SwarmDataType.Creep): return new SwarmCreep();
+            case (SwarmDataType.Flag): return new SwarmFlag();
+            case (SwarmDataType.Room): return new SwarmRoom();
+            case (SwarmDataType.RoomObject):
+                switch (swarmType) {
+                    case (SwarmType.SwarmMineral): return new SwarmMineral();
+                    case (SwarmType.SwarmNuke): return new SwarmNuke();
+                    case (SwarmType.SwarmResource): return new SwarmResource();
+                    case (SwarmType.SwarmSource): return new SwarmSource();
+                    case (SwarmType.SwarmSite): return new SwarmSite();
+                    case (SwarmType.SwarmTombstone): return new SwarmTombstone();
+                }
+            case (SwarmDataType.Structure):
+                switch (subType as StructureConstant) {
+                    case (STRUCTURE_CONTAINER): return new SwarmContainer();
+                    case (STRUCTURE_CONTROLLER): return new SwarmContainer();
+                    case (STRUCTURE_EXTENSION): return new SwarmContainer();
+                    case (STRUCTURE_EXTRACTOR): return new SwarmContainer();
+                    case (STRUCTURE_KEEPER_LAIR): return new SwarmContainer();
+                    case (STRUCTURE_LAB): return new SwarmContainer();
+                    case (STRUCTURE_LINK): return new SwarmContainer();
+                    case (STRUCTURE_NUKER): return new SwarmContainer();
+                    case (STRUCTURE_OBSERVER): return new SwarmContainer();
+                    case (STRUCTURE_PORTAL): return new SwarmContainer();
+                    case (STRUCTURE_POWER_BANK): return new SwarmContainer();
+                    case (STRUCTURE_POWER_SPAWN): return new SwarmContainer();
+                    case (STRUCTURE_RAMPART): return new SwarmContainer();
+                    case (STRUCTURE_ROAD): return new SwarmContainer();
+                    case (STRUCTURE_SPAWN): return new SwarmContainer();
+                    case (STRUCTURE_STORAGE): return new SwarmContainer();
+                    case (STRUCTURE_TERMINAL): return new SwarmContainer();
+                    case (STRUCTURE_TOWER): return new SwarmContainer();
+                    case (STRUCTURE_WALL): return new SwarmContainer();
+                }
+        }
 
+        throw new NotImplementedException("SwarmObject is not configured: dataType[" +
+            dataType + '] - swarmType[' + swarmType + '] - subType[' + subType + ']');
     }
+
     /*
     static CreateNewSwarmObject<T extends Room | RoomObject, U extends SwarmMemoryTypes>(obj: T) {
         let swarmType = this.GetSwarmType(obj);
