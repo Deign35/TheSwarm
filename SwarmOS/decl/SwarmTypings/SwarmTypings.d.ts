@@ -1,9 +1,10 @@
+declare type SwarmSubType = SwarmType | ConsulType | StructureConstant |
+    FlagType | RoomType | CreepType | SwarmDataType
 declare interface IData<T extends SwarmDataType, U extends number | string> {
     id: string;
     MEM_TYPE: T;
     SUB_TYPE: U;
 }
-
 declare interface ISwarmData<T extends SwarmDataType, U extends SwarmType, V extends SwarmSubType> extends IData<T, V> {
     isActive: boolean;
 }
@@ -14,10 +15,17 @@ declare type SwarmDataTypes = MasterSwarmDataTypes | TBasicSwarmData;
 declare type SwarmDataTypeSansMaster = SwarmDataType.Consul | SwarmDataType.Creep | SwarmDataType.Flag |
     SwarmDataType.Room | SwarmDataType.RoomObject | SwarmDataType.Structure;
 
-declare interface AIBase<T extends SwarmDataTypes, U extends SwarmObjectType> extends _Constructor<U> {
-    id: string,
-    isActive: boolean;
+declare type SwarmRoomObjectType = SwarmType.SwarmSite | SwarmType.SwarmMineral | SwarmType.SwarmNuke |
+    SwarmType.SwarmResource | SwarmType.SwarmSource | SwarmType.SwarmTombstone
 
+declare type SwarmStructureType = SwarmType.SwarmContainer | SwarmType.SwarmController | SwarmType.SwarmExtension |
+    SwarmType.SwarmExtractor | SwarmType.SwarmKeepersLair | SwarmType.SwarmLab | SwarmType.SwarmLink |
+    SwarmType.SwarmNuker | SwarmType.SwarmObserver | SwarmType.SwarmPortal | SwarmType.SwarmPowerBank |
+    SwarmType.SwarmPowerSpawn | SwarmType.SwarmRampart | SwarmType.SwarmRoad | SwarmType.SwarmSpawn |
+    SwarmType.SwarmStorage | SwarmType.SwarmTerminal | SwarmType.SwarmTower | SwarmType.SwarmWall
+
+declare type SwarmObjectType = Room | RoomObject | AIConsulObject
+declare interface AIBase<T extends SwarmDataTypes, U extends SwarmObjectType> extends _Constructor<U> {
     Activate(mem: T, obj: U): T;
     InitAsNew(obj: U): T;
     PrepObject(mem: T, obj: U): T;

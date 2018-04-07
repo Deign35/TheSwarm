@@ -5,46 +5,32 @@ import { ConsulObject } from "Consuls/ConsulBase";
 
 
 const HAS_PREPPED = 'hasPrepped';
-abstract class ObjectBaseWithMemory<T extends SwarmDataType, U extends SwarmSubType, V extends IData<T, U>,
-    W extends MemoryBase<T, U, V>, X extends SwarmObjectType> {
-
-}
 @profile
-export abstract class ObjectBase<T extends SwarmDataType, U extends SwarmSubType,
-    W extends MemoryBase<T, U, IData<T, U>>, X extends SwarmObjectType>
-    extends ObjectBaseWithMemory<T, U, IData<T, U>, W, X>{
+export abstract class ObjectBase<T extends SwarmDataTypes, U extends SwarmObjectType> implements AIBase<T, U> {
+    get prototype(): U { return this._instance.prototype; }
     protected OnPrepObject() {
 
     }
-    PrepObject(prepIfInactive: boolean) {
-        if ((prepIfInactive || this.IsActive) && !this.memory.GetFlashData(HAS_PREPPED)) {
+    PrepObject(mem: T, obj: U) {
+        /*if ((prepIfInactive || this.IsActive) && !this.memory.GetFlashData(HAS_PREPPED)) {
             this.OnPrepObject();
             this.memory.SetFlashData(HAS_PREPPED, true);
-        }
+        }*/
+
+        return mem;
     }
 
-    get IsActive(): boolean { return this.memory.isActive; }
-    protected OnActivate() { }
-    Activate(): void {
-        this.PrepObject(false); // What should this actually for reactivating an object??
-        if (this.IsActive) {
-            this.OnActivate();
-        }
-    }
-    InitAsNew() { }
-    AssignObject(obj: X, objMemory: W): void {
-        this._instance = obj;
-        this._memory = objMemory;
-    }
+    abstract Activate(mem: T, obj: U): T;
+    abstract InitAsNew(obj: U): T;
 
-    protected _instance!: X;
-    GetObjectInstance(): X { return this._instance; }
-    private _memory!: W;
-    get memory(): W { return this._memory; }
+    private _instance!: U;
+    private _memory!: T;
 
+    get memory(): T { return this._memory; }
     get id(): string { return this.memory.id; }
 
-    GetMemType(): T {
+    GetObjectInstance(): U { return this._instance; }
+    GetMemType(): SwarmDataType {
         return this.memory.MEM_TYPE;
     }
 }

@@ -1,3 +1,4 @@
+declare type RoomObjectType = Mineral | Resource | Tombstone | Nuke | ConstructionSite | Source;
 declare type TRoomObjectData = IMineralData | ISourceData | INukeData |
     IResourceData | ITombstoneData | ISiteData;
 
@@ -23,7 +24,7 @@ declare interface ITombstoneData extends IRoomObjectData<SwarmType.SwarmTombston
 declare interface ISiteData extends IRoomObjectData<SwarmType.SwarmSite> { }
 
 
-declare interface AIRoomObjectBase<T extends TRoomObjectData, U extends _rmType> extends AIBase<T, U> {
+declare interface AIRoomObjectBase<T extends TRoomObjectData, U extends RoomObjectType> extends AIBase<T, U> {
 
 }
 declare interface AIMineral extends AIRoomObjectBase<IMineralData, Mineral> {

@@ -20,6 +20,7 @@ interface Profiler {
     toString(): string;
 }
 
+/*
 declare type SwarmStructureType = SwarmType.SwarmContainer | SwarmType.SwarmController | SwarmType.SwarmExtension |
     SwarmType.SwarmExtractor | SwarmType.SwarmKeepersLair | SwarmType.SwarmLab | SwarmType.SwarmLink |
     SwarmType.SwarmNuker | SwarmType.SwarmObserver | SwarmType.SwarmPortal | SwarmType.SwarmPowerBank |
@@ -37,7 +38,6 @@ declare type SwarmOwnableStructureType = SwarmType.SwarmController | SwarmType.S
     SwarmType.SwarmPowerBank | SwarmType.SwarmPowerSpawn | SwarmType.SwarmRampart | SwarmType.SwarmSpawn |
     SwarmType.SwarmStorage | SwarmType.SwarmTerminal | SwarmType.SwarmTower
 
-declare type SwarmObjectType = Room | RoomObject | IConsulObject;
 declare interface ISwarmlord {
     ValidateMemory(): void;
     SaveMasterMemory<T extends any>(memObject: T, save: boolean): void;
@@ -57,4 +57,4 @@ declare var SwarmCreator: {
 }
 declare type _rmType = Mineral | Resource | Tombstone | Nuke | ConstructionSite | Source;
 declare type SwarmSubType = SwarmType | ConsulType | StructureConstant |
-    FlagType | RoomType | CreepType | SwarmDataType;
+    FlagType | RoomType | CreepType | SwarmDataType;*/

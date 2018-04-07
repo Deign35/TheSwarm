@@ -3,7 +3,7 @@ import { TConsulMemory, HarvestMemory, ConsulMemory } from "SwarmMemory/ConsulMe
 import { NotImplementedException } from "Tools/SwarmExceptions";
 import { SwarmMemory, MemoryBase } from "SwarmMemory/SwarmMemory";
 
-export abstract class ConsulObject<T extends ConsulType> implements IConsulObject<T> {
+export abstract class ConsulObject<T extends ConsulType> implements AIConsulBase<T> {
     abstract GetConsulType(): T;
     GetSwarmType(): SwarmType.SwarmConsul {
         return SwarmType.SwarmConsul;
