@@ -7,7 +7,7 @@ import { TSwarmObject_1 } from "SwarmTypes/SwarmCreator";
 
 const HAS_PREPPED = 'hasPrepped';
 @profile
-export abstract class ObjectBase<T extends SwarmDataType, U extends string | number,
+export abstract class ObjectBase<T extends SwarmDataType, U extends SwarmSubType,
     V extends IData<T, U>, W extends MemoryBase<T, U, V>, X extends any> {
     protected OnPrepObject() {
 
@@ -30,12 +30,14 @@ export abstract class ObjectBase<T extends SwarmDataType, U extends string | num
     InitAsNew() { }
     AssignObject(obj: X, objMemory: W): void {
         this._instance = obj;
-        this.memory = objMemory;
+        this._memory = objMemory;
     }
 
     protected _instance!: X;
     GetObjectInstance(): X { return this._instance; }
-    protected abstract memory: W;
+    private _memory!: W;
+    get memory(): W { return this._memory; }
+
     get id(): string { return this.memory.id; }
 
     GetMemType(): T {
@@ -43,20 +45,16 @@ export abstract class ObjectBase<T extends SwarmDataType, U extends string | num
     }
 }
 @profile
-export class SwarmTypeBase<T extends SwarmDataTypeSansMaster, U extends SwarmType,
-    V extends string | number, W extends SwarmMemory<T, U, V>, Y extends SwarmObjectType>
+export abstract class SwarmTypeBase<T extends SwarmDataTypeSansMaster, U extends SwarmType,
+    V extends SwarmSubType, W extends SwarmMemory<T, U, V>, Y extends SwarmObjectType>
     extends ObjectBase<T, V, ISwarmData<T, U, V>, W, Y> implements TSwarmObject_1<T, U, V, Y> {
-    private _memory!: W;
-    get memory() { return this._memory; }
-    set memory(mem: W) { this._memory = mem; }
-
     get SWARM_TYPE(): U { return this.memory.SWARM_TYPE; }
     get IsActive() { return this.memory.isActive; }
 }
 
 @profile
 export abstract class SwarmObject_RoomObject<T extends SwarmDataTypeSansMaster, U extends SwarmType,
-    V extends string | number, W extends SwarmMemory<T, U, V>, Y extends RoomObject>
+    V extends SwarmSubType, W extends SwarmMemory<T, U, V>, Y extends RoomObject>
     extends SwarmTypeBase<T, U, V, W, Y> implements RoomObject {
     get pos() { return this._instance.pos; }
     get room() { return this._instance.room; } // This should get the room object i created.
@@ -65,7 +63,7 @@ export abstract class SwarmObject_RoomObject<T extends SwarmDataTypeSansMaster, 
 
 @profile
 export abstract class NotifiableSwarmObject<T extends SwarmDataTypeSansMaster, U extends SwarmType,
-    V extends string | number, W extends SwarmMemory<T, U, V>, Y extends Creep | Structure>
+    V extends SwarmSubType, W extends SwarmMemory<T, U, V>, Y extends Creep | Structure>
     extends SwarmObject_RoomObject<T, U, V, W, Y>  {
     notifyWhenAttacked(enabled: boolean = false) { // ActionIntent
         if (this._instance.notifyWhenAttacked) {
@@ -79,21 +77,20 @@ export abstract class NotifiableSwarmObject<T extends SwarmDataTypeSansMaster, U
 
 @profile
 export abstract class OwnableSwarmObject<T extends SwarmDataTypeSansMaster, U extends SwarmType,
-    V extends string | number, W extends SwarmMemory<T, U, V>,
+    V extends SwarmSubType, W extends SwarmMemory<T, U, V>,
     Y extends Creep | OwnedStructure> extends NotifiableSwarmObject<T, U, V, W, Y> {
     get my() { return this._instance.my; }
     get owner() { return this._instance.owner; }
 }
 @profile
 export abstract class SwarmRoomObject<T extends SwarmRoomObjectType, U extends RoomObjectMemoryBase<T>,
-    X extends Mineral | Resource | Tombstone | Nuke | ConstructionSite | Source>
+    X extends _rmType>
     extends SwarmObject_RoomObject<SwarmDataType.RoomObject, T, T, U, X> {
     get room(): Room { return this._instance.room! }
 }
 
 @profile
 export class SwarmMineral extends SwarmRoomObject<SwarmType.SwarmMineral, MineralMemory, Mineral> implements Mineral {
-
     get SwarmType(): SwarmType.SwarmMineral { return SwarmType.SwarmMineral; }
     get density() { return this._instance.density; }
     get mineralAmount() { return this._instance.mineralAmount; }

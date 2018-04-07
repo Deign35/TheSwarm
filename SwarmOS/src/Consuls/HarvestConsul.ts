@@ -1,19 +1,10 @@
-import { SwarmConsul } from "./ConsulBase";
-import { BasicMemory } from "SwarmMemory/SwarmMemory";
-import { SwarmLoader } from "SwarmTypes/SwarmLoader";
-import { ActionBase, NoOpAction } from "Actions/ActionBase";
-import { HarvestAction } from "Actions/HarvestAction";
+import { SwarmConsul } from "Consuls/ConsulBase";
 import { HarvestMemory } from "SwarmMemory/ConsulMemory";
-import { NotImplementedException } from "Tools/SwarmExceptions";
 import { SwarmSource } from "SwarmTypes/SwarmSource";
-import { SwarmSite } from "SwarmTypes/SwarmSite";
-import { SwarmRoomObjectTypes, SwarmStructureTypes } from "SwarmTypes/SwarmCreator";
-import { SwarmContainer } from "SwarmTypes/SwarmStructures/SwarmStructure";
-import { MoveToPositionAction } from "Actions/MoveToPositionAction";
-import { BuildAction } from "Actions/BuildAction";
 
 
-export class HarvestConsul extends SwarmConsul<HarvestMemory> {
+
+export class HarvestConsul extends SwarmConsul<ConsulType.Harvest, HarvestMemory> {
     SourceData!: {
         [id: string]: {
             hasCreep: boolean;
@@ -24,16 +15,16 @@ export class HarvestConsul extends SwarmConsul<HarvestMemory> {
         }
     }
     protected OnActivate() {
-        for (let i = 0; i < this.memory.sourceIDs.length; i++) {
+        /*for (let i = 0; i < this.memory.sourceIDs.length; i++) {
             let source = SwarmLoader.TheSwarm.roomObjects[this.memory.sourceIDs[i]] as SwarmSource;
             if (this.SourceData[source.id].hasCreep) {
                 this.ActivateHarvest(source);
             }
-        }
+        }*/
     }
 
     protected ActivateHarvest(source: SwarmSource) {
-        let creep = SwarmLoader.TheSwarm.creeps[source.memory.creepID!];
+        /*let creep = SwarmLoader.TheSwarm.creeps[source.memory.creepID!];
         if (!creep.spawning) {
             let action: ActionBase = new HarvestAction(creep, source.GetObjectInstance());
             let validation = action.ValidateAction();
@@ -152,6 +143,6 @@ export class HarvestConsul extends SwarmConsul<HarvestMemory> {
             }
 
             this.SourceData[source.id] = newData;
-        }
+        }*/
     }
 }

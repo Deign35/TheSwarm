@@ -2,7 +2,7 @@ import { profile } from "Tools/Profiler";
 import { SwarmException, MemoryLockException, AlreadyExistsException, NotImplementedException } from "Tools/SwarmExceptions";
 
 @profile
-export abstract class MemoryBase<T extends SwarmDataType, U extends string | number,
+export abstract class MemoryBase<T extends SwarmDataType, U extends SwarmSubType,
     V extends IData<T, U>> implements IData<T, U> {
     constructor(data: V) {
         this._cache = data;
@@ -55,7 +55,7 @@ export abstract class MemoryBase<T extends SwarmDataType, U extends string | num
 
 @profile
 export abstract class SwarmMemory<T extends SwarmDataTypeSansMaster, U extends SwarmType,
-    V extends number | string> extends MemoryBase<T, V, ISwarmData<T, U, V>> {
+    V extends SwarmSubType> extends MemoryBase<T, V, ISwarmData<T, U, V>> {
     get isActive(): boolean {
         return this.cache.isActive;
     }
@@ -125,7 +125,7 @@ export abstract class MasterSwarmMemory<T extends SwarmDataTypeSansMaster, U ext
         newMem.ReserveMemory();
         return newMem;
     }
-    SaveMemory(childData: SwarmMemory<T, SwarmType, string | number>): void {
+    SaveMemory(childData: SwarmMemory<T, SwarmType, SwarmDataType>): void {
         this.ChildData[childData.id] = childData.ReleaseMemory();
     }
     DeleteMemory(saveID: string): void {

@@ -4,7 +4,7 @@ declare interface IData<T extends SwarmDataType, U extends number | string> {
     SUB_TYPE: U;
 }
 
-declare interface ISwarmData<T extends SwarmDataType, U extends SwarmType, V extends number | string> extends IData<T, V> {
+declare interface ISwarmData<T extends SwarmDataType, U extends SwarmType, V extends SwarmSubType> extends IData<T, V> {
     isActive: boolean;
 }
 declare type TBasicSwarmData = TRoomObjectData | TStructureData | TRoomData | TCreepData | TFlagData | TConsulData;

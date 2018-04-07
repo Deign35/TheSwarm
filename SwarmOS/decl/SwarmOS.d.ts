@@ -54,5 +54,7 @@ declare var SwarmCreator: {
     GetSwarmType(obj: any): SwarmType;
     CreateNewSwarmObject<T extends any>(obj: Room | RoomObject): T;
     GetObjSaveID(obj: Room | RoomObject): string;
-
 }
+declare type _rmType = Mineral | Resource | Tombstone | Nuke | ConstructionSite | Source;
+declare type SwarmSubType = SwarmType | ConsulType | StructureConstant |
+    FlagType | RoomType | CreepType | SwarmDataType;

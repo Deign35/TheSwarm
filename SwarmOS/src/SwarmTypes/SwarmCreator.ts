@@ -10,7 +10,7 @@ import { ConsulObject, SwarmConsul } from "Consuls/ConsulBase";
 import { SwarmMemory } from "SwarmMemory/SwarmMemory";
 
 
-export type TSwarmObject_1<T extends SwarmDataTypeSansMaster, U extends SwarmType, V extends string | number,
+export type TSwarmObject_1<T extends SwarmDataTypeSansMaster, U extends SwarmType, V extends SwarmSubType,
     Y extends Room | RoomObject | ConsulObject> = SwarmTypeBase<T, U, V, SwarmMemory<T, U, V>, Y>;
 
 export type SwarmCreep_Type = SwarmCreep<CreepType>;
@@ -20,14 +20,17 @@ export type TSwarmStructure_1<T extends SwarmStructureType, U extends StructureC
 export type TSwarmStructure_2<T extends SwarmStructureType> = TSwarmStructure_1<T, StructureConstant>;
 export type SwarmStructure_Type = TSwarmStructure_2<SwarmStructureType>;
 
-export type TRoomObject_1<T extends SwarmRoomObjectType, U extends RoomObjectMemoryBase<T>, V extends Mineral | Resource | Tombstone | Nuke | ConstructionSite | Source> =
-    SwarmRoomObject<T, U, V>;
-export type SwarmRoomObject_Type<T extends SwarmRoomObjectType, U extends Mineral | Nuke | Resource | Source | ConstructionSite | Tombstone>
-    = TRoomObject_1<T, RoomObjectMemoryBase<T>, U>;
+export type TRoomObject_1<T extends SwarmRoomObjectType, U extends RoomObjectMemoryBase<T>,
+    V extends _rmType> = SwarmRoomObject<T, U, V>;
+export type TRoomObject_2<T extends SwarmRoomObjectType, U extends _rmType> =
+    TRoomObject_1<T, RoomObjectMemoryBase<T>, U>;
+export type SwarmRoomObject_Type = TRoomObject_2<SwarmRoomObjectType, _rmType>;
 
 export type SwarmRoom_Type = SwarmRoom<RoomType>;
 export type SwarmFlag_Type = SwarmFlag<FlagType>;
 //export type SwarmConsul_Type = SwarmConsul<ConsulType>;
+export type SwarmObject_Type = SwarmCreep_Type | SwarmStructure_Type | SwarmRoom_Type | SwarmFlag_Type |
+    SwarmRoomObject_Type;
 
 
 
