@@ -5,7 +5,7 @@ import { profile } from "Tools/Profiler";
 import { SpawnMemory } from "SwarmMemory/StructureMemory";
 
 @profile
-export class SwarmSpawn extends OwnedSwarmStructure<SwarmType.SwarmSpawn, STRUCTURE_SPAWN, ISpawnData,
+export class SwarmSpawn extends OwnedSwarmStructure<SwarmType.SwarmSpawn, STRUCTURE_SPAWN,
 SpawnMemory, StructureSpawn> implements StructureSpawn {
     get energy() { return this._instance.energy; }
     get energyCapacity() { return this._instance.energyCapacity; }

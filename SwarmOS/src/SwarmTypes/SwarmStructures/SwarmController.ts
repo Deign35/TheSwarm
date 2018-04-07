@@ -4,7 +4,7 @@ import { ControllerMemory } from "SwarmMemory/StructureMemory";
 
 @profile
 export class SwarmController extends OwnedSwarmStructure<SwarmType.SwarmController, STRUCTURE_CONTROLLER,
-IControllerData, ControllerMemory, StructureController> implements StructureController {
+ControllerMemory, StructureController> implements StructureController {
     get level() { return this._instance.level; }
     get progress() { return this._instance.progress; }
     get progressTotal() { return this._instance.progressTotal; }

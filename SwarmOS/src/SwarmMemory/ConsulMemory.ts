@@ -7,7 +7,7 @@ export abstract class ConsulMemory<T extends ConsulType>
     get SWARM_TYPE(): SwarmType.SwarmConsul { return SwarmType.SwarmConsul; }
 }
 export class HarvestMemory extends ConsulMemory<ConsulType.Harvest> implements HarvestConsulData {
-    get cache(): HarvestConsulData {
+    protected get cache(): HarvestConsulData {
         return super.cache as HarvestConsulData;
     }
     get sourceIDs() { return this.cache.sourceIDs; }

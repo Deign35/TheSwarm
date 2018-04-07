@@ -10,7 +10,7 @@ export abstract class RoomObjectMemoryBase<T extends SwarmRoomObjectType>
 
 @profile
 export class SourceMemory extends RoomObjectMemoryBase<SwarmType.SwarmSource> implements ISourceData {
-    get cache(): ISourceData {
+    protected get cache(): ISourceData {
         return super.cache as ISourceData;
     }
     get SWARM_TYPE(): SwarmType.SwarmSource { return SwarmType.SwarmSource; }
@@ -23,7 +23,7 @@ export class SourceMemory extends RoomObjectMemoryBase<SwarmType.SwarmSource> im
 
 @profile
 export class MineralMemory extends RoomObjectMemoryBase<SwarmType.SwarmMineral> implements IMineralData {
-    get cache(): IMineralData {
+    protected get cache(): IMineralData {
         return super.cache as IMineralData;
     }
     get SWARM_TYPE(): SwarmType.SwarmMineral { return SwarmType.SwarmMineral; }
@@ -34,28 +34,28 @@ export class MineralMemory extends RoomObjectMemoryBase<SwarmType.SwarmMineral> 
 
 @profile
 export class NukeMemory extends RoomObjectMemoryBase<SwarmType.SwarmNuke> implements INukeData {
-    get cache(): INukeData {
+    protected get cache(): INukeData {
         return super.cache;
     }
     get SWARM_TYPE(): SwarmType.SwarmNuke { return SwarmType.SwarmNuke; }
 }
 @profile
 export class TombstoneMemory extends RoomObjectMemoryBase<SwarmType.SwarmTombstone> implements ITombstoneData {
-    get cache(): ITombstoneData {
+    protected get cache(): ITombstoneData {
         return super.cache;
     }
     get SWARM_TYPE(): SwarmType.SwarmTombstone { return SwarmType.SwarmTombstone; }
 }
 @profile
 export class ConstructionSiteMemory extends RoomObjectMemoryBase<SwarmType.SwarmSite> implements ISiteData {
-    get cache(): ISiteData {
+    protected get cache(): ISiteData {
         return super.cache;
     }
     get SWARM_TYPE(): SwarmType.SwarmSite { return SwarmType.SwarmSite; }
 }
 @profile
 export class ResourceMemory extends RoomObjectMemoryBase<SwarmType.SwarmResource> implements IResourceData {
-    get cache(): IResourceData {
+    protected get cache(): IResourceData {
         return super.cache;
     }
     get SWARM_TYPE(): SwarmType.SwarmResource { return SwarmType.SwarmResource; }

@@ -1,6 +1,5 @@
 import { profile } from "Tools/Profiler";
 import { SwarmException, MemoryLockException, AlreadyExistsException, NotImplementedException } from "Tools/SwarmExceptions";
-import { TSwarmObject_4 } from "SwarmTypes/SwarmCreator";
 
 @profile
 export abstract class MemoryBase<T extends SwarmDataType, U extends string | number,

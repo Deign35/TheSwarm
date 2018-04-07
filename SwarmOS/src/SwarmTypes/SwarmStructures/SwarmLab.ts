@@ -3,7 +3,7 @@ import { LabMemory } from "SwarmMemory/StructureMemory";
 import { profile } from "Tools/Profiler";
 
 @profile
-export class SwarmLab extends OwnedSwarmStructure<SwarmType.SwarmLab, STRUCTURE_LAB, ILabData,
+export class SwarmLab extends OwnedSwarmStructure<SwarmType.SwarmLab, STRUCTURE_LAB,
 LabMemory, StructureLab> implements StructureLab {
     get cooldown() { return this._instance.cooldown; }
     get energy() { return this._instance.energy; }

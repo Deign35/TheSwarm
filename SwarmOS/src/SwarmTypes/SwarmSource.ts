@@ -9,11 +9,10 @@ import { BuildAction } from "Actions/BuildAction";
 import { MoveToPositionAction } from "Actions/MoveToPositionAction";
 import { SwarmContainer } from "./SwarmStructures/SwarmStructure";
 import { SwarmSite } from "SwarmTypes/SwarmSite";
-import { SwarmObjectTypes, SwarmStructureTypes, SwarmRoomObjectTypes } from "SwarmTypes/SwarmCreator";
 
 const CREEP_ID = 'creepID';
 @profile
-export class SwarmSource extends SwarmRoomObject<SwarmType.SwarmSource, ISourceData, SourceMemory, Source> implements Source {
+export class SwarmSource extends SwarmRoomObject<SwarmType.SwarmSource, SourceMemory, Source> implements Source {
     get storageMemoryType() { return SwarmDataType.RoomObject };
     get SwarmType(): SwarmType.SwarmSource { return SwarmType.SwarmSource; }
     get energy() { return this._instance.energy; }

@@ -5,14 +5,13 @@ import { SwarmSpawn } from "./SwarmStructures/SwarmSpawn";
 import { HarvestMemory } from "SwarmMemory/ConsulMemory";
 import { HarvestConsul } from "Consuls/HarvestConsul";
 import { ConsulObject } from "Consuls/ConsulBase";
-import { TConsulTypes } from "SwarmTypes/SwarmCreator";
 import { RoomMemory } from "SwarmMemory/SwarmMemory";
 import { SwarmTypeBase } from "SwarmTypes/SwarmTypes";
 import { profile } from "Tools/Profiler";
 
 @profile
-export class SwarmRoom<T extends RoomType, U extends IRoomData<T>> extends SwarmTypeBase<SwarmDataType.Room,
-SwarmType.SwarmRoom, T, U, RoomMemory<T, U>, Room> implements Room {
+export class SwarmRoom<T extends RoomType> extends SwarmTypeBase<SwarmDataType.Room,
+SwarmType.SwarmRoom, T, RoomMemory<T, IRoomData<T>>, Room> implements Room {
     get prototype() { return this._instance.prototype; }
     private _availableSpawns!: string[];
     protected get spawns(): string[] {
@@ -130,7 +129,7 @@ SwarmType.SwarmRoom, T, U, RoomMemory<T, U>, Room> implements Room {
         let newHarvesterMem = new HarvestMemory(newHarvesterData);
         newHarvesterMem.ReserveMemory();
 
-        let consul: TConsulTypes = SwarmCreator.CreateConsulObject(ConsulType.Harvest);
+        let consul: ConsulObject = SwarmCreator.CreateConsulObject(ConsulType.Harvest);
         /*consul.AssignObject(new ConsulObject(), newHarvesterMem);
         SwarmLoader.TheSwarm.consuls[consul.saveID] = consul;*/
     }

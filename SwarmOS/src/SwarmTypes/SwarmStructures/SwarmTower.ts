@@ -4,7 +4,7 @@ import { TowerMemory } from "SwarmMemory/StructureMemory";
 
 @profile
 export class SwarmTower extends OwnedSwarmStructure<SwarmType.SwarmTower, STRUCTURE_TOWER,
-ITowerData, TowerMemory, StructureTower> implements StructureTower {
+TowerMemory, StructureTower> implements StructureTower {
     get energy() { return this._instance.energy; }
     get energyCapacity() { return this._instance.energyCapacity; }
 
