@@ -6,42 +6,29 @@ import { SwarmRoomObject, SwarmTypeBase } from "SwarmTypes/SwarmTypes";
 import { profile } from "Tools/Profiler";
 import { SwarmRoom } from "./SwarmRoom";
 import { SwarmFlag } from "./SwarmFlag";
-import { ConsulObject } from "Consuls/ConsulBase";
+import { ConsulObject, SwarmConsul } from "Consuls/ConsulBase";
 import { SwarmMemory } from "SwarmMemory/SwarmMemory";
 
 
 export type TSwarmObject_1<T extends SwarmDataTypeSansMaster, U extends SwarmType, V extends string | number,
-    Y extends Room | RoomObject | ConsulObject> = SwarmTypeBase<T, U, V, Y>;
-/*
-export type TSwarmCreep_1<T extends CreepType> = SwarmCreep<T, ICreepData<T>>;
-export type SwarmCreep_Type = TSwarmCreep_1<CreepType>;
+    Y extends Room | RoomObject | ConsulObject> = SwarmTypeBase<T, U, V, SwarmMemory<T, U, V>, Y>;
 
-export type TSwarmStructure_1<T extends SwarmStructureType, U extends StructureConstant,
-    V extends IStructureData<T, U>, W extends StructureMemoryBase<T, U>> = SwarmStructure<T, U, V, W, Structure<U>>;
-export type TSwarmStructure_2<T extends SwarmStructureType, U extends StructureConstant,
-    V extends IStructureData<T, U>> = TSwarmStructure_1<T, U, V, StructureMemoryBase<T, U>>;
-export type TSwarmStructure_3<T extends SwarmStructureType, U extends StructureConstant> =
-    TSwarmStructure_2<T, U, IStructureData<T, U>>;
-export type TSwarmStructure_4<T extends SwarmStructureType> = TSwarmStructure_3<T, StructureConstant>;
-export type SwarmStructure_Type = TSwarmStructure_4<SwarmStructureType>;
+export type SwarmCreep_Type = SwarmCreep<CreepType>;
 
-export type TRoomObject_1<T extends SwarmRoomObjectType, U extends IRoomObjectData<T>, V extends RoomObjectMemoryBase<T>,
-    W extends Mineral | Resource | Tombstone | Nuke | ConstructionSite | Source> = SwarmRoomObject<T, U, V, W>;
-export type TRoomObject_2<T extends SwarmRoomObjectType, U extends IRoomObjectData<T>,
-    V extends RoomObjectMemoryBase<T>> = TRoomObject_1<T, U, V, Mineral | Resource | Tombstone | Nuke | ConstructionSite | Source>;
-export type TRoomObject_3<T extends SwarmRoomObjectType, U extends IRoomObjectData<T>> =
-    TRoomObject_2<T, U, RoomObjectMemoryBase<T>>
-export type TRoomObject_4<T extends SwarmRoomObjectType> = TRoomObject_3<T, IRoomObjectData<T>>;
-export type SwarmRoomObject_Type = TRoomObject_4<SwarmRoomObjectType>;
+export type TSwarmStructure_1<T extends SwarmStructureType, U extends StructureConstant> =
+    SwarmStructure<T, U, StructureMemoryBase<T, U>, Structure<U>>;
+export type TSwarmStructure_2<T extends SwarmStructureType> = TSwarmStructure_1<T, StructureConstant>;
+export type SwarmStructure_Type = TSwarmStructure_2<SwarmStructureType>;
 
-export type TSwarmRoom_1<T extends RoomType, U extends IRoomData<T>> = SwarmRoom<T, U>
-export type TSwarmRoom_2<T extends RoomType> = TSwarmRoom_1<T, IRoomData<T>>;
-export type SwarmRoom_Type = TSwarmRoom_2<RoomType>;
+export type TRoomObject_1<T extends SwarmRoomObjectType, U extends RoomObjectMemoryBase<T>, V extends Mineral | Resource | Tombstone | Nuke | ConstructionSite | Source> =
+    SwarmRoomObject<T, U, V>;
+export type SwarmRoomObject_Type<T extends SwarmRoomObjectType, U extends Mineral | Nuke | Resource | Source | ConstructionSite | Tombstone>
+    = TRoomObject_1<T, RoomObjectMemoryBase<T>, U>;
 
-export type TSwarmFlag_1<T extends FlagType, U extends IFlagData<T>> = SwarmFlag<T, U>;
-export type TSwarmFlag_2<T extends FlagType> = TSwarmFlag_1<T, IFlagData<T>>;
-export type SwarmFlag_Type = TSwarmFlag_2<FlagType>;
-*/
+export type SwarmRoom_Type = SwarmRoom<RoomType>;
+export type SwarmFlag_Type = SwarmFlag<FlagType>;
+//export type SwarmConsul_Type = SwarmConsul<ConsulType>;
+
 
 
 /*
