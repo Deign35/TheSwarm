@@ -13,7 +13,7 @@ import { SwarmObjectTypes, SwarmStructureTypes, SwarmRoomObjectTypes } from "Swa
 
 const CREEP_ID = 'creepID';
 @profile
-export class SwarmSource extends SwarmRoomObject<Source, SourceMemory> implements Source {
+export class SwarmSource extends SwarmRoomObject<SwarmType.SwarmSource, ISourceData, SourceMemory, Source> implements Source {
     get storageMemoryType() { return SwarmDataType.RoomObject };
     get SwarmType(): SwarmType.SwarmSource { return SwarmType.SwarmSource; }
     get energy() { return this._instance.energy; }

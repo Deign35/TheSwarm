@@ -5,7 +5,8 @@ import { OwnableSwarmObject } from "SwarmTypes/SwarmTypes";
 const CARRY_TOTAL = 'CT';
 const CURRENT_PATH = 'CP';
 @profile
-export class SwarmCreep extends OwnableSwarmObject<Creep, CreepMemory> implements Creep {
+export class SwarmCreep<T extends CreepType, U extends ICreepData<T>> extends OwnableSwarmObject<SwarmDataType.Creep,
+SwarmType.SwarmCreep, T, U, CreepMemory<T, U>, Creep> implements Creep {
     get DataType(): SwarmDataType.Creep { return SwarmDataType.Creep };
     PrepObject(unused: boolean) {
         return super.PrepObject(true);

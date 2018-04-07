@@ -37,6 +37,7 @@ declare type SwarmOwnableStructureType = SwarmType.SwarmController | SwarmType.S
     SwarmType.SwarmPowerBank | SwarmType.SwarmPowerSpawn | SwarmType.SwarmRampart | SwarmType.SwarmSpawn |
     SwarmType.SwarmStorage | SwarmType.SwarmTerminal | SwarmType.SwarmTower
 
+declare type SwarmObjectType = Room | RoomObject | IConsulObject;
 declare interface ISwarmlord {
     ValidateMemory(): void;
     SaveMasterMemory<T extends any>(memObject: T, save: boolean): void;

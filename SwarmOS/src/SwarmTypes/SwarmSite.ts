@@ -3,7 +3,7 @@ import { ConstructionSiteMemory } from "SwarmMemory/RoomObjectMemory";
 import { profile } from "Tools/Profiler";
 
 @profile
-export class SwarmSite extends SwarmRoomObject<ConstructionSite, ConstructionSiteMemory>
+export class SwarmSite extends SwarmRoomObject<SwarmType.SwarmSite, ISiteData, ConstructionSiteMemory, ConstructionSite>
     implements ConstructionSite {
     get my() { return this._instance.my; }
     get owner() { return this._instance.owner; }

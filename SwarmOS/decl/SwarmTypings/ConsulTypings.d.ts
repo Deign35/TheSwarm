@@ -8,3 +8,6 @@ declare interface ControlConsulData extends IConsulData<ConsulType.Control> {
     creepIDs: string[];
 }
 declare type TConsulData = HarvestConsulData | ControlConsulData;
+declare interface IConsulObject {
+    GetSwarmType(): SwarmType.SwarmConsul;
+}

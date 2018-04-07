@@ -1,9 +1,10 @@
-import { FlagMemory } from "SwarmMemory/SwarmMemory";
+import { FlagMemory, SwarmMemory } from "SwarmMemory/SwarmMemory";
 import { profile } from "Tools/Profiler";
-import { SwarmItemWithName } from "SwarmTypes/SwarmTypes";
+import { SwarmObject_RoomObject } from "./SwarmTypes";
 
 @profile
-export class SwarmFlag extends SwarmItemWithName<Flag> implements Flag {
+export class SwarmFlag<T extends FlagType, U extends IFlagData<T>> extends SwarmObject_RoomObject<SwarmDataType.Flag,
+SwarmType.SwarmFlag, T, U, SwarmMemory<SwarmDataType.Flag, SwarmType.SwarmFlag, T, U>, Flag> implements Flag {
     get DataType(): SwarmDataType.Flag { return SwarmDataType.Flag };
     get SwarmType(): SwarmType.SwarmFlag { return SwarmType.SwarmFlag; };
     get pos() { return this._instance.pos; }

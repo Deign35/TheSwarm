@@ -97,7 +97,7 @@ export class Swarmlord {
     SaveMasterMemory<T extends SwarmDataTypeSansMaster,
         U extends SwarmType>(memObject: MasterSwarmMemory<T, U, ISwarmData<T, U, number | string>,
             IMasterData<T>>, save: boolean): void {
-        let memData = memObject.ReleaseData();
+        let memData = memObject.ReleaseMemory();
         if (save) {
             Memory[memObject.id] = memData;
         }

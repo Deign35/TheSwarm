@@ -1,5 +1,3 @@
-import { profile } from "Tools/Profiler";
-import { SwarmItemWithName } from "SwarmTypes/SwarmTypes";
 import { SwarmLoader } from "SwarmTypes/SwarmLoader";
 import { ResourceMemory, TombstoneMemory, ConstructionSiteMemory, NukeMemory } from "SwarmMemory/RoomObjectMemory";
 import { StructureMemory } from "SwarmMemory/StructureMemory";
@@ -8,9 +6,14 @@ import { HarvestMemory } from "SwarmMemory/ConsulMemory";
 import { HarvestConsul } from "Consuls/HarvestConsul";
 import { ConsulObject } from "Consuls/ConsulBase";
 import { TConsulTypes } from "SwarmTypes/SwarmCreator";
+import { RoomMemory } from "SwarmMemory/SwarmMemory";
+import { SwarmTypeBase } from "SwarmTypes/SwarmTypes";
+import { profile } from "Tools/Profiler";
 
 @profile
-export class SwarmRoom extends SwarmItemWithName<Room> implements Room {
+export class SwarmRoom<T extends RoomType, U extends IRoomData<T>> extends SwarmTypeBase<SwarmDataType.Room,
+SwarmType.SwarmRoom, T, U, RoomMemory<T, U>, Room> implements Room {
+    get prototype() { return this._instance.prototype; }
     private _availableSpawns!: string[];
     protected get spawns(): string[] {
         if (!this._availableSpawns) {
@@ -18,10 +21,10 @@ export class SwarmRoom extends SwarmItemWithName<Room> implements Room {
             let ids = SwarmLoader.SwarmRoomIDs[this.saveID].structures[STRUCTURE_SPAWN];
             if (ids) {
                 for (let i = 0; i < ids.length; i++) {
-                    let spawn = SwarmLoader.TheSwarm.structures[ids[i]] as SwarmSpawn;
+                    /*let spawn = SwarmLoader.TheSwarm.structures[ids[i]] as SwarmSpawn;
                     if (!spawn.spawning) {
                         this._availableSpawns.push(ids[i]);
-                    }
+                    }*/
                 }
             }
         }
@@ -40,7 +43,7 @@ export class SwarmRoom extends SwarmItemWithName<Room> implements Room {
 
     TrySpawn(body: BodyPartConstant[], name: string,
         opts?: {
-            memory?: ICreepData,
+            memory?: TCreepData,
             energyStructures?: Array<(StructureSpawn | StructureExtension)>,
             directions?: DirectionConstant[],
             spawnID?: string
@@ -48,10 +51,10 @@ export class SwarmRoom extends SwarmItemWithName<Room> implements Room {
         let spawnToUse: SwarmSpawn | undefined;
         if (opts && opts.spawnID) {
             // get spawn this way instead
-            spawnToUse = SwarmLoader.TheSwarm.structures[opts.spawnID] as SwarmSpawn;
+            //spawnToUse = SwarmLoader.TheSwarm.structures[opts.spawnID] as SwarmSpawn;
         } else if (this.spawns.length > 0) {
             if (GetSpawnCost(body) <= this.energyAvailable) {
-                spawnToUse = SwarmLoader.TheSwarm.structures[this.spawns.shift()!] as SwarmSpawn;
+                //spawnToUse = SwarmLoader.TheSwarm.structures[this.spawns.shift()!] as SwarmSpawn;
             } else {
                 return E_REQUIRES_ENERGY;
             }
@@ -98,16 +101,16 @@ export class SwarmRoom extends SwarmItemWithName<Room> implements Room {
             }
         }
 
-        this.memory.SetData(SUB_TYPE, roomType);
+        this.memory.SUB_TYPE = roomType as T;
 
         // Would love to add a pathfinding.
         let sources = this.find(FIND_SOURCES);
         for (let i = 0; i < sources.length; i++) {
-            SwarmLoader.LoadObject(sources[i].id, sources[i], SwarmControllerDataTypes.RoomObjects);
+            //SwarmLoader.LoadObject(sources[i].id, sources[i], SwarmControllerDataTypes.RoomObjects);
         }
         let minerals = this.find(FIND_MINERALS);
         for (let i = 0; i < minerals.length; i++) {
-            SwarmLoader.LoadObject(minerals[i].id, minerals[i], SwarmControllerDataTypes.RoomObjects);
+            //SwarmLoader.LoadObject(minerals[i].id, minerals[i], SwarmControllerDataTypes.RoomObjects);
         }
         // (TODO): Instead of TryFindNewObjects, use a single LookAtArea and find all objects for the new room.
         this.TryFindNewObjects(true);
@@ -128,12 +131,12 @@ export class SwarmRoom extends SwarmItemWithName<Room> implements Room {
         newHarvesterMem.ReserveMemory();
 
         let consul: TConsulTypes = SwarmCreator.CreateConsulObject(ConsulType.Harvest);
-        consul.AssignObject(new ConsulObject(), newHarvesterMem);
-        SwarmLoader.TheSwarm.consuls[consul.saveID] = consul;
+        /*consul.AssignObject(new ConsulObject(), newHarvesterMem);
+        SwarmLoader.TheSwarm.consuls[consul.saveID] = consul;*/
     }
 
     TryFindNewObjects(force: boolean = false) {
-        if (force || Game.time % 5 == 0) {
+        /*if (force || Game.time % 5 == 0) {
             let foundResources = this.find(FIND_DROPPED_RESOURCES);
             for (let j = 0; j < foundResources.length; j++) {
                 if (!SwarmLoader.TheSwarm.roomObjects[foundResources[j].id]) {
@@ -182,6 +185,7 @@ export class SwarmRoom extends SwarmItemWithName<Room> implements Room {
                 }
             }
         }
+        */
     }
 
     get DataType(): SwarmDataType.Room { return SwarmDataType.Room };
