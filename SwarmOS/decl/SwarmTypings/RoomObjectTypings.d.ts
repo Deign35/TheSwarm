@@ -21,3 +21,28 @@ declare interface INukeData extends IRoomObjectData<SwarmType.SwarmNuke> { }
 declare interface IResourceData extends IRoomObjectData<SwarmType.SwarmResource> { }
 declare interface ITombstoneData extends IRoomObjectData<SwarmType.SwarmTombstone> { }
 declare interface ISiteData extends IRoomObjectData<SwarmType.SwarmSite> { }
+
+
+declare interface AIRoomObjectBase<T extends TRoomObjectData, U extends _rmType> extends AIBase<T, U> {
+
+}
+declare interface AIMineral extends AIRoomObjectBase<IMineralData, Mineral> {
+
+}
+declare interface AINuke extends AIRoomObjectBase<INukeData, Nuke> {
+
+}
+declare interface AIResource extends AIRoomObjectBase<IResourceData, Resource> {
+
+}
+declare interface AISource extends AIRoomObjectBase<ISourceData, Source> {
+
+}
+declare interface AISite extends AIRoomObjectBase<ISiteData, ConstructionSite> {
+
+}
+declare interface AITombstone extends AIRoomObjectBase<ITombstoneData, Tombstone> {
+
+}
+
+declare type AIRoomObject = AIMineral | AINuke | AIResource | AISource | AISite | AITombstone;

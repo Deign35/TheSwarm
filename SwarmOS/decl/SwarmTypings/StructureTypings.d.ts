@@ -24,3 +24,70 @@ declare interface IStorageData extends IStructureData<SwarmType.SwarmStorage, ST
 declare interface ITerminalData extends IStructureData<SwarmType.SwarmTerminal, STRUCTURE_TERMINAL> { }
 declare interface ITowerData extends IStructureData<SwarmType.SwarmTower, STRUCTURE_TOWER> { }
 declare interface IWallData extends IStructureData<SwarmType.SwarmWall, STRUCTURE_WALL> { }
+
+
+
+declare interface AIStructureBase<T extends TStructureData, U extends Structure> extends AIBase<T, U> {
+
+}
+declare interface AIContainer extends AIStructureBase<IContainerData, StructureContainer> {
+
+}
+declare interface AIController extends AIStructureBase<IControllerData, StructureController> {
+
+}
+declare interface AIExtension extends AIStructureBase<IExtensionData, StructureExtension> {
+
+}
+declare interface AIExtractor extends AIStructureBase<IExtractorData, StructureExtractor> {
+
+}
+declare interface AIKeepersLair extends AIStructureBase<IKeepersLairData, StructureKeeperLair> {
+
+}
+declare interface AILab extends AIStructureBase<ILabData, StructureLab> {
+
+}
+declare interface AILink extends AIStructureBase<ILinkData, StructureLink> {
+
+}
+declare interface AINuker extends AIStructureBase<INukerData, StructureNuker> {
+
+}
+declare interface AIObserver extends AIStructureBase<IObserverData, StructureObserver> {
+
+}
+declare interface AIPortal extends AIStructureBase<IPortalData, StructurePortal> {
+
+}
+declare interface AIPowerBank extends AIStructureBase<IPowerBankData, StructurePowerBank> {
+
+}
+declare interface AIPowerSpawn extends AIStructureBase<IPowerSpawnData, StructurePowerSpawn> {
+
+}
+declare interface AIRampart extends AIStructureBase<IRampartData, StructureRampart> {
+
+}
+declare interface AIRoad extends AIStructureBase<IRoadData, StructureRoad> {
+
+}
+declare interface AISpawn extends AIStructureBase<ISpawnData, StructureSpawn> {
+
+}
+declare interface AIStorage extends AIStructureBase<IStorageData, StructureStorage> {
+
+}
+declare interface AITerminal extends AIStructureBase<ITerminalData, StructureTerminal> {
+
+}
+declare interface AITower extends AIStructureBase<ITowerData, StructureTower> {
+
+}
+declare interface AIWall extends AIStructureBase<IWallData, StructureWall> {
+
+}
+
+declare type AIStructure = AIContainer | AIController | AIExtension | AIExtractor | AIKeepersLair | AILab |
+    AILink | AINuke | AIObserver | AIPortal | AIPowerBank | AIPowerSpawn | AIRampart | AIRoad | AISpawn |
+    AIStorage | AITerminal | AITower | AIWall;

@@ -3,7 +3,8 @@ import { TConsulMemory, HarvestMemory, ConsulMemory } from "SwarmMemory/ConsulMe
 import { NotImplementedException } from "Tools/SwarmExceptions";
 import { SwarmMemory, MemoryBase } from "SwarmMemory/SwarmMemory";
 
-export class ConsulObject {
+export abstract class ConsulObject<T extends ConsulType> implements IConsulObject<T> {
+    abstract GetConsulType(): T;
     GetSwarmType(): SwarmType.SwarmConsul {
         return SwarmType.SwarmConsul;
     }
@@ -11,7 +12,7 @@ export class ConsulObject {
 
 //ISwarmData < SwarmDataType.Consul, SwarmType.SwarmConsul, T >
 export abstract class SwarmConsul<T extends ConsulType, U extends ConsulMemory<T>>
-    extends SwarmTypeBase<SwarmDataType.Consul, SwarmType.SwarmConsul, T, U, ConsulObject> {
+    extends SwarmTypeBase<SwarmDataType.Consul, SwarmType.SwarmConsul, T, U, ConsulObject<T>> {
     get IsActive() { return this.memory.isActive; }
     get prototype() { return this._instance }
 }
