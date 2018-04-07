@@ -2,6 +2,19 @@ declare type TStructureData = IContainerData | IControllerData | IExtensionData 
     ILabData | ILinkData | INukerData | IObserverData | IPortalData | IPowerBankData | IPowerSpawnData | IRampartData |
     IRoadData | ISpawnData | IStorageData | ITerminalData | ITowerData | IWallData;
 
+declare type TOwnabledStructureData = IControllerData | IExtensionData | IExtractorData | IKeepersLairData |
+    ILabData | ILinkData | INukerData | IObserverData | IPowerSpawnData | IRampartData | ISpawnData |
+    IStorageData | ITerminalData | ITowerData;
+
+declare type OwnableStructureConstant = STRUCTURE_CONTROLLER | STRUCTURE_EXTENSION | STRUCTURE_EXTRACTOR |
+    STRUCTURE_KEEPER_LAIR | STRUCTURE_LAB | STRUCTURE_LINK | STRUCTURE_NUKER | STRUCTURE_OBSERVER | STRUCTURE_POWER_BANK |
+    STRUCTURE_POWER_SPAWN | STRUCTURE_RAMPART | STRUCTURE_SPAWN | STRUCTURE_STORAGE | STRUCTURE_TERMINAL | STRUCTURE_TOWER
+
+declare type SwarmOwnableStructureType = SwarmType.SwarmController | SwarmType.SwarmExtension | SwarmType.SwarmExtractor |
+    SwarmType.SwarmKeepersLair | SwarmType.SwarmLab | SwarmType.SwarmLink | SwarmType.SwarmNuker | SwarmType.SwarmObserver |
+    SwarmType.SwarmPowerBank | SwarmType.SwarmPowerSpawn | SwarmType.SwarmRampart | SwarmType.SwarmSpawn |
+    SwarmType.SwarmStorage | SwarmType.SwarmTerminal | SwarmType.SwarmTower
+
 declare interface IStructureData<T extends SwarmStructureType, U extends StructureConstant>
     extends ISwarmData<SwarmDataType.Structure, T, U> { }
 
@@ -88,6 +101,7 @@ declare interface AIWall extends AIStructureBase<IWallData, StructureWall> {
 
 }
 
-declare type AIStructure = AIContainer | AIController | AIExtension | AIExtractor | AIKeepersLair | AILab |
-    AILink | AINuke | AIObserver | AIPortal | AIPowerBank | AIPowerSpawn | AIRampart | AIRoad | AISpawn |
-    AIStorage | AITerminal | AITower | AIWall;
+declare type AIOwnableStructure = AIController | AIExtension | AIExtractor | AIKeepersLair | AILab |
+    AILink | AINuke | AIObserver | AIPowerSpawn | AIRampart | AISpawn | AIStorage | AITerminal | AITower;
+
+declare type AIStructure = AIOwnableStructure | AIContainer | AIPortal | AIPowerBank | AIRoad | AISpawn | AIWall;

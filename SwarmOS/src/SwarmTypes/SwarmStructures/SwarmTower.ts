@@ -3,8 +3,7 @@ import { profile } from "Tools/Profiler";
 import { TowerMemory } from "SwarmMemory/StructureMemory";
 
 @profile
-export class SwarmTower extends OwnedSwarmStructure<SwarmType.SwarmTower, STRUCTURE_TOWER,
-TowerMemory, StructureTower> implements StructureTower {
+export class SwarmTower extends OwnedSwarmStructure<STRUCTURE_TOWER, StructureTower> implements StructureTower {
     get energy() { return this._instance.energy; }
     get energyCapacity() { return this._instance.energyCapacity; }
 
@@ -17,6 +16,4 @@ TowerMemory, StructureTower> implements StructureTower {
     repair(target: Structure) {
         return this._instance.repair(target);
     }
-    protected OnPrepObject() { }
-    protected OnActivate() { }
 }

@@ -3,8 +3,8 @@ import { profile } from "Tools/Profiler";
 import { ControllerMemory } from "SwarmMemory/StructureMemory";
 
 @profile
-export class SwarmController extends OwnedSwarmStructure<SwarmType.SwarmController, STRUCTURE_CONTROLLER,
-ControllerMemory, StructureController> implements StructureController {
+export class SwarmController extends OwnedSwarmStructure<STRUCTURE_CONTROLLER, StructureController>
+    implements StructureController {
     get level() { return this._instance.level; }
     get progress() { return this._instance.progress; }
     get progressTotal() { return this._instance.progressTotal; }
@@ -18,6 +18,4 @@ ControllerMemory, StructureController> implements StructureController {
 
     activateSafeMode() { return this._instance.activateSafeMode(); }
     unclaim() { return this._instance.unclaim(); }
-    protected OnPrepObject() { }
-    protected OnActivate() { }
 }

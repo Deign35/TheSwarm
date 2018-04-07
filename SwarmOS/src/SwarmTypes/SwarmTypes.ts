@@ -6,112 +6,40 @@ import { ConsulObject } from "Consuls/ConsulBase";
 
 const HAS_PREPPED = 'hasPrepped';
 @profile
-export abstract class ObjectBase<T extends SwarmDataTypes, U extends SwarmObjectType> implements AIBase<T, U> {
-    get prototype(): U { return this._instance.prototype; }
-    protected OnPrepObject() {
-
-    }
-    PrepObject(mem: T, obj: U) {
-        /*if ((prepIfInactive || this.IsActive) && !this.memory.GetFlashData(HAS_PREPPED)) {
-            this.OnPrepObject();
-            this.memory.SetFlashData(HAS_PREPPED, true);
-        }*/
-
-        return mem;
-    }
-
+export abstract class ObjectBase<T extends TBasicSwarmData, U extends SwarmObjectType> {
     abstract Activate(mem: T, obj: U): T;
     abstract InitAsNew(obj: U): T;
+    abstract PrepObject(mem: T, obj: U): T;
 
-    private _instance!: U;
-    private _memory!: T;
-
-    get memory(): T { return this._memory; }
     get id(): string { return this.memory.id; }
+    get memory(): T { return this._memory; }
+    get prototype(): U { return this._instance; }
 
-    GetObjectInstance(): U { return this._instance; }
-    GetMemType(): SwarmDataType {
+    protected _instance!: U;
+    protected _memory!: T;
+
+    GetMemType(): SwarmDataTypeSansMaster {
         return this.memory.MEM_TYPE;
     }
 }
 @profile
-export abstract class SwarmTypeBase<T extends SwarmDataTypeSansMaster, U extends SwarmType,
-    V extends SwarmSubType, W extends SwarmMemory<T, U, V>, Y extends SwarmObjectType>
-    extends ObjectBase<T, V, W, Y> {
-    get SWARM_TYPE(): U { return this.memory.SWARM_TYPE; }
+export abstract class SwarmTypeBase<T extends TBasicSwarmData, U extends SwarmObjectType>
+    extends ObjectBase<T, U> implements AIBase<T, U> {
     get IsActive() { return this.memory.isActive; }
+    GetSwarmType(): SwarmType { return this.memory.SWARM_TYPE; }
 }
-
 @profile
-export abstract class SwarmObject_RoomObject<T extends SwarmDataTypeSansMaster, U extends SwarmType,
-    V extends SwarmSubType, W extends SwarmMemory<T, U, V>, Y extends RoomObject>
-    extends SwarmTypeBase<T, U, V, W, Y> implements RoomObject {
-    get pos() { return this._instance.pos; }
-    get room() { return this._instance.room; } // This should get the room object i created.
-    get prototype(): Y { return this._instance.prototype as Y }
+export abstract class SwarmRoomObjectBase<T extends TBasicSwarmData, U extends RoomObject>
+    extends SwarmTypeBase<T, U> implements RoomObject {
+    get pos(): RoomPosition { return this._instance.pos; }
+    get room(): Room | undefined { return this._instance.room; }
 }
-
 @profile
-export abstract class NotifiableSwarmObject<T extends SwarmDataTypeSansMaster, U extends SwarmType,
-    V extends SwarmSubType, W extends SwarmMemory<T, U, V>, Y extends Creep | Structure>
-    extends SwarmObject_RoomObject<T, U, V, W, Y>  {
-    notifyWhenAttacked(enabled: boolean = false) { // ActionIntent
-        if (this._instance.notifyWhenAttacked) {
-            // Using this to trick the compiler into letting me return the value because apparently,
-            // it doesn't like generic ScreepsReturnCode as a return despite the typings.
-            return this._instance.notifyWhenAttacked(enabled) as OK;
-        }
-        return OK;
-    }
-}
-
-@profile
-export abstract class OwnableSwarmObject<T extends SwarmDataTypeSansMaster, U extends SwarmType,
-    V extends SwarmSubType, W extends SwarmMemory<T, U, V>,
-    Y extends Creep | OwnedStructure> extends NotifiableSwarmObject<T, U, V, W, Y> {
+export abstract class OwnableSwarmObject<T extends TCreepData | TOwnabledStructureData,
+    U extends Creep | OwnedStructure> extends SwarmRoomObjectBase<T, U> {
     get my() { return this._instance.my; }
     get owner() { return this._instance.owner; }
+    notifyWhenAttacked(enabled: boolean = false) { // ActionIntent
+        return this._instance.notifyWhenAttacked(enabled) as OK;
+    }
 }
-@profile
-export abstract class SwarmRoomObject<T extends SwarmRoomObjectType, U extends RoomObjectMemoryBase<T>,
-    X extends _rmType>
-    extends SwarmObject_RoomObject<SwarmDataType.RoomObject, T, T, U, X> {
-    get room(): Room { return this._instance.room! }
-}
-
-@profile
-export class SwarmMineral extends SwarmRoomObject<SwarmType.SwarmMineral, MineralMemory, Mineral> implements Mineral {
-    get SwarmType(): SwarmType.SwarmMineral { return SwarmType.SwarmMineral; }
-    get density() { return this._instance.density; }
-    get mineralAmount() { return this._instance.mineralAmount; }
-    get mineralType() { return this._instance.mineralType; }
-    get ticksToRegeneration() { return this._instance.ticksToRegeneration; }
-}
-
-@profile
-export class SwarmTombstone extends SwarmRoomObject<SwarmType.SwarmTombstone,
-TombstoneMemory, Tombstone> implements Tombstone {
-    get SwarmType(): SwarmType.SwarmTombstone { return SwarmType.SwarmTombstone }
-    get creep() { return this._instance.creep; }
-    get deathTime() { return this._instance.deathTime; }
-    get store() { return this._instance.store; }
-    get ticksToDecay() { return this._instance.ticksToDecay; }
-}
-
-@profile
-export class SwarmResource extends SwarmRoomObject<SwarmType.SwarmResource,
-ResourceMemory, Resource> implements Resource {
-    get storageMemoryType() { return SwarmDataType.RoomObject; }
-    get SwarmType(): SwarmType.SwarmResource { return SwarmType.SwarmResource; }
-    get amount() { return this._instance.amount; }
-    get resourceType() { return this._instance.resourceType; }
-}
-
-@profile
-export class SwarmNuke extends SwarmRoomObject<SwarmType.SwarmNuke, NukeMemory, Nuke> implements Nuke {
-    get storageMemoryType() { return SwarmDataType.RoomObject; }
-    get SwarmType(): SwarmType.SwarmNuke { return SwarmType.SwarmNuke; }
-    get launchRoomName() { return this._instance.launchRoomName; }
-    get timeToLand() { return this._instance.timeToLand; }
-}
-

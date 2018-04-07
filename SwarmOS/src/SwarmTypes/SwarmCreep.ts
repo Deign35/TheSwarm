@@ -5,14 +5,19 @@ import { OwnableSwarmObject } from "SwarmTypes/SwarmTypes";
 const CARRY_TOTAL = 'CT';
 const CURRENT_PATH = 'CP';
 @profile
-export class SwarmCreep<T extends CreepType> extends OwnableSwarmObject<SwarmDataType.Creep,
-SwarmType.SwarmCreep, T, CreepMemory<T, ICreepData<T>>, Creep> implements Creep {
-    get DataType(): SwarmDataType.Creep { return SwarmDataType.Creep };
-    PrepObject(unused: boolean) {
-        return super.PrepObject(true);
+export class SwarmCreep<T extends CreepType> extends OwnableSwarmObject<ICreepData<T>, Creep>
+    implements AICreep, Creep {
+    Activate(mem: ICreepData<T>, obj: Creep): ICreepData<T> {
+        throw new Error("Method not implemented.");
     }
-    protected OnPrepObject() { }
-    protected OnActivate() { }
+    InitAsNew(obj: Creep): ICreepData<T> {
+        throw new Error("Method not implemented.");
+    }
+    PrepObject(mem: ICreepData<T>, obj: Creep): ICreepData<T> {
+        throw new Error("Method not implemented.");
+    }
+
+    // (TODO): Need to switch this to using the flashData.
     protected _cachedData: { [id: string]: any } = {};
     get carryTotal() {
         if (!this._cachedData[CARRY_TOTAL]) {
@@ -31,8 +36,6 @@ SwarmType.SwarmCreep, T, CreepMemory<T, ICreepData<T>>, Creep> implements Creep 
         // enacted as a result of being invalid next tick.
         return 0;
     }
-    get SwarmType(): SwarmType.SwarmCreep { return SwarmType.SwarmCreep; }
-    get saveID(): string { return this.name; }
 
     /**
      * Prototype properties

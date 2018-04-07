@@ -12,7 +12,7 @@ declare interface ControlConsulData extends IConsulData<ConsulType.Control> {
 }
 declare type TConsulData = HarvestConsulData | ControlConsulData;
 
-declare interface AIConsulBaseObject<T extends ConsulType> {
+declare interface AIConsulBaseObject<T extends ConsulType> extends _Constructor<any> {
 
 }
 declare type AIConsulObject = AIConsulBaseObject<ConsulType>;

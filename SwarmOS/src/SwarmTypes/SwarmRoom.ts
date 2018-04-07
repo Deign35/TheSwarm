@@ -9,10 +9,28 @@ import { RoomMemory } from "SwarmMemory/SwarmMemory";
 import { SwarmTypeBase } from "SwarmTypes/SwarmTypes";
 import { profile } from "Tools/Profiler";
 
+/*<T extends CreepType> extends OwnableSwarmObject<ICreepData<T>, Creep>
+    implements AICreep, Creep {
+    Activate(mem: ICreepData<T>, obj: Creep): ICreepData<T> {
+        throw new Error("Method not implemented.");
+    }
+    InitAsNew(obj: Creep): ICreepData<T> {
+        throw new Error("Method not implemented.");
+    }
+    PrepObject(mem: ICreepData<T>, obj: Creep): ICreepData<T> {
+        throw new Error("Method not implemented.");
+    }*/
 @profile
-export class SwarmRoom<T extends RoomType> extends SwarmTypeBase<SwarmDataType.Room,
-SwarmType.SwarmRoom, T, RoomMemory<T, IRoomData<T>>, Room> implements Room {
-    get prototype() { return this._instance.prototype; }
+export class SwarmRoom<T extends RoomType> extends SwarmTypeBase<IRoomData<T>, Room> implements AIRoom, Room {
+    InitAsNew(obj: Room): IRoomData<T> {
+        throw new Error("Method not implemented.");
+    }
+    PrepObject(mem: IRoomData<T>, obj: Room): IRoomData<T> {
+        throw new Error("Method not implemented.");
+    }
+    Activate(mem: IRoomData<T>, obj: Room): IRoomData<T> {
+        throw new Error("Method not implemented.");
+    }
     private _availableSpawns!: string[];
     protected get spawns(): string[] {
         if (!this._availableSpawns) {
@@ -29,16 +47,16 @@ SwarmType.SwarmRoom, T, RoomMemory<T, IRoomData<T>>, Room> implements Room {
         }
         return this._availableSpawns;
     }
-
-    PrepObject(unused: boolean) {
-        return super.PrepObject(true);
-    }
-    protected OnPrepObject() {
-        this.TryFindNewObjects();
-
-    }
-    protected OnActivate() {
-    }
+    /*
+        PrepObject(unused: boolean) {
+            return super.PrepObject(true);
+        }
+        protected OnPrepObject() {
+            this.TryFindNewObjects();
+    
+        }
+        protected OnActivate() {
+        }*/
 
     TrySpawn(body: BodyPartConstant[], name: string,
         opts?: {
@@ -68,71 +86,71 @@ SwarmType.SwarmRoom, T, RoomMemory<T, IRoomData<T>>, Room> implements Room {
         return E_MISSING_TARGET;
     }
 
-    InitAsNew() {
-        SwarmLogger.Log("Initializing a new room");
-        let roomType = this.controller && this.controller.owner && this.controller.owner.username == MY_USERNAME &&
-            this.controller.level;// RCL1 - RCL8 if I own the room
-
-        if (!roomType) {
-            // Not mine, what is it?
-            if (this.controller) {
-                roomType = RoomType.NonHostile;
-                if (this.controller.owner) {
-                    roomType = RoomType.Hostile;
-                } else if (this.controller.reservation) {
-                    if (this.controller.reservation.username == MY_USERNAME) {
-                        roomType = RoomType.HarvestSupport;
-                    } else {
-                        roomType = RoomType.Hostile;
-                    }
-                }
-            } else {
-                roomType = RoomType.NeutralRoom;
-                let hasKeeperLair = this.find(FIND_STRUCTURES, {
-                    filter: function (struct) {
-                        return struct.structureType == STRUCTURE_KEEPER_LAIR;
-                    }
-                }).length > 0;
-
-                if (hasKeeperLair) {
-                    roomType = RoomType.KeepersLair;
-                }
-            }
-        }
-
-        this.memory.SUB_TYPE = roomType as T;
-
-        // Would love to add a pathfinding.
-        let sources = this.find(FIND_SOURCES);
-        for (let i = 0; i < sources.length; i++) {
-            //SwarmLoader.LoadObject(sources[i].id, sources[i], SwarmControllerDataTypes.RoomObjects);
-        }
-        let minerals = this.find(FIND_MINERALS);
-        for (let i = 0; i < minerals.length; i++) {
-            //SwarmLoader.LoadObject(minerals[i].id, minerals[i], SwarmControllerDataTypes.RoomObjects);
-        }
-        // (TODO): Instead of TryFindNewObjects, use a single LookAtArea and find all objects for the new room.
-        this.TryFindNewObjects(true);
-        this.CreateHarvestConsul(sources);
-    }
-
-    CreateHarvestConsul(sources: Source[]) {
-        // Find an existing harvest consul at some point, for now, one per room.
-        let newHarvesterData: HarvestConsulData = {
-            id: this.name + '_harvest',
-            isActive: true,
-            MEM_TYPE: SwarmDataType.Consul,
-            sourceIDs: CopyObject(SwarmLoader.SwarmRoomIDs[this.name].roomObjects[SwarmType.SwarmSource]),
-            SUB_TYPE: ConsulType.Harvest,
-            SWARM_TYPE: SwarmType.SwarmConsul
-        }
-        let newHarvesterMem = new HarvestMemory(newHarvesterData);
-        newHarvesterMem.ReserveMemory();
-
-        let consul: ConsulObject = SwarmCreator.CreateConsulObject(ConsulType.Harvest);
-        /*consul.AssignObject(new ConsulObject(), newHarvesterMem);
-        SwarmLoader.TheSwarm.consuls[consul.saveID] = consul;*/
-    }
+    /* InitAsNew() {
+         SwarmLogger.Log("Initializing a new room");
+         let roomType = this.controller && this.controller.owner && this.controller.owner.username == MY_USERNAME &&
+             this.controller.level;// RCL1 - RCL8 if I own the room
+ 
+         if (!roomType) {
+             // Not mine, what is it?
+             if (this.controller) {
+                 roomType = RoomType.NonHostile;
+                 if (this.controller.owner) {
+                     roomType = RoomType.Hostile;
+                 } else if (this.controller.reservation) {
+                     if (this.controller.reservation.username == MY_USERNAME) {
+                         roomType = RoomType.HarvestSupport;
+                     } else {
+                         roomType = RoomType.Hostile;
+                     }
+                 }
+             } else {
+                 roomType = RoomType.NeutralRoom;
+                 let hasKeeperLair = this.find(FIND_STRUCTURES, {
+                     filter: function (struct) {
+                         return struct.structureType == STRUCTURE_KEEPER_LAIR;
+                     }
+                 }).length > 0;
+ 
+                 if (hasKeeperLair) {
+                     roomType = RoomType.KeepersLair;
+                 }
+             }
+         }
+ 
+         this.memory.SUB_TYPE = roomType as T;
+ 
+         // Would love to add a pathfinding.
+         let sources = this.find(FIND_SOURCES);
+         for (let i = 0; i < sources.length; i++) {
+             //SwarmLoader.LoadObject(sources[i].id, sources[i], SwarmControllerDataTypes.RoomObjects);
+         }
+         let minerals = this.find(FIND_MINERALS);
+         for (let i = 0; i < minerals.length; i++) {
+             //SwarmLoader.LoadObject(minerals[i].id, minerals[i], SwarmControllerDataTypes.RoomObjects);
+         }
+         // (TODO): Instead of TryFindNewObjects, use a single LookAtArea and find all objects for the new room.
+         this.TryFindNewObjects(true);
+         this.CreateHarvestConsul(sources);
+     }
+ 
+     CreateHarvestConsul(sources: Source[]) {
+         // Find an existing harvest consul at some point, for now, one per room.
+         let newHarvesterData: HarvestConsulData = {
+             id: this.name + '_harvest',
+             isActive: true,
+             MEM_TYPE: SwarmDataType.Consul,
+             sourceIDs: CopyObject(SwarmLoader.SwarmRoomIDs[this.name].roomObjects[SwarmType.SwarmSource]),
+             SUB_TYPE: ConsulType.Harvest,
+             SWARM_TYPE: SwarmType.SwarmConsul
+         }
+         let newHarvesterMem = new HarvestMemory(newHarvesterData);
+         newHarvesterMem.ReserveMemory();
+ 
+         let consul: ConsulObject = SwarmCreator.CreateConsulObject(ConsulType.Harvest);
+         /*consul.AssignObject(new ConsulObject(), newHarvesterMem);
+         SwarmLoader.TheSwarm.consuls[consul.saveID] = consul;* /
+     }*/
 
     TryFindNewObjects(force: boolean = false) {
         /*if (force || Game.time % 5 == 0) {

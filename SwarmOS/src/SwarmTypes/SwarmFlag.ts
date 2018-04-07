@@ -1,10 +1,31 @@
 import { FlagMemory, SwarmMemory } from "SwarmMemory/SwarmMemory";
 import { profile } from "Tools/Profiler";
-import { SwarmObject_RoomObject } from "./SwarmTypes";
+import { SwarmTypeBase } from "SwarmTypes/SwarmTypes";
 
+/*
+export class SwarmCreep<T extends CreepType> extends OwnableSwarmObject<ICreepData<T>, Creep>
+    implements AICreep, Creep {
+    Activate(mem: ICreepData<T>, obj: Creep): ICreepData<T> {
+        throw new Error("Method not implemented.");
+    }
+    InitAsNew(obj: Creep): ICreepData<T> {
+        throw new Error("Method not implemented.");
+    }
+    PrepObject(mem: ICreepData<T>, obj: Creep): ICreepData<T> {
+        throw new Error("Method not implemented.");
+    }*/
 @profile
-export class SwarmFlag<T extends FlagType> extends SwarmObject_RoomObject<SwarmDataType.Flag,
-SwarmType.SwarmFlag, T, SwarmMemory<SwarmDataType.Flag, SwarmType.SwarmFlag, T>, Flag> implements Flag {
+export class SwarmFlag<T extends FlagType> extends SwarmTypeBase<IFlagData<T>, Flag>
+    implements AIFlag, Flag {
+    Activate(mem: IFlagData<T>, obj: Flag): IFlagData<T> {
+        throw new Error("Method not implemented.");
+    }
+    InitAsNew(obj: Flag): IFlagData<T> {
+        throw new Error("Method not implemented.");
+    }
+    PrepObject(mem: IFlagData<T>, obj: Flag): IFlagData<T> {
+        throw new Error("Method not implemented.");
+    }
     get DataType(): SwarmDataType.Flag { return SwarmDataType.Flag };
     get SwarmType(): SwarmType.SwarmFlag { return SwarmType.SwarmFlag; };
     get pos() { return this._instance.pos; }
@@ -26,9 +47,4 @@ SwarmType.SwarmFlag, T, SwarmMemory<SwarmDataType.Flag, SwarmType.SwarmFlag, T>,
             return this._instance.setPosition(args[0]);
         }
     }
-    PrepObject(unused: boolean) {
-        return super.PrepObject(true);
-    }
-    protected OnPrepObject() { }
-    protected OnActivate() { }
 }

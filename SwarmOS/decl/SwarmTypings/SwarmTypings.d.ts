@@ -7,6 +7,7 @@ declare interface IData<T extends SwarmDataType, U extends number | string> {
 }
 declare interface ISwarmData<T extends SwarmDataType, U extends SwarmType, V extends SwarmSubType> extends IData<T, V> {
     isActive: boolean;
+    SWARM_TYPE: U
 }
 declare type TBasicSwarmData = TRoomObjectData | TStructureData | TRoomData | TCreepData | TFlagData | TConsulData;
 
@@ -25,11 +26,12 @@ declare type SwarmStructureType = SwarmType.SwarmContainer | SwarmType.SwarmCont
     SwarmType.SwarmStorage | SwarmType.SwarmTerminal | SwarmType.SwarmTower | SwarmType.SwarmWall
 
 declare type SwarmObjectType = Room | RoomObject | AIConsulObject
-declare interface AIBase<T extends SwarmDataTypes, U extends SwarmObjectType> extends _Constructor<U> {
+declare interface AIBase<T extends TBasicSwarmData, U extends SwarmObjectType> extends _Constructor<U> {
     Activate(mem: T, obj: U): T;
     InitAsNew(obj: U): T;
     PrepObject(mem: T, obj: U): T;
-    GetMemType(): SwarmDataType;
+    GetMemType(): SwarmDataTypeSansMaster;
+    GetSwarmType(): SwarmType;
 }
 
 declare type AIObject = AIConsul | AICreep | AIFlag | AIRoom | AIRoomObject | AIStructure;
