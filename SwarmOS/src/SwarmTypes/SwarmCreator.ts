@@ -11,7 +11,7 @@ import { SwarmSpawn } from "./SwarmStructures/SwarmSpawn";
 import { SwarmTower } from "./SwarmStructures/SwarmTower";
 import { NotImplementedException } from "Tools/SwarmExceptions";
 import { profile } from "Tools/Profiler";
-import { MemoryBase, CreepMemory, FlagMemory, RoomMemory } from "SwarmMemory/SwarmMemory";
+import { MemoryBase, CreepMemory, FlagMemory, RoomMemory, SwarmMemory } from "SwarmMemory/SwarmMemory";
 import { ContainerMemory, ControllerMemory, ExtensionMemory, ExtractorMemory, KeepersLairMemory, LabMemory, LinkMemory, NukerMemory, ObserverMemory, PortalMemory, PowerBankMemory, PowerSpawnMemory, RampartMemory, RoadMemory, SpawnMemory, StorageMemory, TerminalMemory, TowerMemory, WallMemory } from "SwarmMemory/StructureMemory";
 import { MineralMemory, NukeMemory, ResourceMemory, ConstructionSiteMemory, SourceMemory, TombstoneMemory } from "SwarmMemory/RoomObjectMemory";
 import { HarvestMemory, ControlMemory } from "SwarmMemory/ConsulMemory";
@@ -92,8 +92,8 @@ export class SwarmCreator {
         return SWARM_OBJECTS[dataType as number][subType] as V;
     }
 
-    static CreateNewSwarmMemory<T extends SwarmDataType, U extends SwarmSubType,
-        V extends IData<T, U>>(id: string, swarmType: SwarmType): V {
+    static CreateNewSwarmMemory<T extends SwarmDataTypeSansMaster, U extends SwarmSubType, V extends SwarmType,
+        X extends SwarmMemory<T, V, U>>(id: string, swarmType: V): X {
         let newMemory: any;
         switch (swarmType) {
             case (SwarmType.SwarmContainer):
@@ -359,12 +359,12 @@ export class SwarmCreator {
                 });
                 break;
         }
-        return newMemory as V;
+        return newMemory as X;
     }
     /**<T extends SwarmDataType, U extends SwarmSubType,
         V extends IData<T, U>>(id: string, swarmType: SwarmType): V { */
     static CreateSwarmMemory<T extends SwarmDataTypeSansMaster, U extends SwarmType, V extends SwarmSubType,
-        W extends TBasicSwarmData>(mem: W): ISwarmData<T, U, V> {
+        W extends TBasicSwarmData>(mem: W): SwarmMemory<T, U, V> {
         let memType = mem.SWARM_TYPE;
         let subType = mem.SUB_TYPE;
 
@@ -480,8 +480,8 @@ export class SwarmCreator {
     }
 
     static GetSwarmType(obj: SwarmObjectType): SwarmType {
-        if ((obj as AIConsulObject).GetSwarmType) {
-            return (obj as AIConsulObject).GetSwarmType();
+        if ((obj as AIConsulObject).ConsulType) {
+            return SwarmType.SwarmConsul;
         }
 
         if ((obj as Room).name) {

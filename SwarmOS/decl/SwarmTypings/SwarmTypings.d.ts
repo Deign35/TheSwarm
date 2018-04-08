@@ -9,6 +9,7 @@ declare interface ISwarmData<T extends SwarmDataType, U extends SwarmType, V ext
     isActive: boolean;
     SWARM_TYPE: U
 }
+declare type SwarmData = ISwarmData<SwarmDataType, SwarmType, SwarmSubType>;
 declare type TBasicSwarmData = TRoomObjectData | TStructureData | TRoomData | TCreepData | TFlagData | TConsulData;
 
 declare type SwarmDataTypes = MasterSwarmDataTypes | TBasicSwarmData;

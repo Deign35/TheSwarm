@@ -6,11 +6,9 @@ import { SwarmMemory, MemoryBase } from "SwarmMemory/SwarmMemory";
 export abstract class ConsulObject<T extends ConsulType> implements AIConsulBaseObject<T> {
     get prototype() {
         throw new NotImplementedException('Consuls do not have a prototype');
+        //return this;
     }
-    abstract GetConsulType(): T;
-    GetSwarmType(): SwarmType.SwarmConsul {
-        return SwarmType.SwarmConsul;
-    }
+    abstract get ConsulType(): T;
 }
 
 //ISwarmData < SwarmDataType.Consul, SwarmType.SwarmConsul, T >

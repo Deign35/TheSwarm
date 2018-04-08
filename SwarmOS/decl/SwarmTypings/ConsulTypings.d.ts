@@ -13,8 +13,7 @@ declare interface ControlConsulData extends IConsulData<ConsulType.Control> {
 declare type TConsulData = HarvestConsulData | ControlConsulData;
 
 declare interface AIConsulBaseObject<T extends ConsulType> extends _Constructor<any> {
-    GetSwarmType(): SwarmType.SwarmConsul;
-    GetConsulType(): T;
+    ConsulType: T;
 }
 declare type AIConsulObject = AIConsulBaseObject<ConsulType>;
 declare interface AIConsulBase<T extends ConsulType> extends AIBase<TConsulData, AIConsulObject> {

@@ -1,6 +1,5 @@
 import { SwarmLoader } from "SwarmTypes/SwarmLoader";
 import { ObjectBase } from "SwarmTypes/SwarmTypes";
-import { AllMemoryTypes } from "SwarmTypes/SwarmCreator";
 
 /*const PREP_ORDER = [ // Cause by some objects gathering their information prior, such as available spawns
     SwarmControllerDataTypes.Rooms,
@@ -26,8 +25,8 @@ export class SwarmQueen {
     }
 }
 
-const DoTheSwarm = function (swarmAction: (obj: ObjectBase<AllMemoryTypes, any>) => void) {
-    let typeKeys = Object.keys(SwarmLoader.TheSwarm) as SwarmControllerDataTypes[];
+const DoTheSwarm = function (swarmAction: (obj: ObjectBase<TBasicSwarmData, any>) => void) {
+    let typeKeys = Object.keys(SwarmLoader.TheSwarm) as AIObject[];
     for (let i = 0; i < typeKeys.length; i++) {
         /*let ids = Object.keys(SwarmLoader.TheSwarm[typeKeys[i]]);
         for (let j = 0; j < ids.length; j++) {

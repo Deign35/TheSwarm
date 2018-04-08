@@ -2114,13 +2114,6 @@ interface OrderFilter {
     remainingAmount?: number;
     price?: number;
 }
-interface Memory {
-    [name: string]: any;
-    creeps: { [name: string]: ICreepData };
-    flags: { [name: string]: IFlagData };
-    rooms: { [name: string]: IRoomData };
-    spawns: { [name: string]: TStructureData };
-}
 
 /**
  * A mineral deposit object. Can be harvested by creeps with a WORK body part using the extractor structure.
@@ -3163,7 +3156,7 @@ interface StructureSpawn extends OwnedStructure<STRUCTURE_SPAWN> {
      * ERR_RCL_NOT_ENOUGH       -14 Your Room Controller level is insufficient to use this spawn.
      * ```
      */
-    spawnCreep(body: BodyPartConstant[], name: string, opts?: { memory?: ICreepData, energyStructures?: Array<(StructureSpawn | StructureExtension)>, dryRun?: boolean, directions?: DirectionConstant[] }): ScreepsReturnCode;
+    spawnCreep(body: BodyPartConstant[], name: string, opts?: { memory?: TCreepData, energyStructures?: Array<(StructureSpawn | StructureExtension)>, dryRun?: boolean, directions?: DirectionConstant[] }): ScreepsReturnCode;
 
     /**
      * Destroy this spawn immediately.

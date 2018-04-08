@@ -2,7 +2,11 @@ import { SwarmConsul, ConsulObject } from "Consuls/ConsulBase";
 import { HarvestMemory, ControlMemory } from "SwarmMemory/ConsulMemory";
 import { SwarmSource } from "SwarmTypes/SwarmRoomObjects";
 
-
+export class HarvestObject extends ConsulObject<ConsulType.Harvest> {
+    get ConsulType(): ConsulType.Harvest {
+        return ConsulType.Harvest
+    }
+}
 
 export class HarvestConsul extends SwarmConsul<ConsulType.Harvest> {
     Activate(mem: HarvestMemory, obj: ConsulObject<ConsulType.Harvest>): HarvestMemory {

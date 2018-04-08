@@ -120,11 +120,11 @@ export abstract class MasterSwarmMemory<T extends SwarmDataTypeSansMaster, U ext
     HasMemory(id: string) { return !!this.ChildData[id]; }
     CheckoutMemory(id: string) {
         let data = this.ChildData[id];
-        let newMem = SwarmCreator.CreateSwarmMemory(data as any as TBasicSwarmData);
+        let newMem = SwarmCreator.CreateSwarmMemory(data as any as ISwarmData<T, SwarmType, SwarmSubType>);
         return newMem;
     }
-    SaveMemory(childData: SwarmMemory<T, SwarmType, SwarmDataType>): void {
-        this.ChildData[childData.id] = childData.ReleaseMemory();
+    SaveMemory(childData: MemObject): void {
+        this.ChildData[childData.id] = childData.ReleaseMemory() as IData<T, SwarmSubType>;
     }
     DeleteMemory(saveID: string): void {
         if (!!this.ChildData[saveID]) {

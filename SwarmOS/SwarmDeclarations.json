@@ -1,7 +1,7 @@
 {
     "Constants": {
         "MY_USERNAME": "Deign",
-        "MY_SIGNATURE": "The dawn of the Swarm -- SwarmOS v1.0.2",
+        "MY_SIGNATURE": "The dawn of the Swarm -- SwarmOS v1.0.3",
         "NOT_CONFIGURED": "NOT_CONFIGURED",
         "SUB_TYPE": "SUB_TYPE",
         "MASTER_CONSUL_MEMORY_ID": "consuls",
