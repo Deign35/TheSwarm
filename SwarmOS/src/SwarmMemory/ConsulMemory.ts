@@ -4,7 +4,7 @@ abstract class ConsulMemoryBase<T extends ConsulType, U extends IConsulData<T>>
     extends SwarmMemoryWithSpecifiedData<U> {
     get MEM_TYPE(): SwarmDataType.Consul { return SwarmDataType.Consul; }
     get SWARM_TYPE(): SwarmType.SwarmConsul { return SwarmType.SwarmConsul; }
-    get SUB_TYPE(): T { return this.cache.SUB_TYPE; }
+    abstract get SUB_TYPE(): T;
 }
 abstract class ConsulMemoryWithSpecifiedData<T extends TConsulData>
     extends ConsulMemoryBase<ConsulType, T> {

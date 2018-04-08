@@ -1,7 +1,5 @@
-import { profile } from "Tools/Profiler";
 import { MemoryLockException } from "Tools/SwarmExceptions";
 
-@profile
 export abstract class MemoryBase {
     constructor() {
         this._checkedOut = false;
@@ -49,14 +47,14 @@ export abstract class MemoryBase {
     }
 }
 
-@profile
 export abstract class SwarmMemoryBase<T extends SwarmDataType, U extends SwarmType, V extends SwarmSubType, X extends ISwarmData<T, U, V>>
     extends MemoryBase implements ISwarmData<T, U, V> {
     protected abstract get cache(): X;
-    abstract get MEM_TYPE(): T; //{ return this.cache.MEM_TYPE; }
-    abstract get SWARM_TYPE(): U; //{ return this.cache.SWARM_TYPE; }
-    abstract get SUB_TYPE(): V; //{ return this.cache.SUB_TYPE; }
+    abstract get MEM_TYPE(): T;
+    abstract get SWARM_TYPE(): U;
+    abstract get SUB_TYPE(): V;
 }
+
 export abstract class SwarmMemoryWithSpecifiedData<T extends SwarmData>
     extends SwarmMemoryBase<SwarmDataType, SwarmType, SwarmSubType, T> implements SwarmData {
     constructor(data: T) {
@@ -65,79 +63,4 @@ export abstract class SwarmMemoryWithSpecifiedData<T extends SwarmData>
     }
     private _cache: T;
     protected get cache() { return this._cache; }
-}
-
-
-
-
-/*
-declare type SwarmMemory = SwarmMemoryBase<SwarmDataType, SwarmType, SwarmSubType>;
-declare type RoomMemory = RoomMemoryBase<RoomType>;
-declare type RoomObjectMemory = RoomObjectMemoryBase<SwarmRoomObjectType>;
-declare type StructureMemory = StructureMemoryBase<SwarmStructureType, StructureConstant>;
-declare type FlagMemory = FlagMemoryBase<FlagType>;
-declare type CreepMemory = CreepMemoryBase<CreepType>;
-declare type ConsulMemory = ConsulMemoryBase<ConsulType>;*/
-
-@profile
-export class MasterMemoryBase<T extends SwarmDataType> extends
-    SwarmMemoryBase<SwarmDataType.Master, SwarmType.SwarmMaster, T> implements IMasterData<T> {
-    get ChildData(): IMasterData<T> {
-
-    }
-}
-
-@profile
-export abstract class MasterSwarmMemory extends
-    SwarmMemoryBase<SwarmDataType.Master, SwarmType.SwarmMaster, SwarmDataType>
-    implements IMasterData<SwarmDataType> {
-    get isActive() { return true; }
-    get ChildData() {
-        return this.cache.ChildData
-    }
-    GetMemoryIDs() { return Object.keys(this.ChildData); }
-    HasMemory(id: string) { return !!this.ChildData[id]; }
-    CheckoutMemory(id: string) {
-        let data = this.ChildData[id];
-        let newMem = SwarmCreator.CreateSwarmMemory(data as IData<T, SwarmSubType>);
-        return newMem;
-    }
-    SaveMemory(childData: MemObject): void {
-        this.ChildData[childData.id] = childData.ReleaseMemory() as IData<T, SwarmSubType>;
-    }
-    DeleteMemory(saveID: string): void {
-        if (!!this.ChildData[saveID]) {
-            delete this.ChildData[saveID];
-        }
-    }
-}
-
-@profile
-export class MasterCreepMemory extends MasterSwarmMemory<SwarmDataType.Creep, IMasterCreepData>
-    implements IMasterCreepData {
-    get SUB_TYPE(): SwarmDataType.Creep { return SwarmDataType.Creep; }
-}
-@profile
-export class MasterFlagMemory extends MasterSwarmMemory<SwarmDataType.Flag, IMasterFlagData> implements IMasterFlagData {
-    get SUB_TYPE(): SwarmDataType.Flag { return SwarmDataType.Flag; }
-}
-@profile
-export class MasterRoomMemory extends MasterSwarmMemory<SwarmDataType.Room, IMasterRoomData> implements IMasterRoomData {
-    get SUB_TYPE(): SwarmDataType.Room { return SwarmDataType.Room; }
-}
-@profile
-export class MasterStructureMemory extends MasterSwarmMemory<SwarmDataType.Structure, IMasterStructureData>
-    implements IMasterStructureData {
-    get SUB_TYPE(): SwarmDataType.Structure { return SwarmDataType.Structure; }
-}
-@profile
-export class MasterRoomObjectMemory extends MasterSwarmMemory<SwarmDataType.RoomObject, IMasterRoomObjectData>
-    implements IMasterRoomObjectData {
-    get SUB_TYPE(): SwarmDataType.RoomObject { return SwarmDataType.RoomObject; }
-}
-@profile
-export class MasterConsulMemory extends MasterSwarmMemory<SwarmDataType.Consul, IMasterConsulData>
-    implements IMasterConsulData {
-    get SUB_TYPE(): SwarmDataType.Consul { return SwarmDataType.Consul; }
-
 }
