@@ -11,7 +11,7 @@ import { SwarmSpawn } from "./SwarmStructures/SwarmSpawn";
 import { SwarmTower } from "./SwarmStructures/SwarmTower";
 import { NotImplementedException } from "Tools/SwarmExceptions";
 import { profile } from "Tools/Profiler";
-import { MemoryBase, CreepMemory, FlagMemory, RoomMemory, SwarmMemory } from "SwarmMemory/SwarmMemory";
+import { MemoryBase, CreepMemory, FlagMemory, RoomMemory, SwarmMemoryBase } from "SwarmMemory/SwarmMemory";
 import { ContainerMemory, ControllerMemory, ExtensionMemory, ExtractorMemory, KeepersLairMemory, LabMemory, LinkMemory, NukerMemory, ObserverMemory, PortalMemory, PowerBankMemory, PowerSpawnMemory, RampartMemory, RoadMemory, SpawnMemory, StorageMemory, TerminalMemory, TowerMemory, WallMemory } from "SwarmMemory/StructureMemory";
 import { MineralMemory, NukeMemory, ResourceMemory, ConstructionSiteMemory, SourceMemory, TombstoneMemory } from "SwarmMemory/RoomObjectMemory";
 import { HarvestMemory, ControlMemory } from "SwarmMemory/ConsulMemory";
@@ -93,7 +93,7 @@ export class SwarmCreator {
     }
 
     static CreateNewSwarmMemory<T extends SwarmDataTypeSansMaster, U extends SwarmSubType, V extends SwarmType,
-        X extends SwarmMemory<T, V, U>>(id: string, swarmType: V): X {
+        X extends SwarmMemoryBase<T, V, U>>(id: string, swarmType: V): X {
         let newMemory: any;
         switch (swarmType) {
             case (SwarmType.SwarmContainer):
@@ -364,7 +364,7 @@ export class SwarmCreator {
     /**<T extends SwarmDataType, U extends SwarmSubType,
         V extends IData<T, U>>(id: string, swarmType: SwarmType): V { */
     static CreateSwarmMemory<T extends SwarmDataTypeSansMaster, U extends SwarmType, V extends SwarmSubType,
-        W extends TBasicSwarmData>(mem: W): SwarmMemory<T, U, V> {
+        W extends SwarmData>(mem: W): SwarmMemoryBase<T, U, V> {
         let memType = mem.SWARM_TYPE;
         let subType = mem.SUB_TYPE;
 
@@ -374,7 +374,7 @@ export class SwarmCreator {
             // Consuls
             case (SwarmType.SwarmConsul):
                 switch (subType as ConsulType) {
-                    case (ConsulType.Harvest): newMemory = new HarvestMemory(mem as HarvestConsulData); break;
+                    case (ConsulType.Harvest): newMemory = new HarvestMemory(mem); break;
                     case (ConsulType.Control): newMemory = new ControlMemory(mem as ControlConsulData); break;
                 }
                 break;

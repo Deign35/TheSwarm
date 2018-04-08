@@ -1,23 +1,22 @@
-import { MemoryBase, SwarmMemory } from "./SwarmMemory";
+import { SwarmMemoryWithSpecifiedData } from "SwarmMemory/SwarmMemory";
 
-export type TConsulMemory = HarvestMemory | ControlMemory;
-
-export abstract class ConsulMemory<T extends ConsulType>
-    extends SwarmMemory<SwarmDataType.Consul, SwarmType.SwarmConsul, T> {
+abstract class ConsulMemoryBase<T extends ConsulType, U extends IConsulData<T>>
+    extends SwarmMemoryWithSpecifiedData<U> {
+    get MEM_TYPE(): SwarmDataType.Consul { return SwarmDataType.Consul; }
     get SWARM_TYPE(): SwarmType.SwarmConsul { return SwarmType.SwarmConsul; }
+    get SUB_TYPE(): T { return this.cache.SUB_TYPE; }
 }
-export class HarvestMemory extends ConsulMemory<ConsulType.Harvest> implements HarvestConsulData {
-    protected get cache(): HarvestConsulData {
-        return super.cache as HarvestConsulData;
-    }
+abstract class ConsulMemoryWithSpecifiedData<T extends TConsulData>
+    extends ConsulMemoryBase<ConsulType, T> {
+}
+
+export class HarvestConsulMemory extends ConsulMemoryWithSpecifiedData<HarvestConsulData> implements HarvestConsulData {
     get sourceIDs() { return this.cache.sourceIDs; }
     get SUB_TYPE(): ConsulType.Harvest { return ConsulType.Harvest; }
 }
-
-export class ControlMemory extends ConsulMemory<ConsulType.Control> implements ControlConsulData {
-    get cache(): ControlConsulData {
-        return super.cache as ControlConsulData;
-    }
+export class ControlConsulMemory extends ConsulMemoryWithSpecifiedData<ControlConsulData> implements ControlConsulData {
     get creepIDs(): string[] { return this.cache.creepIDs; }
     get SUB_TYPE(): ConsulType.Control { return ConsulType.Control; }
 }
+
+export type ConsulMemory = ConsulMemoryWithSpecifiedData<TConsulData>;

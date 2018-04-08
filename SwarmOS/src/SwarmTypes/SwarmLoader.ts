@@ -37,15 +37,6 @@ export class SwarmLoader {
     static LoadTheSwarm() {
         this.SwarmRoomIDs = {}
         global['SwarmRoomIDs'] = this.SwarmRoomIDs;
-        /*this.TheSwarm = {
-            [MASTER_CONSUL_MEMORY_ID]: {} as { [id: string]: AIConsul },
-            [MASTER_CREEP_MEMORY_ID]: {} as { [id: string]: AICreep },
-            [MASTER_FLAG_MEMORY_ID]: {} as { [id: string]: AIFlag },
-            [MASTER_ROOM_MEMORY_ID]: {} as { [id: string]: AIRoom },
-            [MASTER_ROOMOBJECT_MEMORY_ID]: {} as { [id: number]: AIRoomObject },
-            [MASTER_STRUCTURE_MEMORY_ID]: {} as { [id: string]: AIStructure },
-        }
-        global['TheSwarm'] = this.TheSwarm;*/
 
         this.MasterMemory = {
             [MASTER_CONSUL_MEMORY_ID]: Swarmlord.CheckoutMasterMemory(MASTER_CONSUL_MEMORY_ID) as MasterConsulMemory,
@@ -79,7 +70,10 @@ export class SwarmLoader {
             if (!this.MasterMemory.creeps.HasMemory(keys[i])) {
                 this.LoadObject(keys[i], Game.creeps[keys[i]], MASTER_CREEP_MEMORY_ID);
                 //this.SwarmRoomIDs[Game.creeps[keys[i]].room.name].creeps.push(keys[i]);
-                //this.TheSwarm[MASTER_CREEP_MEMORY_ID][keys[i]].InitAsNew();
+                //this.MasterMemory.creeps. .InitAsNew(Game.creeps[keys[i]]);
+                let newCreep = this.MasterMemory.creeps.CheckoutMemory(keys[i]) as AICreep;
+                newCreep.InitAsNew(Game.creeps[keys[i]]);
+                this.MasterMemory.creeps.SaveMemory(newCreep);
             }
         }
         this.LoadObjectsWithName(MASTER_FLAG_MEMORY_ID);

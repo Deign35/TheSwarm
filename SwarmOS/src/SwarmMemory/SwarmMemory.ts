@@ -1,117 +1,96 @@
 import { profile } from "Tools/Profiler";
-import { SwarmException, MemoryLockException, AlreadyExistsException, NotImplementedException } from "Tools/SwarmExceptions";
-import { SwarmCreator } from "SwarmTypes/SwarmCreator";
+import { MemoryLockException } from "Tools/SwarmExceptions";
 
-export type MemObject = MemObjectWithData<SwarmDataType, SwarmSubType>;
-declare type MemObjectWithData<T extends SwarmDataType, U extends SwarmSubType> = MemoryBase<T, U, IData<T, U>>;
 @profile
-export abstract class MemoryBase<T extends SwarmDataType, U extends SwarmSubType,
-    V extends IData<T, U>> implements IData<T, U> {
-    constructor(data: V) {
-        this._cache = data;
+export abstract class MemoryBase {
+    constructor() {
         this._checkedOut = false;
         this._flashMemory = {};
     }
-
-    private _cache: V;
-    private _checkedOut: boolean;
+    protected abstract get cache(): IData;
     private _flashMemory: Dictionary;
-    protected get cache() { return this._cache; }
+    private _checkedOut: boolean;
 
-    get id() { return this.cache.id; }
-    get IsCheckedOut() { return this._checkedOut }
-    abstract get isActive(): boolean;
+    get id(): string { return this.cache.id; }
+    get isActive(): boolean { return this.cache.isActive; }
+    get IsCheckedOut(): boolean { return this._checkedOut }
+    get MEM_TYPE(): SwarmDataType { return this.cache.MEM_TYPE; }
+    get SWARM_TYPE(): SwarmType { return this.cache.SWARM_TYPE; }
+    get SUB_TYPE(): SwarmSubType { return this.cache.SUB_TYPE; }
 
-    abstract MEM_TYPE: T
-    abstract SUB_TYPE: U;
-    //protected abstract SetCache(data: IData<SwarmDataType, string | number>): void;
-
-    GetMemoryIDs() { return Object.keys(this.cache); }
-    HasMemory(id: string): boolean {
-        return !!(this.cache[id]);
-    }
-    GetFlashData<Z>(id: string): Z {
-        return this._flashMemory[id];
-    }
-    SetFlashData<Z>(id: string, data: Z): void {
-        this._flashMemory[id] = data;
-    }
-    RemoveFlashData(id: string): void {
-        delete this._flashMemory[id];
-    }
-
-    ReserveMemory() {
+    ReserveMemory(): void {
         if (this._checkedOut) {
             throw new MemoryLockException(this._checkedOut, "Memory already checked out");
         }
         this._checkedOut = true;
     }
-    ReleaseMemory() {
+    ReleaseMemory(): SwarmData {
         if (!this._checkedOut) {
             throw new MemoryLockException(this._checkedOut, "Memory not checked out");
         }
 
         this._checkedOut = false;
-        return CopyObject(this.cache)
+        return this.cache;
+    }
+
+    GetMemoryIDs(): string[] { return Object.keys(this.cache); }
+    HasMemory(id: string): boolean {
+        return !!(this.cache[id]);
+    }
+
+    GetFlashData<T>(id: string): T {
+        return this._flashMemory[id];
+    }
+    SetFlashData<T>(id: string, data: T): void {
+        this._flashMemory[id] = data;
+    }
+    RemoveFlashData(id: string): void {
+        delete this._flashMemory[id];
     }
 }
 
 @profile
-export abstract class SwarmMemory<T extends SwarmDataTypeSansMaster, U extends SwarmType,
-    V extends SwarmSubType> extends MemoryBase<T, V, ISwarmData<T, U, V>> {
-    get isActive(): boolean {
-        return this.cache.isActive;
+export abstract class SwarmMemoryBase<T extends SwarmDataType, U extends SwarmType, V extends SwarmSubType, X extends ISwarmData<T, U, V>>
+    extends MemoryBase implements ISwarmData<T, U, V> {
+    protected abstract get cache(): X;
+    abstract get MEM_TYPE(): T; //{ return this.cache.MEM_TYPE; }
+    abstract get SWARM_TYPE(): U; //{ return this.cache.SWARM_TYPE; }
+    abstract get SUB_TYPE(): V; //{ return this.cache.SUB_TYPE; }
+}
+export abstract class SwarmMemoryWithSpecifiedData<T extends SwarmData>
+    extends SwarmMemoryBase<SwarmDataType, SwarmType, SwarmSubType, T> implements SwarmData {
+    constructor(data: T) {
+        super();
+        this._cache = data;
     }
-    get MEM_TYPE(): T {
-        switch (this.SWARM_TYPE) {
-            case (SwarmType.None):
-                throw new NotImplementedException('Object has SwarmType.None.');
-            case (SwarmType.SwarmCreep):
-                return SwarmDataType.Creep as T;
-            case (SwarmType.SwarmRoom):
-                return SwarmDataType.Room as T;
-            case (SwarmType.SwarmFlag):
-                return SwarmDataType.Flag as T;
-            case (SwarmType.SwarmConsul):
-                return SwarmDataType.Consul as T;
-            case (SwarmType.SwarmMineral):
-            case (SwarmType.SwarmNuke):
-            case (SwarmType.SwarmResource):
-            case (SwarmType.SwarmSite):
-            case (SwarmType.SwarmSource):
-            case (SwarmType.SwarmTombstone):
-                return SwarmDataType.RoomObject as T;
-            default:
-                return SwarmDataType.Structure as T;
-        }
-    }
-    abstract get SWARM_TYPE(): U;
-    get SUB_TYPE(): V { return this.cache.SUB_TYPE as V; }
-    set SUB_TYPE(subType: V) {
-        this.cache.SUB_TYPE = subType;
+    private _cache: T;
+    protected get cache() { return this._cache; }
+}
+
+
+
+
+/*
+declare type SwarmMemory = SwarmMemoryBase<SwarmDataType, SwarmType, SwarmSubType>;
+declare type RoomMemory = RoomMemoryBase<RoomType>;
+declare type RoomObjectMemory = RoomObjectMemoryBase<SwarmRoomObjectType>;
+declare type StructureMemory = StructureMemoryBase<SwarmStructureType, StructureConstant>;
+declare type FlagMemory = FlagMemoryBase<FlagType>;
+declare type CreepMemory = CreepMemoryBase<CreepType>;
+declare type ConsulMemory = ConsulMemoryBase<ConsulType>;*/
+
+@profile
+export class MasterMemoryBase<T extends SwarmDataType> extends
+    SwarmMemoryBase<SwarmDataType.Master, SwarmType.SwarmMaster, T> implements IMasterData<T> {
+    get ChildData(): IMasterData<T> {
+
     }
 }
 
 @profile
-export class FlagMemory extends SwarmMemory<SwarmDataType.Flag, SwarmType.SwarmFlag, FlagType> implements TFlagData {
-    get SWARM_TYPE(): SwarmType.SwarmFlag { return SwarmType.SwarmFlag; }
-}
-
-
-@profile
-export class CreepMemory extends SwarmMemory<SwarmDataType.Creep, SwarmType.SwarmCreep, CreepType> implements TCreepData {
-    get SWARM_TYPE(): SwarmType.SwarmCreep { return SwarmType.SwarmCreep; }
-}
-
-@profile
-export class RoomMemory extends SwarmMemory<SwarmDataType.Room, SwarmType.SwarmRoom, RoomType> implements TRoomData {
-    get SWARM_TYPE(): SwarmType.SwarmRoom { return SwarmType.SwarmRoom; }
-}
-
-@profile
-export abstract class MasterSwarmMemory<T extends SwarmDataTypeSansMaster, U extends IMasterData<T>>
-    extends MemoryBase<SwarmDataType.Master, T, U> {
-    get MEM_TYPE(): SwarmDataType.Master { return SwarmDataType.Master }
+export abstract class MasterSwarmMemory extends
+    SwarmMemoryBase<SwarmDataType.Master, SwarmType.SwarmMaster, SwarmDataType>
+    implements IMasterData<SwarmDataType> {
     get isActive() { return true; }
     get ChildData() {
         return this.cache.ChildData
@@ -120,7 +99,7 @@ export abstract class MasterSwarmMemory<T extends SwarmDataTypeSansMaster, U ext
     HasMemory(id: string) { return !!this.ChildData[id]; }
     CheckoutMemory(id: string) {
         let data = this.ChildData[id];
-        let newMem = SwarmCreator.CreateSwarmMemory(data as any as ISwarmData<T, SwarmType, SwarmSubType>);
+        let newMem = SwarmCreator.CreateSwarmMemory(data as IData<T, SwarmSubType>);
         return newMem;
     }
     SaveMemory(childData: MemObject): void {

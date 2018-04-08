@@ -1,12 +1,12 @@
 import { profile } from "Tools/Profiler";
-import { SwarmMemory } from "SwarmMemory/SwarmMemory";
+import { SwarmMemoryBase } from "SwarmMemory/SwarmMemory";
 import { NotImplementedException } from "Tools/SwarmExceptions";
 
 
 
 @profile
 export abstract class StructureMemoryBase<T extends SwarmStructureType, U extends StructureConstant>
-    extends SwarmMemory<SwarmDataType.Structure, T, U> implements IStructureData<T, U> {
+    extends SwarmMemoryBase<SwarmDataType.Structure, T, U> implements IStructureData<T, U> {
     get SUB_TYPE(): U {
         switch (this.SWARM_TYPE) {
             case (SwarmType.SwarmContainer): return STRUCTURE_CONTAINER as U;

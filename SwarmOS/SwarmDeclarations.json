@@ -67,7 +67,8 @@
             "SwarmTerminal": 26,
             "SwarmTower": 27,
             "SwarmWall": 28,
-            "SwarmConsul": 29
+            "SwarmConsul": 29,
+            "SwarmMaster": 30
         },
         "Priority": {
             "Hold": 0,

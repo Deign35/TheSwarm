@@ -1,7 +1,7 @@
 import { ObjectBase, SwarmTypeBase } from "SwarmTypes/SwarmTypes";
 import { TConsulMemory, HarvestMemory, ConsulMemory } from "SwarmMemory/ConsulMemory";
 import { NotImplementedException } from "Tools/SwarmExceptions";
-import { SwarmMemory, MemoryBase } from "SwarmMemory/SwarmMemory";
+import { SwarmMemoryBase, MemoryBase } from "SwarmMemory/SwarmMemory";
 
 export abstract class ConsulObject<T extends ConsulType> implements AIConsulBaseObject<T> {
     get prototype() {

@@ -1,4 +1,4 @@
-import { FlagMemory, SwarmMemory } from "SwarmMemory/SwarmMemory";
+import { FlagMemory, SwarmMemoryBase } from "SwarmMemory/SwarmMemory";
 import { profile } from "Tools/Profiler";
 import { SwarmTypeBase } from "SwarmTypes/SwarmTypes";
 

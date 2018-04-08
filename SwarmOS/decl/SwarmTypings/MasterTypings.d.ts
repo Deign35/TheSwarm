@@ -1,5 +1,5 @@
-declare interface IMasterData<T extends SwarmDataType> extends IData<SwarmDataType.Master, T> {
-    ChildData: { [id: string]: IData<T, SwarmSubType> }
+declare interface IMasterData<T extends SwarmDataType> extends ISwarmData<SwarmDataType.Master, SwarmType.SwarmMaster, T> {
+    ChildData: { [id: string]: T }
     MEM_TYPE: SwarmDataType.Master;
 }
 declare interface IMasterRoomObjectData extends IMasterData<SwarmDataType.RoomObject> { }

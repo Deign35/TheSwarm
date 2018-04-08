@@ -1,5 +1,5 @@
 import { profile } from "Tools/Profiler";
-import { MemoryBase, SwarmMemory } from "SwarmMemory/SwarmMemory";
+import { MemoryBase, SwarmMemoryBase } from "SwarmMemory/SwarmMemory";
 import { RoomObjectMemoryBase, MineralMemory, TombstoneMemory, ResourceMemory, NukeMemory } from "SwarmMemory/RoomObjectMemory";
 import { ConsulObject } from "Consuls/ConsulBase";
 

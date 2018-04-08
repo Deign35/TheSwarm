@@ -1,6 +1,6 @@
 import { OwnableSwarmObject, SwarmRoomObjectBase } from "SwarmTypes/SwarmTypes";
 import { StructureMemory, ExtensionMemory, ExtractorMemory, ObserverMemory, LinkMemory, RampartMemory, StorageMemory, TerminalMemory, ContainerMemory, RoadMemory, WallMemory, NukerMemory, KeepersLairMemory, PortalMemory, PowerBankMemory, PowerSpawnMemory, StructureMemoryBase } from "SwarmMemory/StructureMemory";
-import { MemoryBase, SwarmMemory } from "SwarmMemory/SwarmMemory";
+import { MemoryBase, SwarmMemoryBase } from "SwarmMemory/SwarmMemory";
 
 export abstract class SwarmStructure<T extends TStructureData, U extends Structure>
     extends SwarmRoomObjectBase<T, U> implements AIStructureBase<T, U>, Structure {
