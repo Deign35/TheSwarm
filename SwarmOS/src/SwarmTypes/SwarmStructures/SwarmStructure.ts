@@ -19,17 +19,6 @@ export abstract class SwarmStructure<T extends TStructureData, U extends Structu
     notifyWhenAttacked(enabled: boolean = false) { // ActionIntent
         return this._instance.notifyWhenAttacked(enabled) as OK;
     }
-
-
-    Activate(mem: T, obj: U): T {
-        throw new Error("Method not implemented.");
-    }
-    InitAsNew(mem: T, obj: U): T {
-        throw new Error("Method not implemented.");
-    }
-    PrepObject(mem: T, obj: U): T {
-        throw new Error("Method not implemented.");
-    }
 }
 
 export abstract class OwnedSwarmStructure<T extends OwnableStructureConstant, U extends OwnedStructure<T>>

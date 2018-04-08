@@ -17,15 +17,6 @@ export class SwarmCreep<T extends CreepType> extends OwnableSwarmObject<ICreepDa
 @profile
 export class SwarmFlag<T extends FlagType> extends SwarmTypeBase<IFlagData<T>, Flag>
     implements AIFlag, Flag {
-    Activate(mem: IFlagData<T>, obj: Flag): IFlagData<T> {
-        throw new Error("Method not implemented.");
-    }
-    InitAsNew(mem: IFlagData<T>, obj: Flag): IFlagData<T> {
-        throw new Error("Method not implemented.");
-    }
-    PrepObject(mem: IFlagData<T>, obj: Flag): IFlagData<T> {
-        throw new Error("Method not implemented.");
-    }
     get DataType(): SwarmDataType.Flag { return SwarmDataType.Flag };
     get SwarmType(): SwarmType.SwarmFlag { return SwarmType.SwarmFlag; };
     get pos() { return this._instance.pos; }

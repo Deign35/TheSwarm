@@ -1,44 +1,28 @@
 import { SwarmLoader } from "SwarmTypes/SwarmLoader";
-import { ObjectBase } from "SwarmTypes/SwarmTypes";
+import { SwarmCreator } from "SwarmTypes/SwarmCreator";
 
-/*const PREP_ORDER = [ // Cause by some objects gathering their information prior, such as available spawns
-    SwarmControllerDataTypes.Rooms,
-    SwarmControllerDataTypes.RoomObjects,
-    SwarmControllerDataTypes.Flags,
-    SwarmControllerDataTypes.Structures,
-]*/
 export class SwarmQueen {
     static PrepTheSwarm() {
-
-        DoTheSwarm((obj) => {
-            obj.PrepObject(false);
+        DoTheSwarm((obj: AIObject): void => {
+            obj.PrepObject();
         });
     }
     static ActivateTheSwarm() {
-        DoTheSwarm((obj) => {
-            let swarmType = obj.GetSwarmType();
-            if (swarmType == SwarmType.Any) {
-                return;
-            }
+        DoTheSwarm((obj: AIObject): void => {
             obj.Activate();
         });
     }
 }
 
-const DoTheSwarm = function (swarmAction: (obj: ObjectBase<TBasicSwarmData, any>) => void) {
-    let typeKeys = Object.keys(SwarmLoader.TheSwarm) as AIObject[];
-    for (let i = 0; i < typeKeys.length; i++) {
-        /*let ids = Object.keys(SwarmLoader.TheSwarm[typeKeys[i]]);
-        for (let j = 0; j < ids.length; j++) {
-            swarmAction(SwarmLoader.TheSwarm[typeKeys[i]][ids[j]]);
-        }*/
-        DoPartOfTheSwarm(swarmAction, typeKeys[i]);
+const DoTheSwarm = function (swarmAction: (obj: AIObject) => void) {
+    for (let i = 0; i < SwarmLoader.MasterMemoryIds.length; i++) {
+        DoPartOfTheSwarm(swarmAction, SwarmLoader.MasterMemoryIds[i]);
     }
 }
 
-const DoPartOfTheSwarm = function (swarmAction: (obj: ObjectBase<AllMemoryTypes, any>) => void, controllerType: SwarmControllerDataTypes) {
-    let ids = Object.keys(SwarmLoader.TheSwarm[controllerType]);
+const DoPartOfTheSwarm = function (swarmAction: (obj: AIObject) => void, dataType: string) {
+    let ids = Object.keys(SwarmLoader.GetTypeIDs(dataType));
     for (let i = 0; i < ids.length; i++) {
-        swarmAction(SwarmLoader.TheSwarm[controllerType][ids[i]]);
+        swarmAction(SwarmLoader.GetObject(ids[i], dataType));
     }
 }

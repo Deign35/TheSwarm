@@ -5,8 +5,8 @@ global.Profiler = Profiler.init();
 import "Tools/GlobalTools";
 import "SwarmMemory/Swarmlord";
 import { SwarmLoader } from "SwarmTypes/SwarmLoader";
-import { SwarmObject, ObjectBase } from "SwarmTypes/SwarmTypes";
 import { SwarmQueen } from "SwarmBehaviour/SwarmQueen";
+import { Swarmlord } from "SwarmMemory/Swarmlord";
 
 export const loop = function () {
     //debugger;

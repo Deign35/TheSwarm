@@ -9,15 +9,6 @@ export class HarvestObject extends ConsulObject<ConsulType.Harvest> {
 }
 
 export class HarvestConsul extends SwarmConsul<ConsulType.Harvest> {
-    Activate(mem: HarvestConsulMemory, obj: ConsulObject<ConsulType.Harvest>): HarvestConsulMemory {
-        throw new Error("Method not implemented.");
-    }
-    InitAsNew(mem: HarvestConsulMemory, obj: ConsulObject<ConsulType.Harvest>): HarvestConsulMemory {
-        throw new Error("Method not implemented.");
-    }
-    PrepObject(mem: HarvestConsulMemory, obj: ConsulObject<ConsulType.Harvest>): HarvestConsulMemory {
-        throw new Error("Method not implemented.");
-    }
     SourceData!: {
         [id: string]: {
             hasCreep: boolean;

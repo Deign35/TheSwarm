@@ -16,15 +16,6 @@ import { SwarmLoader } from "SwarmTypes/SwarmLoader";
     }*/
 @profile
 export class SwarmRoom<T extends RoomType> extends SwarmTypeBase<IRoomData<T>, Room> implements AIRoom, Room {
-    InitAsNew(mem: IRoomData<T>, obj: Room): IRoomData<T> {
-        throw new Error("Method not implemented.");
-    }
-    PrepObject(mem: IRoomData<T>, obj: Room): IRoomData<T> {
-        throw new Error("Method not implemented.");
-    }
-    Activate(mem: IRoomData<T>, obj: Room): IRoomData<T> {
-        throw new Error("Method not implemented.");
-    }
     private _availableSpawns!: string[];
     protected get spawns(): string[] {
         if (!this._availableSpawns) {

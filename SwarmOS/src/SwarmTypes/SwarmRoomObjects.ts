@@ -7,15 +7,6 @@ export abstract class SwarmObject_RoomObject<T extends TBasicSwarmData, U extend
     get pos() { return this._instance.pos; }
     get room() { return this._instance.room; } // This should get the room object i created.
     get prototype(): U { return this._instance.prototype as U }
-    Activate(mem: T, obj: U): T {
-        throw new Error("Method not implemented.");
-    }
-    InitAsNew(mem: T, obj: U): T {
-        throw new Error("Method not implemented.");
-    }
-    PrepObject(mem: T, obj: U): T {
-        throw new Error("Method not implemented.");
-    }
 }
 
 @profile

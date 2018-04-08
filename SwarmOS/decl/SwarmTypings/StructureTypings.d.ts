@@ -102,6 +102,6 @@ declare interface AIWall extends AIStructureBase<IWallData, StructureWall> {
 }
 
 declare type AIOwnableStructure = AIController | AIExtension | AIExtractor | AIKeepersLair | AILab |
-    AILink | AINuke | AIObserver | AIPowerSpawn | AIRampart | AISpawn | AIStorage | AITerminal | AITower;
+    AILink | AINuker | AIObserver | AIPowerSpawn | AIRampart | AISpawn | AIStorage | AITerminal | AITower;
 
 declare type AIStructure = AIOwnableStructure | AIContainer | AIPortal | AIPowerBank | AIRoad | AISpawn | AIWall;

@@ -6,15 +6,6 @@ const CURRENT_PATH = 'CP';
 @profile
 export class SwarmCreep<T extends CreepType> extends OwnableSwarmObject<ICreepData<T>, Creep>
     implements AICreep, Creep {
-    Activate(mem: ICreepData<T>, obj: Creep): ICreepData<T> {
-        throw new Error("Method not implemented.");
-    }
-    InitAsNew(mem: ICreepData<T>, obj: Creep): ICreepData<T> {
-        throw new Error("Method not implemented.");
-    }
-    PrepObject(mem: ICreepData<T>, obj: Creep): ICreepData<T> {
-        throw new Error("Method not implemented.");
-    }
 
     // (TODO): Need to switch this to using the flashData.
     protected _cachedData: { [id: string]: any } = {};

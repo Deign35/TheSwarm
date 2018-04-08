@@ -7,16 +7,26 @@ export type ObjBase = ObjectBase<TBasicSwarmData, SwarmObjectType>;
 const HAS_PREPPED = 'hasPrepped';
 @profile
 export abstract class ObjectBase<T extends TBasicSwarmData, U extends SwarmObjectType> {
-    abstract Activate(mem: T, obj: U): T;
-    abstract InitAsNew(mem: T, obj: U): T;
-    abstract PrepObject(mem: T, obj: U): T;
+    constructor(data: T, obj: U) {
+        this._memory = data;
+        this._instance = obj;
+    }
+    Activate() {
+
+    }
+    InitAsNew() {
+
+    }
+    PrepObject() {
+
+    }
 
     get id(): string { return this.memory.id; }
     get memory(): T { return this._memory; }
     get prototype(): U { return this._instance; }
 
-    protected _instance!: U;
     protected _memory!: T;
+    protected _instance!: U;
 
     GetMemType(): SwarmDataTypeSansMaster {
         return this.memory.MEM_TYPE;
