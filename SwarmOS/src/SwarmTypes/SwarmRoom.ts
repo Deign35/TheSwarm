@@ -19,10 +19,10 @@ export class SwarmRoom_Base<T extends RoomType> extends SwarmTypeBase<IData, Roo
             let ids = SwarmLoader.SwarmRoomIDs[this.saveID].structures[STRUCTURE_SPAWN];
             if (ids) {
                 for (let i = 0; i < ids.length; i++) {
-                    /*let spawn = SwarmLoader.TheSwarm.structures[ids[i]] as SwarmSpawn;
+                    let spawn = SwarmLoader.GetObject(ids[i], MASTER_STRUCTURE_MEMORY_ID) as SwarmSpawn;
                     if (!spawn.spawning) {
                         this._availableSpawns.push(ids[i]);
-                    }*/
+                    }
                 }
             }
         }
@@ -43,10 +43,10 @@ export class SwarmRoom_Base<T extends RoomType> extends SwarmTypeBase<IData, Roo
         let spawnToUse: SwarmSpawn | undefined;
         if (opts && opts.spawnID) {
             // get spawn this way instead
-            //spawnToUse = SwarmLoader.TheSwarm.structures[opts.spawnID] as SwarmSpawn;
+            spawnToUse = SwarmLoader.GetObject(opts.spawnID, MASTER_STRUCTURE_MEMORY_ID) as SwarmSpawn;
         } else if (this.spawns.length > 0) {
             if (GetSpawnCost(body) <= this.energyAvailable) {
-                //spawnToUse = SwarmLoader.TheSwarm.structures[this.spawns.shift()!] as SwarmSpawn;
+                spawnToUse = SwarmLoader.GetObject(this.spawns.shift()!, MASTER_STRUCTURE_MEMORY_ID) as SwarmSpawn;
             } else {
                 return E_REQUIRES_ENERGY;
             }
@@ -123,10 +123,7 @@ export class SwarmRoom_Base<T extends RoomType> extends SwarmTypeBase<IData, Roo
         newHarvesterMem.ReserveMemory();
 
         let consul = SwarmCreator.CreateSwarmObject(new ConsulObject(ConsulType.Harvest), newHarvesterMem);
-
-
-        /*consul.AssignObject(new ConsulObject(), newHarvesterMem);
-        SwarmLoader.TheSwarm.consuls[consul.saveID] = consul;*/
+        SwarmLoader.SaveObject(consul);
     }
 
     TryFindNewObjects(force: boolean = false) {
