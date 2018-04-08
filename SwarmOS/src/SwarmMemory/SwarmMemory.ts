@@ -16,6 +16,15 @@ export abstract class MemoryBase {
     get SWARM_TYPE(): SwarmType { return this.cache.SWARM_TYPE; }
     get SUB_TYPE(): SwarmSubType { return this.cache.SUB_TYPE; }
 
+    SetCacheValue(valueID: string, newValue: any) {
+        this.cache[valueID] = newValue;
+    }
+    DeleteCacheValue(valueID: string) {
+        if (!!this.cache[valueID]) {
+            delete this.cache[valueID];
+        }
+    }
+
     ReserveMemory(): void {
         if (this._checkedOut) {
             throw new MemoryLockException(this._checkedOut, "Memory already checked out");

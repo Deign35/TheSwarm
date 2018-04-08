@@ -2,12 +2,22 @@ import { OwnableSwarmObject, SwarmRoomObjectBase } from "SwarmTypes/SwarmTypes";
 import {
     StructureMemory, ExtensionMemory, ExtractorMemory, ObserverMemory, LinkMemory, RampartMemory,
     StorageMemory, TerminalMemory, ContainerMemory, RoadMemory, WallMemory, NukerMemory, KeepersLairMemory,
-    PortalMemory, PowerBankMemory, PowerSpawnMemory
+    PortalMemory, PowerBankMemory, PowerSpawnMemory, StructureMemoryWithSpecifiedData
 } from "SwarmMemory/StructureMemory";
 import { MemoryBase, SwarmMemoryBase } from "SwarmMemory/SwarmMemory";
 
 export abstract class SwarmStructure<T extends TStructureData, U extends Structure>
-    extends SwarmRoomObjectBase<T, U> implements AIStructureBase<T, U>, Structure {
+    extends SwarmRoomObjectBase<StructureMemoryWithSpecifiedData<T>, U> implements AIStructureBase<TStructureData, U>, Structure {
+    GetMemType(): SwarmDataType {
+        throw new Error("Method not implemented.");
+    }
+    GetSubType(): SwarmSubType {
+        throw new Error("Method not implemented.");
+    }
+    GetSwarmType(): SwarmType {
+        throw new Error("Method not implemented.");
+    }
+    get prototype() { return this._instance; }
     get hits() { return this._instance.hits; }
     get hitsMax() { return this._instance.hitsMax; }
     get room() { return this._instance.room; }

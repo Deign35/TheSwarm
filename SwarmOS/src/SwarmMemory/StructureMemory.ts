@@ -32,7 +32,7 @@ abstract class StructureMemoryBase<T extends SwarmStructureType,
     }
     abstract get SWARM_TYPE(): T;
 }
-abstract class StructureMemoryWithSpecifiedData<T extends TStructureData>
+export abstract class StructureMemoryWithSpecifiedData<T extends TStructureData>
     extends StructureMemoryBase<SwarmStructureType, StructureConstant, T> {
 }
 

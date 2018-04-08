@@ -31,8 +31,8 @@ export abstract class ObjectBase<T extends SwarmMemory, U extends SwarmObjectTyp
     protected _instance!: U;
 
     abstract GetMemType(): SwarmDataType;
-    abstract GetSwarmType(): SwarmType;// { return this.memory.SWARM_TYPE; }
-    abstract GetSwarmSubType(): SwarmSubType;// { return this.memory.SUB_TYPE; }
+    abstract GetSwarmType(): SwarmType;
+    abstract GetSwarmSubType(): SwarmSubType;
 }
 @profile
 export abstract class SwarmTypeBase<T extends SwarmMemory, U extends SwarmObjectType>

@@ -1,6 +1,7 @@
 import { SwarmMemoryBase } from "SwarmMemory/SwarmMemory";
 import { profile } from "Tools/Profiler";
 import { SwarmTypeBase } from "SwarmTypes/SwarmTypes";
+import { FlagMemory } from "SwarmMemory/FlagMemory";
 
 /*
 export class SwarmCreep<T extends CreepType> extends OwnableSwarmObject<ICreepData<T>, Creep>
@@ -15,16 +16,16 @@ export class SwarmCreep<T extends CreepType> extends OwnableSwarmObject<ICreepDa
         throw new Error("Method not implemented.");
     }*/
 @profile
-export class SwarmFlag<T extends FlagType> extends SwarmTypeBase<IFlagData<T>, Flag>
+export class SwarmFlag<T extends FlagType> extends SwarmTypeBase<FlagMemory, Flag>
     implements AIFlag, Flag {
     GetSwarmSubType(): T {
-        return this.memory.SUB_TYPE;
+        return this.memory.SUB_TYPE as T;
     }
     get DataType(): SwarmDataType.Flag { return SwarmDataType.Flag };
     get SwarmType(): SwarmType.SwarmFlag { return SwarmType.SwarmFlag; };
     get pos() { return this._instance.pos; }
     get room() { return this._instance.room; }
-    get prototype(): Flag { return this._instance.prototype as Flag; }
+    get prototype(): Flag { return this._instance as Flag; }
     get color() { return this._instance.color; }
     get secondaryColor() { return this._instance.secondaryColor; }
     get name() { return this._instance.name; }

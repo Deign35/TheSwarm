@@ -1,13 +1,14 @@
 import { profile } from "Tools/Profiler";
 import { OwnableSwarmObject } from "SwarmTypes/SwarmTypes";
+import { CreepMemory } from "SwarmMemory/CreepMemory";
 
 const CARRY_TOTAL = 'CT';
 const CURRENT_PATH = 'CP';
 @profile
-export class SwarmCreep<T extends CreepType> extends OwnableSwarmObject<ICreepData<T>, Creep>
+export class SwarmCreep<T extends CreepType> extends OwnableSwarmObject<CreepMemory, Creep>
     implements AICreep, Creep {
     GetSwarmSubType(): T {
-        return this.memory.SUB_TYPE;
+        return this.memory.SUB_TYPE as T;
     }
 
     // (TODO): Need to switch this to using the flashData.
@@ -40,7 +41,7 @@ export class SwarmCreep<T extends CreepType> extends OwnableSwarmObject<ICreepDa
     get fatigue() { return this._instance.fatigue; }
     get hits() { return this._instance.hits; }
     get hitsMax() { return this._instance.hitsMax; }
-    get prototype() { return this._instance.prototype; }
+    get prototype() { return this._instance; }
     get name() { return this._instance.name; }
     get room() { return this._instance.room; }
     get saying() { return this._instance.saying; }

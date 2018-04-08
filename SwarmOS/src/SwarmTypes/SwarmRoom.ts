@@ -4,6 +4,7 @@ import { SwarmSpawn } from "SwarmTypes/SwarmStructures/SwarmSpawn";
 import { SwarmLoader } from "SwarmTypes/SwarmLoader";
 import { HarvestConsulMemory } from "SwarmMemory/ConsulMemory";
 import { ConsulObject } from "Consuls/ConsulBase";
+import { RoomMemory } from "SwarmMemory/RoomMemory";
 
 /*<T extends CreepType> extends OwnableSwarmObject<ICreepData<T>, Creep>
     implements AICreep, Creep {
@@ -17,9 +18,9 @@ import { ConsulObject } from "Consuls/ConsulBase";
         throw new Error("Method not implemented.");
     }*/
 @profile
-export class SwarmRoom<T extends RoomType> extends SwarmTypeBase<IRoomData<T>, Room> implements AIRoom, Room {
+export class SwarmRoom<T extends RoomType> extends SwarmTypeBase<RoomMemory, Room> implements AIRoom, Room {
     GetSwarmSubType(): T {
-        return this.memory.SUB_TYPE;
+        return this.memory.SUB_TYPE as T;
     }
     private _availableSpawns!: string[];
     protected get spawns(): string[] {
@@ -98,16 +99,16 @@ export class SwarmRoom<T extends RoomType> extends SwarmTypeBase<IRoomData<T>, R
             }
         }
 
-        this.memory.SUB_TYPE = roomType as T;
+        this.memory.SetCacheValue(SUB_TYPE, roomType)
 
         // Would love to add a pathfinding.
         let sources = this.find(FIND_SOURCES);
         for (let i = 0; i < sources.length; i++) {
-            //SwarmLoader.LoadObject(sources[i].id, sources[i], SwarmControllerDataTypes.RoomObjects);
+            SwarmLoader.LoadObject(sources[i].id, sources[i], MASTER_ROOMOBJECT_MEMORY_ID);
         }
         let minerals = this.find(FIND_MINERALS);
         for (let i = 0; i < minerals.length; i++) {
-            //SwarmLoader.LoadObject(minerals[i].id, minerals[i], SwarmControllerDataTypes.RoomObjects);
+            SwarmLoader.LoadObject(minerals[i].id, minerals[i], MASTER_ROOMOBJECT_MEMORY_ID);
         }
         // (TODO): Instead of TryFindNewObjects, use a single LookAtArea and find all objects for the new room.
         this.TryFindNewObjects(true);
@@ -128,7 +129,7 @@ export class SwarmRoom<T extends RoomType> extends SwarmTypeBase<IRoomData<T>, R
         newHarvesterMem.ReserveMemory();
 
         let consul = SwarmCreator.CreateSwarmObject(newHarvesterMem, new ConsulObject(ConsulType.Harvest));
-        
+
 
         /*consul.AssignObject(new ConsulObject(), newHarvesterMem);
         SwarmLoader.TheSwarm.consuls[consul.saveID] = consul;*/

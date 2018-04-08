@@ -37,7 +37,6 @@ declare interface AIBase<T extends SwarmData, U extends SwarmObjectType> extends
     GetMemType(): SwarmDataType;
     GetSubType(): SwarmSubType;
     GetSwarmType(): SwarmType;
-    memory: T;
 }
 
 declare type AIObject = AIBase<SwarmData, SwarmObjectType>//AIConsul | AICreep | AIFlag | AIRoom | AIRoomObject | AIStructure;
