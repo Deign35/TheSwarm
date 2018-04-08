@@ -1,24 +1,13 @@
-import {
-    MasterCreepMemory, MasterFlagMemory, MasterRoomMemory, MasterStructureMemory,
-    MasterRoomObjectMemory, MasterOtherMemory, MasterSwarmMemory, SwarmMemory, MasterConsulMemory, MemoryBase
-} from "SwarmMemory/SwarmMemory";
-import { SwarmObject, SwarmTypeBase, ObjectBase, SwarmRoomObject } from "./SwarmTypes";
-import { SwarmCreep } from "./SwarmCreep";
-import { SwarmStructure } from "./SwarmStructures/SwarmStructure";
-import { SwarmFlag } from "SwarmTypes/SwarmFlag";
-import { SwarmRoom } from "SwarmTypes/SwarmRoom";
-import { AllMemoryTypes, SwarmMemoryTypes, TConsulTypes, AllObjectTypes } from "SwarmTypes/SwarmCreator";
-import { RoomObjectMemory } from "SwarmMemory/RoomObjectMemory";
-import { StructureMemory } from "SwarmMemory/StructureMemory";
 import { profile } from "Tools/Profiler";
-import { OtherObject } from "./OtherObjects";
-import { TConsulMemory } from "SwarmMemory/ConsulMemory";
+import { MasterSwarmMemory, MasterConsulMemory, MasterCreepMemory, MasterFlagMemory, MasterRoomMemory, MasterRoomObjectMemory, MasterStructureMemory } from "SwarmMemory/SwarmMemory";
+import { Swarmlord } from "SwarmMemory/Swarmlord";
 import { ConsulObject } from "Consuls/ConsulBase";
+
 
 @profile
 export class SwarmLoader {
     protected static MasterMemory: {
-        [dataType: string]: MasterSwarmMemory<MasterSwarmDataTypes, TBasicData>,
+        [dataType: string]: MasterSwarmMemory<SwarmDataTypeSansMaster, MasterSwarmDataTypes>,
         /*consuls: MasterConsulMemory,
         creeps: MasterCreepMemory,
         flags: MasterFlagMemory,
@@ -29,31 +18,30 @@ export class SwarmLoader {
     }
     static TheSwarm: {
         [dataType: string]: {
-            [id: string]: ObjectBase<AllMemoryTypes, any>
+            [id: string]: AIBase<TBasicSwarmData, any>
         }
 
-        consuls: { [id: string]: TConsulTypes },
-        creeps: { [id: string]: SwarmCreep },
-        flags: { [id: string]: SwarmFlag },
-        rooms: { [id: string]: SwarmRoom },
-        roomObjects: { [id: string]: SwarmRoomObject<Source | Mineral | Nuke | Tombstone | Resource | ConstructionSite, RoomObjectMemory> },
-        structures: { [id: string]: SwarmStructure<StructureConstant, Structure, StructureMemory> },
-        otherData: { [id: string]: any }
+        [MASTER_CONSUL_MEMORY_ID]: { [id: string]: AIConsul },
+        [MASTER_CREEP_MEMORY_ID]: { [id: string]: AICreep },
+        [MASTER_FLAG_MEMORY_ID]: { [id: string]: AIFlag },
+        [MASTER_ROOM_MEMORY_ID]: { [id: string]: AIRoom },
+        [MASTER_ROOMOBJECT_MEMORY_ID]: { [id: string]: AIRoomObject },
+        [MASTER_STRUCTURE_MEMORY_ID]: { [id: string]: AIStructure },
     };
 
     static SwarmRoomIDs: {
         [roomID: string]: {
-            structures: {
-                [structureType: string]: string[],
-            }
-            creeps: {
+            [MASTER_CREEP_MEMORY_ID]: {
                 [creepType: string]: string[]
             }
-            flags: {
+            [MASTER_FLAG_MEMORY_ID]: {
                 [flagType: string]: string[]
             }
-            roomObjects: {
+            [MASTER_ROOMOBJECT_MEMORY_ID]: {
                 [roomObjectTypes: number]: string[]
+            }
+            [MASTER_STRUCTURE_MEMORY_ID]: {
+                [structureType: string]: string[],
             }
         }
     }
@@ -61,27 +49,25 @@ export class SwarmLoader {
         this.SwarmRoomIDs = {}
         global['SwarmRoomIDs'] = this.SwarmRoomIDs;
         this.TheSwarm = {
-            consuls: {} as { [id: string]: TConsulTypes },
-            creeps: {} as { [id: string]: SwarmCreep },
-            flags: {} as { [id: string]: SwarmFlag },
-            otherData: {} as { [id: string]: any },
-            rooms: {} as { [id: string]: SwarmRoom },
-            roomObjects: {} as { [id: number]: SwarmRoomObject<Source | Mineral | Nuke | Tombstone | Resource | ConstructionSite, RoomObjectMemory> },
-            structures: {} as { [id: string]: SwarmStructure<StructureConstant, Structure, StructureMemory> },
+            [MASTER_CONSUL_MEMORY_ID]: {} as { [id: string]: AIConsul },
+            [MASTER_CREEP_MEMORY_ID]: {} as { [id: string]: AICreep },
+            [MASTER_FLAG_MEMORY_ID]: {} as { [id: string]: AIFlag },
+            [MASTER_ROOM_MEMORY_ID]: {} as { [id: string]: AIRoom },
+            [MASTER_ROOMOBJECT_MEMORY_ID]: {} as { [id: number]: AIRoomObject },
+            [MASTER_STRUCTURE_MEMORY_ID]: {} as { [id: string]: AIStructure },
         }
         global['TheSwarm'] = this.TheSwarm;
 
         this.MasterMemory = {
-            consuls: Swarmlord.CheckoutMasterMemory(SwarmControllerDataTypes.Consuls) as MasterConsulMemory,
-            creeps: Swarmlord.CheckoutMasterMemory(SwarmControllerDataTypes.Creeps) as MasterCreepMemory,
-            flags: Swarmlord.CheckoutMasterMemory(SwarmControllerDataTypes.Flags) as MasterFlagMemory,
-            otherData: Swarmlord.CheckoutMasterMemory(SwarmControllerDataTypes.Other) as MasterOtherMemory,
-            rooms: Swarmlord.CheckoutMasterMemory(SwarmControllerDataTypes.Rooms) as MasterRoomMemory,
-            roomObjects: Swarmlord.CheckoutMasterMemory(SwarmControllerDataTypes.RoomObjects) as MasterRoomObjectMemory,
-            structures: Swarmlord.CheckoutMasterMemory(SwarmControllerDataTypes.Structures) as MasterStructureMemory,
+            [MASTER_CONSUL_MEMORY_ID]: Swarmlord.CheckoutMasterMemory(MASTER_CONSUL_MEMORY_ID) as MasterConsulMemory,
+            [MASTER_CREEP_MEMORY_ID]: Swarmlord.CheckoutMasterMemory(MASTER_CREEP_MEMORY_ID) as MasterCreepMemory,
+            [MASTER_FLAG_MEMORY_ID]: Swarmlord.CheckoutMasterMemory(MASTER_FLAG_MEMORY_ID) as MasterFlagMemory,
+            [MASTER_ROOM_MEMORY_ID]: Swarmlord.CheckoutMasterMemory(MASTER_ROOM_MEMORY_ID) as MasterRoomMemory,
+            [MASTER_ROOMOBJECT_MEMORY_ID]: Swarmlord.CheckoutMasterMemory(MASTER_ROOMOBJECT_MEMORY_ID) as MasterRoomObjectMemory,
+            [MASTER_STRUCTURE_MEMORY_ID]: Swarmlord.CheckoutMasterMemory(MASTER_STRUCTURE_MEMORY_ID) as MasterStructureMemory,
         };
 
-        this.LoadObjectsWithName(SwarmControllerDataTypes.Rooms);
+        this.LoadObjectsWithName(MASTER_ROOM_MEMORY_ID);
         let ids = Object.keys(this.TheSwarm.rooms);
         for (let i = 0; i < ids.length; i++) {
             this.SwarmRoomIDs[ids[i]] = {
@@ -91,46 +77,46 @@ export class SwarmLoader {
                 roomObjects: {}
             }
         }
-        this.LoadObjectsWithName(SwarmControllerDataTypes.Creeps);
-        this.LoadObjectsWithName(SwarmControllerDataTypes.Flags);
-        this.LoadObjectsWithID(SwarmControllerDataTypes.RoomObjects);
-        this.LoadObjectsWithID(SwarmControllerDataTypes.Structures);
+        this.LoadObjectsWithName(MASTER_CREEP_MEMORY_ID);
+        this.LoadObjectsWithName(MASTER_FLAG_MEMORY_ID);
+        this.LoadObjectsWithID(MASTER_ROOMOBJECT_MEMORY_ID);
+        this.LoadObjectsWithID(MASTER_STRUCTURE_MEMORY_ID);
 
         let keys = Object.keys(Game.rooms);
         for (let i = 0; i < keys.length; i++) {
-            if (!this.TheSwarm[SwarmControllerDataTypes.Rooms][keys[i]]) {
-                this.LoadObject(keys[i], Game.rooms[keys[i]], SwarmControllerDataTypes.Rooms);
+            if (!this.TheSwarm[MASTER_ROOM_MEMORY_ID][keys[i]]) {
+                this.LoadObject(keys[i], Game.rooms[keys[i]], MASTER_ROOM_MEMORY_ID);
                 this.SwarmRoomIDs[keys[i]] = {
                     structures: {},
                     creeps: {},
                     flags: {},
                     roomObjects: {}
                 }
-                this.TheSwarm[SwarmControllerDataTypes.Rooms][keys[i]].InitAsNew();
+                //this.TheSwarm[MASTER_ROOM_MEMORY_ID][keys[i]].InitAsNew(Game.rooms[keys[i]]);
             }
         }
         keys = Object.keys(Game.creeps);
         for (let i = 0; i < keys.length; i++) {
-            if (!this.TheSwarm[SwarmControllerDataTypes.Creeps][keys[i]]) {
-                this.LoadObject(keys[i], Game.creeps[keys[i]], SwarmControllerDataTypes.Creeps);
-                this.TheSwarm[SwarmControllerDataTypes.Creeps][keys[i]].InitAsNew();
+            if (!this.TheSwarm[MASTER_CREEP_MEMORY_ID][keys[i]]) {
+                this.LoadObject(keys[i], Game.creeps[keys[i]], MASTER_CREEP_MEMORY_ID);
+                //this.TheSwarm[MASTER_CREEP_MEMORY_ID][keys[i]].InitAsNew();
             }
         }
         keys = Object.keys(Game.flags);
         for (let i = 0; i < keys.length; i++) {
-            if (!this.TheSwarm[SwarmControllerDataTypes.Flags][keys[i]]) {
-                this.LoadObject(keys[i], Game.flags[keys[i]], SwarmControllerDataTypes.Flags);
-                this.TheSwarm[SwarmControllerDataTypes.Flags][keys[i]].InitAsNew();
+            if (!this.TheSwarm[MASTER_FLAG_MEMORY_ID][keys[i]]) {
+                this.LoadObject(keys[i], Game.flags[keys[i]], MASTER_FLAG_MEMORY_ID);
+                //this.TheSwarm[MASTER_FLAG_MEMORY_ID][keys[i]].InitAsNew();
             }
         }
 
-        keys = this.MasterMemory.consuls.GetDataIDs();
+        keys = this.MasterMemory[MASTER_CONSUL_MEMORY_ID].GetMemoryIDs();
         for (let i = 0; i < keys.length; i++) {
-            this.LoadObject(keys[i], new ConsulObject(), SwarmControllerDataTypes.Consuls);
+            //this.LoadObject(keys[i], new ConsulObject(), MASTER_CONSUL_MEMORY_ID);
         }
     }
 
-    static LoadObjectsWithID<T extends RoomObject, U extends SwarmMemoryTypes>(dataType: SwarmControllerDataTypes) {
+    static LoadObjectsWithID<T extends RoomObject, U extends TBasicSwarmData>(dataType: SwarmControllerDataTypes) {
         let keys = this.MasterMemory[dataType].GetDataIDs();
         for (let i = 0; i < keys.length; i++) {
             this.LoadObject<T, U>(keys[i], Game.getObjectById(keys[i]) as T, dataType);
@@ -222,7 +208,7 @@ export class SwarmLoader {
         this.SaveObjects(SwarmControllerDataTypes.Structures);
         this.SaveObjects(SwarmControllerDataTypes.Other);
     }
-    
+
     static SaveObjects(dataType: SwarmControllerDataTypes) {
         let keys = Object.keys(this.TheSwarm[dataType]);
         for (let i = 0; i < keys.length; i++) {

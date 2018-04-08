@@ -2,12 +2,12 @@ import { profile } from "Tools/Profiler";
 import { MasterSwarmMemory, MasterCreepMemory, MasterFlagMemory, MasterRoomMemory, MasterStructureMemory, MasterRoomObjectMemory, MemoryBase, MasterConsulMemory } from "SwarmMemory/SwarmMemory";
 import { NotImplementedException } from "Tools/SwarmExceptions";
 declare interface IMemory {
-    consuls: IMasterConsulData,
-    creeps: IMasterCreepData,
-    flags: IMasterFlagData,
-    rooms: IMasterRoomData,
-    roomObjects: IMasterRoomObjectData,
-    structures: IMasterStructureData,
+    [MASTER_CONSUL_MEMORY_ID]: IMasterConsulData,
+    [MASTER_CREEP_MEMORY_ID]: IMasterCreepData,
+    [MASTER_FLAG_MEMORY_ID]: IMasterFlagData,
+    [MASTER_ROOM_MEMORY_ID]: IMasterRoomData,
+    [MASTER_ROOMOBJECT_MEMORY_ID]: IMasterRoomObjectData,
+    [MASTER_STRUCTURE_MEMORY_ID]: IMasterStructureData,
 
     INIT: boolean,
     SwarmVersionDate: string,
@@ -18,9 +18,9 @@ declare var Memory: IMemory;
 @profile
 export class Swarmlord {
     constructor() {
-        this.InitializeMemory();
+        Swarmlord.InitializeMemory();
     }
-    private InitializeMemory() {
+    private static InitializeMemory() {
         if (!Memory.INIT || Memory.SwarmVersionDate != SWARM_VERSION_DATE) {
             let initTimer = new Stopwatch();
             initTimer.Start();
@@ -28,41 +28,41 @@ export class Swarmlord {
 
             SwarmLogger.Log("Begin initialization of memory for entire Swarm(" + SWARM_VERSION_DATE + ")");
             let newMemory = {
-                consuls: {
-                    id: "consuls",
+                [MASTER_CONSUL_MEMORY_ID]: {
+                    id: MASTER_CONSUL_MEMORY_ID,
                     ChildData: {},
                     MEM_TYPE: SwarmDataType.Master,
                     SUB_TYPE: SwarmDataType.Consul,
                 },
-                creeps: {
-                    id: "creeps",
+                [MASTER_CREEP_MEMORY_ID]: {
+                    id: MASTER_CREEP_MEMORY_ID,
                     ChildData: {},
                     MEM_TYPE: SwarmDataType.Master,
                     SUB_TYPE: SwarmDataType.Creep,
                 },
-                flags: {
-                    id: "flags",
+                [MASTER_FLAG_MEMORY_ID]: {
+                    id: MASTER_FLAG_MEMORY_ID,
                     ChildData: {},
                     MEM_TYPE: SwarmDataType.Master,
                     SUB_TYPE: SwarmDataType.Flag,
                 },
-                structures: {
-                    id: "structures",
-                    ChildData: {},
-                    MEM_TYPE: SwarmDataType.Master,
-                    SUB_TYPE: SwarmDataType.Structure,
-                },
-                rooms: {
-                    id: "rooms",
+                [MASTER_ROOM_MEMORY_ID]: {
+                    id: MASTER_ROOM_MEMORY_ID,
                     ChildData: {},
                     MEM_TYPE: SwarmDataType.Master,
                     SUB_TYPE: SwarmDataType.Room,
                 },
-                roomObjects: {
-                    id: "roomObjects",
+                [MASTER_ROOMOBJECT_MEMORY_ID]: {
+                    id: MASTER_ROOMOBJECT_MEMORY_ID,
                     ChildData: {},
                     MEM_TYPE: SwarmDataType.Master,
                     SUB_TYPE: SwarmDataType.RoomObject,
+                },
+                [MASTER_STRUCTURE_MEMORY_ID]: {
+                    id: MASTER_STRUCTURE_MEMORY_ID,
+                    ChildData: {},
+                    MEM_TYPE: SwarmDataType.Master,
+                    SUB_TYPE: SwarmDataType.Structure,
                 },
                 stats: {
                     rooms: {},
@@ -88,39 +88,39 @@ export class Swarmlord {
         }
     }
 
-    ValidateMemory() {
+    static ValidateMemory() {
         if (!Memory.INIT || Memory.SwarmVersionDate != SWARM_VERSION_DATE) {
             global['Swarmlord'] = new Swarmlord();
         }
     }
 
-    SaveMasterMemory<T extends SwarmDataTypeSansMaster>(memObject: MasterSwarmMemory<T, IMasterData<T>>, save: boolean): void {
+    static SaveMasterMemory<T extends SwarmDataTypeSansMaster>(memObject: MasterSwarmMemory<T, IMasterData<T>>, save: boolean): void {
         let memData = memObject.ReleaseMemory();
         if (save) {
             Memory[memObject.id] = memData;
         }
     }
 
-    CheckoutMasterMemory(id: string) {
+    static CheckoutMasterMemory(id: string) {
         let data = CopyObject(Memory[id]);
         let newMem;
         switch (data.id) {
-            case ("consuls"):
+            case (MASTER_CONSUL_MEMORY_ID):
                 newMem = new MasterConsulMemory(data);
                 break;
-            case ("creeps"):
+            case (MASTER_CREEP_MEMORY_ID):
                 newMem = new MasterCreepMemory(data);
                 break;
-            case ("flags"):
+            case (MASTER_FLAG_MEMORY_ID):
                 newMem = new MasterFlagMemory(data);
                 break;
-            case ("rooms"):
+            case (MASTER_ROOM_MEMORY_ID):
                 newMem = new MasterRoomMemory(data);
                 break;
-            case ("structures"):
+            case (MASTER_ROOMOBJECT_MEMORY_ID):
                 newMem = new MasterStructureMemory(data);
                 break;
-            case ("roomObjects"):
+            case (MASTER_STRUCTURE_MEMORY_ID):
                 newMem = new MasterRoomObjectMemory(data);
                 break;
         }

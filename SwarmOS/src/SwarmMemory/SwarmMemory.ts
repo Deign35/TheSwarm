@@ -1,5 +1,6 @@
 import { profile } from "Tools/Profiler";
 import { SwarmException, MemoryLockException, AlreadyExistsException, NotImplementedException } from "Tools/SwarmExceptions";
+import { SwarmCreator } from "SwarmTypes/SwarmCreator";
 
 @profile
 export abstract class MemoryBase<T extends SwarmDataType, U extends SwarmSubType,
@@ -90,21 +91,18 @@ export abstract class SwarmMemory<T extends SwarmDataTypeSansMaster, U extends S
 }
 
 @profile
-export class FlagMemory<T extends FlagType>
-    extends SwarmMemory<SwarmDataType.Flag, SwarmType.SwarmFlag, FlagType> implements TFlagData {
+export class FlagMemory extends SwarmMemory<SwarmDataType.Flag, SwarmType.SwarmFlag, FlagType> implements TFlagData {
     get SWARM_TYPE(): SwarmType.SwarmFlag { return SwarmType.SwarmFlag; }
 }
 
 
 @profile
-export class CreepMemory<T extends CreepType, U extends ICreepData<T>>
-    extends SwarmMemory<SwarmDataType.Creep, SwarmType.SwarmCreep, T> implements TCreepData {
+export class CreepMemory extends SwarmMemory<SwarmDataType.Creep, SwarmType.SwarmCreep, CreepType> implements TCreepData {
     get SWARM_TYPE(): SwarmType.SwarmCreep { return SwarmType.SwarmCreep; }
 }
 
 @profile
-export class RoomMemory<T extends RoomType, U extends IRoomData<T>>
-    extends SwarmMemory<SwarmDataType.Room, SwarmType.SwarmRoom, T> implements TRoomData {
+export class RoomMemory extends SwarmMemory<SwarmDataType.Room, SwarmType.SwarmRoom, RoomType> implements TRoomData {
     get SWARM_TYPE(): SwarmType.SwarmRoom { return SwarmType.SwarmRoom; }
 }
 
@@ -120,9 +118,7 @@ export abstract class MasterSwarmMemory<T extends SwarmDataTypeSansMaster, U ext
     HasMemory(id: string) { return !!this.ChildData[id]; }
     CheckoutMemory(id: string) {
         let data = this.ChildData[id];
-        let newMem = SwarmCreator.CreateSwarmMemory(data);
-
-        newMem.ReserveMemory();
+        let newMem = SwarmCreator.CreateSwarmMemory(data as any as TBasicSwarmData);
         return newMem;
     }
     SaveMemory(childData: SwarmMemory<T, SwarmType, SwarmDataType>): void {

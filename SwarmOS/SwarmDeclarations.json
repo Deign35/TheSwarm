@@ -3,7 +3,13 @@
         "MY_USERNAME": "Deign",
         "MY_SIGNATURE": "The dawn of the Swarm -- SwarmOS v1.0.2",
         "NOT_CONFIGURED": "NOT_CONFIGURED",
-        "SUB_TYPE": "SUB_TYPE"
+        "SUB_TYPE": "SUB_TYPE",
+        "MASTER_CONSUL_MEMORY_ID": "consuls",
+        "MASTER_CREEP_MEMORY_ID": "creeps",
+        "MASTER_FLAG_MEMORY_ID": "flags",
+        "MASTER_ROOM_MEMORY_ID": "rooms",
+        "MASTER_ROOMOBJECT_MEMORY_ID": "roomObjects",
+        "MASTER_STRUCTURE_MEMORY_ID": "structures"
     },
     "Primitives": {
         "C_NONE": 0,
