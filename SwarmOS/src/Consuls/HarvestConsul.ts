@@ -1,14 +1,8 @@
-import { SwarmConsul, ConsulObject } from "Consuls/ConsulBase";
+import { SwarmConsulBase, ConsulObject } from "Consuls/ConsulBase";
 import { SwarmSource } from "SwarmTypes/SwarmRoomObjects";
 import { HarvestConsulMemory } from "SwarmMemory/ConsulMemory";
 
-export class HarvestObject extends ConsulObject<ConsulType.Harvest> {
-    get ConsulType(): ConsulType.Harvest {
-        return ConsulType.Harvest
-    }
-}
-
-export class HarvestConsul extends SwarmConsul<ConsulType.Harvest> {
+export class HarvestConsul extends SwarmConsulBase<ConsulType.Harvest> {
     SourceData!: {
         [id: string]: {
             hasCreep: boolean;

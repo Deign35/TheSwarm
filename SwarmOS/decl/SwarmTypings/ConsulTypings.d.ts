@@ -16,7 +16,8 @@ declare interface AIConsulBaseObject<T extends ConsulType> extends _Constructor<
     ConsulType: T;
 }
 declare type AIConsulObject = AIConsulBaseObject<ConsulType>;
-declare interface AIConsulBase<T extends ConsulType> extends AIBase<TConsulData, AIConsulObject> {
+declare interface AIConsulBase<T extends ConsulType>
+    extends AIBase<TConsulData, AIConsulObject> {
 }
 
 declare type AIConsul = AIConsulBase<ConsulType>;

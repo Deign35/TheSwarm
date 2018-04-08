@@ -18,7 +18,7 @@ import { FlagMemory } from "SwarmMemory/FlagMemory";
 import { MineralMemory, NukeMemory, ResourceMemory, SiteMemory, SourceMemory, TombstoneMemory } from "SwarmMemory/RoomObjectMemory";
 import { RoomMemory } from "SwarmMemory/RoomMemory";
 import { HarvestConsulMemory, ControlConsulMemory, ConsulMemory } from "SwarmMemory/ConsulMemory";
-import { ConsulObject } from "Consuls/ConsulBase";
+import { ConsulObject, SwarmConsul } from "Consuls/ConsulBase";
 
 @profile
 export class SwarmCreator {
@@ -570,19 +570,17 @@ export class SwarmCreator {
                 break;
             case (SwarmType.SwarmConsul):
                 if (!subType) { throw new NotImplementedException('Consul subtype not implemented or something'); }
-                newObj = this.CreateConsulObject(mem as ConsulMemory, obj);
+                newObj = this.CreateConsulObject(mem as ConsulMemory, obj as ConsulObject);
                 break;
         }
         return newObj!;
     }
 
-    static CreateConsulObject(mem: ConsulMemory, obj: SwarmObjectType): AIConsul {
-        let subType: SwarmSubType = mem.SUB_TYPE;
+    static CreateConsulObject(mem: ConsulMemory, obj: ConsulObject): AIConsul {
+        let subType = mem.SUB_TYPE;
         switch (subType) {
-            case (ConsulType.Control): return new ControlConsul(mem as ControlConsulMemory,
-                obj as ConsulObject<ConsulType.Control>)
-            case (ConsulType.Harvest): return new HarvestConsul(mem as HarvestConsulMemory,
-                obj as ConsulObject<ConsulType.Harvest>);
+            case (ConsulType.Control): return new ControlConsul(mem as ControlConsulMemory, obj)
+            case (ConsulType.Harvest): return new HarvestConsul(mem as HarvestConsulMemory, obj);
         }
 
         throw new NotImplementedException("Consul type is not configured: ' + subType");

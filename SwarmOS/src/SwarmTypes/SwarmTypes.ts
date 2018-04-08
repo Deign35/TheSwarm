@@ -1,12 +1,14 @@
 import { profile } from "Tools/Profiler";
-import { MemoryBase, SwarmMemoryBase } from "SwarmMemory/SwarmMemory";
+import { MemoryBase, SwarmMemoryBase, SwarmMemory } from "SwarmMemory/SwarmMemory";
 import { MineralMemory, TombstoneMemory, ResourceMemory, NukeMemory } from "SwarmMemory/RoomObjectMemory";
 import { ConsulObject } from "Consuls/ConsulBase";
+import { CreepMemory } from "SwarmMemory/CreepMemory";
+import { StructureMemory } from "SwarmMemory/StructureMemory";
 
-export type ObjBase = ObjectBase<SwarmData, SwarmObjectType>;
+export type ObjBase = ObjectBase<SwarmMemory, SwarmObjectType>;
 const HAS_PREPPED = 'hasPrepped';
 @profile
-export abstract class ObjectBase<T extends SwarmData, U extends SwarmObjectType> {
+export abstract class ObjectBase<T extends SwarmMemory, U extends SwarmObjectType> {
     constructor(data: T, obj: U) {
         this._memory = data;
         this._instance = obj;
@@ -33,7 +35,7 @@ export abstract class ObjectBase<T extends SwarmData, U extends SwarmObjectType>
     abstract GetSwarmSubType(): SwarmSubType;// { return this.memory.SUB_TYPE; }
 }
 @profile
-export abstract class SwarmTypeBase<T extends SwarmData, U extends SwarmObjectType>
+export abstract class SwarmTypeBase<T extends SwarmMemory, U extends SwarmObjectType>
     extends ObjectBase<T, U> implements AIBase<T, U> {
     GetMemType(): SwarmDataType {
         return this.memory.MEM_TYPE;
@@ -47,13 +49,13 @@ export abstract class SwarmTypeBase<T extends SwarmData, U extends SwarmObjectTy
     get IsActive() { return this.memory.isActive; }
 }
 @profile
-export abstract class SwarmRoomObjectBase<T extends SwarmData, U extends RoomObject>
+export abstract class SwarmRoomObjectBase<T extends SwarmMemory, U extends RoomObject>
     extends SwarmTypeBase<T, U> implements RoomObject {
     get pos(): RoomPosition { return this._instance.pos; }
     get room(): Room | undefined { return this._instance.room; }
 }
 @profile
-export abstract class OwnableSwarmObject<T extends TCreepData | TOwnabledStructureData,
+export abstract class OwnableSwarmObject<T extends CreepMemory | StructureMemory,
     U extends Creep | OwnedStructure> extends SwarmRoomObjectBase<T, U> {
     get my() { return this._instance.my; }
     get owner() { return this._instance.owner; }
