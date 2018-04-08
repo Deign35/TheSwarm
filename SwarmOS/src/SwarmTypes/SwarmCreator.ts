@@ -478,31 +478,10 @@ export class SwarmCreator {
 
         return newMemory!;
     }
-}
 
-    /*
-    static CreateNewSwarmObject<T extends Room | RoomObject, U extends SwarmMemoryTypes>(obj: T) {
-        let swarmType = this.GetSwarmType(obj);
-        let newObj = this.CreateSwarmObject(swarmType) as ObjectBase<U, T>;
-        let newMem = this.CreateNewSwarmMemory(this.GetObjSaveID(obj), swarmType);
-        newObj.AssignObject(obj, newMem as U);
-
-        return newObj;
-    }
-
-    static GetObjSaveID(obj: Room | RoomObject): string {
-        if ((obj as Room).name) {
-            if (!(obj as StructureSpawn).structureType) {// Spawns are special case that have a name
-                return (obj as Room).name; // Flags, Creeps, and Rooms
-            }
-        }
-
-        return (obj as Structure).id;
-    }
-
-    static GetSwarmType(obj: Room | RoomObject | ConsulObject): SwarmType {
-        if ((obj as ConsulObject).GetSwarmType) {
-            return (obj as ConsulObject).GetSwarmType();
+    static GetSwarmType(obj: SwarmObjectType): SwarmType {
+        if ((obj as AIConsulObject).GetSwarmType) {
+            return (obj as AIConsulObject).GetSwarmType();
         }
 
         if ((obj as Room).name) {
@@ -537,6 +516,51 @@ export class SwarmCreator {
 
         throw new NotImplementedException('Not an implemented RoomObject ' + JSON.stringify(obj));
     }
+    protected static GetStructureSwarmType(structure: Structure) {
+        switch (structure.structureType) {
+            case (STRUCTURE_CONTAINER): return SwarmType.SwarmContainer;
+            case (STRUCTURE_CONTROLLER): return SwarmType.SwarmController;
+            case (STRUCTURE_EXTENSION): return SwarmType.SwarmExtension;
+            case (STRUCTURE_EXTRACTOR): return SwarmType.SwarmExtractor;
+            case (STRUCTURE_KEEPER_LAIR): return SwarmType.SwarmKeepersLair;
+            case (STRUCTURE_LAB): return SwarmType.SwarmLab;
+            case (STRUCTURE_LINK): return SwarmType.SwarmLink;
+            case (STRUCTURE_NUKER): return SwarmType.SwarmNuker;
+            case (STRUCTURE_OBSERVER): return SwarmType.SwarmObserver;
+            case (STRUCTURE_PORTAL): return SwarmType.SwarmPortal;
+            case (STRUCTURE_POWER_BANK): return SwarmType.SwarmPowerBank;
+            case (STRUCTURE_POWER_SPAWN): return SwarmType.SwarmPowerSpawn;
+            case (STRUCTURE_RAMPART): return SwarmType.SwarmRampart;
+            case (STRUCTURE_ROAD): return SwarmType.SwarmRoad;
+            case (STRUCTURE_SPAWN): return SwarmType.SwarmSpawn;
+            case (STRUCTURE_STORAGE): return SwarmType.SwarmStorage;
+            case (STRUCTURE_TERMINAL): return SwarmType.SwarmTerminal;
+            case (STRUCTURE_TOWER): return SwarmType.SwarmTower;
+            case (STRUCTURE_WALL): return SwarmType.SwarmWall;
+        }
+    }
+}
+
+    /*
+    static CreateNewSwarmObject<T extends Room | RoomObject, U extends SwarmMemoryTypes>(obj: T) {
+        let swarmType = this.GetSwarmType(obj);
+        let newObj = this.CreateSwarmObject(swarmType) as ObjectBase<U, T>;
+        let newMem = this.CreateNewSwarmMemory(this.GetObjSaveID(obj), swarmType);
+        newObj.AssignObject(obj, newMem as U);
+
+        return newObj;
+    }
+
+    static GetObjSaveID(obj: Room | RoomObject): string {
+        if ((obj as Room).name) {
+            if (!(obj as StructureSpawn).structureType) {// Spawns are special case that have a name
+                return (obj as Room).name; // Flags, Creeps, and Rooms
+            }
+        }
+
+        return (obj as Structure).id;
+    }
+
 
     protected static GetStructureSwarmType(structure: Structure) {
         switch (structure.structureType) {

@@ -2,6 +2,8 @@ import { profile } from "Tools/Profiler";
 import { SwarmException, MemoryLockException, AlreadyExistsException, NotImplementedException } from "Tools/SwarmExceptions";
 import { SwarmCreator } from "SwarmTypes/SwarmCreator";
 
+export type MemObject = MemObjectWithData<SwarmDataType, SwarmSubType>;
+declare type MemObjectWithData<T extends SwarmDataType, U extends SwarmSubType> = MemoryBase<T, U, IData<T, U>>;
 @profile
 export abstract class MemoryBase<T extends SwarmDataType, U extends SwarmSubType,
     V extends IData<T, U>> implements IData<T, U> {
