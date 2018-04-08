@@ -1,6 +1,6 @@
 import { profile } from "Tools/Profiler";
-import { MasterSwarmMemory, MasterCreepMemory, MasterFlagMemory, MasterRoomMemory, MasterStructureMemory, MasterRoomObjectMemory, MemoryBase, MasterConsulMemory } from "SwarmMemory/SwarmMemory";
 import { NotImplementedException } from "Tools/SwarmExceptions";
+import { MasterMemory, MasterConsulMemory, MasterCreepMemory, MasterFlagMemory, MasterRoomMemory, MasterStructureMemory, MasterRoomObjectMemory } from "SwarmMemory/MasterMemory";
 declare interface IMemory {
     [MASTER_CONSUL_MEMORY_ID]: IMasterConsulData,
     [MASTER_CREEP_MEMORY_ID]: IMasterCreepData,
@@ -64,11 +64,6 @@ export class Swarmlord {
                     MEM_TYPE: SwarmDataType.Master,
                     SUB_TYPE: SwarmDataType.Structure,
                 },
-                stats: {
-                    rooms: {},
-                    market: {},
-                    totalGCL: 0
-                },
                 profiler: Memory.profiler, // Hacky, but cleanest way to prevent the profiler from breaking because of deleting its memory.
                 SwarmVersionDate: SWARM_VERSION_DATE,
                 INIT: false
@@ -94,7 +89,7 @@ export class Swarmlord {
         }
     }
 
-    static SaveMasterMemory<T extends SwarmDataTypeSansMaster>(memObject: MasterSwarmMemory<T, IMasterData<T>>, save: boolean): void {
+    static SaveMasterMemory<T extends SwarmDataTypeSansMaster>(memObject: MasterMemory, save: boolean): void {
         memObject.ReserveMemory();
         let memData = memObject.ReleaseMemory();
         if (save) {

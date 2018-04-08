@@ -1,12 +1,12 @@
 import { profile } from "Tools/Profiler";
 import { MemoryBase, SwarmMemoryBase } from "SwarmMemory/SwarmMemory";
-import { RoomObjectMemoryBase, MineralMemory, TombstoneMemory, ResourceMemory, NukeMemory } from "SwarmMemory/RoomObjectMemory";
+import { MineralMemory, TombstoneMemory, ResourceMemory, NukeMemory } from "SwarmMemory/RoomObjectMemory";
 import { ConsulObject } from "Consuls/ConsulBase";
 
 
 const HAS_PREPPED = 'hasPrepped';
 @profile
-export abstract class ObjectBase<T extends TBasicSwarmData, U extends SwarmObjectType> {
+export abstract class ObjectBase<T extends SwarmDataTypeSansMaster, U extends SwarmObjectType> {
     abstract Activate(mem: T, obj: U): T;
     abstract InitAsNew(obj: U): T;
     abstract PrepObject(mem: T, obj: U): T;

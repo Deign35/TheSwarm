@@ -1,15 +1,14 @@
 declare type SwarmSubType = SwarmType | ConsulType | StructureConstant |
     FlagType | RoomType | CreepType | SwarmDataType
 
-declare interface IData {
+declare interface IData<T extends SwarmDataType> {
     id: string;
     isActive: boolean;
-    MEM_TYPE: SwarmDataType;
+    MEM_TYPE: T;
     SWARM_TYPE: SwarmType;
     SUB_TYPE: SwarmSubType;
 }
-declare interface ISwarmData<T extends SwarmDataType, U extends SwarmType, V extends SwarmSubType> extends IData {
-    MEM_TYPE: T;
+declare interface ISwarmData<T extends SwarmDataType, U extends SwarmType, V extends SwarmSubType> extends IData<T> {
     SWARM_TYPE: U;
     SUB_TYPE: V;
 }

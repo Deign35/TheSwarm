@@ -5,7 +5,7 @@ export abstract class MemoryBase {
         this._checkedOut = false;
         this._flashMemory = {};
     }
-    protected abstract get cache(): IData;
+    protected abstract get cache(): IData<SwarmDataType>;
     private _flashMemory: Dictionary;
     private _checkedOut: boolean;
 
@@ -64,3 +64,5 @@ export abstract class SwarmMemoryWithSpecifiedData<T extends SwarmData>
     private _cache: T;
     protected get cache() { return this._cache; }
 }
+
+export type SwarmMemory = SwarmMemoryWithSpecifiedData<SwarmData>;
