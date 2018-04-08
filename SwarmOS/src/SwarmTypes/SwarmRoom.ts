@@ -5,17 +5,7 @@ import { SwarmLoader } from "SwarmTypes/SwarmLoader";
 import { ConsulObject } from "Consuls/ConsulBase";
 import { MemoryObject } from "SwarmMemory/SwarmMemory";
 
-/*<T extends CreepType> extends OwnableSwarmObject<ICreepData<T>, Creep>
-    implements AICreep, Creep {
-    Activate(mem: ICreepData<T>, obj: Creep): ICreepData<T> {
-        throw new Error("Method not implemented.");
-    }
-    InitAsNew(obj: Creep): ICreepData<T> {
-        throw new Error("Method not implemented.");
-    }
-    PrepObject(mem: ICreepData<T>, obj: Creep): ICreepData<T> {
-        throw new Error("Method not implemented.");
-    }*/
+
 export type SwarmRoom = SwarmRoom_Base<RoomType>;
 @profile
 export class SwarmRoom_Base<T extends RoomType> extends SwarmTypeBase<IData, Room> implements AIRoom, Room {
@@ -37,6 +27,10 @@ export class SwarmRoom_Base<T extends RoomType> extends SwarmTypeBase<IData, Roo
             }
         }
         return this._availableSpawns;
+    }
+
+    PrepObject() {
+        this.TryFindNewObjects();
     }
 
     TrySpawn(body: BodyPartConstant[], name: string,
@@ -136,12 +130,11 @@ export class SwarmRoom_Base<T extends RoomType> extends SwarmTypeBase<IData, Roo
     }
 
     TryFindNewObjects(force: boolean = false) {
-        /*if (force || Game.time % 5 == 0) {
+        if (force || Game.time % 5 == 0) {
             let foundResources = this.find(FIND_DROPPED_RESOURCES);
             for (let j = 0; j < foundResources.length; j++) {
-                if (!SwarmLoader.TheSwarm.roomObjects[foundResources[j].id]) {
-                    SwarmLoader.LoadObject<Resource, ResourceMemory>(
-                        foundResources[j].id, foundResources[j], SwarmControllerDataTypes.RoomObjects);
+                if (!SwarmLoader.HasObject(foundResources[j].id, MASTER_ROOMOBJECT_MEMORY_ID)) {
+                    SwarmLoader.LoadObject(foundResources[j].id, foundResources[j], MASTER_ROOMOBJECT_MEMORY_ID);
                 }
             }
         }
@@ -149,9 +142,8 @@ export class SwarmRoom_Base<T extends RoomType> extends SwarmTypeBase<IData, Roo
         if (force || Game.time % 11 == 0) {
             let foundTombstones = this.find(FIND_TOMBSTONES);
             for (let j = 0; j < foundTombstones.length; j++) {
-                if (!SwarmLoader.TheSwarm.roomObjects[foundTombstones[j].id]) {
-                    SwarmLoader.LoadObject<Tombstone, TombstoneMemory>(
-                        foundTombstones[j].id, foundTombstones[j], SwarmControllerDataTypes.RoomObjects);
+                if (!SwarmLoader.HasObject(foundTombstones[j].id, MASTER_ROOMOBJECT_MEMORY_ID)) {
+                    SwarmLoader.LoadObject(foundTombstones[j].id, foundTombstones[j], MASTER_ROOMOBJECT_MEMORY_ID);
                 }
             }
         }
@@ -159,9 +151,8 @@ export class SwarmRoom_Base<T extends RoomType> extends SwarmTypeBase<IData, Roo
         if (force || Game.time % 17 == 0) {
             let foundStructures = this.find(FIND_STRUCTURES);
             for (let j = 0; j < foundStructures.length; j++) {
-                if (!SwarmLoader.TheSwarm.structures[foundStructures[j].id]) {
-                    SwarmLoader.LoadObject<Structure, StructureMemory>(
-                        foundStructures[j].id, foundStructures[j], SwarmControllerDataTypes.Structures);
+                if (!SwarmLoader.HasObject(foundStructures[j].id, MASTER_STRUCTURE_MEMORY_ID)) {
+                    SwarmLoader.LoadObject(foundStructures[j].id, foundStructures[j], MASTER_STRUCTURE_MEMORY_ID);
                 }
             }
         }
@@ -169,9 +160,9 @@ export class SwarmRoom_Base<T extends RoomType> extends SwarmTypeBase<IData, Roo
         if (force || Game.time % 29 == 0) {
             let foundSites = this.find(FIND_CONSTRUCTION_SITES);
             for (let j = 0; j < foundSites.length; j++) {
-                if (!SwarmLoader.TheSwarm.roomObjects[foundSites[j].id]) {
-                    SwarmLoader.LoadObject<ConstructionSite, ConstructionSiteMemory>(
-                        foundSites[j].id, foundSites[j], SwarmControllerDataTypes.RoomObjects);
+                if (!SwarmLoader.HasObject(foundSites[j].id, MASTER_ROOMOBJECT_MEMORY_ID)) {
+                    SwarmLoader.LoadObject(
+                        foundSites[j].id, foundSites[j], MASTER_ROOMOBJECT_MEMORY_ID);
                 }
             }
         }
@@ -179,13 +170,13 @@ export class SwarmRoom_Base<T extends RoomType> extends SwarmTypeBase<IData, Roo
         if (force || Game.time % 233 == 0) {
             let foundNukes = this.find(FIND_NUKES);
             for (let j = 0; j < foundNukes.length; j++) {
-                if (!SwarmLoader.TheSwarm.roomObjects[foundNukes[j].id]) {
-                    SwarmLoader.LoadObject<Nuke, NukeMemory>(
-                        foundNukes[j].id, foundNukes[j], SwarmControllerDataTypes.RoomObjects);
+                if (!SwarmLoader.HasObject(foundNukes[j].id, MASTER_ROOMOBJECT_MEMORY_ID)) {
+                    SwarmLoader.LoadObject(
+                        foundNukes[j].id, foundNukes[j], MASTER_ROOMOBJECT_MEMORY_ID);
                 }
             }
         }
-        */
+
     }
 
     get DataType(): SwarmDataType.Room { return SwarmDataType.Room };

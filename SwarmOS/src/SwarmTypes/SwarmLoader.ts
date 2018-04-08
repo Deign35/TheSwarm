@@ -124,7 +124,7 @@ export class SwarmLoader {
         let keys = this.MasterMemory[dataType].GetMemoryIDs();
         for (let i = 0; i < keys.length; i++) {
             let obj = Game[dataType][keys[i]] as U;
-            this.LoadObject<T, U>(obj.name, obj, dataType);
+            this.LoadObject<T, U>(keys[i], obj, dataType);
         }
     }
 
@@ -132,7 +132,7 @@ export class SwarmLoader {
         if (!obj) {
             if (this.MasterMemory[dataType].HasData(saveID) && dataType != MASTER_ROOM_MEMORY_ID) {
                 // (TODO): Determine what to do with hostile objects
-                this.MasterMemory[dataType].DeleteData(saveID);
+                this.MasterMemory[dataType].DeleteChildMemory(saveID);
             } else {
                 // Load a fake obj?
             }
@@ -178,6 +178,9 @@ export class SwarmLoader {
         Swarmlord.SaveMasterMemory(this.MasterMemory[MASTER_ROOM_MEMORY_ID], true);
         Swarmlord.SaveMasterMemory(this.MasterMemory[MASTER_ROOMOBJECT_MEMORY_ID], true);
         Swarmlord.SaveMasterMemory(this.MasterMemory[MASTER_STRUCTURE_MEMORY_ID], true);
+    }
+    static HasObject(id: string, dataType: string) {
+        return this.TheSwarm[dataType][id]
     }
     static GetObject(id: string, dataType: string) {
         return this.TheSwarm[dataType][id];

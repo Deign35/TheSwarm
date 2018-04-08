@@ -90,7 +90,7 @@ export class ParentMemory<T extends MasterDataType> extends MemoryBase<T> {
             this.SetData(CHILD_DATA_ID, this._childData, saveToMemory);
         }
     }
-    DeleteChildMemory(id: string, saveToMemory: boolean): void {
+    DeleteChildMemory(id: string, saveToMemory: boolean = true): void {
         if (!!this._childMemory[id]) {
             delete this._childMemory[id];
         }

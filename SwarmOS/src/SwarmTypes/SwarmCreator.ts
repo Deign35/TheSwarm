@@ -336,6 +336,7 @@ export class SwarmCreator {
             case (SwarmType.SwarmResource):
             case (SwarmType.SwarmSource):
             case (SwarmType.SwarmSite):
+            case (SwarmType.SwarmTombstone):
                 return swarmType;
             default:
                 return this.GetStructureSubType(swarmType);
