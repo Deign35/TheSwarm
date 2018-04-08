@@ -1,4 +1,3 @@
-import { CreepMemory } from "SwarmMemory/SwarmMemory";
 import { profile } from "Tools/Profiler";
 import { OwnableSwarmObject } from "SwarmTypes/SwarmTypes";
 
@@ -10,7 +9,7 @@ export class SwarmCreep<T extends CreepType> extends OwnableSwarmObject<ICreepDa
     Activate(mem: ICreepData<T>, obj: Creep): ICreepData<T> {
         throw new Error("Method not implemented.");
     }
-    InitAsNew(obj: Creep): ICreepData<T> {
+    InitAsNew(mem: ICreepData<T>, obj: Creep): ICreepData<T> {
         throw new Error("Method not implemented.");
     }
     PrepObject(mem: ICreepData<T>, obj: Creep): ICreepData<T> {

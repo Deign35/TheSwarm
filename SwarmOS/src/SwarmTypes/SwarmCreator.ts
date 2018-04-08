@@ -11,10 +11,13 @@ import { SwarmSpawn } from "./SwarmStructures/SwarmSpawn";
 import { SwarmTower } from "./SwarmStructures/SwarmTower";
 import { NotImplementedException } from "Tools/SwarmExceptions";
 import { profile } from "Tools/Profiler";
-import { MemoryBase, CreepMemory, FlagMemory, RoomMemory, SwarmMemoryBase } from "SwarmMemory/SwarmMemory";
+import { SwarmMemoryBase, SwarmMemoryWithSpecifiedData, SwarmMemory } from "SwarmMemory/SwarmMemory";
 import { ContainerMemory, ControllerMemory, ExtensionMemory, ExtractorMemory, KeepersLairMemory, LabMemory, LinkMemory, NukerMemory, ObserverMemory, PortalMemory, PowerBankMemory, PowerSpawnMemory, RampartMemory, RoadMemory, SpawnMemory, StorageMemory, TerminalMemory, TowerMemory, WallMemory } from "SwarmMemory/StructureMemory";
-import { MineralMemory, NukeMemory, ResourceMemory, ConstructionSiteMemory, SourceMemory, TombstoneMemory } from "SwarmMemory/RoomObjectMemory";
-import { HarvestMemory, ControlMemory } from "SwarmMemory/ConsulMemory";
+import { CreepMemory } from "SwarmMemory/CreepMemory";
+import { FlagMemory } from "SwarmMemory/FlagMemory";
+import { MineralMemory, NukeMemory, ResourceMemory, SiteMemory, SourceMemory, TombstoneMemory } from "SwarmMemory/RoomObjectMemory";
+import { RoomMemory } from "SwarmMemory/RoomMemory";
+import { HarvestConsulMemory, ControlConsulMemory } from "SwarmMemory/ConsulMemory";
 
 
 const SWARM_OBJECTS = {}
@@ -89,11 +92,11 @@ export class SwarmCreator {
                 dataType + "]- subType[" + subType + "]");
         }
 
-        return SWARM_OBJECTS[dataType as number][subType] as V;
+        return CopyObject(SWARM_OBJECTS[dataType as number][subType] as V);
     }
 
     static CreateNewSwarmMemory<T extends SwarmDataTypeSansMaster, U extends SwarmSubType, V extends SwarmType,
-        X extends SwarmMemoryBase<T, V, U>>(id: string, swarmType: V): X {
+        X extends SwarmMemory>(id: string, swarmType: V): X {
         let newMemory: any;
         switch (swarmType) {
             case (SwarmType.SwarmContainer):
@@ -281,7 +284,7 @@ export class SwarmCreator {
                 });
                 break;
             case (SwarmType.SwarmSite):
-                newMemory = new ConstructionSiteMemory({
+                newMemory = new SiteMemory({
                     id: id,
                     MEM_TYPE: SwarmDataType.RoomObject,
                     SWARM_TYPE: SwarmType.SwarmSite,
@@ -364,7 +367,7 @@ export class SwarmCreator {
     /**<T extends SwarmDataType, U extends SwarmSubType,
         V extends IData<T, U>>(id: string, swarmType: SwarmType): V { */
     static CreateSwarmMemory<T extends SwarmDataTypeSansMaster, U extends SwarmType, V extends SwarmSubType,
-        W extends SwarmData>(mem: W): SwarmMemoryBase<T, U, V> {
+        W extends SwarmData>(mem: SwarmData): SwarmMemoryWithSpecifiedData<W> {
         let memType = mem.SWARM_TYPE;
         let subType = mem.SUB_TYPE;
 
@@ -374,8 +377,8 @@ export class SwarmCreator {
             // Consuls
             case (SwarmType.SwarmConsul):
                 switch (subType as ConsulType) {
-                    case (ConsulType.Harvest): newMemory = new HarvestMemory(mem); break;
-                    case (ConsulType.Control): newMemory = new ControlMemory(mem as ControlConsulData); break;
+                    case (ConsulType.Harvest): newMemory = new HarvestConsulMemory(mem as HarvestConsulData); break;
+                    case (ConsulType.Control): newMemory = new ControlConsulMemory(mem as ControlConsulData); break;
                 }
                 break;
             // Creeps
@@ -451,7 +454,7 @@ export class SwarmCreator {
                 newMemory = new RoadMemory(mem as IRoadData);
                 break;
             case (SwarmType.SwarmSite):
-                newMemory = new ConstructionSiteMemory(mem as ISiteData);
+                newMemory = new SiteMemory(mem as ISiteData);
                 break;
             case (SwarmType.SwarmSource):
                 newMemory = new SourceMemory(mem as ISourceData);

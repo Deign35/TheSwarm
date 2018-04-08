@@ -1,4 +1,4 @@
-import { SwarmMemoryWithSpecifiedData } from "SwarmMemory/SwarmMemory";
+import { SwarmMemoryWithSpecifiedData, MasterableSwarmMemory, SwarmMemory } from "SwarmMemory/SwarmMemory";
 import { CreepMemory } from "./CreepMemory";
 import { RoomObjectMemory } from "./RoomObjectMemory";
 import { StructureMemory } from "./StructureMemory";
@@ -7,7 +7,8 @@ import { RoomMemory } from "./RoomMemory";
 import { ConsulMemory } from "./ConsulMemory";
 import { SwarmCreator } from "SwarmTypes/SwarmCreator";
 
-export type MasterableMemory = ConsulMemory | CreepMemory | FlagMemory | RoomMemory | RoomObjectMemory | StructureMemory
+
+export type SwarmMemoryTypes = ConsulMemory | CreepMemory | FlagMemory | RoomMemory | RoomObjectMemory | StructureMemory
 
 export abstract class MasterMemoryBase<T extends SwarmDataType,
     U extends IMasterData<T>, V extends ISwarmData<T, SwarmType, SwarmSubType>>
@@ -26,9 +27,11 @@ export abstract class MasterMemoryBase<T extends SwarmDataType,
     CheckoutMemory(id: string) {
         let data = this.ChildData[id];
         let newMem = SwarmCreator.CreateSwarmMemory(data);
+
+        newMem.ReserveMemory();
         return newMem;
     }
-    SaveMemory(childData: MasterableMemory): void {
+    SaveMemory(childData: SwarmMemory): void {
         this.ChildData[childData.id] = childData.ReleaseMemory() as V;
     }
     DeleteMemory(saveID: string): void {

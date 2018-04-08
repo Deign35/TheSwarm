@@ -1,14 +1,14 @@
 import { ObjectBase, SwarmTypeBase } from "SwarmTypes/SwarmTypes";
-import { TConsulMemory, HarvestMemory, ConsulMemory } from "SwarmMemory/ConsulMemory";
 import { NotImplementedException } from "Tools/SwarmExceptions";
 import { SwarmMemoryBase, MemoryBase } from "SwarmMemory/SwarmMemory";
 
-export abstract class ConsulObject<T extends ConsulType> implements AIConsulBaseObject<T> {
-    get prototype() {
+export class ConsulObject<T extends ConsulType>
+    implements _Constructor<AIConsulBaseObject<T>>, AIConsulBaseObject<T> {
+    constructor(public readonly ConsulType: T) { }
+    get prototype(): AIConsulBaseObject<T> {
         throw new NotImplementedException('Consuls do not have a prototype');
         //return this;
     }
-    abstract get ConsulType(): T;
 }
 
 //ISwarmData < SwarmDataType.Consul, SwarmType.SwarmConsul, T >

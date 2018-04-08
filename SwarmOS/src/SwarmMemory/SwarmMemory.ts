@@ -65,4 +65,5 @@ export abstract class SwarmMemoryWithSpecifiedData<T extends SwarmData>
     protected get cache() { return this._cache; }
 }
 
+export type MasterableSwarmMemory = SwarmMemoryWithSpecifiedData<TBasicSwarmData>;
 export type SwarmMemory = SwarmMemoryWithSpecifiedData<SwarmData>;

@@ -1,6 +1,6 @@
 import { SwarmConsul, ConsulObject } from "Consuls/ConsulBase";
-import { HarvestMemory, ControlMemory } from "SwarmMemory/ConsulMemory";
 import { SwarmSource } from "SwarmTypes/SwarmRoomObjects";
+import { HarvestConsulMemory } from "SwarmMemory/ConsulMemory";
 
 export class HarvestObject extends ConsulObject<ConsulType.Harvest> {
     get ConsulType(): ConsulType.Harvest {
@@ -9,13 +9,13 @@ export class HarvestObject extends ConsulObject<ConsulType.Harvest> {
 }
 
 export class HarvestConsul extends SwarmConsul<ConsulType.Harvest> {
-    Activate(mem: HarvestMemory, obj: ConsulObject<ConsulType.Harvest>): HarvestMemory {
+    Activate(mem: HarvestConsulMemory, obj: ConsulObject<ConsulType.Harvest>): HarvestConsulMemory {
         throw new Error("Method not implemented.");
     }
-    InitAsNew(obj: ConsulObject<ConsulType.Harvest>): HarvestMemory {
+    InitAsNew(mem: HarvestConsulMemory, obj: ConsulObject<ConsulType.Harvest>): HarvestConsulMemory {
         throw new Error("Method not implemented.");
     }
-    PrepObject(mem: HarvestMemory, obj: ConsulObject<ConsulType.Harvest>): HarvestMemory {
+    PrepObject(mem: HarvestConsulMemory, obj: ConsulObject<ConsulType.Harvest>): HarvestConsulMemory {
         throw new Error("Method not implemented.");
     }
     SourceData!: {

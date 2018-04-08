@@ -1,5 +1,9 @@
 import { OwnableSwarmObject, SwarmRoomObjectBase } from "SwarmTypes/SwarmTypes";
-import { StructureMemory, ExtensionMemory, ExtractorMemory, ObserverMemory, LinkMemory, RampartMemory, StorageMemory, TerminalMemory, ContainerMemory, RoadMemory, WallMemory, NukerMemory, KeepersLairMemory, PortalMemory, PowerBankMemory, PowerSpawnMemory, StructureMemoryBase } from "SwarmMemory/StructureMemory";
+import {
+    StructureMemory, ExtensionMemory, ExtractorMemory, ObserverMemory, LinkMemory, RampartMemory,
+    StorageMemory, TerminalMemory, ContainerMemory, RoadMemory, WallMemory, NukerMemory, KeepersLairMemory,
+    PortalMemory, PowerBankMemory, PowerSpawnMemory
+} from "SwarmMemory/StructureMemory";
 import { MemoryBase, SwarmMemoryBase } from "SwarmMemory/SwarmMemory";
 
 export abstract class SwarmStructure<T extends TStructureData, U extends Structure>
@@ -20,7 +24,7 @@ export abstract class SwarmStructure<T extends TStructureData, U extends Structu
     Activate(mem: T, obj: U): T {
         throw new Error("Method not implemented.");
     }
-    InitAsNew(obj: U): T {
+    InitAsNew(mem: T, obj: U): T {
         throw new Error("Method not implemented.");
     }
     PrepObject(mem: T, obj: U): T {

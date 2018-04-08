@@ -10,7 +10,7 @@ export abstract class SwarmObject_RoomObject<T extends TBasicSwarmData, U extend
     Activate(mem: T, obj: U): T {
         throw new Error("Method not implemented.");
     }
-    InitAsNew(obj: U): T {
+    InitAsNew(mem: T, obj: U): T {
         throw new Error("Method not implemented.");
     }
     PrepObject(mem: T, obj: U): T {
@@ -19,7 +19,7 @@ export abstract class SwarmObject_RoomObject<T extends TBasicSwarmData, U extend
 }
 
 @profile
-export class SwarmMineral extends SwarmObject_RoomObject<IMineralData, Mineral> implements AIMineral {
+export class SwarmMineral extends SwarmObject_RoomObject<IMineralData, Mineral> implements AIMineral, Mineral {
     get SwarmType(): SwarmType.SwarmMineral { return SwarmType.SwarmMineral; }
     get density() { return this._instance.density; }
     get mineralAmount() { return this._instance.mineralAmount; }

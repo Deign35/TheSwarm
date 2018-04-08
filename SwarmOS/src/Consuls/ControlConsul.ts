@@ -1,14 +1,14 @@
-import { ControlMemory } from "SwarmMemory/ConsulMemory";
+import { ControlConsulMemory } from "SwarmMemory/ConsulMemory";
 import { SwarmConsul, ConsulObject } from "Consuls/ConsulBase";
 
 export class ControlConsul extends SwarmConsul<ConsulType.Control> {
-    Activate(mem: ControlMemory, obj: ConsulObject<ConsulType.Control>): ControlMemory {
+    Activate(mem: ControlConsulMemory, obj: ConsulObject<ConsulType.Control>): ControlConsulMemory {
         throw new Error("Method not implemented.");
     }
-    InitAsNew(obj: ConsulObject<ConsulType.Control>): ControlMemory {
+    InitAsNew(mem: ControlConsulMemory, obj: ConsulObject<ConsulType.Control>): ControlConsulMemory {
         throw new Error("Method not implemented.");
     }
-    PrepObject(mem: ControlMemory, obj: ConsulObject<ConsulType.Control>): ControlMemory {
+    PrepObject(mem: ControlConsulMemory, obj: ConsulObject<ConsulType.Control>): ControlConsulMemory {
         throw new Error("Method not implemented.");
     }
 }

@@ -3,12 +3,12 @@ import { MemoryBase, SwarmMemoryBase } from "SwarmMemory/SwarmMemory";
 import { MineralMemory, TombstoneMemory, ResourceMemory, NukeMemory } from "SwarmMemory/RoomObjectMemory";
 import { ConsulObject } from "Consuls/ConsulBase";
 
-
+export type ObjBase = ObjectBase<TBasicSwarmData, SwarmObjectType>;
 const HAS_PREPPED = 'hasPrepped';
 @profile
-export abstract class ObjectBase<T extends SwarmDataTypeSansMaster, U extends SwarmObjectType> {
+export abstract class ObjectBase<T extends TBasicSwarmData, U extends SwarmObjectType> {
     abstract Activate(mem: T, obj: U): T;
-    abstract InitAsNew(obj: U): T;
+    abstract InitAsNew(mem: T, obj: U): T;
     abstract PrepObject(mem: T, obj: U): T;
 
     get id(): string { return this.memory.id; }

@@ -1,13 +1,7 @@
-import { SwarmLoader } from "SwarmTypes/SwarmLoader";
-import { ResourceMemory, TombstoneMemory, ConstructionSiteMemory, NukeMemory } from "SwarmMemory/RoomObjectMemory";
-import { StructureMemory } from "SwarmMemory/StructureMemory";
-import { SwarmSpawn } from "./SwarmStructures/SwarmSpawn";
-import { HarvestMemory } from "SwarmMemory/ConsulMemory";
-import { HarvestConsul } from "Consuls/HarvestConsul";
-import { ConsulObject } from "Consuls/ConsulBase";
-import { RoomMemory } from "SwarmMemory/SwarmMemory";
-import { SwarmTypeBase } from "SwarmTypes/SwarmTypes";
 import { profile } from "Tools/Profiler";
+import { SwarmTypeBase } from "SwarmTypes/SwarmTypes";
+import { SwarmSpawn } from "SwarmTypes/SwarmStructures/SwarmSpawn";
+import { SwarmLoader } from "SwarmTypes/SwarmLoader";
 
 /*<T extends CreepType> extends OwnableSwarmObject<ICreepData<T>, Creep>
     implements AICreep, Creep {
@@ -22,7 +16,7 @@ import { profile } from "Tools/Profiler";
     }*/
 @profile
 export class SwarmRoom<T extends RoomType> extends SwarmTypeBase<IRoomData<T>, Room> implements AIRoom, Room {
-    InitAsNew(obj: Room): IRoomData<T> {
+    InitAsNew(mem: IRoomData<T>, obj: Room): IRoomData<T> {
         throw new Error("Method not implemented.");
     }
     PrepObject(mem: IRoomData<T>, obj: Room): IRoomData<T> {

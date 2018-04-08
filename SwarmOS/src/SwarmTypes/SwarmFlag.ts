@@ -1,4 +1,4 @@
-import { FlagMemory, SwarmMemoryBase } from "SwarmMemory/SwarmMemory";
+import { SwarmMemoryBase } from "SwarmMemory/SwarmMemory";
 import { profile } from "Tools/Profiler";
 import { SwarmTypeBase } from "SwarmTypes/SwarmTypes";
 
@@ -20,7 +20,7 @@ export class SwarmFlag<T extends FlagType> extends SwarmTypeBase<IFlagData<T>, F
     Activate(mem: IFlagData<T>, obj: Flag): IFlagData<T> {
         throw new Error("Method not implemented.");
     }
-    InitAsNew(obj: Flag): IFlagData<T> {
+    InitAsNew(mem: IFlagData<T>, obj: Flag): IFlagData<T> {
         throw new Error("Method not implemented.");
     }
     PrepObject(mem: IFlagData<T>, obj: Flag): IFlagData<T> {
