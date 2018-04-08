@@ -8,6 +8,9 @@ export class MemoryBase<T extends IData> {
         this._flashMemory = CopyObject(this._cache);
     }
     protected get cache() {
+        if (!this._checkedOut) {
+            throw new MemoryLockException(this._checkedOut, "Memory must be checked out before access to the cache is allowed");
+        }
         return this._flashMemory;
     }
     private _cache: T;
@@ -61,23 +64,41 @@ export class MemoryObject extends MemoryBase<any> {
 
 }
 const CHILD_DATA_ID = 'ChildData';
-export class ParentMemory extends MemoryObject {
+export class ParentMemory<T extends MasterDataType> extends MemoryBase<T> {
+    constructor(data: T) {
+        super(data);
+        this._childData = CopyObject(this.GetData(CHILD_DATA_ID))
+    }
+    private _childData: IDictionary<IData>;
     private _childMemory: IDictionary<MemoryObject> = {}
+    HasData(id: string) { return !!this._childData[id] }
+    GetMemoryIDs() { return Object.keys(this._childData); }
     CheckoutChildMemory(id: string) {
         if (!this._childMemory[id]) {
-            this._childMemory[id] = new MemoryBase(this.GetData(id));
+            this._childMemory[id] = new MemoryBase(this._childData[id]);
         }
         let mem = this._childMemory[id]
         mem.ReserveMemory();
         return mem;
     }
     SaveChildMemory(childMemory: MemoryObject, saveToMemory: boolean): void {
-        this.SetData(childMemory.id, childMemory.ReleaseMemory(), saveToMemory);
+        if (!this._childMemory[childMemory.id]) {
+            this._childMemory[childMemory.id] = childMemory;
+        }
+        this._childData[childMemory.id] = childMemory.ReleaseMemory();
+        if (saveToMemory) {
+            this.SetData(CHILD_DATA_ID, this._childData, saveToMemory);
+        }
     }
-    DeleteChildMemory(id: string): void {
+    DeleteChildMemory(id: string, saveToMemory: boolean): void {
         if (!!this._childMemory[id]) {
             delete this._childMemory[id];
         }
-        this.DeleteData(id);
+        if (!!this._childData[id]) {
+            delete this._childData[id];
+        }
+        if (saveToMemory) {
+            this.SetData(CHILD_DATA_ID, this._childData, saveToMemory);
+        }
     }
 }

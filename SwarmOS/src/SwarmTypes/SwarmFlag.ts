@@ -14,7 +14,7 @@ export class SwarmCreep<T extends CreepType> extends OwnableSwarmObject<ICreepDa
         throw new Error("Method not implemented.");
     }*/
 @profile
-export class SwarmFlag<T extends FlagType> extends SwarmTypeBase<IData, Flag>
+export class SwarmFlag_Base<T extends FlagType> extends SwarmTypeBase<IData, Flag>
     implements AIFlag, Flag {
     GetSwarmSubType(): T {
         return this.memory.SUB_TYPE as T;
@@ -41,3 +41,5 @@ export class SwarmFlag<T extends FlagType> extends SwarmTypeBase<IData, Flag>
         }
     }
 }
+
+export type SwarmFlag = SwarmFlag_Base<FlagType>;

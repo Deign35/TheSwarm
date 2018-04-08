@@ -25,8 +25,8 @@ declare var SwarmCreator: {
     CreateNewSwarmMemory(id: string, swarmType: SwarmType, subType: SwarmSubType): IData;
     GetSwarmType(obj: SwarmObjectType): SwarmType;
     GetObjSaveID(obj: SwarmObjectType): string;
-    CreateSwarmObject(mem: SwarmData, obj: SwarmObjectType): AIObject
-    CreateConsulObject(mem: TConsulData, obj: SwarmObjectType): AIConsul
+    CreateSwarmObject(obj: SwarmObjectType, mem?: IData): any
+    CreateConsulObject(mem: TConsulData, obj: SwarmObjectType): any
 }
 
 declare var Swarmlord: {

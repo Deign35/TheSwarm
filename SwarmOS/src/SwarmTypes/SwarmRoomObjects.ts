@@ -1,6 +1,8 @@
 import { profile } from "Tools/Profiler";
 import { SwarmTypeBase } from "SwarmTypes/SwarmTypes";
 
+export type SwarmRoomObject = SwarmObject_RoomObject<IData, RoomObject>;
+
 @profile
 export abstract class SwarmObject_RoomObject<T extends IData, U extends RoomObject>
     extends SwarmTypeBase<T, U> {

@@ -16,8 +16,9 @@ import { MemoryObject } from "SwarmMemory/SwarmMemory";
     PrepObject(mem: ICreepData<T>, obj: Creep): ICreepData<T> {
         throw new Error("Method not implemented.");
     }*/
+export type SwarmRoom = SwarmRoom_Base<RoomType>;
 @profile
-export class SwarmRoom<T extends RoomType> extends SwarmTypeBase<IData, Room> implements AIRoom, Room {
+export class SwarmRoom_Base<T extends RoomType> extends SwarmTypeBase<IData, Room> implements AIRoom, Room {
     GetSwarmSubType(): T {
         return this.memory.SUB_TYPE as T;
     }
@@ -127,7 +128,7 @@ export class SwarmRoom<T extends RoomType> extends SwarmTypeBase<IData, Room> im
         let newHarvesterMem = new MemoryObject(newHarvesterData);
         newHarvesterMem.ReserveMemory();
 
-        let consul = SwarmCreator.CreateSwarmObject(newHarvesterMem, new ConsulObject(ConsulType.Harvest));
+        let consul = SwarmCreator.CreateSwarmObject(new ConsulObject(ConsulType.Harvest), newHarvesterMem);
 
 
         /*consul.AssignObject(new ConsulObject(), newHarvesterMem);

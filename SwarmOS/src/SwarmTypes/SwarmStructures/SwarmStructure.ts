@@ -1,6 +1,7 @@
 import { OwnableSwarmObject, SwarmRoomObjectBase } from "SwarmTypes/SwarmTypes";
 
-export abstract class SwarmStructure<T extends IData, U extends Structure>
+export type SwarmStructure = SwarmStructureBase<IData, Structure>;
+export abstract class SwarmStructureBase<T extends IData, U extends Structure>
     extends SwarmRoomObjectBase<T, U> implements AIStructureBase<TStructureData, U>, Structure {
     GetMemType(): SwarmDataType {
         throw new Error("Method not implemented.");
@@ -29,7 +30,7 @@ export abstract class SwarmStructure<T extends IData, U extends Structure>
 }
 
 export abstract class OwnedSwarmStructure<T extends OwnableStructureConstant, U extends OwnedStructure<T>>
-    extends SwarmStructure<TOwnabledStructureData, U> {
+    extends SwarmStructureBase<TOwnabledStructureData, U> {
     get my() { return this._instance.my; }
     get owner() { return this._instance.owner; }
     get structureType(): T { return this._instance.structureType; }
@@ -84,18 +85,18 @@ export class SwarmTerminal extends OwnedSwarmStructure<STRUCTURE_TERMINAL, Struc
     }
 }
 
-export class SwarmContainer extends SwarmStructure<IContainerData, StructureContainer> implements AIContainer, StructureContainer {
+export class SwarmContainer extends SwarmStructureBase<IContainerData, StructureContainer> implements AIContainer, StructureContainer {
     get structureType() { return STRUCTURE_CONTAINER; }
     get store() { return this._instance.store; }
     get storeCapacity() { return this._instance.storeCapacity; }
     get ticksToDecay() { return this._instance.ticksToDecay; }
 }
-export class SwarmRoad extends SwarmStructure<IRoadData, StructureRoad> implements AIRoad, StructureRoad {
+export class SwarmRoad extends SwarmStructureBase<IRoadData, StructureRoad> implements AIRoad, StructureRoad {
     get structureType() { return STRUCTURE_ROAD; }
     get ticksToDecay() { return this._instance.ticksToDecay };
 }
 
-export class SwarmWall extends SwarmStructure<IWallData, StructureWall> implements StructureWall {
+export class SwarmWall extends SwarmStructureBase<IWallData, StructureWall> implements StructureWall {
     get structureType() { return STRUCTURE_WALL; }
     get ticksToLive() { return this._instance.ticksToLive; }
     protected OnPrepObject() { }
@@ -116,13 +117,13 @@ export class SwarmKeepersLair extends OwnedSwarmStructure<STRUCTURE_KEEPER_LAIR,
     implements StructureKeeperLair {
     get ticksToSpawn(): number | undefined { return this._instance.ticksToSpawn; }
 }
-export class SwarmPortal extends SwarmStructure<IPortalData, StructurePortal> implements StructurePortal {
+export class SwarmPortal extends SwarmStructureBase<IPortalData, StructurePortal> implements StructurePortal {
     get structureType() { return STRUCTURE_PORTAL; }
     get destination(): RoomPosition { return this._instance.destination; }
     get ticksToDecay(): number { return this._instance.ticksToDecay; }
 }
 
-export class SwarmPowerBank extends SwarmStructure<IPowerBankData, StructurePowerBank> implements StructurePowerBank {
+export class SwarmPowerBank extends SwarmStructureBase<IPowerBankData, StructurePowerBank> implements StructurePowerBank {
     get structureType() { return STRUCTURE_POWER_BANK; }
     get power() { return this._instance.power; }
     get ticksToDecay() { return this._instance.ticksToDecay; }

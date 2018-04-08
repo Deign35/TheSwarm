@@ -14,5 +14,6 @@ export const loop = function () {
 
     SwarmQueen.PrepTheSwarm();
     SwarmQueen.ActivateTheSwarm();
+    SwarmQueen.SaveTheSwarm();
     SwarmLoader.SaveTheSwarm();
 }

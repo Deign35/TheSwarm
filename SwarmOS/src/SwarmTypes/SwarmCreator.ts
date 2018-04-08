@@ -1,8 +1,8 @@
 import { ControlConsul } from "Consuls/ControlConsul";
 import { HarvestConsul } from "Consuls/HarvestConsul";
-import { SwarmCreep } from "SwarmTypes/SwarmCreep";
-import { SwarmFlag } from "SwarmTypes/SwarmFlag";
-import { SwarmRoom } from "SwarmTypes/SwarmRoom";
+import { SwarmCreep, SwarmCreep_Base } from "SwarmTypes/SwarmCreep";
+import { SwarmFlag, SwarmFlag_Base } from "SwarmTypes/SwarmFlag";
+import { SwarmRoom, SwarmRoom_Base } from "SwarmTypes/SwarmRoom";
 import { SwarmMineral, SwarmNuke, SwarmResource, SwarmSite, SwarmSource, SwarmTombstone } from "SwarmTypes/SwarmRoomObjects";
 import { SwarmContainer, SwarmExtractor, SwarmExtension, SwarmKeepersLair, SwarmLink, SwarmObserver, SwarmNuker, SwarmPortal, SwarmPowerBank, SwarmPowerSpawn, SwarmRampart, SwarmRoad, SwarmStorage, SwarmTerminal, SwarmWall } from "./SwarmStructures/SwarmStructure";
 import { SwarmController } from "./SwarmStructures/SwarmController";
@@ -13,6 +13,7 @@ import { NotImplementedException } from "Tools/SwarmExceptions";
 import { profile } from "Tools/Profiler";
 import { ConsulObject, SwarmConsul } from "Consuls/ConsulBase";
 import { MemoryBase, MemoryObject } from "SwarmMemory/SwarmMemory";
+import { ObjBase } from "./SwarmTypes";
 
 @profile
 export class SwarmCreator {
@@ -322,6 +323,50 @@ export class SwarmCreator {
 
         throw new NotImplementedException('Not an implemented RoomObject ' + JSON.stringify(obj));
     }
+    static GetDefaultSwarmSubType(swarmType: SwarmType): SwarmSubType {
+        switch (swarmType) {
+            case (SwarmType.SwarmRoom): return RoomType.NeutralRoom;
+            case (SwarmType.SwarmCreep):
+                SwarmLogger.LogWarning('DefaultSwarmSubType for Creep is being called unexpectedly');
+                return CreepType.None;
+            case (SwarmType.SwarmConsul): return ConsulType.None;
+            case (SwarmType.SwarmFlag): return FlagType.None;
+            case (SwarmType.SwarmMineral):
+            case (SwarmType.SwarmNuke):
+            case (SwarmType.SwarmResource):
+            case (SwarmType.SwarmSource):
+            case (SwarmType.SwarmSite):
+                return swarmType;
+            default:
+                return this.GetStructureSubType(swarmType);
+
+        }
+    }
+    protected static GetStructureSubType(swarmType: SwarmType): StructureConstant {
+        switch (swarmType) {
+            case (SwarmType.SwarmContainer): return STRUCTURE_CONTAINER;
+            case (SwarmType.SwarmController): return STRUCTURE_CONTROLLER;
+            case (SwarmType.SwarmExtension): return STRUCTURE_EXTENSION;
+            case (SwarmType.SwarmExtractor): return STRUCTURE_EXTRACTOR;
+            case (SwarmType.SwarmKeepersLair): return STRUCTURE_KEEPER_LAIR;
+            case (SwarmType.SwarmLab): return STRUCTURE_LAB;
+            case (SwarmType.SwarmLink): return STRUCTURE_LINK;
+            case (SwarmType.SwarmNuker): return STRUCTURE_NUKER;
+            case (SwarmType.SwarmObserver): return STRUCTURE_OBSERVER;
+            case (SwarmType.SwarmPortal): return STRUCTURE_PORTAL;
+            case (SwarmType.SwarmPowerBank): return STRUCTURE_POWER_BANK;
+            case (SwarmType.SwarmPowerSpawn): return STRUCTURE_POWER_SPAWN;
+            case (SwarmType.SwarmRampart): return STRUCTURE_RAMPART;
+            case (SwarmType.SwarmRoad): return STRUCTURE_ROAD;
+            case (SwarmType.SwarmSpawn): return STRUCTURE_SPAWN;
+            case (SwarmType.SwarmStorage): return STRUCTURE_STORAGE;
+            case (SwarmType.SwarmTerminal): return STRUCTURE_TERMINAL;
+            case (SwarmType.SwarmTower): return STRUCTURE_TOWER;
+            case (SwarmType.SwarmWall): return STRUCTURE_WALL;
+        }
+
+        throw new NotImplementedException('Swarm type is not a structure: ' + swarmType);
+    }
     protected static GetStructureSwarmType(structure: Structure) {
         switch (structure.structureType) {
             case (STRUCTURE_CONTAINER): return SwarmType.SwarmContainer;
@@ -355,10 +400,16 @@ export class SwarmCreator {
 
         return (obj as Structure).id;
     }
-    static CreateSwarmObject(mem: MemoryObject, obj: SwarmObjectType): AIObject {
-        let swarmType: SwarmType = mem.SWARM_TYPE;
-        let subType: SwarmSubType = mem.SUB_TYPE;
-        let newObj: AIObject
+    static CreateSwarmObject(obj: SwarmObjectType, mem?: MemoryObject): ObjBase {
+        let mustInit = false;
+        let swarmType = this.GetSwarmType(obj);
+        let subType = this.GetDefaultSwarmSubType(swarmType);
+        if (!mem) {
+            mem = this.CreateNewSwarmMemory(this.GetObjSaveID(obj), swarmType, subType);
+            mustInit = true;
+        }
+
+        let newObj: ObjBase
         switch (swarmType) {
             case (SwarmType.None):
                 throw new NotImplementedException("Other data types have not yet been implemented");
@@ -369,7 +420,7 @@ export class SwarmCreator {
                 newObj = new SwarmController(mem, obj as StructureController);
                 break;
             case (SwarmType.SwarmCreep):
-                newObj = new SwarmCreep(mem, obj as Creep);
+                newObj = new SwarmCreep_Base(mem, obj as Creep);
                 break;
             case (SwarmType.SwarmExtension):
                 newObj = new SwarmExtension(mem, obj as StructureExtension);
@@ -378,7 +429,7 @@ export class SwarmCreator {
                 newObj = new SwarmExtractor(mem, obj as StructureExtractor);
                 break;
             case (SwarmType.SwarmFlag):
-                newObj = new SwarmFlag(mem, obj as Flag);
+                newObj = new SwarmFlag_Base(mem, obj as Flag);
                 break;
             case (SwarmType.SwarmKeepersLair):
                 newObj = new SwarmKeepersLair(mem, obj as StructureKeeperLair);
@@ -420,7 +471,7 @@ export class SwarmCreator {
                 newObj = new SwarmRoad(mem, obj as StructureRoad);
                 break;
             case (SwarmType.SwarmRoom):
-                newObj = new SwarmRoom(mem, obj as Room);
+                newObj = new SwarmRoom_Base(mem, obj as Room);
                 break;
             case (SwarmType.SwarmSite):
                 newObj = new SwarmSite(mem, obj as ConstructionSite);
@@ -447,14 +498,20 @@ export class SwarmCreator {
                 newObj = new SwarmWall(mem, obj as StructureWall);
                 break;
             case (SwarmType.SwarmConsul):
-                if (!subType) { throw new NotImplementedException('Consul subtype not implemented or something'); }
                 newObj = this.CreateConsulObject(mem, obj as ConsulObject);
                 break;
+            default:
+                throw new NotImplementedException('SwarmType is not implemented');
+        }
+
+        if (mustInit) {
+            mem.ReserveMemory();
+            newObj.InitAsNew();
         }
         return newObj!;
     }
 
-    static CreateConsulObject(mem: MemoryObject, obj: ConsulObject): AIConsul {
+    static CreateConsulObject(mem: MemoryObject, obj: ConsulObject): ObjBase {
         let subType = mem.SUB_TYPE;
         switch (subType) {
             case (ConsulType.Control): return new ControlConsul(mem, obj)
