@@ -11,6 +11,7 @@ export class SwarmLoader {
     static MasterMemoryIds = [MASTER_CONSUL_MEMORY_ID, MASTER_CREEP_MEMORY_ID, MASTER_FLAG_MEMORY_ID,
         MASTER_ROOM_MEMORY_ID, MASTER_ROOMOBJECT_MEMORY_ID, MASTER_STRUCTURE_MEMORY_ID]
     protected static MasterMemory: {
+        [id: string]: ParentMemory,
         [MASTER_CONSUL_MEMORY_ID]: ParentMemory,
         [MASTER_CREEP_MEMORY_ID]: ParentMemory,
         [MASTER_FLAG_MEMORY_ID]: ParentMemory,
@@ -128,7 +129,7 @@ export class SwarmLoader {
             let obj = Game.getObjectById(keys[i]) as U;
             this.LoadObject<T, U>(keys[i], Game.getObjectById(keys[i]) as U, dataType);
 
-            let objMem = this.MasterMemory[dataType].CheckoutMemory(keys[i]);
+            let objMem = this.MasterMemory[dataType].CheckoutChildMemory(keys[i]);
             if (obj.room) {
                 this.SetObjectToRoomTree(obj.room.name, objMem);
             }
@@ -144,22 +145,22 @@ export class SwarmLoader {
 
     static LoadObject<T extends SwarmData, U extends SwarmObjectType>(saveID: string, obj: U, dataType: string) {
         if (!obj) {
-            if (this.MasterMemory[dataType].HasMemory(saveID) && dataType != MASTER_ROOM_MEMORY_ID) {
+            if (this.MasterMemory[dataType].HasData(saveID) && dataType != MASTER_ROOM_MEMORY_ID) {
                 // (TODO): Determine what to do with hostile objects
-                this.MasterMemory[dataType].DeleteMemory(saveID);
+                this.MasterMemory[dataType].DeleteData(saveID);
             } else {
                 // Load a fake obj?
             }
             return;
         }
         let swarmType = SwarmCreator.GetSwarmType(obj);
-        if (!this.MasterMemory[dataType].HasMemory(saveID)) {
+        if (!this.MasterMemory[dataType].HasData(saveID)) {
             let newMem = SwarmCreator.CreateNewSwarmMemory(saveID, swarmType) as MemoryObject;
             newMem.ReserveMemory();
-            this.MasterMemory[dataType].SaveMemory(newMem);
+            this.MasterMemory[dataType].SetData(saveID, newMem, true);
         }
 
-        let objMem = this.MasterMemory[dataType].CheckoutMemory(saveID);
+        let objMem = this.MasterMemory[dataType].CheckoutChildMemory(saveID);
         this.AddObjectToTheSwarm(saveID, SwarmCreator.CreateSwarmObject(objMem, obj));
     }
 
@@ -219,7 +220,7 @@ export class SwarmLoader {
             }
         }
         if ((obj.prototype as Creep).room) {
-            let objMem = this.MasterMemory[dataType].CheckoutMemory(saveID);
+            let objMem = this.MasterMemory[dataType].CheckoutChildMemory(saveID);
             this.SetObjectToRoomTree((obj.prototype as Creep).room.name, objMem);
         }
     }

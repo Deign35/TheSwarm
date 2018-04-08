@@ -54,7 +54,7 @@ export class MemoryBase<T extends IData> {
             delete this._cache[valueID];
         }
     }
-    GetMemoryIDs(): string[] { return Object.keys(this.cache); }
+    GetMemoryIDs(): string[] { return Object.keys(this._flashMemory); }
 }
 
 export class MemoryObject extends MemoryBase<any> {

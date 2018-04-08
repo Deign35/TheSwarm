@@ -30,40 +30,16 @@ export class Swarmlord {
             SwarmLogger.Log("Begin initialization of memory for entire Swarm(" + SWARM_VERSION_DATE + ")");
             let newMemory = {
                 [MASTER_CONSUL_MEMORY_ID]: {
-                    id: MASTER_CONSUL_MEMORY_ID,
-                    ChildData: {},
-                    MEM_TYPE: SwarmDataType.Master,
-                    SUB_TYPE: SwarmDataType.Consul,
                 },
                 [MASTER_CREEP_MEMORY_ID]: {
-                    id: MASTER_CREEP_MEMORY_ID,
-                    ChildData: {},
-                    MEM_TYPE: SwarmDataType.Master,
-                    SUB_TYPE: SwarmDataType.Creep,
                 },
                 [MASTER_FLAG_MEMORY_ID]: {
-                    id: MASTER_FLAG_MEMORY_ID,
-                    ChildData: {},
-                    MEM_TYPE: SwarmDataType.Master,
-                    SUB_TYPE: SwarmDataType.Flag,
                 },
                 [MASTER_ROOM_MEMORY_ID]: {
-                    id: MASTER_ROOM_MEMORY_ID,
-                    ChildData: {},
-                    MEM_TYPE: SwarmDataType.Master,
-                    SUB_TYPE: SwarmDataType.Room,
                 },
                 [MASTER_ROOMOBJECT_MEMORY_ID]: {
-                    id: MASTER_ROOMOBJECT_MEMORY_ID,
-                    ChildData: {},
-                    MEM_TYPE: SwarmDataType.Master,
-                    SUB_TYPE: SwarmDataType.RoomObject,
                 },
                 [MASTER_STRUCTURE_MEMORY_ID]: {
-                    id: MASTER_STRUCTURE_MEMORY_ID,
-                    ChildData: {},
-                    MEM_TYPE: SwarmDataType.Master,
-                    SUB_TYPE: SwarmDataType.Structure,
                 },
                 profiler: Memory.profiler, // Hacky, but cleanest way to prevent the profiler from breaking because of deleting its memory.
                 SwarmVersionDate: SWARM_VERSION_DATE,
