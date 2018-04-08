@@ -694,7 +694,7 @@ interface Creep extends RoomObject {
     /**
      * A shorthand to `Memory.creeps[creep.name]`. You can use it for quick access the creep’s specific memory data object.
      */
-    memory: any;
+    memory: TCreepData;
     /**
      * Whether it is your creep or foe.
      */
@@ -978,7 +978,7 @@ interface Flag extends RoomObject {
     /**
      * A shorthand to Memory.flags[flag.name]. You can use it for quick access the flag's specific memory data object.
      */
-    memory: any;
+    memory: TFlagData;
     /**
      * Flag’s name.
      *
@@ -2841,7 +2841,7 @@ interface Room {
     /**
      * A shorthand to `Memory.rooms[room.name]`. You can use it for quick access the room’s specific memory data object.
      */
-    memory: any;
+    memory: TRoomData;
     /**
      * The name of the room.
      */
@@ -3109,7 +3109,7 @@ interface StructureSpawn extends OwnedStructure<STRUCTURE_SPAWN> {
      *
      * @see http://docs.screeps.com/global-objects.html#Memory-object
      */
-    memory: any;
+    memory: TStructureData;
     /**
      * Spawn's name. You choose the name upon creating a new spawn, and it cannot
      * be changed later. This name is a hash key to access the spawn via the

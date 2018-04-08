@@ -16,4 +16,7 @@ export abstract class SwarmConsul<T extends ConsulType>
     extends SwarmTypeBase<TConsulData, ConsulObject<T>> {
     get IsActive() { return this.memory.isActive; }
     get prototype() { return this._instance }
+    GetSwarmSubType(): T {
+        return this._instance.ConsulType;
+    }
 }

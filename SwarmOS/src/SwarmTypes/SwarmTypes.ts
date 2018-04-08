@@ -3,10 +3,10 @@ import { MemoryBase, SwarmMemoryBase } from "SwarmMemory/SwarmMemory";
 import { MineralMemory, TombstoneMemory, ResourceMemory, NukeMemory } from "SwarmMemory/RoomObjectMemory";
 import { ConsulObject } from "Consuls/ConsulBase";
 
-export type ObjBase = ObjectBase<TBasicSwarmData, SwarmObjectType>;
+export type ObjBase = ObjectBase<SwarmData, SwarmObjectType>;
 const HAS_PREPPED = 'hasPrepped';
 @profile
-export abstract class ObjectBase<T extends TBasicSwarmData, U extends SwarmObjectType> {
+export abstract class ObjectBase<T extends SwarmData, U extends SwarmObjectType> {
     constructor(data: T, obj: U) {
         this._memory = data;
         this._instance = obj;
@@ -28,18 +28,26 @@ export abstract class ObjectBase<T extends TBasicSwarmData, U extends SwarmObjec
     protected _memory!: T;
     protected _instance!: U;
 
-    GetMemType(): SwarmDataTypeSansMaster {
+    abstract GetMemType(): SwarmDataType;
+    abstract GetSwarmType(): SwarmType;// { return this.memory.SWARM_TYPE; }
+    abstract GetSwarmSubType(): SwarmSubType;// { return this.memory.SUB_TYPE; }
+}
+@profile
+export abstract class SwarmTypeBase<T extends SwarmData, U extends SwarmObjectType>
+    extends ObjectBase<T, U> implements AIBase<T, U> {
+    GetMemType(): SwarmDataType {
         return this.memory.MEM_TYPE;
     }
-}
-@profile
-export abstract class SwarmTypeBase<T extends TBasicSwarmData, U extends SwarmObjectType>
-    extends ObjectBase<T, U> implements AIBase<T, U> {
+    GetSubType(): SwarmSubType {
+        return this.memory.SUB_TYPE;
+    }
+    GetSwarmType(): SwarmType {
+        return this.memory.SWARM_TYPE;
+    }
     get IsActive() { return this.memory.isActive; }
-    GetSwarmType(): SwarmType { return this.memory.SWARM_TYPE; }
 }
 @profile
-export abstract class SwarmRoomObjectBase<T extends TBasicSwarmData, U extends RoomObject>
+export abstract class SwarmRoomObjectBase<T extends SwarmData, U extends RoomObject>
     extends SwarmTypeBase<T, U> implements RoomObject {
     get pos(): RoomPosition { return this._instance.pos; }
     get room(): Room | undefined { return this._instance.room; }

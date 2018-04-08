@@ -16,6 +16,9 @@ import { SwarmLoader } from "SwarmTypes/SwarmLoader";
     }*/
 @profile
 export class SwarmRoom<T extends RoomType> extends SwarmTypeBase<IRoomData<T>, Room> implements AIRoom, Room {
+    GetSwarmSubType(): T {
+        return this.memory.SUB_TYPE;
+    }
     private _availableSpawns!: string[];
     protected get spawns(): string[] {
         if (!this._availableSpawns) {
@@ -32,16 +35,6 @@ export class SwarmRoom<T extends RoomType> extends SwarmTypeBase<IRoomData<T>, R
         }
         return this._availableSpawns;
     }
-    /*
-        PrepObject(unused: boolean) {
-            return super.PrepObject(true);
-        }
-        protected OnPrepObject() {
-            this.TryFindNewObjects();
-    
-        }
-        protected OnActivate() {
-        }*/
 
     TrySpawn(body: BodyPartConstant[], name: string,
         opts?: {

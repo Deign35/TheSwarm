@@ -20,7 +20,7 @@ const DoTheSwarm = function (swarmAction: (obj: AIObject) => void) {
 }
 
 const DoPartOfTheSwarm = function (swarmAction: (obj: AIObject) => void, dataType: string) {
-    let ids = Object.keys(SwarmLoader.GetTypeIDs(dataType));
+    let ids = SwarmLoader.GetTypeIDs(dataType);
     for (let i = 0; i < ids.length; i++) {
         swarmAction(SwarmLoader.GetObject(ids[i], dataType));
     }

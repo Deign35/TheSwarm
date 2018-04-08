@@ -17,6 +17,9 @@ export class SwarmCreep<T extends CreepType> extends OwnableSwarmObject<ICreepDa
 @profile
 export class SwarmFlag<T extends FlagType> extends SwarmTypeBase<IFlagData<T>, Flag>
     implements AIFlag, Flag {
+    GetSwarmSubType(): T {
+        return this.memory.SUB_TYPE;
+    }
     get DataType(): SwarmDataType.Flag { return SwarmDataType.Flag };
     get SwarmType(): SwarmType.SwarmFlag { return SwarmType.SwarmFlag; };
     get pos() { return this._instance.pos; }

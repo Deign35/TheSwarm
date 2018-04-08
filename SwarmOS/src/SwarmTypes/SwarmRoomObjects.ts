@@ -2,11 +2,14 @@ import { profile } from "Tools/Profiler";
 import { SwarmTypeBase } from "SwarmTypes/SwarmTypes";
 
 @profile
-export abstract class SwarmObject_RoomObject<T extends TBasicSwarmData, U extends RoomObject>
+export abstract class SwarmObject_RoomObject<T extends SwarmData, U extends RoomObject>
     extends SwarmTypeBase<T, U> {
     get pos() { return this._instance.pos; }
     get room() { return this._instance.room; } // This should get the room object i created.
     get prototype(): U { return this._instance.prototype as U }
+    GetSwarmSubType(): SwarmSubType {
+        return this.GetSwarmType();
+    }
 }
 
 @profile

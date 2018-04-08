@@ -19,6 +19,9 @@ export abstract class SwarmStructure<T extends TStructureData, U extends Structu
     notifyWhenAttacked(enabled: boolean = false) { // ActionIntent
         return this._instance.notifyWhenAttacked(enabled) as OK;
     }
+    GetSwarmSubType(): StructureConstant {
+        return this._instance.structureType;
+    }
 }
 
 export abstract class OwnedSwarmStructure<T extends OwnableStructureConstant, U extends OwnedStructure<T>>

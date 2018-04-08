@@ -30,15 +30,17 @@ declare type SwarmStructureType = SwarmType.SwarmContainer | SwarmType.SwarmCont
     SwarmType.SwarmStorage | SwarmType.SwarmTerminal | SwarmType.SwarmTower | SwarmType.SwarmWall
 
 declare type SwarmObjectType = Room | RoomObject | AIConsulObject
-declare interface AIBase<T extends TBasicSwarmData, U extends SwarmObjectType> extends _Constructor<U> {
+declare interface AIBase<T extends SwarmData, U extends SwarmObjectType> extends _Constructor<U> {
     Activate(): void;
     InitAsNew(): void;
     PrepObject(): void;
-    GetMemType(): SwarmDataTypeSansMaster;
+    GetMemType(): SwarmDataType;
+    GetSubType(): SwarmSubType;
     GetSwarmType(): SwarmType;
+    memory: T;
 }
 
-declare type AIObject = AIConsul | AICreep | AIFlag | AIRoom | AIRoomObject | AIStructure;
+declare type AIObject = AIBase<SwarmData, SwarmObjectType>//AIConsul | AICreep | AIFlag | AIRoom | AIRoomObject | AIStructure;
 
 
 /*    
