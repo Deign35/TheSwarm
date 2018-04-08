@@ -1,5 +1,4 @@
 import { SwarmLoader } from "SwarmTypes/SwarmLoader";
-import { SwarmCreator } from "SwarmTypes/SwarmCreator";
 
 export class SwarmQueen {
     static PrepTheSwarm() {

@@ -291,8 +291,6 @@ export class SwarmCreator {
         }
         return newMemory as X;
     }
-    /**<T extends SwarmDataType, U extends SwarmSubType,
-        V extends IData<T, U>>(id: string, swarmType: SwarmType): V { */
     static CreateSwarmMemory<T extends SwarmDataTypeSansMaster, U extends SwarmType, V extends SwarmSubType,
         W extends SwarmData>(mem: SwarmData): SwarmMemoryWithSpecifiedData<W> {
         let memType = mem.SWARM_TYPE;
@@ -470,7 +468,7 @@ export class SwarmCreator {
         }
     }
 
-    static GetObjSaveID(obj: Room | RoomObject | AIConsulObject): string {
+    static GetObjSaveID(obj: SwarmObjectType): string {
         if ((obj as Room).name) {
             if (!(obj as StructureSpawn).structureType) {// Spawns are special case that have a name
                 return (obj as Room).name; // Flags, Creeps, and Rooms

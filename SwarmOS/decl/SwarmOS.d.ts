@@ -20,6 +20,23 @@ interface Profiler {
     toString(): string;
 }
 
+declare var SwarmCreator: {
+    CreateNewSwarmMemory<T extends SwarmDataTypeSansMaster, U extends SwarmSubType, V extends SwarmType,
+        X extends SwarmData>(id: string, swarmType: V): X;
+    CreateSwarmMemory<T extends SwarmDataTypeSansMaster, U extends SwarmType, V extends SwarmSubType,
+        W extends SwarmData>(mem: SwarmData): W;
+    GetSwarmType(obj: SwarmObjectType): SwarmType;
+    GetObjSaveID(obj: SwarmObjectType): string;
+    CreateSwarmObject(mem: SwarmData, obj: SwarmObjectType): AIObject
+    CreateConsulObject(mem: AIConsul, obj: SwarmObjectType): AIConsul
+}
+
+declare var Swarmlord: {
+    ValidateMemory(): void;
+    SaveMasterMemory<T extends SwarmDataTypeSansMaster>(memObject: IMasterData<T>, save: boolean): void;
+    CheckoutMasterMemory(id: string): MasterSwarmDataTypes
+}
+
 /*
 declare type SwarmStructureType = SwarmType.SwarmContainer | SwarmType.SwarmController | SwarmType.SwarmExtension |
     SwarmType.SwarmExtractor | SwarmType.SwarmKeepersLair | SwarmType.SwarmLab | SwarmType.SwarmLink |

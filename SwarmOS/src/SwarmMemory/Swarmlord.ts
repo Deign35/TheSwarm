@@ -1,6 +1,7 @@
 import { profile } from "Tools/Profiler";
 import { NotImplementedException } from "Tools/SwarmExceptions";
 import { MasterMemory, MasterConsulMemory, MasterCreepMemory, MasterFlagMemory, MasterRoomMemory, MasterStructureMemory, MasterRoomObjectMemory } from "SwarmMemory/MasterMemory";
+import { SwarmMemory } from "./SwarmMemory";
 declare interface IMemory {
     [MASTER_CONSUL_MEMORY_ID]: IMasterConsulData,
     [MASTER_CREEP_MEMORY_ID]: IMasterCreepData,
@@ -83,13 +84,13 @@ export class Swarmlord {
         }
     }
 
-    static ValidateMemory() {
+    ValidateMemory() {
         if (!Memory.INIT || Memory.SwarmVersionDate != SWARM_VERSION_DATE) {
             global['Swarmlord'] = new Swarmlord();
         }
     }
 
-    static SaveMasterMemory<T extends SwarmDataTypeSansMaster>(memObject: MasterMemory, save: boolean): void {
+    SaveMasterMemory<T extends SwarmDataTypeSansMaster>(memObject: MasterMemory, save: boolean): void {
         memObject.ReserveMemory();
         let memData = memObject.ReleaseMemory();
         if (save) {
@@ -97,7 +98,7 @@ export class Swarmlord {
         }
     }
 
-    static CheckoutMasterMemory(id: string) {
+    CheckoutMasterMemory(id: string): SwarmMemory {
         let data = CopyObject(Memory[id]);
         let newMem;
         switch (data.id) {

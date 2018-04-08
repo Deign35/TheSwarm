@@ -5,7 +5,6 @@ import { StructureMemory } from "./StructureMemory";
 import { FlagMemory } from "./FlagMemory";
 import { RoomMemory } from "./RoomMemory";
 import { ConsulMemory } from "./ConsulMemory";
-import { SwarmCreator } from "SwarmTypes/SwarmCreator";
 
 
 export type SwarmMemoryTypes = ConsulMemory | CreepMemory | FlagMemory | RoomMemory | RoomObjectMemory | StructureMemory
@@ -26,7 +25,7 @@ export abstract class MasterMemoryBase<T extends SwarmDataType,
     HasMemory(id: string) { return !!this.ChildData[id]; }
     CheckoutMemory(id: string) {
         let data = this.ChildData[id];
-        let newMem = SwarmCreator.CreateSwarmMemory(data);
+        let newMem = SwarmCreator.CreateSwarmMemory(data) as SwarmMemory;
 
         newMem.ReserveMemory();
         return newMem;

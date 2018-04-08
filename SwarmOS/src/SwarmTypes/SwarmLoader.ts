@@ -1,7 +1,5 @@
 import { profile } from "Tools/Profiler";
-import { Swarmlord } from "SwarmMemory/Swarmlord";
 import { ConsulObject } from "Consuls/ConsulBase";
-import { SwarmCreator } from "SwarmTypes/SwarmCreator";
 import { NotImplementedException } from "Tools/SwarmExceptions";
 import { MasterConsulMemory, MasterCreepMemory, MasterFlagMemory, MasterRoomMemory, MasterRoomObjectMemory, MasterStructureMemory, MasterMemory } from "SwarmMemory/MasterMemory";
 import { SwarmCreep } from "./SwarmCreep";
@@ -155,7 +153,7 @@ export class SwarmLoader {
         }
         let swarmType = SwarmCreator.GetSwarmType(obj);
         if (!this.MasterMemory[swarmDataType].HasMemory(saveID)) {
-            let newMem = SwarmCreator.CreateNewSwarmMemory(saveID, swarmType);
+            let newMem = SwarmCreator.CreateNewSwarmMemory(saveID, swarmType) as SwarmMemory;
             newMem.ReserveMemory();
             this.MasterMemory[swarmDataType].SaveMemory(newMem);
         }
