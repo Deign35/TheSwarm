@@ -1,5 +1,4 @@
-import { ControlConsulMemory } from "SwarmMemory/ConsulMemory";
-import { SwarmConsulBase, ConsulObject } from "Consuls/ConsulBase";
+import { SwarmConsulBase } from "Consuls/ConsulBase";
 
 export class ControlConsul extends SwarmConsulBase<ConsulType.Control> {
 }

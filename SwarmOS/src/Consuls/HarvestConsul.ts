@@ -1,6 +1,5 @@
 import { SwarmConsulBase, ConsulObject } from "Consuls/ConsulBase";
 import { SwarmSource } from "SwarmTypes/SwarmRoomObjects";
-import { HarvestConsulMemory } from "SwarmMemory/ConsulMemory";
 
 export class HarvestConsul extends SwarmConsulBase<ConsulType.Harvest> {
     SourceData!: {

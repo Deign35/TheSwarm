@@ -1,5 +1,4 @@
 import { OwnedSwarmStructure } from "./SwarmStructure";
-import { LabMemory } from "SwarmMemory/StructureMemory";
 import { profile } from "Tools/Profiler";
 
 @profile

@@ -1,12 +1,17 @@
 import { MemoryLockException } from "Tools/SwarmExceptions";
 
-export abstract class MemoryBase {
-    constructor() {
+declare type DataCache = Dictionary;
+export class MemoryBase<T extends IData> {
+    constructor(fromMemory: T) {
         this._checkedOut = false;
-        this._flashMemory = {};
+        this._cache = fromMemory;
+        this._flashMemory = CopyObject(this._cache);
     }
-    protected abstract get cache(): IData<SwarmDataType>;
-    private _flashMemory: Dictionary;
+    protected get cache() {
+        return this._flashMemory;
+    }
+    private _cache: T;
+    private _flashMemory: T;
     private _checkedOut: boolean;
 
     get id(): string { return this.cache.id; }
@@ -16,63 +21,63 @@ export abstract class MemoryBase {
     get SWARM_TYPE(): SwarmType { return this.cache.SWARM_TYPE; }
     get SUB_TYPE(): SwarmSubType { return this.cache.SUB_TYPE; }
 
-    SetCacheValue(valueID: string, newValue: any) {
-        this.cache[valueID] = newValue;
-    }
-    DeleteCacheValue(valueID: string) {
-        if (!!this.cache[valueID]) {
-            delete this.cache[valueID];
-        }
-    }
-
     ReserveMemory(): void {
         if (this._checkedOut) {
             throw new MemoryLockException(this._checkedOut, "Memory already checked out");
         }
         this._checkedOut = true;
     }
-    ReleaseMemory(): SwarmData {
+    ReleaseMemory(): IData {
         if (!this._checkedOut) {
             throw new MemoryLockException(this._checkedOut, "Memory not checked out");
         }
 
         this._checkedOut = false;
-        return this.cache;
+        return this._cache;
     }
 
+    HasData(valueID: string) {
+        return !!this._flashMemory[valueID];
+    }
+    GetData<T>(valueID: string): T {
+        return this._flashMemory[valueID];
+    }
+    SetData<T>(valueID: string, newValue: T, saveToMemory: boolean) {
+        this._flashMemory[valueID] = newValue;
+        if (saveToMemory) {
+            this._cache[valueID] = newValue;
+        }
+    }
+    DeleteData(valueID: string, deleteFromMemory: boolean = false) {
+        delete this._flashMemory[valueID];
+        if (deleteFromMemory) {
+            delete this._cache[valueID];
+        }
+    }
     GetMemoryIDs(): string[] { return Object.keys(this.cache); }
-    HasMemory(id: string): boolean {
-        return !!(this.cache[id]);
-    }
-
-    GetFlashData<T>(id: string): T {
-        return this._flashMemory[id];
-    }
-    SetFlashData<T>(id: string, data: T): void {
-        this._flashMemory[id] = data;
-    }
-    RemoveFlashData(id: string): void {
-        delete this._flashMemory[id];
-    }
 }
 
-export abstract class SwarmMemoryBase<T extends SwarmDataType, U extends SwarmType, V extends SwarmSubType, X extends ISwarmData<T, U, V>>
-    extends MemoryBase implements ISwarmData<T, U, V> {
-    protected abstract get cache(): X;
-    abstract get MEM_TYPE(): T;
-    abstract get SWARM_TYPE(): U;
-    abstract get SUB_TYPE(): V;
-}
+export class MemoryObject extends MemoryBase<any> {
 
-export abstract class SwarmMemoryWithSpecifiedData<T extends SwarmData>
-    extends SwarmMemoryBase<SwarmDataType, SwarmType, SwarmSubType, T> implements SwarmData {
-    constructor(data: T) {
-        super();
-        this._cache = data;
+}
+const CHILD_DATA_ID = 'ChildData';
+export class ParentMemory extends MemoryObject {
+    private _childMemory: IDictionary<MemoryObject> = {}
+    CheckoutChildMemory(id: string) {
+        if (!this._childMemory[id]) {
+            this._childMemory[id] = new MemoryBase(this.GetData(id));
+        }
+        let mem = this._childMemory[id]
+        mem.ReserveMemory();
+        return mem;
     }
-    private _cache: T;
-    protected get cache() { return this._cache; }
+    SaveChildMemory(childMemory: MemoryObject, saveToMemory: boolean): void {
+        this.SetData(childMemory.id, childMemory.ReleaseMemory(), saveToMemory);
+    }
+    DeleteChildMemory(id: string): void {
+        if (!!this._childMemory[id]) {
+            delete this._childMemory[id];
+        }
+        this.DeleteData(id);
+    }
 }
-
-export type MasterableSwarmMemory = SwarmMemoryWithSpecifiedData<SwarmData>;
-export type SwarmMemory = SwarmMemoryWithSpecifiedData<SwarmData>;

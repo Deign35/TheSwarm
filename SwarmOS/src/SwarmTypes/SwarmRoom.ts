@@ -2,9 +2,8 @@ import { profile } from "Tools/Profiler";
 import { SwarmTypeBase } from "SwarmTypes/SwarmTypes";
 import { SwarmSpawn } from "SwarmTypes/SwarmStructures/SwarmSpawn";
 import { SwarmLoader } from "SwarmTypes/SwarmLoader";
-import { HarvestConsulMemory } from "SwarmMemory/ConsulMemory";
 import { ConsulObject } from "Consuls/ConsulBase";
-import { RoomMemory } from "SwarmMemory/RoomMemory";
+import { MemoryObject } from "SwarmMemory/SwarmMemory";
 
 /*<T extends CreepType> extends OwnableSwarmObject<ICreepData<T>, Creep>
     implements AICreep, Creep {
@@ -18,7 +17,7 @@ import { RoomMemory } from "SwarmMemory/RoomMemory";
         throw new Error("Method not implemented.");
     }*/
 @profile
-export class SwarmRoom<T extends RoomType> extends SwarmTypeBase<RoomMemory, Room> implements AIRoom, Room {
+export class SwarmRoom<T extends RoomType> extends SwarmTypeBase<IData, Room> implements AIRoom, Room {
     GetSwarmSubType(): T {
         return this.memory.SUB_TYPE as T;
     }
@@ -99,7 +98,7 @@ export class SwarmRoom<T extends RoomType> extends SwarmTypeBase<RoomMemory, Roo
             }
         }
 
-        this.memory.SetCacheValue(SUB_TYPE, roomType)
+        this.memory.SetData(SUB_TYPE, roomType, true)
 
         // Would love to add a pathfinding.
         let sources = this.find(FIND_SOURCES);
@@ -125,7 +124,7 @@ export class SwarmRoom<T extends RoomType> extends SwarmTypeBase<RoomMemory, Roo
             SUB_TYPE: ConsulType.Harvest,
             SWARM_TYPE: SwarmType.SwarmConsul
         }
-        let newHarvesterMem = new HarvestConsulMemory(newHarvesterData);
+        let newHarvesterMem = new MemoryObject(newHarvesterData);
         newHarvesterMem.ReserveMemory();
 
         let consul = SwarmCreator.CreateSwarmObject(newHarvesterMem, new ConsulObject(ConsulType.Harvest));

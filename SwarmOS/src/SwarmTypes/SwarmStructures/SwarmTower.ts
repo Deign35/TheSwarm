@@ -1,6 +1,5 @@
 import { OwnedSwarmStructure } from "./SwarmStructure";
 import { profile } from "Tools/Profiler";
-import { TowerMemory } from "SwarmMemory/StructureMemory";
 
 @profile
 export class SwarmTower extends OwnedSwarmStructure<STRUCTURE_TOWER, StructureTower> implements StructureTower {

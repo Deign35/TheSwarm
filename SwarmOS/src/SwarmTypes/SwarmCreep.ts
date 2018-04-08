@@ -1,11 +1,10 @@
 import { profile } from "Tools/Profiler";
 import { OwnableSwarmObject } from "SwarmTypes/SwarmTypes";
-import { CreepMemory } from "SwarmMemory/CreepMemory";
 
 const CARRY_TOTAL = 'CT';
 const CURRENT_PATH = 'CP';
 @profile
-export class SwarmCreep<T extends CreepType> extends OwnableSwarmObject<CreepMemory, Creep>
+export class SwarmCreep<T extends CreepType> extends OwnableSwarmObject<IData, Creep>
     implements AICreep, Creep {
     GetSwarmSubType(): T {
         return this.memory.SUB_TYPE as T;

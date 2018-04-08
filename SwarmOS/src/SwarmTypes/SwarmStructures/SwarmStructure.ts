@@ -1,13 +1,7 @@
 import { OwnableSwarmObject, SwarmRoomObjectBase } from "SwarmTypes/SwarmTypes";
-import {
-    StructureMemory, ExtensionMemory, ExtractorMemory, ObserverMemory, LinkMemory, RampartMemory,
-    StorageMemory, TerminalMemory, ContainerMemory, RoadMemory, WallMemory, NukerMemory, KeepersLairMemory,
-    PortalMemory, PowerBankMemory, PowerSpawnMemory, StructureMemoryWithSpecifiedData
-} from "SwarmMemory/StructureMemory";
-import { MemoryBase, SwarmMemoryBase } from "SwarmMemory/SwarmMemory";
 
-export abstract class SwarmStructure<T extends TStructureData, U extends Structure>
-    extends SwarmRoomObjectBase<StructureMemoryWithSpecifiedData<T>, U> implements AIStructureBase<TStructureData, U>, Structure {
+export abstract class SwarmStructure<T extends IData, U extends Structure>
+    extends SwarmRoomObjectBase<T, U> implements AIStructureBase<TStructureData, U>, Structure {
     GetMemType(): SwarmDataType {
         throw new Error("Method not implemented.");
     }

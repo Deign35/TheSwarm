@@ -1,7 +1,7 @@
 import { profile } from "Tools/Profiler";
 import { NotImplementedException } from "Tools/SwarmExceptions";
-import { MasterMemory, MasterConsulMemory, MasterCreepMemory, MasterFlagMemory, MasterRoomMemory, MasterStructureMemory, MasterRoomObjectMemory } from "SwarmMemory/MasterMemory";
-import { SwarmMemory } from "./SwarmMemory";
+import { ParentMemory } from "./SwarmMemory";
+
 declare interface IMemory {
     [MASTER_CONSUL_MEMORY_ID]: IMasterConsulData,
     [MASTER_CREEP_MEMORY_ID]: IMasterCreepData,
@@ -90,7 +90,7 @@ export class Swarmlord {
         }
     }
 
-    SaveMasterMemory<T extends SwarmDataTypeSansMaster>(memObject: MasterMemory, save: boolean): void {
+    SaveMasterMemory<T extends SwarmDataTypeSansMaster>(memObject: ParentMemory, save: boolean): void {
         memObject.ReserveMemory();
         let memData = memObject.ReleaseMemory();
         if (save) {
@@ -98,29 +98,9 @@ export class Swarmlord {
         }
     }
 
-    CheckoutMasterMemory(id: string): SwarmMemory {
+    CheckoutMasterMemory(id: string): ParentMemory {
         let data = CopyObject(Memory[id]);
-        let newMem;
-        switch (data.id) {
-            case (MASTER_CONSUL_MEMORY_ID):
-                newMem = new MasterConsulMemory(data);
-                break;
-            case (MASTER_CREEP_MEMORY_ID):
-                newMem = new MasterCreepMemory(data);
-                break;
-            case (MASTER_FLAG_MEMORY_ID):
-                newMem = new MasterFlagMemory(data);
-                break;
-            case (MASTER_ROOM_MEMORY_ID):
-                newMem = new MasterRoomMemory(data);
-                break;
-            case (MASTER_ROOMOBJECT_MEMORY_ID):
-                newMem = new MasterStructureMemory(data);
-                break;
-            case (MASTER_STRUCTURE_MEMORY_ID):
-                newMem = new MasterRoomObjectMemory(data);
-                break;
-        }
+        let newMem = new ParentMemory(data);
 
         if (!newMem) {
             throw new NotImplementedException("[Swarmlord.CheckoutMasterMemory] -- Attempted to checkout memory that isn't mastered correctly: " + id);
