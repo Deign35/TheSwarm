@@ -44,8 +44,15 @@ export class GlobalTools {
             workingVersion(exc);
         }
     }
+    static GetSUID() {
+        return Memory.counter++;
+    }
 }
 global['CopyObject'] = GlobalTools.CopyObject;
 global['GetSpawnCost'] = GlobalTools.GetSpawnCost;
 global['ConstructBodyArray'] = GlobalTools.ConstructBodyArray;
 global['DoTest'] = GlobalTools.DoTest;
+
+declare var Memory: {
+    counter: number
+}

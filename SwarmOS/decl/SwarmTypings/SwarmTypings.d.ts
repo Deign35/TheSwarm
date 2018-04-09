@@ -3,12 +3,12 @@ declare type SwarmSubType = SwarmType | ConsulType | StructureConstant |
 
 declare interface IData {
     id: string;
-    isActive: boolean;
     MEM_TYPE: SwarmDataType;
     SWARM_TYPE: SwarmType;
     SUB_TYPE: SwarmSubType;
 }
 declare interface ISwarmData<T extends SwarmDataType, U extends SwarmType, V extends SwarmSubType> extends IData {
+    isActive: boolean;
     MEM_TYPE: T;
     SWARM_TYPE: U;
     SUB_TYPE: V;

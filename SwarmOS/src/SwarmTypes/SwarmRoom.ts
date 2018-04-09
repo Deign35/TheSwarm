@@ -3,7 +3,7 @@ import { SwarmTypeBase } from "SwarmTypes/SwarmTypes";
 import { SwarmSpawn } from "SwarmTypes/SwarmStructures/SwarmSpawn";
 import { SwarmLoader } from "SwarmTypes/SwarmLoader";
 import { ConsulObject, SwarmConsul } from "Consuls/ConsulBase";
-import { MemoryObject, DataCache } from "SwarmMemory/SwarmMemory";
+import { MemoryObject } from "SwarmMemory/SwarmMemory";
 import { NotImplementedException } from "Tools/SwarmExceptions";
 
 
@@ -11,10 +11,8 @@ export type SwarmRoom = SwarmRoom_Base<RoomType>;
 const FLASH_SPAWN = 'spawns';
 declare type FLASH_SPAWN = 'spawns';
 
-declare interface RoomDataCache extends DataCache {
-}
 @profile
-export class SwarmRoom_Base<T extends RoomType> extends SwarmTypeBase<IData, Room> implements AIRoom, Room, RoomDataCache {
+export class SwarmRoom_Base<T extends RoomType> extends SwarmTypeBase<IData, Room> implements AIRoom, Room {
     protected get spawns(): string[] {
         if (!this.memory.HasData(FLASH_SPAWN)) {
             let availableSpawns = [];
