@@ -19,7 +19,7 @@ declare var Memory: IMemory;
 
 export class Swarmlord {
     constructor() {
-        Swarmlord.InitializeMemory();
+        this.ValidateMemory();
     }
     private static InitializeMemory() {
         if (!Memory.INIT || Memory.SwarmVersionDate != SWARM_VERSION_DATE) {

@@ -118,6 +118,8 @@ export class HarvestConsul extends SwarmConsulBase<ConsulType.Harvest>
                     let targetPos = source.pos;
                     if (source.containerID) {
                         targetPos = SwarmLoader.GetObject<SwarmRoomObjectType>(source.containerID, MASTER_STRUCTURE_MEMORY_ID).pos;
+                    } else if (source.constructionID) {
+                        targetPos = SwarmLoader.GetObject<SwarmRoomObjectType>(source.constructionID, MASTER_ROOMOBJECT_MEMORY_ID).pos;
                     }
                     action = new MoveToPositionAction(creep, targetPos);
                     break;
