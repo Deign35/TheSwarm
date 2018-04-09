@@ -76,6 +76,7 @@ export class HarvestConsul extends SwarmConsulBase<ConsulType.Harvest>
         }
 
         if (!source.creepID) {
+            // (TODO) Convert this to use GetSUID();
             let creepName = 'sHarv_' + Math.floor(Math.random() * 100000);
             let creepBody: BodyPartConstant[] = [WORK, CARRY, MOVE];
             if (source.room.energyCapacityAvailable >= 800) {

@@ -15,7 +15,7 @@ export class SwarmRoom_Base<T extends RoomType> extends SwarmTypeBase<IData, Roo
     protected get spawns(): string[] {
         if (!this.memory.HasData(FLASH_SPAWN)) {
             let availableSpawns = [];
-            for (let i = 0, ids = SwarmLoader.SwarmRoomIDs[this.name].structures[STRUCTURE_SPAWN]; i < ids.length; i++) {
+            for (let i = 0, ids = SwarmLoader.SwarmRoomIDs[this.name].structures[STRUCTURE_SPAWN]; i < (ids && ids.length); i++) {
                 let spawn = SwarmLoader.GetObject<SwarmSpawn>(ids[i], MASTER_STRUCTURE_MEMORY_ID);
                 if (!spawn.spawning) {
                     availableSpawns.push(ids[i]);

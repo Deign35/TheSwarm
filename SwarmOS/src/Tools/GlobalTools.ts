@@ -52,6 +52,7 @@ global['CopyObject'] = GlobalTools.CopyObject;
 global['GetSpawnCost'] = GlobalTools.GetSpawnCost;
 global['ConstructBodyArray'] = GlobalTools.ConstructBodyArray;
 global['DoTest'] = GlobalTools.DoTest;
+global['GetSUID'] = GlobalTools.GetSUID;
 
 declare var Memory: {
     counter: number
