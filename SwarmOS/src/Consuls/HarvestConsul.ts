@@ -144,8 +144,8 @@ export class HarvestConsul extends SwarmConsulBase<ConsulType.Harvest>
     }
     protected ActivateHarvest(source: SwarmSource) {
         let creep = SwarmLoader.GetObject(source.creepID!, MASTER_CREEP_MEMORY_ID) as SwarmCreep
-        if (!creep.spawning) {
-            let action: ActionBase = new HarvestAction(creep, source);
+        if (creep && !creep.spawning) {
+            let action: ActionBase = new HarvestAction(creep, source.prototype);
             let validation = action.ValidateAction();
             switch (validation) {
                 case (C_NONE):

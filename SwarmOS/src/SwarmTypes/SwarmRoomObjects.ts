@@ -58,7 +58,7 @@ export class SwarmSource extends SwarmObject_RoomObject<IData, Source> implement
         return this.memory.GetData('creepID');
     }
     get containerID(): string | undefined {
-        return this.memory.GetData('creepID');
+        return this.memory.GetData('containerID');
     }
     get linkID(): string | undefined {
         return this.memory.GetData('linkID');

@@ -17,7 +17,7 @@ import { ObjBase } from "./SwarmTypes";
 
 @profile
 export class SwarmCreator {
-    static CreateNewSwarmMemory(id: string, swarmType: SwarmType, subType: SwarmSubType): MemoryObject {
+    static CreateNewSwarmMemory(id: string, swarmType: SwarmType): MemoryObject {
         let newMemory: any;
         switch (swarmType) {
             case (SwarmType.SwarmContainer):
@@ -401,14 +401,9 @@ export class SwarmCreator {
 
         return (obj as Structure).id;
     }
-    static CreateSwarmObject(obj: SwarmObjectType, mem?: MemoryObject): ObjBase {
-        let mustInit = false;
-        let swarmType = this.GetSwarmType(obj);
-        let subType = this.GetDefaultSwarmSubType(swarmType);
-        if (!mem) {
-            mem = this.CreateNewSwarmMemory(this.GetObjSaveID(obj), swarmType, subType);
-            mustInit = true;
-        }
+    static CreateSwarmObject(obj: SwarmObjectType, mem: MemoryObject): ObjBase {
+        let swarmType = mem.SWARM_TYPE;
+        let subType = mem.SUB_TYPE;
 
         let newObj: ObjBase
         switch (swarmType) {
@@ -505,10 +500,6 @@ export class SwarmCreator {
                 throw new NotImplementedException('SwarmType is not implemented');
         }
 
-        if (mustInit) {
-            mem.ReserveMemory();
-            newObj.InitAsNew();
-        }
         return newObj!;
     }
 

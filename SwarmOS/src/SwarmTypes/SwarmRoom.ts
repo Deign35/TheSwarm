@@ -14,6 +14,7 @@ export class SwarmRoom_Base<T extends RoomType> extends SwarmTypeBase<IData, Roo
     }
     private _availableSpawns!: string[];
     protected get spawns(): string[] {
+        debugger;
         if (!this._availableSpawns) {
             this._availableSpawns = [];
             let ids = SwarmLoader.SwarmRoomIDs[this.name].structures[STRUCTURE_SPAWN];
@@ -44,7 +45,7 @@ export class SwarmRoom_Base<T extends RoomType> extends SwarmTypeBase<IData, Roo
             return E_REQUIRES_ENERGY;
         }
         let spawnID = (opts && opts.spawnID) ? opts.spawnID : this.spawns.shift();
-        if (!spawnID || SwarmLoader.HasObject(spawnID, MASTER_STRUCTURE_MEMORY_ID)) {
+        if (!spawnID || !SwarmLoader.HasObject(spawnID, MASTER_STRUCTURE_MEMORY_ID)) {
             return E_MISSING_TARGET;
         }
         return (SwarmLoader.GetObject(spawnID, MASTER_STRUCTURE_MEMORY_ID) as SwarmSpawn).spawnCreep(body, name, opts);
@@ -91,12 +92,10 @@ export class SwarmRoom_Base<T extends RoomType> extends SwarmTypeBase<IData, Roo
         for (let i = 0; i < sources.length; i++) {
             sourceIDs.push(sources[i].id);
             SwarmLoader.LoadObject(sources[i].id, sources[i], MASTER_ROOMOBJECT_MEMORY_ID);
-            SwarmLoader.SaveObject(SwarmLoader.GetObject(sources[i].id, MASTER_ROOMOBJECT_MEMORY_ID));
         }
         let minerals = this.find(FIND_MINERALS);
         for (let i = 0; i < minerals.length; i++) {
             SwarmLoader.LoadObject(minerals[i].id, minerals[i], MASTER_ROOMOBJECT_MEMORY_ID);
-            SwarmLoader.SaveObject(SwarmLoader.GetObject(minerals[i].id, MASTER_ROOMOBJECT_MEMORY_ID));
         }
         // (TODO): Instead of TryFindNewObjects, use a single LookAtArea and find all objects for the new room.
         this.TryFindNewObjects(true);

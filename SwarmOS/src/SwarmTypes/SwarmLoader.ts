@@ -138,12 +138,15 @@ export class SwarmLoader {
             return;
         }
         if (!this.MasterMemory[dataType].HasData(saveID)) {
-            let newObj = SwarmCreator.CreateSwarmObject(obj) as ObjBase
-            this.MasterMemory[dataType].SaveChildMemory(newObj.memory, true)
+            let newMem = SwarmCreator.CreateNewSwarmMemory(saveID, SwarmCreator.GetSwarmType(obj)) as MemoryObject
+            newMem.ReserveMemory();
+            let newObj = SwarmCreator.CreateSwarmObject(obj, newMem) as ObjBase
+            newObj.InitAsNew();
+            this.SaveObject(newObj);
         }
         let objMem = this.MasterMemory[dataType].CheckoutChildMemory(saveID);
         this.AddObjectToTheSwarm(SwarmCreator.CreateSwarmObject(obj, objMem));
-
+        objMem.ReleaseMemory();
     }
 
     static GetSwarmControllerDataTypeFromObject(swarmType: SwarmType) {
@@ -209,16 +212,16 @@ export class SwarmLoader {
             let subType = obj.GetSubType();
             if (!this.SwarmRoomIDs[roomName]) {
                 this.SwarmRoomIDs[roomName] = {
-                    structures: {},
-                    creeps: {},
-                    flags: {},
-                    roomObjects: {}
+                    structures: {} as IDictionary<string[]>,
+                    creeps: {} as IDictionary<string[]>,
+                    flags: {} as IDictionary<string[]>,
+                    roomObjects: {} as IDictionary<string[]>
                 }
             }
             if (!this.SwarmRoomIDs[roomName][dataType][subType]) {
                 this.SwarmRoomIDs[roomName][dataType][subType] = [];
             }
-            this.SwarmRoomIDs[(obj as SwarmCreep).room.name][dataType][subType][obj.id] = obj.id;
+            this.SwarmRoomIDs[roomName][dataType][subType].push(obj.id)
         }
     }
 }

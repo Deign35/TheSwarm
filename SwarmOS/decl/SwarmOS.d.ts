@@ -22,10 +22,10 @@ interface Profiler {
 
 
 declare var SwarmCreator: {
-    CreateNewSwarmMemory(id: string, swarmType: SwarmType, subType: SwarmSubType): IData;
+    CreateNewSwarmMemory(id: string, swarmType: SwarmType): IData;
     GetSwarmType(obj: SwarmObjectType): SwarmType;
     GetObjSaveID(obj: SwarmObjectType): string;
-    CreateSwarmObject(obj: SwarmObjectType, mem?: IData): any
+    CreateSwarmObject(obj: SwarmObjectType, mem: IData): any
     CreateConsulObject(mem: TConsulData, obj: SwarmObjectType): any
 }
 
