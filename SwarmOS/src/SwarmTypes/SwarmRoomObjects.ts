@@ -1,4 +1,5 @@
 import { SwarmTypeBase } from "SwarmTypes/SwarmTypes";
+import { SwarmLoader } from "./SwarmLoader";
 
 export type SwarmRoomObjectType = SwarmObject_BaseRoomObject<RoomObject>;
 
@@ -55,19 +56,19 @@ export class SwarmSource extends SwarmObject_BaseRoomObject<Source> implements A
     get ticksToRegeneration() { return this._instance.ticksToRegeneration; }
 
     PrepObject() {
-        if (this.creepID && !Game.creeps[this.creepID]) {
+        if (this.creepID && !SwarmLoader.HasObject(this.creepID, MASTER_CREEP_MEMORY_ID)) {
             this.memory.DeleteData('creepID');
         }
-        if (this.containerID && !Game.creeps[this.containerID]) {
+        if (this.containerID && !SwarmLoader.HasObject(this.containerID, MASTER_STRUCTURE_MEMORY_ID)) {
             this.memory.DeleteData('containerID');
         }
-        if (this.linkID && !Game.creeps[this.linkID]) {
+        if (this.linkID && !SwarmLoader.HasObject(this.linkID, MASTER_STRUCTURE_MEMORY_ID)) {
             this.memory.DeleteData('linkID');
         }
-        if (this.pileID && !Game.creeps[this.pileID]) {
+        if (this.pileID && !SwarmLoader.HasObject(this.pileID, MASTER_ROOMOBJECT_MEMORY_ID)) {
             this.memory.DeleteData('pileID');
         }
-        if (this.constructionID && !Game.creeps[this.constructionID]) {
+        if (this.constructionID && !SwarmLoader.HasObject(this.constructionID, MASTER_ROOMOBJECT_MEMORY_ID)) {
             this.memory.DeleteData('constructionID');
         }
     }
