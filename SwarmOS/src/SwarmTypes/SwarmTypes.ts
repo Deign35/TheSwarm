@@ -5,7 +5,7 @@ import { MemoryObject, MemoryBase } from "SwarmMemory/SwarmMemory";
 export type ObjBase = ObjectBase<IData, SwarmObjectType>;
 const HAS_PREPPED = 'hasPrepped';
 @profile
-export abstract class ObjectBase<T extends IData, U extends SwarmObjectType> {
+export abstract class ObjectBase<T extends IData, U extends SwarmObjectType> implements AIObject {
     constructor(data: MemoryBase<T>, obj: U) {
         this._memory = data;
         this._instance = obj;
@@ -29,7 +29,7 @@ export abstract class ObjectBase<T extends IData, U extends SwarmObjectType> {
 
     abstract GetMemType(): SwarmDataType;
     abstract GetSwarmType(): SwarmType;
-    abstract GetSwarmSubType(): SwarmSubType;
+    abstract GetSubType(): SwarmSubType;
 }
 @profile
 export abstract class SwarmTypeBase<T extends IData, U extends SwarmObjectType> extends ObjectBase<T, U> {

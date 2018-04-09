@@ -23,7 +23,7 @@
     },
     "Enums": {
         "SwarmDataType": {
-            "None": 0,
+            "None": -1,
             "Structure": 1,
             "Room": 2,
             "Flag": 3,
@@ -38,7 +38,7 @@
             "Error": 2
         },
         "SwarmType": {
-            "None": 0,
+            "None": -1,
             "SwarmSite": 1,
             "SwarmCreep": 2,
             "SwarmFlag": 3,
@@ -71,7 +71,7 @@
             "SwarmMaster": 30
         },
         "Priority": {
-            "Hold": 0,
+            "Hold": -1,
             "Lowest": 1,
             "Low": 3,
             "Medium": 5,
@@ -80,7 +80,7 @@
             "EMERGENCY": 10
         },
         "CreepType": {
-            "None": 0,
+            "None": -1,
             "Builder": 1,
             "Retriever": 2,
             "Deliverer": 3,
@@ -92,19 +92,19 @@
             "MineralHarvester": 9
         },
         "ConsulType": {
-            "None": 0,
+            "None": -1,
             "Harvest": 1,
             "Control": 2,
             "Distribution": 3,
             "Infrastructure": 4
         },
         "FlagType": {
-            "None": 0,
+            "None": -1,
             "Construct": 1,
             "Position": 2
         },
         "RoomType": {
-            "NeutralRoom": 0,
+            "NeutralRoom": -1,
             "RCL1": 1,
             "RCL2": 2,
             "RCL3": 3,

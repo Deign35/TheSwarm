@@ -1,21 +1,19 @@
 import { ObjectBase, SwarmTypeBase } from "SwarmTypes/SwarmTypes";
 import { NotImplementedException } from "Tools/SwarmExceptions";
 
-export class ConsulObject implements _Constructor<AIConsulBaseObject<ConsulType>>, AIConsulBaseObject<ConsulType> {
+export class ConsulObject implements _Constructor<AIConsulObject>,
+    AIConsulObject {
     constructor(public readonly ConsulType: ConsulType) { }
-    get prototype(): AIConsulBaseObject<ConsulType> {
+    get prototype(): AIConsulObject {
         return this;
     }
 }
 
 //ISwarmData < SwarmDataType.Consul, SwarmType.SwarmConsul, T >
 export abstract class SwarmConsulBase<T extends ConsulType>
-    extends SwarmTypeBase<IData, ConsulObject> {
+    extends SwarmTypeBase<IData, ConsulObject> implements AIConsulBase<T> {
     get IsActive() { return this.memory.isActive; }
     get prototype() { return this._instance }
-    GetSwarmSubType(): T {
-        return this._instance.ConsulType as T;
-    }
 }
 
-export type SwarmConsul = SwarmConsulBase<ConsulType>;
+export type SwarmConsul = SwarmConsulBase<ConsulType> & AIConsul;

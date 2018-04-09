@@ -24,7 +24,7 @@ export class SwarmMineral extends SwarmObject_RoomObject<IData, Mineral> impleme
 }
 
 @profile
-export class SwarmNuke extends SwarmObject_RoomObject<IData, Nuke> implements Nuke {
+export class SwarmNuke extends SwarmObject_RoomObject<IData, Nuke> implements AINuke, Nuke {
     get storageMemoryType() { return SwarmDataType.RoomObject; }
     get SwarmType(): SwarmType.SwarmNuke { return SwarmType.SwarmNuke; }
     get launchRoomName() { return this._instance.launchRoomName; }
@@ -32,7 +32,7 @@ export class SwarmNuke extends SwarmObject_RoomObject<IData, Nuke> implements Nu
 }
 
 @profile
-export class SwarmResource extends SwarmObject_RoomObject<IData, Resource> implements Resource {
+export class SwarmResource extends SwarmObject_RoomObject<IData, Resource> implements AIResource, Resource {
     get storageMemoryType() { return SwarmDataType.RoomObject; }
     get SwarmType(): SwarmType.SwarmResource { return SwarmType.SwarmResource; }
     get amount() { return this._instance.amount; }
@@ -41,7 +41,7 @@ export class SwarmResource extends SwarmObject_RoomObject<IData, Resource> imple
 
 @profile
 export class SwarmSite extends SwarmObject_RoomObject<IData, ConstructionSite>
-    implements ConstructionSite {
+    implements AISite, ConstructionSite {
     get my() { return this._instance.my; }
     get owner() { return this._instance.owner; }
     get storageMemoryType() { return SwarmDataType.RoomObject };
@@ -54,7 +54,7 @@ export class SwarmSite extends SwarmObject_RoomObject<IData, ConstructionSite>
 }
 
 @profile
-export class SwarmSource extends SwarmObject_RoomObject<IData, Source> implements Source {
+export class SwarmSource extends SwarmObject_RoomObject<IData, Source> implements AISource, Source {
     get storageMemoryType() { return SwarmDataType.RoomObject };
     get SwarmType(): SwarmType.SwarmSource { return SwarmType.SwarmSource; }
     get energy() { return this._instance.energy; }
@@ -64,7 +64,7 @@ export class SwarmSource extends SwarmObject_RoomObject<IData, Source> implement
 }
 
 @profile
-export class SwarmTombstone extends SwarmObject_RoomObject<IData, Tombstone> implements Tombstone {
+export class SwarmTombstone extends SwarmObject_RoomObject<IData, Tombstone> implements AITombstone, Tombstone {
     get SwarmType(): SwarmType.SwarmTombstone { return SwarmType.SwarmTombstone }
     get creep() { return this._instance.creep; }
     get deathTime() { return this._instance.deathTime; }

@@ -1,8 +1,17 @@
 import { SwarmConsulBase, ConsulObject } from "Consuls/ConsulBase";
 import { SwarmSource } from "SwarmTypes/SwarmRoomObjects";
+import { MemoryBase } from "SwarmMemory/SwarmMemory";
+import { SwarmLoader } from "SwarmTypes/SwarmLoader";
 
-export class HarvestConsul extends SwarmConsulBase<ConsulType.Harvest> {
-    SourceData!: {
+declare type SOURCE_IDS = 'sourceIDs';
+const SOURCE_IDS = 'sourceIDs';
+declare type FLASH_SOURCE_DATA = 'SourceData';
+const FLASH_SOURCE_DATA = 'SourceData';
+declare interface HarvestConsulData extends IConsulData<ConsulType.Harvest> {
+    [SOURCE_IDS]: string[];
+}
+declare interface HarvestConsulFlashMemory {
+    [FLASH_SOURCE_DATA]: {
         [id: string]: {
             hasCreep: boolean;
             hasContainer: boolean;
@@ -11,13 +20,31 @@ export class HarvestConsul extends SwarmConsulBase<ConsulType.Harvest> {
             hasSite: boolean;
         }
     }
-    protected OnActivate() {
-        /*for (let i = 0; i < this.memory.sourceIDs.length; i++) {
-            let source = SwarmLoader.TheSwarm.roomObjects[this.memory.sourceIDs[i]] as SwarmSource;
-            if (this.SourceData[source.id].hasCreep) {
-                this.ActivateHarvest(source);
-            }
-        }*/
+}
+
+export class HarvestConsul extends SwarmConsulBase<ConsulType.Harvest> {
+    get [SOURCE_IDS](): HarvestConsulData[SOURCE_IDS] {
+        return this.memory.GetData(SOURCE_IDS);
+    }
+    get [FLASH_SOURCE_DATA](): HarvestConsulFlashMemory[FLASH_SOURCE_DATA] {
+        if (!this.memory.HasData(FLASH_SOURCE_DATA)) {
+            this.memory.SetData(FLASH_SOURCE_DATA, {}, false);
+        }
+        return this.memory.GetData(FLASH_SOURCE_DATA);
+    }
+    
+    get memory(): MemoryBase<HarvestConsulData> { return this._memory as MemoryBase<HarvestConsulData>; }
+    Activate() {
+        let ids = this.memory.GetData<string[]>(SOURCE_IDS);
+        for (let i = 0; i < ids.length; i++) {
+            let source = SwarmLoader.GetObject(ids[i], MASTER_ROOMOBJECT_MEMORY_ID) as SwarmSource;
+            source.memory.ReserveMemory();
+
+            if (this.memory.GetData<HarvestConsulFlashMemory["SourceData"]>(FLASH_SOURCE_DATA)[ids[i]])
+                if (this.SourceData[source.id].hasCreep) {
+                    this.ActivateHarvest(source);
+                }
+        }
     }
 
     protected ActivateHarvest(source: SwarmSource) {

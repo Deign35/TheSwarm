@@ -86,8 +86,7 @@ export class SwarmLoader {
 
         let keys = this.MasterMemory[MASTER_CONSUL_MEMORY_ID].GetMemoryIDs();
         for (let i = 0; i < keys.length; i++) {
-            let consulMem = this.MasterMemory.consuls.CheckoutChildMemory(keys[i]);
-            let consulObj = new ConsulObject(consulMem.SUB_TYPE as ConsulType);
+            let consulObj = new ConsulObject(ConsulType.None);
             this.LoadObject(keys[i], consulObj, MASTER_CONSUL_MEMORY_ID);
         }
 
@@ -207,7 +206,7 @@ export class SwarmLoader {
         if ((obj as SwarmCreep).room) {
             let roomName = (obj as SwarmCreep).room.name;
             let memType = obj.GetMemType();
-            let subType = obj.GetSwarmSubType();
+            let subType = obj.GetSubType();
             if (!this.SwarmRoomIDs[roomName]) {
                 this.SwarmRoomIDs[roomName] = {
                     structures: {},
@@ -219,7 +218,7 @@ export class SwarmLoader {
             if (!this.SwarmRoomIDs[roomName][dataType][subType]) {
                 this.SwarmRoomIDs[roomName][dataType][subType] = [];
             }
-            this.SwarmRoomIDs[(obj as SwarmCreep).room.name][dataType][subType][obj.id] = obj;
+            this.SwarmRoomIDs[(obj as SwarmCreep).room.name][dataType][subType][obj.id] = obj.id;
         }
     }
 }

@@ -2,7 +2,7 @@ import { OwnedSwarmStructure } from "./SwarmStructure";
 import { profile } from "Tools/Profiler";
 
 @profile
-export class SwarmLab extends OwnedSwarmStructure<STRUCTURE_LAB, StructureLab> implements StructureLab {
+export class SwarmLab extends OwnedSwarmStructure<STRUCTURE_LAB, StructureLab> implements AILab, StructureLab {
     get cooldown() { return this._instance.cooldown; }
     get energy() { return this._instance.energy; }
     get energyCapacity() { return this._instance.energyCapacity; }

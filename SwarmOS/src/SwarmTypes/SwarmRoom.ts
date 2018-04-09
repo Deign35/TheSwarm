@@ -16,7 +16,7 @@ export class SwarmRoom_Base<T extends RoomType> extends SwarmTypeBase<IData, Roo
     protected get spawns(): string[] {
         if (!this._availableSpawns) {
             this._availableSpawns = [];
-            let ids = SwarmLoader.SwarmRoomIDs[this.saveID].structures[STRUCTURE_SPAWN];
+            let ids = SwarmLoader.SwarmRoomIDs[this.name].structures[STRUCTURE_SPAWN];
             if (ids) {
                 for (let i = 0; i < ids.length; i++) {
                     let spawn = SwarmLoader.GetObject(ids[i], MASTER_STRUCTURE_MEMORY_ID) as SwarmSpawn;
@@ -40,30 +40,20 @@ export class SwarmRoom_Base<T extends RoomType> extends SwarmTypeBase<IData, Roo
             directions?: DirectionConstant[],
             spawnID?: string
         }) {
-        let spawnToUse: SwarmSpawn | undefined;
-        if (opts && opts.spawnID) {
-            // get spawn this way instead
-            spawnToUse = SwarmLoader.GetObject(opts.spawnID, MASTER_STRUCTURE_MEMORY_ID) as SwarmSpawn;
-        } else if (this.spawns.length > 0) {
-            if (GetSpawnCost(body) <= this.energyAvailable) {
-                spawnToUse = SwarmLoader.GetObject(this.spawns.shift()!, MASTER_STRUCTURE_MEMORY_ID) as SwarmSpawn;
-            } else {
-                return E_REQUIRES_ENERGY;
-            }
-        } else {
+        if (GetSpawnCost(body) > this.energyAvailable) {
+            return E_REQUIRES_ENERGY;
+        }
+        let spawnID = (opts && opts.spawnID) ? opts.spawnID : this.spawns.shift();
+        if (!spawnID || SwarmLoader.HasObject(spawnID, MASTER_STRUCTURE_MEMORY_ID)) {
             return E_MISSING_TARGET;
         }
-
-        if (spawnToUse) {
-            return spawnToUse.spawnCreep(body, name, opts);
-        }
-
-        return E_MISSING_TARGET;
+        return (SwarmLoader.GetObject(spawnID, MASTER_STRUCTURE_MEMORY_ID) as SwarmSpawn).spawnCreep(body, name, opts);
     }
 
     InitAsNew() {
         SwarmLogger.Log("Initializing a new room");
-        let roomType = this.controller && this.controller.owner && this.controller.owner.username == MY_USERNAME &&
+        let roomType = this.controller && this.controller.owner &&
+            this.controller.owner.username == MY_USERNAME &&
             this.controller.level;// RCL1 - RCL8 if I own the room
 
         if (!roomType) {
@@ -110,9 +100,11 @@ export class SwarmRoom_Base<T extends RoomType> extends SwarmTypeBase<IData, Roo
     }
 
     CreateHarvestConsul(sources: Source[]) {
+        debugger;
+        let id = this.name + '_harvest';
         // Find an existing harvest consul at some point, for now, one per room.
         let newHarvesterData: HarvestConsulData = {
-            id: this.name + '_harvest',
+            id: id,
             isActive: true,
             MEM_TYPE: SwarmDataType.Consul,
             sourceIDs: CopyObject(SwarmLoader.SwarmRoomIDs[this.name].roomObjects[SwarmType.SwarmSource]),
@@ -121,9 +113,11 @@ export class SwarmRoom_Base<T extends RoomType> extends SwarmTypeBase<IData, Roo
         }
         let newHarvesterMem = new MemoryObject(newHarvesterData);
         newHarvesterMem.ReserveMemory();
+        let newConsul = new ConsulObject(ConsulType.Harvest);
 
-        let consul = SwarmCreator.CreateSwarmObject(new ConsulObject(ConsulType.Harvest), newHarvesterMem);
+        let consul = SwarmCreator.CreateSwarmObject(newConsul, newHarvesterMem);
         SwarmLoader.SaveObject(consul);
+        SwarmLoader.LoadObject(id, newConsul, MASTER_CONSUL_MEMORY_ID);
     }
 
     TryFindNewObjects(force: boolean = false) {
@@ -173,19 +167,15 @@ export class SwarmRoom_Base<T extends RoomType> extends SwarmTypeBase<IData, Roo
                 }
             }
         }
-
     }
 
-    get DataType(): SwarmDataType.Room { return SwarmDataType.Room };
-    get saveID() { return this.name; }
-    get SwarmType(): SwarmType.SwarmRoom { return SwarmType.SwarmRoom; }
     get RoomLocation(): RoomLocationFormat { return this.name; }
     get controller(): StructureController | undefined { return this._instance.controller; }
     get energyAvailable(): number { return this._instance.energyAvailable; }
     get energyCapacityAvailable(): number { return this._instance.energyCapacityAvailable; }
     get my() { return !!(this.controller && this.controller.my); }
     get owner() { return this.controller && this.controller.owner; }
-    get name(): string { return this._instance.name.slice(); }
+    get name(): string { return this._instance.name; }
     get storage(): StructureStorage | undefined { return this._instance.storage; }
     get terminal(): StructureTerminal | undefined { return this._instance.terminal; }
     get visual(): RoomVisual { return this._instance.visual; }

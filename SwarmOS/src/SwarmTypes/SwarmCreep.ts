@@ -6,10 +6,6 @@ const CURRENT_PATH = 'CP';
 @profile
 export class SwarmCreep_Base<T extends CreepType> extends OwnableSwarmObject<IData, Creep>
     implements AICreep, Creep {
-    GetSwarmSubType(): T {
-        return this.memory.SUB_TYPE as T;
-    }
-
     // (TODO): Need to switch this to using the flashData.
     protected _cachedData: { [id: string]: any } = {};
     get carryTotal() {

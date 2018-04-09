@@ -1,16 +1,12 @@
 
 declare interface IConsulData<T extends ConsulType> extends
     ISwarmData<SwarmDataType.Consul, SwarmType.SwarmConsul, T> {
-
 }
+declare type TConsulData = IConsulData<ConsulType>;
 
-declare interface HarvestConsulData extends IConsulData<ConsulType.Harvest> {
-    sourceIDs: string[];
-}
 declare interface ControlConsulData extends IConsulData<ConsulType.Control> {
     creepIDs: string[];
 }
-declare type TConsulData = HarvestConsulData | ControlConsulData;
 
 declare interface AIConsulBaseObject<T extends ConsulType> extends _Constructor<any> {
     ConsulType: T;
