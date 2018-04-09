@@ -75,6 +75,24 @@ export class SwarmSource extends SwarmObject_RoomObject<IData, Source> implement
     get energyCapacity() { return this._instance.energyCapacity; }
     get room() { return this._instance.room; }
     get ticksToRegeneration() { return this._instance.ticksToRegeneration; }
+
+    PrepObject() {
+        if (this.creepID && !Game.creeps[this.creepID]) {
+            this.memory.DeleteData('creepID');
+        }
+        if (this.containerID && !Game.creeps[this.containerID]) {
+            this.memory.DeleteData('containerID');
+        }
+        if (this.linkID && !Game.creeps[this.linkID]) {
+            this.memory.DeleteData('linkID');
+        }
+        if (this.pileID && !Game.creeps[this.pileID]) {
+            this.memory.DeleteData('pileID');
+        }
+        if (this.constructionID && !Game.creeps[this.constructionID]) {
+            this.memory.DeleteData('constructionID');
+        }
+    }
 }
 
 @profile
