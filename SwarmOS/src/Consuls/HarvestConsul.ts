@@ -4,7 +4,7 @@ import { SwarmLoader } from "SwarmTypes/SwarmLoader";
 import { SwarmContainer, SwarmLink } from "SwarmTypes/SwarmStructures/SwarmStructure";
 import { SwarmCreep } from "SwarmTypes/SwarmCreep";
 import { SwarmRoom } from "SwarmTypes/SwarmRoom";
-import { SwarmSource, SwarmRoomObject } from "SwarmTypes/SwarmRoomObjects";
+import { SwarmSource, SwarmRoomObjectType } from "SwarmTypes/SwarmRoomObjects";
 
 import { ActionBase, NoOpAction } from "Actions/ActionBase";
 import { HarvestAction } from "Actions/HarvestAction";
@@ -77,11 +77,13 @@ export class HarvestConsul extends SwarmConsulBase<ConsulType.Harvest>
 
         if (!source.creepID) {
             let creepName = 'sHarv_' + Math.floor(Math.random() * 100000);
-            let creepBody: BodyPartConstant[] = [WORK, WORK, CARRY, MOVE];
+            let creepBody: BodyPartConstant[] = [WORK, CARRY, MOVE];
             if (source.room.energyCapacityAvailable >= 800) {
                 creepBody = ConstructBodyArray([[WORK, 6], [CARRY, 1], [MOVE, 3]]);
             } else if (source.room.energyCapacityAvailable > 550) {
                 creepBody = ConstructBodyArray([[WORK, 5], [MOVE, 1]]);
+            } else if (source.room.energyCapacityAvailable > 350) {
+                creepBody = ConstructBodyArray([[WORK, 2], [CARRY, 2], [MOVE, 1]])
             }
 
             if (SwarmLoader.GetObject<SwarmRoom>(source.room.name,
@@ -116,7 +118,7 @@ export class HarvestConsul extends SwarmConsulBase<ConsulType.Harvest>
                 case (C_MOVE):
                     let targetPos = source.pos;
                     if (source.containerID) {
-                        targetPos = SwarmLoader.GetObject<SwarmRoomObject>(source.containerID, MASTER_STRUCTURE_MEMORY_ID).pos;
+                        targetPos = SwarmLoader.GetObject<SwarmRoomObjectType>(source.containerID, MASTER_STRUCTURE_MEMORY_ID).pos;
                     }
                     action = new MoveToPositionAction(creep, targetPos);
                     break;

@@ -10,7 +10,6 @@ import { NotImplementedException } from "Tools/SwarmExceptions";
 export type SwarmRoom = SwarmRoom_Base<RoomType>;
 const FLASH_SPAWN = 'spawns';
 declare type FLASH_SPAWN = 'spawns';
-const FLASH_TEST_SPAWNS = 'TEST#Load Spawns'; // Remaining around as perfect example
 
 declare interface RoomDataCache extends DataCache {
 }

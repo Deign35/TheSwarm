@@ -6,7 +6,7 @@ import { ObjBase, ObjectBase } from "SwarmTypes/SwarmTypes";
 import { ParentMemory, MemoryObject } from "SwarmMemory/SwarmMemory";
 import { SwarmFlag } from "SwarmTypes/SwarmFlag";
 import { SwarmRoom } from "SwarmTypes/SwarmRoom";
-import { SwarmRoomObject } from "./SwarmRoomObjects";
+import { SwarmRoomObjectType } from "./SwarmRoomObjects";
 import { SwarmStructure } from "./SwarmStructures/SwarmStructure";
 
 
@@ -31,7 +31,7 @@ export class SwarmLoader {
         [MASTER_CREEP_MEMORY_ID]: { [id: string]: SwarmCreep },
         [MASTER_FLAG_MEMORY_ID]: { [id: string]: SwarmFlag },
         [MASTER_ROOM_MEMORY_ID]: { [id: string]: SwarmRoom },
-        [MASTER_ROOMOBJECT_MEMORY_ID]: { [id: string]: SwarmRoomObject },
+        [MASTER_ROOMOBJECT_MEMORY_ID]: { [id: string]: SwarmRoomObjectType },
         [MASTER_STRUCTURE_MEMORY_ID]: { [id: string]: SwarmStructure }
     }
 
