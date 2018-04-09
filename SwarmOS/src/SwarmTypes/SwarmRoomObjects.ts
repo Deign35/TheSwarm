@@ -53,8 +53,22 @@ export class SwarmSite extends SwarmObject_RoomObject<IData, ConstructionSite>
     remove() { return this._instance.remove(); }
 }
 
-@profile
 export class SwarmSource extends SwarmObject_RoomObject<IData, Source> implements AISource, Source {
+    get creepID(): string | undefined {
+        return this.memory.GetData('creepID');
+    }
+    get containerID(): string | undefined {
+        return this.memory.GetData('creepID');
+    }
+    get linkID(): string | undefined {
+        return this.memory.GetData('linkID');
+    }
+    get pileID(): string | undefined {
+        return this.memory.GetData('pileID');
+    }
+    get constructionID(): string | undefined {
+        return this.memory.GetData('constructionID');
+    }
     get storageMemoryType() { return SwarmDataType.RoomObject };
     get SwarmType(): SwarmType.SwarmSource { return SwarmType.SwarmSource; }
     get energy() { return this._instance.energy; }

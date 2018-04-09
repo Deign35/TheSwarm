@@ -2,7 +2,7 @@ import { profile } from "Tools/Profiler";
 import { SwarmTypeBase } from "SwarmTypes/SwarmTypes";
 import { SwarmSpawn } from "SwarmTypes/SwarmStructures/SwarmSpawn";
 import { SwarmLoader } from "SwarmTypes/SwarmLoader";
-import { ConsulObject } from "Consuls/ConsulBase";
+import { ConsulObject, SwarmConsul } from "Consuls/ConsulBase";
 import { MemoryObject } from "SwarmMemory/SwarmMemory";
 
 
@@ -86,36 +86,42 @@ export class SwarmRoom_Base<T extends RoomType> extends SwarmTypeBase<IData, Roo
         this.memory.SetData(SUB_TYPE, roomType, true)
 
         // Would love to add a pathfinding.
+        let sourceIDs = [];
         let sources = this.find(FIND_SOURCES);
         for (let i = 0; i < sources.length; i++) {
+            sourceIDs.push(sources[i].id);
             SwarmLoader.LoadObject(sources[i].id, sources[i], MASTER_ROOMOBJECT_MEMORY_ID);
+            SwarmLoader.SaveObject(SwarmLoader.GetObject(sources[i].id, MASTER_ROOMOBJECT_MEMORY_ID));
         }
         let minerals = this.find(FIND_MINERALS);
         for (let i = 0; i < minerals.length; i++) {
             SwarmLoader.LoadObject(minerals[i].id, minerals[i], MASTER_ROOMOBJECT_MEMORY_ID);
+            SwarmLoader.SaveObject(SwarmLoader.GetObject(minerals[i].id, MASTER_ROOMOBJECT_MEMORY_ID));
         }
         // (TODO): Instead of TryFindNewObjects, use a single LookAtArea and find all objects for the new room.
         this.TryFindNewObjects(true);
-        this.CreateHarvestConsul(sources);
+        this.CreateHarvestConsul(sourceIDs);
     }
 
-    CreateHarvestConsul(sources: Source[]) {
+    CreateHarvestConsul(sources: string[]) {
         debugger;
         let id = this.name + '_harvest';
         // Find an existing harvest consul at some point, for now, one per room.
-        let newHarvesterData: HarvestConsulData = {
+        let newHarvesterData = {
             id: id,
             isActive: true,
             MEM_TYPE: SwarmDataType.Consul,
-            sourceIDs: CopyObject(SwarmLoader.SwarmRoomIDs[this.name].roomObjects[SwarmType.SwarmSource]),
             SUB_TYPE: ConsulType.Harvest,
-            SWARM_TYPE: SwarmType.SwarmConsul
+            SWARM_TYPE: SwarmType.SwarmConsul,
+
+            sourceIDs: sources,
         }
         let newHarvesterMem = new MemoryObject(newHarvesterData);
         newHarvesterMem.ReserveMemory();
         let newConsul = new ConsulObject(ConsulType.Harvest);
 
-        let consul = SwarmCreator.CreateSwarmObject(newConsul, newHarvesterMem);
+        let consul = SwarmCreator.CreateSwarmObject(newConsul, newHarvesterMem) as SwarmConsul;
+        consul.InitAsNew();
         SwarmLoader.SaveObject(consul);
         SwarmLoader.LoadObject(id, newConsul, MASTER_CONSUL_MEMORY_ID);
     }

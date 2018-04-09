@@ -112,7 +112,7 @@ export class SwarmLoader {
         }
     }
 
-    static LoadObjectsWithID<T extends TStructureData | TRoomObjectData, U extends Structure | RoomObjectType>(dataType: string) {
+    static LoadObjectsWithID<T extends SwarmData, U extends Structure | RoomObjectType>(dataType: string) {
         let keys = this.MasterMemory[dataType].GetMemoryIDs();
         for (let i = 0; i < keys.length; i++) {
             let obj = Game.getObjectById(keys[i]) as U;
