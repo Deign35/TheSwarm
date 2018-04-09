@@ -16,7 +16,6 @@ declare interface IMemory {
 };
 declare var Memory: IMemory;
 
-@profile
 export class Swarmlord {
     constructor() {
         Swarmlord.InitializeMemory();

@@ -182,10 +182,10 @@ export class SwarmLoader {
         Swarmlord.SaveMasterMemory(this.MasterMemory[MASTER_STRUCTURE_MEMORY_ID], true);
     }
     static HasObject(id: string, dataType: string) {
-        return this.TheSwarm[dataType][id]
-    }
-    static GetObject(id: string, dataType: string) {
         return this.TheSwarm[dataType][id];
+    }
+    static GetObject<T extends ObjBase>(id: string, dataType: string): T {
+        return this.TheSwarm[dataType][id] as T;
     }
 
     static SaveObject(obj: ObjBase) {

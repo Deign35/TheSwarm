@@ -1,6 +1,7 @@
 import { Stopwatch } from "./Stopwatch";
 import { SwarmLogger } from "Tools/SwarmLogger";
 import { SwarmCreator } from "SwarmTypes/SwarmCreator";
+import { MemoryObject } from "SwarmMemory/SwarmMemory";
 
 global['Stopwatch'] = Stopwatch;
 global['SwarmLogger'] = SwarmLogger;
@@ -28,7 +29,23 @@ export class GlobalTools {
 
         return body;
     }
+
+    // (TODO): Create a tools consul that manages memory for things, maybe only use flash memory!
+    static DoTest(testID: string, memObject: MemoryObject, testFunction: () => void, workingVersion: (exc: Error) => void) {
+        try {
+            testFunction();
+            if (!memObject.HasData(testID)) {
+                SwarmLogger.Log('Test[' + testID + ']: Success');
+                memObject.SetData(testID, true, false);
+            }
+        } catch (exc) {
+            SwarmLogger.Log('SwarmRoom_Base [' + testID + '] failed [' + JSON.stringify(exc) + ']');
+            memObject.DeleteData(testID);
+            workingVersion(exc);
+        }
+    }
 }
 global['CopyObject'] = GlobalTools.CopyObject;
 global['GetSpawnCost'] = GlobalTools.GetSpawnCost;
 global['ConstructBodyArray'] = GlobalTools.ConstructBodyArray;
+global['DoTest'] = GlobalTools.DoTest;

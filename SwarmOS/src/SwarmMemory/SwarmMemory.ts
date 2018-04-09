@@ -1,12 +1,6 @@
 import { MemoryLockException } from "Tools/SwarmExceptions";
 
-declare interface DataCache {
-    id: string;
-    isActive: boolean;
-    MEM_TYPE: SwarmDataType;
-    SWARM_TYPE: SwarmType;
-    SUB_TYPE: SwarmSubType;
-};
+export interface DataCache { };
 export class MemoryBase<T extends IData> {
     constructor(fromMemory: T) {
         this._checkedOut = false;
