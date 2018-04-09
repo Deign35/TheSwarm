@@ -9,7 +9,6 @@ export class ConsulObject implements _Constructor<AIConsulObject>,
     }
 }
 
-//ISwarmData < SwarmDataType.Consul, SwarmType.SwarmConsul, T >
 export abstract class SwarmConsulBase<T extends ConsulType>
     extends SwarmTypeBase<IData, ConsulObject> implements AIConsulBase<T> {
     get IsActive() { return this.memory.isActive; }

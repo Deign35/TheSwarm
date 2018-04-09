@@ -4,30 +4,27 @@ import { SwarmSpawn } from "SwarmTypes/SwarmStructures/SwarmSpawn";
 import { SwarmLoader } from "SwarmTypes/SwarmLoader";
 import { ConsulObject, SwarmConsul } from "Consuls/ConsulBase";
 import { MemoryObject } from "SwarmMemory/SwarmMemory";
+import { NotImplementedException } from "Tools/SwarmExceptions";
 
 
 export type SwarmRoom = SwarmRoom_Base<RoomType>;
+const FLASH_SPAWN = 'spawns';
+
 @profile
 export class SwarmRoom_Base<T extends RoomType> extends SwarmTypeBase<IData, Room> implements AIRoom, Room {
-    GetSwarmSubType(): T {
-        return this.memory.SUB_TYPE as T;
-    }
-    private _availableSpawns!: string[];
     protected get spawns(): string[] {
-        debugger;
-        if (!this._availableSpawns) {
-            this._availableSpawns = [];
-            let ids = SwarmLoader.SwarmRoomIDs[this.name].structures[STRUCTURE_SPAWN];
-            if (ids) {
-                for (let i = 0; i < ids.length; i++) {
-                    let spawn = SwarmLoader.GetObject(ids[i], MASTER_STRUCTURE_MEMORY_ID) as SwarmSpawn;
-                    if (!spawn.spawning) {
-                        this._availableSpawns.push(ids[i]);
-                    }
+        if (!this.memory.HasData(FLASH_SPAWN)) {
+            let availableSpawns = [];
+            for (let i = 0, ids = SwarmLoader.SwarmRoomIDs[this.name].structures[STRUCTURE_SPAWN]; i < (ids && ids.length); i++) {
+                let spawn = SwarmLoader.GetObject<SwarmSpawn>(ids[i], MASTER_STRUCTURE_MEMORY_ID);
+                if (!spawn.spawning) {
+                    availableSpawns.push(ids[i]);
                 }
             }
+            this.memory.SetData(FLASH_SPAWN, availableSpawns, false);
+
         }
-        return this._availableSpawns;
+        return this.memory.GetData(FLASH_SPAWN);
     }
 
     PrepObject() {
@@ -48,7 +45,7 @@ export class SwarmRoom_Base<T extends RoomType> extends SwarmTypeBase<IData, Roo
         if (!spawnID || !SwarmLoader.HasObject(spawnID, MASTER_STRUCTURE_MEMORY_ID)) {
             return E_MISSING_TARGET;
         }
-        return (SwarmLoader.GetObject(spawnID, MASTER_STRUCTURE_MEMORY_ID) as SwarmSpawn).spawnCreep(body, name, opts);
+        return SwarmLoader.GetObject<SwarmSpawn>(spawnID, MASTER_STRUCTURE_MEMORY_ID).spawnCreep(body, name, opts);
     }
 
     InitAsNew() {
@@ -58,6 +55,7 @@ export class SwarmRoom_Base<T extends RoomType> extends SwarmTypeBase<IData, Roo
             this.controller.level;// RCL1 - RCL8 if I own the room
 
         if (!roomType) {
+            roomType = RoomType.NeutralRoom;
             // Not mine, what is it?
             if (this.controller) {
                 roomType = RoomType.NonHostile;
@@ -83,16 +81,18 @@ export class SwarmRoom_Base<T extends RoomType> extends SwarmTypeBase<IData, Roo
                 }
             }
         }
-
+        // (TODO): Convert SetData here to convert the entire object within the swarm.
         this.memory.SetData(SUB_TYPE, roomType, true)
 
-        // Would love to add a pathfinding.
+        // (TODO): Add pathfinding.
+
         let sourceIDs = [];
         let sources = this.find(FIND_SOURCES);
         for (let i = 0; i < sources.length; i++) {
             sourceIDs.push(sources[i].id);
             SwarmLoader.LoadObject(sources[i].id, sources[i], MASTER_ROOMOBJECT_MEMORY_ID);
         }
+
         let minerals = this.find(FIND_MINERALS);
         for (let i = 0; i < minerals.length; i++) {
             SwarmLoader.LoadObject(minerals[i].id, minerals[i], MASTER_ROOMOBJECT_MEMORY_ID);
@@ -126,49 +126,21 @@ export class SwarmRoom_Base<T extends RoomType> extends SwarmTypeBase<IData, Roo
     }
 
     TryFindNewObjects(force: boolean = false) {
-        if (force || Game.time % 5 == 0) {
-            let foundResources = this.find(FIND_DROPPED_RESOURCES);
-            for (let j = 0; j < foundResources.length; j++) {
-                if (!SwarmLoader.HasObject(foundResources[j].id, MASTER_ROOMOBJECT_MEMORY_ID)) {
-                    SwarmLoader.LoadObject(foundResources[j].id, foundResources[j], MASTER_ROOMOBJECT_MEMORY_ID);
-                }
-            }
-        }
+        // (TODO): Add hostile objects.
+        this.TryLoadObjects(FIND_DROPPED_RESOURCES, 5, MASTER_ROOMOBJECT_MEMORY_ID, false);
+        this.TryLoadObjects(FIND_TOMBSTONES, 11, MASTER_ROOMOBJECT_MEMORY_ID, false);
+        this.TryLoadObjects(FIND_STRUCTURES, 17, MASTER_STRUCTURE_MEMORY_ID, false);
+        this.TryLoadObjects(FIND_CONSTRUCTION_SITES, 29, MASTER_ROOMOBJECT_MEMORY_ID, false);
+        this.TryLoadObjects(FIND_NUKES, 233, MASTER_ROOMOBJECT_MEMORY_ID, false);
 
-        if (force || Game.time % 11 == 0) {
-            let foundTombstones = this.find(FIND_TOMBSTONES);
-            for (let j = 0; j < foundTombstones.length; j++) {
-                if (!SwarmLoader.HasObject(foundTombstones[j].id, MASTER_ROOMOBJECT_MEMORY_ID)) {
-                    SwarmLoader.LoadObject(foundTombstones[j].id, foundTombstones[j], MASTER_ROOMOBJECT_MEMORY_ID);
-                }
-            }
-        }
+    }
 
-        if (force || Game.time % 17 == 0) {
-            let foundStructures = this.find(FIND_STRUCTURES);
-            for (let j = 0; j < foundStructures.length; j++) {
-                if (!SwarmLoader.HasObject(foundStructures[j].id, MASTER_STRUCTURE_MEMORY_ID)) {
-                    SwarmLoader.LoadObject(foundStructures[j].id, foundStructures[j], MASTER_STRUCTURE_MEMORY_ID);
-                }
-            }
-        }
-
-        if (force || Game.time % 29 == 0) {
-            let foundSites = this.find(FIND_CONSTRUCTION_SITES);
-            for (let j = 0; j < foundSites.length; j++) {
-                if (!SwarmLoader.HasObject(foundSites[j].id, MASTER_ROOMOBJECT_MEMORY_ID)) {
-                    SwarmLoader.LoadObject(
-                        foundSites[j].id, foundSites[j], MASTER_ROOMOBJECT_MEMORY_ID);
-                }
-            }
-        }
-
-        if (force || Game.time % 233 == 0) {
-            let foundNukes = this.find(FIND_NUKES);
-            for (let j = 0; j < foundNukes.length; j++) {
-                if (!SwarmLoader.HasObject(foundNukes[j].id, MASTER_ROOMOBJECT_MEMORY_ID)) {
-                    SwarmLoader.LoadObject(
-                        foundNukes[j].id, foundNukes[j], MASTER_ROOMOBJECT_MEMORY_ID);
+    private TryLoadObjects(find: FindConstant, frequency: number, dataType: string, force: boolean) {
+        if (force || Game.time % frequency == 0) {
+            let foundObjs = this.find(find) as SwarmObjectTypeWithID[];
+            for (let i = 0; i < foundObjs.length; i++) {
+                if (!SwarmLoader.HasObject(foundObjs[i].id, dataType)) {
+                    SwarmLoader.LoadObject(foundObjs[i].id, foundObjs[i], dataType);
                 }
             }
         }

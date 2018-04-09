@@ -3,12 +3,12 @@ declare type SwarmSubType = SwarmType | ConsulType | StructureConstant |
 
 declare interface IData {
     id: string;
-    isActive: boolean;
     MEM_TYPE: SwarmDataType;
     SWARM_TYPE: SwarmType;
     SUB_TYPE: SwarmSubType;
 }
 declare interface ISwarmData<T extends SwarmDataType, U extends SwarmType, V extends SwarmSubType> extends IData {
+    isActive: boolean;
     MEM_TYPE: T;
     SWARM_TYPE: U;
     SUB_TYPE: V;
@@ -31,6 +31,7 @@ declare type SwarmStructureType = SwarmType.SwarmContainer | SwarmType.SwarmCont
     SwarmType.SwarmStorage | SwarmType.SwarmTerminal | SwarmType.SwarmTower | SwarmType.SwarmWall
 
 declare type SwarmObjectType = Room | RoomObject | AIConsulObject
+declare type SwarmObjectTypeWithID = Creep | Structure | RoomObjectType;
 declare interface AIBase<T extends SwarmData, U extends SwarmObjectType> extends _Constructor<U> {
     Activate(): void;
     InitAsNew(): void;

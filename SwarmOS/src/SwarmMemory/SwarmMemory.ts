@@ -1,13 +1,6 @@
 import { MemoryLockException } from "Tools/SwarmExceptions";
 
-declare interface DataCache {
-    id: string;
-    isActive: boolean;
-    MEM_TYPE: SwarmDataType;
-    SWARM_TYPE: SwarmType;
-    SUB_TYPE: SwarmSubType;
-};
-export class MemoryBase<T extends IData> {
+export class MemoryBase<T extends Dictionary> {
     constructor(fromMemory: T) {
         this._checkedOut = false;
         this._cache = fromMemory;
@@ -36,7 +29,7 @@ export class MemoryBase<T extends IData> {
         }
         this._checkedOut = true;
     }
-    ReleaseMemory(): IData {
+    ReleaseMemory(): Dictionary {
         if (!this._checkedOut) {
             throw new MemoryLockException(this._checkedOut, "Memory not checked out");
         }
@@ -75,7 +68,7 @@ export class ParentMemory<T extends MasterDataType> extends MemoryBase<T> {
         super(data);
         this._childData = CopyObject(this.GetData(CHILD_DATA_ID))
     }
-    private _childData: IDictionary<IData>;
+    private _childData: Dictionary;
     private _childMemory: IDictionary<MemoryObject> = {}
     HasData(id: string) { return !!this._childData[id] }
     GetMemoryIDs() { return Object.keys(this._childData); }

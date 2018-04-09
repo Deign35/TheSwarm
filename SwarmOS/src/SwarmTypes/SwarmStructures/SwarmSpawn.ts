@@ -6,7 +6,7 @@ import { profile } from "Tools/Profiler";
 export class SwarmSpawn extends OwnedSwarmStructure<STRUCTURE_SPAWN, StructureSpawn> implements AISpawn, StructureSpawn {
     get energy() { return this._instance.energy; }
     get energyCapacity() { return this._instance.energyCapacity; }
-    get name() { return this._instance.name; }
+    get name() { return this._instance.id; }
     get spawning() { return this._instance.spawning; }
 
     spawnCreep(body: BodyPartConstant[], name: string,

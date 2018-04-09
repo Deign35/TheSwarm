@@ -1,14 +1,13 @@
 import { OwnableSwarmObject, SwarmRoomObjectBase } from "SwarmTypes/SwarmTypes";
 
-export type SwarmStructure = SwarmStructureBase<IData, Structure>;
-export abstract class SwarmStructureBase<T extends IData, U extends Structure>
-    extends SwarmRoomObjectBase<T, U> implements AIStructureBase<TStructureData, U>, Structure {
+export type SwarmStructure = SwarmStructureBase<StructureConstant, Structure>;
+export abstract class SwarmStructureBase<T extends StructureConstant, U extends Structure>
+    extends SwarmRoomObjectBase<IData, U> implements AIStructureBase<TStructureData, U>, Structure {
     get prototype() { return this._instance; }
     get hits() { return this._instance.hits; }
     get hitsMax() { return this._instance.hitsMax; }
     get room() { return this._instance.room; }
-    get structureType() { return this._instance.structureType; }
-    get saveID() { return this.id; }
+    get structureType(): T { return this._instance.structureType as T; }
 
     destroy() { return this._instance.destroy() }
     isActive() { return this._instance.isActive() }
@@ -18,15 +17,13 @@ export abstract class SwarmStructureBase<T extends IData, U extends Structure>
 }
 
 export abstract class OwnedSwarmStructure<T extends OwnableStructureConstant, U extends OwnedStructure<T>>
-    extends SwarmStructureBase<TOwnabledStructureData, U> {
+    extends SwarmStructureBase<T, U> {
     get my() { return this._instance.my; }
     get owner() { return this._instance.owner; }
-    get structureType(): T { return this._instance.structureType; }
 }
 
-export class SwarmContainer extends SwarmStructureBase<IContainerData, StructureContainer>
+export class SwarmContainer extends SwarmStructureBase<STRUCTURE_CONTAINER, StructureContainer>
     implements AIContainer, StructureContainer {
-    get structureType() { return STRUCTURE_CONTAINER; }
     get store() { return this._instance.store; }
     get storeCapacity() { return this._instance.storeCapacity; }
     get ticksToDecay() { return this._instance.ticksToDecay; }
@@ -74,20 +71,16 @@ export class SwarmObserver extends OwnedSwarmStructure<STRUCTURE_OBSERVER, Struc
     observeRoom(roomName: string) { return this._instance.observeRoom(roomName); }
 }
 
-export class SwarmPortal extends SwarmStructureBase<IPortalData, StructurePortal>
+export class SwarmPortal extends SwarmStructureBase<STRUCTURE_PORTAL, StructurePortal>
     implements AIPortal, StructurePortal {
-    get structureType() { return STRUCTURE_PORTAL; }
     get destination(): RoomPosition { return this._instance.destination; }
     get ticksToDecay(): number { return this._instance.ticksToDecay; }
 }
 
-export class SwarmPowerBank extends SwarmStructureBase<IPowerBankData, StructurePowerBank>
+export class SwarmPowerBank extends SwarmStructureBase<STRUCTURE_POWER_BANK, StructurePowerBank>
     implements AIPowerBank, StructurePowerBank {
-    get structureType() { return STRUCTURE_POWER_BANK; }
     get power() { return this._instance.power; }
     get ticksToDecay() { return this._instance.ticksToDecay; }
-    protected OnPrepObject() { }
-    protected OnActivate() { }
 }
 
 export class SwarmPowerSpawn extends OwnedSwarmStructure<STRUCTURE_POWER_SPAWN, StructurePowerSpawn>
@@ -112,9 +105,8 @@ export class SwarmRampart extends OwnedSwarmStructure<STRUCTURE_RAMPART, Structu
     setPublic(isPublic: boolean) { return this._instance.setPublic(isPublic); }
 }
 
-export class SwarmRoad extends SwarmStructureBase<IRoadData, StructureRoad>
+export class SwarmRoad extends SwarmStructureBase<STRUCTURE_ROAD, StructureRoad>
     implements AIRoad, StructureRoad {
-    get structureType() { return STRUCTURE_ROAD; }
     get ticksToDecay() { return this._instance.ticksToDecay };
 }
 
@@ -135,10 +127,7 @@ export class SwarmTerminal extends OwnedSwarmStructure<STRUCTURE_TERMINAL, Struc
     }
 }
 
-export class SwarmWall extends SwarmStructureBase<IWallData, StructureWall>
+export class SwarmWall extends SwarmStructureBase<STRUCTURE_WALL, StructureWall>
     implements AIWall, StructureWall {
-    get structureType() { return STRUCTURE_WALL; }
     get ticksToLive() { return this._instance.ticksToLive; }
-    protected OnPrepObject() { }
-    protected OnActivate() { }
 }
