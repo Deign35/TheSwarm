@@ -9,7 +9,6 @@ import { NotImplementedException } from "Tools/SwarmExceptions";
 
 export type SwarmRoom = SwarmRoom_Base<RoomType>;
 const FLASH_SPAWN = 'spawns';
-declare type FLASH_SPAWN = 'spawns';
 
 @profile
 export class SwarmRoom_Base<T extends RoomType> extends SwarmTypeBase<IData, Room> implements AIRoom, Room {

@@ -1,29 +1,22 @@
 import { profile } from "Tools/Profiler";
 import { OwnableSwarmObject } from "SwarmTypes/SwarmTypes";
 
-const CARRY_TOTAL = 'CT';
-const CURRENT_PATH = 'CP';
+const FLASH_CARRY_TOTAL = 'carryTotal';
+const FLASH_CURRENT_PATH = 'curPath';
 @profile
 export class SwarmCreep_Base<T extends CreepType> extends OwnableSwarmObject<IData, Creep>
     implements AICreep, Creep {
-    // (TODO): Need to switch this to using the flashData.
-    protected _cachedData: { [id: string]: any } = {};
     get carryTotal() {
-        if (!this._cachedData[CARRY_TOTAL]) {
-            this._cachedData[CARRY_TOTAL] = _.sum(this._instance.carry);
+        if (!this.memory.HasData(FLASH_CARRY_TOTAL)) {
+            this.memory.SetData(FLASH_CARRY_TOTAL, _.sum(this._instance.carry), false);
         }
-        return this._cachedData[CARRY_TOTAL];
+        return this.memory.GetData(FLASH_CARRY_TOTAL);
     }
     get curPath() {
-        if (!this._cachedData[CURRENT_PATH]) {
-            this._cachedData[CURRENT_PATH] = NOT_CONFIGURED;
+        if (!this.memory.HasData(FLASH_CURRENT_PATH)) {
+            this.memory.SetData(FLASH_CURRENT_PATH, NOT_CONFIGURED, false);
         }
-        return this._cachedData[CURRENT_PATH];
-    }
-    get endTickEnergy() {
-        // This should utilize calls to things like Drop/Harvest/Pickup etc... and calculate if reactions aught to be
-        // enacted as a result of being invalid next tick.
-        return 0;
+        return this.memory.GetData(FLASH_CURRENT_PATH);
     }
 
     /**
