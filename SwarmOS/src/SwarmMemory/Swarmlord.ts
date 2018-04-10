@@ -14,6 +14,7 @@ declare interface IMemory {
     SwarmVersionDate: string,
     profiler: any
     counter: number
+    counterIDs: string[]
 };
 declare var Memory: IMemory;
 
@@ -72,6 +73,7 @@ export class Swarmlord {
                     SWARM_TYPE: SwarmType.SwarmMaster,
                 },
                 counter: 0,
+                counterIDs: [],
                 profiler: Memory.profiler, // Hacky, but cleanest way to prevent the profiler from breaking because of deleting its memory.
                 SwarmVersionDate: SWARM_VERSION_DATE,
                 INIT: false

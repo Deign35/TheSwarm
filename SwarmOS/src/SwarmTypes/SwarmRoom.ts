@@ -6,23 +6,37 @@ import { ConsulObject, SwarmConsul } from "Consuls/ConsulBase";
 import { MemoryObject } from "SwarmMemory/SwarmMemory";
 import { NotImplementedException } from "Tools/SwarmExceptions";
 
-
 export type SwarmRoom = SwarmRoom_Base<RoomType>;
 const FLASH_SPAWN = 'spawns';
+const FLASH_REFRESH_TICK = 'refreshTick';
 
 @profile
 export class SwarmRoom_Base<T extends RoomType> extends SwarmTypeBase<IData, Room> implements AIRoom, Room {
+    private _adjustedTime = 0;
+    protected get adjustedTime() {
+        if (this._adjustedTime == 0) {
+            this._adjustedTime = Game.time + this.memory.GetData<number>('Adj');
+        }
+        return this._adjustedTime;
+    }
+    protected get refreshTick() {
+        if (!this.memory.HasData(FLASH_REFRESH_TICK)) {
+            this.memory.SetData(FLASH_REFRESH_TICK, -1, false);
+        }
+
+        return this.memory.GetData(FLASH_REFRESH_TICK);
+    }
     protected get spawns(): string[] {
-        if (!this.memory.HasData(FLASH_SPAWN)) {
+        if (!this.memory.HasData(FLASH_SPAWN) && this.refreshTick != Game.time) {
             let availableSpawns = [];
             for (let i = 0, ids = SwarmLoader.SwarmRoomIDs[this.name].structures[STRUCTURE_SPAWN]; i < (ids && ids.length); i++) {
                 let spawn = SwarmLoader.GetObject<SwarmSpawn>(ids[i], MASTER_STRUCTURE_MEMORY_ID);
-                if (!spawn.spawning) {
-                    availableSpawns.push(ids[i]);
-                }
+                //if (!spawn.spawning) {
+                availableSpawns.push(ids[i]);
+                //}
             }
             this.memory.SetData(FLASH_SPAWN, availableSpawns, false);
-
+            this.memory.SetData(FLASH_REFRESH_TICK, Game.time, false);
         }
         return this.memory.GetData(FLASH_SPAWN);
     }
@@ -31,25 +45,35 @@ export class SwarmRoom_Base<T extends RoomType> extends SwarmTypeBase<IData, Roo
         this.TryFindNewObjects();
     }
 
-    TrySpawn(body: BodyPartConstant[], name: string,
-        opts?: {
-            memory?: TCreepData,
-            energyStructures?: Array<(StructureSpawn | StructureExtension)>,
-            directions?: DirectionConstant[],
-            spawnID?: string
-        }) {
+    TrySpawn(body: BodyPartConstant[], opts: {
+        memory?: TCreepData,
+        energyStructures?: Array<(StructureSpawn | StructureExtension)>,
+        directions?: DirectionConstant[],
+        spawnID?: string,
+        priority: Priority,
+        requestorType: string,
+        requestorID: string
+    }, name?: string) {
         if (GetSpawnCost(body) > this.energyAvailable) {
-            return E_REQUIRES_ENERGY;
+            return;
         }
-        let spawnID = (opts && opts.spawnID) ? opts.spawnID : this.spawns.shift();
-        if (!spawnID || !SwarmLoader.HasObject(spawnID, MASTER_STRUCTURE_MEMORY_ID)) {
-            return E_MISSING_TARGET;
+
+        let spawn: SwarmSpawn | undefined;
+        if (opts && opts.spawnID) {
+            spawn = SwarmLoader.GetObject<SwarmSpawn>(opts.spawnID, MASTER_STRUCTURE_MEMORY_ID);
+        } else if (this.spawns.length > 0) {
+            if (this.spawns.length > 1) {
+
+            } else {
+                let spawn = SwarmLoader.GetObject<SwarmSpawn>(this.spawns[0], MASTER_STRUCTURE_MEMORY_ID);
+                spawn.spawnCreep(body, name, opts);
+            }
         }
-        return SwarmLoader.GetObject<SwarmSpawn>(spawnID, MASTER_STRUCTURE_MEMORY_ID).spawnCreep(body, name, opts);
     }
 
     InitAsNew() {
         SwarmLogger.Log("Initializing a new room");
+        this.memory.SetData('Adj', GetSUID(), true);
         let roomType = this.controller && this.controller.owner &&
             this.controller.owner.username == MY_USERNAME &&
             this.controller.level;// RCL1 - RCL8 if I own the room
@@ -103,7 +127,6 @@ export class SwarmRoom_Base<T extends RoomType> extends SwarmTypeBase<IData, Roo
     }
 
     CreateHarvestConsul(sources: string[]) {
-        debugger;
         let id = this.name + '_harvest';
         // Find an existing harvest consul at some point, for now, one per room.
         let newHarvesterData = {
@@ -136,7 +159,7 @@ export class SwarmRoom_Base<T extends RoomType> extends SwarmTypeBase<IData, Roo
     }
 
     private TryLoadObjects(find: FindConstant, frequency: number, dataType: string, force: boolean) {
-        if (force || Game.time % frequency == 0) {
+        if (force || this.adjustedTime % frequency == 0) {
             let foundObjs = this.find(find) as SwarmObjectTypeWithID[];
             for (let i = 0; i < foundObjs.length; i++) {
                 if (!SwarmLoader.HasObject(foundObjs[i].id, dataType)) {

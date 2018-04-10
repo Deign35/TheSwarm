@@ -35,7 +35,9 @@ export class SwarmCreator {
                     MEM_TYPE: SwarmDataType.Structure,
                     SWARM_TYPE: SwarmType.SwarmController,
                     SUB_TYPE: STRUCTURE_CONTROLLER,
-                    isActive: true
+                    isActive: true,
+                    creeps: [],
+                    allowance: 0
                 });
                 break;
             case (SwarmType.SwarmCreep):

@@ -19,5 +19,6 @@ declare function CopyObject<T>(obj: T): T;
 declare function GetSpawnCost(body: BodyPartConstant[]): number;
 declare function ConstructBodyArray(bodyPartsList: [BodyPartConstant, number][]): BodyPartConstant[];
 declare function DoTest(testID: string, memObject: any, testFunction: () => void,
-    workingVersion: (exc: Error) => void): void
-declare function GetSUID(): number;
+    workingVersion?: (exc: Error) => void): void
+declare function GetSUID(): string;
+declare function RecycleSUID(suid: string): void;

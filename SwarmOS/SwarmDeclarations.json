@@ -19,7 +19,8 @@
         "E_REQUIRES_ENERGY": -3,
         "E_TARGET_INELLIGIBLE": -4,
         "E_ACTION_UNNECESSARY": -5,
-        "E_NOT_IMPLEMENTED": -6
+        "E_NOT_IMPLEMENTED": -6,
+        "E_REQ_REJECTED": -7
     },
     "Enums": {
         "SwarmDataType": {
@@ -30,7 +31,7 @@
             "Creep": 4,
             "RoomObject": 5,
             "Consul": 6,
-            "Master": 8
+            "Master": 7
         },
         "LogLevel": {
             "Info": 0,
@@ -127,7 +128,8 @@
             "E_REQUIRES_ENERGY",
             "E_TARGET_INELLIGIBLE",
             "E_ACTION_UNNECESSARY",
-            "E_NOT_IMPLEMENTED"
+            "E_NOT_IMPLEMENTED",
+            "E_REQ_REJECTED"
         ],
         "SwarmlingResponse": [
             "C_NONE",

@@ -1,4 +1,5 @@
 import { OwnedSwarmStructure } from "./SwarmStructure";
+import { SwarmLoader } from "../SwarmLoader";
 
 const CREEP_IDS = 'creeps';
 const ALLOWANCE = 'allowance';
@@ -10,10 +11,21 @@ declare interface ControllerData {
 }
 export class SwarmController extends OwnedSwarmStructure<STRUCTURE_CONTROLLER, StructureController>
     implements AIController, StructureController, ControllerData {
+    AssignCreep(creepName: string) {
+        this.creeps.push(creepName);
+        return true;
+    }
+    PrepObject() {
+        for (let i = 0; i < this.creeps.length; i++) {
+            if (!SwarmLoader.HasObject(this.creeps[i], MASTER_CREEP_MEMORY_ID)) {
+                this.creeps.splice(i--, 1);
+            }
+        }
+    }
     get creeps(): string[] { return this.memory.GetData(CREEP_IDS); }
     get allowance(): number { return this.memory.GetData(ALLOWANCE); }
     get pathData(): number[] {
-        if (!this.memory.GetData(FLASH_PATHING)) {
+        if (!this.memory.HasData(FLASH_PATHING)) {
             // Get pathing data up to 5 or 10 squares away.
         }
         return this.memory.GetData(FLASH_PATHING);

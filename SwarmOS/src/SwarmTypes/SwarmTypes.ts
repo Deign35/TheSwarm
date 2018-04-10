@@ -8,14 +8,17 @@ export abstract class ObjectBase<T extends IData, U extends SwarmObjectType> imp
         this._memory = data;
         this._instance = obj;
     }
-    Activate() {
-
-    }
     InitAsNew() {
 
     }
     PrepObject() {
 
+    }
+    Activate() {
+
+    }
+    AssignCreep(name: string): boolean {
+        return false;
     }
 
     get id(): string { return this.memory.id; }

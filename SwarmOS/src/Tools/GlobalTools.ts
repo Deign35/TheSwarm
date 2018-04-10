@@ -31,7 +31,8 @@ export class GlobalTools {
     }
 
     // (TODO): Create a tools consul that manages memory for things, maybe only use flash memory!
-    static DoTest(testID: string, memObject: MemoryObject, testFunction: () => void, workingVersion: (exc: Error) => void) {
+    static DoTest(testID: string, memObject: MemoryObject, testFunction: () => void,
+        workingVersion?: (exc: Error) => void) {
         try {
             testFunction();
             if (!memObject.HasData(testID)) {
@@ -41,11 +42,19 @@ export class GlobalTools {
         } catch (exc) {
             SwarmLogger.Log('SwarmRoom_Base [' + testID + '] failed [' + JSON.stringify(exc) + ']');
             memObject.DeleteData(testID);
-            workingVersion(exc);
+            if (workingVersion) {
+                workingVersion(exc);
+            }
         }
     }
     static GetSUID() {
+        if (Memory.counterIDs.length > 0) {
+            return Memory.counterIDs.shift()!;
+        }
         return Memory.counter++;
+    }
+    static RecycleSUID(suid: string) {
+        Memory.counterIDs.push(suid);
     }
 }
 global['CopyObject'] = GlobalTools.CopyObject;
@@ -53,7 +62,9 @@ global['GetSpawnCost'] = GlobalTools.GetSpawnCost;
 global['ConstructBodyArray'] = GlobalTools.ConstructBodyArray;
 global['DoTest'] = GlobalTools.DoTest;
 global['GetSUID'] = GlobalTools.GetSUID;
+global['RecycleSUID'] = GlobalTools.RecycleSUID;
 
 declare var Memory: {
     counter: number
+    counterIDs: string[]
 }

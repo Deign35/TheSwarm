@@ -1,19 +1,29 @@
 import { SwarmConsulBase } from "Consuls/ConsulBase";
 import { SwarmController } from "SwarmTypes/SwarmStructures/SwarmController";
 import { SwarmLoader } from "SwarmTypes/SwarmLoader";
+import { SwarmCreep } from "SwarmTypes/SwarmCreep";
+import { UpgradeAction } from "Actions/UpgradeAction";
+import { ActionBase, NoOpAction } from "Actions/ActionBase";
+import { MoveToPositionAction } from "Actions/MoveToPositionAction";
+import { SwarmRoom } from "SwarmTypes/SwarmRoom";
 
 declare type CONTROLLER_IDS = 'controllerIDs';
 const CONTROLLER_IDS = 'controllerIDs';
-declare interface ControlerConsulData {
+const ROOM_DATA = 'roomData';
+declare interface ControllerConsulData {
     [CONTROLLER_IDS]: string[];
+    [ROOM_DATA]: Dictionary;
 }
-export class ControlConsul extends SwarmConsulBase<ConsulType.Control> {
-    get sourceIDs(): ControlerConsulData[CONTROLLER_IDS] {
+export class ControlConsul extends SwarmConsulBase<ConsulType.Control> implements ControllerConsulData {
+    get controllerIDs(): ControllerConsulData[CONTROLLER_IDS] {
         return this.memory.GetData(CONTROLLER_IDS);
     }
-    private ControllerObjects: IDictionary<SwarmController> = {};
+    get roomData() { return this.memory.GetData(ROOM_DATA) };
+    private ControllerObjects: IDictionary<SwarmController> = {
+
+    };
     PrepObject() {
-        let ids = this.sourceIDs;
+        let ids = this.controllerIDs;
         for (let i = 0; i < ids.length; i++) {
             if (!this.ControllerObjects[ids[i]]) {
                 let controller = SwarmLoader.GetObject<SwarmController>(ids[i], MASTER_STRUCTURE_MEMORY_ID);
@@ -27,111 +37,75 @@ export class ControlConsul extends SwarmConsulBase<ConsulType.Control> {
     }
 
     protected PrepController(controller: SwarmController) {
-        if (controller.my) {
-            // My controller
-            
+        if (controller.my) { // My controller
+            let creeps = {};
+            let workCount = 0;
+            for (let i = 0; i < controller.creeps.length; i++) {
+                if (!SwarmLoader.HasObject(controller.creeps[i], MASTER_STRUCTURE_MEMORY_ID)) {
+                    controller.creeps.splice(i--, 1);
+                }
+                let creep = SwarmLoader.GetObject<SwarmCreep>(controller.creeps[i], MASTER_STRUCTURE_MEMORY_ID);
+                creeps[creep.name] = creep;
+                workCount += creep.getActiveBodyparts(WORK);
+            }
+            if (controller.allowance > 0 && workCount > controller.allowance) {
+                DoTest('CTRL_TODO', this.memory, () => { }, () => { });
+            }
             switch (controller.level) {
                 // Do level specific changes here.
             }
         } else if (controller.reservation && controller.reservation.username == MY_USERNAME) {
             // I have it reserved
-        } else {
-            // Unowned or enemy.
-        }
-        let canHaveLink = source.room.controller && source.room.controller.owner.username == MY_USERNAME && source.room.controller.level >= 5;
-        let needsCSite = (canHaveLink && !source.linkID) || (!canHaveLink && !source.containerID);
-        if (needsCSite && !source.constructionID && Game.time % 53 == 0) {
-            // Check to see if there's no site, because it was finished building.
-            let structures = source.pos.findInRange(FIND_STRUCTURES, canHaveLink ? 2 : 1, {
-                filter: function (struct: Structure) {
-                    return struct.structureType == STRUCTURE_LINK ||
-                        (!source.containerID && struct.structureType == STRUCTURE_CONTAINER);
-                }
-            });
-            if (structures.length > 0) {
-                if (structures[0].structureType == STRUCTURE_CONTAINER) {
-                    source.memory.SetData('containerID', structures[0].id, true);
-                } else {
-                    source.memory.SetData('linkID', structures[0].id, true);
-                }
-            }
-            let cSites = source.pos.findInRange(FIND_CONSTRUCTION_SITES, canHaveLink ? 2 : 1, {
-                filter: function (cSite: ConstructionSite) {
-                    return cSite.structureType == STRUCTURE_LINK ||
-                        (!source.containerID && cSite.structureType == STRUCTURE_CONTAINER);
-                }
-            });
-
-            if (cSites.length > 0) {
-                source.memory.SetData('constructionID', cSites[0].id, true);
-            }
-        }
-        if (!source.pileID && Game.time % 23 == 0) {
-            let nearbyResources = source.pos.findInRange(FIND_DROPPED_RESOURCES, 1);
-            if (nearbyResources.length > 0) {
-                source.memory.SetData('pileID', _.max(nearbyResources, (resource) => {
-                    return resource.resourceType == RESOURCE_ENERGY && resource.amount;
-                }).id, true);
-            }
-        }
-
-        if (!source.creepID) {
-            // (TODO) Convert this to use GetSUID();
-            let creepName = 'sHarv_' + Math.floor(Math.random() * 100000);
-            let creepBody: BodyPartConstant[] = [WORK, CARRY, MOVE];
-            if (source.room.energyCapacityAvailable >= 800) {
-                creepBody = ConstructBodyArray([[WORK, 6], [CARRY, 1], [MOVE, 3]]);
-            } else if (source.room.energyCapacityAvailable > 550) {
-                creepBody = ConstructBodyArray([[WORK, 5], [MOVE, 1]]);
-            } else if (source.room.energyCapacityAvailable > 350) {
-                creepBody = ConstructBodyArray([[WORK, 2], [CARRY, 2], [MOVE, 1]])
-            }
-
-            if (SwarmLoader.GetObject<SwarmRoom>(source.room.name,
-                MASTER_ROOM_MEMORY_ID).TrySpawn(creepBody, creepName) == OK) {
-                source.memory.SetData('creepID', creepName, true);
-            }
+        } else { // Unowned or enemy.
         }
     }
 
     Activate() {
-        let ids = this.sourceIDs;
+        let ids = this.controllerIDs;
         for (let i = 0; i < ids.length; i++) {
-            let source = SwarmLoader.GetObject<SwarmSource>(ids[i], MASTER_ROOMOBJECT_MEMORY_ID);
+            let controller = SwarmLoader.GetObject<SwarmController>(ids[i], MASTER_ROOMOBJECT_MEMORY_ID);
 
-            if (this.ControllerObjects[ids[i]]) {
-                if (this.ControllerObjects[source.id].creepID) {
-                    this.ActivateHarvest(source);
-                }
+            if (controller.creeps.length == 0) {
+                let creepBody: BodyPartConstant[] = [WORK, CARRY, MOVE];
+                /*if (controller.room.energyCapacityAvailable >= 800) {
+                    creepBody = ConstructBodyArray([[WORK, 6], [CARRY, 1], [MOVE, 3]]);
+                } else if (controller.room.energyCapacityAvailable > 550) {
+                    creepBody = ConstructBodyArray([[WORK, 5], [MOVE, 1]]);
+                } else if (controller.room.energyCapacityAvailable > 350) {
+                    creepBody = ConstructBodyArray([[WORK, 2], [CARRY, 2], [MOVE, 1]])
+                }*/
+
+                SwarmLoader.GetObject<SwarmRoom>(controller.room.name, MASTER_ROOM_MEMORY_ID).TrySpawn(
+                    creepBody, {
+                        requestorID: this.id,
+                        requestorType: MASTER_CONSUL_MEMORY_ID,
+                        priority: Priority.Low
+                    }
+                )
+            }
+
+            for (let j = 0; j < controller.creeps.length; j++) {
+                let creep = SwarmLoader.GetObject<SwarmCreep>(controller.creeps[j], MASTER_CREEP_MEMORY_ID);
+                this.ActivateCreep(creep, controller);
             }
 
             SwarmLoader.SaveObject(this.ControllerObjects[ids[i]]);
         }
     }
-    protected ActivateHarvest(source: SwarmSource) {
-        let creep = SwarmLoader.GetObject<SwarmCreep>(source.creepID!, MASTER_CREEP_MEMORY_ID)
+    protected ActivateCreep(creep: SwarmCreep, controller: SwarmController) {
         if (creep && !creep.spawning) {
-            let action: ActionBase = new HarvestAction(creep, source.prototype);
+            let action: ActionBase = new UpgradeAction(creep, controller.prototype);
             let validation = action.ValidateAction();
             switch (validation) {
                 case (C_NONE):
                     break;
                 case (C_MOVE):
-                    let targetPos = source.pos;
-                    if (source.containerID) {
-                        targetPos = SwarmLoader.GetObject<SwarmRoomObjectType>(source.containerID, MASTER_STRUCTURE_MEMORY_ID).pos;
-                    }
-                    action = new MoveToPositionAction(creep, targetPos);
+                case (E_REQUIRES_ENERGY):
+                    action = new MoveToPositionAction(creep, controller.pos);
                     break;
-                case (E_TARGET_INELLIGIBLE):
+                /*case (E_REQUIRES_ENERGY):
                     action = new NoOpAction(creep);
-                    break;
-                case (E_ACTION_UNNECESSARY):
-                    if (source.constructionID && creep.carry.energy > 0) {
-                        action = new BuildAction(creep,
-                            Game.getObjectById(source.constructionID) as ConstructionSite);
-                    }
-                    break;
+                    break;*/
             }
 
             action.Run();

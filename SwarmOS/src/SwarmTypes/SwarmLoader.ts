@@ -56,8 +56,6 @@ export class SwarmLoader {
 
     }
     static LoadTheSwarm() {
-
-        debugger;
         this.SwarmRoomIDs = {}
         global['SwarmRoomIDs'] = this.SwarmRoomIDs;
 
