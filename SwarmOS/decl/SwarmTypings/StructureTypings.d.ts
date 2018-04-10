@@ -19,7 +19,10 @@ declare interface IStructureData<T extends SwarmStructureType, U extends Structu
     extends ISwarmData<SwarmDataType.Structure, T, U> { }
 
 declare interface IContainerData extends IStructureData<SwarmType.SwarmContainer, STRUCTURE_CONTAINER> { }
-declare interface IControllerData extends IStructureData<SwarmType.SwarmController, STRUCTURE_CONTROLLER> { }
+declare interface IControllerData extends IStructureData<SwarmType.SwarmController, STRUCTURE_CONTROLLER> { 
+    creeps: string[],
+    allowance: number,
+}
 declare interface IExtensionData extends IStructureData<SwarmType.SwarmExtension, STRUCTURE_EXTENSION> { }
 declare interface IExtractorData extends IStructureData<SwarmType.SwarmExtractor, STRUCTURE_EXTRACTOR> { }
 declare interface IKeepersLairData extends IStructureData<SwarmType.SwarmKeepersLair, STRUCTURE_KEEPER_LAIR> { }
