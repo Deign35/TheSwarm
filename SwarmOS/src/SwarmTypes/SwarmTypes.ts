@@ -1,5 +1,6 @@
 import { ConsulObject } from "Consuls/ConsulBase";
 import { MemoryObject, MemoryBase } from "SwarmMemory/SwarmMemory";
+import { SwarmLoader } from "./SwarmLoader";
 
 export type ObjBase = ObjectBase<IData, SwarmObjectType>;
 
@@ -21,6 +22,9 @@ export abstract class ObjectBase<T extends IData, U extends SwarmObjectType> imp
         return false;
     }
 
+    ReleaseSwarmMemory(): void {
+
+    }
     get id(): string { return this.memory.id; }
     get memory(): MemoryBase<T> { return this._memory; }
     get prototype(): U { return this._instance; }

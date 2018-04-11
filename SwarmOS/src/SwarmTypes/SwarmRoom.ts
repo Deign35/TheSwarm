@@ -66,7 +66,9 @@ export class SwarmRoom_Base<T extends RoomType> extends SwarmTypeBase<IData, Roo
 
             } else {
                 let spawn = SwarmLoader.GetObject<SwarmSpawn>(this.spawns[0], MASTER_STRUCTURE_MEMORY_ID);
+                spawn.memory.ReserveMemory();
                 spawn.spawnCreep(body, name, opts);
+                spawn.memory.ReleaseMemory();
             }
         }
     }

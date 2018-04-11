@@ -44,7 +44,7 @@ export class SwarmSite extends SwarmObject_BaseRoomObject<ConstructionSite>
 
 export class SwarmSource extends SwarmObject_BaseRoomObject<Source> implements AISource, Source {
     AssignCreep(creepName: string) {
-        this.memory.SetData(creepName, creepName, true);
+        this.memory.SetData('creepID', creepName, true);
         return true;
     }
     get containerID(): string | undefined { return this.memory.GetData('containerID'); }

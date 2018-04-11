@@ -45,6 +45,9 @@ export class MemoryBase<T extends Dictionary> {
         return this._flashMemory[valueID];
     }
     SetData<T>(valueID: string, newValue: T, saveToMemory: boolean) {
+        if (!this._checkedOut && saveToMemory) {
+            throw new MemoryLockException(this._checkedOut, "Memory must be checked out before you can save it");
+        }
         this._flashMemory[valueID] = newValue;
         if (saveToMemory) {
             this._cache[valueID] = newValue;
