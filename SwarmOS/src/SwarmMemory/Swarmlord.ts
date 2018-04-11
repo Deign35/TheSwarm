@@ -20,7 +20,7 @@ declare var Memory: IMemory;
 
 export class Swarmlord {
     constructor() {
-        this.ValidateMemory();
+        Swarmlord.InitializeMemory();
     }
     private static InitializeMemory() {
         if (!Memory.INIT || Memory.SwarmVersionDate != SWARM_VERSION_DATE) {
@@ -32,7 +32,24 @@ export class Swarmlord {
             let newMemory: IMemory = {
                 [MASTER_CONSUL_MEMORY_ID]: {
                     id: MASTER_CONSUL_MEMORY_ID,
-                    ChildData: {},
+                    ChildData: {
+                        Harvest: {
+                            id: "Harvest",
+                            isActive: true,
+                            SWARM_TYPE: SwarmType.SwarmConsul,
+                            SUB_TYPE: ConsulType.Harvest,
+                            MEM_TYPE: SwarmDataType.Consul,
+                            sourceIDs: []
+                        } as HarvestConsulData,
+                        Control: {
+                            id: "Control",
+                            isActive: true,
+                            SWARM_TYPE: SwarmType.SwarmConsul,
+                            SUB_TYPE: ConsulType.Control,
+                            MEM_TYPE: SwarmDataType.Consul,
+                            controllerIDs: []
+                        } as ControlConsulData
+                    },
                     MEM_TYPE: SwarmDataType.Master,
                     SUB_TYPE: SwarmDataType.Consul,
                     SWARM_TYPE: SwarmType.SwarmMaster,

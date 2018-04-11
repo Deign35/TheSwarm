@@ -5,6 +5,9 @@ import { SwarmLoader } from "SwarmTypes/SwarmLoader";
 import { ConsulObject, SwarmConsul } from "Consuls/ConsulBase";
 import { MemoryObject } from "SwarmMemory/SwarmMemory";
 import { NotImplementedException } from "Tools/SwarmExceptions";
+import { HarvestConsul } from "Consuls/HarvestConsul";
+import { ControlConsul } from "Consuls/ControlConsul";
+import { SwarmController } from "SwarmTypes/SwarmStructures/SwarmController";
 
 export type SwarmRoom = SwarmRoom_Base<RoomType>;
 const FLASH_SPAWN = 'spawns';
@@ -90,6 +93,11 @@ export class SwarmRoom_Base<T extends RoomType> extends SwarmTypeBase<IData, Roo
                 } else if (this.controller.reservation) {
                     if (this.controller.reservation.username == MY_USERNAME) {
                         roomType = RoomType.HarvestSupport;
+                        //SwarmLoader.LoadObject(this.controller.id, this.controller, MASTER_STRUCTURE_MEMORY_ID);
+                        let controlConsul = SwarmLoader.GetObject<ControlConsul>("Control", MASTER_CONSUL_MEMORY_ID);
+                        controlConsul.memory.ReserveMemory();
+                        controlConsul.AddControllerID(this.controller!.id);
+                        SwarmLoader.SaveObject(controlConsul);
                     } else {
                         roomType = RoomType.Hostile;
                     }
@@ -106,6 +114,11 @@ export class SwarmRoom_Base<T extends RoomType> extends SwarmTypeBase<IData, Roo
                     roomType = RoomType.KeepersLair;
                 }
             }
+        } else {
+            let controlConsul = SwarmLoader.GetObject<ControlConsul>("Control", MASTER_CONSUL_MEMORY_ID);
+            controlConsul.memory.ReserveMemory();
+            controlConsul.AddControllerID(this.controller!.id);
+            SwarmLoader.SaveObject(controlConsul);
         }
         // (TODO): Convert SetData here to convert the entire object within the swarm.
         this.memory.SetData(SUB_TYPE, roomType, true)
@@ -125,38 +138,19 @@ export class SwarmRoom_Base<T extends RoomType> extends SwarmTypeBase<IData, Roo
         }
         // (TODO): Instead of TryFindNewObjects, use a single LookAtArea and find all objects for the new room.
         this.TryFindNewObjects(true);
-        this.CreateHarvestConsul(sourceIDs);
-    }
-
-    CreateHarvestConsul(sources: string[]) {
-        let id = this.name + '_harvest';
-        // Find an existing harvest consul at some point, for now, one per room.
-        let newHarvesterData = {
-            id: id,
-            isActive: true,
-            MEM_TYPE: SwarmDataType.Consul,
-            SUB_TYPE: ConsulType.Harvest,
-            SWARM_TYPE: SwarmType.SwarmConsul,
-
-            sourceIDs: sources,
-        }
-        let newHarvesterMem = new MemoryObject(newHarvesterData);
-        newHarvesterMem.ReserveMemory();
-        let newConsul = new ConsulObject(ConsulType.Harvest);
-
-        let consul = SwarmCreator.CreateSwarmObject(newConsul, newHarvesterMem) as SwarmConsul;
-        consul.InitAsNew();
-        SwarmLoader.SaveObject(consul);
-        SwarmLoader.LoadObject(id, newConsul, MASTER_CONSUL_MEMORY_ID);
+        let harvestConsul = SwarmLoader.GetObject<HarvestConsul>("Harvest", MASTER_CONSUL_MEMORY_ID);
+        harvestConsul.memory.ReserveMemory();
+        harvestConsul.AddSourceIDs(sourceIDs);
+        SwarmLoader.SaveObject(harvestConsul);
     }
 
     TryFindNewObjects(force: boolean = false) {
         // (TODO): Add hostile objects.
-        this.TryLoadObjects(FIND_DROPPED_RESOURCES, 5, MASTER_ROOMOBJECT_MEMORY_ID, false);
-        this.TryLoadObjects(FIND_TOMBSTONES, 11, MASTER_ROOMOBJECT_MEMORY_ID, false);
-        this.TryLoadObjects(FIND_STRUCTURES, 17, MASTER_STRUCTURE_MEMORY_ID, false);
-        this.TryLoadObjects(FIND_CONSTRUCTION_SITES, 29, MASTER_ROOMOBJECT_MEMORY_ID, false);
-        this.TryLoadObjects(FIND_NUKES, 233, MASTER_ROOMOBJECT_MEMORY_ID, false);
+        this.TryLoadObjects(FIND_DROPPED_RESOURCES, 5, MASTER_ROOMOBJECT_MEMORY_ID, force);
+        this.TryLoadObjects(FIND_TOMBSTONES, 11, MASTER_ROOMOBJECT_MEMORY_ID, force);
+        this.TryLoadObjects(FIND_STRUCTURES, 17, MASTER_STRUCTURE_MEMORY_ID, force);
+        this.TryLoadObjects(FIND_CONSTRUCTION_SITES, 29, MASTER_ROOMOBJECT_MEMORY_ID, force);
+        this.TryLoadObjects(FIND_NUKES, 233, MASTER_ROOMOBJECT_MEMORY_ID, force);
 
     }
 

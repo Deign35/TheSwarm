@@ -12,7 +12,9 @@ declare interface ControllerData {
 export class SwarmController extends OwnedSwarmStructure<STRUCTURE_CONTROLLER, StructureController>
     implements AIController, StructureController, ControllerData {
     AssignCreep(creepName: string) {
-        this.creeps.push(creepName);
+        let oldIDs = this.creeps;
+        oldIDs.push(creepName);
+        this.memory.SetData(CREEP_IDS, oldIDs, true);
         return true;
     }
     PrepObject() {

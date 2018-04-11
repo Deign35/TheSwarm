@@ -23,6 +23,14 @@ export class HarvestConsul extends SwarmConsulBase<ConsulType.Harvest>
         return this.memory.GetData(SOURCE_IDS);
     }
     private SourceObjects: IDictionary<SwarmSource> = {};
+
+    AddSourceIDs(ids: string[]) {
+        let oldIDs = this.sourceIDs.slice();
+        for (let i = 0; i < ids.length; i++) {
+            oldIDs.push(ids[i]);
+        }
+        this.memory.SetData(SOURCE_IDS, oldIDs, true);
+    }
     PrepObject() {
         let ids = this.sourceIDs;
         for (let i = 0; i < ids.length; i++) {

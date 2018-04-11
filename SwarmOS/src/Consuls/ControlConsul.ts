@@ -22,7 +22,13 @@ export class ControlConsul extends SwarmConsulBase<ConsulType.Control> implement
     private ControllerObjects: IDictionary<SwarmController> = {
 
     };
+    AddControllerID(id: string) {
+        let oldIDs = this.controllerIDs;
+        oldIDs.push(id);
+        this.memory.SetData(CONTROLLER_IDS, oldIDs, true);
+    }
     PrepObject() {
+        this.memory.ReserveMemory();
         let ids = this.controllerIDs;
         for (let i = 0; i < ids.length; i++) {
             if (!this.ControllerObjects[ids[i]]) {
@@ -32,7 +38,7 @@ export class ControlConsul extends SwarmConsulBase<ConsulType.Control> implement
 
             this.ControllerObjects[ids[i]].memory.ReserveMemory();
             this.ControllerObjects[ids[i]].PrepObject();
-            //this.PrepSource(this.ControllerObjects[ids[i]]);
+            this.PrepController(this.ControllerObjects[ids[i]]);
         }
     }
 
@@ -43,6 +49,7 @@ export class ControlConsul extends SwarmConsulBase<ConsulType.Control> implement
             for (let i = 0; i < controller.creeps.length; i++) {
                 if (!SwarmLoader.HasObject(controller.creeps[i], MASTER_STRUCTURE_MEMORY_ID)) {
                     controller.creeps.splice(i--, 1);
+                    continue;
                 }
                 let creep = SwarmLoader.GetObject<SwarmCreep>(controller.creeps[i], MASTER_STRUCTURE_MEMORY_ID);
                 creeps[creep.name] = creep;
@@ -50,6 +57,21 @@ export class ControlConsul extends SwarmConsulBase<ConsulType.Control> implement
             }
             if (controller.allowance > 0 && workCount > controller.allowance) {
                 DoTest('CTRL_TODO', this.memory, () => { }, () => { });
+            }
+
+
+            if (controller.creeps.length == 0) {
+                let creepBody: BodyPartConstant[] = [WORK, CARRY, MOVE];
+                let room = SwarmLoader.GetObject<SwarmRoom>(controller.room.name, MASTER_ROOM_MEMORY_ID);
+                room.memory.ReserveMemory();
+                SwarmLoader.GetObject<SwarmRoom>(controller.room.name, MASTER_ROOM_MEMORY_ID).TrySpawn(
+                    creepBody, {
+                        requestorID: controller.id,
+                        requestorType: MASTER_STRUCTURE_MEMORY_ID,
+                        priority: Priority.Low
+                    }
+                )
+                SwarmLoader.SaveObject(room);
             }
             switch (controller.level) {
                 // Do level specific changes here.
@@ -63,26 +85,7 @@ export class ControlConsul extends SwarmConsulBase<ConsulType.Control> implement
     Activate() {
         let ids = this.controllerIDs;
         for (let i = 0; i < ids.length; i++) {
-            let controller = SwarmLoader.GetObject<SwarmController>(ids[i], MASTER_ROOMOBJECT_MEMORY_ID);
-
-            if (controller.creeps.length == 0) {
-                let creepBody: BodyPartConstant[] = [WORK, CARRY, MOVE];
-                /*if (controller.room.energyCapacityAvailable >= 800) {
-                    creepBody = ConstructBodyArray([[WORK, 6], [CARRY, 1], [MOVE, 3]]);
-                } else if (controller.room.energyCapacityAvailable > 550) {
-                    creepBody = ConstructBodyArray([[WORK, 5], [MOVE, 1]]);
-                } else if (controller.room.energyCapacityAvailable > 350) {
-                    creepBody = ConstructBodyArray([[WORK, 2], [CARRY, 2], [MOVE, 1]])
-                }*/
-
-                SwarmLoader.GetObject<SwarmRoom>(controller.room.name, MASTER_ROOM_MEMORY_ID).TrySpawn(
-                    creepBody, {
-                        requestorID: this.id,
-                        requestorType: MASTER_CONSUL_MEMORY_ID,
-                        priority: Priority.Low
-                    }
-                )
-            }
+            let controller = SwarmLoader.GetObject<SwarmController>(ids[i], MASTER_STRUCTURE_MEMORY_ID);
 
             for (let j = 0; j < controller.creeps.length; j++) {
                 let creep = SwarmLoader.GetObject<SwarmCreep>(controller.creeps[j], MASTER_CREEP_MEMORY_ID);
@@ -91,6 +94,7 @@ export class ControlConsul extends SwarmConsulBase<ConsulType.Control> implement
 
             SwarmLoader.SaveObject(this.ControllerObjects[ids[i]]);
         }
+        SwarmLoader.SaveObject(this);
     }
     protected ActivateCreep(creep: SwarmCreep, controller: SwarmController) {
         if (creep && !creep.spawning) {
