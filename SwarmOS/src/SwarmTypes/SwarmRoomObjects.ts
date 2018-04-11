@@ -1,4 +1,5 @@
 import { SwarmTypeBase } from "SwarmTypes/SwarmTypes";
+import { SwarmLoader } from "./SwarmLoader";
 
 export type SwarmRoomObjectType = SwarmObject_BaseRoomObject<RoomObject>;
 
@@ -57,6 +58,24 @@ export class SwarmSource extends SwarmObject_BaseRoomObject<Source> implements A
     get energyCapacity() { return this._instance.energyCapacity; }
     get room() { return this._instance.room; }
     get ticksToRegeneration() { return this._instance.ticksToRegeneration; }
+
+    PrepObject() {
+        if (this.creepID && !SwarmLoader.HasObject(this.creepID, MASTER_CREEP_MEMORY_ID)) {
+            this.memory.DeleteData('creepID');
+        }
+        if (this.containerID && !SwarmLoader.HasObject(this.containerID, MASTER_STRUCTURE_MEMORY_ID)) {
+            this.memory.DeleteData('containerID');
+        }
+        if (this.linkID && !SwarmLoader.HasObject(this.linkID, MASTER_STRUCTURE_MEMORY_ID)) {
+            this.memory.DeleteData('linkID');
+        }
+        if (this.pileID && !SwarmLoader.HasObject(this.pileID, MASTER_ROOMOBJECT_MEMORY_ID)) {
+            this.memory.DeleteData('pileID');
+        }
+        if (this.constructionID && !SwarmLoader.HasObject(this.constructionID, MASTER_ROOMOBJECT_MEMORY_ID)) {
+            this.memory.DeleteData('constructionID');
+        }
+    }
 }
 
 export class SwarmTombstone extends SwarmObject_BaseRoomObject<Tombstone> implements AITombstone, Tombstone {

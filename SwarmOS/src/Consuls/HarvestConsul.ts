@@ -76,15 +76,12 @@ export class HarvestConsul extends SwarmConsulBase<ConsulType.Harvest>
         }
 
         if (!source.creepID) {
-            // (TODO) Convert this to use GetSUID();
             // (TODO) Move this decision somewhere else?
             let creepBody: BodyPartConstant[] = [WORK, WORK, CARRY, MOVE];
             if (source.room.energyCapacityAvailable >= 800) {
                 creepBody = ConstructBodyArray([[WORK, 6], [CARRY, 1], [MOVE, 3]]);
             } else if (source.room.energyCapacityAvailable > 550) {
                 creepBody = ConstructBodyArray([[WORK, 5], [MOVE, 1]]);
-            } else if (source.room.energyCapacityAvailable > 350) {
-                creepBody = ConstructBodyArray([[WORK, 2], [CARRY, 2], [MOVE, 1]])
             }
 
             let room = SwarmLoader.GetObject<SwarmRoom>(source.room.name, MASTER_ROOM_MEMORY_ID);
@@ -122,6 +119,8 @@ export class HarvestConsul extends SwarmConsulBase<ConsulType.Harvest>
                     let targetPos = source.pos;
                     if (source.containerID) {
                         targetPos = SwarmLoader.GetObject<SwarmRoomObjectType>(source.containerID, MASTER_STRUCTURE_MEMORY_ID).pos;
+                    } else if (source.constructionID) {
+                        targetPos = SwarmLoader.GetObject<SwarmRoomObjectType>(source.constructionID, MASTER_ROOMOBJECT_MEMORY_ID).pos;
                     }
                     action = new MoveToPositionAction(creep, targetPos);
                     break;
