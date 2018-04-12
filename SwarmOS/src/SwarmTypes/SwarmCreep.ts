@@ -1,16 +1,26 @@
 import { profile } from "Tools/Profiler";
 import { OwnableSwarmObject } from "SwarmTypes/SwarmTypes";
+import { ActionBase } from "Actions/ActionBase";
 
 const FLASH_CARRY_TOTAL = 'carryTotal';
 const FLASH_CURRENT_PATH = 'curPath';
 @profile
 export class SwarmCreep_Base<T extends CreepType> extends OwnableSwarmObject<IData, Creep>
     implements AICreep, Creep {
+    RefreshObject(): void {
+        this.memory.SetData(FLASH_CARRY_TOTAL, _.sum(this._instance.carry), false);
+    }
+    FinalizeObject(): void {
+        throw new Error("Method not implemented.");
+    }
+    AssignCreep(name: string): boolean {
+        throw new Error("Method not implemented.");
+    }
+    AssignAction(action: ActionBase): boolean {
+        return false;
+    }
     get carryTotal() {
-        if (!this.memory.HasData(FLASH_CARRY_TOTAL)) {
-            this.memory.SetData(FLASH_CARRY_TOTAL, _.sum(this._instance.carry), false);
-        }
-        return this.memory.GetData(FLASH_CARRY_TOTAL);
+        return this.memory.GetData(FLASH_CARRY_TOTAL) || 0;
     }
     get curPath() {
         if (!this.memory.HasData(FLASH_CURRENT_PATH)) {

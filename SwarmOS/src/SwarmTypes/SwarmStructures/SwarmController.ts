@@ -11,6 +11,12 @@ declare interface ControllerData {
 }
 export class SwarmController extends OwnedSwarmStructure<STRUCTURE_CONTROLLER, StructureController>
     implements AIController, StructureController, ControllerData {
+    RefreshObject(): void {
+        throw new Error("Method not implemented.");
+    }
+    FinalizeObject(): void {
+        throw new Error("Method not implemented.");
+    }
     AssignCreep(creepName: string) {
         let oldIDs = this.creeps;
         oldIDs.push(creepName);

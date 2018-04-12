@@ -37,6 +37,15 @@ export class SwarmExtension extends OwnedSwarmStructure<STRUCTURE_EXTENSION, Str
 
 export class SwarmExtractor extends OwnedSwarmStructure<STRUCTURE_EXTRACTOR, StructureExtractor>
     implements AIExtractor, StructureExtractor {
+    RefreshObject(): void {
+        throw new Error("Method not implemented.");
+    }
+    FinalizeObject(): void {
+        throw new Error("Method not implemented.");
+    }
+    AssignCreep(name: string): boolean {
+        throw new Error("Method not implemented.");
+    }
     get cooldown() { return this._instance.cooldown; }
 }
 
@@ -46,6 +55,15 @@ export class SwarmKeepersLair extends OwnedSwarmStructure<STRUCTURE_KEEPER_LAIR,
 }
 
 export class SwarmLink extends OwnedSwarmStructure<STRUCTURE_LINK, StructureLink> implements AILink, StructureLink {
+    RefreshObject(): void {
+        throw new Error("Method not implemented.");
+    }
+    FinalizeObject(): void {
+        throw new Error("Method not implemented.");
+    }
+    AssignCreep(name: string): boolean {
+        throw new Error("Method not implemented.");
+    }
     get cooldown() { return this._instance.cooldown; }
     get energy() { return this._instance.energy; }
     get energyCapacity() { return this._instance.energyCapacity; }
@@ -112,12 +130,30 @@ export class SwarmRoad extends SwarmStructureBase<STRUCTURE_ROAD, StructureRoad>
 
 export class SwarmStorage extends OwnedSwarmStructure<STRUCTURE_STORAGE, StructureStorage>
     implements AIStorage, StructureStorage {
+    RefreshObject(): void {
+        throw new Error("Method not implemented.");
+    }
+    FinalizeObject(): void {
+        throw new Error("Method not implemented.");
+    }
+    AssignCreep(name: string): boolean {
+        throw new Error("Method not implemented.");
+    }
     get store() { return this._instance.store; }
     get storeCapacity() { return this._instance.storeCapacity; }
 }
 
 export class SwarmTerminal extends OwnedSwarmStructure<STRUCTURE_TERMINAL, StructureTerminal>
     implements AITerminal, StructureTerminal {
+    RefreshObject(): void {
+        throw new Error("Method not implemented.");
+    }
+    FinalizeObject(): void {
+        throw new Error("Method not implemented.");
+    }
+    AssignCreep(name: string): boolean {
+        throw new Error("Method not implemented.");
+    }
     get cooldown() { return this._instance.cooldown; }
     get store() { return this._instance.store; }
     get storeCapacity() { return this._instance.storeCapacity; }

@@ -12,10 +12,16 @@ export abstract class ObjectBase<T extends IData, U extends SwarmObjectType> imp
     InitAsNew() {
 
     }
+    RefreshObject(): void {
+
+    }
     PrepObject() {
 
     }
-    Activate() {
+    ActivateObject() {
+
+    }
+    FinalizeObject(): void {
 
     }
     AssignCreep(name: string): boolean {
@@ -25,6 +31,7 @@ export abstract class ObjectBase<T extends IData, U extends SwarmObjectType> imp
     get id(): string { return this.memory.id; }
     get memory(): MemoryBase<T> { return this._memory; }
     get prototype(): U { return this._instance; }
+    get updateFrequency(): number { return 10; }
 
     protected _memory!: MemoryBase<T>;
     protected _instance!: U;

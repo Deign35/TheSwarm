@@ -15,6 +15,15 @@ const FLASH_REFRESH_TICK = 'refreshTick';
 
 @profile
 export class SwarmRoom_Base<T extends RoomType> extends SwarmTypeBase<IData, Room> implements AIRoom, Room {
+    RefreshObject(): void {
+        
+    }
+    FinalizeObject(): void {
+        throw new Error("Method not implemented.");
+    }
+    AssignCreep(name: string): boolean {
+        throw new Error("Method not implemented.");
+    }
     private _adjustedTime = 0;
     protected get adjustedTime() {
         if (this._adjustedTime == 0) {

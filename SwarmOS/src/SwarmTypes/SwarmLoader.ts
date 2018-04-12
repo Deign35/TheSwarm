@@ -55,26 +55,36 @@ export class SwarmLoader {
         return this.MasterMemory[dataType].GetMemoryIDs();
 
     }
-    static LoadTheSwarm() {
-        this.SwarmRoomIDs = {}
-        global['SwarmRoomIDs'] = this.SwarmRoomIDs;
 
-        this.MasterMemory = {
-            [MASTER_CONSUL_MEMORY_ID]: Swarmlord.CheckoutMasterMemory(MASTER_CONSUL_MEMORY_ID),
-            [MASTER_CREEP_MEMORY_ID]: Swarmlord.CheckoutMasterMemory(MASTER_CREEP_MEMORY_ID),
-            [MASTER_FLAG_MEMORY_ID]: Swarmlord.CheckoutMasterMemory(MASTER_FLAG_MEMORY_ID),
-            [MASTER_ROOM_MEMORY_ID]: Swarmlord.CheckoutMasterMemory(MASTER_ROOM_MEMORY_ID),
-            [MASTER_ROOMOBJECT_MEMORY_ID]: Swarmlord.CheckoutMasterMemory(MASTER_ROOMOBJECT_MEMORY_ID),
-            [MASTER_STRUCTURE_MEMORY_ID]: Swarmlord.CheckoutMasterMemory(MASTER_STRUCTURE_MEMORY_ID),
-        };
-        this.TheSwarm = {
-            [MASTER_CONSUL_MEMORY_ID]: {},
-            [MASTER_CREEP_MEMORY_ID]: {},
-            [MASTER_FLAG_MEMORY_ID]: {},
-            [MASTER_ROOM_MEMORY_ID]: {},
-            [MASTER_ROOMOBJECT_MEMORY_ID]: {},
-            [MASTER_STRUCTURE_MEMORY_ID]: {},
-        };
+    static RefreshTheSwarm() {
+        
+    }
+    static LoadTheSwarm() {
+        if (!global['SwarmRoomIDs'] || !this.SwarmRoomIDs) {
+            this.SwarmRoomIDs = {}
+            global['SwarmRoomIDs'] = this.SwarmRoomIDs;
+        }
+
+        if (!this.MasterMemory) {
+            this.MasterMemory = {
+                [MASTER_CONSUL_MEMORY_ID]: Swarmlord.CheckoutMasterMemory(MASTER_CONSUL_MEMORY_ID),
+                [MASTER_CREEP_MEMORY_ID]: Swarmlord.CheckoutMasterMemory(MASTER_CREEP_MEMORY_ID),
+                [MASTER_FLAG_MEMORY_ID]: Swarmlord.CheckoutMasterMemory(MASTER_FLAG_MEMORY_ID),
+                [MASTER_ROOM_MEMORY_ID]: Swarmlord.CheckoutMasterMemory(MASTER_ROOM_MEMORY_ID),
+                [MASTER_ROOMOBJECT_MEMORY_ID]: Swarmlord.CheckoutMasterMemory(MASTER_ROOMOBJECT_MEMORY_ID),
+                [MASTER_STRUCTURE_MEMORY_ID]: Swarmlord.CheckoutMasterMemory(MASTER_STRUCTURE_MEMORY_ID),
+            };
+        }
+        if (!this.TheSwarm) {
+            this.TheSwarm = {
+                [MASTER_CONSUL_MEMORY_ID]: {},
+                [MASTER_CREEP_MEMORY_ID]: {},
+                [MASTER_FLAG_MEMORY_ID]: {},
+                [MASTER_ROOM_MEMORY_ID]: {},
+                [MASTER_ROOMOBJECT_MEMORY_ID]: {},
+                [MASTER_STRUCTURE_MEMORY_ID]: {},
+            };
+        }
 
         this.LoadObjectsWithName(MASTER_ROOM_MEMORY_ID);
         this.LoadObjectsWithName(MASTER_CREEP_MEMORY_ID);
@@ -127,7 +137,8 @@ export class SwarmLoader {
 
     static LoadObject<T extends SwarmData, U extends SwarmObjectType>(saveID: string, obj: U, dataType: string) {
         if (!obj) {
-            if (this.MasterMemory[dataType].HasData(saveID) && dataType != MASTER_ROOM_MEMORY_ID) {
+            if (this.MasterMemory[dataType].HasData(saveID) &&
+                (dataType != MASTER_ROOM_MEMORY_ID && dataType != MASTER_FLAG_MEMORY_ID)) {
                 // (TODO): Determine what to do with hostile objects
                 this.MasterMemory[dataType].DeleteChildMemory(saveID);
             } else {

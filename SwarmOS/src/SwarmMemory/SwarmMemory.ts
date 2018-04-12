@@ -1,9 +1,14 @@
 import { MemoryLockException } from "Tools/SwarmExceptions";
 
-export class MemoryBase<T extends Dictionary> {
-    constructor(fromMemory: T) {
+declare type ObjectType = {
+    dataType: SwarmDataType,
+    swarmType: SwarmType,
+    subType: SwarmSubType
+}
+export class MemoryBase {
+    constructor(memoryInit: Dictionary) {
         this._checkedOut = false;
-        this._cache = fromMemory;
+        this._cache = memoryInit;
         this._flashMemory = CopyObject(this._cache);
     }
     protected get cache() {
@@ -12,24 +17,27 @@ export class MemoryBase<T extends Dictionary> {
         }
         return this._flashMemory;
     }
-    private _cache: T;
-    private _flashMemory: T;
+    private _cache: Dictionary;
+    private _flashMemory: Dictionary;
     private _checkedOut: boolean;
 
-    get id(): string { return this.cache.id; }
-    get isActive(): boolean { return this.cache.isActive; }
+    get id(): string { return this._flashMemory.id; }
+    get isActive(): boolean { return this._flashMemory.isActive; }
     get IsCheckedOut(): boolean { return this._checkedOut }
-    get MEM_TYPE(): SwarmDataType { return this.cache.MEM_TYPE; }
-    get SWARM_TYPE(): SwarmType { return this.cache.SWARM_TYPE; }
-    get SUB_TYPE(): SwarmSubType { return this.cache.SUB_TYPE; }
 
-    ReserveMemory(): void {
+    get ObjectType(): ObjectType { return this._flashMemory.ObjectType; }
+
+    get MEM_TYPE(): SwarmDataType { return this._flashMemory.MEM_TYPE; }
+    get SWARM_TYPE(): SwarmType { return this._flashMemory.SWARM_TYPE; }
+    get SUB_TYPE(): SwarmSubType { return this._flashMemory.SUB_TYPE; }
+
+    ReserveData(): void {
         if (this._checkedOut) {
             throw new MemoryLockException(this._checkedOut, "Memory already checked out");
         }
         this._checkedOut = true;
     }
-    ReleaseMemory(): Dictionary {
+    ReleaseData(): Dictionary {
         if (!this._checkedOut) {
             throw new MemoryLockException(this._checkedOut, "Memory not checked out");
         }
@@ -39,19 +47,18 @@ export class MemoryBase<T extends Dictionary> {
     }
 
     HasData(valueID: string) {
-        return !!this._flashMemory[valueID];
+        return !(this._flashMemory[valueID] === undefined);
     }
     GetData<T>(valueID: string): T {
         return this._flashMemory[valueID];
     }
     SetData<T>(valueID: string, newValue: T, saveToMemory: boolean) {
-        /*if (!this._checkedOut && saveToMemory) {
+        if (!this._checkedOut) {
             throw new MemoryLockException(this._checkedOut, "Memory must be checked out before you can save to it");
-        }*/
-        // (TODO): Update set data to enforce the memory being checked out
+        }
         this._flashMemory[valueID] = newValue;
         if (saveToMemory) {
-            this._cache[valueID] = newValue;
+            this._cache[valueID] = CopyObject(newValue);
         }
     }
     DeleteData(valueID: string, deleteFromMemory: boolean = false) {
@@ -60,44 +67,45 @@ export class MemoryBase<T extends Dictionary> {
             delete this._cache[valueID];
         }
     }
-    GetMemoryIDs(): string[] { return Object.keys(this._flashMemory); }
+    GetDataIDs(): string[] { return Object.keys(this._flashMemory); }
 }
 
-export class MemoryObject extends MemoryBase<any> {
-
-}
 const CHILD_DATA_ID = 'ChildData';
-export class ParentMemory<T extends MasterDataType> extends MemoryBase<T> {
-    constructor(data: T) {
+export class ParentMemory extends MemoryBase {
+    constructor(data: Dictionary) {
         super(data);
         this._childData = CopyObject(this.GetData(CHILD_DATA_ID))
     }
+
     private _childData: Dictionary;
-    private _childMemory: IDictionary<MemoryObject> = {}
-    HasData(id: string) { return !!this._childData[id] }
+    private _childMemory: IDictionary<MemoryBase> = {}
+
     GetMemoryIDs() { return Object.keys(this._childData); }
+    HasMemory(id: string) { return !!this._childData[id] }
     CheckoutChildMemory(id: string) {
         if (!this._childMemory[id]) {
             this._childMemory[id] = new MemoryBase(this._childData[id]);
         }
         let mem = this._childMemory[id]
-        mem.ReserveMemory();
+        mem.ReserveData();
         return mem;
     }
-    SaveChildMemory(childMemory: MemoryObject, saveToMemory: boolean): void {
+
+    SaveChildMemory(childMemory: MemoryBase, saveToMemory: boolean): void {
         if (!this._childMemory[childMemory.id]) {
             this._childMemory[childMemory.id] = childMemory;
         }
-        this._childData[childMemory.id] = childMemory.ReleaseMemory();
+        this._childData[childMemory.id] = childMemory.ReleaseData();
         if (saveToMemory) {
             this.SetData(CHILD_DATA_ID, this._childData, saveToMemory);
         }
     }
+
     DeleteChildMemory(id: string, saveToMemory: boolean = true): void {
-        if (!!this._childMemory[id]) {
+        if (this._childMemory[id] !== undefined) {
             delete this._childMemory[id];
         }
-        if (!!this._childData[id]) {
+        if (this._childData[id] !== undefined) {
             delete this._childData[id];
         }
         if (saveToMemory) {

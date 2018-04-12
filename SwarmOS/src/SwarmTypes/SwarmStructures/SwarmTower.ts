@@ -3,6 +3,15 @@ import { profile } from "Tools/Profiler";
 
 @profile
 export class SwarmTower extends OwnedSwarmStructure<STRUCTURE_TOWER, StructureTower> implements AITower, StructureTower {
+    RefreshObject(): void {
+        throw new Error("Method not implemented.");
+    }
+    FinalizeObject(): void {
+        throw new Error("Method not implemented.");
+    }
+    AssignCreep(name: string): boolean {
+        throw new Error("Method not implemented.");
+    }
     get energy() { return this._instance.energy; }
     get energyCapacity() { return this._instance.energyCapacity; }
 

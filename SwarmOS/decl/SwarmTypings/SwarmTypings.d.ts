@@ -33,9 +33,11 @@ declare type SwarmStructureType = SwarmType.SwarmContainer | SwarmType.SwarmCont
 declare type SwarmObjectType = Room | RoomObject | AIConsulObject
 declare type SwarmObjectTypeWithID = Creep | Structure | RoomObjectType;
 declare interface AIBase<T extends SwarmData, U extends SwarmObjectType> extends _Constructor<U> {
-    Activate(): void;
     InitAsNew(): void;
+    RefreshObject(): void;
     PrepObject(): void;
+    ActivateObject(): void;
+    FinalizeObject(): void;
     GetMemType(): SwarmDataType;
     GetSubType(): SwarmSubType;
     GetSwarmType(): SwarmType;

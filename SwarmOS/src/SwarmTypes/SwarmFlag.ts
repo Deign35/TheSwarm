@@ -1,13 +1,21 @@
 import { SwarmTypeBase } from "SwarmTypes/SwarmTypes";
 
 export class SwarmFlag_Base<T extends FlagType> extends SwarmTypeBase<IData, Flag> implements AIFlag, Flag {
+    RefreshObject(): void {
+        this._instance = Game.flags[this.id];
+    }
+    FinalizeObject(): void {
+        throw new Error("Method not implemented.");
+    }
+    AssignCreep(name: string): boolean {
+        throw new Error("Method not implemented.");
+    }
     get pos() { return this._instance.pos; }
     get room() { return this._instance.room; }
     get prototype(): Flag { return this._instance as Flag; }
     get color() { return this._instance.color; }
     get secondaryColor() { return this._instance.secondaryColor; }
     get name() { return this._instance.name; }
-    get id() { return this._instance.name; }
 
     remove() { return this._instance.remove(); }
     setColor(color: ColorConstant, secondaryColor?: ColorConstant) {

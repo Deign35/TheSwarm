@@ -3,6 +3,15 @@ import { profile } from "Tools/Profiler";
 
 @profile
 export class SwarmLab extends OwnedSwarmStructure<STRUCTURE_LAB, StructureLab> implements AILab, StructureLab {
+    RefreshObject(): void {
+        throw new Error("Method not implemented.");
+    }
+    FinalizeObject(): void {
+        throw new Error("Method not implemented.");
+    }
+    AssignCreep(name: string): boolean {
+        throw new Error("Method not implemented.");
+    }
     get cooldown() { return this._instance.cooldown; }
     get energy() { return this._instance.energy; }
     get energyCapacity() { return this._instance.energyCapacity; }

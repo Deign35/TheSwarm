@@ -23,6 +23,15 @@ declare interface SpawnRequest {
 @profile
 export class SwarmSpawn extends OwnedSwarmStructure<STRUCTURE_SPAWN, StructureSpawn>
     implements AISpawn, StructureSpawn, SpawnData {
+    RefreshObject(): void {
+        throw new Error("Method not implemented.");
+    }
+    FinalizeObject(): void {
+        throw new Error("Method not implemented.");
+    }
+    AssignCreep(name: string): boolean {
+        throw new Error("Method not implemented.");
+    }
     Activate() {
         if (this.memory.HasData(FLASH_CURRENT_REQUEST)) {
             let request = this.memory.GetData<SpawnRequest>(FLASH_CURRENT_REQUEST);
