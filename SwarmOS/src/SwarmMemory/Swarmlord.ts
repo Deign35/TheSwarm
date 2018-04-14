@@ -116,18 +116,18 @@ export class Swarmlord {
         }
     }
 
-    SaveMasterMemory<T extends MasterDataType>(memObject: ParentMemory<T>): void {
-        Memory[memObject.id] = memObject.ReleaseMemory();
+    SaveMasterMemory<T extends MasterDataType>(memObject: ParentMemory): void {
+        Memory[memObject.id] = memObject.ReleaseData();
     }
 
-    CheckoutMasterMemory(id: string): ParentMemory<MasterDataType> {
+    CheckoutMasterMemory(id: string): ParentMemory {
         let data = CopyObject(Memory[id]);
         let newMem = new ParentMemory(data);
 
         if (!newMem) {
             throw new NotImplementedException("[Swarmlord.CheckoutMasterMemory] -- Attempted to checkout memory that isn't mastered correctly: " + id);
         }
-        newMem.ReserveMemory();
+        newMem.ReserveData();
         return newMem;
     }
 }

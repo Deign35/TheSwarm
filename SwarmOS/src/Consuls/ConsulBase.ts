@@ -3,7 +3,7 @@ import { NotImplementedException } from "Tools/SwarmExceptions";
 
 export class ConsulObject implements _Constructor<AIConsulObject>,
     AIConsulObject {
-    constructor(public readonly ConsulType: ConsulType) { }
+    constructor(public readonly ConsulType: ConsulType, public id: string) { }
     get prototype(): AIConsulObject {
         return this;
     }

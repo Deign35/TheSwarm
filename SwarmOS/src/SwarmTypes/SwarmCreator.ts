@@ -17,7 +17,7 @@ import { ObjBase } from "./SwarmTypes";
 
 @profile
 export class SwarmCreator {
-    static CreateNewSwarmMemory(id: string, swarmType: SwarmType): MemoryObject {
+    static CreateNewSwarmMemory(id: string, swarmType: SwarmType): MemoryBase {
         let newMemory: any;
         switch (swarmType) {
             case (SwarmType.SwarmContainer):

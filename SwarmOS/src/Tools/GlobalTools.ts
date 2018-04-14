@@ -1,7 +1,7 @@
 import { Stopwatch } from "./Stopwatch";
 import { SwarmLogger } from "Tools/SwarmLogger";
 import { SwarmCreator } from "SwarmTypes/SwarmCreator";
-import { MemoryObject } from "SwarmMemory/SwarmMemory";
+import { MemoryBase } from "SwarmMemory/SwarmMemory";
 
 global['Stopwatch'] = Stopwatch;
 global['SwarmLogger'] = SwarmLogger;
@@ -31,7 +31,7 @@ export class GlobalTools {
     }
 
     // (TODO): Create a tools consul that manages memory for things, maybe only use flash memory!
-    static DoTest(testID: string, memObject: MemoryObject, testFunction: () => void,
+    static DoTest(testID: string, memObject: MemoryBase, testFunction: () => void,
         workingVersion?: (exc: Error) => void) {
         try {
             testFunction();

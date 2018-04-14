@@ -971,6 +971,7 @@ declare const Creep: CreepConstructor;
 interface Flag extends RoomObject {
     readonly prototype: Flag;
 
+    id: string;
     /**
      * Flag color. One of the `COLOR_*` constants.
      */
@@ -2826,6 +2827,7 @@ interface TextStyle {
 interface Room {
     readonly prototype: Room;
 
+    id: string;
     /**
      * The Controller structure of this room, if present, otherwise undefined.
      */

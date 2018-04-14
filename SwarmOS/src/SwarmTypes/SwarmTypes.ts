@@ -1,11 +1,11 @@
 import { ConsulObject } from "Consuls/ConsulBase";
-import { MemoryObject, MemoryBase } from "SwarmMemory/SwarmMemory";
+import { MemoryBase } from "SwarmMemory/SwarmMemory";
 import { SwarmLoader } from "./SwarmLoader";
 
 export type ObjBase = ObjectBase<IData, SwarmObjectType>;
 
 export abstract class ObjectBase<T extends IData, U extends SwarmObjectType> implements AIObject {
-    constructor(data: MemoryBase<T>, obj: U) {
+    constructor(data: MemoryBase, obj: U) {
         this._memory = data;
         this._instance = obj;
     }
@@ -29,11 +29,11 @@ export abstract class ObjectBase<T extends IData, U extends SwarmObjectType> imp
     }
 
     get id(): string { return this.memory.id; }
-    get memory(): MemoryBase<T> { return this._memory; }
+    get memory(): MemoryBase { return this._memory; }
     get prototype(): U { return this._instance; }
     get updateFrequency(): number { return 10; }
 
-    protected _memory!: MemoryBase<T>;
+    protected _memory!: MemoryBase;
     protected _instance!: U;
 
     abstract GetMemType(): SwarmDataType;
