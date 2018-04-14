@@ -1,8 +1,12 @@
-'use strict'
+/**
+ * Initial commit was copied from 
+ * https://github.com/ScreepsQuorum/screeps-quorum/tree/7254e727868fdc30e93b4e4dc8e015021d08a6ef
+ * 
+ */
 
-const Scheduler = require('qos_scheduler')
-const Performance = require('qos_performance')
-const Process = require('qos_process')
+import * as Performance from "./Performance";
+import * as Process from "./Process";
+import * as Scheduler from "./Scheduler";
 
 global.BUCKET_EMERGENCY = 1000
 global.BUCKET_FLOOR = 2000
@@ -18,14 +22,16 @@ const RECURRING_BURST = 1.75
 const RECURRING_BURST_FREQUENCY = 25
 const MIN_TICKS_BETWEEN_GC = 20
 const GLOBAL_LAST_RESET = Game.time
-const IVM = typeof Game.getHeapStatistics === 'function'
+const IVM = typeof Game.cpu.getHeapStatistics === 'function'
 
-class QosKernel {
+declare var Memory: any;
+
+class SwarmKernel {
     constructor() {
         global.kernel = this
 
-        if (!Memory.qos) {
-            Memory.qos = {}
+        if (!Memory.SwarmOS) {
+            Memory.SwarmOS = {}
         }
         this.newglobal = GLOBAL_LAST_RESET === Game.time
         this.simulation = !!Game.rooms['sim']
@@ -33,6 +39,11 @@ class QosKernel {
         this.performance = new Performance()
         this.process = Process
     }
+    private newglobal: boolean;
+    private simulation: boolean;
+    private scheduler: Scheduler;
+    private performance: Performance;
+    private process: Process;
 
     start() {
         if (IVM) {

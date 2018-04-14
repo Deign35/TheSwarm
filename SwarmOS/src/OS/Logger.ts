@@ -1,10 +1,20 @@
-'use strict'
+/**
+ * Initial commit was copied from 
+ * https://github.com/ScreepsQuorum/screeps-quorum/tree/7254e727868fdc30e93b4e4dc8e015021d08a6ef
+ * 
+ */
 
+declare const LOG_FATAL = 5;
 global.LOG_FATAL = 5
+declare const LOG_ERROR = 4;
 global.LOG_ERROR = 4
+declare const LOG_WARN = 3;
 global.LOG_WARN = 3
+declare const LOG_INFO = 2;
 global.LOG_INFO = 2
+declare const LOG_DEBUG = 1;
 global.LOG_DEBUG = 1
+declare const LOG_TRACE = 0;
 global.LOG_TRACE = 0
 
 const ERROR_COLORS = {
@@ -17,12 +27,14 @@ const ERROR_COLORS = {
     'highlight': '#ffff00'
 }
 
-class Logger {
+declare var Memory: any;
+export class SwarmLogger {
     constructor() {
         this.defaultLogGroup = 'default'
     }
+    private defaultLogGroup: string;
 
-    log(message, severity = 3, group = false, tags = []) {
+    log(message: string, severity: number = 3, group?: string, tags: string[] = []) {
         if (!group) {
             group = this.defaultLogGroup
         }
@@ -73,5 +85,3 @@ class Logger {
         return this.highlight(JSON.stringify(data))
     }
 }
-
-module.exports = Logger
