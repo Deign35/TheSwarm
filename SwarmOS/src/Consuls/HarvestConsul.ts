@@ -39,7 +39,7 @@ export class HarvestConsul extends SwarmConsulBase<ConsulType.Harvest>
                 this.SourceObjects[ids[i]] = source;
             }
 
-            this.SourceObjects[ids[i]].memory.ReserveMemory();
+            this.SourceObjects[ids[i]].memory.ReserveData();
             this.SourceObjects[ids[i]].PrepObject();
             this.PrepSource(this.SourceObjects[ids[i]]);
         }

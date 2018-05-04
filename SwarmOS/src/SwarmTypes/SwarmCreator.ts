@@ -329,7 +329,7 @@ export class SwarmCreator {
         switch (swarmType) {
             case (SwarmType.SwarmRoom): return RoomType.NeutralRoom;
             case (SwarmType.SwarmCreep):
-                SwarmLogger.LogWarning('DefaultSwarmSubType for Creep is being called unexpectedly');
+                Logger.warn('DefaultSwarmSubType for Creep is being called unexpectedly');
                 return CreepType.None;
             case (SwarmType.SwarmConsul): return ConsulType.None;
             case (SwarmType.SwarmFlag): return FlagType.None;

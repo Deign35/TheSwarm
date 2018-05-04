@@ -28,7 +28,7 @@ export class Swarmlord {
             initTimer.Start();
             global['Swarmlord'] = this;
 
-            SwarmLogger.Log("Begin initialization of memory for entire Swarm(" + SWARM_VERSION_DATE + ")");
+            Logger.warn("Begin initialization of memory for entire Swarm(" + SWARM_VERSION_DATE + ")");
             let newMemory: IMemory = {
                 [MASTER_CONSUL_MEMORY_ID]: {
                     id: MASTER_CONSUL_MEMORY_ID,
@@ -106,7 +106,7 @@ export class Swarmlord {
 
             Memory['INIT'] = true;
             initTimer.Stop();
-            SwarmLogger.Log("End initialization of memory.  Initialization took: " + initTimer.ToString());
+            Logger.warn("End initialization of memory.  Initialization took: " + initTimer.ToString());
         }
     }
 

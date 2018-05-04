@@ -3,7 +3,7 @@ import { SwarmTypeBase } from "SwarmTypes/SwarmTypes";
 import { SwarmSpawn } from "SwarmTypes/SwarmStructures/SwarmSpawn";
 import { SwarmLoader } from "SwarmTypes/SwarmLoader";
 import { ConsulObject, SwarmConsul } from "Consuls/ConsulBase";
-import { MemoryObject } from "SwarmMemory/SwarmMemory";
+import { MemoryBase } from "SwarmMemory/SwarmMemory";
 import { NotImplementedException } from "Tools/SwarmExceptions";
 import { HarvestConsul } from "Consuls/HarvestConsul";
 import { ControlConsul } from "Consuls/ControlConsul";
@@ -16,7 +16,7 @@ const FLASH_REFRESH_TICK = 'refreshTick';
 @profile
 export class SwarmRoom_Base<T extends RoomType> extends SwarmTypeBase<IData, Room> implements AIRoom, Room {
     RefreshObject(): void {
-        
+
     }
     FinalizeObject(): void {
         throw new Error("Method not implemented.");
@@ -78,15 +78,15 @@ export class SwarmRoom_Base<T extends RoomType> extends SwarmTypeBase<IData, Roo
 
             } else {
                 let spawn = SwarmLoader.GetObject<SwarmSpawn>(this.spawns[0], MASTER_STRUCTURE_MEMORY_ID);
-                spawn.memory.ReserveMemory();
+                spawn.memory.ReserveData();
                 spawn.spawnCreep(body, name, opts);
-                spawn.memory.ReleaseMemory();
+                spawn.memory.ReleaseData();
             }
         }
     }
 
     InitAsNew() {
-        SwarmLogger.Log("Initializing a new room");
+        Logger.error("Initializing a new room");
         this.memory.SetData('Adj', GetSUID(), true);
         let roomType = this.controller && this.controller.owner &&
             this.controller.owner.username == MY_USERNAME &&
@@ -104,7 +104,7 @@ export class SwarmRoom_Base<T extends RoomType> extends SwarmTypeBase<IData, Roo
                         roomType = RoomType.HarvestSupport;
                         //SwarmLoader.LoadObject(this.controller.id, this.controller, MASTER_STRUCTURE_MEMORY_ID);
                         let controlConsul = SwarmLoader.GetObject<ControlConsul>("Control", MASTER_CONSUL_MEMORY_ID);
-                        controlConsul.memory.ReserveMemory();
+                        controlConsul.memory.ReserveData();
                         controlConsul.AddControllerID(this.controller!.id);
                         SwarmLoader.SaveObject(controlConsul);
                     } else {
@@ -125,7 +125,7 @@ export class SwarmRoom_Base<T extends RoomType> extends SwarmTypeBase<IData, Roo
             }
         } else {
             let controlConsul = SwarmLoader.GetObject<ControlConsul>("Control", MASTER_CONSUL_MEMORY_ID);
-            controlConsul.memory.ReserveMemory();
+            controlConsul.memory.ReserveData();
             controlConsul.AddControllerID(this.controller!.id);
             SwarmLoader.SaveObject(controlConsul);
         }
@@ -148,7 +148,7 @@ export class SwarmRoom_Base<T extends RoomType> extends SwarmTypeBase<IData, Roo
         // (TODO): Instead of TryFindNewObjects, use a single LookAtArea and find all objects for the new room.
         this.TryFindNewObjects(true);
         let harvestConsul = SwarmLoader.GetObject<HarvestConsul>("Harvest", MASTER_CONSUL_MEMORY_ID);
-        harvestConsul.memory.ReserveMemory();
+        harvestConsul.memory.ReserveData();
         harvestConsul.AddSourceIDs(sourceIDs);
         SwarmLoader.SaveObject(harvestConsul);
     }

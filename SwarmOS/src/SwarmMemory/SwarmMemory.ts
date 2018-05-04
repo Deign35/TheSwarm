@@ -8,8 +8,8 @@ declare type ObjectType = {
 export class MemoryBase {
     constructor(memoryInit: Dictionary) {
         this._checkedOut = false;
-        this._cache = memoryInit;
-        this._flashMemory = CopyObject(this._cache);
+        this._memory = memoryInit;
+        this._flashMemory = CopyObject(this._memory);
     }
     protected get cache() {
         if (!this._checkedOut) {
@@ -17,7 +17,7 @@ export class MemoryBase {
         }
         return this._flashMemory;
     }
-    private _cache: Dictionary;
+    private _memory: Dictionary;
     private _flashMemory: Dictionary;
     private _checkedOut: boolean;
 
@@ -43,7 +43,7 @@ export class MemoryBase {
         }
 
         this._checkedOut = false;
-        return this._cache;
+        return this._memory;
     }
 
     HasData(valueID: string) {
@@ -58,13 +58,13 @@ export class MemoryBase {
         }
         this._flashMemory[valueID] = newValue;
         if (saveToMemory) {
-            this._cache[valueID] = CopyObject(newValue);
+            this._memory[valueID] = CopyObject(newValue);
         }
     }
     DeleteData(valueID: string, deleteFromMemory: boolean = false) {
         delete this._flashMemory[valueID];
         if (deleteFromMemory) {
-            delete this._cache[valueID];
+            delete this._memory[valueID];
         }
     }
     GetDataIDs(): string[] { return Object.keys(this._flashMemory); }

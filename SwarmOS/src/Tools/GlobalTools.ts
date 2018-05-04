@@ -5,6 +5,7 @@ import { MemoryBase } from "SwarmMemory/SwarmMemory";
 
 global['Stopwatch'] = Stopwatch;
 global['SwarmLogger'] = SwarmLogger;
+global['Logger'] = new SwarmLogger('Global');
 global['SwarmCreator'] = SwarmCreator;
 
 export class GlobalTools {
@@ -31,16 +32,18 @@ export class GlobalTools {
     }
 
     // (TODO): Create a tools consul that manages memory for things, maybe only use flash memory!
-    static DoTest(testID: string, memObject: MemoryBase, testFunction: () => void,
+    static DoTest(testID: string,
+        memObject: MemoryBase,
+        testFunction: () => void,
         workingVersion?: (exc: Error) => void) {
         try {
             testFunction();
             if (!memObject.HasData(testID)) {
-                SwarmLogger.Log('Test[' + testID + ']: Success');
+                Logger.info('Test[' + testID + ']: Success');
                 memObject.SetData(testID, true, false);
             }
         } catch (exc) {
-            SwarmLogger.Log('SwarmRoom_Base [' + testID + '] failed [' + JSON.stringify(exc) + ']');
+            Logger.error('SwarmRoom_Base [' + testID + '] failed [' + JSON.stringify(exc) + ']');
             memObject.DeleteData(testID);
             if (workingVersion) {
                 workingVersion(exc);

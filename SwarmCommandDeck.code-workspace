@@ -1,28 +1,28 @@
 {
-	"folders": [
-		{
-			"path": "."
-		}
-	],
-	"settings": {
-		"files.exclude": {
-			"**/.git": true,
-			"**/.svn": true,
-			"**/.tscache": true,
-			"**/.vs": true,
-			"**/.vscode": true,
-			"**/node_modules": true,
-			"**/screeps.json": true,
-			"**/*.sln": true,
-			"**/*.njsproj*": true,
-			"**/npm*/": true,
-			"**/build/": true,
-			"**/dist/": true,
-			"**/package*.json": true,
-			"**/tsconfig.json": true,
-			"**/Gruntfile.js": true,
-			"**/README.md": true
-		},
-		"mocha.enabled": false,
-	}
+    "folders": [
+        {
+            "path": "."
+        }
+    ],
+    "settings": {
+        "files.exclude": {
+            "**/.git": true,
+            "**/.svn": true,
+            "**/.tscache": true,
+            "**/.vs": true,
+            "**/.vscode": true,
+            "**/node_modules": true,
+            "**/screeps.json": true,
+            "**/*.sln": true,
+            "**/*.njsproj*": true,
+            "**/npm*/": true,
+            "**/build/": true,
+            "**/dist/": true,
+            "**/package*.json": false,
+            "**/tsconfig.json": true,
+            "**/Gruntfile.js": true,
+            "**/README.md": true
+        },
+        "mocha.enabled": false,
+    }
 }

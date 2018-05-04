@@ -1,4 +1,4 @@
-import { ParentMemory, MemoryBase } from "SwarmMemory/SwarmMemory";
+/*import { ParentMemory, MemoryBase } from "SwarmMemory/SwarmMemory";
 import { ObjBase } from "./SwarmTypes";
 import { ConsulObject } from "Consuls/ConsulBase";
 

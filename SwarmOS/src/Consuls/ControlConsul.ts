@@ -28,7 +28,7 @@ export class ControlConsul extends SwarmConsulBase<ConsulType.Control> implement
         this.memory.SetData(CONTROLLER_IDS, oldIDs, true);
     }
     PrepObject() {
-        this.memory.ReserveMemory();
+        this.memory.ReserveData();
         let ids = this.controllerIDs;
         for (let i = 0; i < ids.length; i++) {
             if (!this.ControllerObjects[ids[i]]) {
@@ -36,7 +36,7 @@ export class ControlConsul extends SwarmConsulBase<ConsulType.Control> implement
                 this.ControllerObjects[ids[i]] = controller;
             }
 
-            this.ControllerObjects[ids[i]].memory.ReserveMemory();
+            this.ControllerObjects[ids[i]].memory.ReserveData();
             this.ControllerObjects[ids[i]].PrepObject();
             this.PrepController(this.ControllerObjects[ids[i]]);
         }
@@ -63,7 +63,7 @@ export class ControlConsul extends SwarmConsulBase<ConsulType.Control> implement
             if (controller.creeps.length == 0) {
                 let creepBody: BodyPartConstant[] = [WORK, CARRY, MOVE];
                 let room = SwarmLoader.GetObject<SwarmRoom>(controller.room.name, MASTER_ROOM_MEMORY_ID);
-                room.memory.ReserveMemory();
+                room.memory.ReserveData();
                 SwarmLoader.GetObject<SwarmRoom>(controller.room.name, MASTER_ROOM_MEMORY_ID).TrySpawn(
                     creepBody, {
                         requestorID: controller.id,

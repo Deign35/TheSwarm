@@ -9,7 +9,7 @@ export class SwarmQueen {
     }
     static ActivateTheSwarm() {
         DoTheSwarm((obj: ObjBase): void => {
-            obj.Activate();
+            obj.ActivateObject();
         });
     }
     static SaveTheSwarm() {

@@ -3,7 +3,7 @@ import { ConsulObject, SwarmConsul } from "Consuls/ConsulBase";
 import { NotImplementedException } from "Tools/SwarmExceptions";
 import { SwarmCreep } from "./SwarmCreep";
 import { ObjBase, ObjectBase } from "SwarmTypes/SwarmTypes";
-import { ParentMemory, MemoryObject } from "SwarmMemory/SwarmMemory";
+import { ParentMemory, MemoryBase } from "SwarmMemory/SwarmMemory";
 import { SwarmFlag } from "SwarmTypes/SwarmFlag";
 import { SwarmRoom } from "SwarmTypes/SwarmRoom";
 import { SwarmRoomObjectType } from "./SwarmRoomObjects";
@@ -15,13 +15,13 @@ export class SwarmLoader {
     static MasterMemoryIds = [MASTER_CONSUL_MEMORY_ID, MASTER_CREEP_MEMORY_ID, MASTER_FLAG_MEMORY_ID,
         MASTER_ROOM_MEMORY_ID, MASTER_ROOMOBJECT_MEMORY_ID, MASTER_STRUCTURE_MEMORY_ID]
     protected static MasterMemory: {
-        [id: string]: ParentMemory<any>,
-        [MASTER_CONSUL_MEMORY_ID]: ParentMemory<IMasterConsulData>,
-        [MASTER_CREEP_MEMORY_ID]: ParentMemory<IMasterCreepData>,
-        [MASTER_FLAG_MEMORY_ID]: ParentMemory<IMasterFlagData>,
-        [MASTER_ROOM_MEMORY_ID]: ParentMemory<IMasterRoomData>,
-        [MASTER_ROOMOBJECT_MEMORY_ID]: ParentMemory<IMasterRoomObjectData>,
-        [MASTER_STRUCTURE_MEMORY_ID]: ParentMemory<IMasterStructureData>
+        [id: string]: ParentMemory,
+        [MASTER_CONSUL_MEMORY_ID]: ParentMemory,
+        [MASTER_CREEP_MEMORY_ID]: ParentMemory,
+        [MASTER_FLAG_MEMORY_ID]: ParentMemory,
+        [MASTER_ROOM_MEMORY_ID]: ParentMemory,
+        [MASTER_ROOMOBJECT_MEMORY_ID]: ParentMemory,
+        [MASTER_STRUCTURE_MEMORY_ID]: ParentMemory
     }
     protected static TheSwarm: {
         [dataType: string]: {
@@ -57,7 +57,7 @@ export class SwarmLoader {
     }
 
     static RefreshTheSwarm() {
-        
+
     }
     static LoadTheSwarm() {
         if (!global['SwarmRoomIDs'] || !this.SwarmRoomIDs) {
@@ -94,7 +94,7 @@ export class SwarmLoader {
 
         let keys = this.MasterMemory[MASTER_CONSUL_MEMORY_ID].GetMemoryIDs();
         for (let i = 0; i < keys.length; i++) {
-            let consulObj = new ConsulObject(ConsulType.None);
+            let consulObj = new ConsulObject(ConsulType.None, keys[i]);
             this.LoadObject(keys[i], consulObj, MASTER_CONSUL_MEMORY_ID);
         }
 
@@ -147,15 +147,15 @@ export class SwarmLoader {
             return;
         }
         if (!this.MasterMemory[dataType].HasData(saveID)) {
-            let newMem = SwarmCreator.CreateNewSwarmMemory(saveID, SwarmCreator.GetSwarmType(obj)) as MemoryObject
-            newMem.ReserveMemory();
+            let newMem = SwarmCreator.CreateNewSwarmMemory(saveID, SwarmCreator.GetSwarmType(obj)) as MemoryBase
+            newMem.ReserveData();
             let newObj = SwarmCreator.CreateSwarmObject(obj, newMem) as ObjBase
             newObj.InitAsNew();
             this.SaveObject(newObj);
         }
         let objMem = this.MasterMemory[dataType].CheckoutChildMemory(saveID);
         this.AddObjectToTheSwarm(SwarmCreator.CreateSwarmObject(obj, objMem));
-        objMem.ReleaseMemory();
+        objMem.ReleaseData();
     }
 
     static GetSwarmControllerDataTypeFromObject(swarmType: SwarmType) {
