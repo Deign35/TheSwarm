@@ -33,11 +33,6 @@
             "Consul": 6,
             "Master": 7
         },
-        "LogLevel": {
-            "Info": 0,
-            "Warn": 1,
-            "Error": 2
-        },
         "SwarmType": {
             "None": -1,
             "SwarmSite": 1,

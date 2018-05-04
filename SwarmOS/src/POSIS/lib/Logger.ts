@@ -35,7 +35,7 @@ export class Logger implements IPosisLogger {
     if (tick != Game.time) y = 0.2
     tick = Game.time
     let style = styles[level] || styles.default;
-    let color = style.match(/color: ([a-z]*)/)[1]
+    let color = style.match(/color: ([a-z]*)/)![1]
     let vis = new RoomVisual()
     vis.text(message, 0, y, { align: 'left', color })
     y += 0.8

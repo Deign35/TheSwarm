@@ -97,8 +97,14 @@ export class BaseKernel implements IPosisKernel, IPosisSleepExtension {
     }
 
     getProcessById(id: PosisPID): IPosisProcess | undefined {
-        return this.processTable[id] && this.processTable[id].status === "running" &&
-            (this._processCache[id] && this._processCache[id].process || this.createProcess(id));
+        if (this.processTable[id] && this.processTable[id].status === 'running') {
+            if (this._processCache[id]) {
+                return this._processCache[id].process;
+            } else {
+                return this.createProcess(id);
+            }
+        }
+        return;
     }
 
     // passing undefined as parentId means "make me a root process"
@@ -121,7 +127,7 @@ export class BaseKernel implements IPosisKernel, IPosisSleepExtension {
         for (let i = 0; i < ids.length; i++) {
             let id = ids[i];
             let pinfo = this.processTable[id];
-            if (pinfo.status !== "running" && pinfo.ended < Game.time - 100) {
+            if (pinfo.status !== "running" && (!pinfo.ended || pinfo.ended < Game.time - 100)) {
                 delete this.processTable[id];
             }
             if (pinfo.wake && pinfo.wake > Game.time) continue;

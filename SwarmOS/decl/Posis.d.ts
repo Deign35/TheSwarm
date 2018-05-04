@@ -13,11 +13,10 @@ declare interface IPosisInterfaces {
     spawn?: IPosisSpawnExtension;
     sleep?: IPosisSleepExtension;
     coop?: IPosisCooperativeScheduling;
-    segments?: IPosisSegmentsExtension;
+    //segments?: IPosisSegmentsExtension;
     [index: string]: IPosisExtension | undefined;
 }
 declare interface IPosisKernel extends IPosisExtension {
-
     /**
      * beings running a process
      * @param imageName registered image for the process constructor
@@ -78,7 +77,7 @@ declare interface IPosisProcessContext {
     /** Parent ID */
     readonly parentId: PosisPID;
     /** Logger */
-    readonly log: IPosisLogger;
+    readonly logger: IPosisLogger;
     queryPosisInterface<T extends keyof IPosisInterfaces>(interfaceId: T): IPosisInterfaces[T];
 }
 declare interface IPosisProcessRegistry {
@@ -107,6 +106,7 @@ declare interface IPosisSleepExtension {
      */
     sleep(ticks: number): void;
 }
+/*
 declare interface IPosisSegmentsExtension {
     // Returns undefined if segment isn't loaded,
     // else parsed JSON if contents is JSON, else string
@@ -120,6 +120,7 @@ declare interface IPosisSegmentsExtension {
     activate(id: number): void;
 }
 declare interface IPosisSegmentsValue { }
+*/
 declare const enum EPosisSpawnStatus {
     ERROR = -1,
     QUEUED,
@@ -186,4 +187,44 @@ declare interface IPosisSpawnOptions {
      * detached, may (but not guarantee) remove scheduled creeps from queue on process termination
      */
     pid?: PosisPID;
+}
+
+declare interface ProcessInfo {
+    id: PosisPID;
+    pid?: PosisPID;
+    name: string;
+    ns: string;
+    status: string;
+    started: number;
+    wake?: number;
+    ended?: number;
+    process?: IPosisProcess;
+    error?: string;
+}
+
+declare interface ProcessTable {
+    [id: string]: ProcessInfo;
+}
+
+declare interface ProcessMemoryTable {
+    [id: string]: {};
+}
+
+declare interface KernelMemory {
+    processTable: ProcessTable;
+    processMemory: ProcessMemoryTable;
+}
+
+declare var Memory: {
+    kernel: KernelMemory
+    IDGen: number
+}
+declare const enum LogLevel {
+    SILLY,
+    DEBUG = 0,
+    INFO,
+    ALERT,
+    WARN,
+    ERROR,
+    FATAL
 }
