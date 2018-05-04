@@ -1,7 +1,6 @@
 import { Logger } from "../lib/Logger";
 
 let logger = new Logger("[ProcessRegistry]");
-logger.level = LogLevel.DEBUG;
 
 export class ProcessRegistry implements IPosisProcessRegistry {
     constructor() { }

@@ -1,14 +1,13 @@
 import { Logger } from "../lib/Logger";
 
 let logger = new Logger("[ExtensionRegistry]");
-logger.level = LogLevel.DEBUG;
 
 export class ExtensionRegistry implements IPosisExtension {
     constructor() {
         this.registry = {};
         this.register('SwarmExtensionRegistry', this);
     }
-    
+
     private registry: { [interfaceId: string]: IPosisExtension };
     register(interfaceId: string, extension: IPosisExtension): boolean {
         if (this.registry[interfaceId]) {

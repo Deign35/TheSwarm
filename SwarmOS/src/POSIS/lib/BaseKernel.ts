@@ -143,7 +143,7 @@ export class BaseKernel implements IPosisKernel, IPosisSleepExtension {
                 this.killProcess(id);
                 pinfo.status = "crashed";
                 pinfo.error = e.stack || e.toString();
-                this.logger.error(() => `[${id}] ${pinfo.name} crashed\n${e.stack}`);
+                this.logger.error(`[${id}] ${pinfo.name} crashed\n${e.stack}`);
             }
         }
         if (runCnt == 0)

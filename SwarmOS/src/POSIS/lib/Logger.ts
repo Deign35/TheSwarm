@@ -1,61 +1,60 @@
-// Use for HTML styling (Colors match screeps_console)
-export const styles = {
-  default:           "color: white; background-color: black",
-  [LogLevel.SILLY]:  "color: darkblue",
-  [LogLevel.DEBUG]:  "color: darkblue",
-  [LogLevel.INFO]:   "color: darkgreen",
-  [LogLevel.ALERT]:  "color: cyan",
-  [LogLevel.WARN]:   "color: white",
-  [LogLevel.ERROR]:  "color: red",
-  [LogLevel.FATAL]:  "color: yellow; background-color: red",
-};
+/**
+ * Initial commit was copied from 
+ * https://github.com/ScreepsQuorum/screeps-quorum/tree/7254e727868fdc30e93b4e4dc8e015021d08a6ef
+ * 
+ */
 
-let y = 0;
-let tick = 0;
+declare const LOG_FATAL = 5;
+global.LOG_FATAL = 5
+declare const LOG_ERROR = 4;
+global.LOG_ERROR = 4
+declare const LOG_WARN = 3;
+global.LOG_WARN = 3
+declare const LOG_INFO = 2;
+global.LOG_INFO = 2
+declare const LOG_DEBUG = 1;
+global.LOG_DEBUG = 1
+declare const LOG_TRACE = 0;
+global.LOG_TRACE = 0
 
-export class Logger implements IPosisLogger {
-  private prefix: string;
-  public level: LogLevel = LogLevel.INFO;
+const ERROR_COLORS = [
+    '#666666',
+    '#737373',
+    '#999999',
+    '#809fff',
+    '#e65c00',
+    '#ff0066',
+];
 
-  constructor(prefix = "") {
-    this.prefix = prefix;
-  }
+declare var Memory: any;
+export class Logger {
+    constructor(public ID: string) { }
 
-  private log(level: LogLevel, message: (() => string) | string): void {
-    if (level >= this.level) {
-      if (typeof message === "function") {
-        message = message();
-      }
-      let style = styles[level] || styles.default;
-      console.log(`<log severity="${level}" style="${style}">[${level}] ${this.prefix} ${message}</log>`);
-      this.vlog(level, `[${level}] ${this.prefix} ${message}`)
+    trace(message: string) { return this.log(message, LOG_TRACE); }
+    debug(message: string) { return this.log(message, LOG_DEBUG); }
+    info(message: string) { return this.log(message, LOG_INFO); }
+    warn(message: string) { return this.log(message, LOG_WARN); }
+    error(message: string) { return this.log(message, LOG_ERROR); }
+    fatal(message: string) { return this.log(message, LOG_FATAL); }
+
+    private log(message: string, severity: number = 3) {
+        if (Memory.loglevel && Memory.loglevel > severity) {
+            return
+        }
+
+        //message = `[${severity}] ${message}`
+        let attributes = ''
+        /*let tag
+        if (tags) {
+            for (tag in tags) { // jshint ignore:line
+                attributes += ` ${tag}="${tags[tag]}"`
+            }
+        }*/
+        attributes += ` severity="${severity}"`
+        attributes += ` tick="${Game.time}"`
+        message = `<font color="${ERROR_COLORS[severity]}"${attributes}>${message}</font>`
+        console.log(message)
     }
-  }
-  private vlog(level: LogLevel, message: string): void {
-    if (tick != Game.time) y = 0.2
-    tick = Game.time
-    let style = styles[level] || styles.default;
-    let color = style.match(/color: ([a-z]*)/)![1]
-    let vis = new RoomVisual()
-    vis.text(message, 0, y, { align: 'left', color })
-    y += 0.8
-  }
-  debug (message: (() => string) | string): void {
-    this.log(LogLevel.DEBUG, message);
-  }
-  info (message: (() => string) | string): void {
-    this.log(LogLevel.INFO, message);
-  }
-  warn (message: (() => string) | string): void {
-    this.log(LogLevel.WARN, message);
-  }
-  alert (message: (() => string) | string): void {
-    this.log(LogLevel.ALERT, message);
-  }
-  error (message: (() => string) | string): void {
-    this.log(LogLevel.ERROR, message);
-  }
-  fatal (message: (() => string) | string): void {
-    this.log(LogLevel.FATAL, message);
-  }
 }
+
+global['Logger'] = new Logger('Global');
