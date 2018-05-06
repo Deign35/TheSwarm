@@ -1,8 +1,8 @@
 import { posisInterface } from "Core/ExtensionRegistry"
 
 interface IInitMemory {
-    posisTestId?: PosisPID,
-    sleepTestId?: PosisPID,
+    posisTestId?: PID,
+    sleepTestId?: PID,
     msg?: string,
     services: { [id: string]: ServiceDefinition }
 }
@@ -12,7 +12,7 @@ export interface ServiceDefinition {
     name: string
     context: any
     status: 'started' | 'stopped'
-    pid?: PosisPID
+    pid?: PID
 }
 
 class Init implements IPosisProcess {
@@ -22,9 +22,6 @@ class Init implements IPosisProcess {
     }
     get id() {
         return this.context.id
-    }
-    get log() {
-        return this.context.logger
     }
     get memory(): IInitMemory {
         return this.context.memory
@@ -38,13 +35,13 @@ class Init implements IPosisProcess {
     private kernel!: IPosisKernel
 
     run() {
-        this.log.info(`TICK! ${Game.time}`)
+        Logger.info(`TICK! ${Game.time}`)
         this.manageServices()
     }
 
     addService(id: string, name: string, context?: any, restart: boolean = false) {
         if (this.services[id]) return
-        this.log.warn(`Adding service ${id}`)
+        Logger.warn(`Adding service ${id}`)
         this.services[id] = {
             name, context, restart,
             status: 'started'
@@ -74,7 +71,7 @@ class Init implements IPosisProcess {
                     break
                 case "stopped":
                     if (proc && service && service.pid) {
-                        this.log.info(`Killing stopped process ${service.name} ${service.pid}`)
+                        Logger.info(`Killing stopped process ${service.name} ${service.pid}`)
                         this.kernel.killProcess(service.pid)
                     }
                     break

@@ -23,6 +23,12 @@
         "E_REQ_REJECTED": -7
     },
     "Enums": {
+        "ProcessState": {
+            "Init": 0,
+            "Running": 1,
+            "Killed": 2,
+            "Sleeping": 3
+        },
         "SwarmDataType": {
             "None": -1,
             "Structure": 1,

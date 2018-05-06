@@ -28,8 +28,6 @@ const ERROR_COLORS = [
 
 declare var Memory: any;
 export class SwarmLogger {
-    constructor(public ID: string) { }
-
     trace(message: string) { return this.log(message, LOG_TRACE); }
     debug(message: string) { return this.log(message, LOG_DEBUG); }
     info(message: string) { return this.log(message, LOG_INFO); }
@@ -42,7 +40,7 @@ export class SwarmLogger {
             return
         }
 
-        //message = `[${severity}] ${message}`
+        message = `[${severity}] ${message}`
         let attributes = ''
         /*let tag
         if (tags) {

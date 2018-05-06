@@ -26,37 +26,39 @@ class BaseSwarmProcess implements IPosisProcess {
         let kernel: IPosisKernel = this.context.queryPosisInterface("kernel") as IPosisKernel;
         let fatal = false;
 
-        if (this.log === undefined)
+        if (Logger === undefined)
             throw Error(`${this.testName}: 'log' is not set`);
 
         if (this.memory === undefined) {
-            this.log.error(`${this.testName}: 'memory' not set`);
+            Logger.error(`${this.testName}: 'memory' not set`);
             fatal = true;
         }
 
-        this.log.error(`${this.testName}: starting basic diagnostics`);
+        Logger.info(`${this.testName}: starting basic diagnostics`);
 
-        this.log.debug(`${this.testName}: debug message`);
-        this.log.info(`${this.testName}: info message`);
-        this.log.warn(`${this.testName}: warn message`);
-        this.log.error(`${this.testName}: error message`);
+        Logger.trace(`${this.testName}: trace message`);
+        Logger.debug(`${this.testName}: debug message`);
+        Logger.info(`${this.testName}: info message`);
+        Logger.warn(`${this.testName}: warn message`);
+        Logger.error(`${this.testName}: error message`);
+        Logger.fatal(`${this.testName}: fatal message`)
 
         if (this.imageName === undefined)
-            this.log.error(`${this.testName}: 'imageName' not set`);
+            Logger.error(`${this.testName}: 'imageName' not set`);
 
         if (this.imageName !== BaseSwarmProcess.ImageName)
-            this.log.error(`${this.testName}: 'imageName' not matching, expected: '${BaseSwarmProcess.ImageName}', actual '${this.imageName}'`);
+            Logger.error(`${this.testName}: 'imageName' not matching, expected: '${BaseSwarmProcess.ImageName}', actual '${this.imageName}'`);
 
         if (this.id === undefined)
-            this.log.error(`${this.testName}: 'id' not set`);
+            Logger.error(`${this.testName}: 'id' not set`);
 
         if (this.parentId === undefined)
-            this.log.error(`${this.testName}: 'parentId' not set`);
+            Logger.error(`${this.testName}: 'parentId' not set`);
 
-        this.log.error(`${this.testName}: basic diagnostics completed`);
+        Logger.info(`${this.testName}: basic diagnostics completed`);
 
         if (fatal) {
-            this.log.error(`${this.testName}: fatal errors, trying to exit`);
+            Logger.error(`${this.testName}: fatal errors, trying to exit`);
             kernel.killProcess(this.id);
             return;
         }
@@ -67,12 +69,12 @@ class BaseSwarmProcess implements IPosisProcess {
         }
 
         if (this.tmemory.supposedToBeDead)
-            this.log.error(`${this.testName}: can't exit`);
+            Logger.error(`${this.testName}: can't exit`);
 
-        this.log.info(`${this.testName}: started on ${this.tmemory.started}, running for ${Game.time - this.tmemory.started!}`);
+        Logger.info(`${this.testName}: started on ${this.tmemory.started}, running for ${Game.time - this.tmemory.started!}`);
 
         if (this.tmemory.maxRunTime === undefined) {
-            this.log.error(`${this.testName}: 'maxRunTime' is not set, arguments are not passed, or broken`);
+            Logger.error(`${this.testName}: 'maxRunTime' is not set, arguments are not passed, or broken`);
             return;
         }
 
@@ -92,14 +94,11 @@ class BaseSwarmProcess implements IPosisProcess {
     get imageName(): string { // image name (maps to constructor)
         return this.context.imageName;
     }
-    get id(): PosisPID { // ID
+    get id(): PID { // ID
         return this.context.id;
     }
-    get parentId(): PosisPID { // Parent ID
+    get parentId(): PID { // Parent ID
         return this.context.parentId;
-    }
-    get log(): IPosisLogger { // Logger
-        return this.context.logger;
     }
 }
 

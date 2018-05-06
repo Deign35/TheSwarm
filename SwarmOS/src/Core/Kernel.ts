@@ -1,27 +1,28 @@
 import { ProcessRegistry } from "Core/ProcessRegistry";
 import { ExtensionRegistry } from "Core/ExtensionRegistry";
 
+declare type ProcessCache = {
+    [id: string]: {
+        context: IPosisProcessContext,
+        process: IPosisProcess
+    }
+}
 
+declare type ProcessWithID = { pid: PID; process: IPosisProcess; };
+
+const PROCESS_GHOST_TIMER = 100;
 export class Kernel implements IPosisKernel, IPosisSleepExtension {
-    private _processCache: {
-        [id: string]: {
-            context: IPosisProcessContext,
-            process: IPosisProcess
-        }
-    };
-    private curId: string = "";
-    private logger: SwarmLogger = new SwarmLogger("[Kernel]");
+    private _processCache: ProcessCache;
+    private curProcessID: string = "";
 
     get memory(): KernelMemory {
         Memory.kernel = Memory.kernel || { processTable: {}, processMemory: {} };
         return Memory.kernel;
     }
     get processTable(): ProcessTable {
-        this.memory.processTable = this.memory.processTable || {};
         return this.memory.processTable;
     }
     get processMemory(): ProcessMemoryTable {
-        this.memory.processMemory = this.memory.processMemory || {};
         return this.memory.processMemory;
     }
 
@@ -29,130 +30,128 @@ export class Kernel implements IPosisKernel, IPosisSleepExtension {
         this._processCache = {};
     }
 
-    UID(): string {
-        return (Memory.IDGen++).toString()//("P" + Game.time.toString(26).slice(-6) + Math.random().toString(26).slice(-3)).toUpperCase();
-    }
-
-    startProcess(processName: string, startContext: any): { pid: PosisPID; process: IPosisProcess; } | undefined {
-        let id = this.UID() as PosisPID;
-
-        let pinfo: ProcessInfo = {
-            id: id,
-            pid: this.curId,
+    startProcess(processName: string, startContext: any): ProcessWithID | undefined {
+        let pid = GetSUID() as PID;
+        let pInfo: ProcessInfo = {
+            pid: pid,
+            pPID: this.curProcessID,
             name: processName,
-            ns: `ns_${id}`,
-            status: "running",
-            started: Game.time
+            status: ProcessState.Init,
+            begun: Game.time
         };
-        this.processTable[id] = pinfo;
-        this.processMemory[pinfo.ns] = startContext || {};
-        let process = this.createProcess(id);
-        this.logger.debug(`startProcess ${processName}`);
-        return { pid: id, process };
+
+        this.processTable[pid] = pInfo;
+        this.processMemory[pid] = startContext || {};
+
+        let process = this.createProcess(pid);
+        Logger.debug(`CreateNewProcess: ${processName}`);
+        return { pid, process };
     }
 
-    createProcess(id: PosisPID): IPosisProcess {
-        this.logger.debug(`createProcess ${id}`);
-        let pinfo = this.processTable[id];
-        if (!pinfo || pinfo.status !== "running") throw new Error(`Process ${pinfo.id} ${pinfo.name} not running`);
-        let self = this;
+    createProcess(id: PID): IPosisProcess {
+        Logger.debug(`ConstructProcess ${id}`);
+        let pInfo = this.processTable[id];
+        if (!pInfo) {
+            throw new Error(`Process ${id} does not exist`)
+        }
+        let kernelContext = this;
         let context: IPosisProcessContext = {
-            id: pinfo.id,
+            id: pInfo.pid,
             get parentId() {
-                return self.processTable[id] && self.processTable[id].pid || "";
+                return kernelContext.processTable[id] && kernelContext.processTable[id].pPID || "";
             },
-            imageName: pinfo.name,
-            logger: new SwarmLogger(`[${pinfo.id}) ${pinfo.name}]`),
+            imageName: pInfo.name,
             get memory() {
-                self.processMemory[pinfo.ns] = self.processMemory[pinfo.ns] || {};
-                return self.processMemory[pinfo.ns];
+                kernelContext.processMemory[pInfo.pid] = kernelContext.processMemory[pInfo.pid] || {};
+                return kernelContext.processMemory[pInfo.pid];
             },
             // bind getExtension to queryPosisInterface.
-            queryPosisInterface: self.extensionRegistry.getExtension.bind(self.extensionRegistry)
+            queryPosisInterface: kernelContext.extensionRegistry.getExtension.bind(kernelContext.extensionRegistry)
         };
         Object.freeze(context);
-        let process = this.processRegistry.getNewProcess(pinfo.name, context);
-        if (!process) throw new Error(`Could not create process ${pinfo.id} ${pinfo.name}`);
+        let process = this.processRegistry.getNewProcess(pInfo.name, context);
+        if (!process) throw new Error(`Could not create process ${pInfo.pid} ${pInfo.name}`);
         this._processCache[id] = { context, process };
         return process;
     }
     // killProcess also kills all children of this process
     // note to the wise: probably absorb any calls to this that would wipe out your entire process tree.
-    killProcess(id: PosisPID): void {
+    killProcess(id: PID): void {
         let pinfo = this.processTable[id];
         if (!pinfo) return;
-        this.logger.warn(`killed ${id}`);
-        pinfo.status = "killed";
+        Logger.warn(`killed ${id}`);
+        pinfo.status = ProcessState.Killed;
         pinfo.ended = Game.time;
-        if (pinfo.pid == '') return
+        if (pinfo.pPID == '') return
         let ids = Object.keys(this.processTable);
         for (let i = 0; i < ids.length; i++) {
             let id = ids[i];
             let pi = this.processTable[id]
-            if (pi.pid === pinfo.id) {
-                if (pi.status == 'running')
+            if (pi.pPID === pinfo.pid) {
+                if (pi.status != ProcessState.Killed)
                     this.killProcess(id);
             }
         }
     }
 
-    getProcessById(id: PosisPID): IPosisProcess | undefined {
-        if (this.processTable[id] && this.processTable[id].status === 'running') {
-            if (this._processCache[id]) {
-                return this._processCache[id].process;
-            } else {
-                return this.createProcess(id);
-            }
+    getProcessById(pid: PID): IPosisProcess | undefined {
+        if (this._processCache[pid]) {
+            return this._processCache[pid].process;
+        } else {
+            return this.createProcess(pid);
         }
-        return;
     }
 
-    // passing undefined as parentId means "make me a root process"
-    // i.e. one that will not be killed if another process is killed
-    setParent(id: PosisPID, parentId?: PosisPID): boolean {
-        if (!this.processTable[id]) return false;
-        this.processTable[id].pid = parentId;
+    setParent(pid: PID, parentPId?: PID): boolean {
+        if (!this.processTable[pid]) return false;
+        this.processTable[pid].pPID = parentPId;
         return true;
     }
 
     loop() {
-        let ids = Object.keys(this.processTable);
-        if (ids.length === 0) {
+        let processIDs = Object.keys(this.processTable);
+        /*if (processIDs.length === 0) {
             let proc = this.startProcess("init", {});
             // Due to breaking changes in the standard, 
             // init can no longer be ran on first tick.
-            if (proc) ids.push(proc.pid.toString());
-        }
-        let runCnt = 0
-        for (let i = 0; i < ids.length; i++) {
-            let id = ids[i];
-            let pinfo = this.processTable[id];
-            if (pinfo.status !== "running" && (!pinfo.ended || pinfo.ended < Game.time - 100)) {
-                delete this.processTable[id];
+            if (proc) processIDs.push(proc.pid.toString());
+        }*/
+
+        let hasActiveProcesses = false;
+        for (let i = 0; i < processIDs.length; i++) {
+            let pid = processIDs[i];
+            let pInfo = this.processTable[pid];
+            if (pInfo.status === ProcessState.Init) {
+                pInfo.status = ProcessState.Running;
             }
-            if (pinfo.wake && pinfo.wake > Game.time) continue;
-            if (pinfo.status !== "running") continue;
-            runCnt++
+            if (pInfo.status === ProcessState.Killed && (!pInfo.ended || pInfo.ended < Game.time - PROCESS_GHOST_TIMER)) {
+                delete this.processTable[pid];
+            }
+            if (pInfo.status === ProcessState.Sleeping) {
+                if (!pInfo.wake || pInfo.wake <= Game.time) {
+                    pInfo.status = ProcessState.Running;
+                }
+            }
+            if (pInfo.status !== ProcessState.Running) continue;
+            hasActiveProcesses = true;
             try {
-                let proc = this.getProcessById(id);
-                if (!proc) throw new Error(`Could not get process ${id} ${pinfo.name}`);
-                this.curId = id;
+                let proc = this.getProcessById(pid);
+                if (!proc) throw new Error(`Could not get process ${pid} ${pInfo.name}`);
+                this.curProcessID = pid;
                 proc.run();
-                this.curId = "";
+                this.curProcessID = "";
             } catch (e) {
-                this.killProcess(id);
-                pinfo.status = "crashed";
-                pinfo.error = e.stack || e.toString();
-                this.logger.error(`[${id}] ${pinfo.name} crashed\n${e.stack}`);
+                this.killProcess(pid);
+                pInfo.error = e.stack || e.toString();
+                Logger.error(`[${pid}] ${pInfo.name} crashed\n${e.stack}`);
             }
         }
-        if (runCnt == 0)
+        if (!hasActiveProcesses)
             this.startProcess("init", {});
     }
 
     sleep(ticks: number): void {
-        let pinfo = this.processTable[this.curId]
-        if (!pinfo) return
-        pinfo.wake = Game.time + ticks
+        let pInfo = this.processTable[this.curProcessID];
+        pInfo.wake = Game.time + ticks;
     }
 }

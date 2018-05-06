@@ -22,21 +22,21 @@ declare interface IPosisKernel extends IPosisExtension {
      * @param imageName registered image for the process constructor
      * @param startContext context for a process
      */
-    startProcess(imageName: string, startContext: any): { pid: PosisPID; process: IPosisProcess } | undefined;
+    startProcess(imageName: string, startContext: any): { pid: PID; process: IPosisProcess } | undefined;
 
     /**
      * killProcess also kills all children of this process
      * note to the wise: probably absorb any calls to this that would wipe out your entire process tree.
      * @param pid
      */
-    killProcess(pid: PosisPID): void;
+    killProcess(pid: PID): void;
 
     /**
      * gets the instance of a running process
      * @param pid
      * @returns process instance or undefined if the pid is invalid
      */
-    getProcessById(pid: PosisPID): IPosisProcess | undefined;
+    getProcessById(pid: PID): IPosisProcess | undefined;
 
     /**
      * passing undefined as parentId means "make me a root process"
@@ -45,14 +45,7 @@ declare interface IPosisKernel extends IPosisExtension {
      * @param parentId
      * @returns `true` if process was successfully reparented
      */
-    setParent(pid: PosisPID, parentId?: PosisPID): boolean;
-}
-declare interface IPosisLogger {
-    // because sometimes you don't want to eval arguments to ignore them
-    debug(message: (() => string) | string): void;
-    info(message: (() => string) | string): void;
-    warn(message: (() => string) | string): void;
-    error(message: (() => string) | string): void;
+    setParent(pid: PID, parentId?: PID): boolean;
 }
 declare interface IPosisProcess {
     /**
@@ -73,11 +66,9 @@ declare interface IPosisProcessContext {
     /** image name (maps to constructor) */
     readonly imageName: string;
     /** ID */
-    readonly id: PosisPID;
+    readonly id: PID;
     /** Parent ID */
-    readonly parentId: PosisPID;
-    /** Logger */
-    readonly logger: IPosisLogger;
+    readonly parentId: PID;
     queryPosisInterface<T extends keyof IPosisInterfaces>(interfaceId: T): IPosisInterfaces[T];
 }
 declare interface IPosisProcessRegistry {
@@ -87,7 +78,7 @@ declare interface IPosisProcessRegistry {
      */
     register(imageName: string, constructor: IPosisProcessConstructor): boolean;
 }
-declare type PosisPID = string | number;
+declare type PID = string | number;
 declare interface IPosisCooperativeScheduling {
     /** CPU used by process so far. Might include setup time kernel chooses to charge to the process. */
     readonly used: number;
@@ -186,19 +177,19 @@ declare interface IPosisSpawnOptions {
      * Used as a hint for host's logic. Host may (but not guarantee) consider currently spawned creeps
      * detached, may (but not guarantee) remove scheduled creeps from queue on process termination
      */
-    pid?: PosisPID;
+    pid?: PID;
 }
 
 declare interface ProcessInfo {
-    id: PosisPID;
-    pid?: PosisPID;
+    pid: PID;
+    pPID?: PID;
     name: string;
-    ns: string;
-    status: string;
-    started: number;
+    status: ProcessState;
+    begun: number;
+
     wake?: number;
     ended?: number;
-    process?: IPosisProcess;
+    //process?: IPosisProcess;
     error?: string;
 }
 

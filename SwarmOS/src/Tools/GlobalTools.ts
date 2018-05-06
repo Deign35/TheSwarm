@@ -1,12 +1,14 @@
-//import { MemoryBase } from "SwarmMemory/SwarmMemory";
+if (!Memory.counter) {
+    Memory.counter = 1;
+}
+if (!Memory.counterIDs) {
+    Memory.counterIDs = [];
+}
 import { Stopwatch } from "./Stopwatch";
-//import { SwarmCreator } from "SwarmTypes/SwarmCreator";
 import { SwarmLogger } from "Tools/SwarmLogger";
 
 global['Stopwatch'] = Stopwatch;
-//global['SwarmCreator'] = SwarmCreator;
-global['SwarmLogger'] = SwarmLogger;
-global['Logger'] = new SwarmLogger('Global');
+global['Logger'] = new SwarmLogger();
 
 export class GlobalTools {
     static CopyObject<T>(obj: T): T {

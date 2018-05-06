@@ -1,14 +1,12 @@
-let logger = new SwarmLogger("[ProcessRegistry]");
-
 export class ProcessRegistry implements IPosisProcessRegistry {
     constructor() { }
     private registry: { [name: string]: IPosisProcessConstructor } = {};
     register(name: string, constructor: IPosisProcessConstructor): boolean {
         if (this.registry[name]) {
-            logger.error(`Name already registered: ${name}`);
+            Logger.error(`Name already registered: ${name}`);
             return false;
         }
-        logger.debug(`Registered ${name}`);
+        Logger.debug(`Registered ${name}`);
         this.registry[name] = constructor;
         return true;
     }
@@ -17,7 +15,7 @@ export class ProcessRegistry implements IPosisProcessRegistry {
     }
     getNewProcess(name: string, context: IPosisProcessContext): IPosisProcess | undefined {
         if (!this.registry[name]) return;
-        logger.debug(`Created ${name}`);
+        Logger.debug(`Created ${name}`);
         return new this.registry[name](context);
     }
 }
