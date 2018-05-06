@@ -1,8 +1,19 @@
+declare var Memory: {
+    counter: number,
+    counterIDs: string[],
+    testAlgorithms: { [id: string]: number }
+}
+
 if (!Memory.counter) {
     Memory.counter = 1;
 }
+
 if (!Memory.counterIDs) {
     Memory.counterIDs = [];
+}
+
+if (!Memory.testAlgorithms) {
+    Memory.testAlgorithms = {};
 }
 import { Stopwatch } from "./Stopwatch";
 import { SwarmLogger } from "Tools/SwarmLogger";
@@ -10,6 +21,7 @@ import { SwarmLogger } from "Tools/SwarmLogger";
 global['Stopwatch'] = Stopwatch;
 global['Logger'] = new SwarmLogger();
 
+const NUM_ALLOWED_FAILURES = 10;
 export class GlobalTools {
     static CopyObject<T>(obj: T): T {
         return JSON.parse(JSON.stringify(obj));
@@ -34,24 +46,31 @@ export class GlobalTools {
     }
 
     // (TODO): Create a tools consul that manages memory for things, maybe only use flash memory!
-    /*static DoTest(testID: string,
-        memObject: MemoryBase,
+    static TestNewAlgorithm(testID: string,
         testFunction: () => void,
-        workingVersion?: (exc: Error) => void) {
+        workingVersion: () => void) {
+        let wasSuccessful = false;
+        if (!Memory.testAlgorithms[testID]) {
+            Memory.testAlgorithms[testID] = 1;
+        }
+
         try {
-            testFunction();
-            if (!memObject.HasData(testID)) {
-                Logger.info('Test[' + testID + ']: Success');
-                memObject.SetData(testID, true, false);
+            if (Memory.testAlgorithms[testID] <= NUM_ALLOWED_FAILURES) {
+                testFunction();
+                wasSuccessful = true;
+            } else {
+                Logger.warn(`Test[${testID}] has failed ${NUM_ALLOWED_FAILURES} times.  Test skipped`);
             }
         } catch (exc) {
-            Logger.error('SwarmRoom_Base [' + testID + '] failed [' + JSON.stringify(exc) + ']');
-            memObject.DeleteData(testID);
-            if (workingVersion) {
-                workingVersion(exc);
-            }
+            Memory.testAlgorithms[testID] += 1;
+            wasSuccessful = false;
+            Logger.error(`Algorithm test [${testID}] failed: [${JSON.stringify(exc)}]`);
         }
-    }*/
+
+        if (!wasSuccessful) {
+            workingVersion();
+        }
+    }
     static GetSUID() {
         if (Memory.counterIDs.length > 0) {
             return Memory.counterIDs.shift()!;
@@ -65,11 +84,6 @@ export class GlobalTools {
 global['CopyObject'] = GlobalTools.CopyObject;
 global['GetSpawnCost'] = GlobalTools.GetSpawnCost;
 global['ConstructBodyArray'] = GlobalTools.ConstructBodyArray;
-//global['DoTest'] = GlobalTools.DoTest;
+global['TestNewAlgorithm'] = GlobalTools.TestNewAlgorithm;
 global['GetSUID'] = GlobalTools.GetSUID;
 global['RecycleSUID'] = GlobalTools.RecycleSUID;
-
-declare var Memory: {
-    counter: number
-    counterIDs: string[]
-}
