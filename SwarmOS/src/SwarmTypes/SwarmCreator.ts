@@ -12,14 +12,14 @@ import { SwarmTower } from "./SwarmStructures/SwarmTower";
 import { NotImplementedException } from "Tools/SwarmExceptions";
 import { profile } from "Tools/Profiler";
 import { ConsulObject, SwarmConsul } from "Consuls/ConsulBase";
-import { MemoryBase, MemoryObject } from "SwarmMemory/SwarmMemory";
+import { MemoryBase } from "SwarmMemory/SwarmMemory";
 import { ObjBase } from "./SwarmTypes";
 
 @profile
 export class SwarmCreator {
     static CreateNewSwarmMemory(id: string, swarmType: SwarmType): MemoryBase {
         let newMemory: any;
-        switch (swarmType) {
+        /*switch (swarmType) {
             case (SwarmType.SwarmContainer):
                 newMemory = new MemoryBase<IContainerData>({
                     id: id,
@@ -284,7 +284,7 @@ export class SwarmCreator {
                     isActive: true
                 });
                 break;
-        }
+        }*/
         return newMemory;
     }
 
@@ -403,7 +403,7 @@ export class SwarmCreator {
 
         return (obj as Structure).id;
     }
-    static CreateSwarmObject(obj: SwarmObjectType, mem: MemoryObject): ObjBase {
+    static CreateSwarmObject(obj: SwarmObjectType, mem: MemoryBase): ObjBase {
         let swarmType = mem.SWARM_TYPE;
         let subType = mem.SUB_TYPE;
 
@@ -505,7 +505,7 @@ export class SwarmCreator {
         return newObj!;
     }
 
-    static CreateConsulObject(mem: MemoryObject, obj: ConsulObject): ObjBase {
+    static CreateConsulObject(mem: MemoryBase, obj: ConsulObject): ObjBase {
         let subType = mem.SUB_TYPE;
         switch (subType) {
             case (ConsulType.Control): return new ControlConsul(mem, obj)
