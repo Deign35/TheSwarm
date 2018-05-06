@@ -1,4 +1,4 @@
-import { posisInterface } from "./common"
+import { posisInterface } from "Core/ExtensionRegistry"
 
 interface IInitMemory {
     posisTestId?: PosisPID,
@@ -17,8 +17,8 @@ export interface ServiceDefinition {
 
 class Init implements IPosisProcess {
     constructor(private context: IPosisProcessContext) {
-        this.addService("sleeperTest", "ags131/SleeperTest", {}, true)
-        this.addService("baseTest", "POSISTest/PosisBaseTestProcess", { maxRunTime: 5 })
+        //this.addService("sleeperTest", "ags131/SleeperTest", {}, true)
+        this.addService("baseTest", "SwarmBase/PosisBaseTestProcess", { maxRunTime: 25 })
     }
     get id() {
         return this.context.id
@@ -34,8 +34,8 @@ class Init implements IPosisProcess {
         return this.memory.services
     }
 
-    @posisInterface("baseKernel")
-    private kernel: IPosisKernel
+    @posisInterface("kernel")
+    private kernel!: IPosisKernel
 
     run() {
         this.log.info(`TICK! ${Game.time}`)
@@ -53,16 +53,20 @@ class Init implements IPosisProcess {
 
     manageServices() {
         let ids = Object.keys(this.services)
-        ids.forEach(id => {
+        for (let i = 0, length = ids.length; i < length; i++) {
+            let id = ids[i];
             let service = this.services[id]
-            let proc: IPosisProcess
+            let proc: IPosisProcess | undefined
             if (service.pid) proc = this.kernel.getProcessById(service.pid)
             switch (service.status) {
                 case "started":
                     if (!proc) {
                         if (service.restart || !service.pid) {
-                            let { pid, process } = this.kernel.startProcess(service.name, Object.assign({}, service.context))
-                            service.pid = pid
+                            let result = this.kernel.startProcess(service.name, Object.assign({}, service.context));
+                            if (result) {
+                                service.pid = result.pid;
+                            }
+                            //service.pid = pid
                         } else {
                             service.status = 'stopped'
                         }
@@ -75,7 +79,7 @@ class Init implements IPosisProcess {
                     }
                     break
             }
-        })
+        }
     }
 }
 

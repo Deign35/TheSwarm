@@ -9,6 +9,7 @@ declare class Stopwatch {
     ToString(): string;
 }
 declare class SwarmLogger {
+    constructor(loggerName: string);
     trace(message: string): void;
     debug(message: string): void;
     info(message: string): void;

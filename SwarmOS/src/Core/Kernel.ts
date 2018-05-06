@@ -1,8 +1,8 @@
-import { ProcessRegistry } from "../lib/ProcessRegistry";
-import { ExtensionRegistry } from "../lib/ExtensionRegistry";
-import { Logger } from "../lib/Logger";
+import { ProcessRegistry } from "Core/ProcessRegistry";
+import { ExtensionRegistry } from "Core/ExtensionRegistry";
 
-export class BaseKernel implements IPosisKernel, IPosisSleepExtension {
+
+export class Kernel implements IPosisKernel, IPosisSleepExtension {
     private _processCache: {
         [id: string]: {
             context: IPosisProcessContext,
@@ -10,7 +10,7 @@ export class BaseKernel implements IPosisKernel, IPosisSleepExtension {
         }
     };
     private curId: string = "";
-    private logger: Logger = new Logger("[Kernel]");
+    private logger: SwarmLogger = new SwarmLogger("[Kernel]");
 
     get memory(): KernelMemory {
         Memory.kernel = Memory.kernel || { processTable: {}, processMemory: {} };
@@ -62,7 +62,7 @@ export class BaseKernel implements IPosisKernel, IPosisSleepExtension {
                 return self.processTable[id] && self.processTable[id].pid || "";
             },
             imageName: pinfo.name,
-            logger: new Logger(`[${pinfo.id}) ${pinfo.name}]`),
+            logger: new SwarmLogger(`[${pinfo.id}) ${pinfo.name}]`),
             get memory() {
                 self.processMemory[pinfo.ns] = self.processMemory[pinfo.ns] || {};
                 return self.processMemory[pinfo.ns];

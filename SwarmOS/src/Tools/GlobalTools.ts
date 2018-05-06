@@ -1,12 +1,12 @@
+//import { MemoryBase } from "SwarmMemory/SwarmMemory";
 import { Stopwatch } from "./Stopwatch";
+//import { SwarmCreator } from "SwarmTypes/SwarmCreator";
 import { SwarmLogger } from "Tools/SwarmLogger";
-import { SwarmCreator } from "SwarmTypes/SwarmCreator";
-import { MemoryBase } from "SwarmMemory/SwarmMemory";
 
 global['Stopwatch'] = Stopwatch;
+//global['SwarmCreator'] = SwarmCreator;
 global['SwarmLogger'] = SwarmLogger;
 global['Logger'] = new SwarmLogger('Global');
-global['SwarmCreator'] = SwarmCreator;
 
 export class GlobalTools {
     static CopyObject<T>(obj: T): T {
@@ -32,7 +32,7 @@ export class GlobalTools {
     }
 
     // (TODO): Create a tools consul that manages memory for things, maybe only use flash memory!
-    static DoTest(testID: string,
+    /*static DoTest(testID: string,
         memObject: MemoryBase,
         testFunction: () => void,
         workingVersion?: (exc: Error) => void) {
@@ -49,7 +49,7 @@ export class GlobalTools {
                 workingVersion(exc);
             }
         }
-    }
+    }*/
     static GetSUID() {
         if (Memory.counterIDs.length > 0) {
             return Memory.counterIDs.shift()!;
@@ -63,7 +63,7 @@ export class GlobalTools {
 global['CopyObject'] = GlobalTools.CopyObject;
 global['GetSpawnCost'] = GlobalTools.GetSpawnCost;
 global['ConstructBodyArray'] = GlobalTools.ConstructBodyArray;
-global['DoTest'] = GlobalTools.DoTest;
+//global['DoTest'] = GlobalTools.DoTest;
 global['GetSUID'] = GlobalTools.GetSUID;
 global['RecycleSUID'] = GlobalTools.RecycleSUID;
 

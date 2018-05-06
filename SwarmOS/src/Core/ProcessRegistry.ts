@@ -1,6 +1,4 @@
-import { Logger } from "../lib/Logger";
-
-let logger = new Logger("[ProcessRegistry]");
+let logger = new SwarmLogger("[ProcessRegistry]");
 
 export class ProcessRegistry implements IPosisProcessRegistry {
     constructor() { }

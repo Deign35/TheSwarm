@@ -1,6 +1,4 @@
-import { Logger } from "../lib/Logger";
-
-let logger = new Logger("[ExtensionRegistry]");
+let logger = new SwarmLogger("[ExtensionRegistry]");
 
 export class ExtensionRegistry implements IPosisExtension {
     constructor() {
@@ -33,3 +31,16 @@ export class ExtensionRegistry implements IPosisExtension {
     }
 }
 
+export function posisInterface(interfaceId: string): (target: any, propertyKey: string) => any {
+    return function (target: any, propertyKey: string): any {
+        let value: IPosisExtension
+        return {
+            get() {
+                if (!value) {
+                    value = this.context.queryPosisInterface(interfaceId);
+                }
+                return value;
+            }
+        }
+    }
+}

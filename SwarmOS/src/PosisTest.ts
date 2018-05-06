@@ -23,7 +23,7 @@ class BaseSwarmProcess implements IPosisProcess {
     }
 
     public run(): void {
-        let kernel: IPosisKernel = this.context.queryPosisInterface("baseKernel") as IPosisKernel;
+        let kernel: IPosisKernel = this.context.queryPosisInterface("kernel") as IPosisKernel;
         let fatal = false;
 
         if (this.log === undefined)
@@ -37,13 +37,9 @@ class BaseSwarmProcess implements IPosisProcess {
         this.log.error(`${this.testName}: starting basic diagnostics`);
 
         this.log.debug(`${this.testName}: debug message`);
-        this.log.debug(() => `${this.testName}: deferred debug message`);
         this.log.info(`${this.testName}: info message`);
-        this.log.info(() => `${this.testName}: deferred info message`);
         this.log.warn(`${this.testName}: warn message`);
-        this.log.warn(() => `${this.testName}: deferred warn message`);
         this.log.error(`${this.testName}: error message`);
-        this.log.error(() => `${this.testName}: deferred error message`);
 
         if (this.imageName === undefined)
             this.log.error(`${this.testName}: 'imageName' not set`);
