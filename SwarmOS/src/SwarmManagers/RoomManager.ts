@@ -1,14 +1,22 @@
+declare interface RoomData_StructureData {
+    hits: number
+    id: string,
+    room?: string,
+    x?: number,
+    y?: number,
+}
 declare interface RoomData_StructureMemory {
-    [STRUCTURE_CONTAINER]: string[],
-    [STRUCTURE_ROAD]: string[],
+    [STRUCTURE_CONTAINER]: RoomData_StructureData[],
+    [STRUCTURE_ROAD]: RoomData_StructureData[],
 
-    [STRUCTURE_EXTENSION]?: string[],
-    [STRUCTURE_LAB]?: string[],
-    [STRUCTURE_LINK]?: string[],
-    [STRUCTURE_RAMPART]?: string[],
-    [STRUCTURE_SPAWN]?: string[],
-    [STRUCTURE_TOWER]?: string[],
-    [STRUCTURE_WALL]?: string[],
+    [STRUCTURE_EXTENSION]?: RoomData_StructureData[],
+    [STRUCTURE_LAB]?: RoomData_StructureData[],
+    [STRUCTURE_LINK]?: RoomData_StructureData[],
+    [STRUCTURE_RAMPART]?: RoomData_StructureData[],
+    [STRUCTURE_SPAWN]?: RoomData_StructureData[],
+    [STRUCTURE_TOWER]?: RoomData_StructureData[],
+    [STRUCTURE_WALL]?: RoomData_StructureData[],
+    [index: string]: RoomData_StructureData[] | undefined
 }
 declare interface RoomData_Memory {
     lastUpdated: number;
@@ -32,8 +40,8 @@ if (!Memory.RoomData) {
 import { BaseProcess } from "Core/BaseProcess";
 import { ExtensionBase } from "Core/BaseExtension";
 
-const MIN_ROOM_REFRESH = 5//primes_500[27];  // 27 = 101
-const STRUCTURE_REFRESH = 11//primes_100[10]; // 10 = 29
+const FRE_RoomView = primes_500[27];  // 27 = 101
+const FRE_RoomStructures = primes_100[10]; // 10 = 29
 class RoomManager extends BaseProcess {
     run(): void {
         let roomView = this.context.queryPosisInterface(EXT_RoomView);
@@ -122,8 +130,29 @@ class RoomStructuresExtension extends RoomExtension implements IRoomStructuresEx
         }
         let allStructures = room.find(FIND_STRUCTURES);
         for (let i = 0, length = allStructures.length; i < length; i++) {
-            if (roomData.structures[allStructures[i].structureType]) {
-                roomData.structures[allStructures[i].structureType].push(allStructures[i].id);
+            let structure = allStructures[i];
+            if (roomData.structures[structure.structureType]) {
+                let structureData: RoomData_StructureData = {
+                    hits: structure.hits,
+                    id: structure.id,
+                }
+                if (structure.structureType == STRUCTURE_CONTAINER ||
+                    structure.structureType == STRUCTURE_CONTROLLER ||
+                    structure.structureType == STRUCTURE_KEEPER_LAIR ||
+                    structure.structureType == STRUCTURE_LINK ||
+                    structure.structureType == STRUCTURE_NUKER ||
+                    structure.structureType == STRUCTURE_PORTAL ||
+                    structure.structureType == STRUCTURE_POWER_BANK ||
+                    structure.structureType == STRUCTURE_POWER_SPAWN ||
+                    structure.structureType == STRUCTURE_STORAGE ||
+                    structure.structureType == STRUCTURE_TOWER ||
+                    structure.structureType == STRUCTURE_TERMINAL ||
+                    structure.structureType == STRUCTURE_LAB) {
+                    structureData.room = structure.pos.roomName;
+                    structureData.x = structure.pos.x;
+                    structureData.y = structure.pos.y;
+                }
+                roomData.structures[structure.structureType]!.push(structureData);
             } else {
                 // flash data for the rest?
             }
@@ -149,10 +178,10 @@ class RoomViewExtension extends RoomExtension implements IRoomManagerExtension {
         forceUpdate = forceUpdate || !this.memory[roomID] || (this.memory[roomID].lastUpdated == 0);
         let { room, roomData } = this.getRoomData(roomID);
         if (room) {
-            if (forceUpdate || this.shouldRefresh(MIN_ROOM_REFRESH, roomData!.minUpdateOffset)) {
+            if (forceUpdate || this.shouldRefresh(FRE_RoomView, roomData!.minUpdateOffset)) {
                 this.Examine(roomID);
             }
-            if (forceUpdate || this.shouldRefresh(STRUCTURE_REFRESH, roomData!.minUpdateOffset)) {
+            if (forceUpdate || this.shouldRefresh(FRE_RoomStructures, roomData!.minUpdateOffset)) {
                 this.RoomStructure.PopulateRoomStructures(roomID);
             }
         } else {
