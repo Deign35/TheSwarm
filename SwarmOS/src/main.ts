@@ -64,8 +64,6 @@ import { processBundle as ManagerBundle } from "SwarmManagers/index";
 kernel.installBundles([ManagerBundle, ServiceBundle]);
 
 export function loop() {
-    Logger.debug(`Begin tick ${Game.time}`);
     kernel.loop();
-    Logger.trace(`End tick.  Used CPU: ${Game.cpu.getUsed()}`);
     Logger.OutputLog();
 };
