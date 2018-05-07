@@ -9,9 +9,10 @@ declare interface IPosisBundle<IDefaultRootMemory> {
 }
 declare interface IPosisExtension { }
 declare interface IPosisInterfaces {
-    baseKernel?: IPosisKernel;
+    baseKernel: IPosisKernel;
+    sleep: IPosisSleepExtension;
+
     spawn?: IPosisSpawnExtension;
-    sleep?: IPosisSleepExtension;
     coop?: IPosisCooperativeScheduling;
     //segments?: IPosisSegmentsExtension;
     [index: string]: IPosisExtension | undefined;
@@ -69,6 +70,8 @@ declare interface IPosisProcessContext {
     readonly pid: PID;
     /** Parent ID */
     readonly pPID: PID;
+    /** process state */
+    readonly state: ProcessState;
     queryPosisInterface<T extends keyof IPosisInterfaces>(interfaceId: T): IPosisInterfaces[T];
 }
 declare interface IPosisProcessRegistry {

@@ -1,4 +1,5 @@
 import { posisInterface } from "Core/ExtensionRegistry"
+import { BaseProcess } from "Core/BaseProcess";
 
 declare type ServiceProviderMemory = {
     services: {
@@ -23,23 +24,13 @@ const REQUIRED_PROCESSES: IDictionary<ProcDetails> = {
     }
 };
 
-class ServiceProvider implements IPosisProcess {
-    constructor(private context: IPosisProcessContext) {
+class ServiceProvider extends BaseProcess {
+    constructor(protected context: IPosisProcessContext) {
+        super(context);
         if (!this.context.memory.services) {
             this.context.memory.services = {};
         }
-        //this.addService("sleeperTest", "ags131/SleeperTest", {}, true)
-        //this.addService("baseTest", "SwarmBase/PosisBaseTestProcess", { maxRunTime: 25 })
     }
-    get id() {
-        return this.context.pid
-    }
-    get memory(): ServiceProviderMemory {
-        return this.context.memory
-    }
-
-    @posisInterface("kernel")
-    private kernel!: IPosisKernel
 
     addService(serviceID: string, id: string, startContext: any = {}) {
         Logger.info(`Adding service ${id}`);
@@ -71,11 +62,14 @@ class ServiceProvider implements IPosisProcess {
                 }
             }
         }
+
+        this.SetProcessToSleep(5);
     }
 }
 
+export const IN_ServiceProvider = 'ServiceProvider';
 export const bundle: IPosisBundle<{}> = {
     install(registry: IPosisProcessRegistry) {
-        registry.register("ServiceProvider", ServiceProvider)
+        registry.register(IN_ServiceProvider, ServiceProvider)
     }
 }

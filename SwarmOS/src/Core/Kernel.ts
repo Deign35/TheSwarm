@@ -54,15 +54,18 @@ export class Kernel implements IPosisKernel, IPosisSleepExtension {
         if (!pInfo) {
             throw new Error(`Process ${id} does not exist`)
         }
+
         let kernelContext = this;
         let context: IPosisProcessContext = {
             pid: pInfo.pid,
+            imageName: pInfo.name,
+            get state() {
+                return kernelContext.processTable[id] && kernelContext.processTable[id].status;
+            },
             get pPID() {
                 return kernelContext.processTable[id] && kernelContext.processTable[id].pPID || "";
             },
-            imageName: pInfo.name,
             get memory() {
-                kernelContext.processMemory[pInfo.pid] = kernelContext.processMemory[pInfo.pid] || {};
                 return kernelContext.processMemory[pInfo.pid];
             },
             // bind getExtension to queryPosisInterface.
