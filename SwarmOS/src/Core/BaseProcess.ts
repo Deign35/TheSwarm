@@ -1,11 +1,12 @@
 
 
 export abstract class BaseProcess implements IPosisProcess {
-    constructor(protected context: IPosisProcessContext) {
-
-    }
+    constructor(protected context: IPosisProcessContext) { }
     @posisInterface("kernel")
     protected kernel!: IPosisKernel
+    @posisInterface("extRegistry")
+    protected extensions!: IPosisExtensionRegistry;
+
     protected get memory(): any {
         return this.context.memory;
     }

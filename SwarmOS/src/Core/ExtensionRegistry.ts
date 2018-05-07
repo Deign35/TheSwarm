@@ -1,7 +1,7 @@
 export class ExtensionRegistry implements IPosisExtension {
     constructor() {
         this.registry = {};
-        this.register('SwarmExtensionRegistry', this);
+        this.register('extRegistry', this);
     }
 
     private registry: { [interfaceId: string]: IPosisExtension };

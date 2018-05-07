@@ -1,21 +1,33 @@
 /** Bundle for programs that are logically grouped */
 declare interface IPosisBundle<IDefaultRootMemory> {
     /** host will call that once, possibly outside of main loop, registers all bundle processes here */
-    install(registry: IPosisProcessRegistry): void;
+    install(processRegistry: IPosisProcessRegistry, extensionRegistry: IPosisExtensionRegistry): void;
     /** image name of root process in the bundle, if any */
     rootImageName?: string;
     /** function returning default starting memory for root process, doubles as public parameter documentation */
     makeDefaultRootMemory?: (override?: IDefaultRootMemory) => IDefaultRootMemory;
 }
 declare interface IPosisExtension { }
+declare interface IPosisExtensionRegistry extends IPosisExtension {
+    register(interfaceId: string, extension: IPosisExtension): boolean;
+    unregister(interfaceId: string): boolean;
+    getExtension(interfaceId: string): IPosisExtension | undefined;
+}
 declare interface IPosisInterfaces {
     baseKernel: IPosisKernel;
     sleep: IPosisSleepExtension;
+    extRegistry: IPosisExtensionRegistry;
+    RoomView: IRoomManagerExtension;
 
     spawn?: IPosisSpawnExtension;
     coop?: IPosisCooperativeScheduling;
     //segments?: IPosisSegmentsExtension;
     [index: string]: IPosisExtension | undefined;
+}
+
+declare interface IRoomManagerExtension extends IPosisExtension {
+    Examine(roomID: string): void;
+    View(roomID: string, updateFrequency?: number): void;
 }
 declare interface IPosisKernel extends IPosisExtension {
     /**

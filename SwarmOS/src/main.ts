@@ -3,6 +3,10 @@ import * as Profiler from "Tools/Profiler";
 global.Profiler = Profiler.init();
 
 import "Tools/GlobalTools";
+
+import { Kernel } from "Core/Kernel";
+import { ExtensionRegistry } from "Core/ExtensionRegistry";
+import { ProcessRegistry } from "Core/ProcessRegistry";
 /*import "SwarmMemory/Swarmlord";
 import { SwarmLoader } from "SwarmTypes/SwarmLoader";
 import { SwarmQueen } from "SwarmBehaviour/SwarmQueen";
@@ -18,9 +22,6 @@ export const loop = function () {
     SwarmLoader.SaveTheSwarm();
 }*/
 
-import { Kernel } from "Core/Kernel";
-import { ExtensionRegistry } from "Core/ExtensionRegistry";
-import { ProcessRegistry } from "Core/ProcessRegistry";
 
 import { bundle as ServiceBundle } from "Core/ServiceProvider";
 import { bundle as TestBundle } from "PosisTest";
