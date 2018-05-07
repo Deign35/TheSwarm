@@ -40,7 +40,7 @@ export class SwarmSpawn extends OwnedSwarmStructure<STRUCTURE_SPAWN, StructureSp
                 let requestor = SwarmLoader.GetObject(request.requestor, request.requestorType);
                 requestor.AssignCreep(newName);
             } else {
-                RecycleSUID(newName);
+                //RecycleSUID(newName);
             }
             this.memory.DeleteData(FLASH_CURRENT_REQUEST);
         }

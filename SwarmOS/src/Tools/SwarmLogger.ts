@@ -30,6 +30,9 @@ const ERROR_COLORS = [
 
 const MIN_LOG_LEVEL = LOG_INFO;
 export class SwarmLogger {
+    constructor() {
+        this.InitQueue();
+    }
     trace(message: (string | (() => string))) { return this.log(message, LOG_TRACE); }
     debug(message: (string | (() => string))) { return this.log(message, LOG_DEBUG); }
     info(message: (string | (() => string))) { return this.log(message, LOG_INFO); }
@@ -40,24 +43,46 @@ export class SwarmLogger {
 
     private log(message: (string | (() => string)), severity: number = 3) {
         if (MIN_LOG_LEVEL > severity) {
-            return
+            return;
         }
-
-        if (typeof message === "function") {
-            message = message();
-        }
-
-        message = `[${severity}] ${message}`
-        let attributes = ''
-        /*let tag
-        if (tags) {
-            for (tag in tags) { // jshint ignore:line
-                attributes += ` ${tag}="${tags[tag]}"`
-            }
-        }*/
-        attributes += ` severity="${severity}"`
-        attributes += ` tick="${Game.time}"`
-        message = `<font color="${ERROR_COLORS[severity]}"${attributes}>${message}</font>`
-        console.log(message)
+        this.logQueue[severity].push(message);
     }
+
+    OutputLog(): void {
+        let queues = this.logQueue;
+        let output = () => {
+            let outStr = '';
+            for (let i = queues.length - 1; i >= 0; i--) {
+                if (queues[i].length == 0) {
+                    continue;
+                }
+                outStr += `<font color="${ERROR_COLORS[i]}">Log[${i}] - ${queues[i].length} messages\n`
+                while (queues[i].length > 0) {
+                    let nextMessage = queues[i].shift();
+                    if (nextMessage) {
+                        if (typeof nextMessage === "function") {
+                            nextMessage = nextMessage();
+                        }
+                        outStr += `${nextMessage}\n`;
+                    }
+                }
+                outStr += `</font>`;
+            }
+            let introStr = `<font color="${ERROR_COLORS[LOG_INFO]}">Tick[${Game.time}] - CPU: (`
+            introStr += `${Game.cpu.getUsed()}\/${Game.cpu.tickLimit}\/${Game.cpu.bucket})</font>\n`;
+            return introStr + outStr;
+        }
+
+        console.log(output());
+        this.InitQueue();
+    }
+
+    private InitQueue(): void {
+        this.logQueue = [];
+        for (let i = 0; i < ERROR_COLORS.length; i++) {
+            this.logQueue.push([]);
+        }
+    }
+
+    private logQueue!: (string | (() => string))[][];
 }

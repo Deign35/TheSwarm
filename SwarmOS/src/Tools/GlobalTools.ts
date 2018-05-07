@@ -1,19 +1,6 @@
 declare var Memory: {
     counter: number,
-    counterIDs: string[],
     testAlgorithms: { [id: string]: number }
-}
-
-if (!Memory.counter) {
-    Memory.counter = 1;
-}
-
-if (!Memory.counterIDs) {
-    Memory.counterIDs = [];
-}
-
-if (!Memory.testAlgorithms) {
-    Memory.testAlgorithms = {};
 }
 import { Stopwatch } from "./Stopwatch";
 
@@ -70,13 +57,7 @@ export class GlobalTools {
         }
     }
     static GetSUID() {
-        if (Memory.counterIDs.length > 0) {
-            return Memory.counterIDs.shift()!;
-        }
         return Memory.counter++;
-    }
-    static RecycleSUID(suid: string) {
-        Memory.counterIDs.push(suid);
     }
 
     static GetRandomIndex(list: any[]): number {
@@ -107,7 +88,6 @@ global['GetSpawnCost'] = GlobalTools.GetSpawnCost;
 global['ConstructBodyArray'] = GlobalTools.ConstructBodyArray;
 global['TestNewAlgorithm'] = GlobalTools.TestNewAlgorithm;
 global['GetSUID'] = GlobalTools.GetSUID;
-global['RecycleSUID'] = GlobalTools.RecycleSUID;
 global['GetRandomIndex'] = GlobalTools.GetRandomIndex;
 global['GetRandomID'] = GlobalTools.GetRandomID;
 global['ForEach'] = GlobalTools.ForEach;

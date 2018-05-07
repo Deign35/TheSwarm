@@ -16,6 +16,8 @@ declare class SwarmLogger {
     error(message: (string | (() => string))): void;
     fatal(message: (string | (() => string))): void;
     alert(message: (string | (() => string))): void;
+
+    OutputLog(): void;
 }
 declare var Logger: SwarmLogger;
 
@@ -26,7 +28,6 @@ declare function ConstructBodyArray(bodyPartsList: [BodyPartConstant, number][])
 declare function DoTest(testID: string, memObject: any, testFunction: () => void,
     workingVersion?: (exc: Error) => void): void
 declare function GetSUID(): string;
-declare function RecycleSUID(suid: string): void;
 declare function GetRandomIndex(list: any[]): number;
 declare function GetRandomID<T>(dictionaryObject: IDictionary<T>): T | undefined;
 declare function ForEach<T>(collection: IDictionary<T>, action: (val: T, index: number) => void): void

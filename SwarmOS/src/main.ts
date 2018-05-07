@@ -67,4 +67,5 @@ export function loop() {
     Logger.debug(`Begin tick ${Game.time}`);
     kernel.loop();
     Logger.trace(`End tick.  Used CPU: ${Game.cpu.getUsed()}`);
+    Logger.OutputLog();
 };
