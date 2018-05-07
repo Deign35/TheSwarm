@@ -66,9 +66,9 @@ declare interface IPosisProcessContext {
     /** image name (maps to constructor) */
     readonly imageName: string;
     /** ID */
-    readonly id: PID;
+    readonly pid: PID;
     /** Parent ID */
-    readonly parentId: PID;
+    readonly pPID: PID;
     queryPosisInterface<T extends keyof IPosisInterfaces>(interfaceId: T): IPosisInterfaces[T];
 }
 declare interface IPosisProcessRegistry {

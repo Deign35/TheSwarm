@@ -22,7 +22,7 @@ import { Kernel } from "Core/Kernel";
 import { ExtensionRegistry } from "Core/ExtensionRegistry";
 import { ProcessRegistry } from "Core/ProcessRegistry";
 
-import { bundle as InitBundle } from "./Init";
+import { bundle as ServiceBundle } from "./ServiceProvider";
 import { bundle as TestBundle } from "PosisTest";
 
 export let extensionRegistry = new ExtensionRegistry();
@@ -33,7 +33,7 @@ let OSKernel = new Kernel(processRegistry, extensionRegistry);
 extensionRegistry.register("kernel", OSKernel);
 extensionRegistry.register("sleep", OSKernel);
 
-processRegistry.install(InitBundle);
+processRegistry.install(ServiceBundle);
 processRegistry.install(TestBundle);
 
 export function loop() {

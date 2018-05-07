@@ -56,8 +56,8 @@ export class Kernel implements IPosisKernel, IPosisSleepExtension {
         }
         let kernelContext = this;
         let context: IPosisProcessContext = {
-            id: pInfo.pid,
-            get parentId() {
+            pid: pInfo.pid,
+            get pPID() {
                 return kernelContext.processTable[id] && kernelContext.processTable[id].pPID || "";
             },
             imageName: pInfo.name,
@@ -147,7 +147,7 @@ export class Kernel implements IPosisKernel, IPosisSleepExtension {
             }
         }
         if (!hasActiveProcesses)
-            this.startProcess("init", {});
+            this.startProcess("ServiceProvider", {});
     }
 
     sleep(ticks: number): void {

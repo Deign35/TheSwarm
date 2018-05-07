@@ -95,10 +95,10 @@ class BaseSwarmProcess implements IPosisProcess {
         return this.context.imageName;
     }
     get id(): PID { // ID
-        return this.context.id;
+        return this.context.pid;
     }
     get parentId(): PID { // Parent ID
-        return this.context.parentId;
+        return this.context.pPID;
     }
 }
 
