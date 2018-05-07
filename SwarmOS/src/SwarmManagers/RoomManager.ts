@@ -1,16 +1,18 @@
 declare interface RoomData_Memory {
-    lastUpdated: number,
-    sourceIDs: string[],
-    mineralIDs: string[],
-    owner: string
+    lastUpdated: number;
+    sourceIDs: string[];
+    mineralIDs: string[];
+    owner: string;
+    spawns?: string[];
 }
 declare interface RoomView_Memory {
-    RoomData: IDictionary<RoomData_Memory>,
-    ObsQueue: string[]
+    RoomData: IDictionary<RoomData_Memory>;
+    ObsQueue: string[];
 }
 declare var Memory: {
-    RoomView: RoomView_Memory
-};
+    RoomView: RoomView_Memory;
+}
+
 if (!Memory.RoomView) {
     Memory.RoomView = {
         RoomData: {},
@@ -47,6 +49,12 @@ class RoomViewExtension extends ExtensionBase implements IRoomManagerExtension {
         roomData.owner = (room.controller &&
             (room.controller.owner && room.controller.owner.username) ||
             (room.controller!.reservation && room.controller!.reservation!.username)) || '';
+
+        if (roomData.owner == MY_USERNAME) {
+            roomData.spawns = room.find(FIND_MY_SPAWNS)!.map((val: StructureSpawn) => {
+                return val.id;
+            })
+        }
 
         // Update path stuff somehow.
 

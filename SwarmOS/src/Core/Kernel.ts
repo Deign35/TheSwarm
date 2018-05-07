@@ -30,6 +30,15 @@ export class Kernel implements IPosisKernel, IPosisSleepExtension {
         this._processCache = {};
     }
 
+    installBundle(bundle: IPosisBundle<{}>) {
+        bundle.install(this.processRegistry, this.extensionRegistry);
+    }
+    installBundles(bundles: IPosisBundle<{}>[]) {
+        for (let id in bundles) {
+            this.installBundle(bundles[id]);
+        }
+    }
+
     startProcess(processName: string, startContext: any): ProcessWithID | undefined {
         let pid = GetSUID() as PID;
         let pInfo: ProcessInfo = {

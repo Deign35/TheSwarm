@@ -26,3 +26,5 @@ declare function DoTest(testID: string, memObject: any, testFunction: () => void
     workingVersion?: (exc: Error) => void): void
 declare function GetSUID(): string;
 declare function RecycleSUID(suid: string): void;
+declare function GetRandomIndex(list: any[]): number;
+declare function GetRandomID<T>(dictionaryObject: IDictionary<T>): T | undefined;

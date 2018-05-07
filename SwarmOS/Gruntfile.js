@@ -118,6 +118,45 @@ module.exports = function (grunt) {
             }
             declarationsFile.push(compoundDeclaration.slice(0, -3) + ';');
         }
+        globalsFile.push("// Primes");
+        declarationsFile.push("");
+
+        console.log(`Begin primes: ${new Date()}`);
+        let primes = [3, 5, 7, 11];
+        let curNum = 13;
+        while (primes.length < 3000) {
+            for (let i = 0, length = primes.length; i < length; i++) {
+                if (curNum % primes[i] == 0) {
+                    curNum += 2;
+                    continue;
+                }
+            }
+            primes.push(curNum);
+            curNum += 2;
+        }
+        primes = [2].concat(primes);
+        console.log(`End primes: ${new Date()}`);
+
+        let primeLists = {
+            100: "",
+            500: "",
+            1500: "",
+            3000: "",
+        };
+
+        for (let i = 0, length = primes.length; i < length; i++) {
+            for (let maxNumber in primeLists) {
+                if (maxNumber > primes[i]) {
+                    primeLists[maxNumber] += `${primes[i]}, `;
+                }
+            }
+        }
+
+        for (let maxNumber in primeLists) {
+            primeLists[maxNumber] = primeLists[maxNumber].slice(0, -2);
+            globalsFile.push(`global["primes_${maxNumber}"] = [ ${primeLists[maxNumber]} ];`);
+            declarationsFile.push(`declare const primes_${maxNumber}: [ ${primeLists[maxNumber]} ];`);
+        }
 
         let declarationContents = "";
         for (let i = 0; i < declarationsFile.length; i++) {
@@ -129,7 +168,7 @@ module.exports = function (grunt) {
             globalContents += globalsFile[i] + '\n';
         }
         grunt.file.write("./build/compiled/globalConstants.js", globalContents);
-    })
+    });
 
     grunt.registerTask('help', 'Help info', function () {
         let output = 'Grunt Help Menu *******************';

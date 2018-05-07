@@ -32,16 +32,12 @@ extensionRegistry.register("sleep", kernel);
 
 */
 
-import { extensionRegistry, processRegistry, kernel } from "Core";
+import { kernel } from "Core";
 import { bundle as ServiceBundle } from "Core/ServiceProvider";
 import { bundle as TestBundle } from "PosisTest";
 import { processBundle as ManagerBundle } from "SwarmManagers";
 
-
-ManagerBundle.install(processRegistry, extensionRegistry);
-ServiceBundle.install(processRegistry, extensionRegistry);
-
-processRegistry.install(TestBundle);
+kernel.installBundles([ManagerBundle, ServiceBundle, TestBundle]);
 
 export function loop() {
     kernel.loop();

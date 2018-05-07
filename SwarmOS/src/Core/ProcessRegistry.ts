@@ -10,9 +10,6 @@ export class ProcessRegistry implements IPosisProcessRegistry {
         this.registry[name] = constructor;
         return true;
     }
-    install(bundle: IPosisBundle<any>) {
-        bundle.install(this)
-    }
     getNewProcess(name: string, context: IPosisProcessContext): IPosisProcess | undefined {
         if (!this.registry[name]) return;
         Logger.debug(`Created ${name}`);

@@ -9,9 +9,9 @@ declare interface IPosisBundle<IDefaultRootMemory> {
 }
 declare interface IPosisExtension { }
 declare interface IPosisExtensionRegistry extends IPosisExtension {
+    getExtension(interfaceId: string): IPosisExtension | undefined;
     register(interfaceId: string, extension: IPosisExtension): boolean;
     unregister(interfaceId: string): boolean;
-    getExtension(interfaceId: string): IPosisExtension | undefined;
 }
 declare interface IPosisInterfaces {
     baseKernel: IPosisKernel;
@@ -30,6 +30,8 @@ declare interface IRoomManagerExtension extends IPosisExtension {
     View(roomID: string, updateFrequency?: number): void;
 }
 declare interface IPosisKernel extends IPosisExtension {
+    installBundle(bundle: IPosisBundle<{}>): void;
+    installBundles(bundles: IPosisBundle<{}>[]): void;
     /**
      * beings running a process
      * @param imageName registered image for the process constructor

@@ -80,6 +80,18 @@ export class GlobalTools {
     static RecycleSUID(suid: string) {
         Memory.counterIDs.push(suid);
     }
+
+    static GetRandomIndex(list: any[]): number {
+        if (!list || list.length == 0) {
+            return 0;
+        }
+
+        return list[Math.floor(Math.random() * list.length)];
+    }
+    static GetRandomID<T>(dictionaryObject: IDictionary<T>): T | undefined {
+        let index = this.GetRandomIndex(Object.keys(dictionaryObject));
+        return (dictionaryObject && dictionaryObject[index]) || undefined;
+    }
 }
 global['CopyObject'] = GlobalTools.CopyObject;
 global['GetSpawnCost'] = GlobalTools.GetSpawnCost;
@@ -87,3 +99,5 @@ global['ConstructBodyArray'] = GlobalTools.ConstructBodyArray;
 global['TestNewAlgorithm'] = GlobalTools.TestNewAlgorithm;
 global['GetSUID'] = GlobalTools.GetSUID;
 global['RecycleSUID'] = GlobalTools.RecycleSUID;
+global['GetRandomIndex'] = GlobalTools.GetRandomIndex;
+global['GetRandomID'] = GlobalTools.GetRandomID;
