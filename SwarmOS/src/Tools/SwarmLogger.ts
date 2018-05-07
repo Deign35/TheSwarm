@@ -26,7 +26,12 @@ const ERROR_COLORS = [
     '#ff0066',
 ];
 
-declare var Memory: any;
+declare var Memory: {
+    logLevel: number;
+}
+if (!Memory.logLevel) {
+    Memory.logLevel = LOG_INFO;
+}
 export class SwarmLogger {
     trace(message: string) { return this.log(message, LOG_TRACE); }
     debug(message: string) { return this.log(message, LOG_DEBUG); }
@@ -36,7 +41,7 @@ export class SwarmLogger {
     fatal(message: string) { return this.log(message, LOG_FATAL); }
 
     private log(message: string, severity: number = 3) {
-        if (Memory.loglevel && Memory.loglevel > severity) {
+        if (Memory.logLevel && Memory.logLevel > severity) {
             return
         }
 

@@ -88,9 +88,20 @@ export class GlobalTools {
 
         return list[Math.floor(Math.random() * list.length)];
     }
+
     static GetRandomID<T>(dictionaryObject: IDictionary<T>): T | undefined {
         let index = this.GetRandomIndex(Object.keys(dictionaryObject));
         return (dictionaryObject && dictionaryObject[index]) || undefined;
+    }
+
+    static ForEach<T>(collection: IDictionary<T>, action: (val: T, index: number) => void): void {
+        let ids = Object.keys(collection);
+        for (let i = 0, length = ids.length; i < length; i++) {
+            if (!collection[ids[i]]) {
+                throw new Error(`Collection modified while executing ForEach`);
+            }
+            action(collection[ids[i]], i);
+        }
     }
 }
 global['CopyObject'] = GlobalTools.CopyObject;
@@ -101,3 +112,4 @@ global['GetSUID'] = GlobalTools.GetSUID;
 global['RecycleSUID'] = GlobalTools.RecycleSUID;
 global['GetRandomIndex'] = GlobalTools.GetRandomIndex;
 global['GetRandomID'] = GlobalTools.GetRandomID;
+global['ForEach'] = GlobalTools.ForEach;

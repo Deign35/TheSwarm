@@ -32,13 +32,14 @@ extensionRegistry.register("sleep", kernel);
 
 */
 
-import { kernel } from "Core";
+import { kernel } from "Core/index";
 import { bundle as ServiceBundle } from "Core/ServiceProvider";
-import { bundle as TestBundle } from "PosisTest";
-import { processBundle as ManagerBundle } from "SwarmManagers";
+import { processBundle as ManagerBundle } from "SwarmManagers/index";
 
-kernel.installBundles([ManagerBundle, ServiceBundle, TestBundle]);
+kernel.installBundles([ManagerBundle, ServiceBundle]);
 
 export function loop() {
+    Logger.fatal(`Begin tick ${Game.time}`);
     kernel.loop();
+    Logger.debug(`End tick.  Used CPU: ${Game.cpu.getUsed()}`);
 };

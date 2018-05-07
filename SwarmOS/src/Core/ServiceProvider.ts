@@ -1,4 +1,5 @@
 import { BaseProcess } from "Core/BaseProcess";
+import { IN_RoomManager } from "SwarmManagers/RoomManager";
 
 declare type ServiceProviderMemory = {
     services: {
@@ -15,12 +16,15 @@ declare type ProcDetails = {
 }
 
 const REQUIRED_PROCESSES: IDictionary<ProcDetails> = {
-    baseTest: {
+    roomManager: {
+        processName: IN_RoomManager
+    },
+    /*baseTest: {
         processName: "SwarmBase/PosisBaseTestProcess",
         startContext: {
             maxRunTime: 25
         }
-    }
+    }*/
 };
 
 class ServiceProvider extends BaseProcess {
@@ -47,7 +51,7 @@ class ServiceProvider extends BaseProcess {
             let service = this.memory.services[ids[i]];
             let process = (service && service.pid) ? this.kernel.getProcessById(service.pid) : undefined;
 
-            if (!service || !process) {
+            if (!service || !process || process.state == ProcessState.Killed) {
                 Logger.info(`Initializing service ${ids[i]}`);
 
                 let initData = REQUIRED_PROCESSES[ids[i]];

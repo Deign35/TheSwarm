@@ -28,3 +28,4 @@ declare function GetSUID(): string;
 declare function RecycleSUID(suid: string): void;
 declare function GetRandomIndex(list: any[]): number;
 declare function GetRandomID<T>(dictionaryObject: IDictionary<T>): T | undefined;
+declare function ForEach<T>(collection: IDictionary < T >, action: (val: T, index: number) => void): void

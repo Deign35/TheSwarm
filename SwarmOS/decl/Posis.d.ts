@@ -18,16 +18,22 @@ declare interface IPosisInterfaces {
     sleep: IPosisSleepExtension;
     extRegistry: IPosisExtensionRegistry;
     RoomView: IRoomManagerExtension;
+    RoomStructure: IRoomStructuresExtension;
 
     spawn?: IPosisSpawnExtension;
     coop?: IPosisCooperativeScheduling;
     //segments?: IPosisSegmentsExtension;
     [index: string]: IPosisExtension | undefined;
 }
-
+declare interface IRoomStructuresExtension extends IPosisExtension {
+    PopulateRoomStructures(roomID: string): void;
+    PopulateRoomStructures(roomID: string, forceUpdate: boolean): void;
+    AddStructure(structure: Structure): void;
+}
 declare interface IRoomManagerExtension extends IPosisExtension {
     Examine(roomID: string): void;
-    View(roomID: string, updateFrequency?: number): void;
+    View(roomID: string): void;
+    View(roomID: string, forceUpdate: boolean): void;
 }
 declare interface IPosisKernel extends IPosisExtension {
     installBundle(bundle: IPosisBundle<{}>): void;
@@ -67,6 +73,11 @@ declare interface IPosisProcess {
      * Main function, implement all process logic here.
      */
     run(): void;
+
+    /** ID */
+    readonly pid: PID;
+    /** process state */
+    readonly state: ProcessState;
 }
 /**
  * Bundle: Don't write to context object (including setting new props on it), host will likely freeze it anyway.
