@@ -1,4 +1,29 @@
 ﻿require('globalConstants');
+import { SwarmLogger } from "Tools/SwarmLogger";
+global['Logger'] = new SwarmLogger();
+declare var Memory: {
+    VERSION: string,
+    counter: number,
+    testAlgorithms: Dictionary
+}
+const RESET_IN_SIM_ON_UPDATE = true;
+if (!Memory.VERSION || Memory.VERSION != SWARM_VERSION_DATE) {
+    Logger.alert(`OS Version updated`);
+    if (RESET_IN_SIM_ON_UPDATE && !!Game.rooms.sim) {
+        Logger.fatal('SIM UPDATE RESET ENACTED');
+        for (let id in Memory) {
+            Memory[id] = undefined;
+        }
+        Logger.error(`SIM UPDATE RESET - Memory Cleaned`);
+    }
+
+    Logger.warn(`Updating OS to ${SWARM_VERSION_DATE}`);
+    Memory.counter = Memory.counter || 1;
+    Memory.testAlgorithms = Memory.testAlgorithms || {};
+    Memory.VERSION = SWARM_VERSION_DATE;
+    Logger.info(`Updating OS complete`)
+}
+
 import * as Profiler from "Tools/Profiler";
 global.Profiler = Profiler.init();
 
@@ -39,7 +64,7 @@ import { processBundle as ManagerBundle } from "SwarmManagers/index";
 kernel.installBundles([ManagerBundle, ServiceBundle]);
 
 export function loop() {
-    Logger.fatal(`Begin tick ${Game.time}`);
+    Logger.debug(`Begin tick ${Game.time}`);
     kernel.loop();
-    Logger.debug(`End tick.  Used CPU: ${Game.cpu.getUsed()}`);
+    Logger.trace(`End tick.  Used CPU: ${Game.cpu.getUsed()}`);
 };

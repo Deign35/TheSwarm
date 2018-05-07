@@ -16,10 +16,8 @@ if (!Memory.testAlgorithms) {
     Memory.testAlgorithms = {};
 }
 import { Stopwatch } from "./Stopwatch";
-import { SwarmLogger } from "Tools/SwarmLogger";
 
 global['Stopwatch'] = Stopwatch;
-global['Logger'] = new SwarmLogger();
 
 const NUM_ALLOWED_FAILURES = 10;
 export class GlobalTools {

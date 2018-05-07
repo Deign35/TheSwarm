@@ -19,6 +19,7 @@ declare interface RoomData_StructureMemory {
     [index: string]: RoomData_StructureData[] | undefined
 }
 declare interface RoomData_Memory {
+    cSites: RoomData_StructureData[]; // (TODO): Change this to use a flag
     lastUpdated: number;
     mineralIDs: string[];
     minUpdateOffset: number;
@@ -26,7 +27,7 @@ declare interface RoomData_Memory {
     resources: string[];
     sourceIDs: string[];
     structures: RoomData_StructureMemory
-    tombStones: string[];
+    tombstones: string[];
 }
 declare type RoomView_Memory = IDictionary<RoomData_Memory>
 
@@ -40,7 +41,6 @@ if (!Memory.RoomData) {
 import { BaseProcess } from "Core/BaseProcess";
 import { ExtensionBase } from "Core/BaseExtension";
 
-const FRE_RoomView = primes_500[27];  // 27 = 101
 const FRE_RoomStructures = primes_100[10]; // 10 = 29
 class RoomManager extends BaseProcess {
     run(): void {
@@ -69,6 +69,7 @@ class RoomExtension extends ExtensionBase {
     private InitRoomData(room: Room) {
         Logger.info(`Initialize new room ${room.name}`);
         this.memory[room.name] = {
+            cSites: [],
             lastUpdated: 0,
             mineralIDs: room.find(FIND_MINERALS)!.map((val: Mineral) => {
                 return val.id;
@@ -83,7 +84,7 @@ class RoomExtension extends ExtensionBase {
                 container: [],
                 road: []
             },
-            tombStones: [],
+            tombstones: [],
         }
     }
 
@@ -144,6 +145,7 @@ class RoomStructuresExtension extends RoomExtension implements IRoomStructuresEx
                     structure.structureType == STRUCTURE_PORTAL ||
                     structure.structureType == STRUCTURE_POWER_BANK ||
                     structure.structureType == STRUCTURE_POWER_SPAWN ||
+                    structure.structureType == STRUCTURE_SPAWN ||
                     structure.structureType == STRUCTURE_STORAGE ||
                     structure.structureType == STRUCTURE_TOWER ||
                     structure.structureType == STRUCTURE_TERMINAL ||
@@ -178,9 +180,7 @@ class RoomViewExtension extends RoomExtension implements IRoomManagerExtension {
         forceUpdate = forceUpdate || !this.memory[roomID] || (this.memory[roomID].lastUpdated == 0);
         let { room, roomData } = this.getRoomData(roomID);
         if (room) {
-            if (forceUpdate || this.shouldRefresh(FRE_RoomView, roomData!.minUpdateOffset)) {
-                this.Examine(roomID);
-            }
+            this.Examine(roomID, forceUpdate);
             if (forceUpdate || this.shouldRefresh(FRE_RoomStructures, roomData!.minUpdateOffset)) {
                 this.RoomStructure.PopulateRoomStructures(roomID);
             }
@@ -195,7 +195,7 @@ class RoomViewExtension extends RoomExtension implements IRoomManagerExtension {
         return this.memory[roomID];
     }
 
-    Examine(roomID: string) {
+    Examine(roomID: string, forceUpdate: boolean = false) {
         let { room, roomData } = this.getRoomData(roomID);
         if (!room) {
             Logger.debug(`Room out of view [${roomID}]`)
@@ -206,15 +206,32 @@ class RoomViewExtension extends RoomExtension implements IRoomManagerExtension {
             return;
         }
 
-        Logger.info(`Examine room ${roomID}`);
+        Logger.trace(`Examine room ${roomID}`);
         roomData.lastUpdated = Game.time;
-
-        roomData.resources = room.find(FIND_DROPPED_RESOURCES).map((value: Resource) => {
-            return value.id;
-        });
-        roomData.tombStones = room.find(FIND_TOMBSTONES).map((value: Tombstone) => {
-            return value.id;
-        });
+        if (forceUpdate || this.shouldRefresh(11, roomData!.minUpdateOffset)) {
+            Logger.trace(`Examine room[DroppedResources] ${roomID}`);
+            roomData.resources = room.find(FIND_DROPPED_RESOURCES).map((value: Resource) => {
+                return value.id;
+            });
+        }
+        if (forceUpdate || this.shouldRefresh(27, roomData!.minUpdateOffset)) {
+            Logger.trace(`Examine room[Tombstones] ${roomID}`);
+            roomData.tombstones = room.find(FIND_TOMBSTONES).map((value: Tombstone) => {
+                return value.id;
+            });
+        }
+        if (forceUpdate || this.shouldRefresh(29, roomData!.minUpdateOffset)) {
+            Logger.trace(`Examine room[ConstructionSites] ${roomID}`);
+            roomData.cSites = room.find(FIND_CONSTRUCTION_SITES).map((value: ConstructionSite) => {
+                return {
+                    hits: value.progress,
+                    id: value.id,
+                    room: value.pos.roomName,
+                    x: value.pos.x,
+                    y: value.pos.y
+                }
+            });
+        }
         // Update path stuff somehow.
     }
 }

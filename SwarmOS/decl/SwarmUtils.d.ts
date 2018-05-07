@@ -9,12 +9,13 @@ declare class Stopwatch {
     ToString(): string;
 }
 declare class SwarmLogger {
-    trace(message: string): void;
-    debug(message: string): void;
-    info(message: string): void;
-    warn(message: string): void;
-    error(message: string): void;
-    fatal(message: string): void;
+    trace(message: (string | (() => string))): void;
+    debug(message: (string | (() => string))): void;
+    info(message: (string | (() => string))): void;
+    warn(message: (string | (() => string))): void;
+    error(message: (string | (() => string))): void;
+    fatal(message: (string | (() => string))): void;
+    alert(message: (string | (() => string))): void;
 }
 declare var Logger: SwarmLogger;
 
@@ -28,4 +29,4 @@ declare function GetSUID(): string;
 declare function RecycleSUID(suid: string): void;
 declare function GetRandomIndex(list: any[]): number;
 declare function GetRandomID<T>(dictionaryObject: IDictionary<T>): T | undefined;
-declare function ForEach<T>(collection: IDictionary < T >, action: (val: T, index: number) => void): void
+declare function ForEach<T>(collection: IDictionary<T>, action: (val: T, index: number) => void): void
