@@ -68,7 +68,7 @@ class ServiceProvider extends BaseProcess {
 
 export const IN_ServiceProvider = 'ServiceProvider';
 export const bundle: IPosisBundle<{}> = {
-    install(registry: IPosisProcessRegistry) {
-        registry.register(IN_ServiceProvider, ServiceProvider)
+    install(processRegistry: IPosisProcessRegistry, extensionRegistry: IPosisExtensionRegistry) {
+        processRegistry.register(IN_ServiceProvider, ServiceProvider)
     }
 }
