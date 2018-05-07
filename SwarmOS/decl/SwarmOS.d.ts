@@ -19,7 +19,7 @@ interface Profiler {
     stop(): void;
     toString(): string;
 }
-
+declare function posisInterface(interfaceId: string): (target: any, propertyKey: string) => any
 
 declare var SwarmCreator: {
     CreateNewSwarmMemory(id: string, swarmType: SwarmType): any;

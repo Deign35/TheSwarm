@@ -1,4 +1,4 @@
-import { posisInterface } from "Core/ExtensionRegistry"
+
 
 export abstract class BaseProcess implements IPosisProcess {
     constructor(protected context: IPosisProcessContext) {

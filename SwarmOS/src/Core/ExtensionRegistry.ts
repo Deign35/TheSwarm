@@ -29,7 +29,7 @@ export class ExtensionRegistry implements IPosisExtension {
     }
 }
 
-export function posisInterface(interfaceId: string): (target: any, propertyKey: string) => any {
+function posisInterface(interfaceId: string): (target: any, propertyKey: string) => any {
     return function (target: any, propertyKey: string): any {
         let value: IPosisExtension
         return {
@@ -42,3 +42,5 @@ export function posisInterface(interfaceId: string): (target: any, propertyKey: 
         }
     }
 }
+
+global['posisInterface'] = posisInterface;

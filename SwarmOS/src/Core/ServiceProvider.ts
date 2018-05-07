@@ -1,4 +1,3 @@
-import { posisInterface } from "Core/ExtensionRegistry"
 import { BaseProcess } from "Core/BaseProcess";
 
 declare type ServiceProviderMemory = {
