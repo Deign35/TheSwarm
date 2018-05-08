@@ -43,4 +43,10 @@ function posisInterface(interfaceId: string): (target: any, propertyKey: string)
     }
 }
 
+export abstract class ExtensionBase implements IPosisExtension {
+    constructor(protected extensionRegistry: IPosisExtensionRegistry) {
+    }
+    protected abstract get memory(): any;
+}
+
 global['posisInterface'] = posisInterface;

@@ -1,8 +1,8 @@
 if (!Memory.RoomData) {
     Memory.RoomData = {};
 }
-import { BaseProcess } from "Core/BaseProcess";
-import { ExtensionBase } from "Core/BaseExtension";
+import { BaseProcess } from "Core/ProcessRegistry";
+import { ExtensionBase } from "Core/ExtensionRegistry";
 
 const FRE_RoomStructures = primes_100[10]; // 10 = 29
 class RoomManager extends BaseProcess {

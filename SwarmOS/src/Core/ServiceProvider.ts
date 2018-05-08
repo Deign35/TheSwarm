@@ -1,4 +1,4 @@
-import { BaseProcess } from "Core/BaseProcess";
+import { BaseProcess } from "Core/ProcessRegistry";
 import { IN_RoomManager } from "SwarmManagers/RoomManager";
 
 declare type ServiceProviderMemory = {
@@ -19,12 +19,6 @@ const REQUIRED_PROCESSES: IDictionary<ProcDetails> = {
     roomManager: {
         processName: IN_RoomManager
     },
-    /*baseTest: {
-        processName: "SwarmBase/PosisBaseTestProcess",
-        startContext: {
-            maxRunTime: 25
-        }
-    }*/
 };
 
 class ServiceProvider extends BaseProcess {
