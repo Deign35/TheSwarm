@@ -20,7 +20,14 @@
         "E_TARGET_INELLIGIBLE": -4,
         "E_ACTION_UNNECESSARY": -5,
         "E_NOT_IMPLEMENTED": -6,
-        "E_REQ_REJECTED": -7
+        "E_REQ_REJECTED": -7,
+        "LOG_ALERT": "\"alert\"",
+        "LOG_DEBUG": "\"debug\"",
+        "LOG_ERROR": "\"error\"",
+        "LOG_FATAL": "\"fatal\"",
+        "LOG_INFO": "\"info\"",
+        "LOG_TRACE": "\"trace\"",
+        "LOG_WARN": "\"warn\""
     },
     "Enums": {
         "ProcessState": {
@@ -136,6 +143,15 @@
             "C_NONE",
             "C_MOVE",
             "SwarmErrors"
+        ],
+        "LogLevel": [
+            "LOG_ALERT",
+            "LOG_DEBUG",
+            "LOG_ERROR",
+            "LOG_FATAL",
+            "LOG_INFO",
+            "LOG_TRACE",
+            "LOG_WARN"
         ]
     }
 }

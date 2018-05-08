@@ -1,33 +1,46 @@
-/**
- * Initial commit was copied from 
- * https://github.com/ScreepsQuorum/screeps-quorum/tree/7254e727868fdc30e93b4e4dc8e015021d08a6ef
- * 
- */
-global.LOG_ALERT = 6;
-global.LOG_FATAL = 5
-global.LOG_ERROR = 4
-global.LOG_WARN = 3
-global.LOG_INFO = 2
-global.LOG_DEBUG = 1
-global.LOG_TRACE = 0
+interface ILogLevelSetting {
+    color: string,
+    level: number
+}
 
-const ERROR_COLORS = [
-    '#666666', // Trace - Dark grey
-    '#00C6B6', // Debug - Teal
-    '#FFFFFF', // Info - White
-    '#F4D000', // Warn - Yellow
-    '#e65c00', // Error - Red
-    '#ff0066', // Fatal - Fuscia(sp?)
-    '#C050E1', // Alert - Purple
-];
+const LOGGER_SETTINGS: IDictionary<ILogLevelSetting> = {
+    [LOG_ALERT]: {
+        color: '#C050E1', // Purple
+        level: 6
+    },
+    [LOG_DEBUG]: {
+        color: '#00C6B6', // Teal
+        level: 1
+    },
+    [LOG_ERROR]: {
+        color: '#E65C00', // Red
+        level: 4
+    },
+    [LOG_FATAL]: {
+        color: '#FF0066', // Fuscia(sp?)
+        level: 5
+    },
+    [LOG_INFO]: {
+        color: '#FFFFFF', // White
+        level: 2
+    },
+    [LOG_TRACE]: {
+        color: '#666666', // Dark Grey
+        level: 0
+    },
+    [LOG_WARN]: {
+        color: '#F4D000', // Yellow
+        level: 3
+    }
+}
 interface Context {
-    logLevel: number,
+    logLevel: LogLevel,
     logs: {
         [id: number]: (string | (() => string))[]
     }
 }
 
-const DEFAULT_LOG_LEVEL = Game.rooms['sim'] ? LOG_TRACE : LOG_INFO;
+const DEFAULT_LOG_LEVEL: LogLevel = Game.rooms['sim'] ? LOG_TRACE : LOG_INFO;
 const DEFAULT_LOG_ID = 'SwarmOS';
 export class SwarmLogger implements ILogger {
     CreateLogContext(context: LogContext): void {
@@ -38,6 +51,8 @@ export class SwarmLogger implements ILogger {
             }
         }
     }
+    private color(logLevel: LogLevel) { return LOGGER_SETTINGS[logLevel].color; }
+    private level(logLevel: LogLevel) { return LOGGER_SETTINGS[logLevel].level; }
     constructor() {
         this.logContexts = {};
         this.InitQueue();
@@ -51,7 +66,7 @@ export class SwarmLogger implements ILogger {
     alert(message: (string | (() => string)), contextID?: string) { return this.log(message, contextID, LOG_ALERT); }
 
     private logContexts: IDictionary<Context>;
-    protected log(message: (string | (() => string)), contextID: string = DEFAULT_LOG_ID, severity: number = 3) {
+    protected log(message: (string | (() => string)), contextID: string = DEFAULT_LOG_ID, severity: LogLevel = LOG_INFO) {
         let context = this.logContexts[contextID];
         if (!context) {
             this.CreateLogContext({ logID: contextID, logLevel: DEFAULT_LOG_LEVEL });
@@ -77,7 +92,7 @@ export class SwarmLogger implements ILogger {
             }
         }
         let startLoggingTime = Game.cpu.getUsed();
-        let introStr = `<font color="${ERROR_COLORS[LOG_ALERT]}">Begin SwarmOS Log - t${Game.time}\n`
+        let introStr = `<font color="${LOGGER_SETTINGS[LOG_ALERT].color}">Begin SwarmOS Log - t${Game.time}\n`
         introStr += `CPU: (${startLoggingTime}\/${Game.cpu.limit}\/${Game.cpu.bucket})</font>\n`;
 
         console.log(introStr);
@@ -93,14 +108,16 @@ export class SwarmLogger implements ILogger {
         let queues = context.logs;
         let hasLogs = false;
         let output = () => {
-            let outStr = `<font color="${ERROR_COLORS[LOG_WARN]}">Begin Log[${logID}] - {${context.logLevel}}</font>\n`;
-            for (let i = ERROR_COLORS.length - 1; i >= 0; i--) {
-                if (!queues[i] || queues[i].length == 0) {
+            let outStr = `<font color="${this.color(LOG_WARN)}">Begin Log[${logID}] - {${context.logLevel}}</font>\n`;
+            //for (let i = ERROR_COLORS.length - 1; i >= 0; i--) {
+            for (let settingID in LOGGER_SETTINGS) {
+                if (!queues[settingID] || queues[settingID].length == 0) {
                     continue;
                 }
-                outStr += `<font color="${ERROR_COLORS[i]}">`
-                while (queues[i].length > 0) {
-                    let nextMessage = queues[i].shift();
+                let color = LOGGER_SETTINGS[settingID].color;
+                outStr += `<font color="${color}">`
+                while (queues[settingID].length > 0) {
+                    let nextMessage = queues[settingID].shift();
                     if (nextMessage) {
                         if (typeof nextMessage === "function") {
                             nextMessage = `[DL]${nextMessage()}`;

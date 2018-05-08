@@ -11,16 +11,9 @@ declare class Stopwatch {
 
 declare interface LogContext {
     logID: string,
-    logLevel: number,
+    logLevel: LogLevel,
 }
 /*declare class SwarmLogger {*/
-declare const LOG_ALERT = 6;
-declare const LOG_FATAL = 5;
-declare const LOG_ERROR = 4;
-declare const LOG_WARN = 3;
-declare const LOG_INFO = 2;
-declare const LOG_DEBUG = 1;
-declare const LOG_TRACE = 0;
 declare interface ILogger {
     trace(message: (string | (() => string)), contextID?: string): void;
     debug(message: (string | (() => string)), contextID?: string): void;

@@ -1,10 +1,10 @@
 declare var Memory: {
     testAlgorithms: Dictionary;
-    profiler: Dictionary;
+    RoomData: IDictionary<RoomData_Memory>;
 
     kernel: KernelMemory;
-    RoomData: IDictionary<RoomData_Memory>;
     stats: StatsMemoryStructure;
+    profiler: ProfilerMemory;
 
     counter: number;
     VERSION: string;
@@ -57,4 +57,14 @@ declare type StatsMemoryStructure = {
     rooms: { [id: string]: RoomStats }
     market: MarketStats
     totalGCL: number
+}
+declare interface ProfilerMemory {
+    data: { [name: string]: ProfilerData };
+    start?: number;
+    total: number;
+}
+
+interface ProfilerData {
+    calls: number;
+    time: number;
 }
