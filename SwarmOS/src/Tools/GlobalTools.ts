@@ -1,7 +1,3 @@
-declare var Memory: {
-    counter: number,
-    testAlgorithms: { [id: string]: number }
-}
 import { Stopwatch } from "./Stopwatch";
 
 global['Stopwatch'] = Stopwatch;

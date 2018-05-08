@@ -17,7 +17,7 @@ declare interface IPosisInterfaces {
     baseKernel: IPosisKernel;
     sleep: IPosisSleepExtension;
     extRegistry: IPosisExtensionRegistry;
-    RoomView: IRoomManagerExtension;
+    RoomView: IRoomViewExtension;
     RoomStructure: IRoomStructuresExtension;
 
     spawn?: IPosisSpawnExtension;
@@ -26,18 +26,16 @@ declare interface IPosisInterfaces {
     [index: string]: IPosisExtension | undefined;
 }
 declare interface IRoomStructuresExtension extends IPosisExtension {
-    PopulateRoomStructures(roomID: string): void;
-    PopulateRoomStructures(roomID: string, forceUpdate: boolean): void;
+    PopulateRoomStructures(roomID: string, forceUpdate?: boolean): void;
     AddStructure(structure: Structure): void;
 }
-declare interface IRoomManagerExtension extends IPosisExtension {
+declare interface IRoomViewExtension extends IPosisExtension {
     Examine(roomID: string): void;
-    View(roomID: string): void;
-    View(roomID: string, forceUpdate: boolean): void;
+    View(roomID: string, forceUpdate?: boolean): RoomData_Memory | undefined
 }
 declare interface IPosisKernel extends IPosisExtension {
-    installBundle(bundle: IPosisBundle<{}>): void;
-    installBundles(bundles: IPosisBundle<{}>[]): void;
+    installBundle(bundle: IPosisBundle<any>): void;
+    installBundles(bundles: IPosisBundle<any>[]): void;
     /**
      * beings running a process
      * @param imageName registered image for the process constructor
@@ -229,46 +227,3 @@ declare interface ProcessMemoryTable {
     [id: string]: {};
 }
 
-declare interface KernelMemory {
-    processTable: ProcessTable;
-    processMemory: ProcessMemoryTable;
-}
-
-declare var Memory: {
-    kernel: KernelMemory;
-    IDGen: number;
-    RoomData: RoomView_Memory;
-}
-
-declare interface RoomData_StructureData {
-    hits: number
-    id: string,
-    room?: string,
-    x?: number,
-    y?: number,
-}
-declare interface RoomData_StructureMemory {
-    [STRUCTURE_CONTAINER]: RoomData_StructureData[],
-    [STRUCTURE_ROAD]: RoomData_StructureData[],
-
-    [STRUCTURE_EXTENSION]?: RoomData_StructureData[],
-    [STRUCTURE_LAB]?: RoomData_StructureData[],
-    [STRUCTURE_LINK]?: RoomData_StructureData[],
-    [STRUCTURE_RAMPART]?: RoomData_StructureData[],
-    [STRUCTURE_SPAWN]?: RoomData_StructureData[],
-    [STRUCTURE_TOWER]?: RoomData_StructureData[],
-    [STRUCTURE_WALL]?: RoomData_StructureData[],
-    [index: string]: RoomData_StructureData[] | undefined
-}
-declare interface RoomData_Memory {
-    cSites: RoomData_StructureData[]; // (TODO): Change this to use a flag
-    lastUpdated: number;
-    mineralIDs: string[];
-    minUpdateOffset: number;
-    owner?: string;
-    resources: string[];
-    sourceIDs: string[];
-    structures: RoomData_StructureMemory
-    tombstones: string[];
-}
-declare type RoomView_Memory = IDictionary<RoomData_Memory>;

@@ -28,7 +28,7 @@ const ERROR_COLORS = [
     '#C050E1', // Alert - Purple
 ];
 
-const MIN_LOG_LEVEL = LOG_INFO;
+const MIN_LOG_LEVEL = Game.rooms['sim'] ? LOG_TRACE : LOG_INFO;
 export class SwarmLogger {
     constructor() {
         this.InitQueue();
@@ -61,7 +61,7 @@ export class SwarmLogger {
                     let nextMessage = queues[i].shift();
                     if (nextMessage) {
                         if (typeof nextMessage === "function") {
-                            nextMessage = nextMessage();
+                            nextMessage = `[DL]${nextMessage()}`;
                         }
                         outStr += `${nextMessage}\n`;
                     }
