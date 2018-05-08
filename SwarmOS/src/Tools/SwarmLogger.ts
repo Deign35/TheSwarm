@@ -145,8 +145,9 @@ export class SwarmLogger implements ILogger {
                         outStr += `${nextMessage}\n`;
                     }
                 }
-                outStr += `</font>${CONTEXT_SEPARATOR}\n`;
+                outStr += `</font>`;
             }
+            outStr += `${CONTEXT_SEPARATOR}\n`;
             return outStr;
         }
 
