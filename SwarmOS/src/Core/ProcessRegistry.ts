@@ -1,12 +1,18 @@
+const ProcessRegistry_LogContext: LogContext = {
+    logID: "ProcessRegistry",
+    logLevel: LOG_INFO
+}
 export class ProcessRegistry implements IPosisProcessRegistry {
-    constructor() { }
+    constructor() {
+        Logger.CreateLogContext(ProcessRegistry_LogContext);
+    }
     private registry: { [name: string]: IPosisProcessConstructor } = {};
     register(name: string, constructor: IPosisProcessConstructor): boolean {
         if (this.registry[name]) {
             Logger.error(`Name already registered: ${name}`);
             return false;
         }
-        Logger.debug(`Registered ${name}`);
+        Logger.debug(`Registered ${name}`, ProcessRegistry_LogContext.logID);
         this.registry[name] = constructor;
         return true;
     }

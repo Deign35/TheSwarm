@@ -3,19 +3,12 @@
  * https://github.com/ScreepsQuorum/screeps-quorum/tree/7254e727868fdc30e93b4e4dc8e015021d08a6ef
  * 
  */
-declare const LOG_ALERT = 6;
 global.LOG_ALERT = 6;
-declare const LOG_FATAL = 5;
 global.LOG_FATAL = 5
-declare const LOG_ERROR = 4;
 global.LOG_ERROR = 4
-declare const LOG_WARN = 3;
 global.LOG_WARN = 3
-declare const LOG_INFO = 2;
 global.LOG_INFO = 2
-declare const LOG_DEBUG = 1;
 global.LOG_DEBUG = 1
-declare const LOG_TRACE = 0;
 global.LOG_TRACE = 0
 
 const ERROR_COLORS = [
@@ -27,81 +20,112 @@ const ERROR_COLORS = [
     '#ff0066', // Fatal - Fuscia(sp?)
     '#C050E1', // Alert - Purple
 ];
+interface Context {
+    logLevel: number,
+    logs: {
+        [id: number]: (string | (() => string))[]
+    }
+}
 
-const MIN_LOG_LEVEL = Game.rooms['sim'] ? LOG_TRACE : LOG_INFO;
-export class SwarmLogger {
-    constructor(public LogLevel: number = MIN_LOG_LEVEL) {
+const DEFAULT_LOG_LEVEL = Game.rooms['sim'] ? LOG_TRACE : LOG_INFO;
+const DEFAULT_LOG_ID = 'SwarmOS';
+export class SwarmLogger implements ILogger {
+    CreateLogContext(context: LogContext): void {
+        if (!this.logContexts[context.logID]) {
+            this.logContexts[context.logID] = {
+                logLevel: context.logLevel,
+                logs: []
+            }
+        }
+    }
+    constructor() {
+        this.logContexts = {};
         this.InitQueue();
     }
-    trace(message: (string | (() => string))) { return this.log(message, LOG_TRACE); }
-    debug(message: (string | (() => string))) { return this.log(message, LOG_DEBUG); }
-    info(message: (string | (() => string))) { return this.log(message, LOG_INFO); }
-    warn(message: (string | (() => string))) { return this.log(message, LOG_WARN); }
-    error(message: (string | (() => string))) { return this.log(message, LOG_ERROR); }
-    fatal(message: (string | (() => string))) { return this.log(message, LOG_FATAL); }
-    alert(message: (string | (() => string))) { return this.log(message, LOG_ALERT); }
+    trace(message: (string | (() => string)), contextID?: string) { return this.log(message, contextID, LOG_TRACE); }
+    debug(message: (string | (() => string)), contextID?: string) { return this.log(message, contextID, LOG_DEBUG); }
+    info(message: (string | (() => string)), contextID?: string) { return this.log(message, contextID, LOG_INFO); }
+    warn(message: (string | (() => string)), contextID?: string) { return this.log(message, contextID, LOG_WARN); }
+    error(message: (string | (() => string)), contextID?: string) { return this.log(message, contextID, LOG_ERROR); }
+    fatal(message: (string | (() => string)), contextID?: string) { return this.log(message, contextID, LOG_FATAL); }
+    alert(message: (string | (() => string)), contextID?: string) { return this.log(message, contextID, LOG_ALERT); }
 
-    protected log(message: (string | (() => string)), severity: number = 3) {
-        if (this.LogLevel > severity) {
+    private logContexts: IDictionary<Context>;
+    protected log(message: (string | (() => string)), contextID: string = DEFAULT_LOG_ID, severity: number = 3) {
+        let context = this.logContexts[contextID];
+        if (!context) {
+            this.CreateLogContext({ logID: contextID, logLevel: DEFAULT_LOG_LEVEL });
+            context = this.logContexts[contextID];
+        }
+        if (context.logLevel > severity) {
             return;
         }
-        this.logQueue[severity].push(message);
+        if (!context.logs[severity]) {
+            context.logs[severity] = [];
+        }
+        context.logs[severity].push(message);
     }
-    OutputLog(logID?: string): string {
-        let queues = this.logQueue;
+    OutputLog(): void {
+        let logOutputs = [];
+        let ids = Object.keys(this.logContexts);
+        for (let i = 0, length = ids.length; i < length; i++) {
+            let context = this.logContexts[ids[i]];
+            let log = this.compileLog(ids[i], context);
+
+            if (log) {
+                logOutputs.push(log);
+            }
+        }
+        let startLoggingTime = Game.cpu.getUsed();
+        let introStr = `<font color="${ERROR_COLORS[LOG_ALERT]}">Begin SwarmOS Log - t${Game.time}\n`
+        introStr += `CPU: (${startLoggingTime}\/${Game.cpu.tickLimit}\/${Game.cpu.bucket})</font>\n`;
+
+        console.log(introStr);
+        for (let i = 0; i < logOutputs.length; i++) {
+            console.log(logOutputs[i]);
+        }
+
+        this.InitQueue();
+        console.log(`End Logging(${Game.cpu.getUsed() - startLoggingTime})`);
+    }
+
+    private compileLog(logID: string, context: Context) {
+        let queues = context.logs;
+        let hasLogs = false;
         let output = () => {
-            let outStr = logID ? `<font color="${ERROR_COLORS[0]}">Begin Log[${logID}]</font>` : '';
-            for (let i = queues.length - 1; i >= 0; i--) {
-                if (queues[i].length == 0) {
+            let outStr = `<font color="${ERROR_COLORS[0]}">Begin Log[${logID}] - {${context.logLevel}}</font>\n`;
+            for (let i = ERROR_COLORS.length - 1; i >= 0; i--) {
+                if (!queues[i] || queues[i].length == 0) {
                     continue;
                 }
-                outStr += `<font color="${ERROR_COLORS[i]}">Log[${i}] - ${queues[i].length} messages\n`
+                outStr += `<font color="${ERROR_COLORS[i]}">`
                 while (queues[i].length > 0) {
                     let nextMessage = queues[i].shift();
                     if (nextMessage) {
                         if (typeof nextMessage === "function") {
                             nextMessage = `[DL]${nextMessage()}`;
                         }
+                        hasLogs = true;
                         outStr += `${nextMessage}\n`;
                     }
                 }
                 outStr += `</font>`;
             }
             return outStr;
-            /*let introStr = `<font color="${ERROR_COLORS[LOG_INFO]}">Tick[${Game.time}] - CPU: (`
-            introStr += `${Game.cpu.getUsed()}\/${Game.cpu.tickLimit}\/${Game.cpu.bucket})</font>\n`;
-            return introStr + outStr;*/
         }
 
         let compiledLog = output();
-        this.InitQueue();
-        return compiledLog;
+        return hasLogs ? compiledLog : undefined;
     }
 
     protected InitQueue(): void {
-        this.logQueue = [];
-        for (let i = 0; i < ERROR_COLORS.length; i++) {
-            this.logQueue.push([]);
-        }
-    }
-
-    protected logQueue!: (string | (() => string))[][];
-}
-
-export class GlobalLogger {
-    constructor() {
-        this.contextualLoggers = {};
-    }
-
-    private contextualLoggers: IDictionary<SwarmLogger>;
-
-    GetContextualLogger(loggerID: string, logLevel: number = MIN_LOG_LEVEL): SwarmLogger {
-        if (!this.contextualLoggers[loggerID]) {
-            this.contextualLoggers[loggerID] = new SwarmLogger(logLevel);
+        let ids = Object.keys(this.logContexts);
+        for (let i = 0, length = ids.length; i < length; i++) {
+            this.logContexts[ids[i]].logs = {};
         }
 
-        return this.contextualLoggers[loggerID];
+        if (!this.logContexts[DEFAULT_LOG_ID]) {
+            this.CreateLogContext({ logID: DEFAULT_LOG_ID, logLevel: DEFAULT_LOG_LEVEL });
+        }
     }
-
-    // OutputLog - Combine all the contextual loggers into a single output string but grouped by logger id
 }

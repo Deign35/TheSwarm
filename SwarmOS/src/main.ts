@@ -43,7 +43,7 @@ export function loop() {
     try {
         kernel.loop();
     } finally {
-        console.log(Logger.OutputLog());
+        Logger.OutputLog();
     }
 };
 
