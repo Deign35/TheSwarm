@@ -24,7 +24,7 @@ declare interface ILogger {
     alert(message: (string | (() => string)), contextID?: string): void;
 
     CreateLogContext(context: LogContext): void;
-    OutputLog(): void;
+    DumpLogToConsole(endTick?: boolean): void;
 }
 declare var Logger: ILogger;
 

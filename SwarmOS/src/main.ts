@@ -15,7 +15,7 @@ import "Tools/GlobalTools";
 import "Tools_Prototypes";
 
 // Update the OS as needed
-const RESET_IN_SIM_ON_UPDATE = false;
+const RESET_IN_SIM_ON_UPDATE = true;
 if (!Memory.VERSION || Memory.VERSION != SWARM_VERSION_DATE) {
     Logger.alert(`OS Version updated`);
     if (RESET_IN_SIM_ON_UPDATE && !!Game.rooms.sim) {
@@ -43,7 +43,7 @@ export function loop() {
     try {
         kernel.loop();
     } finally {
-        Logger.OutputLog();
+        Logger.DumpLogToConsole();
     }
 };
 
