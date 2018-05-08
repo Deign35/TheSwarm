@@ -1,5 +1,4 @@
 import { Stopwatch } from "./Stopwatch";
-
 global['Stopwatch'] = Stopwatch;
 
 const NUM_ALLOWED_FAILURES = 10;

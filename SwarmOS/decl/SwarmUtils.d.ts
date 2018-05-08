@@ -9,6 +9,7 @@ declare class Stopwatch {
     ToString(): string;
 }
 declare class SwarmLogger {
+    constructor(LogLevel?: number);
     trace(message: (string | (() => string))): void;
     debug(message: (string | (() => string))): void;
     info(message: (string | (() => string))): void;
@@ -17,7 +18,7 @@ declare class SwarmLogger {
     fatal(message: (string | (() => string))): void;
     alert(message: (string | (() => string))): void;
 
-    OutputLog(): void;
+    OutputLog(): string;
 }
 declare var Logger: SwarmLogger;
 

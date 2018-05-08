@@ -30,7 +30,7 @@ const ERROR_COLORS = [
 
 const MIN_LOG_LEVEL = Game.rooms['sim'] ? LOG_TRACE : LOG_INFO;
 export class SwarmLogger {
-    constructor() {
+    constructor(public LogLevel: number = MIN_LOG_LEVEL) {
         this.InitQueue();
     }
     trace(message: (string | (() => string))) { return this.log(message, LOG_TRACE); }
@@ -41,17 +41,16 @@ export class SwarmLogger {
     fatal(message: (string | (() => string))) { return this.log(message, LOG_FATAL); }
     alert(message: (string | (() => string))) { return this.log(message, LOG_ALERT); }
 
-    private log(message: (string | (() => string)), severity: number = 3) {
-        if (MIN_LOG_LEVEL > severity) {
+    protected log(message: (string | (() => string)), severity: number = 3) {
+        if (this.LogLevel > severity) {
             return;
         }
         this.logQueue[severity].push(message);
     }
-
-    OutputLog(): void {
+    OutputLog(logID?: string): string {
         let queues = this.logQueue;
         let output = () => {
-            let outStr = '';
+            let outStr = logID ? `<font color="${ERROR_COLORS[0]}">Begin Log[${logID}]</font>` : '';
             for (let i = queues.length - 1; i >= 0; i--) {
                 if (queues[i].length == 0) {
                     continue;
@@ -68,21 +67,41 @@ export class SwarmLogger {
                 }
                 outStr += `</font>`;
             }
-            let introStr = `<font color="${ERROR_COLORS[LOG_INFO]}">Tick[${Game.time}] - CPU: (`
+            return outStr;
+            /*let introStr = `<font color="${ERROR_COLORS[LOG_INFO]}">Tick[${Game.time}] - CPU: (`
             introStr += `${Game.cpu.getUsed()}\/${Game.cpu.tickLimit}\/${Game.cpu.bucket})</font>\n`;
-            return introStr + outStr;
+            return introStr + outStr;*/
         }
 
-        console.log(output());
+        let compiledLog = output();
         this.InitQueue();
+        return compiledLog;
     }
 
-    private InitQueue(): void {
+    protected InitQueue(): void {
         this.logQueue = [];
         for (let i = 0; i < ERROR_COLORS.length; i++) {
             this.logQueue.push([]);
         }
     }
 
-    private logQueue!: (string | (() => string))[][];
+    protected logQueue!: (string | (() => string))[][];
+}
+
+export class GlobalLogger {
+    constructor() {
+        this.contextualLoggers = {};
+    }
+
+    private contextualLoggers: IDictionary<SwarmLogger>;
+
+    GetContextualLogger(loggerID: string, logLevel: number = MIN_LOG_LEVEL): SwarmLogger {
+        if (!this.contextualLoggers[loggerID]) {
+            this.contextualLoggers[loggerID] = new SwarmLogger(logLevel);
+        }
+
+        return this.contextualLoggers[loggerID];
+    }
+
+    // OutputLog - Combine all the contextual loggers into a single output string but grouped by logger id
 }
