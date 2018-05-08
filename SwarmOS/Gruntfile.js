@@ -186,9 +186,10 @@ module.exports = function (grunt) {
         output += '\ncompile: Compiles the Typescript';
         console.log(output);
     });
-    grunt.registerTask('commitMain', ['compile', 'replace', 'copy', 'screepsBranch:SwarmOS_Main', 'screeps', 'time']);
-    grunt.registerTask('commitSim', ['compile', 'replace', 'copy', 'screepsBranch:SwarmOS_Sim', 'screeps', 'time']);
-    grunt.registerTask('compile', ['clean', 'compileDefs', 'ts', 'time']);
+    grunt.registerTask('commitMain', ['compileComplete', 'screepsBranch:SwarmOS_Main', 'screeps', 'time']);
+    grunt.registerTask('commitSim', ['compileComplete', 'screepsBranch:SwarmOS_Sim', 'screeps', 'time']);
+    grunt.registerTask('compileComplete', ['compile', 'replace', 'copy'])
+    grunt.registerTask('compile', ['clean', 'compileDefs', 'ts']);
     grunt.registerTask('compileDefs', ['generateGlobals']);
     grunt.registerTask('default', ['help']);
 }

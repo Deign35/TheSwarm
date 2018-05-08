@@ -78,7 +78,7 @@ export class SwarmLogger implements ILogger {
         }
         let startLoggingTime = Game.cpu.getUsed();
         let introStr = `<font color="${ERROR_COLORS[LOG_ALERT]}">Begin SwarmOS Log - t${Game.time}\n`
-        introStr += `CPU: (${startLoggingTime}\/${Game.cpu.tickLimit}\/${Game.cpu.bucket})</font>\n`;
+        introStr += `CPU: (${startLoggingTime}\/${Game.cpu.limit}\/${Game.cpu.bucket})</font>\n`;
 
         console.log(introStr);
         for (let i = 0; i < logOutputs.length; i++) {
@@ -93,7 +93,7 @@ export class SwarmLogger implements ILogger {
         let queues = context.logs;
         let hasLogs = false;
         let output = () => {
-            let outStr = `<font color="${ERROR_COLORS[0]}">Begin Log[${logID}] - {${context.logLevel}}</font>\n`;
+            let outStr = `<font color="${ERROR_COLORS[LOG_WARN]}">Begin Log[${logID}] - {${context.logLevel}}</font>\n`;
             for (let i = ERROR_COLORS.length - 1; i >= 0; i--) {
                 if (!queues[i] || queues[i].length == 0) {
                     continue;
