@@ -59,7 +59,7 @@ class RoomExtension extends ExtensionBase implements IRoomStructuresExtension, I
     }
 
     private InitRoomData(room: Room) {
-        Logger.info(`Initialize new room ${room.name}`);
+        this.log.info(`Initialize new room ${room.name}`);
         this.memory[room.name] = {
             cSites: [],
             lastUpdated: 0,
@@ -86,11 +86,11 @@ class RoomExtension extends ExtensionBase implements IRoomStructuresExtension, I
     RefreshRoomStructures(roomID: string): void {
         let { room, roomData } = this.getRoomData(roomID);
         if (!room || !roomData) {
-            Logger.debug(() => (room ? `Room has not been initialized[${roomID}]` : `Room out of view [${roomID}]`));
+            this.log.debug(() => (room ? `Room has not been initialized[${roomID}]` : `Room out of view [${roomID}]`));
             return;
         }
 
-        Logger.info(`Update room structures ${roomID}`);
+        this.log.info(`Update room structures ${roomID}`);
 
         roomData.owner = (room.controller && (
             (room.controller.owner && room.controller.owner.username) ||
@@ -159,10 +159,10 @@ class RoomExtension extends ExtensionBase implements IRoomStructuresExtension, I
                 this.RefreshRoomStructures(roomID);
             }
         } else {
-            Logger.debug(`Room out of view [${roomID}]`);
+            this.log.debug(`Room out of view [${roomID}]`);
         }
         if (!roomData) {
-            Logger.error(`Room has not been initialized [${roomID}]`);
+            this.log.error(`Room has not been initialized [${roomID}]`);
             return;
         }
 
@@ -172,26 +172,26 @@ class RoomExtension extends ExtensionBase implements IRoomStructuresExtension, I
     RefreshRoom(roomID: string, force: boolean = false) {
         let { room, roomData } = this.getRoomData(roomID);
         if (!room || !roomData) {
-            Logger.debug(() => (room ? `Room has not been initialized[${roomID}]` : `Room out of view [${roomID}]`));
+            this.log.debug(() => (room ? `Room has not been initialized[${roomID}]` : `Room out of view [${roomID}]`));
             return;
         }
 
-        Logger.trace(`Examine room ${roomID}`);
+        this.log.trace(`Examine room ${roomID}`);
         roomData.lastUpdated = Game.time;
         if (force || this.shouldRefresh(11, roomData!.minUpdateOffset)) {
-            Logger.trace(`Examine room[DroppedResources] ${roomID}`);
+            this.log.trace(`Examine room[DroppedResources] ${roomID}`);
             roomData.resources = room.find(FIND_DROPPED_RESOURCES).map((value: Resource) => {
                 return value.id;
             });
         }
         if (force || this.shouldRefresh(27, roomData!.minUpdateOffset)) {
-            Logger.trace(`Examine room[Tombstones] ${roomID}`);
+            this.log.trace(`Examine room[Tombstones] ${roomID}`);
             roomData.tombstones = room.find(FIND_TOMBSTONES).map((value: Tombstone) => {
                 return value.id;
             });
         }
         if (force || this.shouldRefresh(29, roomData!.minUpdateOffset)) {
-            Logger.trace(`Examine room[ConstructionSites] ${roomID}`);
+            this.log.trace(`Examine room[ConstructionSites] ${roomID}`);
             roomData.cSites = room.find(FIND_CONSTRUCTION_SITES).map((value: ConstructionSite) => {
                 return {
                     hits: value.progress,

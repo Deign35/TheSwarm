@@ -4,21 +4,24 @@ const ProcessRegistry_LogContext: LogContext = {
 }
 export class ProcessRegistry implements IPosisProcessRegistry {
     constructor() {
-        Logger.CreateLogContext(ProcessRegistry_LogContext);
+        this.log.CreateLogContext(ProcessRegistry_LogContext);
+    }
+    protected get log() {
+        return Logger;
     }
     private registry: { [name: string]: IPosisProcessConstructor } = {};
     register(name: string, constructor: IPosisProcessConstructor): boolean {
         if (this.registry[name]) {
-            Logger.error(`Name already registered: ${name}`);
+            this.log.error(`Name already registered: ${name}`);
             return false;
         }
-        Logger.debug(`Registered ${name}`, ProcessRegistry_LogContext.logID);
+        this.log.debug(() => `Registered ${name}`, ProcessRegistry_LogContext.logID);
         this.registry[name] = constructor;
         return true;
     }
     getNewProcess(name: string, context: IPosisProcessContext): IPosisProcess | undefined {
         if (!this.registry[name]) return;
-        Logger.debug(`Created ${name}`);
+        this.log.debug(() => `Created ${name}`);
         return new this.registry[name](context);
     }
 }
@@ -45,6 +48,9 @@ export abstract class BaseProcess implements IPosisProcess {
     get state() {
         return this.context.state;
     }
+    protected get log(): ILogger {
+        return Logger;
+    }
     SetProcessToSleep(ticks: number) {
         let sleeper = this.context.queryPosisInterface("sleep");
         sleeper.sleep(ticks);
@@ -56,12 +62,12 @@ export abstract class BaseProcess implements IPosisProcess {
 
     run(): void {
         let startCPU = Game.cpu.getUsed();
-        Logger.trace(() => `Begin ${this.imageName}(${this.pid}): ${startCPU}`);
+        this.log.trace(() => `Begin ${this.imageName}(${this.pid}): ${startCPU}`);
         if (!this.memory) {
-            Logger.warn(`${this.imageName} memory init.`)
+            this.log.warn(() => `${this.imageName} memory init.`)
             this.handleMissingMemory();
         }
 
-        Logger.trace(() => `End ${this.imageName}(${this.pid}): ${Game.cpu.getUsed() - startCPU}`);
+        this.log.trace(() => `End ${this.imageName}(${this.pid}): ${Game.cpu.getUsed() - startCPU}`);
     }
 }

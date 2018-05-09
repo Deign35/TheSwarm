@@ -3,23 +3,26 @@ export class ExtensionRegistry implements IPosisExtension {
         this.registry = {};
         this.register('extRegistry', this);
     }
+    get log() {
+        return Logger;
+    }
 
     private registry: { [interfaceId: string]: IPosisExtension };
     register(interfaceId: string, extension: IPosisExtension): boolean {
         if (this.registry[interfaceId]) {
-            Logger.warn(`Interface Id already registered: ${interfaceId}`);
+            this.log.warn(`Interface Id already registered: ${interfaceId}`);
         }
-        Logger.debug(`Registered ${interfaceId}`);
+        this.log.debug(`Registered ${interfaceId}`);
         this.registry[interfaceId] = extension;
         return true;
     }
     unregister(interfaceId: string): boolean {
         if (this.registry[interfaceId]) {
-            Logger.debug(`Unregistered ${interfaceId}`);
+            this.log.debug(`Unregistered ${interfaceId}`);
             delete this.registry[interfaceId]
             return true;
         } else {
-            Logger.error(`Interface Id not registered: ${interfaceId}`);
+            this.log.error(`Interface Id not registered: ${interfaceId}`);
             return false;
         }
     }
@@ -45,6 +48,9 @@ function posisInterface(interfaceId: string): (target: any, propertyKey: string)
 
 export abstract class ExtensionBase implements IPosisExtension {
     constructor(protected extensionRegistry: IPosisExtensionRegistry) {
+    }
+    protected get log() {
+        return Logger;
     }
     protected abstract get memory(): any;
 }

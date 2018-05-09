@@ -1,5 +1,17 @@
 declare const require: (module: string) => any;
 declare var global: { [id: string]: any };
+declare type IDictionary<T> = { [id: string]: T };
+declare type Dictionary = IDictionary<any>
+
+declare interface Profiler {
+    clear(): void;
+    output(): void;
+    start(): void;
+    status(): void;
+    stop(): void;
+    toString(): string;
+}
+declare function posisInterface(interfaceId: string): (target: any, propertyKey: string) => any
 
 declare class Stopwatch {
     Start(): void;

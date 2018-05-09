@@ -29,9 +29,12 @@ class ServiceProvider extends BaseProcess {
             this.context.memory.services = {};
         }
     }
+    get log() {
+        return Logger;
+    }
 
     addService(serviceID: string, id: string, startContext: any = {}) {
-        Logger.info(`Adding service ${id}`);
+        this.log.info(`Adding service ${id}`);
         let result = this.kernel.startProcess(id, Object.assign({}, startContext));
         if (result) {
             this.kernel.setParent(result.pid);
@@ -47,7 +50,7 @@ class ServiceProvider extends BaseProcess {
             let process = (service && service.pid) ? this.kernel.getProcessById(service.pid) : undefined;
 
             if (!service || !process || process.state == ProcessState.Killed) {
-                Logger.info(`Initializing service ${ids[i]}`);
+                this.log.info(`Initializing service ${ids[i]}`);
 
                 let initData = REQUIRED_PROCESSES[ids[i]];
                 this.addService(ids[i], initData.processName, initData.startContext);
@@ -55,7 +58,7 @@ class ServiceProvider extends BaseProcess {
                 process = (service && service.pid) ? this.kernel.getProcessById(service.pid) : undefined;
 
                 if (!service || !process) {
-                    Logger.error(`Failed to restart service ${ids[i]}`);
+                    this.log.error(`Failed to restart service ${ids[i]}`);
                     continue;
                 }
             }

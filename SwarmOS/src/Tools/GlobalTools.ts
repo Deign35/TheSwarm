@@ -32,7 +32,8 @@ export class GlobalTools {
     // (TODO): Create a tools consul that manages memory for things, maybe only use flash memory!
     static TestNewAlgorithm(testID: string,
         testFunction: () => void,
-        workingVersion: () => void) {
+        workingVersion: () => void,
+        loggerID?: string) {
         let wasSuccessful = false;
         if (!Memory.testAlgorithms[testID]) {
             Memory.testAlgorithms[testID] = 1;
@@ -43,7 +44,7 @@ export class GlobalTools {
                 testFunction();
                 wasSuccessful = true;
             } else {
-                Logger.warn(`Test[${testID}] has failed ${NUM_ALLOWED_FAILURES} times.  Test skipped`);
+                Logger.warn(`Test[${testID}] has failed ${NUM_ALLOWED_FAILURES} times.  Test skipped`, loggerID);
             }
         } catch (exc) {
             Memory.testAlgorithms[testID] += 1;

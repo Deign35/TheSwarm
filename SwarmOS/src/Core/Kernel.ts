@@ -17,7 +17,9 @@ const PROCESS_GHOST_TIMER = 100;
 export class Kernel implements IPosisKernel, IPosisSleepExtension {
     private _processCache: ProcessCache;
     private curProcessID: string = "";
-
+    protected get log() {
+        return Logger;
+    }
     get memory(): KernelMemory {
         Memory.kernel = Memory.kernel || { processTable: {}, processMemory: {} };
         return Memory.kernel;
@@ -56,12 +58,12 @@ export class Kernel implements IPosisKernel, IPosisSleepExtension {
         this.processMemory[pid] = startContext || {};
 
         let process = this.createProcess(pid);
-        Logger.debug(`CreateNewProcess: ${processName}`);
+        this.log.debug(`CreateNewProcess: ${processName}`);
         return { pid, process };
     }
 
     createProcess(id: PID): IPosisProcess {
-        Logger.debug(`ConstructProcess ${id}`);
+        this.log.debug(`ConstructProcess ${id}`);
         let pInfo = this.processTable[id];
         if (!pInfo) {
             throw new Error(`Process ${id} does not exist`)
@@ -94,7 +96,7 @@ export class Kernel implements IPosisKernel, IPosisSleepExtension {
     killProcess(id: PID): void {
         let pinfo = this.processTable[id];
         if (!pinfo) return;
-        Logger.warn(`killed ${id}`);
+        this.log.warn(`killed ${id}`);
         pinfo.status = ProcessState.Killed;
         pinfo.ended = Game.time;
         if (pinfo.pPID == '') return
@@ -158,7 +160,7 @@ export class Kernel implements IPosisKernel, IPosisSleepExtension {
             } catch (e) {
                 this.killProcess(pid);
                 pInfo.error = e.stack || e.toString();
-                Logger.error(`[${pid}] ${pInfo.name} crashed\n${e.stack}`);
+                this.log.error(`[${pid}] ${pInfo.name} crashed\n${e.stack}`);
             }
         }
         if (!hasActiveProcesses)

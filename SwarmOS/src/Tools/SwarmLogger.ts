@@ -1,43 +1,71 @@
 interface ILogLevelSetting {
-    color: string,
-    level: number
+    level: number,
+    font: {
+        color: string,
+        size: number
+    }
 }
 
-const LOGGER_SEPARATOR = `<font color="green">-----------------------------------------------------------------------</font>`;
-const CONTEXT_SEPARATOR = `<font color="yellow">-----------------------------------------------------------------------</font>`;
+const LOGGER_SEPARATOR = `<font color="yellow">-----------------------------------------------------------------------</font>`;
+const CONTEXT_SEPARATOR = `<font color="green">-----------------------------------------------------------------------</font>`;
 
+const DEFAULT_LOG_FONT_SIZE = 3;
 const LOGGER_SETTINGS: IDictionary<ILogLevelSetting> = {
     [LOG_ALERT]: {
-        color: '#C050E1', // Purple
-        level: 6
+        level: 6,
+        font: {
+            color: '#C050E1', // Purple
+            size: DEFAULT_LOG_FONT_SIZE + 3,
+        }
     },
     [LOG_DEBUG]: {
-        color: '#00C6B6', // Teal
-        level: 1
+        level: 1,
+        font: {
+            color: '#00C6B6', // Teal
+            size: DEFAULT_LOG_FONT_SIZE,
+        }
     },
     [LOG_ERROR]: {
-        color: '#E65C00', // Red
-        level: 4
+        level: 4,
+        font: {
+            color: '#E65C00', // Red
+            size: DEFAULT_LOG_FONT_SIZE + 2,
+        }
     },
     [LOG_FATAL]: {
-        color: '#FF0066', // Fuscia(sp?)
-        level: 5
+        level: 5,
+        font: {
+            color: '#FF0066', // Fuscia(sp?)
+            size: DEFAULT_LOG_FONT_SIZE + 2,
+        }
     },
     [LOG_INFO]: {
-        color: '#FFFFFF', // White
-        level: 2
+        level: 2,
+        font: {
+            color: '#FFFFFF', // White
+            size: DEFAULT_LOG_FONT_SIZE,
+        }
     },
     [LOG_TRACE]: {
-        color: '#666666', // Dark Grey
-        level: 0
+        level: 0,
+        font: {
+            color: '#666666', // Dark Grey
+            size: DEFAULT_LOG_FONT_SIZE - 1,
+        }
     },
     [LOG_WARN]: {
-        color: '#F4D000', // Yellow
-        level: 3
+        level: 3,
+        font: {
+            color: '#F4D000', // Yellow
+            size: DEFAULT_LOG_FONT_SIZE + 1,
+        }
     }
 }
 const ShouldLog = function (minLevel: LogLevel, messageLevel: LogLevel) {
     return LOGGER_SETTINGS[minLevel].level <= LOGGER_SETTINGS[messageLevel].level
+}
+const MakeFontTag = function (level: LogLevel) {
+    return `<font size="${LOGGER_SETTINGS[level].font.size}" color="${LOGGER_SETTINGS[level].font.color}">`
 }
 interface Context {
     logLevel: LogLevel,
@@ -109,7 +137,7 @@ export class SwarmLogger implements ILogger {
             }
         }
 
-        let introStr = `${LOGGER_SEPARATOR}\n<font color="${LOGGER_SETTINGS[LOG_ALERT].color}">Begin SwarmOS Log - [${Game.time}]`
+        let introStr = `${LOGGER_SEPARATOR}\n${MakeFontTag(LOG_ALERT)}Begin SwarmOS Log - [${Game.time}]`
         if (endTick) {
             introStr += `\nCPU: (${startLoggingTime}\/${Game.cpu.limit} -- [${Game.cpu.bucket}])</font>`;
         }
@@ -121,21 +149,19 @@ export class SwarmLogger implements ILogger {
 
         // Reset the logger
         this.InitQueue();
-        console.log(`<font color="${LOGGER_SETTINGS[LOG_ALERT].color}">End Logging(${Game.cpu.getUsed() - startLoggingTime})</font>\n${LOGGER_SEPARATOR}`);
+        console.log(`${MakeFontTag(LOG_ALERT)}End Logging(${Game.cpu.getUsed() - startLoggingTime})</font>\n${LOGGER_SEPARATOR}`);
     }
 
     private compileContext(logID: string, context: Context) {
         let queues = context.logs;
         let hasLogs = false;
         let output = () => {
-            let outStr = `${CONTEXT_SEPARATOR}\n<font color="${LOGGER_SETTINGS[LOG_WARN].color}">Begin Log[${logID}] - {${context.logLevel}}</font>\n`;
-            //for (let i = ERROR_COLORS.length - 1; i >= 0; i--) {
+            let outStr = `${CONTEXT_SEPARATOR}\n${MakeFontTag(LOG_WARN)}Begin Log[${logID}] - {${context.logLevel}}</font>\n`;
             for (let settingID in LOGGER_SETTINGS) {
                 if (!queues[settingID] || queues[settingID].length == 0) {
                     continue;
                 }
-                let color = LOGGER_SETTINGS[settingID].color;
-                outStr += `<font color="${color}">`
+                outStr += MakeFontTag(context.logLevel);
                 while (queues[settingID].length > 0) {
                     let nextMessage = queues[settingID].shift();
                     if (nextMessage) {
