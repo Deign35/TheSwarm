@@ -4,18 +4,22 @@
  * Then do a find and replace for
  * '___Empty___'
  * 
- * Replace with whatever name you want
+ * Replace with whatever name you want.
+ * 
+ * You now have a ${'___Empty___'}Manager to implement
  */
+declare interface I___Empty___Data_Memory {
 
+}
 declare var Memory: {
-    ___Empty___Data: any
+    ___Empty___Data: I___Empty___Data_Memory
 }
 
 import { BaseProcess } from "Core/ProcessRegistry";
 import { ExtensionBase } from "Core/ExtensionRegistry";
 
 export const IN____Empty___Manager = '___Empty___Manager';
-export const bundle: IPosisBundle<IDictionary<RoomData_Memory>> = {
+export const bundle: IPosisBundle<I___Empty___Data_Memory> = {
     install(processRegistry: IPosisProcessRegistry, extensionRegistry: IPosisExtensionRegistry) {
         processRegistry.register(IN____Empty___Manager, ___Empty___Manager);
     },
@@ -34,12 +38,12 @@ class ___Empty___Manager extends BaseProcess {
         return Memory.___Empty___Data;
     }
     executeProcess(): void {
-
+        this.log.warn(`${IN____Empty___Manager} has not been implemented.`);
     }
 }
 
 class ___Empty___Extension extends ExtensionBase {
-    protected get memory(): IDictionary<RoomData_Memory> {
+    protected get memory(): I___Empty___Data_Memory {
         return Memory.___Empty___Data;
     }
 }

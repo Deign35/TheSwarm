@@ -51,8 +51,13 @@ declare interface RoomData_Memory {
 }
 
 /** SpawnData */
-declare interface SpawnData_Memory {
-    [str: string]: any
+declare type SpawnData_Memory = EDictionary<SpawnData_SpawnQueue>
+declare type SpawnData_SpawnQueue = SpawnData_SpawnCard[]
+
+declare interface SpawnData_SpawnCard {
+    creepName: string,
+    body: BodyPartConstant[],
+    defaultMemory?: any
 }
 
 /** Stats */

@@ -6,14 +6,16 @@ import { BaseProcess } from "Core/ProcessRegistry";
 import { ExtensionBase } from "Core/ExtensionRegistry";
 
 export const IN_SpawnManager = 'SpawnManager';
-export const bundle: IPosisBundle<IDictionary<RoomData_Memory>> = {
+export const bundle: IPosisBundle<SpawnData_Memory> = {
     install(processRegistry: IPosisProcessRegistry, extensionRegistry: IPosisExtensionRegistry) {
         processRegistry.register(IN_SpawnManager, SpawnManager);
     },
     rootImageName: IN_SpawnManager,
     makeDefaultRootMemory: () => {
         if (!Memory.spawnData) {
-            Memory.spawnData = {};
+            Memory.spawnData = {
+
+            };
         }
 
         return Memory.spawnData;
@@ -26,12 +28,12 @@ class SpawnManager extends BaseProcess {
         return Memory.spawnData;
     }
     executeProcess(): void {
-
+        this.log.warn(`${IN_SpawnManager} has not been implemented.`);
     }
 }
 
 class SpawnExtension extends ExtensionBase {
-    protected get memory(): IDictionary<RoomData_Memory> {
+    protected get memory(): SpawnData_Memory {
         return Memory.spawnData;
     }
 }
