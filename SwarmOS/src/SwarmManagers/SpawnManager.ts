@@ -2,6 +2,33 @@ declare var Memory: {
     spawnData: SpawnData_Memory
 }
 
+const MIN_BODY = 0;
+const TINY_BODY = 1;
+const SMALL_BODY = 2;
+const MEDIUM_BODY = 3;
+const BIG_BODY = 4;
+const LARGE_BODY = 5;
+const SUPER_BODY = 6;
+
+/*
+const exDef: RoleDefinition<'scout'> = {
+    roleID: 'scout',
+    body: [
+        [MOVE],
+        [TOUGH, TOUGH, TOUGH, MOVE],
+        [TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, MOVE],
+    ]
+}
+// (TODO) Automate role definitions to precalculate body costs and shit
+const exDef2: RoleDefinition<'harvester'> = {
+    roleID: 'harvester',
+    body: {
+        [MIN_BODY]: [WORK, CARRY, MOVE],
+        [SMALL_BODY]: [TOUGH, TOUGH, TOUGH, MOVE],
+        [MEDIUM_BODY]: [TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, MOVE],
+    }
+}
+*/
 import { BaseProcess } from "Core/ProcessRegistry";
 import { ExtensionBase } from "Core/ExtensionRegistry";
 
@@ -11,13 +38,21 @@ export const EXT_CreepSpawnExtension = 'CreepSpawner'; // Added to BaseProcess
 export const bundle: IPosisBundle<SpawnData_Memory> = {
     install(processRegistry: IPosisProcessRegistry, extensionRegistry: IPosisExtensionRegistry) {
         processRegistry.register(IN_SpawnManager, SpawnManager);
-        extensionRegistry.register(EXT_CreepSpawnExtension, new SpawnExtension(extensionRegistry));
+        let SpawnManagerExtension = new SpawnExtension(extensionRegistry);
+        extensionRegistry.register(EXT_CreepSpawnExtension, SpawnManagerExtension);
     },
     rootImageName: IN_SpawnManager
 }
 
 // Spawn queue order, pre organized priorities and excludes Priority.Hold which is not a valid spawn priority.
-const queueOrder = [Priority.EMERGENCY, Priority.Highest, Priority.High, Priority.Medium, Priority.Low, Priority.Lowest];
+const queueOrder = [
+    Priority.EMERGENCY,
+    Priority.Highest,
+    Priority.High,
+    Priority.Medium,
+    Priority.Low,
+    Priority.Lowest
+];
 
 const SpawnManager_LogContext: LogContext = {
     logID: IN_SpawnManager,
@@ -50,75 +85,77 @@ class SpawnManager extends BaseProcess {
 
     handleMissingMemory() {
         if (!Memory.spawnData) {
+            this.log.warn(`Initializing memory`);
             Memory.spawnData = {
-                [Priority.EMERGENCY]: [],
-                [Priority.Highest]: [],
-                [Priority.High]: [],
-                [Priority.Medium]: [],
-                [Priority.Low]: [],
-                [Priority.Lowest]: []
+                queue: [],
+                scheduledSpawn: {}
             };
-        }
-        return Memory.spawnData;
-    }
-    
-    executeProcess(): void {
-        this.log.alert(`Start`);
-        this.log.debug(`Get Queues`);
-        this.log.debug(`Find the highest priority queue that has requests --- Req[Pri(X)]`);
-
-        let checkNextQueue = true;
-        let minSpawnSize = 100000;
-        let availableSpawns: SDictionary<StructureSpawn> = {};
-
-        let allIDs = Object.keys(Game.spawns);
-        for (let i = 0, length = allIDs.length; i < length; i++) {
-            let spawn = Game.spawns[allIDs[i]];
-            if (spawn.isActive() && !spawn.spawning) {
-                availableSpawns[allIDs[i]] = spawn;
+            for (let i = 0; i < queueOrder.length; i++) {
+                Memory.spawnData.queue[queueOrder[i]] = [];
             }
         }
+    }
+
+    executeProcess(): void {
+        let minSpawnSize = 0;
+        let availableSpawns: SDictionary<StructureSpawn> = {};
+
+        let allSpawnIDs = Object.keys(Game.spawns);
+        for (let i = 0, length = allSpawnIDs.length; i < length; i++) {
+            let spawn = Game.spawns[allSpawnIDs[i]];
+            if (spawn.isActive() && !spawn.spawning) {
+                availableSpawns[allSpawnIDs[i]] = spawn;
+            }
+        }
+        let availableSpawnIDs = Object.keys(availableSpawns);
+        let availableSpawnCount = availableSpawnIDs.length;
 
         for (let i = 0; i < queueOrder.length; i++) {
-            let queue = this.memory[queueOrder[i]]; // assume its already sorted
+            let queue = this.memory.queue[queueOrder[i]]; // (TODO): Verify my assumption: This is already sorted
             let unspawnables: SpawnData_SpawnCard[] = [];
             while (queue.length > 0) {
-                this.log.debug(`Try to spawn everything in X`);
-                let curReq = queue[0];
-                if (curReq) {
-                    this.log.debug(`Try to find a spawn that can fulfill the request`);
+                if (availableSpawnIDs.length == 0) {
+                    this.log.debug(`There are no remaining available spawns to spawn from`);
+                    while (queue.length > 0) {
+                        unspawnables.push(queue.shift()!);
+                    }
+                    this.memory[queueOrder[i]] = unspawnables;
+                    // (TODO): Put to sleep until a spawn is freed up.
+                    return;
+                }
 
-                    let ids = Object.keys(availableSpawns).sort((a, b) => {
-                        return availableSpawns[a].room.energyCapacityAvailable > availableSpawns[b].room.energyCapacityAvailable ? -1 : 1;
-                    });
+                let curReq = queue.shift(); // Because this is already sorted, this will be the hardest to spawn by cost
+                if (!curReq) { continue; }
 
-                    for (let j = 0; j < ids.length; j++) {
-                        let spawn = allIDs[j];
+                // If I can't spawn it, hang on to it to be put back in when we're done.
+                if (curReq.body.cost < minSpawnSize) {
+                    unspawnables.push(curReq);
+                    continue;
+                }
+
+                // Sort the available spawns by available energy
+                availableSpawnIDs = availableSpawnIDs.sort((a, b) => {
+                    return availableSpawns[a].room.energyCapacityAvailable > availableSpawns[b].room.energyCapacityAvailable ? -1 : 1;
+                });
+
+                let closestSpawn = Game.map.getRoomLinearDistance(curReq.location, availableSpawns[availableSpawnIDs[0]].room.name);
+                for (let j = 0; j < availableSpawnCount; j++) {
+                    let spawn = availableSpawns[allSpawnIDs[j]];
+                    if (spawn.room.energyCapacityAvailable < curReq.body.cost) {
+
                     }
                 }
 
                 this.log.debug(`Successfully spawned a thing`);
-                queue.shift();
-
-                this.log.debug(`Check if there are any available spawns here and break if no?`);
             }
 
-            if (!checkNextQueue) {
-                this.log.debug(`After checking Req[Pri(X - 1)] quit trying to spawn things`)
-                break;
-            }
-
-            this.log.debug(`If its because the queue could not be depleted (due to not enough energy or an open spawner)`);
             if (unspawnables.length > 0) {
                 this.memory[queueOrder[i]] = unspawnables;
-                this.log.debug(`Then go again, but with Req[Pri(X - 1)] and do not repeat again after.`);
-                checkNextQueue = false;
-                this.log.debug(`If the spawn couldn't spawn because of lack of energy, spawns on the next level wont spawn if they cost more than the min`)
-                minSpawnSize = GetSpawnCost(queue[0].body);
-                this.log.debug(`If the spawn couldn't spawn because of something else, next spawns that cost more won't be blocked by this`);
+                //If the spawn couldn't spawn because of lack of energy, spawns on the next level wont spawn if they cost more than the min
+                //If the spawn couldn't spawn because of something else, next spawns that cost more won't be blocked by this
+                minSpawnSize = queue[0].body.cost;
                 continue;
             }
-            this.log.debug(`When you can't spawn anymore, if cause queue is empty, start over.`);
         }
     }
 }

@@ -180,6 +180,10 @@ declare interface IPosisSpawnExtension {
     cancelCreep(id: string): boolean;
 }
 
+declare interface ISpawnDef {
+    body: BodyPartConstant[];
+    cost: number;
+}
 
 declare interface ProcessInfo {
     pid: PID;
