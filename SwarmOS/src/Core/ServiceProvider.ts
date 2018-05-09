@@ -21,6 +21,7 @@ const REQUIRED_PROCESSES: IDictionary<ProcDetails> = {
     },
 };
 
+const SCAN_FREQUENCY = 5;
 class ServiceProvider extends BaseProcess {
     constructor(protected context: IPosisProcessContext) {
         super(context);
@@ -39,7 +40,7 @@ class ServiceProvider extends BaseProcess {
         }
     }
 
-    run() {
+    protected executeProcess() {
         let ids = Object.keys(REQUIRED_PROCESSES)
         for (let i = 0, length = ids.length; i < length; i++) {
             let service = this.memory.services[ids[i]];
@@ -60,7 +61,7 @@ class ServiceProvider extends BaseProcess {
             }
         }
 
-        this.SetProcessToSleep(5);
+        this.SetProcessToSleep(SCAN_FREQUENCY);
     }
 }
 

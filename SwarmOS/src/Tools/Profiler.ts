@@ -1,3 +1,6 @@
+declare var Memory: {
+    profiler: ProfilerMemory
+}
 export function init(): Profiler {
     const defaults = {
         data: {},

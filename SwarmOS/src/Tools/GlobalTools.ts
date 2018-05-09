@@ -1,3 +1,7 @@
+declare var Memory: {
+    testAlgorithms: Dictionary,
+    counter: number,
+}
 import { Stopwatch } from "./Stopwatch";
 global['Stopwatch'] = Stopwatch;
 

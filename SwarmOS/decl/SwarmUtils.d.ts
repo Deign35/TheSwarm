@@ -11,7 +11,8 @@ declare class Stopwatch {
 
 declare interface LogContext {
     logID: string,
-    logLevel: LogLevel,
+    logLevel?: LogLevel,
+    counter?: boolean // (TODO) Implement labeling logs by a log counter
 }
 /*declare class SwarmLogger {*/
 declare interface ILogger {

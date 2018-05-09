@@ -1,3 +1,6 @@
+declare var Memory: {
+    kernel: KernelMemory
+}
 import { ProcessRegistry } from "Core/ProcessRegistry";
 import { ExtensionRegistry } from "Core/ExtensionRegistry";
 

@@ -67,8 +67,9 @@ export class SwarmLogger implements ILogger {
     CreateLogContext(context: LogContext): void {
         if (!this.logContexts[context.logID]) {
             this.logContexts[context.logID] = {
-                logLevel: context.logLevel,
-                logs: []
+                logLevel: context.logLevel || DEFAULT_LOG_LEVEL,
+                logs: [],
+                //counter: false // (TODO) prepend a counter to logs.
             }
         }
     }

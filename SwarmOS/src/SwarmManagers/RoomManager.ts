@@ -1,46 +1,51 @@
-if (!Memory.RoomData) {
-    Memory.RoomData = {};
+declare var Memory: {
+    roomData: IDictionary<RoomData_Memory>
+}
+
+if (!Memory.roomData) {
+    Memory.roomData = {};
 }
 import { BaseProcess } from "Core/ProcessRegistry";
 import { ExtensionBase } from "Core/ExtensionRegistry";
 
-const FRE_RoomStructures = primes_100[10]; // 10 = 29
-class RoomManager extends BaseProcess {
-    private get RoomView() {
-        if (!this._roomView) {
-            this._roomView = this.context.queryPosisInterface(EXT_RoomView);
+export const IN_RoomManager = 'RoomManager';
+export const EXT_RoomView = 'RoomView';
+export const EXT_RoomStructures = 'RoomStructure';
+export const bundle: IPosisBundle<IDictionary<RoomData_Memory>> = {
+    install(processRegistry: IPosisProcessRegistry, extensionRegistry: IPosisExtensionRegistry) {
+        processRegistry.register(IN_RoomManager, RoomManager);
+        let roomDataExtension = new RoomExtension(extensionRegistry);
+        extensionRegistry.register(EXT_RoomView, roomDataExtension);
+        extensionRegistry.register(EXT_RoomStructures, roomDataExtension);
+    },
+    rootImageName: IN_RoomManager,
+    makeDefaultRootMemory: () => {
+        if (!Memory.roomData) {
+            Memory.roomData = {};
         }
-        return this._roomView
-    }
-    private _roomView!: IRoomViewExtension;
 
-    run(): void {
-        Logger.trace(`Begin RoomManager Process: ${Game.cpu.getUsed()}`);
-        for (let roomID in Game.rooms) {
-            this.RoomView.View(roomID);
-        }
-        Logger.trace(`End RoomManager Process: ${Game.cpu.getUsed()}`);
+        return Memory.roomData;
     }
 }
 
-class RoomExtension extends ExtensionBase {
-    get RoomStructure() {
-        if (!this._structuresExt) {
-            this._structuresExt = this.extensionRegistry.getExtension(EXT_RoomStructures) as IRoomStructuresExtension;
-        }
-        return this._structuresExt;
-    }
-    private _structuresExt?: IRoomStructuresExtension;
-    get RoomView() {
-        if (!this._viewExt) {
-            this._viewExt = this.extensionRegistry.getExtension(EXT_RoomView) as IRoomViewExtension;
-        }
-        return this._viewExt;
-    }
-    private _viewExt?: IRoomViewExtension;
+class RoomManager extends BaseProcess {
+    @posisInterface(EXT_RoomView)
+    View!: IRoomViewExtension;
+    @posisInterface(EXT_RoomStructures)
+    Structures!: IRoomStructuresExtension;
 
+    executeProcess(): void {
+        for (let roomID in Game.rooms) {
+            this.View.GetRoomData(roomID);
+        }
+    }
+}
+
+
+const FRE_RoomStructures = primes_100[10]; // 10 = 29
+class RoomExtension extends ExtensionBase implements IRoomStructuresExtension, IRoomViewExtension {
     protected get memory(): IDictionary<RoomData_Memory> {
-        return Memory.RoomData;
+        return Memory.roomData;
     }
     protected getRoomData(roomID: string): { room?: Room, roomData?: RoomData_Memory } {
         let room = Game.rooms[roomID];
@@ -78,9 +83,7 @@ class RoomExtension extends ExtensionBase {
     protected shouldRefresh(frequency: number, offset: number): boolean {
         return (Game.time + offset) % frequency == 0;
     }
-}
-class RoomStructuresExtension extends RoomExtension implements IRoomStructuresExtension {
-    PopulateRoomStructures(roomID: string): void {
+    RefreshRoomStructures(roomID: string): void {
         let { room, roomData } = this.getRoomData(roomID);
         if (!room || !roomData) {
             Logger.debug(() => (room ? `Room has not been initialized[${roomID}]` : `Room out of view [${roomID}]`));
@@ -144,18 +147,16 @@ class RoomStructuresExtension extends RoomExtension implements IRoomStructuresEx
         }
     }
     AddStructure(structure: Structure): void {
-        let roomInfo = this.RoomView.View(structure.room.name);
+        //let roomInfo = this.RoomView.View(structure.room.name);
         //if(!roomInfo || !)
     }
-}
-class RoomViewExtension extends RoomExtension implements IRoomViewExtension {
-    View(roomID: string, forceUpdate: boolean = false): RoomData_Memory | undefined {
-        forceUpdate = forceUpdate || !this.memory[roomID] || (this.memory[roomID].lastUpdated == 0);
+    GetRoomData(roomID: string, forceRefresh: boolean = false): RoomData_Memory | undefined {
+        forceRefresh = forceRefresh || !this.memory[roomID] || (this.memory[roomID].lastUpdated == 0);
         let { room, roomData } = this.getRoomData(roomID);
         if (room) {
-            this.Examine(roomID, forceUpdate);
-            if (forceUpdate || this.shouldRefresh(FRE_RoomStructures, roomData!.minUpdateOffset)) {
-                this.RoomStructure.PopulateRoomStructures(roomID);
+            this.RefreshRoom(roomID, forceRefresh);
+            if (forceRefresh || this.shouldRefresh(FRE_RoomStructures, roomData!.minUpdateOffset)) {
+                this.RefreshRoomStructures(roomID);
             }
         } else {
             Logger.debug(`Room out of view [${roomID}]`);
@@ -168,7 +169,7 @@ class RoomViewExtension extends RoomExtension implements IRoomViewExtension {
         return this.memory[roomID];
     }
 
-    Examine(roomID: string, forceUpdate: boolean = false) {
+    RefreshRoom(roomID: string, force: boolean = false) {
         let { room, roomData } = this.getRoomData(roomID);
         if (!room || !roomData) {
             Logger.debug(() => (room ? `Room has not been initialized[${roomID}]` : `Room out of view [${roomID}]`));
@@ -177,19 +178,19 @@ class RoomViewExtension extends RoomExtension implements IRoomViewExtension {
 
         Logger.trace(`Examine room ${roomID}`);
         roomData.lastUpdated = Game.time;
-        if (forceUpdate || this.shouldRefresh(11, roomData!.minUpdateOffset)) {
+        if (force || this.shouldRefresh(11, roomData!.minUpdateOffset)) {
             Logger.trace(`Examine room[DroppedResources] ${roomID}`);
             roomData.resources = room.find(FIND_DROPPED_RESOURCES).map((value: Resource) => {
                 return value.id;
             });
         }
-        if (forceUpdate || this.shouldRefresh(27, roomData!.minUpdateOffset)) {
+        if (force || this.shouldRefresh(27, roomData!.minUpdateOffset)) {
             Logger.trace(`Examine room[Tombstones] ${roomID}`);
             roomData.tombstones = room.find(FIND_TOMBSTONES).map((value: Tombstone) => {
                 return value.id;
             });
         }
-        if (forceUpdate || this.shouldRefresh(29, roomData!.minUpdateOffset)) {
+        if (force || this.shouldRefresh(29, roomData!.minUpdateOffset)) {
             Logger.trace(`Examine room[ConstructionSites] ${roomID}`);
             roomData.cSites = room.find(FIND_CONSTRUCTION_SITES).map((value: ConstructionSite) => {
                 return {
@@ -202,28 +203,5 @@ class RoomViewExtension extends RoomExtension implements IRoomViewExtension {
             });
         }
         // Update path stuff somehow.
-    }
-}
-
-declare interface IRoomData {
-    pid?: PID
-}
-
-export const IN_RoomManager = 'RoomManager';
-export const EXT_RoomView = 'RoomView';
-export const EXT_RoomStructures = 'RoomStructure';
-export const bundle: IPosisBundle<IDictionary<RoomData_Memory>> = {
-    install(processRegistry: IPosisProcessRegistry, extensionRegistry: IPosisExtensionRegistry) {
-        processRegistry.register(IN_RoomManager, RoomManager);
-        extensionRegistry.register(EXT_RoomView, new RoomViewExtension(extensionRegistry));
-        extensionRegistry.register(EXT_RoomStructures, new RoomStructuresExtension(extensionRegistry));
-    },
-    rootImageName: IN_RoomManager,
-    makeDefaultRootMemory: () => {
-        if (!Memory.RoomData) {
-            Memory.RoomData = {};
-        }
-
-        return Memory.RoomData;
     }
 }

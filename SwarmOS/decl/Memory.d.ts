@@ -1,6 +1,7 @@
-declare var Memory: {
+/*declare var Memory: {
     testAlgorithms: Dictionary;
-    RoomData: IDictionary<RoomData_Memory>;
+    roomData: IDictionary<RoomData_Memory>;
+    spawnData: SpawnData_Memory;
 
     kernel: KernelMemory;
     stats: StatsMemoryStructure;
@@ -8,7 +9,7 @@ declare var Memory: {
 
     counter: number;
     VERSION: string;
-}
+}*/
 
 /** Core OS */
 declare interface KernelMemory {
@@ -47,6 +48,11 @@ declare interface RoomData_Memory {
     sourceIDs: string[];
     structures: RoomData_StructureMemory
     tombstones: string[];
+}
+
+/** SpawnData */
+declare interface SpawnData_Memory {
+    [str: string]: any
 }
 
 /** Stats */

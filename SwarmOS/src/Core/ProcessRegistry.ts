@@ -49,6 +49,19 @@ export abstract class BaseProcess implements IPosisProcess {
         let sleeper = this.context.queryPosisInterface("sleep");
         sleeper.sleep(ticks);
     }
+    protected abstract executeProcess(): void;
+    protected handleMissingMemory() { // (TODO): Implement somewhere
+        throw new Error(`${this.imageName}(${this.pid}) memory does not exist.`);
+    }
 
-    abstract run(): void;
+    run(): void {
+        let startCPU = Game.cpu.getUsed();
+        Logger.trace(() => `Begin ${this.imageName}(${this.pid}): ${startCPU}`);
+        if (!this.memory) {
+            Logger.warn(`${this.imageName} memory init.`)
+            this.handleMissingMemory();
+        }
+
+        Logger.trace(() => `End ${this.imageName}(${this.pid}): ${Game.cpu.getUsed() - startCPU}`);
+    }
 }

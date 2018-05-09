@@ -26,12 +26,12 @@ declare interface IPosisInterfaces {
     [index: string]: IPosisExtension | undefined;
 }
 declare interface IRoomStructuresExtension extends IPosisExtension {
-    PopulateRoomStructures(roomID: string, forceUpdate?: boolean): void;
+    RefreshRoomStructures(roomID: string, forceUpdate?: boolean): void;
     AddStructure(structure: Structure): void;
 }
 declare interface IRoomViewExtension extends IPosisExtension {
-    Examine(roomID: string): void;
-    View(roomID: string, forceUpdate?: boolean): RoomData_Memory | undefined
+    RefreshRoom(roomID: string): void;
+    GetRoomData(roomID: string, forceUpdate?: boolean): RoomData_Memory | undefined
 }
 declare interface IPosisKernel extends IPosisExtension {
     installBundle(bundle: IPosisBundle<any>): void;

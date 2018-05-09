@@ -1,4 +1,9 @@
-﻿let startLoad = Game.cpu.getUsed(); // Will not use any prototype defined version of getUsed
+﻿declare var Memory: {
+    VERSION: string,
+    counter: number,
+    testAlgorithms: Dictionary
+}
+let startLoad = Game.cpu.getUsed(); // Will not use any prototype defined version of getUsed
 // Ensure all constants are initialized
 require('globalConstants');
 
