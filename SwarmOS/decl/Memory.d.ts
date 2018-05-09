@@ -57,7 +57,9 @@ declare type SpawnData_SpawnQueue = SpawnData_SpawnCard[]
 declare interface SpawnData_SpawnCard {
     creepName: string,
     body: BodyPartConstant[],
-    defaultMemory?: any
+    reqLocation: string,
+    defaultMemory?: any,
+    maxSpawnDist?: number
 }
 
 /** Stats */

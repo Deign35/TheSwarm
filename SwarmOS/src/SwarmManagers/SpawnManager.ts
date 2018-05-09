@@ -14,6 +14,8 @@ export const bundle: IPosisBundle<SpawnData_Memory> = {
     rootImageName: IN_SpawnManager
 }
 
+const queueOrder = [Priority.EMERGENCY, Priority.Highest, Priority.High, Priority.Medium, Priority.Low, Priority.Lowest] // Exclude Priority.Hold from the queue cycles
+
 const SpawnManager_LogContext: LogContext = {
     logID: IN_SpawnManager,
     logLevel: LOG_TRACE
@@ -43,7 +45,14 @@ class SpawnManager extends BaseProcess {
     }
     handleMissingMemory() {
         if (!Memory.spawnData) {
-            Memory.spawnData = {};
+            Memory.spawnData = {
+                [Priority.EMERGENCY]: [],
+                [Priority.Highest]: [],
+                [Priority.High]: [],
+                [Priority.Medium]: [],
+                [Priority.Low]: [],
+                [Priority.Lowest]: []
+            };
         }
         return Memory.spawnData;
     }
@@ -51,10 +60,62 @@ class SpawnManager extends BaseProcess {
         this.log.alert(`Start`);
         this.log.debug(`Get Queues`);
         this.log.debug(`Find the highest priority queue that has requests --- Req[Pri(X)]`);
-        this.log.debug(`Try to spawn everything in X`);
-        this.log.debug(`When you can't spawn anymore, if cause queue is empty, start over.`);
-        this.log.debug(`If its because the queue could not be depleted (due to not enough energy or an open spawner)`);
-        this.log.debug(`Then go again, but with Req[Pri(X - 1)] and do not repeat again after.`)
+
+        let checkNextQueue = true;
+        let minSpawnSize = 100000;
+        let availableSpawns: SDictionary<StructureSpawn> = {};
+
+        let allIDs = Object.keys(Game.spawns);
+        for (let i = 0, length = allIDs.length; i < length; i++) {
+            let spawn = Game.spawns[allIDs[i]];
+            if (spawn.isActive() && !spawn.spawning) {
+                availableSpawns[allIDs[i]] = spawn;
+            }
+        }
+
+        for (let i = 0; i < queueOrder.length; i++) {
+            let queue = this.memory[queueOrder[i]]; // assume its already sorted
+            let unspawnables: SpawnData_SpawnCard[] = [];
+            while (queue.length > 0) {
+                this.log.debug(`Try to spawn everything in X`);
+                let curReq = queue[0];
+                if (curReq) {
+                    this.log.debug(`Try to find a spawn that can fulfill the request`);
+
+                    let ids = Object.keys(availableSpawns).sort((a, b) => {
+                        return availableSpawns[a].room.energyCapacityAvailable > availableSpawns[b].room.energyCapacityAvailable ? -1 : 1;
+                    });
+
+                    for (let j = 0; j < ids.length; j++) {
+                        let spawn = allIDs[j];
+
+                        this.log.debug(`Sort the `)
+                    }
+                }
+
+                this.log.debug(`Successfully spawned a thing`);
+                queue.shift();
+
+                this.log.debug(`Check if there are any available spawns here and break if no?`);
+            }
+
+            if (!checkNextQueue) {
+                this.log.debug(`After checking Req[Pri(X - 1)] quit trying to spawn things`)
+                break;
+            }
+
+            this.log.debug(`If its because the queue could not be depleted (due to not enough energy or an open spawner)`);
+            if (unspawnables.length > 0) {
+                this.memory[queueOrder[i]] = unspawnables;
+                this.log.debug(`Then go again, but with Req[Pri(X - 1)] and do not repeat again after.`);
+                checkNextQueue = false;
+                this.log.debug(`If the spawn couldn't spawn because of lack of energy, spawns on the next level wont spawn if they cost more than the min`)
+                minSpawnSize = GetSpawnCost(queue[0].body);
+                this.log.debug(`If the spawn couldn't spawn because of something else, next spawns that cost more won't be blocked by this`);
+                continue;
+            }
+            this.log.debug(`When you can't spawn anymore, if cause queue is empty, start over.`);
+        }
     }
 }
 

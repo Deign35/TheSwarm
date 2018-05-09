@@ -68,12 +68,12 @@ export class GlobalTools {
         return list[Math.floor(Math.random() * list.length)];
     }
 
-    static GetRandomID<T>(dictionaryObject: IDictionary<T>): T | undefined {
+    static GetRandomID<T>(dictionaryObject: SDictionary<T>): T | undefined {
         let index = this.GetRandomIndex(Object.keys(dictionaryObject));
         return (dictionaryObject && dictionaryObject[index]) || undefined;
     }
 
-    static ForEach<T>(collection: IDictionary<T>, action: (val: T, index: number) => void): void {
+    static ForEach<T>(collection: SDictionary<T>, action: (val: T, index: number) => void): void {
         let ids = Object.keys(collection);
         for (let i = 0, length = ids.length; i < length; i++) {
             if (!collection[ids[i]]) {

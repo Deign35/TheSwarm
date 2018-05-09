@@ -9,8 +9,8 @@ interface ILogLevelSetting {
 const LOGGER_SEPARATOR = `<font color="yellow">-----------------------------------------------------------------------</font>`;
 const CONTEXT_SEPARATOR = `<font color="green">-----------------------------------------------------------------------</font>`;
 
-const DEFAULT_LOG_FONT_SIZE = 3;
-const LOGGER_SETTINGS: IDictionary<ILogLevelSetting> = {
+const DEFAULT_LOG_FONT_SIZE = 2;
+const LOGGER_SETTINGS: SDictionary<ILogLevelSetting> = {
     [LOG_ALERT]: {
         level: 6,
         font: {
@@ -81,7 +81,7 @@ export class SwarmLogger implements ILogger {
         this.logContexts = {};
         this.InitQueue();
     }
-    private logContexts: IDictionary<Context>;
+    private logContexts: SDictionary<Context>;
     protected InitQueue(): void {
         let ids = Object.keys(this.logContexts);
         for (let i = 0, length = ids.length; i < length; i++) {

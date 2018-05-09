@@ -16,7 +16,7 @@ declare type ProcDetails = {
     startContext?: any
 }
 
-const REQUIRED_PROCESSES: IDictionary<ProcDetails> = {
+const REQUIRED_PROCESSES: SDictionary<ProcDetails> = {
     roomManager: {
         processName: IN_RoomManager
     },

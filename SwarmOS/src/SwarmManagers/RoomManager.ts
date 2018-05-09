@@ -1,5 +1,5 @@
 declare var Memory: {
-    roomData: IDictionary<RoomData_Memory>
+    roomData: SDictionary<RoomData_Memory>
 }
 
 if (!Memory.roomData) {
@@ -11,7 +11,7 @@ import { ExtensionBase } from "Core/ExtensionRegistry";
 export const IN_RoomManager = 'RoomManager';
 export const EXT_RoomView = 'RoomView';
 export const EXT_RoomStructures = 'RoomStructure';
-export const bundle: IPosisBundle<IDictionary<RoomData_Memory>> = {
+export const bundle: IPosisBundle<SDictionary<RoomData_Memory>> = {
     install(processRegistry: IPosisProcessRegistry, extensionRegistry: IPosisExtensionRegistry) {
         processRegistry.register(IN_RoomManager, RoomManager);
         let roomDataExtension = new RoomExtension(extensionRegistry);
@@ -43,7 +43,7 @@ class RoomManager extends BaseProcess {
 
 const FRE_RoomStructures = primes_100[10]; // 10 = 29
 class RoomExtension extends ExtensionBase implements IRoomStructuresExtension, IRoomViewExtension {
-    protected get memory(): IDictionary<RoomData_Memory> {
+    protected get memory(): SDictionary<RoomData_Memory> {
         return Memory.roomData;
     }
     protected getRoomData(roomID: string): { room?: Room, roomData?: RoomData_Memory } {
