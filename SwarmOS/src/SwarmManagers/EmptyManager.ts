@@ -24,11 +24,34 @@ export const bundle: IPosisBundle<I___Empty___Data_Memory> = {
     },
     rootImageName: IN____Empty___Manager
 }
+const IN____Empty___Manager_LogContext: LogContext = {
+    logID: IN____Empty___Manager,
+    logLevel: LOG_DEBUG
+}
 
 class ___Empty___Manager extends BaseProcess {
+    constructor(protected context: IPosisProcessContext) {
+        super(context);
+        Logger.CreateLogContext(IN____Empty___Manager_LogContext);
+    }
     protected get memory() {
         return Memory.___Empty___Data;
     }
+    protected get log() {
+        return this._logger;
+    }
+    private _logger: ILogger = {
+        alert: (message: (string | (() => string))) => { Logger.alert(message, IN____Empty___Manager); },
+        debug: (message: (string | (() => string))) => { Logger.debug(message, IN____Empty___Manager); },
+        error: (message: (string | (() => string))) => { Logger.error(message, IN____Empty___Manager); },
+        fatal: (message: (string | (() => string))) => { Logger.fatal(message, IN____Empty___Manager); },
+        info: (message: (string | (() => string))) => { Logger.info(message, IN____Empty___Manager); },
+        trace: (message: (string | (() => string))) => { Logger.trace(message, IN____Empty___Manager); },
+        warn: (message: (string | (() => string))) => { Logger.warn(message, IN____Empty___Manager); },
+        CreateLogContext: Logger.CreateLogContext,
+        DumpLogToConsole: Logger.DumpLogToConsole
+    }
+
     handleMissingMemory() {
         if (!Memory.___Empty___Data) {
             Memory.___Empty___Data = {};
@@ -36,7 +59,7 @@ class ___Empty___Manager extends BaseProcess {
         return Memory.___Empty___Data;
     }
     executeProcess(): void {
-        this.log.warn(`${IN____Empty___Manager} has not been implemented.`);
+        this.log.warn(`${IN____Empty___Manager} has not been implemented.`, IN____Empty___Manager);
     }
 }
 
