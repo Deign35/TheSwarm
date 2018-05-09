@@ -6,15 +6,18 @@ import { BaseProcess } from "Core/ProcessRegistry";
 import { ExtensionBase } from "Core/ExtensionRegistry";
 
 export const IN_SpawnManager = 'SpawnManager';
+export const EXT_CreepSpawnExtension = 'CreepSpawner'; // Added to BaseProcess
 
 export const bundle: IPosisBundle<SpawnData_Memory> = {
     install(processRegistry: IPosisProcessRegistry, extensionRegistry: IPosisExtensionRegistry) {
         processRegistry.register(IN_SpawnManager, SpawnManager);
+        extensionRegistry.register(EXT_CreepSpawnExtension, new SpawnExtension(extensionRegistry));
     },
     rootImageName: IN_SpawnManager
 }
 
-const queueOrder = [Priority.EMERGENCY, Priority.Highest, Priority.High, Priority.Medium, Priority.Low, Priority.Lowest] // Exclude Priority.Hold from the queue cycles
+// Spawn queue order, pre organized priorities and excludes Priority.Hold which is not a valid spawn priority.
+const queueOrder = [Priority.EMERGENCY, Priority.Highest, Priority.High, Priority.Medium, Priority.Low, Priority.Lowest];
 
 const SpawnManager_LogContext: LogContext = {
     logID: IN_SpawnManager,
@@ -26,6 +29,7 @@ class SpawnManager extends BaseProcess {
         super(context);
         Logger.CreateLogContext(SpawnManager_LogContext);
     }
+
     protected get memory() {
         return Memory.spawnData;
     }
@@ -43,6 +47,7 @@ class SpawnManager extends BaseProcess {
         CreateLogContext: Logger.CreateLogContext,
         DumpLogToConsole: Logger.DumpLogToConsole
     }
+
     handleMissingMemory() {
         if (!Memory.spawnData) {
             Memory.spawnData = {
@@ -56,6 +61,7 @@ class SpawnManager extends BaseProcess {
         }
         return Memory.spawnData;
     }
+    
     executeProcess(): void {
         this.log.alert(`Start`);
         this.log.debug(`Get Queues`);
@@ -88,8 +94,6 @@ class SpawnManager extends BaseProcess {
 
                     for (let j = 0; j < ids.length; j++) {
                         let spawn = allIDs[j];
-
-                        this.log.debug(`Sort the `)
                     }
                 }
 
@@ -119,8 +123,21 @@ class SpawnManager extends BaseProcess {
     }
 }
 
-class SpawnExtension extends ExtensionBase {
+class SpawnExtension extends ExtensionBase implements IPosisSpawnExtension {
+    spawnCreep(opts: SpawnData_SpawnCard): string {
+        throw new Error("Method not implemented.");
+    }
+    getStatus(id: string): { status: EPosisSpawnStatus; message?: string | undefined; } {
+        throw new Error("Method not implemented.");
+    }
+    getCreep(id: string): Creep | undefined {
+        throw new Error("Method not implemented.");
+    }
+    cancelCreep(id: string): boolean {
+        throw new Error("Method not implemented.");
+    }
     protected get memory(): SpawnData_Memory {
         return Memory.spawnData;
     }
+
 }

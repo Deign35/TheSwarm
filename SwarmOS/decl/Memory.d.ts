@@ -55,11 +55,14 @@ declare type SpawnData_Memory = EDictionary<SpawnData_SpawnQueue>
 declare type SpawnData_SpawnQueue = SpawnData_SpawnCard[]
 
 declare interface SpawnData_SpawnCard {
-    creepName: string,
-    body: BodyPartConstant[],
-    reqLocation: string,
-    defaultMemory?: any,
-    maxSpawnDist?: number
+    body: BodyPartConstant[];
+    creepName: string;
+    pPID: PID;
+    location: string;
+    priority: Priority;
+
+    defaultMemory?: any;
+    maxSpawnDist?: number;
 }
 
 /** Stats */

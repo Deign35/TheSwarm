@@ -32,6 +32,8 @@ export abstract class BaseProcess implements IPosisProcess {
     protected kernel!: IPosisKernel
     @posisInterface("extRegistry")
     protected extensions!: IPosisExtensionRegistry;
+    @posisInterface("CreepSpawner")
+    protected spawner!: IPosisSpawnExtension;
 
     protected get memory(): any {
         return this.context.memory;
