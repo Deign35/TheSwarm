@@ -97,7 +97,6 @@ class SpawnManager extends BaseProcess {
     }
 
     executeProcess(): void {
-        let minSpawnSize = 0;
         let availableSpawns: SDictionary<StructureSpawn> = {};
 
         let allSpawnIDs = Object.keys(Game.spawns);
@@ -107,54 +106,38 @@ class SpawnManager extends BaseProcess {
                 availableSpawns[allSpawnIDs[i]] = spawn;
             }
         }
-        let availableSpawnIDs = Object.keys(availableSpawns);
-        let availableSpawnCount = availableSpawnIDs.length;
+        let sortedSpawns = Object.keys(availableSpawns).sort((a, b) => {
+            return availableSpawns[a].room.energyCapacityAvailable > availableSpawns[b].room.energyCapacityAvailable ? -1 : 1;
+        });
 
-        for (let i = 0; i < queueOrder.length; i++) {
-            let queue = this.memory.queue[queueOrder[i]]; // (TODO): Verify my assumption: This is already sorted
-            let unspawnables: SpawnData_SpawnCard[] = [];
-            while (queue.length > 0) {
-                if (availableSpawnIDs.length == 0) {
-                    this.log.debug(`There are no remaining available spawns to spawn from`);
-                    while (queue.length > 0) {
-                        unspawnables.push(queue.shift()!);
-                    }
-                    this.memory[queueOrder[i]] = unspawnables;
-                    // (TODO): Put to sleep until a spawn is freed up.
-                    return;
-                }
+        for (let i = 0; i < sortedSpawns.length; i++) {
+            let spawn = availableSpawns[sortedSpawns[i]];
+            let spawnRequest = undefined;
+            for (let i = 0; i < queueOrder.length; i++) {
+                let queue = this.memory.queue[queueOrder[i]];
+                let bestRequest = queue.length - 1;
+                let bestValue = 0;
 
-                let curReq = queue.shift(); // Because this is already sorted, this will be the hardest to spawn by cost
-                if (!curReq) { continue; }
+                for (let i = 0; i < queue.length; i++) {
+                    let req = queue[i];
+                    let reqValue = queue.length - i;
+                    // do a bunch of checks
+                    //let closestSpawn = Game.map.getRoomLinearDistance(curReq.location, availableSpawns[availableSpawnIDs[0]].room.name);
 
-                // If I can't spawn it, hang on to it to be put back in when we're done.
-                if (curReq.body.cost < minSpawnSize) {
-                    unspawnables.push(curReq);
-                    continue;
-                }
-
-                // Sort the available spawns by available energy
-                availableSpawnIDs = availableSpawnIDs.sort((a, b) => {
-                    return availableSpawns[a].room.energyCapacityAvailable > availableSpawns[b].room.energyCapacityAvailable ? -1 : 1;
-                });
-
-                let closestSpawn = Game.map.getRoomLinearDistance(curReq.location, availableSpawns[availableSpawnIDs[0]].room.name);
-                for (let j = 0; j < availableSpawnCount; j++) {
-                    let spawn = availableSpawns[allSpawnIDs[j]];
-                    if (spawn.room.energyCapacityAvailable < curReq.body.cost) {
-
+                    if (reqValue > bestValue) {
+                        bestRequest = i;
+                        bestValue = reqValue;
                     }
                 }
 
-                this.log.debug(`Successfully spawned a thing`);
+                if (bestRequest >= 0 && bestValue > 0) {
+                    spawnRequest = queue[bestRequest];
+                    break;
+                }
             }
 
-            if (unspawnables.length > 0) {
-                this.memory[queueOrder[i]] = unspawnables;
-                //If the spawn couldn't spawn because of lack of energy, spawns on the next level wont spawn if they cost more than the min
-                //If the spawn couldn't spawn because of something else, next spawns that cost more won't be blocked by this
-                minSpawnSize = queue[0].body.cost;
-                continue;
+            if (spawnRequest) {
+                // Then spawn the fuckin thing!
             }
         }
     }
