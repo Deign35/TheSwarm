@@ -10,16 +10,7 @@ export const bundle: IPosisBundle<SpawnData_Memory> = {
     install(processRegistry: IPosisProcessRegistry, extensionRegistry: IPosisExtensionRegistry) {
         processRegistry.register(IN_SpawnManager, SpawnManager);
     },
-    rootImageName: IN_SpawnManager,
-    makeDefaultRootMemory: () => {
-        if (!Memory.spawnData) {
-            Memory.spawnData = {
-
-            };
-        }
-
-        return Memory.spawnData;
-    }
+    rootImageName: IN_SpawnManager
 }
 
 //const FRE_RoomStructures = primes_100[10]; // 10 = 29
@@ -27,8 +18,14 @@ class SpawnManager extends BaseProcess {
     protected get memory() {
         return Memory.spawnData;
     }
+    handleMissingMemory() {
+        if (!Memory.spawnData) {
+            Memory.spawnData = {};
+        }
+        return Memory.spawnData;
+    }
     executeProcess(): void {
-        this.log.warn(`${IN_SpawnManager} has not been implemented.`);
+        this.log.warn(`${IN_SpawnManager} has not been implemented.`, IN_SpawnManager);
     }
 }
 

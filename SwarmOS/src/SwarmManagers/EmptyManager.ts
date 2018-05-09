@@ -8,9 +8,8 @@
  * 
  * You now have a ${'___Empty___'}Manager to implement
  */
-declare interface I___Empty___Data_Memory {
+declare type I___Empty___Data_Memory = Dictionary;
 
-}
 declare var Memory: {
     ___Empty___Data: I___Empty___Data_Memory
 }
@@ -23,18 +22,17 @@ export const bundle: IPosisBundle<I___Empty___Data_Memory> = {
     install(processRegistry: IPosisProcessRegistry, extensionRegistry: IPosisExtensionRegistry) {
         processRegistry.register(IN____Empty___Manager, ___Empty___Manager);
     },
-    rootImageName: IN____Empty___Manager,
-    makeDefaultRootMemory: () => {
-        if (!Memory.___Empty___Data) {
-            Memory.___Empty___Data = {};
-        }
-
-        return Memory.___Empty___Data;
-    }
+    rootImageName: IN____Empty___Manager
 }
 
 class ___Empty___Manager extends BaseProcess {
     protected get memory() {
+        return Memory.___Empty___Data;
+    }
+    handleMissingMemory() {
+        if (!Memory.___Empty___Data) {
+            Memory.___Empty___Data = {};
+        }
         return Memory.___Empty___Data;
     }
     executeProcess(): void {

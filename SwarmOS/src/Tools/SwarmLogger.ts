@@ -15,28 +15,28 @@ const LOGGER_SETTINGS: IDictionary<ILogLevelSetting> = {
         level: 6,
         font: {
             color: '#C050E1', // Purple
-            size: DEFAULT_LOG_FONT_SIZE + 3,
+            size: DEFAULT_LOG_FONT_SIZE + 1,
         }
     },
     [LOG_DEBUG]: {
         level: 1,
         font: {
             color: '#00C6B6', // Teal
-            size: DEFAULT_LOG_FONT_SIZE,
+            size: DEFAULT_LOG_FONT_SIZE - 0.5,
         }
     },
     [LOG_ERROR]: {
         level: 4,
         font: {
             color: '#E65C00', // Red
-            size: DEFAULT_LOG_FONT_SIZE + 2,
+            size: DEFAULT_LOG_FONT_SIZE + 0.5,
         }
     },
     [LOG_FATAL]: {
         level: 5,
         font: {
             color: '#FF0066', // Fuscia(sp?)
-            size: DEFAULT_LOG_FONT_SIZE + 2,
+            size: DEFAULT_LOG_FONT_SIZE + 0.75,
         }
     },
     [LOG_INFO]: {
@@ -57,7 +57,7 @@ const LOGGER_SETTINGS: IDictionary<ILogLevelSetting> = {
         level: 3,
         font: {
             color: '#F4D000', // Yellow
-            size: DEFAULT_LOG_FONT_SIZE + 1,
+            size: DEFAULT_LOG_FONT_SIZE + 0.25,
         }
     }
 }
@@ -74,7 +74,7 @@ interface Context {
     }
 }
 
-const DEFAULT_LOG_LEVEL: LogLevel = Game.rooms['sim'] ? LOG_TRACE : LOG_INFO;
+const DEFAULT_LOG_LEVEL: LogLevel = LOG_TRACE; // Game.rooms['sim'] ? LOG_TRACE : LOG_INFO;
 const DEFAULT_LOG_ID = 'SwarmOS';
 export class SwarmLogger implements ILogger {
     constructor() {
@@ -139,8 +139,9 @@ export class SwarmLogger implements ILogger {
 
         let introStr = `${LOGGER_SEPARATOR}\n${MakeFontTag(LOG_ALERT)}Begin SwarmOS Log - [${Game.time}]`
         if (endTick) {
-            introStr += `\nCPU: (${startLoggingTime}\/${Game.cpu.limit} -- [${Game.cpu.bucket}])</font>`;
+            introStr += `\nCPU: (${startLoggingTime}\/${Game.cpu.limit} -- [${Game.cpu.bucket}])`;
         }
+        introStr += `</font>`
 
         console.log(introStr);
         for (let i = 0; i < logOutputs.length; i++) {
@@ -161,7 +162,8 @@ export class SwarmLogger implements ILogger {
                 if (!queues[settingID] || queues[settingID].length == 0) {
                     continue;
                 }
-                outStr += MakeFontTag(context.logLevel);
+
+                outStr += MakeFontTag(settingID as LogLevel);
                 while (queues[settingID].length > 0) {
                     let nextMessage = queues[settingID].shift();
                     if (nextMessage) {

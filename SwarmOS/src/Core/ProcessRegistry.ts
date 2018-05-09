@@ -1,6 +1,6 @@
 const ProcessRegistry_LogContext: LogContext = {
     logID: "ProcessRegistry",
-    logLevel: LOG_INFO
+    logLevel: LOG_DEBUG
 }
 export class ProcessRegistry implements IPosisProcessRegistry {
     constructor() {
@@ -56,18 +56,19 @@ export abstract class BaseProcess implements IPosisProcess {
         sleeper.sleep(ticks);
     }
     protected abstract executeProcess(): void;
-    protected handleMissingMemory() { // (TODO): Implement somewhere
+    protected handleMissingMemory() {
         throw new Error(`${this.imageName}(${this.pid}) memory does not exist.`);
     }
 
     run(): void {
         let startCPU = Game.cpu.getUsed();
-        this.log.trace(() => `Begin ${this.imageName}(${this.pid}): ${startCPU}`);
+        this.log.debug(() => `Begin ${this.imageName}(${this.pid}): ${startCPU}`);
         if (!this.memory) {
             this.log.warn(() => `${this.imageName} memory init.`)
             this.handleMissingMemory();
         }
 
-        this.log.trace(() => `End ${this.imageName}(${this.pid}): ${Game.cpu.getUsed() - startCPU}`);
+        this.executeProcess();
+        this.log.debug(() => `End ${this.imageName}(${this.pid}): ${Game.cpu.getUsed() - startCPU}`);
     }
 }

@@ -1,5 +1,6 @@
 import { BaseProcess } from "Core/ProcessRegistry";
 import { IN_RoomManager } from "SwarmManagers/RoomManager";
+import { IN_SpawnManager } from "SwarmManagers/SpawnManager";
 
 declare type ServiceProviderMemory = {
     services: {
@@ -19,6 +20,9 @@ const REQUIRED_PROCESSES: IDictionary<ProcDetails> = {
     roomManager: {
         processName: IN_RoomManager
     },
+    spawnManager: {
+        processName: IN_SpawnManager
+    }
 };
 
 const SCAN_FREQUENCY = 5;
@@ -64,7 +68,7 @@ class ServiceProvider extends BaseProcess {
             }
         }
 
-        this.SetProcessToSleep(SCAN_FREQUENCY);
+        // this.SetProcessToSleep(SCAN_FREQUENCY); (TODO) Implement sleep
     }
 }
 

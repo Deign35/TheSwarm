@@ -18,14 +18,7 @@ export const bundle: IPosisBundle<IDictionary<RoomData_Memory>> = {
         extensionRegistry.register(EXT_RoomView, roomDataExtension);
         extensionRegistry.register(EXT_RoomStructures, roomDataExtension);
     },
-    rootImageName: IN_RoomManager,
-    makeDefaultRootMemory: () => {
-        if (!Memory.roomData) {
-            Memory.roomData = {};
-        }
-
-        return Memory.roomData;
-    }
+    rootImageName: IN_RoomManager
 }
 
 class RoomManager extends BaseProcess {
@@ -34,6 +27,12 @@ class RoomManager extends BaseProcess {
     @posisInterface(EXT_RoomStructures)
     Structures!: IRoomStructuresExtension;
 
+    handleMissingMemory() {
+        if (!Memory.roomData) {
+            Memory.roomData = {};
+        }
+        return Memory.roomData;
+    }
     executeProcess(): void {
         for (let roomID in Game.rooms) {
             this.View.GetRoomData(roomID);
