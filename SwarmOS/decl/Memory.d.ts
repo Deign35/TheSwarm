@@ -92,12 +92,17 @@ interface ProfilerData {
 }
 
 /** Creep Memory */
-declare interface CreepData_Memory {
+declare interface CreepProcess_Memory {
     creep?: string;
 }
-declare interface Harvester_Memory extends CreepData_Memory {
+declare interface Harvester_Memory extends CreepProcess_Memory {
     targetID: string;
     linkID?: string;
     containerID?: string;
     constructionSite?: string;
+}
+
+/** Room Memory */
+declare interface RoomProcess_Memory {
+    roomName: string
 }

@@ -1,6 +1,6 @@
 import { ProcessBase } from "Core/BasicTypes";
 
-export abstract class BaseCreepProcess<T extends CreepData_Memory> extends ProcessBase {
+export abstract class CreepBase<T extends CreepProcess_Memory> extends ProcessBase {
     protected get memory(): T {
         return super.memory;
     }

@@ -9,14 +9,14 @@ export const bundle: IPosisBundle<SpawnData_Memory> = {
     rootImageName: IN_CREEP_HARVESTER
 }
 
-import { BaseCreepProcess } from "./BaseCreepProcess";
+import { CreepBase } from "Creeps/CreepBase";
 import { HarvestAction } from "Actions/HarvestAction";
 import { ActionBase } from "Actions/ActionBase";
 import { MoveToPositionAction } from "Actions/MoveToPositionAction";
 import { BuildAction } from "Actions/BuildAction";
 import { RepairAction } from "Actions/RepairAction";
 
-export class Harvester extends BaseCreepProcess<Harvester_Memory> {
+export class Harvester extends CreepBase<Harvester_Memory> {
     protected activateCreep(): void {
         let creep = Game.creeps[this.memory.creep!];
         if (!creep) {
