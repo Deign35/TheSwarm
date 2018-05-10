@@ -44,6 +44,7 @@ declare interface RoomData_Memory {
     mineralIDs: string[];
     minUpdateOffset: number;
     owner?: string;
+    pid?: PID;
     resources: string[];
     sourceIDs: string[];
     structures: RoomData_StructureMemory

@@ -1,4 +1,4 @@
-import { BaseProcess, ExtensionBase } from "Core/BasicTypes";
+import { ProcessBase, ExtensionBase } from "Core/BasicTypes";
 
 export const IN_CREEP_HARVESTER = 'Creep/Roles/Harvester';
 

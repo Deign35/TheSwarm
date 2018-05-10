@@ -5,7 +5,7 @@ declare var Memory: {
 if (!Memory.roomData) {
     Memory.roomData = {};
 }
-import { BaseProcess, ExtensionBase } from "Core/BasicTypes";
+import { ProcessBase, ExtensionBase } from "Core/BasicTypes";
 
 export const IN_RoomManager = 'RoomManager';
 export const EXT_RoomView = 'RoomView';
@@ -20,7 +20,7 @@ export const bundle: IPosisBundle<SDictionary<RoomData_Memory>> = {
     rootImageName: IN_RoomManager
 }
 
-class RoomManager extends BaseProcess {
+class RoomManager extends ProcessBase {
     @posisInterface(EXT_RoomView)
     View!: IRoomViewExtension;
     @posisInterface(EXT_RoomStructures)
@@ -34,10 +34,23 @@ class RoomManager extends BaseProcess {
     }
     executeProcess(): void {
         for (let roomID in Game.rooms) {
-            let data = this.View.GetRoomData(roomID);
-            if (data && data.owner && data.owner == MY_USERNAME) {
-                // Then do my stuff to it.
-
+            let data = this.View.GetRoomData(roomID)!;
+            if (!data) {
+                this.log.fatal(`(ASSUMPTION FAILURE): A room is visible but has no data (${roomID})`);
+                data = this.View.GetRoomData(roomID, true)!;
+                if (!data) {
+                    this.kernel.killProcess(this.pid);
+                    return;
+                } else {
+                    // Actually assumption should be that this can't happen either
+                    this.log.warn(`(ASSUMPTION RECOVERY): GetRoomData refresh fixed it (${roomID})`)
+                }
+            }
+            if (!data.pid || !this.kernel.getProcessById(data.pid)) {
+                let newRoomProcess = this.kernel.startProcess('TBD', {});
+                if (newRoomProcess && newRoomProcess.pid && newRoomProcess.process) {
+                    data.pid = newRoomProcess.pid;
+                }
             }
         }
     }

@@ -14,7 +14,7 @@ declare var Memory: {
     ___Empty___Data: I___Empty___Data_Memory
 }
 
-import { BaseProcess, ExtensionBase } from "Core/BasicTypes";
+import { ProcessBase, ExtensionBase } from "Core/BasicTypes";
 
 export const IN____Empty___Manager = '___Empty___Manager';
 export const bundle: IPosisBundle<I___Empty___Data_Memory> = {
@@ -28,7 +28,7 @@ const IN____Empty___Manager_LogContext: LogContext = {
     logLevel: LOG_DEBUG
 }
 
-class ___Empty___Manager extends BaseProcess {
+class ___Empty___Manager extends ProcessBase {
     constructor(protected context: IPosisProcessContext) {
         super(context);
         Logger.CreateLogContext(IN____Empty___Manager_LogContext);

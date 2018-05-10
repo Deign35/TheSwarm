@@ -1,4 +1,4 @@
-export abstract class BaseProcess implements IPosisProcess {
+export abstract class ProcessBase implements IPosisProcess {
     constructor(protected context: IPosisProcessContext) { }
     @posisInterface("kernel")
     protected kernel!: IPosisKernel
@@ -62,7 +62,7 @@ declare type ServiceProviderMemory = {
 }
 
 const SCAN_FREQUENCY = 5;
-export abstract class IServiceProvider extends BaseProcess {
+export abstract class ServiceProviderBase extends ProcessBase {
     constructor(protected context: IPosisProcessContext) {
         super(context);
         if (!this.context.memory.services) {
@@ -74,7 +74,7 @@ export abstract class IServiceProvider extends BaseProcess {
     get ScanFrequency() { return SCAN_FREQUENCY; }
 
     addService(serviceID: string, id: string, parentPID?: PID, startContext: any = {}) {
-        this.log.info(`Adding service ${id}`);
+        this.log.info(() => `Adding service ${id}`);
         let result = this.kernel.startProcess(id, Object.assign({}, startContext));
         if (result) {
             this.kernel.setParent(result.pid, parentPID);
@@ -89,7 +89,7 @@ export abstract class IServiceProvider extends BaseProcess {
             let process = (service && service.pid) ? this.kernel.getProcessById(service.pid) : undefined;
 
             if (!service || !process || process.state == ProcessState.Killed) {
-                this.log.info(`Initializing service ${ids[i]}`);
+                this.log.info(() => `Initializing service ${ids[i]}`);
 
                 let initData = this.RequiredServices[ids[i]];
                 this.addService(ids[i], initData.processName, initData.startContext);
@@ -97,7 +97,7 @@ export abstract class IServiceProvider extends BaseProcess {
                 process = (service && service.pid) ? this.kernel.getProcessById(service.pid) : undefined;
 
                 if (!service || !process) {
-                    this.log.error(`Failed to restart service ${ids[i]}`);
+                    this.log.error(() => `Failed to restart service ${ids[i]}`);
                     continue;
                 }
             }
@@ -105,6 +105,13 @@ export abstract class IServiceProvider extends BaseProcess {
 
         this.SetProcessToSleep(this.ScanFrequency); // Does this work???
     }
+}
+
+export abstract class ExtensionBase implements IPosisExtension {
+    constructor(protected extensionRegistry: IPosisExtensionRegistry) { }
+    protected get log() { return Logger; }
+
+    protected abstract get memory(): any;
 }
 
 function posisInterface(interfaceId: string): (target: any, propertyKey: string) => any {
@@ -119,13 +126,6 @@ function posisInterface(interfaceId: string): (target: any, propertyKey: string)
             }
         }
     }
-}
-
-export abstract class ExtensionBase implements IPosisExtension {
-    constructor(protected extensionRegistry: IPosisExtensionRegistry) { }
-    protected get log() { return Logger; }
-
-    protected abstract get memory(): any;
 }
 
 global['posisInterface'] = posisInterface;

@@ -29,7 +29,7 @@ const exDef2: RoleDefinition<'harvester'> = {
     }
 }
 */
-import { BaseProcess, ExtensionBase } from "Core/BasicTypes";
+import { ProcessBase, ExtensionBase } from "Core/BasicTypes";
 
 export const IN_SpawnManager = 'SpawnManager';
 export const EXT_CreepSpawnExtension = 'CreepSpawner'; // Added to BaseProcess
@@ -48,7 +48,7 @@ const SpawnManager_LogContext: LogContext = {
     logLevel: LOG_TRACE
 }
 //const FRE_RoomStructures = primes_100[10]; // 10 = 29
-class SpawnManager extends BaseProcess {
+class SpawnManager extends ProcessBase {
     constructor(protected context: IPosisProcessContext) {
         super(context);
         Logger.CreateLogContext(SpawnManager_LogContext);
