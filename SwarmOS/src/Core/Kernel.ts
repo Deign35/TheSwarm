@@ -1,8 +1,6 @@
 declare var Memory: {
     kernel: KernelMemory
 }
-import { ProcessRegistry } from "Core/ProcessRegistry";
-import { ExtensionRegistry } from "Core/ExtensionRegistry";
 
 declare type ProcessCache = {
     [id: string]: {
@@ -31,7 +29,7 @@ export class Kernel implements IPosisKernel, IPosisSleepExtension {
         return this.memory.processMemory;
     }
 
-    constructor(private processRegistry: ProcessRegistry, private extensionRegistry: ExtensionRegistry) {
+    constructor(private processRegistry: IPosisProcessRegistry, private extensionRegistry: IPosisExtensionRegistry) {
         this._processCache = {};
     }
 

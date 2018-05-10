@@ -29,8 +29,7 @@ const exDef2: RoleDefinition<'harvester'> = {
     }
 }
 */
-import { BaseProcess } from "Core/ProcessRegistry";
-import { ExtensionBase } from "Core/ExtensionRegistry";
+import { BaseProcess, ExtensionBase } from "Core/BasicTypes";
 
 export const IN_SpawnManager = 'SpawnManager';
 export const EXT_CreepSpawnExtension = 'CreepSpawner'; // Added to BaseProcess

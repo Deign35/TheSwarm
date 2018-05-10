@@ -1,4 +1,4 @@
-import { BaseProcess } from "Core/ProcessRegistry";
+import { BaseProcess } from "Core/BasicTypes";
 
 export abstract class BaseCreepProcess<T extends CreepData_Memory> extends BaseProcess {
     protected get memory(): T {

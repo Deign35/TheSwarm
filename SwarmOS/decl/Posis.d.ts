@@ -104,6 +104,7 @@ declare interface IPosisProcessRegistry {
      * if your bundle consists of several programs you can pretend that we have a VFS: "ANI/MyBundle/BundledProgram1"
      */
     register(imageName: string, constructor: IPosisProcessConstructor): boolean;
+    getNewProcess(name: string, context: IPosisProcessContext): IPosisProcess | undefined;
 }
 declare type PID = string | number;
 declare interface IPosisCooperativeScheduling {

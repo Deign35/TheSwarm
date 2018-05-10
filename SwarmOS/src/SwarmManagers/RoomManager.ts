@@ -5,8 +5,7 @@ declare var Memory: {
 if (!Memory.roomData) {
     Memory.roomData = {};
 }
-import { BaseProcess } from "Core/ProcessRegistry";
-import { ExtensionBase } from "Core/ExtensionRegistry";
+import { BaseProcess, ExtensionBase } from "Core/BasicTypes";
 
 export const IN_RoomManager = 'RoomManager';
 export const EXT_RoomView = 'RoomView';
@@ -35,7 +34,11 @@ class RoomManager extends BaseProcess {
     }
     executeProcess(): void {
         for (let roomID in Game.rooms) {
-            this.View.GetRoomData(roomID);
+            let data = this.View.GetRoomData(roomID);
+            if (data && data.owner && data.owner == MY_USERNAME) {
+                // Then do my stuff to it.
+
+            }
         }
     }
 }

@@ -31,26 +31,3 @@ export class ExtensionRegistry implements IPosisExtension {
         return this.registry[interfaceId];
     }
 }
-
-function posisInterface(interfaceId: string): (target: any, propertyKey: string) => any {
-    return function (target: any, propertyKey: string): any {
-        let value: IPosisExtension
-        return {
-            get() {
-                if (!value) {
-                    value = this.context.queryPosisInterface(interfaceId);
-                }
-                return value;
-            }
-        }
-    }
-}
-
-export abstract class ExtensionBase implements IPosisExtension {
-    constructor(protected extensionRegistry: IPosisExtensionRegistry) { }
-    protected get log() { return Logger; }
-
-    protected abstract get memory(): any;
-}
-
-global['posisInterface'] = posisInterface;

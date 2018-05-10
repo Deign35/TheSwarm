@@ -39,11 +39,10 @@ if (!Memory.VERSION || Memory.VERSION != SWARM_VERSION_DATE) {
 }
 
 import { kernel } from "Core/index";
-import { bundle as ServiceBundle } from "Core/ServiceProvider";
-import { processBundle as ManagerBundle } from "SwarmManagers/index";
+import { bundle as SwarmManager } from "SwarmManagers/index";
 import { creepBundle } from "Creeps/index";
 
-kernel.installBundles([ManagerBundle, ServiceBundle, creepBundle]);
+kernel.installBundles([SwarmManager, creepBundle]);
 
 export function loop() {
     try {

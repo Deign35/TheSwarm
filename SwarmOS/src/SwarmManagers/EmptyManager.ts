@@ -14,8 +14,7 @@ declare var Memory: {
     ___Empty___Data: I___Empty___Data_Memory
 }
 
-import { BaseProcess } from "Core/ProcessRegistry";
-import { ExtensionBase } from "Core/ExtensionRegistry";
+import { BaseProcess, ExtensionBase } from "Core/BasicTypes";
 
 export const IN____Empty___Manager = '___Empty___Manager';
 export const bundle: IPosisBundle<I___Empty___Data_Memory> = {

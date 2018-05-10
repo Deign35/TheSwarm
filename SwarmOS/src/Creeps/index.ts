@@ -1,8 +1,7 @@
 import { bundle as Harvester } from "Creeps/Harvester"
-import { ExtensionRegistry } from "Core/ExtensionRegistry";
 
 export const creepBundle: IPosisBundle<{}> = {
-    install(processRegistry: IPosisProcessRegistry, extensionRegistry: ExtensionRegistry) {
+    install(processRegistry: IPosisProcessRegistry, extensionRegistry: IPosisExtensionRegistry) {
         Harvester.install(processRegistry, extensionRegistry);
     }
 }
