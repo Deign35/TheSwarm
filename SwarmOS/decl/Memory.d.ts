@@ -89,3 +89,13 @@ interface ProfilerData {
     calls: number;
     time: number;
 }
+
+/** Creep Memory */
+declare interface CreepData_Memory {
+    creep?: string;
+}
+declare interface Harvester_Memory extends CreepData_Memory {
+    targetID: string;
+    linkID?: string;
+    containerID?: string;
+}

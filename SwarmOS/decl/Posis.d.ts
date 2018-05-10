@@ -19,6 +19,7 @@ declare interface IPosisInterfaces {
     extRegistry: IPosisExtensionRegistry;
     RoomView: IRoomViewExtension;
     RoomStructure: IRoomStructuresExtension;
+    CreepSpawner: IPosisSpawnExtension;
 
     spawn?: IPosisSpawnExtension;
     coop?: IPosisCooperativeScheduling;
