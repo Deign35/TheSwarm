@@ -40,26 +40,27 @@ export class Harvester extends CreepBase<Harvester_Memory> {
         let target = Game.getObjectById(this.memory.targetID) as Source | Mineral;
         let action: ActionBase = new HarvestAction(creep, target);
         switch (action.ValidateAction()) {
-            case (C_NONE): break;
+            case (C_NONE):
             case (C_MOVE):
-                this.log.fatal(`Harvest position is out of range of the target`);
-                this.kernel.killProcess(this.pid);
-                return;
+                break;
             case (E_TARGET_INELLIGIBLE): // Target is empty.  (TODO) let it still try to build or repair
             case (E_ACTION_UNNECESSARY): // Creep's carry is full
             default:
+                let hasReplacementAction = false;
                 if (creep.carry.energy > 0) {
                     if (this.memory.constructionSite) {
+                        hasReplacementAction = true;
                         action = new BuildAction(creep, Game.getObjectById(this.memory.constructionSite) as ConstructionSite);
                     } else if (this.memory.containerID) {
                         let container = Game.getObjectById(this.memory.containerID) as StructureContainer;
                         if (container && container.hits < container.hitsMax) {
+                            hasReplacementAction = true;
                             action = new RepairAction(creep, container);
                         }
                     }
                 }
 
-                if (action.ValidateAction() != C_NONE) {
+                if (hasReplacementAction && action.ValidateAction() != C_NONE) {
                     this.log.fatal(`Action unable to occur for an unexpected reason -- ${action.ValidateAction()}`);
                     this.kernel.killProcess(this.pid);
                     break;

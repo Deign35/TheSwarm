@@ -17,8 +17,7 @@ declare interface IPosisInterfaces {
     baseKernel: IPosisKernel;
     sleep: IPosisSleepExtension;
     extRegistry: IPosisExtensionRegistry;
-    RoomView: IRoomViewExtension;
-    RoomStructure: IRoomStructuresExtension;
+    roomView: RoomExtensions;
     CreepSpawner: IPosisSpawnExtension;
 
     spawn?: IPosisSpawnExtension;
@@ -26,14 +25,14 @@ declare interface IPosisInterfaces {
     //segments?: IPosisSegmentsExtension;
     [index: string]: IPosisExtension | undefined;
 }
-declare interface IRoomStructuresExtension extends IPosisExtension {
+declare interface RoomExtensions extends IPosisExtension {
     RefreshRoomStructures(roomID: string, forceUpdate?: boolean): void;
     AddStructure(structure: Structure): void;
-}
-declare interface IRoomViewExtension extends IPosisExtension {
+    DEBUG_ForceResetRoomMemory(roomID: string): void;
     RefreshRoom(roomID: string): void;
     GetRoomData(roomID: string, forceUpdate?: boolean): RoomData_Memory | undefined
 }
+
 declare interface IPosisKernel extends IPosisExtension {
     installBundle(bundle: IPosisBundle<any>): void;
     installBundles(bundles: IPosisBundle<any>[]): void;

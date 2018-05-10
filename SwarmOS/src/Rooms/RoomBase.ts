@@ -1,14 +1,17 @@
 import { ProcessBase } from "Core/BasicTypes";
-import { EXT_RoomView, EXT_RoomStructures } from "SwarmManagers/RoomManager";
+import { EXT_RoomView } from "SwarmManagers/RoomManager";
 
 export abstract class RoomBase<T extends RoomProcess_Memory> extends ProcessBase {
+    OnLoad() { }
     @posisInterface(EXT_RoomView)
-    View!: IRoomViewExtension;
-    @posisInterface(EXT_RoomStructures)
-    Structures!: IRoomStructuresExtension;
+    View!: RoomExtensions;
 
     protected get memory(): T {
         return super.memory;
+    }
+
+    get room(): Room | undefined {
+        return Game.rooms[this.memory.roomName]
     }
 
     GetRoomView() {

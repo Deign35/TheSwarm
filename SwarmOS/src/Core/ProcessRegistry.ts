@@ -1,6 +1,6 @@
 const ProcessRegistry_LogContext: LogContext = {
     logID: "ProcessRegistry",
-    logLevel: LOG_DEBUG
+    logLevel: LOG_INFO
 }
 export class ProcessRegistry implements IPosisProcessRegistry {
     constructor() {

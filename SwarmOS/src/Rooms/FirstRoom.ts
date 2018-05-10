@@ -21,19 +21,12 @@ class FirstRoom extends RoomBase<FirstRoom_Memory> {
         }
         for (let i = 0; i < roomData.sourceIDs.length; i++) {
             let sourceID = roomData.sourceIDs[i];
-            if (!this.memory.sources[sourceID]) {
-                this.memory.sources[sourceID] = {
-                    sourceID: sourceID,
-                    pid: undefined
-                };
-            }
 
-            let sourceData = this.memory.sources[sourceID];
-            let sourceProcess = undefined;
-            if (sourceData.pid) {
-                sourceProcess = this.kernel.getProcessById(sourceData.pid);
+            let sourceProcess;
+            let sourcePID = this.memory.sources[sourceID];
+            if (sourcePID) {
+                sourceProcess = this.kernel.getProcessById(sourcePID);
             }
-
             if (!sourceProcess) {
                 let sourceContext: Harvester_Memory = {
                     targetID: sourceID,
@@ -44,7 +37,7 @@ class FirstRoom extends RoomBase<FirstRoom_Memory> {
                     this.kernel.killProcess(this.pid);
                     return;
                 }
-                this.memory.sources[sourceID].pid = newPID.pid;
+                this.memory.sources[sourceID] = newPID.pid;
             }
         }
     }

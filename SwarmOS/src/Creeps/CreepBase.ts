@@ -1,6 +1,10 @@
 import { ProcessBase } from "Core/BasicTypes";
 
 export abstract class CreepBase<T extends CreepProcess_Memory> extends ProcessBase {
+    OnLoad() { }
+    protected GetNewCreepName() {
+        return GetSUID();
+    }
     protected get memory(): T {
         return super.memory;
     }
@@ -27,7 +31,7 @@ export abstract class CreepBase<T extends CreepProcess_Memory> extends ProcessBa
                         body: [WORK, WORK, CARRY, MOVE],
                         cost: 300
                     },
-                    creepName: GetSUID(),
+                    creepName: this.GetNewCreepName(),
                     location: '',
                     spawnState: EPosisSpawnStatus.QUEUED,
                     priority: Priority.Medium,

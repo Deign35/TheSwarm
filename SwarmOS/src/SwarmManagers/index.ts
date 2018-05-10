@@ -5,7 +5,7 @@ import { ServiceProviderBase, InitData } from "Core/BasicTypes";
 import { IN_SpawnManager } from "SwarmManagers/SpawnManager";
 import { IN_RoomManager } from "SwarmManagers/RoomManager";
 
-class SwarmManager extends ServiceProviderBase {
+class SwarmManager extends ServiceProviderBase<ServiceProviderMemory> {
     protected RequiredServices: SDictionary<InitData> = {
         roomManager: {
             processName: IN_RoomManager

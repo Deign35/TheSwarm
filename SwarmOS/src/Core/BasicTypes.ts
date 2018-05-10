@@ -1,5 +1,7 @@
 export abstract class ProcessBase implements IPosisProcess {
-    constructor(protected context: IPosisProcessContext) { }
+    constructor(protected context: IPosisProcessContext) {
+        this.OnLoad();
+    }
     @posisInterface("kernel")
     protected kernel!: IPosisKernel
     @posisInterface("extRegistry")
@@ -22,52 +24,53 @@ export abstract class ProcessBase implements IPosisProcess {
     get state() {
         return this.context.state;
     }
+    get isInDebugMode() { return false; }
     protected get log(): ILogger {
         return Logger;
     }
+
     SetProcessToSleep(ticks: number) {
         let sleeper = this.context.queryPosisInterface("sleep");
         sleeper.sleep(ticks);
     }
+    protected abstract OnLoad(): void;
     protected abstract executeProcess(): void;
     protected handleMissingMemory() {
         throw new Error(`${this.imageName}(${this.pid}) memory does not exist.`);
     }
 
     run(): void {
-        let startCPU = Game.cpu.getUsed();
-        this.log.debug(() => `Begin ${this.imageName}(${this.pid}): ${startCPU}`);
+        let startCPU = 0;
+        if (this.isInDebugMode) {
+            let startCPU = Game.cpu.getUsed();
+            this.log.debug(() => `Begin ${this.imageName}(${this.pid}): ${startCPU}`);
+        }
         if (!this.memory) {
             this.log.warn(() => `${this.imageName} memory init.`)
             this.handleMissingMemory();
         }
 
         this.executeProcess();
-        this.log.debug(() => `End ${this.imageName}(${this.pid}): ${Game.cpu.getUsed() - startCPU}`);
+        if (this.isInDebugMode) {
+            this.log.debug(() => `End ${this.imageName}(${this.pid}): ${Game.cpu.getUsed() - startCPU}`);
+        }
     }
 }
 
 export interface InitData {
-
     processName: string,
     startContext?: any
 }
-declare type ServiceProviderMemory = {
-    services: {
-        [id: string]: {
-            pid: PID,
-            serviceID: string
-        }
-    }
-}
 
 const SCAN_FREQUENCY = 5;
-export abstract class ServiceProviderBase extends ProcessBase {
-    constructor(protected context: IPosisProcessContext) {
-        super(context);
-        if (!this.context.memory.services) {
-            this.context.memory.services = {};
+export abstract class ServiceProviderBase<T extends ServiceProviderMemory> extends ProcessBase {
+    OnLoad() {
+        if (!this.memory.services) {
+            this.memory.services = {};
         }
+    }
+    get memory(): T {
+        return super.memory;
     }
 
     protected abstract RequiredServices: SDictionary<InitData>;

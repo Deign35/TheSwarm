@@ -45,17 +45,19 @@ export const bundle: IPosisBundle<SpawnData_Memory> = {
 
 const SpawnManager_LogContext: LogContext = {
     logID: IN_SpawnManager,
-    logLevel: LOG_TRACE
+    logLevel: LOG_DEBUG
 }
 //const FRE_RoomStructures = primes_100[10]; // 10 = 29
 class SpawnManager extends ProcessBase {
-    constructor(protected context: IPosisProcessContext) {
-        super(context);
+    OnLoad() {
         Logger.CreateLogContext(SpawnManager_LogContext);
     }
 
     protected get memory() {
         return Memory.spawnData;
+    }
+    protected get queue() {
+        return this.memory.queue;
     }
     protected get log() {
         return this._logger;
@@ -107,18 +109,24 @@ class SpawnManager extends ProcessBase {
     }
 
     executeProcess(): void {
+        if (Object.keys(this.memory.queue).length == 0) {
+            this.log.warn(`No spawn requests in the queue.  You have spawn capacity available.`);
+            return;
+        }
+        let minSpawnCost = 20000;
+        let keys = Object.keys(this.queue);
+        for (let i = 0; i < keys.length; i++) {
+            minSpawnCost = Math.min(minSpawnCost, this.queue[keys[i]].body.cost);
+        }
         let availableSpawns: SDictionary<StructureSpawn> = {};
 
         let allSpawnIDs = Object.keys(Game.spawns);
         for (let i = 0, length = allSpawnIDs.length; i < length; i++) {
             let spawn = Game.spawns[allSpawnIDs[i]];
-            if (spawn.isActive() && !spawn.spawning) {
+            if (spawn.isActive() && !spawn.spawning && spawn.room.energyCapacityAvailable >= minSpawnCost) {
                 availableSpawns[allSpawnIDs[i]] = spawn;
             }
         }
-        let sortedSpawns = Object.keys(availableSpawns).sort((a, b) => {
-            return availableSpawns[a].room.energyCapacityAvailable > availableSpawns[b].room.energyCapacityAvailable ? -1 : 1;
-        });
         let sortedRequests = Object.keys(this.memory.queue).sort((a, b) => {
             let reqA = this.memory.queue[a];
             let reqB = this.memory.queue[b];
@@ -137,6 +145,9 @@ class SpawnManager extends ProcessBase {
             let bDiff = this.calculateSpawnDifficulty(reqB);
 
             return aDiff > bDiff ? -1 : 1;
+        });
+        let sortedSpawns = Object.keys(availableSpawns).sort((a, b) => {
+            return availableSpawns[a].room.energyCapacityAvailable > availableSpawns[b].room.energyCapacityAvailable ? -1 : 1;
         });
 
         this.log.debug(`AvailableSpawnerCount(${sortedSpawns.length}) - SpawnRequestCount(${sortedRequests.length})`);
@@ -164,7 +175,7 @@ class SpawnManager extends ProcessBase {
                     switch (spawnResult) {
                         case (ERR_NAME_EXISTS):
                             spawnRequest.req.creepName += `_` + (Game.time % GetRandomIndex(primes_100));
-                            break;
+                        case (OK): break;
                         default:
                             this.log.error(`Spawn Creep has failed (${spawnResult})`);
                             spawnRequest.req.spawnState = EPosisSpawnStatus.ERROR;
@@ -186,7 +197,7 @@ class SpawnManager extends ProcessBase {
 
 class SpawnExtension extends ExtensionBase implements IPosisSpawnExtension {
     cancelCreep(id: string): boolean {
-        if (this.getStatus(id).status != EPosisSpawnStatus.SPAWNING) {
+        if (this.memory.queue[id]) {
             delete this.memory.queue[id];
             return true;
         }
@@ -196,9 +207,9 @@ class SpawnExtension extends ExtensionBase implements IPosisSpawnExtension {
     getCreep(id: string): Creep | undefined {
         if (Game.creeps[id]) {
             return Game.creeps[id];
-        } else {
-            return;
         }
+
+        return;
     }
     getStatus(id: string): { status: EPosisSpawnStatus; message?: string | undefined; } {
         return { status: this.memory.queue[id].spawnState, message: this.memory.queue[id].spawner }

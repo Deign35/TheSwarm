@@ -8,23 +8,21 @@ if (!Memory.roomData) {
 import { ProcessBase, ExtensionBase } from "Core/BasicTypes";
 
 export const IN_RoomManager = 'RoomManager';
-export const EXT_RoomView = 'RoomView';
-export const EXT_RoomStructures = 'RoomStructure';
+export const EXT_RoomView = 'roomView';
 export const bundle: IPosisBundle<SDictionary<RoomData_Memory>> = {
     install(processRegistry: IPosisProcessRegistry, extensionRegistry: IPosisExtensionRegistry) {
         processRegistry.register(IN_RoomManager, RoomManager);
-        let roomDataExtension = new RoomExtension(extensionRegistry);
-        extensionRegistry.register(EXT_RoomView, roomDataExtension);
-        extensionRegistry.register(EXT_RoomStructures, roomDataExtension);
+        extensionRegistry.register(EXT_RoomView, new RoomExtension(extensionRegistry));
     },
     rootImageName: IN_RoomManager
 }
 
 class RoomManager extends ProcessBase {
+    OnLoad() {
+
+    }
     @posisInterface(EXT_RoomView)
-    View!: IRoomViewExtension;
-    @posisInterface(EXT_RoomStructures)
-    Structures!: IRoomStructuresExtension;
+    View!: RoomExtensions;
 
     handleMissingMemory() {
         if (!Memory.roomData) {
@@ -47,7 +45,12 @@ class RoomManager extends ProcessBase {
                 }
             }
             if (!data.pid || !this.kernel.getProcessById(data.pid)) {
-                let newRoomProcess = this.kernel.startProcess("Rooms/FirstRoom", {});
+                let newRoomMemory: FirstRoom_Memory = {
+                    sources: {},
+                    roomName: roomID
+                }
+
+                let newRoomProcess = this.kernel.startProcess("Rooms/FirstRoom", newRoomMemory);
                 if (newRoomProcess && newRoomProcess.pid && newRoomProcess.process) {
                     data.pid = newRoomProcess.pid;
                 }
@@ -58,7 +61,7 @@ class RoomManager extends ProcessBase {
 
 
 const FRE_RoomStructures = primes_100[10]; // 10 = 29
-class RoomExtension extends ExtensionBase implements IRoomStructuresExtension, IRoomViewExtension {
+class RoomExtension extends ExtensionBase implements RoomExtensions {
     protected get memory(): SDictionary<RoomData_Memory> {
         return Memory.roomData;
     }
@@ -164,6 +167,7 @@ class RoomExtension extends ExtensionBase implements IRoomStructuresExtension, I
     AddStructure(structure: Structure): void {
         //let roomInfo = this.RoomView.View(structure.room.name);
         //if(!roomInfo || !)
+        throw new Error('Not implemented');
     }
     GetRoomData(roomID: string, forceRefresh: boolean = false): RoomData_Memory | undefined {
         forceRefresh = forceRefresh || !this.memory[roomID] || (this.memory[roomID].lastUpdated == 0);
@@ -184,6 +188,11 @@ class RoomExtension extends ExtensionBase implements IRoomStructuresExtension, I
         return this.memory[roomID];
     }
 
+    DEBUG_ForceResetRoomMemory(roomID: string) {
+        if (this.memory[roomID]) {
+            delete this.memory[roomID]
+        }
+    }
     RefreshRoom(roomID: string, force: boolean = false) {
         let { room, roomData } = this.getRoomData(roomID);
         if (!room || !roomData) {

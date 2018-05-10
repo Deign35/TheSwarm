@@ -17,9 +17,11 @@ declare var Memory: {
 import { ProcessBase, ExtensionBase } from "Core/BasicTypes";
 
 export const IN____Empty___Manager = '___Empty___Manager';
+export const IN____Empty___Extensions = '___Empty___Extensions';
 export const bundle: IPosisBundle<I___Empty___Data_Memory> = {
     install(processRegistry: IPosisProcessRegistry, extensionRegistry: IPosisExtensionRegistry) {
         processRegistry.register(IN____Empty___Manager, ___Empty___Manager);
+        extensionRegistry.register(IN____Empty___Extensions, ___Empty___Extension);
     },
     rootImageName: IN____Empty___Manager
 }
@@ -29,6 +31,7 @@ const IN____Empty___Manager_LogContext: LogContext = {
 }
 
 class ___Empty___Manager extends ProcessBase {
+    protected OnLoad(): void { }
     constructor(protected context: IPosisProcessContext) {
         super(context);
         Logger.CreateLogContext(IN____Empty___Manager_LogContext);

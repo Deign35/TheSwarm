@@ -108,10 +108,15 @@ declare interface RoomProcess_Memory {
 }
 
 declare interface FirstRoom_Memory extends RoomProcess_Memory {
-    sources: {
+    sources: SDictionary<PID | undefined>
+}
+
+
+declare type ServiceProviderMemory = {
+    services: {
         [id: string]: {
-            sourceID: string,
-            pid?: PID
+            pid: PID,
+            serviceID: string
         }
     }
 }
