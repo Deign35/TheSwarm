@@ -52,20 +52,21 @@ declare interface RoomData_Memory {
 
 /** SpawnData */
 declare interface SpawnData_Memory {
-    queue: EDictionary<SpawnData_SpawnQueue>,
+    queue: SDictionary<SpawnData_SpawnCard>,
     scheduledSpawn: any
 }
-declare type SpawnData_SpawnQueue = SpawnData_SpawnCard[]
 
 declare interface SpawnData_SpawnCard {
     body: ISpawnDef;
     creepName: string;
-    pPID: PID;
     location: string;
+    pid: PID;
     priority: Priority;
+    spawnState: EPosisSpawnStatus;
 
     defaultMemory?: any;
     maxSpawnDist?: number;
+    spawner?: string;
 }
 declare type SpawnRequest_BodyDef = EDictionary<ISpawnDef>;
 
