@@ -162,7 +162,7 @@ export class Kernel implements IPosisKernel, IPosisSleepExtension {
             }
         }
         if (!hasActiveProcesses)
-            this.startProcess("ServiceProvider", {});
+            this.startProcess("SwarmManager", {});
     }
 
     sleep(ticks: number): void {
