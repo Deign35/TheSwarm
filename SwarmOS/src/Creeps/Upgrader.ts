@@ -1,54 +1,16 @@
-/*import { ProcessBase } from "Core/BasicTypes";
-
-export const IN_Creep_Upgrader = 'Creep/Roles/Upgrader';
-
 export const bundle: IPosisBundle<SpawnData_Memory> = {
     install(processRegistry: IPosisProcessRegistry, extensionRegistry: IPosisExtensionRegistry) {
-        processRegistry.register(IN_Creep_Harvester, Upgrader);
+        processRegistry.register(PKG_CreepUpgrader, Upgrader);
     },
-    rootImageName: IN_Creep_Harvester
+    rootImageName: PKG_CreepUpgrader
 }
 
 import { CreepBase } from "Creeps/CreepBase";
-import { HarvestAction } from "Actions/HarvestAction";
-import { ActionBase } from "Actions/ActionBase";
 import { MoveToPositionAction } from "Actions/MoveToPositionAction";
-import { BuildAction } from "Actions/BuildAction";
-import { RepairAction } from "Actions/RepairAction";
+import { ActionBase } from "Actions/ActionBase";
+import { UpgradeAction } from "Actions/UpgradeAction";
 
-export class Upgrader extends CreepBase<Harvester_Memory> {
-    OnLoad() {
-        super.OnLoad();
-        let target = Game.getObjectById(this.memory.targetID) as Source | Mineral;
-        if ((target as Source).energyCapacity) {
-            // Make a link if possible
-        } else if ((target as Mineral).mineralType) {
-            // Dont spawn if mineral is empty
-        }
-
-        if (!this.memory.containerID) {
-            let containers = target.pos.findInRange(FIND_STRUCTURES, 1, {
-                filter: function (struct: Structure) {
-                    return struct.structureType == STRUCTURE_CONTAINER;
-                }
-            });
-            if (containers.length > 0) {
-                this.memory.containerID = containers[0].id;
-            } else if (!this.memory.constructionSite) {
-                let sites = target.pos.findInRange(FIND_CONSTRUCTION_SITES, 1);
-                for (let i = 0; i < sites.length; i++) {
-                    if (sites[i].structureType == STRUCTURE_CONTAINER) {
-                        this.memory.constructionSite = sites[i].id;
-                    }
-                }
-                if (!this.memory.constructionSite) {
-                    target.pos.findInRange(FIND_FLAGS, 1);
-                    // define what flags do damn it...
-                    this.log.warn(`No constructionSite exists.  Harvester unable to see flags.`);
-                }
-            }
-        }
-    }
+export class Upgrader extends CreepBase<Upgrader_Memory> {
     protected activateCreep(): void {
         let creep = Game.creeps[this.memory.creep!];
         if (!creep) {
@@ -61,45 +23,28 @@ export class Upgrader extends CreepBase<Harvester_Memory> {
             this.log.debug(`Harvester Creep is spawning(${this.imageName}[${this.pid}])`);
             return;
         }
-        let moveTarget = (Game.getObjectById(this.memory.containerID) as StructureContainer) ||
-            (Game.getObjectById(this.memory.constructionSite) as ConstructionSite);
-        if (moveTarget) {
-            if (!creep.pos.isEqualTo(moveTarget.pos)) {
-                new MoveToPositionAction(creep, moveTarget.pos).Run(true);
-                return;
-            }
+        if (creep.room.name != this.memory.targetLocation) {
+            new MoveToPositionAction(creep, new RoomPosition(25, 25, this.memory.targetLocation)).Run();
+            return;
         }
 
-        let target = Game.getObjectById(this.memory.targetID) as Source | Mineral;
-        let action: ActionBase = new HarvestAction(creep, target);
+        if (!creep.room.controller) {
+            this.log.fatal(`Target is missing`);
+            this.kernel.killProcess(this.pid);
+            return;
+        }
+
+        let target = creep.room.controller;
+        let action: ActionBase = new UpgradeAction(creep, target);
         switch (action.ValidateAction()) {
-            case (C_NONE):
-            case (C_MOVE):
+            case (SR_NONE):
+            case (SR_MOVE):
                 break;
-            case (E_TARGET_INELLIGIBLE): // Target is empty.  (TODO) let it still try to build or repair
-            case (E_ACTION_UNNECESSARY): // Creep's carry is full
-            default:
-                let hasReplacementAction = false;
-                if (creep.carry.energy > 0) {
-                    if (this.memory.constructionSite) {
-                        hasReplacementAction = true;
-                        action = new BuildAction(creep, Game.getObjectById(this.memory.constructionSite) as ConstructionSite);
-                    } else if (this.memory.containerID) {
-                        let container = Game.getObjectById(this.memory.containerID) as StructureContainer;
-                        if (container && container.hits < container.hitsMax) {
-                            hasReplacementAction = true;
-                            action = new RepairAction(creep, container);
-                        }
-                    }
-                }
-
-                if (hasReplacementAction && action.ValidateAction() != C_NONE) {
-                    this.log.fatal(`Action unable to occur for an unexpected reason -- ${action.ValidateAction()}`);
-                    this.kernel.killProcess(this.pid);
-                    break;
-                }
+            case (SR_REQUIRES_ENERGY): // (TODO): Implement refilling Upgrader's resources somehow.
+                break;
         }
 
+        // Do something to confirm whether or not this creep should move and make space for other creeps
         action.Run();
     }
-}*/
+}

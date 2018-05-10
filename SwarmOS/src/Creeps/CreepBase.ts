@@ -1,6 +1,9 @@
 import { ProcessBase } from "Core/BasicTypes";
 
 export abstract class CreepBase<T extends CreepProcess_Memory> extends ProcessBase {
+    @posisInterface(EXT_RoomView)
+    RoomView!: RoomExtensions;
+
     OnLoad() {
         // Clean up any existing spawn requests
         if (this.memory.creep) {

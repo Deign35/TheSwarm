@@ -42,7 +42,7 @@ export const bundle: IPosisBundle<SpawnData_Memory> = {
 
 const SpawnManager_LogContext: LogContext = {
     logID: PKG_SpawnManager,
-    logLevel: LOG_DEBUG
+    logLevel: LOG_INFO
 }
 //const FRE_RoomStructures = primes_100[10]; // 10 = 29
 class SpawnManager extends ProcessBase {
@@ -94,7 +94,7 @@ class SpawnManager extends ProcessBase {
             canSpawn = false;
             let spawnDistance = Game.map.getRoomLinearDistance(spawn.room.name, req.location);
             if (!req.maxSpawnDist || req.maxSpawnDist >= spawnDistance) {
-                if (req.body.cost <= spawn.room.energyCapacityAvailable) {
+                if (req.body.cost <= spawn.room.energyAvailable) {
                     canSpawn = true;
                     // Multiply by a factor of the actual distance
                     difficulty *= E2C_SpawnDistance * (spawnDistance || 1);
@@ -106,6 +106,7 @@ class SpawnManager extends ProcessBase {
     }
 
     executeProcess(): void {
+        debugger;
         if (Object.keys(this.memory.queue).length == 0) {
             this.log.warn(`No spawn requests in the queue.  You have spawn capacity available.`);
             return;
@@ -120,10 +121,11 @@ class SpawnManager extends ProcessBase {
         let allSpawnIDs = Object.keys(Game.spawns);
         for (let i = 0, length = allSpawnIDs.length; i < length; i++) {
             let spawn = Game.spawns[allSpawnIDs[i]];
-            if (spawn.isActive() && !spawn.spawning && spawn.room.energyCapacityAvailable >= minSpawnCost) {
+            if (spawn.isActive() && !spawn.spawning && spawn.room.energyAvailable >= minSpawnCost) {
                 availableSpawns[allSpawnIDs[i]] = spawn;
             }
         }
+
         let sortedRequests = Object.keys(this.memory.queue).sort((a, b) => {
             let reqA = this.memory.queue[a];
             let reqB = this.memory.queue[b];
@@ -144,7 +146,7 @@ class SpawnManager extends ProcessBase {
             return aDiff > bDiff ? -1 : 1;
         });
         let sortedSpawns = Object.keys(availableSpawns).sort((a, b) => {
-            return availableSpawns[a].room.energyCapacityAvailable > availableSpawns[b].room.energyCapacityAvailable ? -1 : 1;
+            return availableSpawns[a].room.energyAvailable > availableSpawns[b].room.energyAvailable ? -1 : 1;
         });
 
         this.log.debug(`AvailableSpawnerCount(${sortedSpawns.length}) - SpawnRequestCount(${sortedRequests.length})`);
@@ -172,7 +174,8 @@ class SpawnManager extends ProcessBase {
                     switch (spawnResult) {
                         case (ERR_NAME_EXISTS):
                             spawnRequest.req.creepName += `_` + (Game.time % GetRandomIndex(primes_100));
-                        case (OK): break;
+                        case (OK):
+                            break;
                         default:
                             this.log.error(`Spawn Creep has failed (${spawnResult})`);
                             spawnRequest.req.spawnState = EPosisSpawnStatus.ERROR;

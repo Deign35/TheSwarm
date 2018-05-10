@@ -1,5 +1,3 @@
-import { ProcessBase } from "Core/BasicTypes";
-
 export const bundle: IPosisBundle<SpawnData_Memory> = {
     install(processRegistry: IPosisProcessRegistry, extensionRegistry: IPosisExtensionRegistry) {
         processRegistry.register(PKG_CreepHarvester, Harvester);
@@ -63,19 +61,22 @@ export class Harvester extends CreepBase<Harvester_Memory> {
             (Game.getObjectById(this.memory.constructionSite) as ConstructionSite);
         if (moveTarget) {
             if (!creep.pos.isEqualTo(moveTarget.pos)) {
-                new MoveToPositionAction(creep, moveTarget.pos).Run(true);
-                return;
+                new MoveToPositionAction(creep, moveTarget.pos).Run();
             }
         }
 
         let target = Game.getObjectById(this.memory.targetID) as Source | Mineral;
+        if (!target) {
+            new MoveToPositionAction(creep, new RoomPosition(25, 25, this.memory.targetLocation)).Run();
+            return;
+        }
         let action: ActionBase = new HarvestAction(creep, target);
         switch (action.ValidateAction()) {
-            case (C_NONE):
-            case (C_MOVE):
+            case (SR_NONE):
+            case (SR_MOVE):
                 break;
-            case (E_TARGET_INELLIGIBLE): // Target is empty.  (TODO) let it still try to build or repair
-            case (E_ACTION_UNNECESSARY): // Creep's carry is full
+            case (SR_TARGET_INELLIGIBLE): // Target is empty.
+            case (SR_ACTION_UNNECESSARY): // Creep's carry is full
             default:
                 let hasReplacementAction = false;
                 if (creep.carry.energy > 0) {
@@ -91,13 +92,13 @@ export class Harvester extends CreepBase<Harvester_Memory> {
                     }
                 }
 
-                if (hasReplacementAction && action.ValidateAction() != C_NONE) {
+                if (hasReplacementAction && action.ValidateAction() != SR_NONE) {
                     this.log.fatal(`Action unable to occur for an unexpected reason -- ${action.ValidateAction()}`);
                     this.kernel.killProcess(this.pid);
                     break;
                 }
         }
 
-        action.Run();
+        action.Run(!moveTarget);
     }
 }

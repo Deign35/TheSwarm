@@ -27,6 +27,7 @@ class FirstRoom extends RoomBase<FirstRoom_Memory> {
             if (!sourceProcess) {
                 let sourceContext: Harvester_Memory = {
                     targetID: sourceID,
+                    targetLocation: room.name
                 }
                 let newPID = this.kernel.startProcess(PKG_CreepHarvester, sourceContext);
                 if (!newPID || !newPID.pid || !newPID.process) {
