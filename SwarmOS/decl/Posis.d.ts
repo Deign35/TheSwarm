@@ -73,9 +73,7 @@ declare interface IPosisProcess {
     run(): void;
 
     /** ID */
-    readonly pid: PID;
-    /** process state */
-    readonly state: ProcessState;
+    //readonly pid: PID;
 }
 /**
  * Bundle: Don't write to context object (including setting new props on it), host will likely freeze it anyway.
@@ -93,8 +91,8 @@ declare interface IPosisProcessContext {
     readonly pid: PID;
     /** Parent ID */
     readonly pPID: PID;
-    /** process state */
-    readonly state: ProcessState;
+    /** isActive */
+    readonly isActive: boolean;
     queryPosisInterface<T extends keyof IPosisInterfaces>(interfaceId: T): IPosisInterfaces[T];
 }
 declare interface IPosisProcessRegistry {
@@ -190,8 +188,8 @@ declare interface ProcessInfo {
     pid: PID;
     pPID?: PID;
     name: string;
-    status: ProcessState;
     begun: number;
+    running: boolean;
 
     wake?: number;
     ended?: number;

@@ -9,7 +9,7 @@ interface ILogLevelSetting {
 const LOGGER_SEPARATOR = `<font color="yellow">-----------------------------------------------------------------------</font>`;
 const CONTEXT_SEPARATOR = `<font color="green">-----------------------------------------------------------------------</font>`;
 
-const DEFAULT_LOG_FONT_SIZE = 2;
+const DEFAULT_LOG_FONT_SIZE = 1.5;
 const LOGGER_SETTINGS: SDictionary<ILogLevelSetting> = {
     [LOG_ALERT]: {
         level: 6,

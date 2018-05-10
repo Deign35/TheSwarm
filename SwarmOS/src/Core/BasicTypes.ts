@@ -21,9 +21,6 @@ export abstract class ProcessBase implements IPosisProcess {
     get parentPID(): PID { // Parent ID
         return this.context.pPID;
     }
-    get state() {
-        return this.context.state;
-    }
     get isInDebugMode() { return false; }
     protected get log(): ILogger {
         return Logger;
@@ -91,7 +88,7 @@ export abstract class ServiceProviderBase<T extends ServiceProviderMemory> exten
             let service = this.memory.services[ids[i]];
             let process = (service && service.pid) ? this.kernel.getProcessById(service.pid) : undefined;
 
-            if (!service || !process || process.state == ProcessState.Killed) {
+            if (!service || !process) {
                 this.log.info(() => `Initializing service ${ids[i]}`);
 
                 let initData = this.RequiredServices[ids[i]];

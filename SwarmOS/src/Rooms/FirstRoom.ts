@@ -32,7 +32,7 @@ class FirstRoom extends RoomBase<FirstRoom_Memory> {
                     targetID: sourceID,
                 }
                 let newPID = this.kernel.startProcess(IN_Creep_Harvester, sourceContext);
-                if (!newPID || !newPID.pid || !newPID.process || newPID.process.state == ProcessState.Killed) {
+                if (!newPID || !newPID.pid || !newPID.process) {
                     this.log.fatal(`Room failed to create a harvester process (${room.name})`);
                     this.kernel.killProcess(this.pid);
                     return;
