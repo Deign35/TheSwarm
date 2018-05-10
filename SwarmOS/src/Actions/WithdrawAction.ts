@@ -30,15 +30,15 @@ export class WithdrawAction extends ActionWithTarget<WithdrawTargetType> {
     }
     protected ActionImplemented(): SwarmlingResponse {
         let result = this.AssignedCreep.withdraw(this.Target, this.ResourceType, this.Amount);
-        let actionResponse: SwarmlingResponse = C_NONE;
+        let actionResponse: SwarmlingResponse = SR_NONE;
         switch (result) {
-            case (OK): actionResponse = C_NONE; break;
+            case (OK): actionResponse = SR_NONE; break;
             //case(ERR_NOT_OWNER): Not the owner of this object.
             //case(ERR_BUSY): Creep is still being spawned.
-            case (ERR_NOT_ENOUGH_RESOURCES): actionResponse = E_TARGET_INELLIGIBLE; break;
+            case (ERR_NOT_ENOUGH_RESOURCES): actionResponse = SR_TARGET_INELLIGIBLE; break;
             //case(ERR_INVALID_TARGET): Target is not a valid constructionsite.
-            case (ERR_FULL): actionResponse = E_ACTION_UNNECESSARY; break;
-            case (ERR_NOT_IN_RANGE): actionResponse = C_MOVE; break;
+            case (ERR_FULL): actionResponse = SR_ACTION_UNNECESSARY; break;
+            case (ERR_NOT_IN_RANGE): actionResponse = SR_MOVE; break;
             //case(ERR_INVALID_ARGS): The resources amount or type is incorrect.
             default: console.log('FAILED ACTION[WithdrawAction] -- ' + result);
         }
@@ -46,33 +46,33 @@ export class WithdrawAction extends ActionWithTarget<WithdrawTargetType> {
         return actionResponse;
     }
     ValidateAction(): SwarmlingResponse {
-        let validationResult = C_NONE as SwarmlingResponse;
+        let validationResult = SR_NONE as SwarmlingResponse;
 
         if (_.sum(this.AssignedCreep.carry) == this.AssignedCreep.carryCapacity) {
-            validationResult = E_ACTION_UNNECESSARY;
+            validationResult = SR_ACTION_UNNECESSARY;
         } else if ((this.Target as WithdrawTypeEnergy).energyCapacity) {
             if ((this.Target as WithdrawTypeEnergy).energy == 0) {
-                validationResult = E_TARGET_INELLIGIBLE;
+                validationResult = SR_TARGET_INELLIGIBLE;
             }
         } else if ((this.Target as WithdrawTypeStorage).storeCapacity) {
             if (!(this.Target as WithdrawTypeStorage).store[this.ResourceType]) {
-                validationResult = E_TARGET_INELLIGIBLE;
+                validationResult = SR_TARGET_INELLIGIBLE;
             }
         } else if ((this.Target as StructureLab)) {
             if (this.ResourceType == RESOURCE_ENERGY) {
-                validationResult = (this.Target as StructureLab).energy > 0 ? C_NONE : E_TARGET_INELLIGIBLE;
+                validationResult = (this.Target as StructureLab).energy > 0 ? SR_NONE : SR_TARGET_INELLIGIBLE;
             } else {
                 if ((this.Target as StructureLab).mineralType != this.ResourceType) {
-                    validationResult = E_TARGET_INELLIGIBLE;
+                    validationResult = SR_TARGET_INELLIGIBLE;
                 } else {
                     // Amount already verified by constructor.
                 }
             }
         }
 
-        if (validationResult == C_NONE) {
+        if (validationResult == SR_NONE) {
             if (!this.AssignedCreep.pos.isNearTo(this.Target)) {
-                return C_MOVE;
+                return SR_MOVE;
             }
         }
         return validationResult;

@@ -5,7 +5,7 @@ export abstract class ActionBase {
     Run(autoMove: boolean = true): SwarmlingResponse {
         let jobResult = this.ActionImplemented();
 
-        if (autoMove && jobResult == C_MOVE) {
+        if (autoMove && jobResult == SR_MOVE) {
             this.Move(this.GetMovePosition());
         }
 
@@ -43,12 +43,12 @@ export abstract class ActionWithTarget<T extends RoomObject> extends ActionBase 
 export class NoOpAction extends ActionBase {
     protected BlockValue = 0;
     protected ActionImplemented(): SwarmlingResponse {
-        return C_NONE;
+        return SR_NONE;
     }
     protected GetMovePosition(): RoomPosition {
         return this.AssignedCreep.pos;
     }
     ValidateAction(): SwarmlingResponse {
-        return C_NONE;
+        return SR_NONE;
     }
 }

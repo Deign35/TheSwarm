@@ -53,8 +53,9 @@
         },
         "SR": {
             "comment": "Swarm Result -- Unique return results from SwarmOS services",
-            "enabled": false,
+            "enabled": true,
             "type": true,
+            "combinedType": "SwarmlingResponse",
             "entries": {
                 "NONE": 0,
                 "INVALID": -1,
@@ -69,8 +70,9 @@
         },
         "C": {
             "comment": "Legacy constants, need to be updated.",
-            "enabled": true,
+            "enabled": false,
             "type": true,
+            "combinedType": "SwarmlingResponse",
             "entries": {
                 "NONE": 0,
                 "MOVE": -8
@@ -78,8 +80,9 @@
         },
         "E": {
             "comment": "Legacy constants, need to be updated.",
-            "enabled": true,
+            "enabled": false,
             "type": true,
+            "combinedType": "SwarmlingResponse",
             "entries": {
                 "INVALID": -1,
                 "MISSING_TARGET": -2,
@@ -198,21 +201,5 @@
             "Ally": 12,
             "NonHostile": 13
         }
-    },
-    "CompoundTypes": {
-        "SwarmErrors": [
-            "E_INVALID",
-            "E_MISSING_TARGET",
-            "E_REQUIRES_ENERGY",
-            "E_TARGET_INELLIGIBLE",
-            "E_ACTION_UNNECESSARY",
-            "E_NOT_IMPLEMENTED",
-            "E_REQ_REJECTED"
-        ],
-        "SwarmlingResponse": [
-            "C_NONE",
-            "C_MOVE",
-            "SwarmErrors"
-        ]
     }
 }

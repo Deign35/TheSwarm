@@ -8,12 +8,12 @@ export class SayAction extends ActionBase {
     }
     protected ActionImplemented(): SwarmlingResponse {
         this.AssignedCreep.say(this.SayString);
-        return C_NONE;
+        return SR_NONE;
     }
     protected GetMovePosition(): RoomPosition {
         return this.AssignedCreep.pos;
     }
     ValidateAction(): SwarmlingResponse {
-        return C_NONE;
+        return SR_NONE;
     }
 }
