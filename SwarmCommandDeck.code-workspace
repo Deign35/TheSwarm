@@ -18,7 +18,7 @@
             "**/npm*/": true,
             "**/build/": true,
             "**/dist/": true,
-            "**/package*.json": false,
+            "**/package*.json": true,
             "**/tsconfig.json": true,
             "**/Gruntfile.js": true,
             "**/README.md": true

@@ -19,7 +19,8 @@
                 "SpawnManager",
                 "RoomManager",
                 "FirstRoom",
-                "CreepHarvester"
+                "CreepHarvester",
+                "CreepUpgrader"
             ]
         },
         "EXT": {
@@ -39,6 +40,7 @@
             "enabled": true,
             "string": true,
             "type": true,
+            "combinedType": "LogLevel",
             "entries": {
                 "ALERT": "alert",
                 "DEBUG": "debug",
@@ -211,15 +213,6 @@
             "C_NONE",
             "C_MOVE",
             "SwarmErrors"
-        ],
-        "LogLevel": [
-            "LOG_ALERT",
-            "LOG_DEBUG",
-            "LOG_ERROR",
-            "LOG_FATAL",
-            "LOG_INFO",
-            "LOG_TRACE",
-            "LOG_WARN"
         ]
     }
 }

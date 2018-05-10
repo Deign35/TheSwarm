@@ -104,6 +104,7 @@ module.exports = function (grunt) {
                 declarationsFile.push("/** " + constDef.comment + " */");
                 globalsFile.push("/** " + constDef.comment + " */");
             }
+            let entryIDs = [];
             for (let entryID in constDef.entries) {
                 let constName = constGroup + "_" + entryID;
                 let constVal = constDef.entries[entryID];
@@ -111,6 +112,7 @@ module.exports = function (grunt) {
                 if (constDef.isArray) {
                     constName = constGroup + "_" + constVal;
                 }
+                entryIDs.push(constName);
                 let constDecl = "declare const " + constName + " = ";
                 let globalDecl = "global[\"" + constName + "\"] = ";
                 if (constDef.string) {
@@ -130,6 +132,13 @@ module.exports = function (grunt) {
 
                 declarationsFile.push(constDecl);
                 globalsFile.push(globalDecl);
+            }
+            if (constDef.combinedType) {
+                let compoundDeclaration = "declare type " + constDef.combinedType + " = ";
+                for (let i = 0; i < entryIDs.length; i++) {
+                    compoundDeclaration += entryIDs[i] + " | ";
+                }
+                declarationsFile.push(compoundDeclaration.slice(0, -3) + ';');
             }
             globalsFile.push("");
         }
