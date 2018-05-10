@@ -61,7 +61,8 @@ export class Harvester extends CreepBase<Harvester_Memory> {
             this.log.debug(`Harvester Creep is spawning(${this.imageName}[${this.pid}])`);
             return;
         }
-        let moveTarget = (Game.getObjectById(this.memory.containerID) as StructureContainer);
+        let moveTarget = (Game.getObjectById(this.memory.containerID) as StructureContainer) ||
+            (Game.getObjectById(this.memory.constructionSite) as ConstructionSite);
         if (moveTarget) {
             if (!creep.pos.isEqualTo(moveTarget.pos)) {
                 new MoveToPositionAction(creep, moveTarget.pos).Run(true);
