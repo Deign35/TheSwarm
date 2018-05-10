@@ -187,7 +187,7 @@ class SpawnManager extends BaseProcess {
 
 class SpawnExtension extends ExtensionBase implements IPosisSpawnExtension {
     cancelCreep(id: string): boolean {
-        if (this.getStatus(id).status == EPosisSpawnStatus.QUEUED) {
+        if (this.getStatus(id).status != EPosisSpawnStatus.SPAWNING) {
             delete this.memory.queue[id];
             return true;
         }

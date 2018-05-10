@@ -98,4 +98,5 @@ declare interface Harvester_Memory extends CreepData_Memory {
     targetID: string;
     linkID?: string;
     containerID?: string;
+    constructionSite?: string;
 }
