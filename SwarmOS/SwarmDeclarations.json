@@ -9,6 +9,31 @@
                 "SIGNATURE": "The Swarm rises from the ashes -- SwarmOSv0.2.0"
             }
         },
+        "PKG": {
+            "comment": "Package names for installation",
+            "enabled": true,
+            "string": true,
+            "isArray": true,
+            "entries": [
+                "SwarmManager",
+                "SpawnManager",
+                "RoomManager",
+                "FirstRoom",
+                "CreepHarvester"
+            ]
+        },
+        "EXT": {
+            "comment": "Extensions provided by packages for processless package interactions",
+            "enabled": true,
+            "string": true,
+            "entries": {
+                "CreepSpawner": "spawner",
+                "RoomView": "roomView",
+                "Registry": "extRegistry",
+                "Kernel": "kernel",
+                "Sleep": "sleep"
+            }
+        },
         "LOG": {
             "comment": "Logger Priority",
             "enabled": true,

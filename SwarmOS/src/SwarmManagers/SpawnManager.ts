@@ -31,20 +31,17 @@ const exDef2: RoleDefinition<'harvester'> = {
 */
 import { ProcessBase, ExtensionBase } from "Core/BasicTypes";
 
-export const IN_SpawnManager = 'SpawnManager';
-export const EXT_CreepSpawnExtension = 'CreepSpawner'; // Added to BaseProcess
-
 export const bundle: IPosisBundle<SpawnData_Memory> = {
     install(processRegistry: IPosisProcessRegistry, extensionRegistry: IPosisExtensionRegistry) {
-        processRegistry.register(IN_SpawnManager, SpawnManager);
+        processRegistry.register(PKG_SpawnManager, SpawnManager);
         let SpawnManagerExtension = new SpawnExtension(extensionRegistry);
-        extensionRegistry.register(EXT_CreepSpawnExtension, SpawnManagerExtension);
+        extensionRegistry.register(EXT_CreepSpawner, SpawnManagerExtension);
     },
-    rootImageName: IN_SpawnManager
+    rootImageName: PKG_SpawnManager
 }
 
 const SpawnManager_LogContext: LogContext = {
-    logID: IN_SpawnManager,
+    logID: PKG_SpawnManager,
     logLevel: LOG_DEBUG
 }
 //const FRE_RoomStructures = primes_100[10]; // 10 = 29
@@ -63,13 +60,13 @@ class SpawnManager extends ProcessBase {
         return this._logger;
     }
     private _logger: ILogger = {
-        alert: (message: (string | (() => string))) => { Logger.alert(message, IN_SpawnManager); },
-        debug: (message: (string | (() => string))) => { Logger.debug(message, IN_SpawnManager); },
-        error: (message: (string | (() => string))) => { Logger.error(message, IN_SpawnManager); },
-        fatal: (message: (string | (() => string))) => { Logger.fatal(message, IN_SpawnManager); },
-        info: (message: (string | (() => string))) => { Logger.info(message, IN_SpawnManager); },
-        trace: (message: (string | (() => string))) => { Logger.trace(message, IN_SpawnManager); },
-        warn: (message: (string | (() => string))) => { Logger.warn(message, IN_SpawnManager); },
+        alert: (message: (string | (() => string))) => { Logger.alert(message, PKG_SpawnManager); },
+        debug: (message: (string | (() => string))) => { Logger.debug(message, PKG_SpawnManager); },
+        error: (message: (string | (() => string))) => { Logger.error(message, PKG_SpawnManager); },
+        fatal: (message: (string | (() => string))) => { Logger.fatal(message, PKG_SpawnManager); },
+        info: (message: (string | (() => string))) => { Logger.info(message, PKG_SpawnManager); },
+        trace: (message: (string | (() => string))) => { Logger.trace(message, PKG_SpawnManager); },
+        warn: (message: (string | (() => string))) => { Logger.warn(message, PKG_SpawnManager); },
         CreateLogContext: Logger.CreateLogContext,
         DumpLogToConsole: Logger.DumpLogToConsole
     }

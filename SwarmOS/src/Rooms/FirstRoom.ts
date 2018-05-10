@@ -1,16 +1,13 @@
 import { ProcessBase } from "Core/BasicTypes";
 
-export const IN_Room_FirstRoom = 'Rooms/FirstRoom';
-
 export const bundle: IPosisBundle<SpawnData_Memory> = {
     install(processRegistry: IPosisProcessRegistry, extensionRegistry: IPosisExtensionRegistry) {
-        processRegistry.register(IN_Room_FirstRoom, FirstRoom);
+        processRegistry.register(PKG_FirstRoom, FirstRoom);
     },
-    rootImageName: IN_Room_FirstRoom
+    rootImageName: PKG_FirstRoom
 }
 
 import { RoomBase } from "Rooms/RoomBase";
-import { IN_Creep_Harvester } from "Creeps/Harvester";
 
 class FirstRoom extends RoomBase<FirstRoom_Memory> {
     protected activateRoom(roomData: RoomData_Memory, room?: Room): void {
@@ -31,7 +28,7 @@ class FirstRoom extends RoomBase<FirstRoom_Memory> {
                 let sourceContext: Harvester_Memory = {
                     targetID: sourceID,
                 }
-                let newPID = this.kernel.startProcess(IN_Creep_Harvester, sourceContext);
+                let newPID = this.kernel.startProcess(PKG_CreepHarvester, sourceContext);
                 if (!newPID || !newPID.pid || !newPID.process) {
                     this.log.fatal(`Room failed to create a harvester process (${room.name})`);
                     this.kernel.killProcess(this.pid);

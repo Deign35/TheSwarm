@@ -1,7 +1,7 @@
 export class ExtensionRegistry implements IPosisExtension {
     constructor() {
         this.registry = {};
-        this.register('extRegistry', this);
+        this.register(EXT_Registry, this);
     }
     get log() {
         return Logger;

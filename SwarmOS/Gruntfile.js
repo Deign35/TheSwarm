@@ -104,21 +104,27 @@ module.exports = function (grunt) {
                 declarationsFile.push("/** " + constDef.comment + " */");
                 globalsFile.push("/** " + constDef.comment + " */");
             }
-            for (let constName in constDef.entries) {
-                let constDecl = "declare const " + constGroup + "_" + constName + " = ";
-                let globalDecl = "global[\"" + constGroup + "_" + constName + "\"] = ";
+            for (let entryID in constDef.entries) {
+                let constName = constGroup + "_" + entryID;
+                let constVal = constDef.entries[entryID];
+
+                if (constDef.isArray) {
+                    constName = constGroup + "_" + constVal;
+                }
+                let constDecl = "declare const " + constName + " = ";
+                let globalDecl = "global[\"" + constName + "\"] = ";
                 if (constDef.string) {
-                    constDecl += "\"" + constDef.entries[constName] + "\";";
-                    globalDecl += "\"" + constDef.entries[constName] + "\";";
+                    constDecl += "\"" + constVal + "\";";
+                    globalDecl += "\"" + constVal + "\";";
                 } else {
-                    constDecl += constDef.entries[constName] + ";";
-                    globalDecl += constDef.entries[constName] + ";";
+                    constDecl += constVal + ";";
+                    globalDecl += constVal + ";";
                 }
                 if (constDef.type) {
                     if (constDef.string) {
-                        declarationsFile.push("declare type " + constGroup + "_" + constName + " = \"" + constDef.entries[constName] + "\";");
+                        declarationsFile.push("declare type " + constName + " = \"" + constVal + "\";");
                     } else {
-                        declarationsFile.push("declare type " + constGroup + "_" + constName + " = " + constDef.entries[constName] + ";");
+                        declarationsFile.push("declare type " + constName + " = " + constVal + ";");
                     }
                 }
 

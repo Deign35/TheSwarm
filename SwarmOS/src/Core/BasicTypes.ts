@@ -2,11 +2,11 @@ export abstract class ProcessBase implements IPosisProcess {
     constructor(protected context: IPosisProcessContext) {
         this.OnLoad();
     }
-    @posisInterface("kernel")
+    @posisInterface(EXT_Kernel)
     protected kernel!: IPosisKernel
-    @posisInterface("extRegistry")
+    @posisInterface(EXT_Registry)
     protected extensions!: IPosisExtensionRegistry;
-    @posisInterface("CreepSpawner")
+    @posisInterface(EXT_CreepSpawner)
     protected spawner!: IPosisSpawnExtension;
 
     protected get memory(): any {

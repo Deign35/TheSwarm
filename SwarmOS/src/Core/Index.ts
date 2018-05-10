@@ -6,5 +6,5 @@ export var extensionRegistry = new ExtensionRegistry();
 export var processRegistry = new ProcessRegistry();
 export var kernel = new Kernel(processRegistry, extensionRegistry);
 
-extensionRegistry.register("kernel", kernel);
-extensionRegistry.register("sleep", kernel);
+extensionRegistry.register(EXT_Kernel, kernel);
+extensionRegistry.register(EXT_Sleep, kernel);

@@ -7,14 +7,12 @@ if (!Memory.roomData) {
 }
 import { ProcessBase, ExtensionBase } from "Core/BasicTypes";
 
-export const IN_RoomManager = 'RoomManager';
-export const EXT_RoomView = 'roomView';
 export const bundle: IPosisBundle<SDictionary<RoomData_Memory>> = {
     install(processRegistry: IPosisProcessRegistry, extensionRegistry: IPosisExtensionRegistry) {
-        processRegistry.register(IN_RoomManager, RoomManager);
+        processRegistry.register(PKG_RoomManager, RoomManager);
         extensionRegistry.register(EXT_RoomView, new RoomExtension(extensionRegistry));
     },
-    rootImageName: IN_RoomManager
+    rootImageName: PKG_RoomManager
 }
 
 class RoomManager extends ProcessBase {
@@ -50,7 +48,7 @@ class RoomManager extends ProcessBase {
                     roomName: roomID
                 }
 
-                let newRoomProcess = this.kernel.startProcess("Rooms/FirstRoom", newRoomMemory);
+                let newRoomProcess = this.kernel.startProcess(PKG_FirstRoom, newRoomMemory);
                 if (newRoomProcess && newRoomProcess.pid && newRoomProcess.process) {
                     data.pid = newRoomProcess.pid;
                 }

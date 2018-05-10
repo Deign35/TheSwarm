@@ -31,6 +31,8 @@ if (!Memory.VERSION || Memory.VERSION != SWARM_VERSION_DATE) {
         Logger.error(`SIM UPDATE RESET - Memory Cleaned`);
     }
 
+    // Save the current memory to (segmented) Memory in case of a need to rollback.
+
     Logger.warn(`Updating OS to ${SWARM_VERSION_DATE}`);
     Memory.counter = Memory.counter || 1;
     Memory.testAlgorithms = Memory.testAlgorithms || {};

@@ -160,7 +160,7 @@ export class Kernel implements IPosisKernel, IPosisSleepExtension {
             }
         }
         if (!hasActiveProcesses)
-            this.startProcess("SwarmManager", {});
+            this.startProcess(PKG_SwarmManager, {});
     }
 
     sleep(ticks: number): void {

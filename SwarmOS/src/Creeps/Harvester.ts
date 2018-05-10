@@ -1,12 +1,10 @@
 import { ProcessBase } from "Core/BasicTypes";
 
-export const IN_Creep_Harvester = 'Creep/Roles/Harvester';
-
 export const bundle: IPosisBundle<SpawnData_Memory> = {
     install(processRegistry: IPosisProcessRegistry, extensionRegistry: IPosisExtensionRegistry) {
-        processRegistry.register(IN_Creep_Harvester, Harvester);
+        processRegistry.register(PKG_CreepHarvester, Harvester);
     },
-    rootImageName: IN_Creep_Harvester
+    rootImageName: PKG_CreepHarvester
 }
 
 import { CreepBase } from "Creeps/CreepBase";

@@ -1,5 +1,4 @@
 import { ProcessBase } from "Core/BasicTypes";
-import { EXT_RoomView } from "SwarmManagers/RoomManager";
 
 export abstract class RoomBase<T extends RoomProcess_Memory> extends ProcessBase {
     OnLoad() { }
