@@ -1,43 +1,76 @@
 {
-    "Comment1": "Constants are strings, probably can just be merged with Primitives",
     "Constants": {
-        "MY_USERNAME": "Deign",
-        "MY_SIGNATURE": "The dawn of the Swarm -- SwarmOS v1.0.3",
-        "NOT_CONFIGURED": "NOT_CONFIGURED",
-        "SUB_TYPE": "SUB_TYPE",
-        "MASTER_CONSUL_MEMORY_ID": "consuls",
-        "MASTER_CREEP_MEMORY_ID": "creeps",
-        "MASTER_FLAG_MEMORY_ID": "flags",
-        "MASTER_ROOM_MEMORY_ID": "rooms",
-        "MASTER_ROOMOBJECT_MEMORY_ID": "roomObjects",
-        "MASTER_STRUCTURE_MEMORY_ID": "structures"
-    },
-    "Comment2": "Primitives tend to have prefixes.",
-    "PrimitivePrefixes": {
-        "Creep": "C_",
-        "Error": "E_",
-        "Logger": "LOG_",
-        "EnergyConversion": "E2C_"
-    },
-    "Primitives": {
-        "C_NONE": 0,
-        "C_MOVE": 1,
-        "E_INVALID": -1,
-        "E_MISSING_TARGET": -2,
-        "E_REQUIRES_ENERGY": -3,
-        "E_TARGET_INELLIGIBLE": -4,
-        "E_ACTION_UNNECESSARY": -5,
-        "E_NOT_IMPLEMENTED": -6,
-        "E_REQ_REJECTED": -7,
-        "LOG_ALERT": "\"alert\"",
-        "LOG_DEBUG": "\"debug\"",
-        "LOG_ERROR": "\"error\"",
-        "LOG_FATAL": "\"fatal\"",
-        "LOG_INFO": "\"info\"",
-        "LOG_TRACE": "\"trace\"",
-        "LOG_WARN": "\"warn\"",
-        "E2C_MaxSpawnDistance": 10,
-        "E2C_SpawnDistance": 2
+        "MY": {
+            "comment": "Constants for personal swarm configuration",
+            "enabled": true,
+            "string": true,
+            "entries": {
+                "USERNAME": "Deign",
+                "SIGNATURE": "The Swarm rises from the ashes -- SwarmOSv0.2.0"
+            }
+        },
+        "LOG": {
+            "comment": "Logger Priority",
+            "enabled": true,
+            "string": true,
+            "type": true,
+            "entries": {
+                "ALERT": "alert",
+                "DEBUG": "debug",
+                "ERROR": "error",
+                "FATAL": "fatal",
+                "INFO": "info",
+                "TRACE": "trace",
+                "WARN": "warn"
+            }
+        },
+        "SR": {
+            "comment": "Swarm Result -- Unique return results from SwarmOS services",
+            "enabled": false,
+            "type": true,
+            "entries": {
+                "NONE": 0,
+                "INVALID": -1,
+                "MISSING_TARGET": -2,
+                "REQUIRES_ENERGY": -3,
+                "TARGET_INELLIGIBLE": -4,
+                "ACTION_UNNECESSARY": -5,
+                "NOT_IMPLEMENTED": -6,
+                "REQ_REJECTED": -7,
+                "MOVE": -8
+            }
+        },
+        "C": {
+            "comment": "Legacy constants, need to be updated.",
+            "enabled": true,
+            "type": true,
+            "entries": {
+                "NONE": 0,
+                "MOVE": -8
+            }
+        },
+        "E": {
+            "comment": "Legacy constants, need to be updated.",
+            "enabled": true,
+            "type": true,
+            "entries": {
+                "INVALID": -1,
+                "MISSING_TARGET": -2,
+                "REQUIRES_ENERGY": -3,
+                "TARGET_INELLIGIBLE": -4,
+                "ACTION_UNNECESSARY": -5,
+                "NOT_IMPLEMENTED": -6,
+                "REQ_REJECTED": -7
+            }
+        },
+        "E2C": {
+            "comment": "Energy to cost conversion",
+            "enabled": true,
+            "entries": {
+                "MaxSpawnDistance": 10,
+                "SpawnDistance": 2
+            }
+        }
     },
     "Enums": {
         "ProcessState": {

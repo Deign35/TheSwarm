@@ -89,25 +89,45 @@ module.exports = function (grunt) {
         }
         globalsFile.push("// End Enums\n");
 
-        let consts = declarations['Constants'];
         globalsFile.push("// Begin Consts");
         declarationsFile.push("declare const SWARM_VERSION_DATE = \"CURRENT_VERSION\";");
-        globalsFile.push("global[\"SWARM_VERSION_DATE\"] = \"" + new Date().toLocaleString() + "\";");
-        for (let constName in consts) {
-            declarationsFile.push("declare const " + constName + " = \"" + consts[constName] + "\";");
-            globalsFile.push("global[\"" + constName + "\"] = \"" + consts[constName] + "\";");
+        globalsFile.push("global[\"SWARM_VERSION_DATE\"] = \"" + new Date().toLocaleString() + "\";\n");
+
+        let consts = declarations['Constants'];
+        for (let constGroup in consts) {
+            let constDef = consts[constGroup];
+
+            if (!constDef.enabled) {
+                continue;
+            }
+            if (constDef.comment) {
+                declarationsFile.push("/** " + constDef.comment + " */");
+                globalsFile.push("/** " + constDef.comment + " */");
+            }
+            for (let constName in constDef.entries) {
+                let constDecl = "declare const " + constGroup + "_" + constName + " = ";
+                let globalDecl = "global[\"" + constGroup + "_" + constName + "\"] = ";
+                if (constDef.string) {
+                    constDecl += "\"" + constDef.entries[constName] + "\";";
+                    globalDecl += "\"" + constDef.entries[constName] + "\";";
+                } else {
+                    constDecl += constDef.entries[constName] + ";";
+                    globalDecl += constDef.entries[constName] + ";";
+                }
+                if (constDef.type) {
+                    if (constDef.string) {
+                        declarationsFile.push("declare type " + constGroup + "_" + constName + " = \"" + constDef.entries[constName] + "\";");
+                    } else {
+                        declarationsFile.push("declare type " + constGroup + "_" + constName + " = " + constDef.entries[constName] + ";");
+                    }
+                }
+
+                declarationsFile.push(constDecl);
+                globalsFile.push(globalDecl);
+            }
+            globalsFile.push("");
         }
         globalsFile.push("// End Consts\n");
-        declarationsFile.push("");
-
-        let primitives = declarations['Primitives'];
-        globalsFile.push("// Begin Primitives");
-        for (let primName in primitives) {
-            declarationsFile.push("declare type " + primName + " = " + primitives[primName] + ";");
-            declarationsFile.push("declare const " + primName + " = " + primitives[primName] + ";");
-            globalsFile.push("global[\"" + primName + "\"] = " + primitives[primName] + ";");
-        }
-        globalsFile.push("// End Primitives\n");
         declarationsFile.push("");
 
         let compoundTypes = declarations['CompoundTypes'];

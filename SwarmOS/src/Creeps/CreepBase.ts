@@ -4,7 +4,6 @@ export abstract class CreepBase<T extends CreepProcess_Memory> extends ProcessBa
     OnLoad() {
         // Clean up any existing spawn requests
         if (this.memory.creep) {
-            debugger;
             let creepStatus = this.spawner.getStatus(this.memory.creep);
             if (creepStatus.status == EPosisSpawnStatus.ERROR || creepStatus.status == EPosisSpawnStatus.SPAWNED) {
                 this.spawner.cancelCreep(this.memory.creep);
