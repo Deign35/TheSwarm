@@ -12,7 +12,7 @@ export class ExtensionRegistry implements IPosisExtension {
         if (this.registry[interfaceId]) {
             this.log.warn(`Interface Id already registered: ${interfaceId}`);
         }
-        this.log.debug(`Registered ${interfaceId}`);
+        this.log.debug(`Registered extension: ${interfaceId}`);
         this.registry[interfaceId] = extension;
         return true;
     }

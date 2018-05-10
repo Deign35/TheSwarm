@@ -106,3 +106,12 @@ declare interface Harvester_Memory extends CreepProcess_Memory {
 declare interface RoomProcess_Memory {
     roomName: string
 }
+
+declare interface FirstRoom_Memory extends RoomProcess_Memory {
+    sources: {
+        [id: string]: {
+            sourceID: string,
+            pid?: PID
+        }
+    }
+}

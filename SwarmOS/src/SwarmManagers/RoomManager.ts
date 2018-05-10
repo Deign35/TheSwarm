@@ -47,7 +47,7 @@ class RoomManager extends ProcessBase {
                 }
             }
             if (!data.pid || !this.kernel.getProcessById(data.pid)) {
-                let newRoomProcess = this.kernel.startProcess('TBD', {});
+                let newRoomProcess = this.kernel.startProcess("Rooms/FirstRoom", {});
                 if (newRoomProcess && newRoomProcess.pid && newRoomProcess.process) {
                     data.pid = newRoomProcess.pid;
                 }

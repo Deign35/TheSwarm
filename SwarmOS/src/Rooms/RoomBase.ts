@@ -16,8 +16,16 @@ export abstract class RoomBase<T extends RoomProcess_Memory> extends ProcessBase
     }
 
     protected executeProcess(): void {
-
+        let roomData = this.GetRoomView();
+        if (!roomData) {
+            this.log.error(`Room view data missing ${this.memory.roomName}`);
+            this.kernel.killProcess(this.pid);
+            return;
+        }
+        let room = Game.rooms[this.memory.roomName];
+        // Check what type of room this is and convert as needed
+        this.activateRoom(roomData, room);
     }
 
-    protected abstract activateRoom(): void;
+    protected abstract activateRoom(roomData: RoomData_Memory, room?: Room): void;
 }
