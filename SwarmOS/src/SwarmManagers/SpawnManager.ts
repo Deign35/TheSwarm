@@ -212,7 +212,24 @@ class SpawnExtension extends ExtensionBase implements IPosisSpawnExtension {
         return;
     }
     getStatus(id: string): { status: EPosisSpawnStatus; message?: string | undefined; } {
-        return { status: this.memory.queue[id].spawnState, message: this.memory.queue[id].spawner }
+        if (!this.memory.queue[id]) {
+            return {
+                status: EPosisSpawnStatus.ERROR,
+                message: "Missing Request ID"
+            }
+        }
+        let spawnCard = this.memory.queue[id];
+        let spawnState = { status: spawnCard.spawnState, message: spawnCard.spawner }
+
+        if (spawnState.status == EPosisSpawnStatus.SPAWNING) {
+            let creep = Game.creeps[spawnCard.creepName];
+            if (creep && !creep.spawning) {
+                this.memory.queue[id].spawnState = EPosisSpawnStatus.SPAWNED;
+                spawnState.status = EPosisSpawnStatus.SPAWNED;
+            }
+        }
+
+        return spawnState;
     }
 
     spawnCreep(opts: SpawnData_SpawnCard): string {

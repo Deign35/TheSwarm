@@ -17,6 +17,38 @@ import { BuildAction } from "Actions/BuildAction";
 import { RepairAction } from "Actions/RepairAction";
 
 export class Harvester extends CreepBase<Harvester_Memory> {
+    OnLoad() {
+        super.OnLoad();
+        let target = Game.getObjectById(this.memory.targetID) as Source | Mineral;
+        if ((target as Source).energyCapacity) {
+            // Make a link if possible
+        } else if ((target as Mineral).mineralType) {
+            // Dont spawn if mineral is empty
+        }
+
+        if (!this.memory.containerID) {
+            let containers = target.pos.findInRange(FIND_STRUCTURES, 1, {
+                filter: function (struct: Structure) {
+                    return struct.structureType == STRUCTURE_CONTAINER;
+                }
+            });
+            if (containers.length > 0) {
+                this.memory.containerID = containers[0].id;
+            } else if (!this.memory.constructionSite) {
+                let sites = target.pos.findInRange(FIND_CONSTRUCTION_SITES, 1);
+                for (let i = 0; i < sites.length; i++) {
+                    if (sites[i].structureType == STRUCTURE_CONTAINER) {
+                        this.memory.constructionSite = sites[i].id;
+                    }
+                }
+                if (!this.memory.constructionSite) {
+                    target.pos.findInRange(FIND_FLAGS, 1);
+                    // define what flags do damn it...
+                    this.log.warn(`No constructionSite exists.  Harvester unable to see flags.`);
+                }
+            }
+        }
+    }
     protected activateCreep(): void {
         let creep = Game.creeps[this.memory.creep!];
         if (!creep) {

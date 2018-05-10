@@ -61,7 +61,7 @@ const LOGGER_SETTINGS: SDictionary<ILogLevelSetting> = {
         }
     }
 }
-const ShouldLog = function (messageLevel: LogLevel, minLevel: LogLevel) {
+const ShouldLog = function (minLevel: LogLevel, messageLevel: LogLevel) {
     return LOGGER_SETTINGS[minLevel].level <= LOGGER_SETTINGS[messageLevel].level
 }
 const MakeFontTag = function (level: LogLevel) {
@@ -74,7 +74,7 @@ interface Context {
     }
 }
 
-const DEFAULT_LOG_LEVEL: LogLevel = LOG_DEBUG; // Game.rooms['sim'] ? LOG_TRACE : LOG_INFO;
+const DEFAULT_LOG_LEVEL: LogLevel = LOG_INFO; // Game.rooms['sim'] ? LOG_TRACE : LOG_INFO;
 const DEFAULT_LOG_ID = 'SwarmOS';
 export class SwarmLogger implements ILogger {
     constructor() {
