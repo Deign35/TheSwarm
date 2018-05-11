@@ -50,7 +50,8 @@ class EnergyDistributionManager extends ServiceProviderBase<ServiceProviderMemor
         if (!Memory.energyData) {
             Memory.energyData = {
                 distributors: [],
-                requests: {}
+                requests: {},
+                suppliers: {}
             };
         }
         return Memory.energyData;
