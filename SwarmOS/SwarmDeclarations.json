@@ -70,31 +70,6 @@
                 "MOVE": -8
             }
         },
-        "C": {
-            "comment": "Legacy constants, need to be updated.",
-            "enabled": false,
-            "type": true,
-            "combinedType": "SwarmlingResponse",
-            "entries": {
-                "NONE": 0,
-                "MOVE": -8
-            }
-        },
-        "E": {
-            "comment": "Legacy constants, need to be updated.",
-            "enabled": false,
-            "type": true,
-            "combinedType": "SwarmlingResponse",
-            "entries": {
-                "INVALID": -1,
-                "MISSING_TARGET": -2,
-                "REQUIRES_ENERGY": -3,
-                "TARGET_INELLIGIBLE": -4,
-                "ACTION_UNNECESSARY": -5,
-                "NOT_IMPLEMENTED": -6,
-                "REQ_REJECTED": -7
-            }
-        },
         "E2C": {
             "comment": "Energy to cost conversion",
             "enabled": true,

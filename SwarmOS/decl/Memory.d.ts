@@ -1,16 +1,16 @@
 /** Energy Distribution */
 declare interface EnergyDist_Memory {
     distributors: PID[];
-    activeRequests: SDictionary<EnergyDist_Data>;
-    inActiveRequests: SDictionary<EnergyDist_Data>;
+    requests: SDictionary<EnergyDist_Data>;
 }
 // Due to the number of entries, property names have been shortened to save Memory space.
 declare type EnergyDist_Data = {
+    act: boolean; // Active or not
     ass: number; // Currently assigned energy being delivered
-    pri: Priority; // Priority of the requestor.
-    req: number; // requested energy to be delivered
     loc: string; // location of the request by roomID
+    pri: Priority; // Priority of the requestor.
     ref: boolean; // Should this request automatically refresh itself
+    req: number; // requested energy to be delivered
 }
 
 /** Core OS */

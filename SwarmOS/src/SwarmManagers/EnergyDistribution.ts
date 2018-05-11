@@ -16,6 +16,7 @@ const PKG_EnergyDistribution_LogContext: LogContext = {
     logLevel: LOG_DEBUG
 }
 
+const DIST_REQ_RATIO = 10;
 class EnergyDistributionManager extends ServiceProviderBase<ServiceProviderMemory> {
     constructor(protected context: IPosisProcessContext) {
         super(context);
@@ -49,14 +50,21 @@ class EnergyDistributionManager extends ServiceProviderBase<ServiceProviderMemor
         if (!Memory.energyData) {
             Memory.energyData = {
                 distributors: [],
-                activeRequests: {},
-                inActiveRequests: {}
+                requests: {}
             };
         }
         return Memory.energyData;
     }
     executeProcess(): void {
         this.log.warn(`${PKG_EnergyDistribution} has not been implemented.`);
+
+        this.log.trace(`Begin by checking if there are available distributors`);
+        this.log.trace(`If imablanced, create distributors as needed`);
+
+        this.log.trace(`For each available distributor, find a dist target`);
+        this.log.trace(`Careful not to bury a request such that it never gets fulfilled`);
+
+        this.log.trace(`Done???`);
     }
 }
 
@@ -64,11 +72,30 @@ class EnergyDistributionExtension extends ExtensionBase {
     protected get memory(): EnergyDist_Memory {
         return Memory.energyData;
     }
+    DisableRequest(id: string) {
+        if (this.memory.requests[id]) {
+            this.memory.requests[id].act = false;
+        }
+    }
+    GetRequestStatus(id: string) {
+        // shrug...
+    }
 
-
+    UpdateDistRequest(id: string, amount: number, location: string, priority: Priority = Priority.Low, autoRefresh: boolean = false) {
+        let newReq = {
+            act: true,
+            ass: this.memory.requests[id] ? this.memory.requests[id].ass : 0,
+            loc: location,
+            pri: priority,
+            ref: autoRefresh,
+            req: amount
+        }
+        this.memory.requests[id] = newReq;
+    }
 }
 /*
 declare type EnergyDist_Data = {
+    act: active
     ass: number; // Currently assigned energy being delivered
     pri: Priority; // Priority of the requestor.
     req: number; // requested energy to be delivered
