@@ -1,7 +1,7 @@
 /** Energy Distribution */
 declare interface EnergyDist_Memory {
     distributors: PID[];
-    suppliers: SDictionary<any>;
+    suppliers: SDictionary<EnergyDist_Supp>;
     requests: SDictionary<EnergyDist_Data>;
 }
 // Due to the number of entries, property names have been shortened to save Memory space.
@@ -16,7 +16,8 @@ declare interface EnergyDist_Data {
 
 declare interface EnergyDist_Supp {
     loc: string; // location of the request by roomID
-    
+    has: number; // available energy for withdraw
+    res: number; // reserved energy
 }
 
 /** Core OS */

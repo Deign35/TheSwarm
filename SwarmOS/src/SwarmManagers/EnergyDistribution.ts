@@ -69,19 +69,38 @@ class EnergyDistributionManager extends ServiceProviderBase<ServiceProviderMemor
     }
 }
 
+declare type EnergySupplierType = Source | StructureContainer | StructureStorage
+    | Tombstone | StructureLink | StructureLab | StructureTerminal | Creep;
 class EnergyDistributionExtension extends ExtensionBase {
     protected get memory(): EnergyDist_Memory {
         return Memory.energyData;
+    }
+    UpdateSupplier(supplier: EnergySupplierType, availableEnergy: number) {
+        if (!this.memory.suppliers[supplier.id]) {
+            this.memory.suppliers[supplier.id] = {
+                loc: supplier.room!.name,
+                has: availableEnergy,
+                res: 0
+            }
+        }
+        this.memory.suppliers[supplier.id].has = availableEnergy;
+    }
+    GetSupplier(location: string, amount: number): string | undefined {
+        let foundSupplier = undefined;
+        for (let id in this.memory.suppliers) {
+            let supplier = this.memory.suppliers[id];
+            if (supplier.loc == location && (supplier.has - supplier.res) >= amount) {
+                foundSupplier = id;
+            }
+        }
+
+        return foundSupplier;
     }
     DisableRequest(id: string) {
         if (this.memory.requests[id]) {
             this.memory.requests[id].act = false;
         }
     }
-    GetRequestStatus(id: string) {
-        // shrug...
-    }
-
     UpdateDistRequest(id: string, amount: number, location: string, priority: Priority = Priority.Low, autoRefresh: boolean = false) {
         let newReq = {
             act: true,
@@ -94,13 +113,3 @@ class EnergyDistributionExtension extends ExtensionBase {
         this.memory.requests[id] = newReq;
     }
 }
-/*
-declare type EnergyDist_Data = {
-    act: active
-    ass: number; // Currently assigned energy being delivered
-    pri: Priority; // Priority of the requestor.
-    req: number; // requested energy to be delivered
-    loc: string; // location of the request by roomID
-    ref: boolean; // Should this request automatically refresh itself
-}
-*/
