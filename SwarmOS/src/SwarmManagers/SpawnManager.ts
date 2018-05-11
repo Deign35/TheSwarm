@@ -46,6 +46,9 @@ const SpawnManager_LogContext: LogContext = {
 }
 //const FRE_RoomStructures = primes_100[10]; // 10 = 29
 class SpawnManager extends ProcessBase {
+    @posisInterface(EXT_CreepSpawner)
+    SpawnerExtensions!: SpawnExtension;
+
     OnLoad() {
         Logger.CreateLogContext(SpawnManager_LogContext);
     }

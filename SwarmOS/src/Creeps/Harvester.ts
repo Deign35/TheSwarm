@@ -57,6 +57,10 @@ export class Harvester extends CreepBase<Harvester_Memory> {
             this.log.debug(`Harvester Creep is spawning(${this.imageName}[${this.pid}])`);
             return;
         }
+        if (creep.room.name != this.memory.targetRoom) {
+            new MoveToPositionAction(creep, new RoomPosition(25, 25, this.memory.targetRoom)).Run();
+            return;
+        }
         let moveTarget = (Game.getObjectById(this.memory.containerID) as StructureContainer) ||
             (Game.getObjectById(this.memory.constructionSite) as ConstructionSite);
         if (moveTarget) {
@@ -67,7 +71,7 @@ export class Harvester extends CreepBase<Harvester_Memory> {
 
         let target = Game.getObjectById(this.memory.targetID) as Source | Mineral;
         if (!target) {
-            new MoveToPositionAction(creep, new RoomPosition(25, 25, this.memory.targetLocation)).Run();
+            new MoveToPositionAction(creep, new RoomPosition(25, 25, this.memory.targetRoom)).Run();
             return;
         }
         let action: ActionBase = new HarvestAction(creep, target);

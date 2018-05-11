@@ -61,7 +61,7 @@ export interface InitData {
 
 const SCAN_FREQUENCY = 5;
 export abstract class ServiceProviderBase<T extends ServiceProviderMemory> extends ProcessBase {
-    OnLoad() {
+    protected OnLoad() {
         if (!this.memory.services) {
             this.memory.services = {};
         }

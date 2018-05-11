@@ -1,15 +1,17 @@
-/*declare var Memory: {
-    testAlgorithms: Dictionary;
-    roomData: IDictionary<RoomData_Memory>;
-    spawnData: SpawnData_Memory;
-
-    kernel: KernelMemory;
-    stats: StatsMemoryStructure;
-    profiler: ProfilerMemory;
-
-    counter: number;
-    VERSION: string;
-}*/
+/** Energy Distribution */
+declare interface EnergyDist_Memory {
+    distributors: PID[];
+    activeRequests: SDictionary<EnergyDist_Data>;
+    inActiveRequests: SDictionary<EnergyDist_Data>;
+}
+// Due to the number of entries, property names have been shortened to save Memory space.
+declare type EnergyDist_Data = {
+    ass: number; // Currently assigned energy being delivered
+    pri: Priority; // Priority of the requestor.
+    req: number; // requested energy to be delivered
+    loc: string; // location of the request by roomID
+    ref: boolean; // Should this request automatically refresh itself
+}
 
 /** Core OS */
 declare interface KernelMemory {
@@ -20,23 +22,23 @@ declare interface KernelMemory {
 /** RoomData */
 declare interface RoomData_StructureData {
     hits: number
-    id: string,
-    room?: string,
-    x?: number,
-    y?: number,
+    id: string;
+    room?: string;
+    x?: number;
+    y?: number;
 }
 declare interface RoomData_StructureMemory {
-    [STRUCTURE_CONTAINER]: RoomData_StructureData[],
-    [STRUCTURE_ROAD]: RoomData_StructureData[],
+    [STRUCTURE_CONTAINER]: RoomData_StructureData[];
+    [STRUCTURE_ROAD]: RoomData_StructureData[];
 
-    [STRUCTURE_EXTENSION]?: RoomData_StructureData[],
-    [STRUCTURE_LAB]?: RoomData_StructureData[],
-    [STRUCTURE_LINK]?: RoomData_StructureData[],
-    [STRUCTURE_RAMPART]?: RoomData_StructureData[],
-    [STRUCTURE_SPAWN]?: RoomData_StructureData[],
-    [STRUCTURE_TOWER]?: RoomData_StructureData[],
-    [STRUCTURE_WALL]?: RoomData_StructureData[],
-    [index: string]: RoomData_StructureData[] | undefined
+    [STRUCTURE_EXTENSION]?: RoomData_StructureData[];
+    [STRUCTURE_LAB]?: RoomData_StructureData[];
+    [STRUCTURE_LINK]?: RoomData_StructureData[];
+    [STRUCTURE_RAMPART]?: RoomData_StructureData[];
+    [STRUCTURE_SPAWN]?: RoomData_StructureData[];
+    [STRUCTURE_TOWER]?: RoomData_StructureData[];
+    [STRUCTURE_WALL]?: RoomData_StructureData[];
+    [index: string]: RoomData_StructureData[] | undefined;
 }
 declare interface RoomData_Memory {
     cSites: RoomData_StructureData[]; // (TODO): Change this to use a flag
@@ -53,8 +55,7 @@ declare interface RoomData_Memory {
 
 /** SpawnData */
 declare interface SpawnData_Memory {
-    queue: SDictionary<SpawnData_SpawnCard>,
-    scheduledSpawn: any
+    queue: SDictionary<SpawnData_SpawnCard>;
 }
 
 declare interface SpawnData_SpawnCard {
@@ -94,7 +95,8 @@ interface ProfilerData {
 /** Creep Memory */
 declare interface CreepProcess_Memory {
     creep?: string;
-    targetLocation: string;
+    homeRoom: string;
+    targetRoom: string;
 }
 declare interface Harvester_Memory extends CreepProcess_Memory {
     targetID: string;

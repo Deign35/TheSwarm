@@ -23,8 +23,8 @@ export class Upgrader extends CreepBase<Upgrader_Memory> {
             this.log.debug(`Harvester Creep is spawning(${this.imageName}[${this.pid}])`);
             return;
         }
-        if (creep.room.name != this.memory.targetLocation) {
-            new MoveToPositionAction(creep, new RoomPosition(25, 25, this.memory.targetLocation)).Run();
+        if (creep.room.name != this.memory.targetRoom) {
+            new MoveToPositionAction(creep, new RoomPosition(25, 25, this.memory.targetRoom)).Run();
             return;
         }
 

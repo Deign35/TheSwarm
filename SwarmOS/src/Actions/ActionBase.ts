@@ -35,6 +35,7 @@ export abstract class ActionWithTarget<T extends RoomObject> extends ActionBase 
     constructor(creep: Creep, protected Target: T) {
         super(creep);
     }
+
     GetMovePosition() {
         return this.Target.pos;
     }

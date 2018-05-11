@@ -61,7 +61,7 @@ class ___Empty___Manager extends ProcessBase {
         return Memory.___Empty___Data;
     }
     executeProcess(): void {
-        this.log.warn(`${IN____Empty___Manager} has not been implemented.`, IN____Empty___Manager);
+        this.log.warn(`${IN____Empty___Manager} has not been implemented.`);
     }
 }
 
