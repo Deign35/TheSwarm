@@ -1,8 +1,8 @@
 import { ActionWithTarget } from "Actions/ActionBase";
 
 declare type WithdrawTargetType = WithdrawTypeStorage | WithdrawTypeEnergy | StructureLab;
-declare type WithdrawTypeStorage = StructureContainer | StructureStorage;
-declare type WithdrawTypeEnergy = StructureSpawn | StructureTower | StructureExtension | StructureLink
+declare type WithdrawTypeStorage = StructureContainer | StructureStorage | StructureTerminal
+declare type WithdrawTypeEnergy = StructureSpawn | StructureTower | StructureExtension | StructureLink;
 
 export class WithdrawAction extends ActionWithTarget<WithdrawTargetType> {
     static SimultaneousActionValue = 0;

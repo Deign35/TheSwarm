@@ -102,8 +102,12 @@ interface ProfilerData {
 /** Creep Memory */
 declare interface CreepProcess_Memory {
     creep?: string;
+    targetID?: string;
     homeRoom: string;
     targetRoom: string;
+    retrieving: boolean;
+}
+declare interface SpawnRefiller_Memory extends CreepProcess_Memory {
 }
 declare interface Harvester_Memory extends CreepProcess_Memory {
     targetID: string;
@@ -122,7 +126,9 @@ declare interface RoomProcess_Memory {
 }
 
 declare interface FirstRoom_Memory extends RoomProcess_Memory {
-    sources: SDictionary<PID | undefined>
+    refiller?: PID;
+    sources: SDictionary<PID | undefined>;
+    upgraders: PID[];
 }
 
 

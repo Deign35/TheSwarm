@@ -13,6 +13,10 @@ import { BuildAction } from "Actions/BuildAction";
 import { RepairAction } from "Actions/RepairAction";
 
 export class Harvester extends CreepBase<Harvester_Memory> {
+    protected get CreepPrefix() { return 'Harv_'; }
+    protected get SpawnPriority() {
+        return Priority.High;
+    }
     OnLoad() {
         super.OnLoad();
         let target = Game.getObjectById(this.memory.targetID) as Source | Mineral;
@@ -54,7 +58,6 @@ export class Harvester extends CreepBase<Harvester_Memory> {
             return;
         }
         if (creep.spawning) {
-            this.log.debug(`Harvester Creep is spawning(${this.imageName}[${this.pid}])`);
             return;
         }
         if (creep.room.name != this.memory.targetRoom) {

@@ -78,8 +78,7 @@ class SpawnManager extends ProcessBase {
         if (!Memory.spawnData) {
             this.log.warn(`Initializing memory`);
             Memory.spawnData = {
-                queue: {},
-                scheduledSpawn: {}
+                queue: {}
             }
         }
     }
@@ -105,7 +104,7 @@ class SpawnManager extends ProcessBase {
             }
         }
 
-        return (canSpawn) ? difficulty : -1;
+        return ((canSpawn) ? difficulty : -1) * req.priority;
     }
 
     executeProcess(): void {

@@ -16,6 +16,51 @@ class FirstRoom extends RoomBase<FirstRoom_Memory> {
             this.kernel.killProcess(this.pid);
             return;
         }
+
+        let refillerPID = this.memory.refiller;
+        let refillerProcess = refillerPID ? this.kernel.getProcessById(refillerPID) : undefined;
+
+        if (!refillerProcess) {
+            let refillerContext: SpawnRefiller_Memory = {
+                homeRoom: room.name,
+                targetRoom: room.name,
+                retrieving: true
+            }
+            let newPID = this.kernel.startProcess(PKG_CreepRefiller, refillerContext);
+            if (!newPID || !newPID.pid || !newPID.process) {
+                this.log.fatal(`Room failed to create a refiller process (${room.name})`);
+                this.kernel.killProcess(this.pid);
+                return;
+            }
+            this.memory.refiller = newPID.pid;
+        }
+
+        for (let i = 0; i < this.memory.upgraders.length; i++) {
+            let upgraderProcess;
+            let upgraderPID = this.memory.upgraders[i];
+            if (upgraderPID) {
+                upgraderProcess = this.kernel.getProcessById(upgraderPID);
+                if (!upgraderProcess) {
+                    this.memory.upgraders.splice(i--, 1);
+                }
+            }
+        }
+
+        if (Object.keys(this.memory.upgraders).length < 2) {
+            let upgraderContext: Upgrader_Memory = {
+                homeRoom: room.name,
+                targetRoom: room.name,
+                retrieving: true
+            }
+            let newPID = this.kernel.startProcess(PKG_CreepUpgrader, upgraderContext);
+            if (!newPID || !newPID.pid || !newPID.process) {
+                this.log.fatal(`Room failed to create an upgrader process (${room.name})`);
+                this.kernel.killProcess(this.pid);
+                return;
+            }
+            this.memory.upgraders.push(newPID.pid)
+        }
+
         for (let i = 0; i < roomData.sourceIDs.length; i++) {
             let sourceID = roomData.sourceIDs[i];
 
@@ -28,7 +73,8 @@ class FirstRoom extends RoomBase<FirstRoom_Memory> {
                 let sourceContext: Harvester_Memory = {
                     targetID: sourceID,
                     targetRoom: room.name,
-                    homeRoom: room.name
+                    homeRoom: room.name,
+                    retrieving: false
                 }
                 let newPID = this.kernel.startProcess(PKG_CreepHarvester, sourceContext);
                 if (!newPID || !newPID.pid || !newPID.process) {

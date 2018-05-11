@@ -11,6 +11,10 @@ import { ActionBase } from "Actions/ActionBase";
 import { UpgradeAction } from "Actions/UpgradeAction";
 
 export class Upgrader extends CreepBase<Upgrader_Memory> {
+    protected get CreepPrefix() { return 'Upg_'; }
+    protected get SpawnPriority() {
+        return Priority.Lowest;
+    }
     protected activateCreep(): void {
         let creep = Game.creeps[this.memory.creep!];
         if (!creep) {
@@ -20,17 +24,33 @@ export class Upgrader extends CreepBase<Upgrader_Memory> {
             return;
         }
         if (creep.spawning) {
-            this.log.debug(`Harvester Creep is spawning(${this.imageName}[${this.pid}])`);
-            return;
-        }
-        if (creep.room.name != this.memory.targetRoom) {
-            new MoveToPositionAction(creep, new RoomPosition(25, 25, this.memory.targetRoom)).Run();
             return;
         }
 
         if (!creep.room.controller) {
             this.log.fatal(`Target is missing`);
             this.kernel.killProcess(this.pid);
+            return;
+        }
+
+        if (this.memory.retrieving) {
+            if (this.creep.carry.energy == this.creep.carryCapacity) {
+                this.memory.targetID = undefined;
+                this.memory.retrieving = false;
+                //this.memory.targetRoom = this.
+            } else {
+                this.getEnergy(this.creep.carryCapacity / 2);
+                return;
+            }
+        } else if (this.creep.carry.energy == 0) {
+            this.memory.targetID = undefined;
+            this.memory.retrieving = true;
+            this.getEnergy(this.creep.carryCapacity / 2);
+            return;
+        }
+
+        if (creep.room.name != this.memory.targetRoom) {
+            new MoveToPositionAction(creep, new RoomPosition(25, 25, this.memory.targetRoom)).Run();
             return;
         }
 

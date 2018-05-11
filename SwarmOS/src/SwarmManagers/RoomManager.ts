@@ -45,6 +45,7 @@ class RoomManager extends ProcessBase {
             if (!data.pid || !this.kernel.getProcessById(data.pid)) {
                 let newRoomMemory: FirstRoom_Memory = {
                     sources: {},
+                    upgraders: [],
                     roomName: roomID
                 }
 
