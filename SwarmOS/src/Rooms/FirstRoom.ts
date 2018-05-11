@@ -17,6 +17,31 @@ class FirstRoom extends RoomBase<FirstRoom_Memory> {
             return;
         }
 
+        let sites = this.GetRoomView()!.cSites;
+        if (sites.length > 0) {
+            for (let i = 0; i < this.memory.builders.length; i++) {
+                let builderPID = this.memory.builders[i];
+                let builderProcess = builderPID ? this.kernel.getProcessById(builderPID) : undefined;
+
+                if (!builderProcess) {
+                    this.memory.builders.splice(i--, 1);
+                }
+            }
+            if (this.memory.builders.length < 3) {
+                let builderContext: Builder_memory = {
+                    homeRoom: room.name,
+                    targetRoom: room.name,
+                    retrieving: true
+                }
+                let newPID = this.kernel.startProcess(PKG_CreepBuilder, builderContext);
+                if (!newPID || !newPID.pid || !newPID.process) {
+                    this.log.fatal(`Room failed to create a builder process (${room.name})`);
+                    this.kernel.killProcess(this.pid);
+                    return;
+                }
+                this.memory.builders.push(newPID.pid);
+            }
+        }
         let refillerPID = this.memory.refiller;
         let refillerProcess = refillerPID ? this.kernel.getProcessById(refillerPID) : undefined;
 

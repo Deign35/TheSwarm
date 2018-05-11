@@ -88,8 +88,8 @@ export class Harvester extends CreepBase<Harvester_Memory> {
                 let hasReplacementAction = false;
                 if (creep.carry.energy > 0) {
                     if (this.memory.constructionSite) {
-                        hasReplacementAction = true;
-                        action = new BuildAction(creep, Game.getObjectById(this.memory.constructionSite) as ConstructionSite);
+                        //hasReplacementAction = true;
+                        //action = new BuildAction(creep, Game.getObjectById(this.memory.constructionSite) as ConstructionSite);
                     } else if (this.memory.containerID) {
                         let container = Game.getObjectById(this.memory.containerID) as StructureContainer;
                         if (container && container.hits < container.hitsMax) {

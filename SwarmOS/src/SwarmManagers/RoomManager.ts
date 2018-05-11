@@ -46,6 +46,7 @@ class RoomManager extends ProcessBase {
                 let newRoomMemory: FirstRoom_Memory = {
                     sources: {},
                     upgraders: [],
+                    builders: [],
                     roomName: roomID
                 }
 

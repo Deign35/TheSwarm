@@ -19,6 +19,7 @@
                 "SpawnManager",
                 "RoomManager",
                 "FirstRoom",
+                "CreepBuilder",
                 "CreepHarvester",
                 "CreepRefiller",
                 "CreepUpgrader",

@@ -2,6 +2,7 @@ import { ProcessBase } from "Core/BasicTypes";
 import { ActionBase } from "Actions/ActionBase";
 import { WithdrawAction } from "Actions/WithdrawAction";
 import { HarvestAction } from "Actions/HarvestAction";
+import { PickupAction } from "Actions/PickupAction";
 
 export abstract class CreepBase<T extends CreepProcess_Memory> extends ProcessBase {
     @posisInterface(EXT_RoomView)
@@ -86,7 +87,7 @@ export abstract class CreepBase<T extends CreepProcess_Memory> extends ProcessBa
 
         if (this.memory.targetID) {
             withdrawTarget = Game.getObjectById(this.memory.targetID) as StructureStorage | StructureContainer |
-                StructureLink | Source | StructureTerminal;
+                StructureLink | Source | StructureTerminal | Resource;
             if (!withdrawTarget) {
                 this.memory.targetID = undefined;
             } else {
@@ -95,6 +96,8 @@ export abstract class CreepBase<T extends CreepProcess_Memory> extends ProcessBa
                     available = (withdrawTarget as StructureStorage).store.energy;
                 } else if ((withdrawTarget as StructureLink).energyCapacity) {
                     available = (withdrawTarget as Source).energy;
+                } else if ((withdrawTarget as Resource).resourceType == RESOURCE_ENERGY) {
+                    available = (withdrawTarget as Resource).amount;
                 } else {
                     this.log.fatal(`Withdraw target unexpected ${JSON.stringify(withdrawTarget)}`);
                     this.memory.targetID = undefined;
@@ -119,15 +122,20 @@ export abstract class CreepBase<T extends CreepProcess_Memory> extends ProcessBa
             action = new WithdrawAction(this.creep,
                 (withdrawTarget as StructureStorage | StructureTerminal | StructureContainer | StructureLink),
                 RESOURCE_ENERGY);
-        } else {
+        } else if ((withdrawTarget as Source).ticksToRegeneration) {
             action = new HarvestAction(this.creep, (withdrawTarget) as Source);
+        } else if ((withdrawTarget as Resource).resourceType) {
+            action = new PickupAction(this.creep, withdrawTarget as Resource);
+        } else {
+            this.log.error(`I dunno, will this ever happen?`);
+            return;
         }
 
         action.Run();
     }
 
     private FindNearestEnergyDispenser(targetRoom: string, minEnergy: number = 0): StructureContainer | StructureStorage |
-        StructureTerminal | StructureLink | Source | undefined {
+        StructureTerminal | StructureLink | Source | Resource | undefined {
         let view = this.RoomView.GetRoomData(targetRoom);
         if (!view) {
             this.log.fatal(`This should not be possible`);
@@ -140,6 +148,18 @@ export abstract class CreepBase<T extends CreepProcess_Memory> extends ProcessBa
             crY: this.creep.pos.y,
             dist: 100
         }
+
+        for (let i = 0; i < view.resources.length; i++) {
+            let resource = Game.getObjectById(view.resources[i]) as Resource
+            if (resource && resource.resourceType == RESOURCE_ENERGY) {
+                if (resource.amount > minEnergy) {
+                    // (TODO): Fix this!
+                    closestTarget = resource;
+                    break;
+                }
+            }
+        }
+
         if (this.creep.room.storage) {
             let storage = this.creep.room.storage;
             if (storage.store.energy >= minEnergy) {
@@ -172,7 +192,7 @@ export abstract class CreepBase<T extends CreepProcess_Memory> extends ProcessBa
             }
         }
         if (!closestTarget) {
-            if (this.creep.getActiveBodyparts(ATTACK) > 0) {
+            if (this.creep.getActiveBodyparts(WORK) > 0) {
                 for (let i = 0; i < view.sourceIDs.length; i++) {
                     let source = Game.getObjectById(view.sourceIDs[i]) as Source;
                     if (!source) { continue; } // If its cause its in another room.  then what?

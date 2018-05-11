@@ -119,10 +119,14 @@ declare interface Upgrader_Memory extends CreepProcess_Memory {
     isReserving?: boolean;
     isClaiming?: boolean;
 }
+declare interface Builder_memory extends CreepProcess_Memory {
+
+}
 
 /** Room Memory */
 declare interface RoomProcess_Memory {
-    roomName: string
+    roomName: string;
+    builders: PID[];
 }
 
 declare interface FirstRoom_Memory extends RoomProcess_Memory {
