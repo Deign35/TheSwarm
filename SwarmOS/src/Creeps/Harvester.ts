@@ -1,5 +1,5 @@
-export const bundle: IPosisBundle<SpawnData_Memory> = {
-    install(processRegistry: IPosisProcessRegistry, extensionRegistry: IPosisExtensionRegistry) {
+export const bundle: IPackage<SpawnData_Memory> = {
+    install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
         processRegistry.register(PKG_CreepHarvester, Harvester);
     },
     rootImageName: PKG_CreepHarvester

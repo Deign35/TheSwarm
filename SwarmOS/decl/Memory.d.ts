@@ -1,11 +1,14 @@
+declare interface MemBase {
+
+}
 /** Energy Distribution */
-declare interface EnergyDist_Memory {
+declare interface EnergyDist_Memory extends MemBase {
     distributors: PID[];
     suppliers: SDictionary<EnergyDist_Supp>;
     requests: SDictionary<EnergyDist_Data>;
 }
 // Due to the number of entries, property names have been shortened to save Memory space.
-declare interface EnergyDist_Data {
+declare interface EnergyDist_Data extends MemBase {
     act: boolean; // Active or not
     ass: number; // Currently assigned energy being delivered
     loc: string; // location of the request by roomID
@@ -14,27 +17,27 @@ declare interface EnergyDist_Data {
     req: number; // requested energy to be delivered
 }
 
-declare interface EnergyDist_Supp {
+declare interface EnergyDist_Supp extends MemBase {
     loc: string; // location of the request by roomID
     has: number; // available energy for withdraw
     res: SDictionary<string>; // Reserved energy not to be removed by anyone else
 }
 
 /** Core OS */
-declare interface KernelMemory {
+declare interface KernelMemory extends MemBase {
     processTable: ProcessTable;
-    processMemory: ProcessMemoryTable;
+    processMemory: ProcessMemory;
 }
 
 /** RoomData */
-declare interface RoomData_StructureData {
+declare interface RoomData_StructureData extends MemBase {
     hits: number
     id: string;
     room?: string;
     x?: number;
     y?: number;
 }
-declare interface RoomData_StructureMemory {
+declare interface RoomData_StructureMemory extends MemBase {
     [STRUCTURE_CONTAINER]: RoomData_StructureData[];
     [STRUCTURE_ROAD]: RoomData_StructureData[];
 
@@ -47,7 +50,7 @@ declare interface RoomData_StructureMemory {
     [STRUCTURE_WALL]?: RoomData_StructureData[];
     [index: string]: RoomData_StructureData[] | undefined;
 }
-declare interface RoomData_Memory {
+declare interface RoomData_Memory extends MemBase {
     cSites: RoomData_StructureData[]; // (TODO): Change this to use a flag
     lastUpdated: number;
     mineralIDs: string[];
@@ -64,17 +67,17 @@ declare interface RoomData_Memory {
 }
 
 /** SpawnData */
-declare interface SpawnData_Memory {
+declare interface SpawnData_Memory extends MemBase {
     queue: SDictionary<SpawnData_SpawnCard>;
 }
 
-declare interface SpawnData_SpawnCard {
+declare interface SpawnData_SpawnCard extends MemBase {
     body: ISpawnDef;
     creepName: string;
     location: string;
     pid: PID;
     priority: Priority;
-    spawnState: EPosisSpawnStatus;
+    spawnState: SpawnState;
 
     defaultMemory?: any;
     maxSpawnDist?: number;
@@ -103,12 +106,12 @@ interface ProfilerData {
 }
 
 /** Flag Memory */
-declare interface FlagProcess_Memory {
+declare interface FlagProcess_Memory extends MemBase {
     flagID: string;
 }
 
 /** Creep Memory */
-declare interface CreepProcess_Memory {
+declare interface CreepProcess_Memory extends MemBase {
     creep?: string;
     targetID?: string;
     homeRoom: string;
@@ -132,11 +135,11 @@ declare interface Builder_memory extends CreepProcess_Memory {
 }
 
 /** Room Memory */
-declare interface RoomProcess_Memory {
+declare interface RoomProcess_Memory extends MemBase {
     roomName: string;
     creeps: RoomProcess_CreepMemory
 }
-declare interface RoomProcess_CreepMemory {
+declare interface RoomProcess_CreepMemory extends MemBase {
     bui: PID[]; // Builders
     ref?: PID[]; // Refillers
     harv?: PID[]; // Harvesters
@@ -146,7 +149,6 @@ declare interface RoomProcess_CreepMemory {
 }
 
 declare interface BasicOwnedRoom_Memory extends RoomProcess_Memory {
-
     sources: SDictionary<PID | undefined>;
 }
 
@@ -155,7 +157,7 @@ declare interface FirstRoom_Memory extends RoomProcess_Memory {
 }
 
 
-declare type ServiceProviderMemory = {
+declare interface ServiceProviderMemory extends MemBase {
     services: {
         [id: string]: {
             pid: PID,
@@ -165,6 +167,6 @@ declare type ServiceProviderMemory = {
 }
 
 /** Flags */
-declare interface FlagMemory {
+declare interface FlagMemory extends MemBase {
     [id: string]: PID
 }

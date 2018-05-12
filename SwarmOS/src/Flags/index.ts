@@ -1,7 +1,7 @@
 import { bundle as FlagBase } from "Flags/FlagBase"
 
-export const flagBundle: IPosisBundle<{}> = {
-    install(processRegistry: IPosisProcessRegistry, extensionRegistry: IPosisExtensionRegistry) {
+export const flagBundle: IPackage<{}> = {
+    install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
         FlagBase.install(processRegistry, extensionRegistry);
     }
 }

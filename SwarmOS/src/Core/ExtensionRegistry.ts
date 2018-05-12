@@ -1,4 +1,4 @@
-export class ExtensionRegistry implements IPosisExtension {
+export class ExtensionRegistry implements IPackageExtension {
     constructor() {
         this.registry = {};
         this.register(EXT_Registry, this);
@@ -7,8 +7,8 @@ export class ExtensionRegistry implements IPosisExtension {
         return Logger;
     }
 
-    private registry: { [interfaceId: string]: IPosisExtension };
-    register(interfaceId: string, extension: IPosisExtension): boolean {
+    private registry: { [interfaceId: string]: IPackageExtension };
+    register(interfaceId: string, extension: IPackageExtension): boolean {
         if (this.registry[interfaceId]) {
             this.log.warn(`Interface Id already registered: ${interfaceId}`);
         }
@@ -26,7 +26,7 @@ export class ExtensionRegistry implements IPosisExtension {
             return false;
         }
     }
-    getExtension(interfaceId: string): IPosisExtension | undefined {
+    getExtension(interfaceId: string): IPackageExtension | undefined {
         if (!this.registry[interfaceId]) return;
         return this.registry[interfaceId];
     }

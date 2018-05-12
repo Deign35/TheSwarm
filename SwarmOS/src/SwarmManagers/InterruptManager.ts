@@ -6,8 +6,8 @@ declare interface InterruptMemory {
 
 import { ProcessBase, ExtensionBase } from "Core/BasicTypes";
 
-export const bundle: IPosisBundle<InterruptMemory> = {
-    install(processRegistry: IPosisProcessRegistry, extensionRegistry: IPosisExtensionRegistry) {
+export const bundle: IPackage<InterruptMemory> = {
+    install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
         processRegistry.register(PKG_InterruptManager, InterruptManager);
     },
     rootImageName: PKG_InterruptManager
@@ -22,7 +22,7 @@ class InterruptManager extends ProcessBase {
         let interruptionExtension = new InterruptExtension(this.extensions, this.memory);
         this.extensions.register(EXT_Interrupt, interruptionExtension);
     }
-    constructor(protected context: IPosisProcessContext) {
+    constructor(protected context: IProcessContext) {
         super(context);
         Logger.CreateLogContext(PKG_InterruptManager_LogContext);
     }
@@ -49,12 +49,12 @@ class InterruptManager extends ProcessBase {
 }
 
 class InterruptExtension extends ExtensionBase {
-    constructor(protected extensionRegistry: IPosisExtensionRegistry, mem: InterruptMemory) {
+    constructor(protected extensionRegistry: IExtensionRegistry, mem: InterruptMemory) {
         super(extensionRegistry);
         this._memory = mem;
     }
     @posisInterface(EXT_Sleep)
-    protected sleeper!: IPosisSleepExtension
+    protected sleeper!: IKernelSleepExtension
 
     protected get memory(): InterruptMemory {
         return this._memory;

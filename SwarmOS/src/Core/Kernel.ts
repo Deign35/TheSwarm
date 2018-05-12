@@ -4,15 +4,15 @@ declare var Memory: {
 
 declare type ProcessCache = {
     [id: string]: {
-        context: IPosisProcessContext,
-        process: IPosisProcess
+        context: IProcessContext,
+        process: IProcess
     }
 }
 
-declare type ProcessWithID = { pid: PID; process: IPosisProcess; };
+declare type ProcessWithID = { pid: PID; process: IProcess; };
 
 const PROCESS_GHOST_TIMER = 100;
-export class Kernel implements IPosisKernel, IPosisSleepExtension {
+export class Kernel implements IKernel, IKernelSleepExtension {
     private _processCache: ProcessCache;
     private curProcessID: string = "";
     protected get log() {
@@ -25,18 +25,18 @@ export class Kernel implements IPosisKernel, IPosisSleepExtension {
     get processTable(): ProcessTable {
         return this.memory.processTable;
     }
-    get processMemory(): ProcessMemoryTable {
+    get processMemory(): ProcessMemory {
         return this.memory.processMemory;
     }
 
-    constructor(private processRegistry: IPosisProcessRegistry, private extensionRegistry: IPosisExtensionRegistry) {
+    constructor(private processRegistry: IProcessRegistry, private extensionRegistry: IExtensionRegistry) {
         this._processCache = {};
     }
 
-    installBundle(bundle: IPosisBundle<{}>) {
+    installBundle(bundle: IPackage<{}>) {
         bundle.install(this.processRegistry, this.extensionRegistry);
     }
-    installBundles(bundles: IPosisBundle<{}>[]) {
+    installPackages(bundles: IPackage<{}>[]) {
         for (let id in bundles) {
             this.installBundle(bundles[id]);
         }
@@ -44,12 +44,12 @@ export class Kernel implements IPosisKernel, IPosisSleepExtension {
 
     startProcess(processName: string, startContext: any): ProcessWithID | undefined {
         let pid = GetSUID() as PID;
-        let pInfo: ProcessInfo = {
+        let pInfo: ProcInfo = {
             pid: pid,
-            pPID: this.curProcessID,
-            name: processName,
-            running: true,
-            begun: Game.time
+            pP: this.curProcessID,
+            PKG: processName,
+            ex: true,
+            st: Game.time,
         };
 
         this.processTable[pid] = pInfo;
@@ -60,7 +60,7 @@ export class Kernel implements IPosisKernel, IPosisSleepExtension {
         return { pid, process };
     }
 
-    createProcess(id: PID): IPosisProcess {
+    createProcess(id: PID): IProcess {
         this.log.debug(`ConstructProcess ${id}`);
         let pInfo = this.processTable[id];
         if (!pInfo) {
@@ -68,14 +68,14 @@ export class Kernel implements IPosisKernel, IPosisSleepExtension {
         }
 
         let kernelContext = this;
-        let context: IPosisProcessContext = {
+        let context: IProcessContext = {
             pid: pInfo.pid,
-            imageName: pInfo.name,
+            imageName: pInfo.PKG,
             get isActive() {
-                return kernelContext.processTable[id] && kernelContext.processTable[id].running;
+                return kernelContext.processTable[id] && kernelContext.processTable[id].ex;
             },
             get pPID() {
-                return kernelContext.processTable[id] && kernelContext.processTable[id].pPID || "";
+                return kernelContext.processTable[id] && kernelContext.processTable[id].pP || "";
             },
             get memory() {
                 return kernelContext.processMemory[pInfo.pid];
@@ -84,8 +84,8 @@ export class Kernel implements IPosisKernel, IPosisSleepExtension {
             queryPosisInterface: kernelContext.extensionRegistry.getExtension.bind(kernelContext.extensionRegistry)
         };
         Object.freeze(context);
-        let process = this.processRegistry.getNewProcess(pInfo.name, context);
-        if (!process) throw new Error(`Could not create process ${pInfo.pid} ${pInfo.name}`);
+        let process = this.processRegistry.createNewProcess(pInfo.PKG, context);
+        if (!process) throw new Error(`Could not create process ${pInfo.pid} ${pInfo.PKG}`);
         this._processCache[id] = { context, process };
         return process;
     }
@@ -96,22 +96,22 @@ export class Kernel implements IPosisKernel, IPosisSleepExtension {
         let pinfo = this.processTable[id];
         if (!pinfo) return;
         this.log.warn(`killed ${id}`);
-        pinfo.running = false;
-        pinfo.ended = Game.time;
-        if (pinfo.pPID == '') return
+        pinfo.ex = false;
+        pinfo.end = Game.time;
+        if (pinfo.pP == '') return
         let ids = Object.keys(this.processTable);
         for (let i = 0; i < ids.length; i++) {
             let id = ids[i];
             let pi = this.processTable[id]
-            if (pi.pPID === pinfo.pid) {
-                if (pi.running) {
+            if (pi.pP === pinfo.pid) {
+                if (pi.ex) {
                     this.killProcess(id);
                 }
             }
         }
     }
 
-    getProcessById(pid: PID): IPosisProcess | undefined {
+    getProcessById(pid: PID): IProcess | undefined {
         if (!this.processTable[pid]) {
             return;
         }
@@ -124,24 +124,18 @@ export class Kernel implements IPosisKernel, IPosisSleepExtension {
 
     setParent(pid: PID, parentPId?: PID): boolean {
         if (!this.processTable[pid]) return false;
-        this.processTable[pid].pPID = parentPId;
+        this.processTable[pid].pP = parentPId;
         return true;
     }
 
     loop() {
         let processIDs = Object.keys(this.processTable);
-        /*if (processIDs.length === 0) {
-            let proc = this.startProcess("init", {});
-            // Due to breaking changes in the standard, 
-            // init can no longer be ran on first tick.
-            if (proc) processIDs.push(proc.pid.toString());
-        }*/
 
         let hasActiveProcesses = false;
         for (let i = 0; i < processIDs.length; i++) {
             let pid = processIDs[i];
             let pInfo = this.processTable[pid];
-            if (!pInfo.running) {
+            if (!pInfo.ex) {
                 delete this.processTable[pid];
                 delete this.processMemory[pid];
                 continue;
@@ -149,23 +143,23 @@ export class Kernel implements IPosisKernel, IPosisSleepExtension {
             hasActiveProcesses = true;
             try {
                 let proc = this.getProcessById(pid);
-                if (!proc) throw new Error(`Could not get process ${pid} ${pInfo.name}`);
+                if (!proc) throw new Error(`Could not get process ${pid} ${pInfo.PKG}`);
                 this.curProcessID = pid;
 
-                if (this.processTable[pid].wake) {
-                    if (this.processTable[pid].wake == Game.time) {
+                if (this.processTable[pid].sl) {
+                    if (this.processTable[pid].sl == Game.time) {
                         this.wake(this.curProcessID);
                     }
                 }
-                if (!this.processTable[pid].wake) {
+                if (!this.processTable[pid].sl) {
                     proc.run();
                 }
 
                 this.curProcessID = "";
             } catch (e) {
                 this.killProcess(pid);
-                pInfo.error = e.stack || e.toString();
-                this.log.error(`[${pid}] ${pInfo.name} crashed\n${e.stack}`);
+                pInfo.err = e.stack || e.toString();
+                this.log.error(`[${pid}] ${pInfo.PKG} crashed\n${e.stack}`);
             }
         }
         if (!hasActiveProcesses)
@@ -174,9 +168,9 @@ export class Kernel implements IPosisKernel, IPosisSleepExtension {
 
     sleep(ticks: number): void {
         let pInfo = this.processTable[this.curProcessID];
-        pInfo.wake = Game.time + ticks;
+        pInfo.sl = Game.time + ticks;
     }
     wake(pid: PID): void {
-        delete this.memory.processTable[pid].wake
+        delete this.memory.processTable[pid].sl
     }
 }

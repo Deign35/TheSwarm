@@ -1,7 +1,7 @@
 import { ProcessBase } from "Core/BasicTypes";
 
-export const bundle: IPosisBundle<SpawnData_Memory> = {
-    install(processRegistry: IPosisProcessRegistry, extensionRegistry: IPosisExtensionRegistry) {
+export const bundle: IPackage<SpawnData_Memory> = {
+    install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
         processRegistry.register(PKG_BasicOwnedRoom, BasicOwnedRoom);
     },
     rootImageName: PKG_BasicOwnedRoom

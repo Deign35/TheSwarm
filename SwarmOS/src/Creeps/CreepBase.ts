@@ -6,7 +6,7 @@ import { PickupAction } from "Actions/PickupAction";
 
 export abstract class CreepBase<T extends CreepProcess_Memory> extends ProcessBase {
     @posisInterface(EXT_RoomView)
-    RoomView!: RoomExtensions;
+    RoomView!: IRoomDataExtension;
 
     OnLoad() {
         this._lastUpdate = Game.time;
@@ -15,9 +15,9 @@ export abstract class CreepBase<T extends CreepProcess_Memory> extends ProcessBa
         }
         // Clean up any existing spawn requests
         if (this.memory.creep) {
-            let creepStatus = this.spawner.getStatus(this.memory.creep);
-            if (creepStatus.status == EPosisSpawnStatus.ERROR || creepStatus.status == EPosisSpawnStatus.SPAWNED) {
-                this.spawner.cancelCreep(this.memory.creep);
+            let creepStatus = this.spawner.getRequestStatus(this.memory.creep);
+            if (creepStatus == SP_ERROR || creepStatus == SP_COMPLETE) {
+                this.spawner.cancelRequest(this.memory.creep);
                 if (!Game.creeps[this.memory.creep]) {
                     delete this.memory.creep;
                 }
@@ -57,26 +57,26 @@ export abstract class CreepBase<T extends CreepProcess_Memory> extends ProcessBa
             this.activateCreep();
         } else {
             if (this.memory.creep) {
-                let spawnStatus = this.spawner.getStatus(this.memory.creep);
+                let spawnStatus = this.spawner.getRequestStatus(this.memory.creep);
                 if (!spawnStatus) {
                     this.memory.creep = undefined;
                     this.kernel.killProcess(this.pid);
                     return;
                 } else {
-                    if (spawnStatus.status != EPosisSpawnStatus.QUEUED) {
-                        if (spawnStatus.status != EPosisSpawnStatus.SPAWNING) {
-                            this.spawner.cancelCreep(this.memory.creep);
+                    if (spawnStatus != SP_QUEUED) {
+                        if (spawnStatus != SP_SPAWNING) {
+                            this.spawner.cancelRequest(this.memory.creep);
                             this.memory.creep = undefined;
                         }
                     }
                 }
             }
             if (!this.memory.creep) {
-                this.memory.creep = this.spawner.spawnCreep({
+                this.memory.creep = this.spawner.requestCreep({
                     body: this.SpawnBody,
                     creepName: this.GetNewCreepName(),
                     location: '',
-                    spawnState: EPosisSpawnStatus.QUEUED,
+                    spawnState: SP_QUEUED,
                     priority: this.SpawnPriority,
                     pid: this.pid
                 });

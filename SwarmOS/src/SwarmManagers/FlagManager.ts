@@ -4,8 +4,8 @@ declare var Memory: {
 
 import { ProcessBase, ExtensionBase } from "Core/BasicTypes";
 
-export const bundle: IPosisBundle<FlagMemory> = {
-    install(processRegistry: IPosisProcessRegistry, extensionRegistry: IPosisExtensionRegistry) {
+export const bundle: IPackage<FlagMemory> = {
+    install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
         processRegistry.register(PKG_FlagManager, FlagManager);
         extensionRegistry.register(EXT_Flags, FlagExtension);
     },
@@ -18,7 +18,7 @@ const PKG_FlagManager_LogContext: LogContext = {
 
 class FlagManager extends ProcessBase {
     protected OnLoad(): void { }
-    constructor(protected context: IPosisProcessContext) {
+    constructor(protected context: IProcessContext) {
         super(context);
         Logger.CreateLogContext(PKG_FlagManager_LogContext);
     }

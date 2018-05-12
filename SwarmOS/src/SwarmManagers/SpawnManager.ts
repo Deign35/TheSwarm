@@ -31,8 +31,8 @@ const exDef2: RoleDefinition<'harvester'> = {
 */
 import { ProcessBase, ExtensionBase } from "Core/BasicTypes";
 
-export const bundle: IPosisBundle<SpawnData_Memory> = {
-    install(processRegistry: IPosisProcessRegistry, extensionRegistry: IPosisExtensionRegistry) {
+export const bundle: IPackage<SpawnData_Memory> = {
+    install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
         processRegistry.register(PKG_SpawnManager, SpawnManager);
         let SpawnManagerExtension = new SpawnExtension(extensionRegistry);
         extensionRegistry.register(EXT_CreepSpawner, SpawnManagerExtension);
@@ -85,7 +85,7 @@ class SpawnManager extends ProcessBase {
 
     // (TODO) Scale this appropriately
     protected calculateSpawnDifficulty(req: SpawnData_SpawnCard, spawn?: StructureSpawn) {
-        let canSpawn = req.spawnState == EPosisSpawnStatus.QUEUED;
+        let canSpawn = req.spawnState == SP_QUEUED;
         let difficulty = req.body.cost;
         // Multiply by a factor of the max distance
         if (req.maxSpawnDist) {
@@ -132,10 +132,10 @@ class SpawnManager extends ProcessBase {
         let sortedRequests = Object.keys(this.memory.queue).sort((a, b) => {
             let reqA = this.memory.queue[a];
             let reqB = this.memory.queue[b];
-            if (reqA.spawnState != EPosisSpawnStatus.QUEUED) {
+            if (reqA.spawnState != SP_QUEUED) {
                 return 1;
             }
-            if (reqB.spawnState != EPosisSpawnStatus.QUEUED) {
+            if (reqB.spawnState != SP_QUEUED) {
                 return -1;
             }
 
@@ -175,7 +175,7 @@ class SpawnManager extends ProcessBase {
             if (spawnRequest.req && spawnRequest.diff > 0) {
                 // Spawn it
                 let spawnResult = ERR_INVALID_ARGS as ScreepsReturnCode;
-                while (spawnResult != OK && spawnRequest.req.spawnState == EPosisSpawnStatus.QUEUED) {
+                while (spawnResult != OK && spawnRequest.req.spawnState == SP_QUEUED) {
                     spawnResult = spawn.spawnCreep(spawnRequest.req.body.body,
                         spawnRequest.req.creepName,
                         { memory: spawnRequest.req.defaultMemory });
@@ -186,16 +186,14 @@ class SpawnManager extends ProcessBase {
                             break;
                         default:
                             this.log.error(`Spawn Creep has failed (${spawnResult})`);
-                            spawnRequest.req.spawnState = EPosisSpawnStatus.ERROR;
-                            spawnRequest.req.spawner = `Spawn failed ${spawnResult}`;
+                            spawnRequest.req.spawnState = SP_ERROR;
                             break;
                     }
                 }
 
                 if (spawnResult == OK) {
                     this.log.debug(`Spawn Creep successful for ${spawnRequest.req.creepName} - pid(${spawnRequest.req.pid})`);
-                    spawnRequest.req.spawnState = EPosisSpawnStatus.SPAWNING;
-                    spawnRequest.req.spawner = spawn.id;
+                    spawnRequest.req.spawnState = SP_SPAWNING;
                 } else {
                 }
             }
@@ -203,8 +201,8 @@ class SpawnManager extends ProcessBase {
     }
 }
 
-class SpawnExtension extends ExtensionBase implements IPosisSpawnExtension {
-    cancelCreep(id: string): boolean {
+class SpawnExtension extends ExtensionBase implements ISpawnExtension {
+    cancelRequest(id: string): boolean {
         if (this.memory.queue[id]) {
             delete this.memory.queue[id];
             return true;
@@ -219,28 +217,25 @@ class SpawnExtension extends ExtensionBase implements IPosisSpawnExtension {
 
         return;
     }
-    getStatus(id: string): { status: EPosisSpawnStatus; message?: string | undefined; } {
+    getRequestStatus(id: string): SpawnState {
         if (!this.memory.queue[id]) {
-            return {
-                status: EPosisSpawnStatus.ERROR,
-                message: "Missing Request ID"
-            }
+            return SP_ERROR;
         }
         let spawnCard = this.memory.queue[id];
-        let spawnState = { status: spawnCard.spawnState, message: spawnCard.spawner }
+        let spawnState = spawnCard.spawnState;
 
-        if (spawnState.status == EPosisSpawnStatus.SPAWNING) {
+        if (spawnState == SP_SPAWNING) {
             let creep = Game.creeps[spawnCard.creepName];
             if (creep && !creep.spawning) {
-                this.memory.queue[id].spawnState = EPosisSpawnStatus.SPAWNED;
-                spawnState.status = EPosisSpawnStatus.SPAWNED;
+                this.memory.queue[id].spawnState = SP_COMPLETE;
+                spawnState = SP_COMPLETE;
             }
         }
 
         return spawnState;
     }
 
-    spawnCreep(opts: SpawnData_SpawnCard): string {
+    requestCreep(opts: SpawnData_SpawnCard): string {
         if (Game.creeps[opts.creepName] || this.memory.queue[opts.creepName]) {
             return '';
         }

@@ -3,8 +3,8 @@ import { bundle as Refiller } from "Creeps/Refiller";
 import { bundle as Upgrader } from "Creeps/Upgrader";
 import { bundle as Builder } from "Creeps/Builder";
 
-export const creepBundle: IPosisBundle<{}> = {
-    install(processRegistry: IPosisProcessRegistry, extensionRegistry: IPosisExtensionRegistry) {
+export const creepBundle: IPackage<{}> = {
+    install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
         Builder.install(processRegistry, extensionRegistry);
         Harvester.install(processRegistry, extensionRegistry);
         Refiller.install(processRegistry, extensionRegistry);

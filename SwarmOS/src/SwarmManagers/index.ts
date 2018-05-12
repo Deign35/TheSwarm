@@ -22,8 +22,8 @@ class SwarmManager extends ServiceProviderBase<ServiceProviderMemory> {
     }
 }
 
-export const bundle: IPosisBundle<{}> = {
-    install(processRegistry: IPosisProcessRegistry, extensionRegistry: IPosisExtensionRegistry) {
+export const bundle: IPackage<{}> = {
+    install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
         processRegistry.register(PKG_SwarmManager, SwarmManager);
         RoomManager.install(processRegistry, extensionRegistry);
         SpawnManager.install(processRegistry, extensionRegistry);

@@ -4,8 +4,8 @@ declare var Memory: {
 
 import { ExtensionBase, ServiceProviderBase, InitData } from "Core/BasicTypes";
 
-export const bundle: IPosisBundle<EnergyDist_Memory> = {
-    install(processRegistry: IPosisProcessRegistry, extensionRegistry: IPosisExtensionRegistry) {
+export const bundle: IPackage<EnergyDist_Memory> = {
+    install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
         processRegistry.register(PKG_EnergyDistribution, EnergyDistributionManager);
         extensionRegistry.register(EXT_EnergyDist, EnergyDistributionExtension);
     },
@@ -18,7 +18,7 @@ const PKG_EnergyDistribution_LogContext: LogContext = {
 
 const DIST_REQ_RATIO = 10;
 class EnergyDistributionManager extends ServiceProviderBase<ServiceProviderMemory> {
-    constructor(protected context: IPosisProcessContext) {
+    constructor(protected context: IProcessContext) {
         super(context);
         Logger.CreateLogContext(PKG_EnergyDistribution_LogContext);
     }

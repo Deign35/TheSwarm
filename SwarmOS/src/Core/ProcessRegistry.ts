@@ -2,15 +2,15 @@ const ProcessRegistry_LogContext: LogContext = {
     logID: "ProcessRegistry",
     logLevel: LOG_INFO
 }
-export class ProcessRegistry implements IPosisProcessRegistry {
+export class ProcessRegistry implements IProcessRegistry {
     constructor() {
         this.log.CreateLogContext(ProcessRegistry_LogContext);
     }
     protected get log() {
         return Logger;
     }
-    private registry: { [name: string]: IPosisProcessConstructor } = {};
-    register(name: string, constructor: IPosisProcessConstructor): boolean {
+    private registry: { [name: string]: _ProcessConstructor } = {};
+    register(name: string, constructor: _ProcessConstructor): boolean {
         if (this.registry[name]) {
             this.log.error(`Name already registered: ${name}`);
             return false;
@@ -19,7 +19,7 @@ export class ProcessRegistry implements IPosisProcessRegistry {
         this.registry[name] = constructor;
         return true;
     }
-    getNewProcess(name: string, context: IPosisProcessContext): IPosisProcess | undefined {
+    createNewProcess(name: string, context: IProcessContext): IProcess | undefined {
         if (!this.registry[name]) return;
         this.log.debug(() => `Created ${name}`);
         return new this.registry[name](context);

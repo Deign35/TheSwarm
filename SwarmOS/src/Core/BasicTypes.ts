@@ -1,13 +1,13 @@
-export abstract class ProcessBase implements IPosisProcess {
-    constructor(protected context: IPosisProcessContext) {
+export abstract class ProcessBase implements IProcess {
+    constructor(protected context: IProcessContext) {
         this.OnLoad();
     }
     @posisInterface(EXT_Kernel)
-    protected kernel!: IPosisKernel
+    protected kernel!: IKernel
     @posisInterface(EXT_Registry)
-    protected extensions!: IPosisExtensionRegistry;
+    protected extensions!: IExtensionRegistry;
     @posisInterface(EXT_CreepSpawner)
-    protected spawner!: IPosisSpawnExtension;
+    protected spawner!: ISpawnExtension;;
 
     protected get memory(): any {
         return this.context.memory;
@@ -28,7 +28,7 @@ export abstract class ProcessBase implements IPosisProcess {
 
     SetProcessToSleep(ticks: number) {
         let sleeper = this.context.queryPosisInterface(EXT_Sleep);
-        sleeper.sleep(ticks);
+        sleeper.sleep(ticks, this.pid);
     }
     protected abstract OnLoad(): void;
     protected abstract executeProcess(): void;
@@ -107,8 +107,8 @@ export abstract class ServiceProviderBase<T extends ServiceProviderMemory> exten
     }
 }
 
-export abstract class ExtensionBase implements IPosisExtension {
-    constructor(protected extensionRegistry: IPosisExtensionRegistry) { }
+export abstract class ExtensionBase implements IPackageExtension {
+    constructor(protected extensionRegistry: IExtensionRegistry) { }
     protected get log() { return Logger; }
 
     protected abstract get memory(): any;
@@ -116,7 +116,7 @@ export abstract class ExtensionBase implements IPosisExtension {
 
 function posisInterface(interfaceId: string): (target: any, propertyKey: string) => any {
     return function (target: any, propertyKey: string): any {
-        let value: IPosisExtension
+        let value: IPackageExtension
         return {
             get() {
                 if (!value) {

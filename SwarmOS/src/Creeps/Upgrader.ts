@@ -1,5 +1,5 @@
-export const bundle: IPosisBundle<SpawnData_Memory> = {
-    install(processRegistry: IPosisProcessRegistry, extensionRegistry: IPosisExtensionRegistry) {
+export const bundle: IPackage<SpawnData_Memory> = {
+    install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
         processRegistry.register(PKG_CreepUpgrader, Upgrader);
     },
     rootImageName: PKG_CreepUpgrader

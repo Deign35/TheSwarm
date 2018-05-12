@@ -7,8 +7,8 @@ if (!Memory.roomData) {
 }
 import { ProcessBase, ExtensionBase } from "Core/BasicTypes";
 
-export const bundle: IPosisBundle<SDictionary<RoomData_Memory>> = {
-    install(processRegistry: IPosisProcessRegistry, extensionRegistry: IPosisExtensionRegistry) {
+export const bundle: IPackage<SDictionary<RoomData_Memory>> = {
+    install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
         processRegistry.register(PKG_RoomManager, RoomManager);
         extensionRegistry.register(EXT_RoomView, new RoomExtension(extensionRegistry));
     },
@@ -20,7 +20,7 @@ class RoomManager extends ProcessBase {
 
     }
     @posisInterface(EXT_RoomView)
-    View!: RoomExtensions;
+    View!: IRoomDataExtension;
 
     handleMissingMemory() {
         if (!Memory.roomData) {
@@ -61,7 +61,7 @@ class RoomManager extends ProcessBase {
 }
 
 const FRE_RoomStructures = primes_100[10]; // 10 = 29
-class RoomExtension extends ExtensionBase implements RoomExtensions {
+class RoomExtension extends ExtensionBase implements IRoomDataExtension {
     protected get memory(): SDictionary<RoomData_Memory> {
         return Memory.roomData;
     }
@@ -101,7 +101,7 @@ class RoomExtension extends ExtensionBase implements RoomExtensions {
     protected shouldRefresh(frequency: number, offset: number): boolean {
         return (Game.time + offset) % frequency == 0;
     }
-    RefreshRoomStructures(roomID: string): void {
+    protected RefreshRoomStructures(roomID: string): void {
         let { room, roomData } = this.getRoomData(roomID);
         if (!room || !roomData) {
             this.log.debug(() => (room ? `Room has not been initialized[${roomID}]` : `Room out of view [${roomID}]`));
@@ -183,11 +183,6 @@ class RoomExtension extends ExtensionBase implements RoomExtensions {
             }
         }
     }
-    AddStructure(structure: Structure): void {
-        //let roomInfo = this.RoomView.View(structure.room.name);
-        //if(!roomInfo || !)
-        throw new Error('Not implemented');
-    }
     GetRoomData(roomID: string, forceRefresh: boolean = false): RoomData_Memory | undefined {
         forceRefresh = forceRefresh || !this.memory[roomID] || (this.memory[roomID].lastUpdated == 0);
         let { room, roomData } = this.getRoomData(roomID);
@@ -207,12 +202,12 @@ class RoomExtension extends ExtensionBase implements RoomExtensions {
         return this.memory[roomID];
     }
 
-    DEBUG_ForceResetRoomMemory(roomID: string) {
+    ForceResetRoomMemory(roomID: string) {
         if (this.memory[roomID]) {
             delete this.memory[roomID]
         }
     }
-    RefreshRoom(roomID: string, force: boolean = false) {
+    protected RefreshRoom(roomID: string, force: boolean = false) {
         let { room, roomData } = this.getRoomData(roomID);
         if (!room || !roomData) {
             this.log.debug(() => (room ? `Room has not been initialized[${roomID}]` : `Room out of view [${roomID}]`));

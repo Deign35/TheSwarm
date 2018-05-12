@@ -1,7 +1,7 @@
 import { bundle as BasicOwnedRoom } from "Rooms/BasicOwnedRoom"
 
-export const roomBundle: IPosisBundle<{}> = {
-    install(processRegistry: IPosisProcessRegistry, extensionRegistry: IPosisExtensionRegistry) {
+export const roomBundle: IPackage<{}> = {
+    install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
         BasicOwnedRoom.install(processRegistry, extensionRegistry);
     }
 }

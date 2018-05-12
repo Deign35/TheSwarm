@@ -3,7 +3,7 @@ import { ProcessBase } from "Core/BasicTypes";
 export abstract class RoomBase<T extends RoomProcess_Memory> extends ProcessBase {
     OnLoad() { }
     @posisInterface(EXT_RoomView)
-    View!: RoomExtensions;
+    View!: IRoomDataExtension;
 
     protected get memory(): T {
         return super.memory;
