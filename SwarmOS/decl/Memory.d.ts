@@ -27,9 +27,9 @@ declare interface EnergyDist_Supp extends MemBase {
 declare interface KernelMemory extends MemBase {
     processTable: ProcessTable;
     processMemory: ProcessMemory;
-    subscriptions: SDictionary<PID[]>
+    subscriptions: SDictionary<PID[]>;
+    notifications: string[]
 }
-
 /** RoomData */
 declare interface RoomData_StructureData extends MemBase {
     hits: number

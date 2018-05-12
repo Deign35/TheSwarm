@@ -26,9 +26,7 @@
                 "CreepUpgrader",
                 "EnergyDistribution",
                 "BasicOwnedRoom",
-                "FlagBase",
-                "InterruptManager",
-                "TestInterrupt"
+                "FlagBase"
             ]
         },
         "EXT": {
@@ -44,6 +42,15 @@
                 "Sleep": "sleep",
                 "EnergyDist": "energyDist",
                 "Interrupt": "interrupt"
+            }
+        },
+        "FT": {
+            "comment": "Function Tests",
+            "enabled": true,
+            "string": true,
+            "entries": {
+                "InterruptListener": "interrupt_listener",
+                "InterruptNotifier": "interrupt_notifier"
             }
         },
         "LOG": {

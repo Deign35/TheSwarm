@@ -19,7 +19,12 @@ export class Kernel implements IKernel, IKernelSleepExtension {
         return Logger;
     }
     get memory(): KernelMemory {
-        Memory.kernel = Memory.kernel || { processTable: {}, processMemory: {} };
+        Memory.kernel = Memory.kernel || {
+            processTable: {},
+            processMemory: {},
+            subscriptions: {},
+            notifications: []
+        };
         return Memory.kernel;
     }
     get processTable(): ProcessTable {
@@ -130,6 +135,19 @@ export class Kernel implements IKernel, IKernelSleepExtension {
     }
 
     loop() {
+        let notifications = {};
+        for (let i = 0; i < this.memory.notifications.length; i++) {
+            let notifyID = this.memory.notifications[i];
+            if (!this.memory.subscriptions[notifyID]) { continue; }
+
+            for (let j = 0; j < this.memory.subscriptions[notifyID].length; j++) {
+                let subscriberPID = this.memory.subscriptions[notifyID][j];
+                if (!notifications[subscriberPID]) {
+                    notifications[subscriberPID] = true;
+                }
+            }
+        }
+        this.memory.notifications = [];
         let processIDs = Object.keys(this.processTable);
 
         let hasActiveProcesses = false;
@@ -148,7 +166,7 @@ export class Kernel implements IKernel, IKernelSleepExtension {
                 this.curProcessID = pid;
 
                 if (this.processTable[pid].sl) {
-                    if (this.processTable[pid].sl! <= Game.time) {
+                    if (notifications[pid] || (this.processTable[pid].sl! <= Game.time)) {
                         this.wake(this.curProcessID);
                     }
                 }
@@ -179,7 +197,7 @@ export class Kernel implements IKernel, IKernelSleepExtension {
     }
 
     IsSubscribed(id: string, pid: PID) {
-        if (this.memory[id]) {
+        if (this.memory.subscriptions[id]) {
             for (let i = 0; i < this.memory.subscriptions[id].length; i++) {
                 if (this.memory.subscriptions[id][id] == pid) {
                     return true;
@@ -199,7 +217,7 @@ export class Kernel implements IKernel, IKernelSleepExtension {
         }
     }
     UnSubscribe(id: string, pid: PID) {
-        if (this.memory[id]) {
+        if (this.memory.subscriptions[id]) {
             for (let i = 0; i < this.memory.subscriptions[id].length; i++) {
                 if (this.memory.subscriptions[id][i] == pid) {
                     this.memory.subscriptions[id].splice(i, 1);
@@ -210,15 +228,6 @@ export class Kernel implements IKernel, IKernelSleepExtension {
     }
 
     Notify(id: string) {
-        if (this.memory[id]) {
-            for (let i = 0; i < this.memory.subscriptions[id].length; i++) {
-                let subscriber = this.getProcessById(this.memory.subscriptions[id][i]);
-                if (!subscriber) {
-                    this.memory.subscriptions[id].splice(i--, 1);
-                } else {
-                    this.wake(this.memory.subscriptions[id][i]);
-                }
-            }
-        }
+        this.memory.notifications.push(id);
     }
 }

@@ -9,7 +9,7 @@ export abstract class ProcessBase implements IProcess {
     @posisInterface(EXT_CreepSpawner)
     protected spawner!: ISpawnExtension;;
     @posisInterface(EXT_Interrupt)
-    protected interupter!: IInteruptExtension
+    protected interrupter!: IInteruptExtension
 
     protected get memory(): any {
         return this.context.memory;
