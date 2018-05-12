@@ -103,17 +103,18 @@ class SpawnManager extends ProcessBase {
                 }
             }
         }
+        difficulty += req.priority * 1000;
 
-        return ((canSpawn) ? difficulty : -1) * req.priority;
+        return ((canSpawn) ? difficulty : -1);
     }
 
     executeProcess(): void {
-        debugger;
         if (Object.keys(this.memory.queue).length == 0) {
             this.log.warn(`No spawn requests in the queue.  You have spawn capacity available.`);
             return;
         }
         let minSpawnCost = 20000;
+        // (TODO): Dont let lower prioritys override higher priorities?
         let keys = Object.keys(this.queue);
         for (let i = 0; i < keys.length; i++) {
             minSpawnCost = Math.min(minSpawnCost, this.queue[keys[i]].body.cost);

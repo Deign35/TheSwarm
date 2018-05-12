@@ -12,12 +12,21 @@ import { TransferAction } from "Actions/TransferAction";
 class Refiller extends CreepBase<SpawnRefiller_Memory> {
     protected get CreepPrefix() { return 'Ref_'; }
     protected get SpawnBody() {
+        if (Object.keys(Game.creeps).length == 0) {
+            return {
+                body: [WORK, CARRY, MOVE],
+                cost: 200
+            }
+        }
         return {
             body: [CARRY, MOVE, CARRY, MOVE],
             cost: 200
         }
     }
     protected get SpawnPriority() {
+        if (Object.keys(Game.creeps).length == 0) {
+            return Priority.EMERGENCY;
+        }
         return Priority.Highest;
     }
     protected activateCreep(): void {

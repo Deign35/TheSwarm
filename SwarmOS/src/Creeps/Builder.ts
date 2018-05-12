@@ -58,7 +58,7 @@ export class Builder extends CreepBase<Builder_memory> {
         let targetSite = Game.constructionSites[this.memory.targetID!];
         if (!targetSite) {
             let keys = Object.keys(Game.constructionSites);
-            let dist = Math.max();
+            let dist = 100;
             for (let i = 0; i < keys.length; i++) {
                 let nextSite = Game.constructionSites[keys[i]];
                 let siteDist = this.creep.pos.getRangeTo(nextSite);

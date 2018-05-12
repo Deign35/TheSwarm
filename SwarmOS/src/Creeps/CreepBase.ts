@@ -122,7 +122,7 @@ export abstract class CreepBase<T extends CreepProcess_Memory> extends ProcessBa
             action = new WithdrawAction(this.creep,
                 (withdrawTarget as StructureStorage | StructureTerminal | StructureContainer | StructureLink),
                 RESOURCE_ENERGY);
-        } else if ((withdrawTarget as Source).ticksToRegeneration) {
+        } else if ((withdrawTarget as Source).energyCapacity) {
             action = new HarvestAction(this.creep, (withdrawTarget) as Source);
         } else if ((withdrawTarget as Resource).resourceType) {
             action = new PickupAction(this.creep, withdrawTarget as Resource);
