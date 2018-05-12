@@ -80,7 +80,7 @@ class EnergyDistributionExtension extends ExtensionBase {
             this.memory.suppliers[supplier.id] = {
                 loc: supplier.room!.name,
                 has: availableEnergy,
-                res: 0
+                res: {}
             }
         }
         this.memory.suppliers[supplier.id].has = availableEnergy;
@@ -89,9 +89,9 @@ class EnergyDistributionExtension extends ExtensionBase {
         let foundSupplier = undefined;
         for (let id in this.memory.suppliers) {
             let supplier = this.memory.suppliers[id];
-            if (supplier.loc == location && (supplier.has - supplier.res) >= amount) {
+            /*if (supplier.loc == location && (supplier.has - supplier.res) >= amount) {
                 foundSupplier = id;
-            }
+            }*/
         }
 
         return foundSupplier;

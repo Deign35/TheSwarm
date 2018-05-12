@@ -17,6 +17,24 @@ export class Harvester extends CreepBase<Harvester_Memory> {
     protected get SpawnPriority() {
         return Priority.High;
     }
+    protected get SpawnBody() {
+        let energyCap = Game.rooms[this.memory.targetRoom].energyCapacityAvailable
+        if (energyCap >= 700) {
+            return {
+                body: [WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE],
+                cost: 700
+            }
+        } else if (energyCap >= 550) {
+            return {
+                body: [WORK, WORK, WORK, WORK, WORK, MOVE],
+                cost: 550
+            }
+        }
+        return {
+            body: [WORK, WORK, CARRY, MOVE],
+            cost: 300
+        }
+    }
     OnLoad() {
         super.OnLoad();
         let target = Game.getObjectById(this.memory.targetID) as Source | Mineral;
@@ -88,8 +106,11 @@ export class Harvester extends CreepBase<Harvester_Memory> {
                 let hasReplacementAction = false;
                 if (creep.carry.energy > 0) {
                     if (this.memory.constructionSite) {
-                        //hasReplacementAction = true;
-                        //action = new BuildAction(creep, Game.getObjectById(this.memory.constructionSite) as ConstructionSite);
+                        let site = Game.getObjectById(this.memory.constructionSite) as ConstructionSite;
+                        if (site) {
+                            hasReplacementAction = true;
+                            action = new BuildAction(creep, site);
+                        }
                     } else if (this.memory.containerID) {
                         let container = Game.getObjectById(this.memory.containerID) as StructureContainer;
                         if (container && container.hits < container.hitsMax) {

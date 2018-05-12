@@ -12,22 +12,67 @@ import { TransferAction } from "Actions/TransferAction";
 class Refiller extends CreepBase<SpawnRefiller_Memory> {
     protected get CreepPrefix() { return 'Ref_'; }
     protected get SpawnBody() {
-        if (Object.keys(Game.creeps).length == 0) {
+        let spawnCap = Game.rooms[this.memory.targetRoom].energyCapacityAvailable;
+        if (spawnCap >= 2000) {
             return {
-                body: [WORK, CARRY, MOVE],
-                cost: 200
+                body: [
+                    CARRY, CARRY, CARRY, CARRY, CARRY,
+                    MOVE, MOVE, MOVE, MOVE, MOVE,
+                    CARRY, CARRY, CARRY, CARRY, CARRY,
+                    MOVE, MOVE, MOVE, MOVE, MOVE,
+                    CARRY, CARRY, CARRY, CARRY, CARRY,
+                    MOVE, MOVE, MOVE, MOVE, MOVE,
+                    CARRY, CARRY, CARRY, CARRY, CARRY,
+                    MOVE, MOVE, MOVE, MOVE, MOVE
+                ],
+                cost: 2000
             }
-        }
-        return {
-            body: [CARRY, MOVE, CARRY, MOVE],
-            cost: 200
+        } else if (spawnCap > 1000) {
+            return {
+                body: [
+                    CARRY, CARRY, CARRY, CARRY, CARRY,
+                    MOVE, MOVE, MOVE, MOVE, MOVE,
+                    CARRY, CARRY, CARRY, CARRY, CARRY,
+                    MOVE, MOVE, MOVE, MOVE, MOVE,
+                ],
+                cost: 1000
+            }
+        } else if (spawnCap >= 500) {
+            return {
+                body: [
+                    CARRY, CARRY, CARRY, CARRY, CARRY,
+                    MOVE, MOVE, MOVE, MOVE, MOVE,
+                ],
+                cost: 500
+            }
+        } else {
+            if (Object.keys(Game.creeps).length == 0) {
+                return {
+                    body: [WORK, CARRY, MOVE],
+                    cost: 200
+                }
+            } else {
+                return {
+                    body: [CARRY, MOVE, CARRY, MOVE],
+                    cost: 200
+                }
+            }
         }
     }
     protected get SpawnPriority() {
-        if (Object.keys(Game.creeps).length == 0) {
-            return Priority.EMERGENCY;
+        let spawnCap = Game.rooms[this.memory.targetRoom].energyCapacityAvailable;
+        if (spawnCap > 4000) {
+            return Priority.Low;
+        } else if (spawnCap > 2000) {
+            return Priority.Medium;
+        } else if (spawnCap > 1000) {
+            return Priority.High;
+        } else {
+            if (Object.keys(Game.creeps).length == 0) {
+                return Priority.EMERGENCY;
+            }
+            return Priority.Highest;
         }
-        return Priority.Highest;
     }
     protected activateCreep(): void {
         let creep = Game.creeps[this.memory.creep!];

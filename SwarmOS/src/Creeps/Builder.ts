@@ -17,6 +17,42 @@ export class Builder extends CreepBase<Builder_memory> {
         return Priority.Low;
     }
     protected get SpawnBody() {
+        let spawnCap = Game.rooms[this.memory.targetRoom].energyCapacityAvailable;
+        if (spawnCap >= 2000) {
+            return {
+                body: [WORK, WORK, WORK, WORK, WORK,
+                    CARRY, CARRY, CARRY, CARRY, CARRY,
+                    CARRY, CARRY, CARRY, CARRY, CARRY,
+                    CARRY, CARRY, CARRY, CARRY, CARRY,
+                    MOVE, MOVE, MOVE, MOVE, MOVE,
+                    MOVE, MOVE, MOVE, MOVE, MOVE,
+                    MOVE, MOVE, MOVE, MOVE, MOVE],
+                cost: 2000
+            }
+        } else if (spawnCap >= 1200) {
+            return {
+                body: [WORK, WORK,
+                    CARRY, CARRY, CARRY, CARRY, CARRY,
+                    CARRY, CARRY, CARRY, CARRY, CARRY,
+                    MOVE, MOVE, MOVE, MOVE, MOVE,
+                    MOVE, MOVE, MOVE, MOVE, MOVE],
+                cost: 1200
+            }
+        } else if (spawnCap >= 600) {
+            return {
+                body: [WORK,
+                    CARRY, CARRY, CARRY, CARRY, CARRY,
+                    MOVE, MOVE, MOVE, MOVE, MOVE],
+                cost: 600
+            }
+        } else if (spawnCap >= 450) {
+            return {
+                body: [WORK, WORK,
+                    CARRY, CARRY,
+                    MOVE, MOVE, MOVE],
+                cost: 450
+            }
+        }
         return {
             body: [WORK, CARRY, CARRY, MOVE],
             cost: 250

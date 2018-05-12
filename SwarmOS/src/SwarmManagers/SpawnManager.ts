@@ -159,9 +159,14 @@ class SpawnManager extends ProcessBase {
 
             for (let j = 0; j < sortedRequests.length; j++) {
                 let req = this.memory.queue[sortedRequests[j]];
+                if (spawnRequest.req && req.priority != spawnRequest.req.priority) {
+                    if (req.priority > spawnRequest.req.priority) {
+                        spawnRequest = { req, diff: this.calculateSpawnDifficulty(req, spawn) }
+                    }
+                    continue;
+                }
                 let diff = this.calculateSpawnDifficulty(req, spawn);
 
-                // If this request is eligible for this spawn, then get difficulty
                 if (!spawnRequest.req || diff > spawnRequest.diff) {
                     spawnRequest = { req, diff }
                 }
