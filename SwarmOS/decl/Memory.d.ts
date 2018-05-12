@@ -17,7 +17,7 @@ declare interface EnergyDist_Data {
 declare interface EnergyDist_Supp {
     loc: string; // location of the request by roomID
     has: number; // available energy for withdraw
-    res: number; // reserved energy
+    res: SDictionary<string>; // Reserved energy not to be removed by anyone else
 }
 
 /** Core OS */
