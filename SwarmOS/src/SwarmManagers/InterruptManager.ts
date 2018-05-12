@@ -9,6 +9,7 @@ import { ProcessBase, ExtensionBase } from "Core/BasicTypes";
 export const bundle: IPackage<InterruptMemory> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
         processRegistry.register(PKG_InterruptManager, InterruptManager);
+        extensionRegistry.register(EXT_Interrupt, new InterruptExtension(extensionRegistry, {}));
     },
     rootImageName: PKG_InterruptManager
 }
@@ -48,7 +49,7 @@ class InterruptManager extends ProcessBase {
     }
 }
 
-class InterruptExtension extends ExtensionBase {
+class InterruptExtension extends ExtensionBase implements IInteruptExtension {
     constructor(protected extensionRegistry: IExtensionRegistry, mem: InterruptMemory) {
         super(extensionRegistry);
         this._memory = mem;
@@ -97,7 +98,7 @@ class InterruptExtension extends ExtensionBase {
     Notify(id: string) {
         if (this.memory[id]) {
             for (let i = 0; i < this.memory[id].subscribers.length; i++) {
-                this.sleeper.wake(this.memory[id].subscribers[i]);
+                (this.extensionRegistry.getExtension(EXT_Sleep)! as IKernelSleepExtension).wake(this.memory[id].subscribers[i]);
             }
         }
     }

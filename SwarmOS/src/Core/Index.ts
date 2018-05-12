@@ -8,3 +8,4 @@ export var kernel = new Kernel(processRegistry, extensionRegistry);
 
 extensionRegistry.register(EXT_Kernel, kernel);
 extensionRegistry.register(EXT_Sleep, kernel);
+extensionRegistry.register(EXT_Interrupt, kernel);

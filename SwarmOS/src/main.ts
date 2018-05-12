@@ -20,7 +20,7 @@ import "Tools/GlobalTools";
 import "Tools_Prototypes";
 
 // Update the OS as needed
-const RESET_IN_SIM_ON_UPDATE = false;
+const RESET_IN_SIM_ON_UPDATE = true;
 if (!Memory.VERSION || Memory.VERSION != SWARM_VERSION_DATE) {
     Logger.alert(`OS Version updated`);
     if (RESET_IN_SIM_ON_UPDATE && !!Game.rooms.sim) {
@@ -41,9 +41,9 @@ if (!Memory.VERSION || Memory.VERSION != SWARM_VERSION_DATE) {
 }
 
 import { kernel } from "Core/index";
-import { bundle as SwarmManager } from "SwarmManagers/index";
 import { creepBundle } from "Creeps/index";
 import { roomBundle } from "Rooms/index";
+import { bundle as SwarmManager } from "SwarmManagers/index";
 import { flagBundle } from "Flags/index";
 
 kernel.installPackages([SwarmManager, creepBundle, roomBundle, flagBundle]);

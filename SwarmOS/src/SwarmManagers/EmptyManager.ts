@@ -8,7 +8,7 @@
  * 
  * You now have a ${'___Empty___'}Manager to implement
  */
-declare type I___Empty___Data_Memory = Dictionary;
+declare interface I___Empty___Data_Memory extends SDictionary<any> { }
 
 declare var Memory: {
     ___Empty___Data: I___Empty___Data_Memory

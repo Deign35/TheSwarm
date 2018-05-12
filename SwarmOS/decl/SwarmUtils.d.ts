@@ -1,7 +1,7 @@
 declare const require: (module: string) => any;
 declare var global: { [id: string]: any }
-declare type SDictionary<T> = { [id: string]: T }
-declare type EDictionary<T> = { [id: number]: T }
+declare interface SDictionary<T> { [id: string]: T }
+declare interface EDictionary<T> { [id: number]: T }
 declare type IDictionary<T> = EDictionary<T> | SDictionary<T>;
 declare type Dictionary = IDictionary<any>;
 

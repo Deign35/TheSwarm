@@ -27,7 +27,8 @@
                 "EnergyDistribution",
                 "BasicOwnedRoom",
                 "FlagBase",
-                "InterruptManager"
+                "InterruptManager",
+                "TestInterrupt"
             ]
         },
         "EXT": {

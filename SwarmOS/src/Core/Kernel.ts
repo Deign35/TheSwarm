@@ -68,6 +68,7 @@ export class Kernel implements IKernel, IKernelSleepExtension {
         }
 
         let kernelContext = this;
+        // (TODO): Reevaluate and ensure start context is correct
         let context: IProcessContext = {
             pid: pInfo.pid,
             imageName: pInfo.PKG,
@@ -86,7 +87,7 @@ export class Kernel implements IKernel, IKernelSleepExtension {
         Object.freeze(context);
         let process = this.processRegistry.createNewProcess(pInfo.PKG, context);
         if (!process) throw new Error(`Could not create process ${pInfo.pid} ${pInfo.PKG}`);
-        this._processCache[id] = { context, process };
+        this._processCache[id] = { context, process, };
         return process;
     }
 
@@ -147,7 +148,7 @@ export class Kernel implements IKernel, IKernelSleepExtension {
                 this.curProcessID = pid;
 
                 if (this.processTable[pid].sl) {
-                    if (this.processTable[pid].sl == Game.time) {
+                    if (this.processTable[pid].sl! <= Game.time) {
                         this.wake(this.curProcessID);
                     }
                 }
@@ -171,6 +172,53 @@ export class Kernel implements IKernel, IKernelSleepExtension {
         pInfo.sl = Game.time + ticks;
     }
     wake(pid: PID): void {
-        delete this.memory.processTable[pid].sl
+        if (this.memory.processTable[pid] && this.memory.processTable[pid].sl) {
+            delete this.memory.processTable[pid].sl;
+            // (TODO): Don't let newly awoken processes run this tick.
+        }
+    }
+
+    IsSubscribed(id: string, pid: PID) {
+        if (this.memory[id]) {
+            for (let i = 0; i < this.memory.subscriptions[id].length; i++) {
+                if (this.memory.subscriptions[id][id] == pid) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    Subscribe(id: string, pid: PID) {
+        if (!this.memory.subscriptions[id]) {
+            this.memory.subscriptions[id] = []
+        }
+        if (!this.IsSubscribed(id, pid)) {
+            this.memory.subscriptions[id].push(pid);
+        }
+    }
+    UnSubscribe(id: string, pid: PID) {
+        if (this.memory[id]) {
+            for (let i = 0; i < this.memory.subscriptions[id].length; i++) {
+                if (this.memory.subscriptions[id][i] == pid) {
+                    this.memory.subscriptions[id].splice(i, 1);
+                    return;
+                }
+            }
+        }
+    }
+
+    Notify(id: string) {
+        if (this.memory[id]) {
+            for (let i = 0; i < this.memory.subscriptions[id].length; i++) {
+                let subscriber = this.getProcessById(this.memory.subscriptions[id][i]);
+                if (!subscriber) {
+                    this.memory.subscriptions[id].splice(i--, 1);
+                } else {
+                    this.wake(this.memory.subscriptions[id][i]);
+                }
+            }
+        }
     }
 }

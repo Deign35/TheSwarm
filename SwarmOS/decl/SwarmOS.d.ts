@@ -37,7 +37,6 @@ declare interface IProcess {
     run(): void;
 }
 declare interface _ProcessConstructor {
-    // (TODO): Freeze the context, it should never change!
     new(context: IProcessContext): IProcess;
 }
 declare interface IProcessContext {
@@ -102,3 +101,11 @@ declare interface ProcessMemory {
     [id: string]: {};
 }
 
+
+
+declare interface IInteruptExtension {
+    IsSubscribed(id: string, pid: PID): boolean;
+    Subscribe(id: string, pid: PID): void;
+    UnSubscribe(id: string, pid: PID): void;
+    Notify(id: string): void;
+}

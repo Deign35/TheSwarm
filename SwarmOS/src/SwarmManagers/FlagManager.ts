@@ -1,7 +1,9 @@
 declare var Memory: {
     flagData: FlagMemory
 }
-
+if (!Memory.flagData) {
+    Memory.flagData = {};
+}
 import { ProcessBase, ExtensionBase } from "Core/BasicTypes";
 
 export const bundle: IPackage<FlagMemory> = {
