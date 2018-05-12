@@ -1,8 +1,8 @@
 import { bundle as RoomManager } from "SwarmManagers/RoomManager";
 import { bundle as SpawnManager } from "SwarmManagers/SpawnManager";
-import { bundle as EnergyDist } from "SwarmManagers/EnergyDistribution";
 import { bundle as FlagManager } from "SwarmManagers/FlagManager";
-import { ExtensionRegistry } from "Core/ExtensionRegistry";
+import { bundle as InterruptManager } from "SwarmManagers/InterruptManager"
+
 import { ServiceProviderBase, InitData } from "Core/BasicTypes";
 
 class SwarmManager extends ServiceProviderBase<ServiceProviderMemory> {
@@ -15,15 +15,19 @@ class SwarmManager extends ServiceProviderBase<ServiceProviderMemory> {
         },
         flagManager: {
             processName: PKG_FlagManager
+        },
+        interruptManager: {
+            processName: PKG_InterruptManager
         }
     }
 }
 
 export const bundle: IPosisBundle<{}> = {
-    install(processRegistry: IPosisProcessRegistry, extensionRegistry: ExtensionRegistry) {
+    install(processRegistry: IPosisProcessRegistry, extensionRegistry: IPosisExtensionRegistry) {
         processRegistry.register(PKG_SwarmManager, SwarmManager);
         RoomManager.install(processRegistry, extensionRegistry);
         SpawnManager.install(processRegistry, extensionRegistry);
         FlagManager.install(processRegistry, extensionRegistry);
+        InterruptManager.install(processRegistry, extensionRegistry);
     }
 }

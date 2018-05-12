@@ -151,7 +151,16 @@ export class Kernel implements IPosisKernel, IPosisSleepExtension {
                 let proc = this.getProcessById(pid);
                 if (!proc) throw new Error(`Could not get process ${pid} ${pInfo.name}`);
                 this.curProcessID = pid;
-                proc.run();
+
+                if (this.processTable[pid].wake) {
+                    if (this.processTable[pid].wake == Game.time) {
+                        this.wake(this.curProcessID);
+                    }
+                }
+                if (!this.processTable[pid].wake) {
+                    proc.run();
+                }
+
                 this.curProcessID = "";
             } catch (e) {
                 this.killProcess(pid);
@@ -166,5 +175,8 @@ export class Kernel implements IPosisKernel, IPosisSleepExtension {
     sleep(ticks: number): void {
         let pInfo = this.processTable[this.curProcessID];
         pInfo.wake = Game.time + ticks;
+    }
+    wake(pid: PID): void {
+        delete this.memory.processTable[pid].wake
     }
 }

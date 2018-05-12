@@ -121,6 +121,7 @@ declare interface IPosisSleepExtension {
      * @param ticks number of ticks to sleep for
      */
     sleep(ticks: number): void;
+    wake(pid: PID): void;
 }
 /*
 declare interface IPosisSegmentsExtension {

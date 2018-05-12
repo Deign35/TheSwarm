@@ -27,7 +27,7 @@ export abstract class ProcessBase implements IPosisProcess {
     }
 
     SetProcessToSleep(ticks: number) {
-        let sleeper = this.context.queryPosisInterface("sleep");
+        let sleeper = this.context.queryPosisInterface(EXT_Sleep);
         sleeper.sleep(ticks);
     }
     protected abstract OnLoad(): void;
@@ -103,7 +103,7 @@ export abstract class ServiceProviderBase<T extends ServiceProviderMemory> exten
             }
         }
 
-        this.SetProcessToSleep(this.ScanFrequency); // Does this work???
+        this.SetProcessToSleep(this.ScanFrequency);
     }
 }
 
