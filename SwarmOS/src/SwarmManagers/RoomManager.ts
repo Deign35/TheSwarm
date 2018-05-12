@@ -42,7 +42,6 @@ class RoomManager extends ProcessBase {
                     this.log.warn(`(ASSUMPTION RECOVERY): GetRoomData refresh fixed it (${roomID})`)
                 }
             }
-            debugger;
             if (!data.pid || !this.kernel.getProcessById(data.pid)) {
                 let newRoomMemory: BasicOwnedRoom_Memory = {
                     roomName: roomID,

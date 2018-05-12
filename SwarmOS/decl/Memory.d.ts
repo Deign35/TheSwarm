@@ -102,6 +102,11 @@ interface ProfilerData {
     time: number;
 }
 
+/** Flag Memory */
+declare interface FlagProcess_Memory {
+    flagID: string;
+}
+
 /** Creep Memory */
 declare interface CreepProcess_Memory {
     creep?: string;
@@ -157,4 +162,9 @@ declare type ServiceProviderMemory = {
             serviceID: string
         }
     }
+}
+
+/** Flags */
+declare interface FlagMemory {
+    [id: string]: PID
 }

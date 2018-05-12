@@ -44,8 +44,9 @@ import { kernel } from "Core/index";
 import { bundle as SwarmManager } from "SwarmManagers/index";
 import { creepBundle } from "Creeps/index";
 import { roomBundle } from "Rooms/index";
+import { flagBundle } from "Flags/index";
 
-kernel.installBundles([SwarmManager, creepBundle, roomBundle]);
+kernel.installBundles([SwarmManager, creepBundle, roomBundle, flagBundle]);
 
 export function loop() {
     try {
