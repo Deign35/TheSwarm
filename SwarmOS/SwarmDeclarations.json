@@ -23,7 +23,8 @@
                 "CreepHarvester",
                 "CreepRefiller",
                 "CreepUpgrader",
-                "EnergyDistribution"
+                "EnergyDistribution",
+                "BasicOwnedRoom"
             ]
         },
         "EXT": {

@@ -1,4 +1,4 @@
-import { ProcessBase } from "Core/BasicTypes";
+/*import { ProcessBase } from "Core/BasicTypes";
 
 export const bundle: IPosisBundle<SpawnData_Memory> = {
     install(processRegistry: IPosisProcessRegistry, extensionRegistry: IPosisExtensionRegistry) {
@@ -111,4 +111,4 @@ class FirstRoom extends RoomBase<FirstRoom_Memory> {
             }
         }
     }
-}
+}*/

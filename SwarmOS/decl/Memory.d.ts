@@ -58,6 +58,9 @@ declare interface RoomData_Memory {
     sourceIDs: string[];
     structures: RoomData_StructureMemory
     tombstones: string[];
+
+    [STRUCTURE_STORAGE]?: RoomData_StructureData;
+    [STRUCTURE_TERMINAL]?: RoomData_StructureData
 }
 
 /** SpawnData */
@@ -126,13 +129,24 @@ declare interface Builder_memory extends CreepProcess_Memory {
 /** Room Memory */
 declare interface RoomProcess_Memory {
     roomName: string;
-    builders: PID[];
+    creeps: RoomProcess_CreepMemory
+}
+declare interface RoomProcess_CreepMemory {
+    bui: PID[]; // Builders
+    ref?: PID[]; // Refillers
+    harv?: PID[]; // Harvesters
+    upg?: PID[]; // Upgraders
+
+    misc?: PID[]; // Misc
+}
+
+declare interface BasicOwnedRoom_Memory extends RoomProcess_Memory {
+
+    sources: SDictionary<PID | undefined>;
 }
 
 declare interface FirstRoom_Memory extends RoomProcess_Memory {
-    refiller?: PID;
     sources: SDictionary<PID | undefined>;
-    upgraders: PID[];
 }
 
 

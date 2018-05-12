@@ -48,8 +48,8 @@ class Refiller extends CreepBase<SpawnRefiller_Memory> {
         } else {
             if (Object.keys(Game.creeps).length == 0) {
                 return {
-                    body: [WORK, CARRY, MOVE],
-                    cost: 200
+                    body: [WORK, WORK, CARRY, MOVE],
+                    cost: 300
                 }
             } else {
                 return {

@@ -42,15 +42,17 @@ class RoomManager extends ProcessBase {
                     this.log.warn(`(ASSUMPTION RECOVERY): GetRoomData refresh fixed it (${roomID})`)
                 }
             }
+            debugger;
             if (!data.pid || !this.kernel.getProcessById(data.pid)) {
-                let newRoomMemory: FirstRoom_Memory = {
-                    sources: {},
-                    upgraders: [],
-                    builders: [],
-                    roomName: roomID
+                let newRoomMemory: BasicOwnedRoom_Memory = {
+                    roomName: roomID,
+                    creeps: {
+                        bui: []
+                    },
+                    sources: {}
                 }
 
-                let newRoomProcess = this.kernel.startProcess(PKG_FirstRoom, newRoomMemory);
+                let newRoomProcess = this.kernel.startProcess(PKG_BasicOwnedRoom, newRoomMemory);
                 if (newRoomProcess && newRoomProcess.pid && newRoomProcess.process) {
                     data.pid = newRoomProcess.pid;
                 }
@@ -58,7 +60,6 @@ class RoomManager extends ProcessBase {
         }
     }
 }
-
 
 const FRE_RoomStructures = primes_100[10]; // 10 = 29
 class RoomExtension extends ExtensionBase implements RoomExtensions {
@@ -127,6 +128,25 @@ class RoomExtension extends ExtensionBase implements RoomExtensions {
                 spawn: [],
                 tower: []
             }
+            if (room.storage) {
+                roomData.storage = {
+                    id: room.storage.id,
+                    hits: room.storage.hits,
+                    x: room.storage.pos.x,
+                    y: room.storage.pos.y,
+                    room: room.name
+                }
+            }
+            if (room.terminal) {
+                roomData.terminal = {
+                    id: room.terminal.id,
+                    hits: room.terminal.hits,
+                    x: room.terminal.pos.x,
+                    y: room.terminal.pos.y,
+                    room: room.name
+                }
+            }
+
         } else {
             roomData.structures = {
                 container: [],

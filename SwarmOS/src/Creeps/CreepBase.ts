@@ -60,6 +60,8 @@ export abstract class CreepBase<T extends CreepProcess_Memory> extends ProcessBa
                 let spawnStatus = this.spawner.getStatus(this.memory.creep);
                 if (!spawnStatus) {
                     this.memory.creep = undefined;
+                    this.kernel.killProcess(this.pid);
+                    return;
                 } else {
                     if (spawnStatus.status != EPosisSpawnStatus.QUEUED) {
                         if (spawnStatus.status != EPosisSpawnStatus.SPAWNING) {
