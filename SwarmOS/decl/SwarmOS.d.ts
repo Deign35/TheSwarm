@@ -1,8 +1,6 @@
 declare interface IPackage<MemBase> {
-    /** host will call that once, possibly outside of main loop, registers all bundle processes here */
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry): void;
-    /** image name of root process in the bundle, if any */
-    rootImageName?: string;
+    rootImageName?: string; // (TODO): Unusued
 }
 declare interface IPackageExtension { }
 declare interface IExtensionRegistry extends IPackageExtension {

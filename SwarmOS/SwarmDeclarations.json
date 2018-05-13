@@ -45,7 +45,7 @@
             }
         },
         "FT": {
-            "comment": "Function Tests",
+            "comment": "Functional Tests",
             "enabled": true,
             "string": true,
             "entries": {

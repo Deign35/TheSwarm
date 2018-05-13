@@ -40,7 +40,7 @@ export const bundle: IPackage<SpawnData_Memory> = {
     rootImageName: PKG_SpawnManager
 }
 
-const SpawnManager_LogContext: LogContext = {
+const PKG_SpawnManager_LogContext: LogContext = {
     logID: PKG_SpawnManager,
     logLevel: LOG_INFO
 }
@@ -50,7 +50,7 @@ class SpawnManager extends ProcessBase {
     SpawnerExtensions!: SpawnExtension;
 
     OnLoad() {
-        Logger.CreateLogContext(SpawnManager_LogContext);
+        Logger.CreateLogContext(PKG_SpawnManager_LogContext);
     }
 
     protected get memory() {
@@ -59,19 +59,9 @@ class SpawnManager extends ProcessBase {
     protected get queue() {
         return this.memory.queue;
     }
-    protected get log() {
-        return this._logger;
-    }
-    private _logger: ILogger = {
-        alert: (message: (string | (() => string))) => { Logger.alert(message, PKG_SpawnManager); },
-        debug: (message: (string | (() => string))) => { Logger.debug(message, PKG_SpawnManager); },
-        error: (message: (string | (() => string))) => { Logger.error(message, PKG_SpawnManager); },
-        fatal: (message: (string | (() => string))) => { Logger.fatal(message, PKG_SpawnManager); },
-        info: (message: (string | (() => string))) => { Logger.info(message, PKG_SpawnManager); },
-        trace: (message: (string | (() => string))) => { Logger.trace(message, PKG_SpawnManager); },
-        warn: (message: (string | (() => string))) => { Logger.warn(message, PKG_SpawnManager); },
-        CreateLogContext: Logger.CreateLogContext,
-        DumpLogToConsole: Logger.DumpLogToConsole
+
+    protected get logID() {
+        return PKG_SpawnManager_LogContext.logID;
     }
 
     handleMissingMemory() {

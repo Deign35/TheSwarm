@@ -39,19 +39,9 @@ class ___Empty___Manager extends ProcessBase {
     protected get memory() {
         return Memory.___Empty___Data;
     }
-    protected get log() {
-        return this._logger;
-    }
-    private _logger: ILogger = {
-        alert: (message: (string | (() => string))) => { Logger.alert(message, IN____Empty___Manager); },
-        debug: (message: (string | (() => string))) => { Logger.debug(message, IN____Empty___Manager); },
-        error: (message: (string | (() => string))) => { Logger.error(message, IN____Empty___Manager); },
-        fatal: (message: (string | (() => string))) => { Logger.fatal(message, IN____Empty___Manager); },
-        info: (message: (string | (() => string))) => { Logger.info(message, IN____Empty___Manager); },
-        trace: (message: (string | (() => string))) => { Logger.trace(message, IN____Empty___Manager); },
-        warn: (message: (string | (() => string))) => { Logger.warn(message, IN____Empty___Manager); },
-        CreateLogContext: Logger.CreateLogContext,
-        DumpLogToConsole: Logger.DumpLogToConsole
+
+    protected get logID() {
+        return IN____Empty___Manager_LogContext.logID
     }
 
     handleMissingMemory() {

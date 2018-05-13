@@ -14,18 +14,32 @@ export abstract class ProcessBase implements IProcess {
     protected get memory(): any {
         return this.context.memory;
     }
-    get imageName(): string { // image name (maps to constructor)
+    get imageName(): string {
         return this.context.imageName;
     }
-    get pid(): PID { // ID
+    get pid(): PID {
         return this.context.pid;
     }
-    get parentPID(): PID { // Parent ID
+    get parentPID(): PID {
         return this.context.pPID;
     }
     get isInDebugMode() { return false; }
+    protected get logID() {
+        return "SwarmOS"; // (TODO): Make this a constant 
+    }
     protected get log(): ILogger {
-        return Logger;
+        return this._logger;
+    }
+    private _logger: ILogger = {
+        alert: (message: (string | (() => string))) => { Logger.alert(message, this.logID); },
+        debug: (message: (string | (() => string))) => { Logger.debug(message, this.logID); },
+        error: (message: (string | (() => string))) => { Logger.error(message, this.logID); },
+        fatal: (message: (string | (() => string))) => { Logger.fatal(message, this.logID); },
+        info: (message: (string | (() => string))) => { Logger.info(message, this.logID); },
+        trace: (message: (string | (() => string))) => { Logger.trace(message, this.logID); },
+        warn: (message: (string | (() => string))) => { Logger.warn(message, this.logID); },
+        CreateLogContext: Logger.CreateLogContext,
+        DumpLogToConsole: Logger.DumpLogToConsole
     }
 
     SetProcessToSleep(ticks: number) {

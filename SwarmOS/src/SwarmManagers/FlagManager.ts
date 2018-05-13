@@ -27,19 +27,9 @@ class FlagManager extends ProcessBase {
     protected get memory() {
         return Memory.flagData;
     }
-    protected get log() {
-        return this._logger;
-    }
-    private _logger: ILogger = {
-        alert: (message: (string | (() => string))) => { Logger.alert(message, PKG_FlagManager); },
-        debug: (message: (string | (() => string))) => { Logger.debug(message, PKG_FlagManager); },
-        error: (message: (string | (() => string))) => { Logger.error(message, PKG_FlagManager); },
-        fatal: (message: (string | (() => string))) => { Logger.fatal(message, PKG_FlagManager); },
-        info: (message: (string | (() => string))) => { Logger.info(message, PKG_FlagManager); },
-        trace: (message: (string | (() => string))) => { Logger.trace(message, PKG_FlagManager); },
-        warn: (message: (string | (() => string))) => { Logger.warn(message, PKG_FlagManager); },
-        CreateLogContext: Logger.CreateLogContext,
-        DumpLogToConsole: Logger.DumpLogToConsole
+
+    protected get logID() {
+        return PKG_FlagManager_LogContext.logID;
     }
 
     handleMissingMemory() {

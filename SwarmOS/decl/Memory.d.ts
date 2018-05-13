@@ -1,27 +1,4 @@
-declare interface MemBase {
-
-}
-/** Energy Distribution */
-declare interface EnergyDist_Memory extends MemBase {
-    distributors: PID[];
-    suppliers: SDictionary<EnergyDist_Supp>;
-    requests: SDictionary<EnergyDist_Data>;
-}
-// Due to the number of entries, property names have been shortened to save Memory space.
-declare interface EnergyDist_Data extends MemBase {
-    act: boolean; // Active or not
-    ass: number; // Currently assigned energy being delivered
-    loc: string; // location of the request by roomID
-    pri: Priority; // Priority of the requestor.
-    ref: boolean; // Should this request automatically refresh itself
-    req: number; // requested energy to be delivered
-}
-
-declare interface EnergyDist_Supp extends MemBase {
-    loc: string; // location of the request by roomID
-    has: number; // available energy for withdraw
-    res: SDictionary<string>; // Reserved energy not to be removed by anyone else
-}
+declare interface MemBase { }
 
 /** Core OS */
 declare interface KernelMemory extends MemBase {
@@ -30,7 +7,7 @@ declare interface KernelMemory extends MemBase {
     subscriptions: SDictionary<PID[]>;
     notifications: string[]
 }
-/** RoomData */
+/** RoomViewData */
 declare interface RoomData_StructureData extends MemBase {
     hits: number
     id: string;
@@ -84,7 +61,6 @@ declare interface SpawnData_SpawnCard extends MemBase {
     maxSpawnDist?: number;
     spawner?: string;
 }
-declare type SpawnRequest_BodyDef = EDictionary<ISpawnDef>;
 
 /** Stats */
 declare type RoomStats = {}

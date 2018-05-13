@@ -44,19 +44,9 @@ class TestSleeper extends ProcessBase {
     protected get memory() {
         return Memory.TestData;
     }
-    protected get log() {
-        return this._logger;
-    }
-    private _logger: ILogger = {
-        alert: (message: (string | (() => string))) => { Logger.alert(message, FT_InterruptListener); },
-        debug: (message: (string | (() => string))) => { Logger.debug(message, FT_InterruptListener); },
-        error: (message: (string | (() => string))) => { Logger.error(message, FT_InterruptListener); },
-        fatal: (message: (string | (() => string))) => { Logger.fatal(message, FT_InterruptListener); },
-        info: (message: (string | (() => string))) => { Logger.info(message, FT_InterruptListener); },
-        trace: (message: (string | (() => string))) => { Logger.trace(message, FT_InterruptListener); },
-        warn: (message: (string | (() => string))) => { Logger.warn(message, FT_InterruptListener); },
-        CreateLogContext: Logger.CreateLogContext,
-        DumpLogToConsole: Logger.DumpLogToConsole
+
+    protected get logID() {
+        return PKG_TestInterrupt_LogContext.logID;
     }
 
     handleMissingMemory() {
@@ -139,19 +129,9 @@ class TestInterrupter extends ProcessBase {
     protected get memory() {
         return Memory.TestData;
     }
-    protected get log() {
-        return this._logger;
-    }
-    private _logger: ILogger = {
-        alert: (message: (string | (() => string))) => { Logger.alert(message, FT_InterruptListener); },
-        debug: (message: (string | (() => string))) => { Logger.debug(message, FT_InterruptListener); },
-        error: (message: (string | (() => string))) => { Logger.error(message, FT_InterruptListener); },
-        fatal: (message: (string | (() => string))) => { Logger.fatal(message, FT_InterruptListener); },
-        info: (message: (string | (() => string))) => { Logger.info(message, FT_InterruptListener); },
-        trace: (message: (string | (() => string))) => { Logger.trace(message, FT_InterruptListener); },
-        warn: (message: (string | (() => string))) => { Logger.warn(message, FT_InterruptListener); },
-        CreateLogContext: Logger.CreateLogContext,
-        DumpLogToConsole: Logger.DumpLogToConsole
+
+    protected get logID() {
+        return PKG_TestInterrupt_LogContext.logID
     }
 
     executeProcess(): void {
