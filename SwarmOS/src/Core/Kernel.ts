@@ -12,7 +12,7 @@ declare type ProcessCache = {
 declare type ProcessWithID = { pid: PID; process: IProcess; };
 
 const PROCESS_GHOST_TIMER = 100;
-export class Kernel implements IKernel, IKernelSleepExtension {
+export class Kernel implements IKernelProcessExtensions, IKernelSleepExtension {
     private _processCache: ProcessCache;
     private curProcessID: string = "";
     protected get log() {
@@ -87,7 +87,7 @@ export class Kernel implements IKernel, IKernelSleepExtension {
                 return kernelContext.processMemory[pInfo.pid];
             },
             // bind getExtension to queryPosisInterface.
-            queryPosisInterface: kernelContext.extensionRegistry.getExtension.bind(kernelContext.extensionRegistry)
+            getPackageInterface: kernelContext.extensionRegistry.get.bind(kernelContext.extensionRegistry)
         };
         Object.freeze(context);
         let process = this.processRegistry.createNewProcess(pInfo.PKG, context);

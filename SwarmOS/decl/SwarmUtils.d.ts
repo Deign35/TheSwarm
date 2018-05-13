@@ -30,18 +30,14 @@ declare interface LogContext {
 }
 /*declare class SwarmLogger {*/
 declare interface ILogger {
-    trace(message: (string | (() => string)), contextID?: string): void;
-    debug(message: (string | (() => string)), contextID?: string): void;
-    info(message: (string | (() => string)), contextID?: string): void;
-    warn(message: (string | (() => string)), contextID?: string): void;
-    error(message: (string | (() => string)), contextID?: string): void;
-    fatal(message: (string | (() => string)), contextID?: string): void;
-    alert(message: (string | (() => string)), contextID?: string): void;
-
-    CreateLogContext(logID: string, logLevel?: LogLevel): ILogger;
-    DumpLogToConsole(endTick?: boolean): void;
+    trace(message: (string | (() => string))): void;
+    debug(message: (string | (() => string))): void;
+    info(message: (string | (() => string))): void;
+    warn(message: (string | (() => string))): void;
+    error(message: (string | (() => string))): void;
+    fatal(message: (string | (() => string))): void;
+    alert(message: (string | (() => string))): void;
 }
-declare var Logger: ILogger;
 
 
 declare function CopyObject<T>(obj: T): T;

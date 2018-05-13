@@ -29,5 +29,5 @@ export abstract class RoomBase<T extends RoomProcess_Memory> extends ProcessBase
         this.activateRoom(roomData, room);
     }
 
-    protected abstract activateRoom(roomData: RoomData_Memory, room?: Room): void;
+    protected abstract activateRoom(roomData: RVD_RoomMemory, room?: Room): void;
 }

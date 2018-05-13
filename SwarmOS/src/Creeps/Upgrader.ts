@@ -1,4 +1,4 @@
-export const bundle: IPackage<SpawnData_Memory> = {
+export const bundle: IPackage<SpawnerExtension_Memory> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
         processRegistry.register(PKG_CreepUpgrader, Upgrader);
     },

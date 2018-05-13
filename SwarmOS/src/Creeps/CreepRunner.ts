@@ -1,19 +1,11 @@
 declare var Memory: {
-    spawnData: SpawnData_Memory,
+    spawnData: SpawnerExtension_Memory,
 }
-
-const MIN_BODY = 0;
-const TINY_BODY = 1;
-const SMALL_BODY = 2;
-const MEDIUM_BODY = 3;
-const BIG_BODY = 4;
-const LARGE_BODY = 5;
-const SUPER_BODY = 6;
 
 declare const PKG_CreepRunner: string;
 import { ProcessBase, ExtensionBase } from "Core/BasicTypes";
 
-export const creepRunnerPackage: IPackage<SpawnData_Memory> = {
+export const creepRunnerPackage: IPackage<SpawnerExtension_Memory> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
         processRegistry.register(PKG_CreepRunner, CreepRunner);
         let CreepRunnerExtension = new SpawnExtension(extensionRegistry);
@@ -28,6 +20,7 @@ const PKG_CreepRunner_LogContext: LogContext = {
 
 class CreepRunner extends ProcessBase {
     protected OnLoad(): void { }
+
     @posisInterface(EXT_CreepSpawner)
     SpawnerExtensions!: SpawnExtension;
 
@@ -56,30 +49,6 @@ class CreepRunner extends ProcessBase {
                 spawnedCreeps: {}
             }
         }
-    }
-
-    // (TODO) Scale this properly
-    protected calculateSpawnDifficulty(req: SpawnData_SpawnCard, spawn?: StructureSpawn) {
-        let canSpawn = req.spawnState == SP_QUEUED;
-        let difficulty = req.body.cost;
-        // Multiply by a factor of the max distance
-        if (req.maxSpawnDist) {
-            difficulty *= (E2C_MaxSpawnDistance / req.maxSpawnDist);
-        }
-
-        if (spawn) {
-            canSpawn = false;
-            let spawnDistance = Game.map.getRoomLinearDistance(spawn.room.name, req.location);
-            if (!req.maxSpawnDist || req.maxSpawnDist >= spawnDistance) {
-                if (req.body.cost <= spawn.room.energyAvailable) {
-                    canSpawn = true;
-                    // Multiply by a factor of the actual distance
-                    difficulty *= E2C_SpawnDistance * (spawnDistance || 1);
-                }
-            }
-        }
-
-        return ((canSpawn) ? difficulty : -1);
     }
 
     executeProcess(): void {
@@ -136,13 +105,19 @@ class CreepRunner extends ProcessBase {
             let reqIDs = Object.keys(this.memory.queue);
             for (let j = 0; j < reqIDs.length; j++) {
                 let req = this.memory.queue[reqIDs[j]];
+                let diff = req.body.cost;
+                let dist = Game.map.getRoomLinearDistance(spawn.room.name, req.location);
+                if (req.maxSpawnDist && dist > req.maxSpawnDist) {
+                    continue;
+                }
+                diff += E2C_MaxSpawnDistance * (req.maxSpawnDist || 0);
+                diff -= E2C_SpawnDistance * dist;
                 if (spawnRequest.req && req.priority != spawnRequest.req.priority) {
                     if (req.priority > spawnRequest.req.priority) {
-                        spawnRequest = { req, diff: this.calculateSpawnDifficulty(req, spawn) }
+                        spawnRequest = { req, diff }
                     }
                     continue;
                 }
-                let diff = this.calculateSpawnDifficulty(req, spawn);
 
                 if (!spawnRequest.req || diff > spawnRequest.diff) {
                     spawnRequest = { req, diff }
@@ -171,7 +146,12 @@ class CreepRunner extends ProcessBase {
                 if (spawnResult == OK) {
                     this.log.debug(`Spawn Creep successful for ${spawnRequest.req.creepName} - pid(${spawnRequest.req.pid})`);
                     spawnRequest.req.spawnState = SP_SPAWNING;
-                    this.spawnedCreeps[spawnRequest.req.creepName] = spawnRequest.req.pid;
+                    this.spawnedCreeps[spawnRequest.req.creepName] = {
+                        owner: spawnRequest.req.pid,
+                        carry: 0,
+                        move: 0,
+                        work: 0
+                    }
                 }
             }
         }
@@ -179,7 +159,7 @@ class CreepRunner extends ProcessBase {
 }
 
 class SpawnExtension extends ExtensionBase implements ISpawnExtension {
-    protected get memory(): SpawnData_Memory {
+    protected get memory(): SpawnerExtension_Memory {
         return Memory.spawnData;
     }
     cancelRequest(id: string): boolean {

@@ -1,4 +1,13 @@
+//declare var Memory: { [id: string]: MemBase }
 declare interface MemBase { }
+
+declare type ObjectID = string;
+declare type CreepID = ObjectID;
+declare type StructureID = ObjectID;
+declare type FlagID = ObjectID;
+
+declare type RoomID = string;
+declare type PlayerID = string;
 
 /** Core OS */
 declare interface KernelMemory extends MemBase {
@@ -8,92 +17,101 @@ declare interface KernelMemory extends MemBase {
     notifications: string[]
 }
 /** RoomViewData */
-declare interface RoomData_StructureData extends MemBase {
-    hits: number
-    id: string;
-    room?: string;
+declare interface RoomViewData_Memory extends MemBase {
+    [roomID: string]: RVD_RoomMemory
+}
+
+interface RVD_RoomMemory extends MemBase {
+    cSites: RVD_StructureData[];
+    lastUpdated: number;
+    mineralIDs: ObjectID[];
+    minUpdateOffset: number;
+    owner?: PlayerID;
+    pid?: PID;
+    resources: ObjectID[];
+    sourceIDs: ObjectID[];
+    structures: RVD_StructureMemory
+    tombstones: ObjectID[];
+
+    [STRUCTURE_CONTROLLER]?: ObjectID;
+    [STRUCTURE_STORAGE]?: ObjectID;
+    [STRUCTURE_TERMINAL]?: ObjectID;
+}
+interface RVD_StructureData extends MemBase {
+    id: ObjectID;
+    hits?: number
+    room?: RoomID;
     x?: number;
     y?: number;
 }
-declare interface RoomData_StructureMemory extends MemBase {
-    [STRUCTURE_CONTAINER]: RoomData_StructureData[];
-    [STRUCTURE_ROAD]: RoomData_StructureData[];
+interface RVD_StructureMemory extends MemBase {
+    //[index: string]: RVD_StructureData[] | undefined;
+    [STRUCTURE_CONTAINER]: RVD_StructureData[];
+    [STRUCTURE_ROAD]: RVD_StructureData[];
 
-    [STRUCTURE_EXTENSION]?: RoomData_StructureData[];
-    [STRUCTURE_LAB]?: RoomData_StructureData[];
-    [STRUCTURE_LINK]?: RoomData_StructureData[];
-    [STRUCTURE_RAMPART]?: RoomData_StructureData[];
-    [STRUCTURE_SPAWN]?: RoomData_StructureData[];
-    [STRUCTURE_TOWER]?: RoomData_StructureData[];
-    [STRUCTURE_WALL]?: RoomData_StructureData[];
-    [index: string]: RoomData_StructureData[] | undefined;
-}
-declare interface RoomData_Memory extends MemBase {
-    cSites: RoomData_StructureData[]; // (TODO): Change this to use a flag
-    lastUpdated: number;
-    mineralIDs: string[];
-    minUpdateOffset: number;
-    owner?: string;
-    pid?: PID;
-    resources: string[];
-    sourceIDs: string[];
-    structures: RoomData_StructureMemory
-    tombstones: string[];
-
-    [STRUCTURE_STORAGE]?: RoomData_StructureData;
-    [STRUCTURE_TERMINAL]?: RoomData_StructureData
+    [STRUCTURE_EXTENSION]?: RVD_StructureData[];
+    [STRUCTURE_LAB]?: RVD_StructureData[];
+    [STRUCTURE_LINK]?: RVD_StructureData[];
+    [STRUCTURE_RAMPART]?: RVD_StructureData[];
+    [STRUCTURE_SPAWN]?: RVD_StructureData[];
+    [STRUCTURE_TOWER]?: RVD_StructureData[];
+    [STRUCTURE_WALL]?: RVD_StructureData[];
 }
 
 /** SpawnData */
-declare interface SpawnData_Memory extends MemBase {
-    queue: SDictionary<SpawnData_SpawnCard>;
-    spawnedCreeps: SDictionary<PID>;
+declare interface SpawnerExtension_Memory extends MemBase {
+    queue: SDictionary<SpawnerRequest>;
+    spawnedCreeps: SDictionary<CreepContext>;
+}
+declare interface CreepContext extends MemBase {
+    m: number;      // (m)ove
+    n: CreepID;     // (n)ame
+    o: PID;         // (o)wner
+    t?: number;     // (t)ough
+}
+declare interface CreepContext_Worker extends CreepContext {
+    w: number;      // (w)ork
+    c: number;      // (c)arry
+}
+declare interface CreepContext_Claimer extends CreepContext {
+    cl: number;     // (cl)aim
+}
+declare interface CreepContext_Attacker extends CreepContext {
+    a: number;      // (a)ttack
+    r: number;      // (r)angedAttack
+    h: number;      // (h)eal
 }
 
-declare interface SpawnData_SpawnCard extends MemBase {
-    body: ISpawnDef;
-    creepName: string;
-    location: string;
-    pid: PID;
-    priority: Priority;
-    spawnState: SpawnState;
+declare interface SpawnerRequest extends MemBase {
+    con: CreepContext;  // Context
+    name: CreepID       // Desired spawn name
+    loc: RoomID;        // Where the spawn request originates
+    pri: Priority;      // How much of a priority is this spawn??
+    sta: SpawnState;    // Current Spawn state
 
-    defaultMemory?: any;
-    maxSpawnDist?: number;
-    spawner?: string;
-}
-
-/** Stats */
-declare type RoomStats = {}
-declare type MarketStats = {}
-declare type CollectionStats = {}
-declare type StatsMemoryStructure = {
-    rooms: { [id: string]: RoomStats }
-    market: MarketStats
-    totalGCL: number
-}
-declare interface ProfilerMemory {
-    data: { [name: string]: ProfilerData };
-    start?: number;
-    total: number;
-}
-
-interface ProfilerData {
-    calls: number;
-    time: number;
+    dm?: any;           // Default memory
+    max?: number;       // Max spawning distance allowed for this spawn.
+    spawner?: StructureID; // ID of the spawner that this creep is being spawned at.,
 }
 
 /** Flag Memory */
 declare interface FlagProcess_Memory extends MemBase {
-    flagID: string;
+    flagID: FlagID;
 }
 
-/** Creep Memory */
+/** Flags Extension memory */
+declare interface FlagMemory extends MemBase {
+    [id: string]: PID
+}
+
+/** Creep extension Memory */
 declare interface CreepMemory extends MemBase {
     [id: string]: CreepProcess_Memory
 }
+
+
 declare interface CreepProcess_Memory extends MemBase {
-    creep?: string;
+    creep?: CreepContext;
     targetID?: string;
     homeRoom: string;
     targetRoom: string;
@@ -147,7 +165,26 @@ declare interface ServiceProviderMemory extends MemBase {
     }
 }
 
-/** Flags */
-declare interface FlagMemory extends MemBase {
-    [id: string]: PID
+
+
+
+
+/** Stats */
+declare type RoomStats = {}
+declare type MarketStats = {}
+declare type CollectionStats = {}
+declare type StatsMemoryStructure = {
+    rooms: { [id: string]: RoomStats }
+    market: MarketStats
+    totalGCL: number
+}
+declare interface ProfilerMemory {
+    data: { [name: string]: ProfilerData };
+    start?: number;
+    total: number;
+}
+
+interface ProfilerData {
+    calls: number;
+    time: number;
 }

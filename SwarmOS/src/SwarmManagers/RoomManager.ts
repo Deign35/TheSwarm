@@ -1,5 +1,5 @@
 declare var Memory: {
-    roomData: SDictionary<RoomData_Memory>
+    roomData: SDictionary<RVD_RoomMemory>
 }
 
 if (!Memory.roomData) {
@@ -7,7 +7,7 @@ if (!Memory.roomData) {
 }
 import { ProcessBase, ExtensionBase } from "Core/BasicTypes";
 
-export const bundle: IPackage<SDictionary<RoomData_Memory>> = {
+export const bundle: IPackage<SDictionary<RVD_RoomMemory>> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
         processRegistry.register(PKG_RoomManager, RoomManager);
         extensionRegistry.register(EXT_RoomView, new RoomExtension(extensionRegistry));
@@ -62,10 +62,10 @@ class RoomManager extends ProcessBase {
 
 const FRE_RoomStructures = primes_100[10]; // 10 = 29
 class RoomExtension extends ExtensionBase implements IRoomDataExtension {
-    protected get memory(): SDictionary<RoomData_Memory> {
+    protected get memory(): SDictionary<RVD_RoomMemory> {
         return Memory.roomData;
     }
-    protected getRoomData(roomID: string): { room?: Room, roomData?: RoomData_Memory } {
+    protected getRoomData(roomID: string): { room?: Room, roomData?: RVD_RoomMemory } {
         let room = Game.rooms[roomID];
         if (!this.memory[roomID]) {
             if (!room) {
@@ -156,7 +156,7 @@ class RoomExtension extends ExtensionBase implements IRoomDataExtension {
         for (let i = 0, length = allStructures.length; i < length; i++) {
             let structure = allStructures[i];
             if (roomData.structures[structure.structureType]) {
-                let structureData: RoomData_StructureData = {
+                let structureData: RVD_StructureData = {
                     hits: structure.hits,
                     id: structure.id,
                 }
@@ -183,7 +183,7 @@ class RoomExtension extends ExtensionBase implements IRoomDataExtension {
             }
         }
     }
-    GetRoomData(roomID: string, forceRefresh: boolean = false): RoomData_Memory | undefined {
+    GetRoomData(roomID: string, forceRefresh: boolean = false): RVD_RoomMemory | undefined {
         forceRefresh = forceRefresh || !this.memory[roomID] || (this.memory[roomID].lastUpdated == 0);
         let { room, roomData } = this.getRoomData(roomID);
         if (room) {

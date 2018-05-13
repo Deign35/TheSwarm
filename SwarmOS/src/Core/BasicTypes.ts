@@ -4,13 +4,13 @@ export abstract class ProcessBase implements IProcess {
         this.OnLoad();
     }
     @posisInterface(EXT_Kernel)
-    protected kernel!: IKernel
+    protected kernel!: IKernelProcessExtensions
     @posisInterface(EXT_Registry)
     protected extensions!: IExtensionRegistry;
     @posisInterface(EXT_CreepSpawner)
     protected spawner!: ISpawnExtension;;
     @posisInterface(EXT_Interrupt)
-    protected interrupter!: IInteruptExtension
+    protected interrupter!: IKernelNotificationsExtension
 
     protected get memory(): any {
         return this.context.memory;
@@ -37,7 +37,7 @@ export abstract class ProcessBase implements IProcess {
     private _logger: ILogger;
 
     SetProcessToSleep(ticks: number) {
-        let sleeper = this.context.queryPosisInterface(EXT_Sleep);
+        let sleeper = this.context.getPackageInterface(EXT_Sleep);
         sleeper.sleep(ticks, this.pid);
     }
     protected abstract OnLoad(): void;

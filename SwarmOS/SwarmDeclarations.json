@@ -102,8 +102,8 @@
             "comment": "Energy to cost conversion",
             "enabled": true,
             "entries": {
-                "MaxSpawnDistance": 10,
-                "SpawnDistance": 2
+                "MaxSpawnDistance": 200,
+                "SpawnDistance": 100
             }
         },
         "DEFAULT": {

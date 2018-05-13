@@ -1,6 +1,6 @@
 import { ProcessBase } from "Core/BasicTypes";
 
-export const bundle: IPackage<SpawnData_Memory> = {
+export const bundle: IPackage<SpawnerExtension_Memory> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
         processRegistry.register(PKG_BasicOwnedRoom, BasicOwnedRoom);
     },
@@ -10,7 +10,7 @@ export const bundle: IPackage<SpawnData_Memory> = {
 import { RoomBase } from "Rooms/RoomBase";
 
 class BasicOwnedRoom extends RoomBase<BasicOwnedRoom_Memory> {
-    protected activateRoom(roomData: RoomData_Memory, room?: Room): void {
+    protected activateRoom(roomData: RVD_RoomMemory, room?: Room): void {
         if (!room) {
             this.log.fatal(`Owned room not found (${this.memory.roomName})`);
             this.kernel.killProcess(this.pid);

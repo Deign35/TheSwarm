@@ -1,5 +1,5 @@
 declare var Memory: {
-    spawnData: SpawnData_Memory
+    spawnData: SpawnerExtension_Memory
 }
 
 const MIN_BODY = 0;
@@ -31,7 +31,7 @@ const exDef2: RoleDefinition<'harvester'> = {
 */
 import { ProcessBase, ExtensionBase } from "Core/BasicTypes";
 
-export const bundle: IPackage<SpawnData_Memory> = {
+export const bundle: IPackage<SpawnerExtension_Memory> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
         processRegistry.register(PKG_SpawnManager, SpawnManager);
         let SpawnManagerExtension = new SpawnExtension(extensionRegistry);
@@ -234,7 +234,7 @@ class SpawnExtension extends ExtensionBase implements ISpawnExtension {
         this.memory.queue[opts.creepName] = opts;
         return opts.creepName;
     }
-    protected get memory(): SpawnData_Memory {
+    protected get memory(): SpawnerExtension_Memory {
         return Memory.spawnData;
     }
 }
