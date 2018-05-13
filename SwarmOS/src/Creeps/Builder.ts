@@ -13,8 +13,8 @@ import { BuildAction } from "Actions/BuildAction";
 
 export class Builder extends CreepBase<Builder_memory> {
     protected get CreepPrefix() { return 'Bui_'; }
-    protected get SpawnPriority() {
-        return Priority.Low;
+    protected get SpawnPriority(): Priority {
+        return Priority_Low;
     }
     protected get SpawnBody() {
         let spawnCap = Game.rooms[this.memory.targetRoom].energyCapacityAvailable;

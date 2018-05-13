@@ -62,16 +62,16 @@ class Refiller extends CreepBase<SpawnRefiller_Memory> {
     protected get SpawnPriority() {
         let spawnCap = Game.rooms[this.memory.targetRoom].energyCapacityAvailable;
         if (spawnCap > 4000) {
-            return Priority.Low;
+            return Priority_Low;
         } else if (spawnCap > 2000) {
-            return Priority.Medium;
+            return Priority_Medium;
         } else if (spawnCap > 1000) {
-            return Priority.High;
+            return Priority_High;
         } else {
             if (Object.keys(Game.creeps).length == 0) {
-                return Priority.EMERGENCY;
+                return Priority_EMERGENCY;
             }
-            return Priority.Highest;
+            return Priority_Highest;
         }
     }
     protected activateCreep(): void {

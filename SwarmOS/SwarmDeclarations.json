@@ -113,106 +113,21 @@
                 "LOG_LEVEL": "\"info\"",
                 "LOG_ID": "\"SwarmOS\""
             }
-        }
-    },
-    "Enums": {
-        "ProcessState": {
-            "Init": 0,
-            "Running": 1,
-            "Killed": 2,
-            "Sleeping": 3
-        },
-        "SwarmDataType": {
-            "None": -1,
-            "Structure": 1,
-            "Room": 2,
-            "Flag": 3,
-            "Creep": 4,
-            "RoomObject": 5,
-            "Consul": 6,
-            "Master": 7
-        },
-        "SwarmType": {
-            "None": -1,
-            "SwarmSite": 1,
-            "SwarmCreep": 2,
-            "SwarmFlag": 3,
-            "SwarmMineral": 4,
-            "SwarmNuke": 5,
-            "SwarmResource": 6,
-            "SwarmRoom": 7,
-            "SwarmSource": 8,
-            "SwarmTombstone": 9,
-            "SwarmContainer": 10,
-            "SwarmController": 11,
-            "SwarmExtension": 12,
-            "SwarmExtractor": 13,
-            "SwarmKeepersLair": 14,
-            "SwarmLab": 15,
-            "SwarmLink": 16,
-            "SwarmNuker": 17,
-            "SwarmObserver": 18,
-            "SwarmPowerBank": 19,
-            "SwarmPowerSpawn": 20,
-            "SwarmPortal": 21,
-            "SwarmRampart": 22,
-            "SwarmRoad": 23,
-            "SwarmSpawn": 24,
-            "SwarmStorage": 25,
-            "SwarmTerminal": 26,
-            "SwarmTower": 27,
-            "SwarmWall": 28,
-            "SwarmConsul": 29,
-            "SwarmMaster": 30
         },
         "Priority": {
-            "Hold": -1,
-            "Lowest": 1,
-            "Low": 3,
-            "Medium": 5,
-            "High": 7,
-            "Highest": 9,
-            "EMERGENCY": 10
-        },
-        "CreepType": {
-            "None": -1,
-            "Builder": 1,
-            "Retriever": 2,
-            "Deliverer": 3,
-            "Upgrader": 4,
-            "Repairer": 5,
-            "Scientist": 6,
-            "Defender": 7,
-            "SourceHarvester": 8,
-            "MineralHarvester": 9
-        },
-        "ConsulType": {
-            "None": -1,
-            "Harvest": 1,
-            "Control": 2,
-            "Distribution": 3,
-            "Infrastructure": 4
-        },
-        "FlagType": {
-            "None": -1,
-            "Construct": 1,
-            "Position": 2
-        },
-        "RoomType": {
-            "NeutralRoom": -1,
-            "RCL1": 1,
-            "RCL2": 2,
-            "RCL3": 3,
-            "RCL4": 4,
-            "RCL5": 5,
-            "RCL6": 6,
-            "RCL7": 7,
-            "RCL8": 8,
-            "HarvestSupport": 9,
-            "KeepersLair": 10,
-            "Hostile": 11,
-            "Ally": 12,
-            "NonHostile": 13
+            "comment": "Priority values",
+            "enabled": true,
+            "combinedType": "Priority",
+            "type": true,
+            "entries": {
+                "Hold": -1,
+                "Lowest": 1,
+                "Low": 3,
+                "Medium": 5,
+                "High": 7,
+                "Highest": 9,
+                "EMERGENCY": 10
+            }
         }
     }
 }

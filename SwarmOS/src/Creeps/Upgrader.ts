@@ -73,9 +73,9 @@ export class Upgrader extends CreepBase<Upgrader_Memory> {
     }
     protected get SpawnPriority() {
         if (Game.rooms[this.memory.targetRoom].controller!.ticksToDowngrade < 3000) {
-            return Priority.EMERGENCY;
+            return Priority_EMERGENCY;
         }
-        return Priority.Lowest;
+        return Priority_Lowest;
     }
     protected activateCreep(): void {
         let creep = Game.creeps[this.memory.creep!];

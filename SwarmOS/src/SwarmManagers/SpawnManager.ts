@@ -69,7 +69,8 @@ class SpawnManager extends ProcessBase {
         if (!Memory.spawnData) {
             this.log.warn(`Initializing memory`);
             Memory.spawnData = {
-                queue: {}
+                queue: {},
+                spawnedCreeps: {}
             }
         }
     }

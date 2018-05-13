@@ -14,8 +14,8 @@ import { RepairAction } from "Actions/RepairAction";
 
 export class Harvester extends CreepBase<Harvester_Memory> {
     protected get CreepPrefix() { return 'Harv_'; }
-    protected get SpawnPriority() {
-        return Priority.High;
+    protected get SpawnPriority(): Priority {
+        return Priority_High;
     }
     protected get SpawnBody() {
         let energyCap = Game.rooms[this.memory.targetRoom].energyCapacityAvailable

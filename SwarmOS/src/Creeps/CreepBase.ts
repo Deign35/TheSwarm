@@ -27,7 +27,7 @@ export abstract class CreepBase<T extends CreepProcess_Memory> extends ProcessBa
     private _lastUpdate!: number;
     protected abstract get CreepPrefix(): string
     protected get SpawnPriority(): Priority {
-        return Priority.Low;
+        return Priority_Low;
     }
     protected get SpawnBody(): ISpawnDef {
         return {
