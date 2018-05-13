@@ -37,16 +37,14 @@ const PKG_TestInterrupt_LogContext: LogContext = {
 
 class TestSleeper extends ProcessBase {
     protected OnLoad(): void { }
-    constructor(protected context: IProcessContext) {
-        super(context);
-        Logger.CreateLogContext(PKG_TestInterrupt_LogContext);
-    }
     protected get memory() {
         return Memory.TestData;
     }
-
     protected get logID() {
         return PKG_TestInterrupt_LogContext.logID;
+    }
+    protected get logLevel(): LogLevel {
+        return PKG_TestInterrupt_LogContext.logLevel!;
     }
 
     handleMissingMemory() {
@@ -122,16 +120,14 @@ class TestSleeper extends ProcessBase {
 
 class TestInterrupter extends ProcessBase {
     protected OnLoad(): void { }
-    constructor(protected context: IProcessContext) {
-        super(context);
-        Logger.CreateLogContext(PKG_TestInterrupt_LogContext);
-    }
     protected get memory() {
         return Memory.TestData;
     }
-
     protected get logID() {
         return PKG_TestInterrupt_LogContext.logID
+    }
+    protected get logLevel(): LogLevel {
+        return LOG_DEBUG;
     }
 
     executeProcess(): void {

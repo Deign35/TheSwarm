@@ -1,5 +1,6 @@
 export abstract class ProcessBase implements IProcess {
     constructor(protected context: IProcessContext) {
+        this._logger = Logger.CreateLogContext(this.logID, this.logLevel);
         this.OnLoad();
     }
     @posisInterface(EXT_Kernel)
@@ -25,22 +26,15 @@ export abstract class ProcessBase implements IProcess {
     }
     get isInDebugMode() { return false; }
     protected get logID() {
-        return "SwarmOS"; // (TODO): Make this a constant 
+        return DEFAULT_LOG_ID;
+    }
+    protected get logLevel(): LogLevel {
+        return DEFAULT_LOG_LEVEL;
     }
     protected get log(): ILogger {
         return this._logger;
     }
-    private _logger: ILogger = {
-        alert: (message: (string | (() => string))) => { Logger.alert(message, this.logID); },
-        debug: (message: (string | (() => string))) => { Logger.debug(message, this.logID); },
-        error: (message: (string | (() => string))) => { Logger.error(message, this.logID); },
-        fatal: (message: (string | (() => string))) => { Logger.fatal(message, this.logID); },
-        info: (message: (string | (() => string))) => { Logger.info(message, this.logID); },
-        trace: (message: (string | (() => string))) => { Logger.trace(message, this.logID); },
-        warn: (message: (string | (() => string))) => { Logger.warn(message, this.logID); },
-        CreateLogContext: Logger.CreateLogContext,
-        DumpLogToConsole: Logger.DumpLogToConsole
-    }
+    private _logger: ILogger;
 
     SetProcessToSleep(ticks: number) {
         let sleeper = this.context.queryPosisInterface(EXT_Sleep);

@@ -32,16 +32,15 @@ const IN____Empty___Manager_LogContext: LogContext = {
 
 class ___Empty___Manager extends ProcessBase {
     protected OnLoad(): void { }
-    constructor(protected context: IProcessContext) {
-        super(context);
-        Logger.CreateLogContext(IN____Empty___Manager_LogContext);
-    }
     protected get memory() {
         return Memory.___Empty___Data;
     }
 
     protected get logID() {
         return IN____Empty___Manager_LogContext.logID
+    }
+    protected get logLevel(): LogLevel {
+        return IN____Empty___Manager_LogContext.logLevel!;
     }
 
     handleMissingMemory() {

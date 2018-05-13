@@ -38,7 +38,7 @@ declare interface ILogger {
     fatal(message: (string | (() => string)), contextID?: string): void;
     alert(message: (string | (() => string)), contextID?: string): void;
 
-    CreateLogContext(context: LogContext): void;
+    CreateLogContext(logID: string, logLevel?: LogLevel): ILogger;
     DumpLogToConsole(endTick?: boolean): void;
 }
 declare var Logger: ILogger;

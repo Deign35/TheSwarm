@@ -74,8 +74,6 @@ interface Context {
     }
 }
 
-const DEFAULT_LOG_LEVEL: LogLevel = LOG_INFO; // Game.rooms['sim'] ? LOG_TRACE : LOG_INFO;
-const DEFAULT_LOG_ID = 'SwarmOS';
 export class SwarmLogger implements ILogger {
     constructor() {
         this.logContexts = {};
@@ -89,23 +87,38 @@ export class SwarmLogger implements ILogger {
         }
 
         if (!this.logContexts[DEFAULT_LOG_ID]) {
-            this.CreateLogContext({ logID: DEFAULT_LOG_ID, logLevel: DEFAULT_LOG_LEVEL });
+            this.CreateLogContext(DEFAULT_LOG_ID, DEFAULT_LOG_LEVEL);
         }
     }
-    CreateLogContext(context: LogContext): void {
-        if (!this.logContexts[context.logID]) {
-            this.logContexts[context.logID] = {
-                logLevel: context.logLevel || DEFAULT_LOG_LEVEL,
+    CreateLogContext(logID: string, logLevel: LogLevel): ILogger {
+        if (!this.logContexts[logID]) {
+            this.logContexts[logID] = {
+                logLevel: logLevel || DEFAULT_LOG_LEVEL,
                 logs: [],
                 //counter: false // (TODO) prepend a counter to logs.
             }
+        }
+
+        return {
+            alert: (message: (string | (() => string))) => { Logger.alert(message, logID); },
+            debug: (message: (string | (() => string))) => { Logger.debug(message, logID); },
+            error: (message: (string | (() => string))) => { Logger.error(message, logID); },
+            fatal: (message: (string | (() => string))) => { Logger.fatal(message, logID); },
+            info: (message: (string | (() => string))) => { Logger.info(message, logID); },
+            trace: (message: (string | (() => string))) => { Logger.trace(message, logID); },
+            warn: (message: (string | (() => string))) => { Logger.warn(message, logID); },
+            CreateLogContext: Logger.CreateLogContext,
+            DumpLogToConsole: Logger.DumpLogToConsole
         }
     }
 
     protected log(message: (string | (() => string)), contextID: string = DEFAULT_LOG_ID, severity: LogLevel = LOG_INFO) {
         let context = this.logContexts[contextID];
         if (!context) {
-            this.CreateLogContext({ logID: contextID, logLevel: DEFAULT_LOG_LEVEL });
+            this.logContexts[contextID] = {
+                logLevel: DEFAULT_LOG_LEVEL,
+                logs: [],
+            }
             context = this.logContexts[contextID];
         }
         if (ShouldLog(context.logLevel, severity)) {

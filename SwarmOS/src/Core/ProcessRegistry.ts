@@ -4,10 +4,17 @@ const ProcessRegistry_LogContext: LogContext = {
 }
 export class ProcessRegistry implements IProcessRegistry {
     constructor() {
-        this.log.CreateLogContext(ProcessRegistry_LogContext);
+        this._logger = this.log.CreateLogContext(this.logID, this.logLevel);
     }
     protected get log() {
-        return Logger;
+        return this._logger;
+    }
+    private _logger: ILogger;
+    protected get logID() {
+        return ProcessRegistry_LogContext.logID;
+    }
+    protected get logLevel(): LogLevel {
+        return ProcessRegistry_LogContext.logLevel!;
     }
     private registry: { [name: string]: _ProcessConstructor } = {};
     register(name: string, constructor: _ProcessConstructor): boolean {

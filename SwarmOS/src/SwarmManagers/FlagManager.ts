@@ -20,16 +20,14 @@ const PKG_FlagManager_LogContext: LogContext = {
 
 class FlagManager extends ProcessBase {
     protected OnLoad(): void { }
-    constructor(protected context: IProcessContext) {
-        super(context);
-        Logger.CreateLogContext(PKG_FlagManager_LogContext);
-    }
     protected get memory() {
         return Memory.flagData;
     }
-
     protected get logID() {
         return PKG_FlagManager_LogContext.logID;
+    }
+    protected get logLevel(): LogLevel {
+        return PKG_FlagManager_LogContext.logLevel!;
     }
 
     handleMissingMemory() {

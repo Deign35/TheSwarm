@@ -105,6 +105,14 @@
                 "MaxSpawnDistance": 10,
                 "SpawnDistance": 2
             }
+        },
+        "DEFAULT": {
+            "comment": "Default values",
+            "enabled": true,
+            "entries": {
+                "LOG_LEVEL": "\"info\"",
+                "LOG_ID": "\"SwarmOS\""
+            }
         }
     },
     "Enums": {

@@ -1,5 +1,5 @@
 declare var Memory: {
-    spawnData: SpawnData_Memory
+    spawnData: SpawnData_Memory,
 }
 
 const MIN_BODY = 0;
@@ -29,45 +29,45 @@ const exDef2: RoleDefinition<'harvester'> = {
     }
 }
 */
+declare const PKG_CreepRunner: string;
 import { ProcessBase, ExtensionBase } from "Core/BasicTypes";
 
 export const bundle: IPackage<SpawnData_Memory> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
-        processRegistry.register(PKG_SpawnManager, SpawnManager);
-        let SpawnManagerExtension = new SpawnExtension(extensionRegistry);
-        extensionRegistry.register(EXT_CreepSpawner, SpawnManagerExtension);
+        processRegistry.register(PKG_CreepRunner, CreepRunner);
+        let CreepRunnerExtension = new SpawnExtension(extensionRegistry);
+        extensionRegistry.register(EXT_CreepSpawner, CreepRunnerExtension);
     },
-    rootImageName: PKG_SpawnManager
+    rootImageName: PKG_CreepRunner
 }
 
-const PKG_SpawnManager_LogContext: LogContext = {
-    logID: PKG_SpawnManager,
+const PKG_CreepRunner_LogContext: LogContext = {
+    logID: PKG_CreepRunner,
     logLevel: LOG_INFO
 }
 
-//const FRE_RoomStructures = primes_100[10]; // 10 = 29
-class SpawnManager extends ProcessBase {
+class CreepRunner extends ProcessBase {
+    protected OnLoad(): void { }
     @posisInterface(EXT_CreepSpawner)
     SpawnerExtensions!: SpawnExtension;
-
-    OnLoad() { }
 
     protected get memory() {
         return Memory.spawnData;
     }
-    protected get queue() {
+    protected get spawnQueue() {
         return this.memory.queue;
     }
+
     protected get logID() {
-        return PKG_SpawnManager_LogContext.logID;
+        return PKG_CreepRunner_LogContext.logID;
     }
     protected get logLevel() {
-        return PKG_SpawnManager_LogContext.logLevel!;
+        return PKG_CreepRunner_LogContext.logLevel!;
     }
 
     handleMissingMemory() {
         if (!Memory.spawnData) {
-            this.log.warn(`Initializing memory`);
+            this.log.warn(`Initializing CreepRunner memory`);
             Memory.spawnData = {
                 queue: {}
             }
@@ -94,21 +94,24 @@ class SpawnManager extends ProcessBase {
                 }
             }
         }
-        difficulty += req.priority * 1000;
 
         return ((canSpawn) ? difficulty : -1);
     }
 
     executeProcess(): void {
+        this.spawnCreeps();
+    }
+
+    spawnCreeps(): void {
         if (Object.keys(this.memory.queue).length == 0) {
             this.log.warn(`No spawn requests in the queue.  You have spawn capacity available.`);
             return;
         }
 
         let minSpawnCost = 20000;
-        let keys = Object.keys(this.queue);
+        let keys = Object.keys(this.spawnQueue);
         for (let i = 0; i < keys.length; i++) {
-            minSpawnCost = Math.min(minSpawnCost, this.queue[keys[i]].body.cost);
+            minSpawnCost = Math.min(minSpawnCost, this.spawnQueue[keys[i]].body.cost);
         }
         let availableSpawns: SDictionary<StructureSpawn> = {};
 
@@ -120,36 +123,18 @@ class SpawnManager extends ProcessBase {
             }
         }
 
-        let sortedRequests = Object.keys(this.memory.queue).sort((a, b) => {
-            let reqA = this.memory.queue[a];
-            let reqB = this.memory.queue[b];
-            if (reqA.spawnState != SP_QUEUED) {
-                return 1;
-            }
-            if (reqB.spawnState != SP_QUEUED) {
-                return -1;
-            }
-
-            if (reqA.priority != reqB.priority) {
-                return reqA.priority > reqB.priority ? -1 : 1;
-            }
-
-            let aDiff = this.calculateSpawnDifficulty(reqA);
-            let bDiff = this.calculateSpawnDifficulty(reqB);
-
-            return aDiff > bDiff ? -1 : 1;
-        });
         let sortedSpawns = Object.keys(availableSpawns).sort((a, b) => {
             return availableSpawns[a].room.energyAvailable > availableSpawns[b].room.energyAvailable ? -1 : 1;
         });
 
-        this.log.debug(`AvailableSpawnerCount(${sortedSpawns.length}) - SpawnRequestCount(${sortedRequests.length})`);
+        this.log.debug(`AvailableSpawnerCount(${sortedSpawns.length}) - SpawnRequestCount(${keys.length})`);
         for (let i = 0; i < sortedSpawns.length; i++) {
             let spawnRequest: { req?: SpawnData_SpawnCard, diff: number } = { req: undefined, diff: 0 };
             let spawn = availableSpawns[sortedSpawns[i]];
 
-            for (let j = 0; j < sortedRequests.length; j++) {
-                let req = this.memory.queue[sortedRequests[j]];
+            let reqIDs = Object.keys(this.memory.queue);
+            for (let j = 0; j < reqIDs.length; j++) {
+                let req = this.memory.queue[reqIDs[j]];
                 if (spawnRequest.req && req.priority != spawnRequest.req.priority) {
                     if (req.priority > spawnRequest.req.priority) {
                         spawnRequest = { req, diff: this.calculateSpawnDifficulty(req, spawn) }
@@ -185,7 +170,6 @@ class SpawnManager extends ProcessBase {
                 if (spawnResult == OK) {
                     this.log.debug(`Spawn Creep successful for ${spawnRequest.req.creepName} - pid(${spawnRequest.req.pid})`);
                     spawnRequest.req.spawnState = SP_SPAWNING;
-                } else {
                 }
             }
         }
