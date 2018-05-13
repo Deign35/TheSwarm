@@ -47,6 +47,7 @@ declare interface RoomData_Memory extends MemBase {
 /** SpawnData */
 declare interface SpawnData_Memory extends MemBase {
     queue: SDictionary<SpawnData_SpawnCard>;
+    spawnedCreeps: SDictionary<PID>;
 }
 
 declare interface SpawnData_SpawnCard extends MemBase {
@@ -88,6 +89,9 @@ declare interface FlagProcess_Memory extends MemBase {
 }
 
 /** Creep Memory */
+declare interface CreepMemory extends MemBase {
+    [id: string]: CreepProcess_Memory
+}
 declare interface CreepProcess_Memory extends MemBase {
     creep?: string;
     targetID?: string;

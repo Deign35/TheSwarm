@@ -10,35 +10,15 @@ const BIG_BODY = 4;
 const LARGE_BODY = 5;
 const SUPER_BODY = 6;
 
-/*
-const exDef: RoleDefinition<'scout'> = {
-    roleID: 'scout',
-    body: [
-        [MOVE],
-        [TOUGH, TOUGH, TOUGH, MOVE],
-        [TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, MOVE],
-    ]
-}
-// (TODO) Automate role definitions to precalculate body costs and shit
-const exDef2: RoleDefinition<'harvester'> = {
-    roleID: 'harvester',
-    body: {
-        [MIN_BODY]: [WORK, CARRY, MOVE],
-        [SMALL_BODY]: [TOUGH, TOUGH, TOUGH, MOVE],
-        [MEDIUM_BODY]: [TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, MOVE],
-    }
-}
-*/
 declare const PKG_CreepRunner: string;
 import { ProcessBase, ExtensionBase } from "Core/BasicTypes";
 
-export const bundle: IPackage<SpawnData_Memory> = {
+export const creepRunnerPackage: IPackage<SpawnData_Memory> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
         processRegistry.register(PKG_CreepRunner, CreepRunner);
         let CreepRunnerExtension = new SpawnExtension(extensionRegistry);
         extensionRegistry.register(EXT_CreepSpawner, CreepRunnerExtension);
-    },
-    rootImageName: PKG_CreepRunner
+    }
 }
 
 const PKG_CreepRunner_LogContext: LogContext = {
@@ -57,6 +37,9 @@ class CreepRunner extends ProcessBase {
     protected get spawnQueue() {
         return this.memory.queue;
     }
+    protected get spawnedCreeps() {
+        return this.memory.spawnedCreeps;
+    }
 
     protected get logID() {
         return PKG_CreepRunner_LogContext.logID;
@@ -69,7 +52,8 @@ class CreepRunner extends ProcessBase {
         if (!Memory.spawnData) {
             this.log.warn(`Initializing CreepRunner memory`);
             Memory.spawnData = {
-                queue: {}
+                queue: {},
+                spawnedCreeps: {}
             }
         }
     }
@@ -99,10 +83,23 @@ class CreepRunner extends ProcessBase {
     }
 
     executeProcess(): void {
-        this.spawnCreeps();
+        let unassignedCreeps: SDictionary<Creep> = {};
+
+        let spawnedIDs = Object.keys(this.spawnedCreeps);
+        for (let i = 0; i < spawnedIDs.length; i++) {
+            let creepName = spawnedIDs[i];
+            let creep = Game.creeps[creepName];
+            if (!creep) {
+                delete this.spawnedCreeps[creepName];
+            }
+            if (!this.kernel.getProcessById(this.spawnCreeps[creepName])) {
+                unassignedCreeps[creepName] = creep
+            }
+        }
+        this.spawnCreeps(unassignedCreeps);
     }
 
-    spawnCreeps(): void {
+    protected spawnCreeps(unassignedCreeps: SDictionary<Creep>): void {
         if (Object.keys(this.memory.queue).length == 0) {
             this.log.warn(`No spawn requests in the queue.  You have spawn capacity available.`);
             return;
@@ -111,6 +108,10 @@ class CreepRunner extends ProcessBase {
         let minSpawnCost = 20000;
         let keys = Object.keys(this.spawnQueue);
         for (let i = 0; i < keys.length; i++) {
+            let creeps = Object.keys(unassignedCreeps);
+            for (let j = 0; j < creeps.length; j++) {
+                // Check if bodies are compatible, if so, don't bother spawning it, just assign the damn pid
+            }
             minSpawnCost = Math.min(minSpawnCost, this.spawnQueue[keys[i]].body.cost);
         }
         let availableSpawns: SDictionary<StructureSpawn> = {};
@@ -170,6 +171,7 @@ class CreepRunner extends ProcessBase {
                 if (spawnResult == OK) {
                     this.log.debug(`Spawn Creep successful for ${spawnRequest.req.creepName} - pid(${spawnRequest.req.pid})`);
                     spawnRequest.req.spawnState = SP_SPAWNING;
+                    this.spawnedCreeps[spawnRequest.req.creepName] = spawnRequest.req.pid;
                 }
             }
         }
@@ -177,6 +179,9 @@ class CreepRunner extends ProcessBase {
 }
 
 class SpawnExtension extends ExtensionBase implements ISpawnExtension {
+    protected get memory(): SpawnData_Memory {
+        return Memory.spawnData;
+    }
     cancelRequest(id: string): boolean {
         if (this.memory.queue[id]) {
             delete this.memory.queue[id];
@@ -216,8 +221,5 @@ class SpawnExtension extends ExtensionBase implements ISpawnExtension {
         }
         this.memory.queue[opts.creepName] = opts;
         return opts.creepName;
-    }
-    protected get memory(): SpawnData_Memory {
-        return Memory.spawnData;
     }
 }

@@ -55,6 +55,8 @@ class FlagManager extends ProcessBase {
                 this.memory[id] = newPID.pid;
             }
         }
+
+        this.SetProcessToSleep(30);
     }
 }
 
