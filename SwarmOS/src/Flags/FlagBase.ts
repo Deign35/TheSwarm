@@ -7,6 +7,40 @@ export const bundle: IPackage<SpawnData_Memory> = {
     rootImageName: PKG_FlagBase
 }
 
+/**
+ * BLUE_ -- Basic constructionSites
+ *      BLUE_ -- StructureContainer
+ *      BROWN_ -- StructureExtension
+ *      CYAN_ -- StructreLab
+ *      GREEN_ -- StructureLink
+ *      GREY_ -- StructureRampart
+ *      ORANGE_ -- StructureRoad
+ *      PURPLE_ -- StructureTower
+ *      RED_ -- StructureWall
+ *      WHITE_ --
+ *      YELLOW_ --
+ * 
+ * BROWN_ -- Advancd constructionSite
+ *      BLUE_ -- StructureExtractor
+ *      BROWN_ -- StructureNuker
+ *      CYAN_ -- StructreObserver
+ *      GREEN_ -- StructurePowerSpawn
+ *      GREY_ -- StructureSpawn
+ *      ORANGE_ -- StructureStorage
+ *      PURPLE_ -- StructureTerminal
+ *      RED_ --
+ *      WHITE_ --
+ *      YELLOW_ --
+ * 
+ * CYAN_ --  
+ * GREEN_ -- 
+ * GREY_ --
+ * ORANGE_ --
+ * PURPLE_ --
+ * RED_ --
+ * WHITE_ --
+ * YELLOW_ --
+ */
 class FlagBase extends ProcessBase {
     protected get memory(): FlagProcess_Memory {
         return super.memory;
@@ -22,13 +56,11 @@ class FlagBase extends ProcessBase {
             return;
         }
 
-        debugger;
         switch (flag.color) {
             case (COLOR_BLUE):
                 this.createBasicSite();
                 break;
             case (COLOR_BROWN):
-                // Construction sites are Blue/Brown
                 this.createAdvancedSite();
                 break;
             case (COLOR_CYAN):

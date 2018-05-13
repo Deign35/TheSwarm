@@ -73,7 +73,7 @@ class SpawnManager extends ProcessBase {
         }
     }
 
-    // (TODO) Scale this appropriately
+    // (TODO) Scale this properly
     protected calculateSpawnDifficulty(req: SpawnData_SpawnCard, spawn?: StructureSpawn) {
         let canSpawn = req.spawnState == SP_QUEUED;
         let difficulty = req.body.cost;
@@ -103,8 +103,8 @@ class SpawnManager extends ProcessBase {
             this.log.warn(`No spawn requests in the queue.  You have spawn capacity available.`);
             return;
         }
+
         let minSpawnCost = 20000;
-        // (TODO): Dont let lower prioritys override higher priorities?
         let keys = Object.keys(this.queue);
         for (let i = 0; i < keys.length; i++) {
             minSpawnCost = Math.min(minSpawnCost, this.queue[keys[i]].body.cost);
