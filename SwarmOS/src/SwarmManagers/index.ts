@@ -1,5 +1,4 @@
 import { bundle as RoomManager } from "SwarmManagers/RoomManager";
-import { bundle as SpawnManager } from "SwarmManagers/SpawnManager";
 import { bundle as FlagManager } from "SwarmManagers/FlagManager";
 import { bundle as TestInterrupt } from "SwarmManagers/TestInterruptManager"
 
@@ -10,7 +9,6 @@ class SwarmManager extends PackageProviderBase<PackageProviderMemory> {
     static install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
         processRegistry.register(PKG_SwarmManager, SwarmManager);
         RoomManager.install(processRegistry, extensionRegistry);
-        SpawnManager.install(processRegistry, extensionRegistry);
         FlagManager.install(processRegistry, extensionRegistry);
     }
     protected get RequiredServices(): SDictionary<InitData> {
@@ -24,7 +22,7 @@ class SwarmManager extends PackageProviderBase<PackageProviderMemory> {
                 processName: PKG_RoomManager
             },
             spawnManager: {
-                processName: PKG_SpawnManager
+                processName: PKG_CreepRunner
             },
             flagManager: {
                 processName: PKG_FlagManager

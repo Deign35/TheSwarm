@@ -18,7 +18,7 @@ const PKG_FlagManager_LogContext: LogContext = {
     logLevel: LOG_DEBUG
 }
 
-class FlagManager extends BasicProcess {
+class FlagManager extends BasicProcess<FlagMemory> {
     protected OnOSLoad(): void { }
     protected get memory() {
         return Memory.flagData;
@@ -56,7 +56,7 @@ class FlagManager extends BasicProcess {
             }
         }
 
-        this.SetProcessToSleep(30);
+        this.sleeper.sleep(30);
     }
 }
 

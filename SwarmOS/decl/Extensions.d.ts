@@ -73,7 +73,6 @@ declare interface IKernelLoggerExtensions extends IPackageExtension, ILogger {
  * Messages will queue up for the tick and will be sent on the following tick.
  */
 declare interface IKernelNotificationsExtension extends IPackageExtension {
-    IsSubscribed(id: string): boolean;
     Notify(id: string): void;
     Subscribe(id: string): void;
     UnSubscribe(id: string): void;
@@ -93,7 +92,7 @@ declare interface IKernelSleepExtension extends IPackageExtension {
  * Is updated on a regular schedule by the RoomManager.
  */
 declare interface IRoomDataExtension extends IPackageExtension {
-    ForceResetRoomMemory(roomID: string): void;
+    ForceResetRVDMemory(roomID: string): void;
     GetRoomData(roomID: string, forceUpdate?: boolean): RVD_RoomMemory | undefined;
 }
 

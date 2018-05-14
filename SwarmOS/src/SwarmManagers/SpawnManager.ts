@@ -1,4 +1,4 @@
-declare var Memory: {
+/*declare var Memory: {
     spawnData: SpawnerExtension_Memory
 }
 
@@ -28,7 +28,7 @@ const exDef2: RoleDefinition<'harvester'> = {
         [MEDIUM_BODY]: [TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, MOVE],
     }
 }
-*/
+*
 import { BasicProcess, ExtensionBase } from "Core/BasicTypes";
 
 export const bundle: IPackage<SpawnerExtension_Memory> = {
@@ -237,4 +237,4 @@ class SpawnExtension extends ExtensionBase implements ISpawnExtension {
     protected get memory(): SpawnerExtension_Memory {
         return Memory.spawnData;
     }
-}
+}*/

@@ -1,36 +1,22 @@
 declare var Memory: {
-    roomData: SDictionary<RVD_RoomMemory>
+    roomData: RoomViewData_Memory
 }
 
-if (!Memory.roomData) {
-    Memory.roomData = {};
-}
 import { BasicProcess, ExtensionBase } from "Core/BasicTypes";
 
-export const bundle: IPackage<SDictionary<RVD_RoomMemory>> = {
+export const bundle: IPackage<RoomViewData_Memory> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
         processRegistry.register(PKG_RoomManager, RoomManager);
         extensionRegistry.register(EXT_RoomView, new RoomExtension(extensionRegistry));
-    },
-    rootImageName: PKG_RoomManager
+    }
 }
 
-class RoomManager extends BasicProcess {
-    OnOSLoad() {
-
-    }
+class RoomManager extends BasicProcess<{}> {
     @extensionInterface(EXT_RoomView)
     View!: IRoomDataExtension;
-
-    handleMissingMemory() {
-        if (!Memory.roomData) {
-            Memory.roomData = {};
-        }
-        return Memory.roomData;
-    }
     executeProcess(): void {
         for (let roomID in Game.rooms) {
-            let data = this.View.GetRoomData(roomID)!;
+            let data = this.View.GetRoomData(roomID);
             if (!data) {
                 this.log.fatal(`(ASSUMPTION FAILURE): A room is visible but has no data (${roomID})`);
                 data = this.View.GetRoomData(roomID, true)!;
@@ -62,9 +48,10 @@ class RoomManager extends BasicProcess {
 
 const FRE_RoomStructures = primes_100[10]; // 10 = 29
 class RoomExtension extends ExtensionBase implements IRoomDataExtension {
-    protected get memory(): SDictionary<RVD_RoomMemory> {
+    protected get memory(): RoomViewData_Memory {
         return Memory.roomData;
     }
+
     protected getRoomData(roomID: string): { room?: Room, roomData?: RVD_RoomMemory } {
         let room = Game.rooms[roomID];
         if (!this.memory[roomID]) {
@@ -79,14 +66,15 @@ class RoomExtension extends ExtensionBase implements IRoomDataExtension {
     private InitRoomData(room: Room) {
         this.log.info(`Initialize new room ${room.name}`);
         this.memory[room.name] = {
-            cSites: [],
+            owner: '',
             lastUpdated: 0,
+            cSites: [],
+            resources: [],
+            tombstones: [],
             mineralIDs: room.find(FIND_MINERALS)!.map((val: Mineral) => {
                 return val.id;
             }),
             minUpdateOffset: GetRandomIndex(primes_3000) || 73,
-            owner: '',
-            resources: [],
             sourceIDs: room.find(FIND_SOURCES)!.map((val: Source) => {
                 return val.id;
             }),
@@ -94,26 +82,20 @@ class RoomExtension extends ExtensionBase implements IRoomDataExtension {
                 container: [],
                 road: []
             },
-            tombstones: [],
         }
     }
 
     protected shouldRefresh(frequency: number, offset: number): boolean {
         return (Game.time + offset) % frequency == 0;
-    }
+    } // (TODO): Needs to be replaced, if a room is out of view on the frame its supposed to update, it may never update.
+
     protected RefreshRoomStructures(roomID: string): void {
         let { room, roomData } = this.getRoomData(roomID);
         if (!room || !roomData) {
             this.log.debug(() => (room ? `Room has not been initialized[${roomID}]` : `Room out of view [${roomID}]`));
             return;
         }
-
         this.log.info(`Update room structures ${roomID}`);
-
-        roomData.owner = (room.controller && (
-            (room.controller.owner && room.controller.owner.username) ||
-            (room.controller.reservation && room.controller.reservation.username)
-        )) || undefined;
 
         if (roomData.owner && room.controller!.owner) {
             roomData.structures = {
@@ -127,41 +109,34 @@ class RoomExtension extends ExtensionBase implements IRoomDataExtension {
                 spawn: [],
                 tower: []
             }
-            if (room.storage) {
-                roomData.storage = {
-                    id: room.storage.id,
-                    hits: room.storage.hits,
-                    x: room.storage.pos.x,
-                    y: room.storage.pos.y,
-                    room: room.name
-                }
-            }
-            if (room.terminal) {
-                roomData.terminal = {
-                    id: room.terminal.id,
-                    hits: room.terminal.hits,
-                    x: room.terminal.pos.x,
-                    y: room.terminal.pos.y,
-                    room: room.name
-                }
-            }
-
         } else {
             roomData.structures = {
                 container: [],
                 road: []
             }
         }
+
+        if (room.controller) {
+            roomData.controller = room.controller.id;
+        }
+        if (room.storage) {
+            roomData.storage = room.storage.id;
+        }
+        if (room.terminal) {
+            roomData.terminal = room.terminal.id;
+        }
+
         let allStructures = room.find(FIND_STRUCTURES);
         for (let i = 0, length = allStructures.length; i < length; i++) {
             let structure = allStructures[i];
             if (roomData.structures[structure.structureType]) {
                 let structureData: RVD_StructureData = {
-                    hits: structure.hits,
                     id: structure.id,
                 }
+                if (structure.hits < structure.hitsMax) {
+                    structureData.hits = structure.hits;
+                }
                 if (structure.structureType == STRUCTURE_CONTAINER ||
-                    structure.structureType == STRUCTURE_CONTROLLER ||
                     structure.structureType == STRUCTURE_KEEPER_LAIR ||
                     structure.structureType == STRUCTURE_LINK ||
                     structure.structureType == STRUCTURE_NUKER ||
@@ -169,10 +144,12 @@ class RoomExtension extends ExtensionBase implements IRoomDataExtension {
                     structure.structureType == STRUCTURE_POWER_BANK ||
                     structure.structureType == STRUCTURE_POWER_SPAWN ||
                     structure.structureType == STRUCTURE_SPAWN ||
-                    structure.structureType == STRUCTURE_STORAGE ||
                     structure.structureType == STRUCTURE_TOWER ||
-                    structure.structureType == STRUCTURE_TERMINAL ||
+                    /*structure.structureType == STRUCTURE_WALL ||
+                    structure.structureType == STRUCTURE_ROAD ||
+                    structure.structureType == STRUCTURE_RAMPART ||*/
                     structure.structureType == STRUCTURE_LAB) {
+
                     structureData.room = structure.pos.roomName;
                     structureData.x = structure.pos.x;
                     structureData.y = structure.pos.y;
@@ -183,6 +160,7 @@ class RoomExtension extends ExtensionBase implements IRoomDataExtension {
             }
         }
     }
+
     GetRoomData(roomID: string, forceRefresh: boolean = false): RVD_RoomMemory | undefined {
         forceRefresh = forceRefresh || !this.memory[roomID] || (this.memory[roomID].lastUpdated == 0);
         let { room, roomData } = this.getRoomData(roomID);
@@ -198,13 +176,12 @@ class RoomExtension extends ExtensionBase implements IRoomDataExtension {
             this.log.error(`Room has not been initialized [${roomID}]`);
             return;
         }
-
         return this.memory[roomID];
     }
 
-    ForceResetRoomMemory(roomID: string) {
+    ForceResetRVDMemory(roomID: string) {
         if (this.memory[roomID]) {
-            delete this.memory[roomID]
+            delete this.memory[roomID];
         }
     }
     protected RefreshRoom(roomID: string, force: boolean = false) {
@@ -213,9 +190,14 @@ class RoomExtension extends ExtensionBase implements IRoomDataExtension {
             this.log.debug(() => (room ? `Room has not been initialized[${roomID}]` : `Room out of view [${roomID}]`));
             return;
         }
-
         this.log.trace(`Examine room ${roomID}`);
+
         roomData.lastUpdated = Game.time;
+        roomData.owner = (room.controller && (
+            (room.controller.owner && room.controller.owner.username) ||
+            (room.controller.reservation && room.controller.reservation.username)
+        )) || undefined;
+
         if (force || this.shouldRefresh(11, roomData!.minUpdateOffset)) {
             this.log.trace(`Examine room[DroppedResources] ${roomID}`);
             roomData.resources = room.find(FIND_DROPPED_RESOURCES).map((value: Resource) => {

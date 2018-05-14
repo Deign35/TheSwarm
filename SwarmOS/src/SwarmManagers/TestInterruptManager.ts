@@ -35,7 +35,7 @@ const PKG_TestInterrupt_LogContext: LogContext = {
     logLevel: LOG_DEBUG
 }
 
-class TestSleeper extends BasicProcess {
+class TestSleeper extends BasicProcess<ITestData_Memory> {
     protected OnOSLoad(): void { }
     protected get memory() {
         return Memory.TestData;
@@ -85,25 +85,25 @@ class TestSleeper extends BasicProcess {
         this.log.debug(`Sleeper tick: ${this.memory.CurStep}`);
         switch (this.memory.CurStep) {
             case (0):
-                this.interrupter.Subscribe('Test0', this.pid);
-                this.interrupter.Subscribe('Test1', this.pid);
-                this.interrupter.Subscribe('Test2', this.pid);
+                this.interrupter.Subscribe('Test0');
+                this.interrupter.Subscribe('Test1');
+                this.interrupter.Subscribe('Test2');
                 this.memory.expectedSleep = Game.time + 5;
                 break;
             case (1):
-                this.interrupter.UnSubscribe(`Test0`, this.pid);
+                this.interrupter.UnSubscribe(`Test0`);
                 this.memory.expectedSleep = Game.time + 10;
                 break;
             case (2):
-                this.interrupter.Subscribe('Test0', this.pid);
+                this.interrupter.Subscribe('Test0');
                 this.memory.expectedSleep = Game.time + 5;
                 break;
             case (3):
-                this.interrupter.UnSubscribe('Test1', this.pid);
+                this.interrupter.UnSubscribe('Test1');
                 this.memory.expectedSleep = Game.time + 5;
                 break;
             case (4):
-                this.interrupter.UnSubscribe('Test0', this.pid);
+                this.interrupter.UnSubscribe('Test0');
                 this.memory.expectedSleep = Game.time + 15;
                 break;
             default:
@@ -114,11 +114,11 @@ class TestSleeper extends BasicProcess {
 
         this.memory.SleeperReady = true;
         this.memory.begun = Game.time;
-        this.SetProcessToSleep(60);
+        this.sleeper.sleep(60);
     }
 }
 
-class TestInterrupter extends BasicProcess {
+class TestInterrupter extends BasicProcess<ITestData_Memory> {
     protected OnOSLoad(): void { }
     protected get memory() {
         return Memory.TestData;

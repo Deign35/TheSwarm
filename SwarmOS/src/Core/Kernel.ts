@@ -199,7 +199,7 @@ export class Kernel implements IKernelProcessExtensions, IKernelSleepExtension {
         }
     }
 
-    IsSubscribed(id: string, pid: PID) {
+    protected IsSubscribed(id: string, pid: PID) {
         if (this.memory.subscriptions[id]) {
             for (let i = 0; i < this.memory.subscriptions[id].length; i++) {
                 if (this.memory.subscriptions[id][id] == pid) {
@@ -211,18 +211,18 @@ export class Kernel implements IKernelProcessExtensions, IKernelSleepExtension {
         return false;
     }
 
-    Subscribe(id: string, pid: PID) {
+    Subscribe(id: string) {
         if (!this.memory.subscriptions[id]) {
             this.memory.subscriptions[id] = []
         }
-        if (!this.IsSubscribed(id, pid)) {
-            this.memory.subscriptions[id].push(pid);
+        if (!this.IsSubscribed(id, this.curProcessID)) {
+            this.memory.subscriptions[id].push(this.curProcessID);
         }
     }
-    UnSubscribe(id: string, pid: PID) {
+    UnSubscribe(id: string) {
         if (this.memory.subscriptions[id]) {
             for (let i = 0; i < this.memory.subscriptions[id].length; i++) {
-                if (this.memory.subscriptions[id][i] == pid) {
+                if (this.memory.subscriptions[id][i] == this.curProcessID) {
                     this.memory.subscriptions[id].splice(i, 1);
                     return;
                 }
