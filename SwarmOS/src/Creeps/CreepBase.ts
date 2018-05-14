@@ -3,15 +3,17 @@ import { ActionBase } from "Actions/ActionBase";
 import { WithdrawAction } from "Actions/WithdrawAction";
 import { HarvestAction } from "Actions/HarvestAction";
 import { PickupAction } from "Actions/PickupAction";
+import { SayAction } from "Actions/SayAction";
 
-export abstract class CreepBase<T extends CreepProcess_Memory> extends BasicProcess {
+export abstract class CreepBase<T extends CreepProcess_Memory> extends BasicProcess<T> {
     @extensionInterface(EXT_RoomView)
     RoomView!: IRoomDataExtension;
 
+    /**  Convert this over to the CreepRunner to ensure creeps are pushed to the appropriate process?
     OnOSLoad() {
         this._lastUpdate = Game.time;
         if (this.memory.creep) {
-            this._creep = Game.creeps[this.memory.creep];
+            this._creep = Game.creeps[this.memory.creep.n];
         }
         // Clean up any existing spawn requests
         if (this.memory.creep) {
@@ -24,74 +26,88 @@ export abstract class CreepBase<T extends CreepProcess_Memory> extends BasicProc
             }
         }
     }
-    private _lastUpdate!: number;
+    */
     protected abstract get CreepPrefix(): string
     protected get SpawnPriority(): Priority {
         return Priority_Low;
     }
-    protected get SpawnBody(): ISpawnDef {
-        return {
-            body: [WORK, WORK, CARRY, MOVE],
-            cost: 300
-        }
-    }
     protected GetNewCreepName() {
         return this.CreepPrefix + GetSUID();
     }
-    protected get memory(): T {
-        return super.memory;
-    }
     protected get creep() {
         if (this._lastUpdate != Game.time) {
-            if (this.memory.creep) {
-                this._creep = Game.creeps[this.memory.creep];
+            if (this.memory.CC) {
+                this._creep = Game.creeps[this.memory.CC.n];
             }
             this._lastUpdate = Game.time;
         }
 
         return this._creep;
     }
+    private _lastUpdate!: number;
     private _creep!: Creep;
+
     protected executeProcess(): void {
         if (this.creep) {
-            this.activateCreep();
+            if (this.creep.spawning) {
+                return;
+            }
+            if (this.memory.en) {
+                if (this.creep.carry.energy == this.creep.carryCapacity) {
+                    this.memory.tar = undefined;
+                    this.memory.en = false;
+                } else {
+                    this.getEnergy(this.creep.carryCapacity / 2);
+                    return;
+                }
+            }
+            this.activateCreep(this.creep);
         } else {
-            if (this.memory.creep) {
-                let spawnStatus = this.spawner.getRequestStatus(this.memory.creep);
+            if (this.memory.CC) {
+                let spawnStatus = this.spawner.getRequestStatus(this.memory.CC.n);
                 if (!spawnStatus) {
-                    this.memory.creep = undefined;
+                    this.memory.CC = undefined;
                     this.kernel.killProcess(this.pid);
                     return;
                 } else {
                     if (spawnStatus != SP_QUEUED) {
                         if (spawnStatus != SP_SPAWNING) {
-                            this.spawner.cancelRequest(this.memory.creep);
-                            this.memory.creep = undefined;
+                            this.spawner.cancelRequest(this.memory.CC.n);
+                            this.memory.CC = undefined;
                         }
                     }
                 }
             }
-            if (!this.memory.creep) {
-                this.memory.creep = this.spawner.requestCreep({
-                    body: this.SpawnBody,
-                    creepName: this.GetNewCreepName(),
-                    location: '',
-                    spawnState: SP_QUEUED,
-                    priority: this.SpawnPriority,
-                    pid: this.pid
-                });
+            if (!this.memory.CC) {
+                this.memory.CC = this.spawner.requestCreep(this.spawnRequest);
             }
         }
     }
-    protected abstract activateCreep(): void;
+    protected get spawnRequest(): SpawnerRequest {
+        let newCreepName = this.GetNewCreepName();
+        return {
+            name: newCreepName,
+            loc: '',
+            sta: SP_QUEUED,
+            pri: this.SpawnPriority,
+            pid: this.pid,
+            con: {
+                m: 1,
+                n: newCreepName,
+                o: this.pid
+            }
+        };
+    }
+
+    protected abstract activateCreep(creep: Creep): void;
     protected getEnergy(minEnergy: number = 0) {
         let withdrawTarget = undefined;
 
-        if (this.memory.targetID) {
-            withdrawTarget = Game.getObjectById(this.memory.targetID) as StructureStorage | StructureContainer |
+        if (this.memory.tar) {
+            withdrawTarget = Game.getObjectById(this.memory.tar) as StructureStorage | StructureContainer |
                 StructureLink | Source | StructureTerminal | Resource;
             if (!withdrawTarget) {
-                this.memory.targetID = undefined;
+                this.memory.tar = undefined;
             } else {
                 let available = 0;
                 if ((withdrawTarget as StructureStorage).storeCapacity) {
@@ -102,15 +118,16 @@ export abstract class CreepBase<T extends CreepProcess_Memory> extends BasicProc
                     available = (withdrawTarget as Resource).amount;
                 } else {
                     this.log.fatal(`Withdraw target unexpected ${JSON.stringify(withdrawTarget)}`);
-                    this.memory.targetID = undefined;
+                    this.memory.tar = undefined;
                 }
 
                 if (minEnergy > available) {
-                    this.memory.targetID = undefined;
+                    this.memory.tar = undefined;
                     withdrawTarget = undefined;
                 }
             }
         }
+
         if (!withdrawTarget) {
             withdrawTarget = this.FindNearestEnergyDispenser(this.creep.room.name, minEnergy);
             if (!withdrawTarget) {
@@ -129,13 +146,14 @@ export abstract class CreepBase<T extends CreepProcess_Memory> extends BasicProc
         } else if ((withdrawTarget as Resource).resourceType) {
             action = new PickupAction(this.creep, withdrawTarget as Resource);
         } else {
-            this.log.error(`I dunno, will this ever happen?`);
-            return;
+            action = new SayAction(this.creep, "I'm confused about my target...");
+            this.memory.tar = undefined;
         }
 
         action.Run();
     }
 
+    // (TODO): This needs to be extracted out to a seperate service, perhaps provided by the RoomViewData
     private FindNearestEnergyDispenser(targetRoom: string, minEnergy: number = 0): StructureContainer | StructureStorage |
         StructureTerminal | StructureLink | Source | Resource | undefined {
         let view = this.RoomView.GetRoomData(targetRoom);
@@ -220,14 +238,14 @@ export abstract class CreepBase<T extends CreepProcess_Memory> extends BasicProc
         }
 
         if (!closestTarget) {
-            if (this.memory.homeRoom != targetRoom) {
-                return this.FindNearestEnergyDispenser(this.memory.homeRoom, minEnergy);
+            if (this.memory.home != targetRoom) {
+                return this.FindNearestEnergyDispenser(this.memory.home, minEnergy);
             } else if (minEnergy > 0) {
-                return this.FindNearestEnergyDispenser(this.memory.homeRoom, 0);
+                return this.FindNearestEnergyDispenser(this.memory.home, 0);
             }
         }
 
-        this.memory.targetRoom = targetRoom;
+        this.memory.loc = targetRoom;
         return closestTarget;
     }
 }

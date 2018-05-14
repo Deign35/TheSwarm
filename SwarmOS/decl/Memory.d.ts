@@ -66,7 +66,7 @@ declare interface SpawnerExtension_Memory extends MemBase {
 declare interface CreepContext extends MemBase {
     m: number;      // (m)ove
     n: CreepID;     // (n)ame
-    o: PID;         // (o)wner
+    o: PID;         // (o)wner process
     t?: number;     // (t)ough
 }
 declare interface CreepContext_Worker extends CreepContext {
@@ -109,18 +109,17 @@ declare interface CreepMemory extends MemBase {
     [id: string]: CreepProcess_Memory
 }
 
-
 declare interface CreepProcess_Memory extends MemBase {
-    creep?: CreepContext;
-    targetID?: string;
-    homeRoom: string;
-    targetRoom: string;
-    retrieving: boolean;
+    CC?: CreepContext;  // The creep context corresponding to the creep assigned to this process
+    tar?: ObjectID;     // The current target
+    home: RoomID;       // Room from where this creep was spawned
+    loc: RoomID;        // Room location of where this creep is doing its shtuff
+    en: boolean;        // Getting energy
 }
 declare interface SpawnRefiller_Memory extends CreepProcess_Memory {
 }
 declare interface Harvester_Memory extends CreepProcess_Memory {
-    targetID: string;
+    tar: string;
     linkID?: string;
     containerID?: string;
     constructionSite?: string;
@@ -138,6 +137,7 @@ declare interface RoomProcess_Memory extends MemBase {
     roomName: string;
     creeps: RoomProcess_CreepMemory
 }
+
 declare interface RoomProcess_CreepMemory extends MemBase {
     bui: PID[]; // Builders
     ref?: PID[]; // Refillers
@@ -151,11 +151,6 @@ declare interface BasicOwnedRoom_Memory extends RoomProcess_Memory {
     sources: SDictionary<PID | undefined>;
 }
 
-declare interface FirstRoom_Memory extends RoomProcess_Memory {
-    sources: SDictionary<PID | undefined>;
-}
-
-
 declare interface PackageProviderMemory extends MemBase {
     services: {
         [id: string]: {
@@ -164,6 +159,7 @@ declare interface PackageProviderMemory extends MemBase {
         }
     }
 }
+
 
 
 

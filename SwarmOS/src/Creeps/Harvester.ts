@@ -18,7 +18,7 @@ export class Harvester extends CreepBase<Harvester_Memory> {
         return Priority_High;
     }
     protected get SpawnBody() {
-        let energyCap = Game.rooms[this.memory.targetRoom].energyCapacityAvailable
+        let energyCap = Game.rooms[this.memory.loc].energyCapacityAvailable
         if (energyCap >= 700) {
             return {
                 body: [WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE],
@@ -37,7 +37,7 @@ export class Harvester extends CreepBase<Harvester_Memory> {
     }
     OnOSLoad() {
         super.OnOSLoad();
-        let target = Game.getObjectById(this.memory.targetID) as Source | Mineral;
+        let target = Game.getObjectById(this.memory.tar) as Source | Mineral;
         if ((target as Source).energyCapacity) {
             // Make a link if possible
         } else if ((target as Mineral).mineralType) {
@@ -68,18 +68,18 @@ export class Harvester extends CreepBase<Harvester_Memory> {
         }
     }
     protected activateCreep(): void {
-        let creep = Game.creeps[this.memory.creep!];
+        let creep = Game.creeps[this.memory.CC!];
         if (!creep) {
             // This should never happen
             this.log.fatal(`Creep activation occurred without an assigned creep`);
-            this.memory.creep = undefined;
+            this.memory.CC = undefined;
             return;
         }
         if (creep.spawning) {
             return;
         }
-        if (creep.room.name != this.memory.targetRoom) {
-            new MoveToPositionAction(creep, new RoomPosition(25, 25, this.memory.targetRoom)).Run();
+        if (creep.room.name != this.memory.loc) {
+            new MoveToPositionAction(creep, new RoomPosition(25, 25, this.memory.loc)).Run();
             return;
         }
         let moveTarget = (Game.getObjectById(this.memory.containerID) as StructureContainer) ||
@@ -90,9 +90,9 @@ export class Harvester extends CreepBase<Harvester_Memory> {
             }
         }
 
-        let target = Game.getObjectById(this.memory.targetID) as Source | Mineral;
+        let target = Game.getObjectById(this.memory.tar) as Source | Mineral;
         if (!target) {
-            new MoveToPositionAction(creep, new RoomPosition(25, 25, this.memory.targetRoom)).Run();
+            new MoveToPositionAction(creep, new RoomPosition(25, 25, this.memory.loc)).Run();
             return;
         }
         let action: ActionBase = new HarvestAction(creep, target);

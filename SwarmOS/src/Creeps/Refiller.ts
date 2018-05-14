@@ -12,7 +12,7 @@ import { TransferAction } from "Actions/TransferAction";
 class Refiller extends CreepBase<SpawnRefiller_Memory> {
     protected get CreepPrefix() { return 'Ref_'; }
     protected get SpawnBody() {
-        let spawnCap = Game.rooms[this.memory.targetRoom].energyCapacityAvailable;
+        let spawnCap = Game.rooms[this.memory.loc].energyCapacityAvailable;
         if (spawnCap >= 2000) {
             return {
                 body: [
@@ -60,7 +60,7 @@ class Refiller extends CreepBase<SpawnRefiller_Memory> {
         }
     }
     protected get SpawnPriority() {
-        let spawnCap = Game.rooms[this.memory.targetRoom].energyCapacityAvailable;
+        let spawnCap = Game.rooms[this.memory.loc].energyCapacityAvailable;
         if (spawnCap > 4000) {
             return Priority_Low;
         } else if (spawnCap > 2000) {
@@ -75,32 +75,32 @@ class Refiller extends CreepBase<SpawnRefiller_Memory> {
         }
     }
     protected activateCreep(): void {
-        let creep = Game.creeps[this.memory.creep!];
+        let creep = Game.creeps[this.memory.CC!];
         if (!creep) {
             // This should never happen
             this.log.fatal(`Creep activation occurred without an assigned creep`);
-            this.memory.creep = undefined;
+            this.memory.CC = undefined;
             return;
         }
         if (creep.spawning) {
             return;
         }
-        if (creep.room.name != this.memory.targetRoom) {
-            new MoveToPositionAction(creep, new RoomPosition(25, 25, this.memory.targetRoom)).Run();
+        if (creep.room.name != this.memory.loc) {
+            new MoveToPositionAction(creep, new RoomPosition(25, 25, this.memory.loc)).Run();
             return;
         }
 
-        if (this.memory.retrieving) {
+        if (this.memory.en) {
             if (this.creep.carry.energy == this.creep.carryCapacity) {
-                this.memory.retrieving = false;
-                this.memory.targetID = undefined;
+                this.memory.en = false;
+                this.memory.tar = undefined;
             } else {
                 this.getEnergy(this.creep.carryCapacity / 2);
                 return;
             }
         } else if (this.creep.carry.energy == 0) {
-            this.memory.targetID = undefined;
-            this.memory.retrieving = true;
+            this.memory.tar = undefined;
+            this.memory.en = true;
             this.getEnergy(this.creep.carryCapacity / 2);
             return;
         }
@@ -109,9 +109,9 @@ class Refiller extends CreepBase<SpawnRefiller_Memory> {
     }
 
     RefillSpawnOrExtension() {
-        let target = Game.getObjectById(this.memory.targetID) as StructureExtension | StructureSpawn;
+        let target = Game.getObjectById(this.memory.tar) as StructureExtension | StructureSpawn;
         if (!target || target.energy == target.energyCapacity) {
-            this.memory.targetID = undefined;
+            this.memory.tar = undefined;
             let roomData = this.RoomView.GetRoomData(this.creep.room.name);
             if (!roomData) {
                 // This should never happen
@@ -126,20 +126,20 @@ class Refiller extends CreepBase<SpawnRefiller_Memory> {
                     target = Game.getObjectById(extensions[i].id) as StructureExtension;
                     if (!target) { continue; }
                     if (target.energy < target.energyCapacity) {
-                        this.memory.targetID = extensions[i].id;
+                        this.memory.tar = extensions[i].id;
                         break;
                     }
                 }
             }
 
-            if (!this.memory.targetID) {
+            if (!this.memory.tar) {
                 let spawns = roomData.structures.spawn;
                 if (spawns) {
                     for (let i = 0; i < spawns.length; i++) {
                         target = Game.getObjectById(spawns[i].id) as StructureSpawn;
                         if (!target) { continue; }
                         if (target.energy < target.energyCapacity) {
-                            this.memory.targetID = spawns[i].id;
+                            this.memory.tar = spawns[i].id;
                             break;
                         }
                     }
@@ -147,7 +147,7 @@ class Refiller extends CreepBase<SpawnRefiller_Memory> {
             }
         }
 
-        if (this.memory.targetID) {
+        if (this.memory.tar) {
             new TransferAction(this.creep, target).Run()
         } else {
             this.log.info(() => `Nothing to refill`);

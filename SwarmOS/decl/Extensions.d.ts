@@ -103,7 +103,7 @@ declare interface IRoomDataExtension extends IPackageExtension {
 declare interface ISpawnExtension extends IPackageExtension {
     cancelRequest(id: string): boolean;
     getRequestStatus(id: string): SpawnState;
-    requestCreep(opts: SpawnerRequest): string;
+    requestCreep(opts: SpawnerRequest): CreepContext;
 }
 
 

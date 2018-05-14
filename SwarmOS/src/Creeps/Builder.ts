@@ -17,7 +17,7 @@ export class Builder extends CreepBase<Builder_memory> {
         return Priority_Low;
     }
     protected get SpawnBody() {
-        let spawnCap = Game.rooms[this.memory.targetRoom].energyCapacityAvailable;
+        let spawnCap = Game.rooms[this.memory.loc].energyCapacityAvailable;
         if (spawnCap >= 2000) {
             return {
                 body: [WORK, WORK, WORK, WORK, WORK,
@@ -58,40 +58,28 @@ export class Builder extends CreepBase<Builder_memory> {
             cost: 250
         }
     }
-    protected activateCreep(): void {
-        let creep = Game.creeps[this.memory.creep!];
-        if (!creep) {
-            // This should never happen
-            this.log.fatal(`Creep activation occurred without an assigned creep`);
-            this.memory.creep = undefined;
-            return;
-        }
-        if (creep.spawning) {
-            return;
-        }
-
-        if (this.memory.retrieving) {
+    protected activateCreep(creep: Creep): void {
+        if (this.memory.en) {
             if (this.creep.carry.energy == this.creep.carryCapacity) {
-                this.memory.targetID = undefined;
-                this.memory.retrieving = false;
-                //this.memory.targetRoom = this.
+                this.memory.tar = undefined;
+                this.memory.en = false;
             } else {
                 this.getEnergy(this.creep.carryCapacity / 2);
                 return;
             }
         } else if (this.creep.carry.energy == 0) {
-            this.memory.targetID = undefined;
-            this.memory.retrieving = true;
+            this.memory.tar = undefined;
+            this.memory.en = true;
             this.getEnergy(this.creep.carryCapacity / 2);
             return;
         }
 
-        if (creep.room.name != this.memory.targetRoom) {
-            new MoveToPositionAction(creep, new RoomPosition(25, 25, this.memory.targetRoom)).Run();
+        if (creep.room.name != this.memory.loc) {
+            new MoveToPositionAction(creep, new RoomPosition(25, 25, this.memory.loc)).Run();
             return;
         }
 
-        let targetSite = Game.constructionSites[this.memory.targetID!];
+        let targetSite = Game.constructionSites[this.memory.tar!];
         if (!targetSite) {
             let keys = Object.keys(Game.constructionSites);
             let dist = 100;
@@ -105,7 +93,7 @@ export class Builder extends CreepBase<Builder_memory> {
             }
 
             if (targetSite) {
-                this.memory.targetID = targetSite.id;
+                this.memory.tar = targetSite.id;
             }
         }
 

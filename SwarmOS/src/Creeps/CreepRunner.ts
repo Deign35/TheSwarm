@@ -18,7 +18,7 @@ const PKG_CreepRunner_LogContext: LogContext = {
     logLevel: LOG_INFO
 }
 
-class CreepRunner extends BasicProcess {
+class CreepRunner extends BasicProcess<SpawnerExtension_Memory> {
     protected OnOSLoad(): void { }
 
     @extensionInterface(EXT_CreepSpawner)
