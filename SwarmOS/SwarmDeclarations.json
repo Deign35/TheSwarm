@@ -37,6 +37,7 @@
             "entries": {
                 "Flags": "flag",
                 "CreepSpawner": "spawner",
+                "CreepRegistry": "creeps",
                 "RoomView": "roomView",
                 "Registry": "extRegistry",
                 "Kernel": "kernel",

@@ -22,6 +22,7 @@ declare interface IPackageInterfaces {
     [EXT_RoomView]: IRoomDataExtension;
     [EXT_Sleep]: IKernelSleepExtension;
     [EXT_Logger]: IKernelLoggerExtensions;
+    [EXT_CreepRegistry]: ICreepRegistry;
 }
 
 /**
@@ -99,10 +100,16 @@ declare interface IRoomDataExtension extends IPackageExtension {
 /**
  * Extension for processes to be able to request creep spawning.
  */
+declare type SpawnRequestID = string;
 declare interface ISpawnExtension extends IPackageExtension {
-    cancelRequest(id: string): boolean;
-    getRequestStatus(id: string): SpawnState;
-    requestCreep(opts: SpawnerRequest): CreepContext;
+    cancelRequest(id: SpawnRequestID): boolean;
+    getRequestStatus(id: SpawnRequestID): SpawnState;
+    requestSpawn(context: CreepContext, location: RoomID, requestorPID: PID, spawnPriority: Priority,
+        maxSpawnDistance?: number, startMem?: any): SpawnRequestID
+}
+
+declare interface ICreepRegistry extends IPackageExtension {
+    getCreep(creepName: CreepID, requestingPID: PID): Creep | undefined
 }
 
 

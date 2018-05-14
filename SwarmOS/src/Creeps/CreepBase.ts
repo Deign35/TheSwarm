@@ -6,46 +6,31 @@ import { PickupAction } from "Actions/PickupAction";
 import { SayAction } from "Actions/SayAction";
 
 export abstract class CreepBase<T extends CreepProcess_Memory> extends BasicProcess<T> {
+    @extensionInterface(EXT_CreepRegistry)
+    protected creeper!: ICreepRegistry;
     @extensionInterface(EXT_RoomView)
     RoomView!: IRoomDataExtension;
 
-    /**  (TODO): Convert this over to the CreepRunner to ensure creeps are pushed to the appropriate process?
-    OnOSLoad() {
-        this._lastUpdate = Game.time;
-        if (this.memory.creep) {
-            this._creep = Game.creeps[this.memory.creep.n];
-        }
-        // Clean up any existing spawn requests
-        if (this.memory.creep) {
-            let creepStatus = this.spawner.getRequestStatus(this.memory.creep);
-            if (creepStatus == SP_ERROR || creepStatus == SP_COMPLETE) {
-                this.spawner.cancelRequest(this.memory.creep);
-                if (!Game.creeps[this.memory.creep]) {
-                    delete this.memory.creep;
-                }
-            }
-        }
-    }
-    */
     protected abstract get CreepPrefix(): string
-    protected get SpawnPriority(): Priority {
-        return Priority_Low;
-    }
     protected GetNewCreepName() {
         return this.CreepPrefix + GetSUID();
     }
-    protected get creep() {
+    protected get creep(): Creep {
         if (this._lastUpdate != Game.time) {
             if (this.memory.CC) {
-                this._creep = Game.creeps[this.memory.CC.n];
+                this._creep = this.creeper.getCreep(this.memory.CC.n, this.pid);
             }
             this._lastUpdate = Game.time;
         }
 
-        return this._creep;
+        return this._creep!; // Little cheaty, but best way to get Typescript to compile the assumption that the program won't run without the creep
     }
     private _lastUpdate!: number;
-    private _creep!: Creep;
+    private _creep?: Creep;
+
+    protected get SpawnPriority(): Priority {
+        return Priority_Low;
+    }
 
     protected executeProcess(): void {
         if (this.creep) {
@@ -62,40 +47,35 @@ export abstract class CreepBase<T extends CreepProcess_Memory> extends BasicProc
             }
             this.activateCreep(this.creep);
         } else {
-            if (this.memory.CC) {
-                let spawnStatus = this.spawner.getRequestStatus(this.memory.CC.n);
+            if (this.memory.SR) {
+                let spawnStatus = this.spawner.getRequestStatus(this.memory.SR);
                 if (!spawnStatus) {
-                    this.memory.CC = undefined;
+                    this.memory.SR = undefined;
                     this.kernel.killProcess(this.pid);
                     return;
                 } else {
                     if (spawnStatus != SP_QUEUED) {
                         if (spawnStatus != SP_SPAWNING) {
-                            this.spawner.cancelRequest(this.memory.CC.n);
-                            this.memory.CC = undefined;
+                            this.spawner.cancelRequest(this.memory.SR);
+                            this.memory.SR = undefined;
                         }
                     }
                 }
             }
-            if (!this.memory.CC) {
-                this.memory.CC = this.spawner.requestCreep(this.spawnRequest);
+            if (!this.memory.SR) {
+                this.memory.SR = this.spawner.requestSpawn(this.creepContext, this.memory.loc, this.pid, this.SpawnPriority);
             }
         }
     }
-    protected get spawnRequest(): SpawnerRequest {
-        let newCreepName = this.GetNewCreepName();
+    protected get creepContext(): CreepContext {
         return {
-            name: newCreepName,
-            loc: '',
-            sta: SP_QUEUED,
-            pri: this.SpawnPriority,
-            pid: this.pid,
-            con: {
-                m: 1,
-                n: newCreepName,
-                o: this.pid
-            }
-        };
+            n: GetSUID(),
+            o: this.pid,
+
+            c: 1,
+            m: 1,
+            w: 2
+        }
     }
 
     protected abstract activateCreep(creep: Creep): void;

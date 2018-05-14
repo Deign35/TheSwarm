@@ -66,8 +66,15 @@ declare interface SpawnerExtension_Memory extends MemBase {
 declare interface CreepContext extends MemBase {
     m: number;      // (m)ove
     n: CreepID;     // (n)ame
-    o: PID;         // (o)wner process
+    o?: PID;         // (o)wner process
+
+    a?: number;      // (a)ttack
+    c?: number;      // (c)arry
+    cl?: number;     // (cl)aim
+    h?: number;      // (h)eal
+    r?: number;      // (r)angedAttack
     t?: number;     // (t)ough
+    w?: number;      // (w)ork
 }
 declare interface CreepContext_Worker extends CreepContext {
     w: number;      // (w)ork
@@ -84,15 +91,15 @@ declare interface CreepContext_Attacker extends CreepContext {
 
 declare interface SpawnerRequest extends MemBase {
     con: CreepContext;  // Context
-    name: CreepID       // Desired spawn name
+    id: SpawnRequestID;         // requestID
     loc: RoomID;        // Where the spawn request originates
+    pid: PID;           // RequestorPID
     pri: Priority;      // How much of a priority is this spawn??
     sta: SpawnState;    // Current Spawn state
-    pid: PID;           // RequestorPID
 
     dm?: any;           // Default memory
     max?: number;       // Max spawning distance allowed for this spawn.
-    spawner?: StructureID; // ID of the spawner that this creep is being spawned at.,
+    spawner?: StructureID; // ID of the spawner that this creep is being spawned at.
 }
 
 /** Flag Memory */
@@ -112,6 +119,7 @@ declare interface CreepMemory extends MemBase {
 
 declare interface CreepProcess_Memory extends MemBase {
     CC?: CreepContext;  // The creep context corresponding to the creep assigned to this process
+    SR?: SpawnRequestID;        // Spawn request ID
     tar?: ObjectID;     // The current target
     home: RoomID;       // Room from where this creep was spawned
     loc: RoomID;        // Room location of where this creep is doing its shtuff

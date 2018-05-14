@@ -14,7 +14,42 @@ export const OSPackage: IPackage<SpawnerExtension_Memory> = {
 
 const PKG_CreepRunner_LogContext: LogContext = {
     logID: PKG_CreepRunner,
-    logLevel: LOG_INFO
+    logLevel: LOG_DEBUG
+}
+
+// This order determines the default order of body parts
+const BodyLegend = {
+    t: TOUGH,
+    a: ATTACK,
+    r: RANGED_ATTACK,
+    cl: CLAIM,
+    w: WORK,
+    c: CARRY,
+    h: HEAL,
+    m: MOVE,
+}
+
+const ConvertContextToSpawnCost = function (context: CreepContext) {
+    let cost = 0;
+    for (let bodyID in BodyLegend) {
+        if (context[bodyID]) {
+            cost += BODYPART_COST[BodyLegend[bodyID]] * context[bodyID];
+        }
+    }
+
+    return cost;
+}
+const ConvertContextToSpawnBody = function (context: CreepContext) {
+    let body = [];
+    for (let bodyID in BodyLegend) {
+        if (context[bodyID]) {
+            for (let i = 0; i < context[bodyID]; i++) {
+                body.push(BodyLegend[bodyID]);
+            }
+        }
+    }
+
+    return body;
 }
 
 class CreepRunner extends BasicProcess<{}> {
@@ -38,13 +73,14 @@ class CreepRunner extends BasicProcess<{}> {
         return this.spawnerMemory.spawnedCreeps;
     }
     protected get spawnCosts(): SDictionary<number> {
-        if (!this.cache.costs) {
-            this.cache.costs = {};
-        }
         return this.cache.costs;
     }
+    protected initProcessCacheData() {
+        return {
+            costs: {}
+        }
+    }
 
-    // (TODO): make contexts and attach to the process context
     protected get logID(): string {
         return PKG_CreepRunner_LogContext.logID;
     }
@@ -53,23 +89,11 @@ class CreepRunner extends BasicProcess<{}> {
     }
 
     executeProcess(): void {
-
-        /*if (this.memory.creep) {
-            this._creep = Game.creeps[this.memory.creep.n];
-        }
-        // Clean up any existing spawn requests
-        if (this.memory.creep) {
-            let creepStatus = this.spawner.getRequestStatus(this.memory.creep);
-            if (creepStatus == SP_ERROR || creepStatus == SP_COMPLETE) {
-                this.spawner.cancelRequest(this.memory.creep);
-                if (!Game.creeps[this.memory.creep]) {
-                    delete this.memory.creep;
-                }
-            }
-        }*/
-
+        this.log.debug(`Begin CreepRunner`);
+        this.cache.costs = {}; // Prevent hashing of incorrect data, yikes
         let unassignedCreeps: SDictionary<Creep> = {};
 
+        // (TODO) Revert all managers from using global memory.  Just do it right(?)
         // This confines the CreepRunner to only manage creeps that
         // have been spawned by it.
         let spawnedIDs = Object.keys(this.spawnedCreeps);
@@ -85,11 +109,14 @@ class CreepRunner extends BasicProcess<{}> {
                     this.spawner.cancelRequest(creepName);
                 }
             }
-            if (!this.kernel.getProcessById(this.spawnCreeps[creepName])) {
+            if (!this.spawnedCreeps[creepName].o || !this.kernel.getProcessById(this.spawnedCreeps[creepName].o!)) {
                 unassignedCreeps[creepName] = creep
             }
         }
         this.spawnCreeps(unassignedCreeps);
+        this.sleeper.sleep(3);
+
+        this.log.debug(`End CreepRunner`);
     }
 
     protected spawnCreeps(unassignedCreeps: SDictionary<Creep>): void {
@@ -99,14 +126,18 @@ class CreepRunner extends BasicProcess<{}> {
             return;
         }
 
+        let creepIDs = Object.keys(unassignedCreeps);
         let minSpawnCost = 20000;
         for (let i = 0; i < requests.length; i++) {
-            // (TODO): This needs to convert the body parts to a string that can be easily hashed: 8m6c2w -- etc...
+            let req = this.spawnQueue[requests[i]];
+            let con = req.con;
+
             if (!this.spawnCosts[requests[i]]) {
-                this.spawnCosts[requests[i]] = 0; // Calculate the cost of the spawn and cache it.
+                this.spawnCosts[requests[i]] = ConvertContextToSpawnCost(con); // Calculate the cost of the spawn and cache it.
+
             }
             let spawnCost = this.spawnCosts[requests[i]]; // (TODO): Will this slow down the running script if it never gets cleaned and the OS doesn't reload?
-            let creepIDs = Object.keys(unassignedCreeps);
+
             let compatibleCreep = undefined;
             for (let j = 0; j < creepIDs.length; j++) {
                 // Check if bodies are compatible, if so, don't bother spawning it, just assign the damn pid
@@ -121,29 +152,30 @@ class CreepRunner extends BasicProcess<{}> {
             }
             minSpawnCost = Math.min(minSpawnCost, spawnCost);
         }
-        let availableSpawns: SDictionary<StructureSpawn> = {};
 
-        let allSpawnIDs = Object.keys(Game.spawns);
-        for (let i = 0, length = allSpawnIDs.length; i < length; i++) {
-            let spawn = Game.spawns[allSpawnIDs[i]];
+        let availableSpawns: SDictionary<StructureSpawn> = {};
+        let spawnIDs = Object.keys(Game.spawns);
+
+        for (let i = 0, length = spawnIDs.length; i < length; i++) {
+            let spawn = Game.spawns[spawnIDs[i]];
             if (spawn.isActive() && !spawn.spawning && spawn.room.energyAvailable >= minSpawnCost) {
-                availableSpawns[allSpawnIDs[i]] = spawn;
+                availableSpawns[spawnIDs[i]] = spawn;
             }
         }
 
-        let sortedSpawns = Object.keys(availableSpawns).sort((a, b) => {
+        spawnIDs = Object.keys(availableSpawns).sort((a, b) => {
             return availableSpawns[a].room.energyAvailable > availableSpawns[b].room.energyAvailable ? -1 : 1;
         });
 
-        this.log.debug(`AvailableSpawnerCount(${sortedSpawns.length}) - SpawnRequestCount(${requests.length})`);
-        for (let i = 0; i < sortedSpawns.length; i++) {
+        this.log.debug(`AvailableSpawnerCount(${spawnIDs.length}) - SpawnRequestCount(${requests.length})`);
+        for (let i = 0; i < spawnIDs.length; i++) {
             let spawnRequest: { req?: SpawnerRequest, diff: number } = { req: undefined, diff: 0 };
-            let spawn = availableSpawns[sortedSpawns[i]];
+            let spawn = availableSpawns[spawnIDs[i]];
 
             for (let j = 0; j < requests.length; j++) {
                 let req = this.spawnQueue[requests[j]];
-                let diff = this.spawnCosts[req.name];
-                let dist = Game.map.getRoomLinearDistance(spawn.room.name, req.loc);
+                let diff = this.spawnCosts[req.id];
+                let dist = Game.map.getRoomLinearDistance(spawn.room.name, req.loc) || 0
                 if (req.max && dist > req.max) {
                     continue;
                 }
@@ -166,12 +198,12 @@ class CreepRunner extends BasicProcess<{}> {
                 let spawnResult = ERR_INVALID_ARGS as ScreepsReturnCode;
                 while (spawnResult != OK && spawnRequest.req.sta == SP_QUEUED) {
                     // construct the body here somehow
-                    spawnResult = spawn.spawnCreep([WORK, CARRY, MOVE], //spawnRequest.req.body.body,
-                        spawnRequest.req.name,
+                    spawnResult = spawn.spawnCreep(ConvertContextToSpawnBody(spawnRequest.req.con),
+                        spawnRequest.req.con.n,
                         { memory: spawnRequest.req.dm });
                     switch (spawnResult) {
                         case (ERR_NAME_EXISTS):
-                            spawnRequest.req.name += `_` + (Game.time % GetRandomIndex(primes_100));
+                            spawnRequest.req.con.n += `_` + (Game.time % GetRandomIndex(primes_100));
                         case (OK):
                             break;
                         default:
@@ -182,22 +214,15 @@ class CreepRunner extends BasicProcess<{}> {
                 }
 
                 if (spawnResult == OK) {
-                    this.log.debug(`Spawn Creep successful for ${spawnRequest.req.name} - pid(${spawnRequest.req.pid})`);
+                    this.log.debug(`Spawn Creep successful for ${spawnRequest.req.con.n} - pid(${spawnRequest.req.pid})`);
                     spawnRequest.req.sta = SP_SPAWNING;
-                    this.spawnedCreeps[spawnRequest.req.name] = {
-                        o: spawnRequest.req.pid,
-                        c: 0,
-                        m: 0,
-                        w: 0,
-                        n: spawnRequest.req.name
-                    } as CreepContext_Worker;
                 }
             }
         }
     }
 }
 
-class SpawnExtension extends ExtensionBase implements ISpawnExtension {
+class SpawnExtension extends ExtensionBase implements ISpawnExtension, ICreepRegistry {
     protected get memory(): SpawnerExtension_Memory {
         if (!Memory.spawnData) {
             this.log.warn(`Initializing CreepRunner memory`);
@@ -215,6 +240,12 @@ class SpawnExtension extends ExtensionBase implements ISpawnExtension {
         return this.memory.spawnedCreeps;
     }
 
+    releaseCreep(id: string): void {
+        if (this.spawnedCreeps[id]) {
+            this.spawnedCreeps[id].o = undefined;
+        }
+    }
+
     cancelRequest(id: string): boolean {
         if (this.spawnQueue[id]) {
             delete this.spawnQueue[id];
@@ -223,41 +254,44 @@ class SpawnExtension extends ExtensionBase implements ISpawnExtension {
 
         return false;
     }
-    getCreep(id: string): Creep | undefined {
-        if (Game.creeps[id]) {
-            return Game.creeps[id];
-        }
-
-        return;
-    }
     getRequestStatus(id: string): SpawnState {
         if (!this.spawnQueue[id]) {
             return SP_ERROR;
         }
-        let spawnCard = this.spawnQueue[id];
-        let spawnState = spawnCard.sta;
+        let spawnRequest = this.spawnQueue[id];
 
-        if (spawnState == SP_SPAWNING) {
-            let creep = Game.creeps[spawnCard.name];
+        if (spawnRequest.sta == SP_SPAWNING) {
+            let creep = Game.creeps[spawnRequest.con.n];
             if (creep && !creep.spawning) {
                 this.spawnQueue[id].sta = SP_COMPLETE;
-                spawnState = SP_COMPLETE;
+                spawnRequest.sta = SP_COMPLETE;
+                this.spawnedCreeps[this.spawnQueue[id].con.n] = this.spawnQueue[id].con;
             }
         }
 
-        return spawnState;
+        return spawnRequest.sta;
     }
-
-    requestCreep(opts: SpawnerRequest): CreepContext {
-        if (Game.creeps[opts.name]) {
-            if (this.spawnQueue[opts.name]) {
-                return this.spawnQueue[opts.name].con;
-            }/* else {
-                do something?  These could be already assigned, and rejected as requests,
-                or it could be used to override process ownership of a creep
-            }*/
+    getCreep(creepName: CreepID, requestingPID: PID): Creep | undefined {
+        if (!Game.creeps[creepName] || !this.spawnedCreeps[creepName] ||
+            !this.spawnedCreeps[creepName].o || this.spawnedCreeps[creepName].o != requestingPID) {
+            return undefined;
         }
-        this.spawnQueue[opts.name] = opts;
-        return opts.con;
+        return Game.creeps[creepName];
+    }
+    requestSpawn(context: CreepContext, location: RoomID, requestorPID: PID, spawnPriority: Priority,
+        maxSpawnDistance: number = 3, startMem?: any): SpawnRequestID {
+        let newRequest: SpawnerRequest = {
+            con: context,
+            dm: startMem,
+            id: GetSUID(),
+            loc: location,
+            max: maxSpawnDistance,
+            pid: requestorPID,
+            pri: spawnPriority,
+            sta: SP_QUEUED,
+        }
+
+        this.spawnQueue[newRequest.id] = newRequest;
+        return newRequest.id;
     }
 }
