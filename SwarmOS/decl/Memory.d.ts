@@ -156,7 +156,7 @@ declare interface FirstRoom_Memory extends RoomProcess_Memory {
 }
 
 
-declare interface ServiceProviderMemory extends MemBase {
+declare interface PackageProviderMemory extends MemBase {
     services: {
         [id: string]: {
             pid: PID,

@@ -1,10 +1,10 @@
 const ProcessRegistry_LogContext: LogContext = {
-    logID: "ProcessRegistry",
+    logID: "ExtensionRegistry",
     logLevel: LOG_INFO
 }
 export class ProcessRegistry implements IProcessRegistry {
-    constructor() {
-        this._logger = this.log.CreateLogContext(this.logID, this.logLevel);
+    constructor(logger: IKernelLoggerExtensions) {
+        this._logger = logger.CreateLogContext(this.logID, this.logLevel);
     }
     protected get log() {
         return this._logger;
@@ -22,7 +22,7 @@ export class ProcessRegistry implements IProcessRegistry {
             this.log.error(`Name already registered: ${name}`);
             return false;
         }
-        this.log.debug(() => `Registered Process: ${name}`, ProcessRegistry_LogContext.logID);
+        this.log.debug(() => `Registered Process: ${name}`);
         this.registry[name] = constructor;
         return true;
     }

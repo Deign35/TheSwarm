@@ -1,6 +1,12 @@
 declare interface IPackage<MemBase> {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry): void;
-    rootImageName?: string; // (TODO): Unusued
+}
+declare interface IKernel extends IKernelProcessExtensions, IKernelLoggerExtensions, IKernelSleepExtension, IKernelNotificationsExtension {
+    loop(): void;
+}
+declare interface IProcessRegistry {
+    register(pkgName: string, constructor: _ProcessConstructor): boolean;
+    createNewProcess(name: string, context: IProcessContext): IProcess | undefined;
 }
 declare interface IProcess {
     run(): void;
@@ -10,22 +16,12 @@ declare interface _ProcessConstructor {
 }
 declare interface IProcessContext {
     readonly memory: MemBase;
-    readonly imageName: string;
+    readonly pkgName: string;
     readonly pid: PID;
     readonly pPID: PID;
     readonly isActive: boolean;
 }
-declare interface IProcessRegistry {
-    register(imageName: string, constructor: _ProcessConstructor): boolean;
-    createNewProcess(name: string, context: IProcessContext): IProcess | undefined;
-}
 declare type PID = string | number;
-
-
-declare interface ISpawnDef {
-    body: BodyPartConstant[];
-    cost: number;
-}
 
 declare interface ProcInfo {
     ex: boolean;// Executing -- If this process is currently executing

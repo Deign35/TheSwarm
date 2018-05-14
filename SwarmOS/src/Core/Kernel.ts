@@ -1,3 +1,5 @@
+import { Logger } from "Core/Logger";
+
 declare var Memory: {
     kernel: KernelMemory
 }
@@ -13,11 +15,16 @@ declare type ProcessWithID = { pid: PID; process: IProcess; };
 
 const PROCESS_GHOST_TIMER = 100;
 export class Kernel implements IKernelProcessExtensions, IKernelSleepExtension {
+    constructor(private processRegistry: IProcessRegistry, private extensionRegistry: IExtensionRegistry, private _logger: IKernelLoggerExtensions) {
+        this._processCache = {};
+        this._logger = new Logger();
+    }
     private _processCache: ProcessCache;
     private curProcessID: string = "";
     protected get log() {
-        return Logger;
+        return this._logger;
     }
+
     get memory(): KernelMemory {
         Memory.kernel = Memory.kernel || {
             processTable: {},
@@ -32,10 +39,6 @@ export class Kernel implements IKernelProcessExtensions, IKernelSleepExtension {
     }
     get processMemory(): ProcessMemory {
         return this.memory.processMemory;
-    }
-
-    constructor(private processRegistry: IProcessRegistry, private extensionRegistry: IExtensionRegistry) {
-        this._processCache = {};
     }
 
     installBundle(bundle: IPackage<{}>) {
@@ -76,7 +79,7 @@ export class Kernel implements IKernelProcessExtensions, IKernelSleepExtension {
         // (TODO): Reevaluate and ensure start context is correct
         let context: IProcessContext = {
             pid: pInfo.pid,
-            imageName: pInfo.PKG,
+            pkgName: pInfo.PKG,
             get isActive() {
                 return kernelContext.processTable[id] && kernelContext.processTable[id].ex;
             },
@@ -86,7 +89,7 @@ export class Kernel implements IKernelProcessExtensions, IKernelSleepExtension {
             get memory() {
                 return kernelContext.processMemory[pInfo.pid];
             },
-            // bind getExtension to queryPosisInterface.
+            // bind getExtension to getPackageInterface.
             getPackageInterface: kernelContext.extensionRegistry.get.bind(kernelContext.extensionRegistry)
         };
         Object.freeze(context);

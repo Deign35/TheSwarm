@@ -13,7 +13,7 @@ declare interface Profiler {
     stop(): void;
     toString(): string;
 }
-declare function posisInterface(interfaceId: string): (target: any, propertyKey: string) => any
+declare function extensionInterface(interfaceId: string): (target: any, propertyKey: string) => any
 
 declare class Stopwatch {
     Start(): void;

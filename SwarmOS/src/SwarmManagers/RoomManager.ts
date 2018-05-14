@@ -5,7 +5,7 @@ declare var Memory: {
 if (!Memory.roomData) {
     Memory.roomData = {};
 }
-import { ProcessBase, ExtensionBase } from "Core/BasicTypes";
+import { BasicProcess, ExtensionBase } from "Core/BasicTypes";
 
 export const bundle: IPackage<SDictionary<RVD_RoomMemory>> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
@@ -15,11 +15,11 @@ export const bundle: IPackage<SDictionary<RVD_RoomMemory>> = {
     rootImageName: PKG_RoomManager
 }
 
-class RoomManager extends ProcessBase {
-    OnLoad() {
+class RoomManager extends BasicProcess {
+    OnOSLoad() {
 
     }
-    @posisInterface(EXT_RoomView)
+    @extensionInterface(EXT_RoomView)
     View!: IRoomDataExtension;
 
     handleMissingMemory() {

@@ -3,10 +3,10 @@ import { bundle as SpawnManager } from "SwarmManagers/SpawnManager";
 import { bundle as FlagManager } from "SwarmManagers/FlagManager";
 import { bundle as TestInterrupt } from "SwarmManagers/TestInterruptManager"
 
-import { ServiceProviderBase, InitData } from "Core/BasicTypes";
+import { PackageProviderBase, InitData } from "Core/BasicTypes";
 
 const TESTING_ENABLED = false;
-class SwarmManager extends ServiceProviderBase<ServiceProviderMemory> {
+class SwarmManager extends PackageProviderBase<PackageProviderMemory> {
     static install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
         processRegistry.register(PKG_SwarmManager, SwarmManager);
         RoomManager.install(processRegistry, extensionRegistry);
@@ -18,7 +18,7 @@ class SwarmManager extends ServiceProviderBase<ServiceProviderMemory> {
     }
     private _reqServices!: SDictionary<InitData>;
 
-    OnLoad() {
+    OnOSLoad() {
         this._reqServices = {
             roomManager: {
                 processName: PKG_RoomManager
@@ -35,7 +35,7 @@ class SwarmManager extends ServiceProviderBase<ServiceProviderMemory> {
             this._reqServices['testListener'] = { processName: FT_InterruptListener }
             this._reqServices['testNotifier'] = { processName: FT_InterruptNotifier }
         }
-        super.OnLoad();
+        super.OnOSLoad();
     }
 }
 

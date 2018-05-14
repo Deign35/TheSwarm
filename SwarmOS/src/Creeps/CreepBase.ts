@@ -1,14 +1,14 @@
-import { ProcessBase } from "Core/BasicTypes";
+import { BasicProcess } from "Core/BasicTypes";
 import { ActionBase } from "Actions/ActionBase";
 import { WithdrawAction } from "Actions/WithdrawAction";
 import { HarvestAction } from "Actions/HarvestAction";
 import { PickupAction } from "Actions/PickupAction";
 
-export abstract class CreepBase<T extends CreepProcess_Memory> extends ProcessBase {
-    @posisInterface(EXT_RoomView)
+export abstract class CreepBase<T extends CreepProcess_Memory> extends BasicProcess {
+    @extensionInterface(EXT_RoomView)
     RoomView!: IRoomDataExtension;
 
-    OnLoad() {
+    OnOSLoad() {
         this._lastUpdate = Game.time;
         if (this.memory.creep) {
             this._creep = Game.creeps[this.memory.creep];

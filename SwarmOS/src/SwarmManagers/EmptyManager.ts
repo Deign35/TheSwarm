@@ -14,7 +14,7 @@ declare var Memory: {
     ___Empty___Data: I___Empty___Data_Memory
 }
 
-import { ProcessBase, ExtensionBase } from "Core/BasicTypes";
+import { BasicProcess, ExtensionBase } from "Core/BasicTypes";
 
 export const IN____Empty___Manager = '___Empty___Manager';
 export const IN____Empty___Extensions = '___Empty___Extensions';
@@ -30,8 +30,8 @@ const IN____Empty___Manager_LogContext: LogContext = {
     logLevel: LOG_DEBUG
 }
 
-class ___Empty___Manager extends ProcessBase {
-    protected OnLoad(): void { }
+class ___Empty___Manager extends BasicProcess {
+    protected OnOSLoad(): void { }
     protected get memory() {
         return Memory.___Empty___Data;
     }

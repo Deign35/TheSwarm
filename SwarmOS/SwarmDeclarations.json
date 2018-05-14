@@ -41,7 +41,8 @@
                 "Kernel": "kernel",
                 "Sleep": "sleep",
                 "EnergyDist": "energyDist",
-                "Interrupt": "interrupt"
+                "Interrupt": "interrupt",
+                "Logger": "logger"
             }
         },
         "FT": {

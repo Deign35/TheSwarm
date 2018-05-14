@@ -4,7 +4,7 @@ declare var Memory: {
 if (!Memory.flagData) {
     Memory.flagData = {};
 }
-import { ProcessBase, ExtensionBase } from "Core/BasicTypes";
+import { BasicProcess, ExtensionBase } from "Core/BasicTypes";
 
 export const bundle: IPackage<FlagMemory> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
@@ -18,8 +18,8 @@ const PKG_FlagManager_LogContext: LogContext = {
     logLevel: LOG_DEBUG
 }
 
-class FlagManager extends ProcessBase {
-    protected OnLoad(): void { }
+class FlagManager extends BasicProcess {
+    protected OnOSLoad(): void { }
     protected get memory() {
         return Memory.flagData;
     }

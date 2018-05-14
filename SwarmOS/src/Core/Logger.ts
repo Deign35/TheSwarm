@@ -61,25 +61,20 @@ const LOGGER_SETTINGS: SDictionary<ILogLevelSetting> = {
         }
     }
 }
-const ShouldLog = function (minLevel: LogLevel, messageLevel: LogLevel) {
-    return LOGGER_SETTINGS[minLevel].level <= LOGGER_SETTINGS[messageLevel].level
-}
-const MakeFontTag = function (level: LogLevel) {
-    return `<font size="${LOGGER_SETTINGS[level].font.size}" color="${LOGGER_SETTINGS[level].font.color}">`
-}
-interface Context {
+interface LoggerContext {
     logLevel: LogLevel,
     logs: {
         [id: number]: (string | (() => string))[]
     }
 }
 
-export class SwarmLogger implements ILogger {
+export class Logger implements IKernelLoggerExtensions {
     constructor() {
         this.logContexts = {};
         this.InitQueue();
     }
-    private logContexts: SDictionary<Context>;
+    private logContexts: SDictionary<LoggerContext>;
+
     protected InitQueue(): void {
         let ids = Object.keys(this.logContexts);
         for (let i = 0, length = ids.length; i < length; i++) {
@@ -90,29 +85,8 @@ export class SwarmLogger implements ILogger {
             this.CreateLogContext(DEFAULT_LOG_ID, DEFAULT_LOG_LEVEL);
         }
     }
-    CreateLogContext(logID: string, logLevel: LogLevel): ILogger {
-        if (!this.logContexts[logID]) {
-            this.logContexts[logID] = {
-                logLevel: logLevel || DEFAULT_LOG_LEVEL,
-                logs: [],
-                //counter: false // (TODO) prepend a counter to logs.
-            }
-        }
 
-        return {
-            alert: (message: (string | (() => string))) => { Logger.alert(message, logID); },
-            debug: (message: (string | (() => string))) => { Logger.debug(message, logID); },
-            error: (message: (string | (() => string))) => { Logger.error(message, logID); },
-            fatal: (message: (string | (() => string))) => { Logger.fatal(message, logID); },
-            info: (message: (string | (() => string))) => { Logger.info(message, logID); },
-            trace: (message: (string | (() => string))) => { Logger.trace(message, logID); },
-            warn: (message: (string | (() => string))) => { Logger.warn(message, logID); },
-            CreateLogContext: Logger.CreateLogContext,
-            DumpLogToConsole: Logger.DumpLogToConsole
-        }
-    }
-
-    protected log(message: (string | (() => string)), contextID: string = DEFAULT_LOG_ID, severity: LogLevel = LOG_INFO) {
+    protected log(message: (string | (() => string)), contextID: string = DEFAULT_LOG_ID, severity: LogLevel = DEFAULT_LOG_LEVEL) {
         let context = this.logContexts[contextID];
         if (!context) {
             this.logContexts[contextID] = {
@@ -121,7 +95,7 @@ export class SwarmLogger implements ILogger {
             }
             context = this.logContexts[contextID];
         }
-        if (ShouldLog(context.logLevel, severity)) {
+        if (this.ShouldLog(context.logLevel, severity)) {
             if (!context.logs[severity]) {
                 context.logs[severity] = [];
             }
@@ -137,8 +111,30 @@ export class SwarmLogger implements ILogger {
     trace(message: (string | (() => string)), contextID?: string) { return this.log(message, contextID, LOG_TRACE); }
     warn(message: (string | (() => string)), contextID?: string) { return this.log(message, contextID, LOG_WARN); }
 
+    CreateLogContext(logID: string, logLevel: LogLevel): ILogger {
+        if (!this.logContexts[logID]) {
+            this.logContexts[logID] = {
+                logLevel: logLevel || DEFAULT_LOG_LEVEL,
+                logs: [],
+                //counter: false // (TODO) prepend a counter to logs.
+            }
+        }
+
+        let self = this;
+        return {
+            alert: (message: (string | (() => string))) => { self.alert(message, logID); },
+            debug: (message: (string | (() => string))) => { self.debug(message, logID); },
+            error: (message: (string | (() => string))) => { self.error(message, logID); },
+            fatal: (message: (string | (() => string))) => { self.fatal(message, logID); },
+            info: (message: (string | (() => string))) => { self.info(message, logID); },
+            trace: (message: (string | (() => string))) => { self.trace(message, logID); },
+            warn: (message: (string | (() => string))) => { self.warn(message, logID); }
+        }
+    }
+
     DumpLogToConsole(endTick: boolean = true): void {
         let startLoggingTime = Game.cpu.getUsed();
+
         let logOutputs = [];
         let ids = Object.keys(this.logContexts);
         for (let i = 0, length = ids.length; i < length; i++) {
@@ -150,7 +146,7 @@ export class SwarmLogger implements ILogger {
             }
         }
 
-        let introStr = `${LOGGER_SEPARATOR}\n${MakeFontTag(LOG_ALERT)}Begin SwarmOS Log - [${Game.time}]`
+        let introStr = `${LOGGER_SEPARATOR}\n${this.MakeFontTag(LOG_ALERT)}Begin SwarmOS Log - [${Game.time}]`
         if (endTick) {
             introStr += `\nCPU: (${startLoggingTime}\/${Game.cpu.limit} -- [${Game.cpu.bucket}])`;
         }
@@ -163,20 +159,27 @@ export class SwarmLogger implements ILogger {
 
         // Reset the logger
         this.InitQueue();
-        console.log(`${MakeFontTag(LOG_ALERT)}End Logging(${Game.cpu.getUsed() - startLoggingTime})</font>\n${LOGGER_SEPARATOR}`);
+        console.log(`${this.MakeFontTag(LOG_ALERT)}End Logging(${Game.cpu.getUsed() - startLoggingTime})</font>\n${LOGGER_SEPARATOR}`);
     }
 
-    private compileContext(logID: string, context: Context) {
+    private ShouldLog(minLevel: LogLevel, messageLevel: LogLevel) {
+        return LOGGER_SETTINGS[minLevel].level <= LOGGER_SETTINGS[messageLevel].level
+    }
+    private MakeFontTag(level: LogLevel) {
+        return `<font size="${LOGGER_SETTINGS[level].font.size}" color="${LOGGER_SETTINGS[level].font.color}">`
+    }
+
+    private compileContext(logID: string, context: LoggerContext) {
         let queues = context.logs;
         let hasLogs = false;
         let output = () => {
-            let outStr = `${CONTEXT_SEPARATOR}\n${MakeFontTag(LOG_WARN)}Begin Log[${logID}] - {${context.logLevel}}</font>\n`;
+            let outStr = `${CONTEXT_SEPARATOR}\n${this.MakeFontTag(LOG_WARN)}Begin Log[${logID}] - {${context.logLevel}}</font>\n`;
             for (let settingID in LOGGER_SETTINGS) {
                 if (!queues[settingID] || queues[settingID].length == 0) {
                     continue;
                 }
 
-                outStr += MakeFontTag(settingID as LogLevel);
+                outStr += this.MakeFontTag(settingID as LogLevel);
                 while (queues[settingID].length > 0) {
                     let nextMessage = queues[settingID].shift();
                     if (nextMessage) {

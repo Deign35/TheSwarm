@@ -35,8 +35,8 @@ export class Harvester extends CreepBase<Harvester_Memory> {
             cost: 300
         }
     }
-    OnLoad() {
-        super.OnLoad();
+    OnOSLoad() {
+        super.OnOSLoad();
         let target = Game.getObjectById(this.memory.targetID) as Source | Mineral;
         if ((target as Source).energyCapacity) {
             // Make a link if possible

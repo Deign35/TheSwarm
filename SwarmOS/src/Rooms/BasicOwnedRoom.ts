@@ -1,4 +1,4 @@
-import { ProcessBase } from "Core/BasicTypes";
+import { BasicProcess } from "Core/BasicTypes";
 
 export const bundle: IPackage<SpawnerExtension_Memory> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {

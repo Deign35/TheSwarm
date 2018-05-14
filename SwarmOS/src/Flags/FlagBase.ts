@@ -1,4 +1,4 @@
-import { ProcessBase } from "Core/BasicTypes";
+import { BasicProcess } from "Core/BasicTypes";
 
 export const bundle: IPackage<SpawnerExtension_Memory> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
@@ -41,14 +41,14 @@ export const bundle: IPackage<SpawnerExtension_Memory> = {
  * WHITE_ --
  * YELLOW_ --
  */
-class FlagBase extends ProcessBase {
+class FlagBase extends BasicProcess {
     protected get memory(): FlagProcess_Memory {
         return super.memory;
     }
     protected get flag(): Flag {
         return Game.flags[this.memory.flagID];
     }
-    protected OnLoad(): void { }
+    protected OnOSLoad(): void { }
     protected executeProcess(): void {
         let flag = this.flag;
         if (!flag) {

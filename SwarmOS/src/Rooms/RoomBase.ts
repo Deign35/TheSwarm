@@ -1,8 +1,8 @@
-import { ProcessBase } from "Core/BasicTypes";
+import { BasicProcess } from "Core/BasicTypes";
 
-export abstract class RoomBase<T extends RoomProcess_Memory> extends ProcessBase {
-    OnLoad() { }
-    @posisInterface(EXT_RoomView)
+export abstract class RoomBase<T extends RoomProcess_Memory> extends BasicProcess {
+    OnOSLoad() { }
+    @extensionInterface(EXT_RoomView)
     View!: IRoomDataExtension;
 
     protected get memory(): T {

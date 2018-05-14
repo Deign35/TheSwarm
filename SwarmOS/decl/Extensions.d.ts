@@ -21,6 +21,7 @@ declare interface IPackageInterfaces {
     [EXT_Kernel]: IKernelProcessExtensions;
     [EXT_RoomView]: IRoomDataExtension;
     [EXT_Sleep]: IKernelSleepExtension;
+    [EXT_Logger]: IKernelLoggerExtensions;
 }
 
 /**
@@ -102,7 +103,7 @@ declare interface IRoomDataExtension extends IPackageExtension {
 declare interface ISpawnExtension extends IPackageExtension {
     cancelRequest(id: string): boolean;
     getRequestStatus(id: string): SpawnState;
-    requestCreep(opts: SpawnData_SpawnCard): string;
+    requestCreep(opts: SpawnerRequest): string;
 }
 
 

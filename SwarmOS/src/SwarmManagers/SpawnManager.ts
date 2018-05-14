@@ -29,7 +29,7 @@ const exDef2: RoleDefinition<'harvester'> = {
     }
 }
 */
-import { ProcessBase, ExtensionBase } from "Core/BasicTypes";
+import { BasicProcess, ExtensionBase } from "Core/BasicTypes";
 
 export const bundle: IPackage<SpawnerExtension_Memory> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
@@ -46,11 +46,11 @@ const PKG_SpawnManager_LogContext: LogContext = {
 }
 
 //const FRE_RoomStructures = primes_100[10]; // 10 = 29
-class SpawnManager extends ProcessBase {
-    @posisInterface(EXT_CreepSpawner)
+class SpawnManager extends BasicProcess {
+    @extensionInterface(EXT_CreepSpawner)
     SpawnerExtensions!: SpawnExtension;
 
-    OnLoad() { }
+    OnOSLoad() { }
 
     protected get memory() {
         return Memory.spawnData;

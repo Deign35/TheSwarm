@@ -3,7 +3,7 @@ declare var Memory: {
 }
 
 declare const PKG_CreepRunner: string;
-import { ProcessBase, ExtensionBase } from "Core/BasicTypes";
+import { BasicProcess, ExtensionBase } from "Core/BasicTypes";
 
 export const creepRunnerPackage: IPackage<SpawnerExtension_Memory> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
@@ -18,10 +18,10 @@ const PKG_CreepRunner_LogContext: LogContext = {
     logLevel: LOG_INFO
 }
 
-class CreepRunner extends ProcessBase {
-    protected OnLoad(): void { }
+class CreepRunner extends BasicProcess {
+    protected OnOSLoad(): void { }
 
-    @posisInterface(EXT_CreepSpawner)
+    @extensionInterface(EXT_CreepSpawner)
     SpawnerExtensions!: SpawnExtension;
 
     protected get memory() {

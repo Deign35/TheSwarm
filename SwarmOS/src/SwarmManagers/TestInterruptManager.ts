@@ -22,7 +22,7 @@ if (!Memory.TestData) {
     }
 }
 
-import { ProcessBase, ExtensionBase } from "Core/BasicTypes";
+import { BasicProcess, ExtensionBase } from "Core/BasicTypes";
 export const bundle: IPackage<ITestData_Memory> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
         processRegistry.register(FT_InterruptListener, TestSleeper);
@@ -35,8 +35,8 @@ const PKG_TestInterrupt_LogContext: LogContext = {
     logLevel: LOG_DEBUG
 }
 
-class TestSleeper extends ProcessBase {
-    protected OnLoad(): void { }
+class TestSleeper extends BasicProcess {
+    protected OnOSLoad(): void { }
     protected get memory() {
         return Memory.TestData;
     }
@@ -118,8 +118,8 @@ class TestSleeper extends ProcessBase {
     }
 }
 
-class TestInterrupter extends ProcessBase {
-    protected OnLoad(): void { }
+class TestInterrupter extends BasicProcess {
+    protected OnOSLoad(): void { }
     protected get memory() {
         return Memory.TestData;
     }
