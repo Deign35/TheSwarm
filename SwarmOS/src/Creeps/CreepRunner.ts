@@ -4,7 +4,7 @@ declare var Memory: {
 
 import { BasicProcess, ExtensionBase } from "Core/BasicTypes";
 
-export const creepRunnerPackage: IPackage<SpawnerExtension_Memory> = {
+export const OSPackage: IPackage<SpawnerExtension_Memory> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
         processRegistry.register(PKG_CreepRunner, CreepRunner);
         let CreepRunnerExtension = new SpawnExtension(extensionRegistry);
