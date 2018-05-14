@@ -11,24 +11,12 @@ declare var Memory: {
     TestData: ITestData_Memory
 }
 
-if (!Memory.TestData) {
-    Memory.TestData = {
-        NotificationSent: 0,
-        SleeperReady: false,
-        expectedSleep: 0,
-        begun: 0,
-        CurStep: 0,
-        testComplete: false,
-    }
-}
-
 import { BasicProcess, ExtensionBase } from "Core/BasicTypes";
 export const bundle: IPackage<ITestData_Memory> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
         processRegistry.register(FT_InterruptListener, TestSleeper);
         processRegistry.register(FT_InterruptNotifier, TestInterrupter);
-    },
-    rootImageName: FT_InterruptListener
+    }
 }
 const PKG_TestInterrupt_LogContext: LogContext = {
     logID: FT_InterruptListener,
@@ -36,8 +24,18 @@ const PKG_TestInterrupt_LogContext: LogContext = {
 }
 
 class TestSleeper extends BasicProcess<ITestData_Memory> {
-    protected OnOSLoad(): void { }
-    protected get memory() {
+    protected get memory(): ITestData_Memory {
+        if (!Memory.TestData) {
+            this.log.warn(`Initializing RoomManager memory`);
+            Memory.TestData = {
+                NotificationSent: 0,
+                SleeperReady: false,
+                expectedSleep: 0,
+                begun: 0,
+                CurStep: 0,
+                testComplete: false,
+            }
+        }
         return Memory.TestData;
     }
     protected get logID() {
@@ -119,8 +117,18 @@ class TestSleeper extends BasicProcess<ITestData_Memory> {
 }
 
 class TestInterrupter extends BasicProcess<ITestData_Memory> {
-    protected OnOSLoad(): void { }
-    protected get memory() {
+    protected get memory(): ITestData_Memory {
+        if (!Memory.TestData) {
+            this.log.warn(`Initializing RoomManager memory`);
+            Memory.TestData = {
+                NotificationSent: 0,
+                SleeperReady: false,
+                expectedSleep: 0,
+                begun: 0,
+                CurStep: 0,
+                testComplete: false,
+            }
+        }
         return Memory.TestData;
     }
     protected get logID() {

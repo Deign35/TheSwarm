@@ -1,4 +1,4 @@
-import { bundle as FlagBase } from "Flags/FlagBase"
+import { OSPackage as FlagBase } from "Flags/FlagBase"
 
 export const flagBundle: IPackage<{}> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {

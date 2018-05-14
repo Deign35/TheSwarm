@@ -3,8 +3,7 @@ import { BasicProcess } from "Core/BasicTypes";
 export const bundle: IPackage<SpawnerExtension_Memory> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
         processRegistry.register(PKG_BasicOwnedRoom, BasicOwnedRoom);
-    },
-    rootImageName: PKG_BasicOwnedRoom
+    }
 }
 
 import { RoomBase } from "Rooms/RoomBase";

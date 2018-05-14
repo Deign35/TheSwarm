@@ -10,8 +10,7 @@ export const bundle: IPackage<FlagMemory> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
         processRegistry.register(PKG_FlagManager, FlagManager);
         extensionRegistry.register(EXT_Flags, FlagExtension);
-    },
-    rootImageName: PKG_FlagManager
+    }
 }
 const PKG_FlagManager_LogContext: LogContext = {
     logID: PKG_FlagManager,
@@ -20,7 +19,11 @@ const PKG_FlagManager_LogContext: LogContext = {
 
 class FlagManager extends BasicProcess<FlagMemory> {
     protected OnOSLoad(): void { }
-    protected get memory() {
+    protected get memory(): FlagMemory {
+        if (!Memory.flagData) {
+            this.log.warn(`Initializing FlagManager memory`);
+            Memory.flagData = {}
+        }
         return Memory.flagData;
     }
     protected get logID() {
@@ -62,6 +65,10 @@ class FlagManager extends BasicProcess<FlagMemory> {
 
 class FlagExtension extends ExtensionBase {
     protected get memory(): FlagMemory {
+        if (!Memory.flagData) {
+            this.log.warn(`Initializing FlagManager memory`);
+            Memory.flagData = {}
+        }
         return Memory.flagData;
     }
 }

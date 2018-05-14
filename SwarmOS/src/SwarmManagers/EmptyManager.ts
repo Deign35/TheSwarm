@@ -22,8 +22,7 @@ export const bundle: IPackage<I___Empty___Data_Memory> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
         processRegistry.register(IN____Empty___Manager, ___Empty___Manager);
         extensionRegistry.register(IN____Empty___Extensions, ___Empty___Extension);
-    },
-    rootImageName: IN____Empty___Manager
+    }
 }
 const IN____Empty___Manager_LogContext: LogContext = {
     logID: IN____Empty___Manager,

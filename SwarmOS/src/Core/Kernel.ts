@@ -14,14 +14,14 @@ declare type ProcessCache = {
 declare type ProcessWithID = { pid: PID; process: IProcess; };
 
 const PROCESS_GHOST_TIMER = 100;
-export class Kernel implements IKernelProcessExtensions, IKernelSleepExtension {
+export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepExtension {
     constructor(private processRegistry: IProcessRegistry, private extensionRegistry: IExtensionRegistry, private _logger: IKernelLoggerExtensions) {
         this._processCache = {};
         this._logger = new Logger();
     }
     private _processCache: ProcessCache;
     private curProcessID: string = "";
-    protected get log() {
+    get log() {
         return this._logger;
     }
 

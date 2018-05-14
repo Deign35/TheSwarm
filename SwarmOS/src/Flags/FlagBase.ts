@@ -1,10 +1,9 @@
 import { BasicProcess } from "Core/BasicTypes";
 
-export const bundle: IPackage<SpawnerExtension_Memory> = {
+export const OSPackage: IPackage<SpawnerExtension_Memory> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
         processRegistry.register(PKG_FlagBase, FlagBase);
-    },
-    rootImageName: PKG_FlagBase
+    }
 }
 
 /**
@@ -41,14 +40,10 @@ export const bundle: IPackage<SpawnerExtension_Memory> = {
  * WHITE_ --
  * YELLOW_ --
  */
-class FlagBase extends BasicProcess {
-    protected get memory(): FlagProcess_Memory {
-        return super.memory;
-    }
+class FlagBase extends BasicProcess<FlagProcess_Memory> {
     protected get flag(): Flag {
         return Game.flags[this.memory.flagID];
     }
-    protected OnOSLoad(): void { }
     protected executeProcess(): void {
         let flag = this.flag;
         if (!flag) {
@@ -116,7 +111,7 @@ class FlagBase extends BasicProcess {
         if (csCreated == OK) {
             flag.remove();
         } else {
-            this.SetProcessToSleep(20);
+            this.sleeper.sleep(20);
         }
     }
     protected createAdvancedSite() {
@@ -157,7 +152,7 @@ class FlagBase extends BasicProcess {
         if (csCreated == OK) {
             flag.remove();
         } else {
-            this.SetProcessToSleep(200);
+            this.sleeper.sleep(200);
         }
     }
 }

@@ -49,6 +49,10 @@ class RoomManager extends BasicProcess<{}> {
 const FRE_RoomStructures = primes_100[10]; // 10 = 29
 class RoomExtension extends ExtensionBase implements IRoomDataExtension {
     protected get memory(): RoomViewData_Memory {
+        if (!Memory.roomData) {
+            this.log.warn(`Initializing RoomManager memory`);
+            Memory.roomData = {}
+        }
         return Memory.roomData;
     }
 

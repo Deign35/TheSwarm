@@ -1,5 +1,4 @@
 declare var Memory: {
-    testAlgorithms: Dictionary,
     counter: number,
 }
 import { Stopwatch } from "./Stopwatch";
@@ -29,33 +28,6 @@ export class GlobalTools {
         return body;
     }
 
-    // (TODO): Create a tools consul that manages memory for things, maybe only use flash memory!
-    static TestNewAlgorithm(testID: string,
-        testFunction: () => void,
-        workingVersion: () => void,
-        loggerID?: string) {
-        let wasSuccessful = false;
-        if (!Memory.testAlgorithms[testID]) {
-            Memory.testAlgorithms[testID] = 1;
-        }
-
-        try {
-            if (Memory.testAlgorithms[testID] <= NUM_ALLOWED_FAILURES) {
-                testFunction();
-                wasSuccessful = true;
-            } else {
-                Logger.warn(`Test[${testID}] has failed ${NUM_ALLOWED_FAILURES} times.  Test skipped`, loggerID);
-            }
-        } catch (exc) {
-            Memory.testAlgorithms[testID] += 1;
-            wasSuccessful = false;
-            Logger.error(`Algorithm test [${testID}] failed: [${JSON.stringify(exc)}]`);
-        }
-
-        if (!wasSuccessful) {
-            workingVersion();
-        }
-    }
     static GetSUID() {
         return Memory.counter++;
     }
@@ -86,7 +58,6 @@ export class GlobalTools {
 global['CopyObject'] = GlobalTools.CopyObject;
 global['GetSpawnCost'] = GlobalTools.GetSpawnCost;
 global['ConstructBodyArray'] = GlobalTools.ConstructBodyArray;
-global['TestNewAlgorithm'] = GlobalTools.TestNewAlgorithm;
 global['GetSUID'] = GlobalTools.GetSUID;
 global['GetRandomIndex'] = GlobalTools.GetRandomIndex;
 global['GetRandomID'] = GlobalTools.GetRandomID;

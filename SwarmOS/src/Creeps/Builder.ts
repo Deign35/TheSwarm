@@ -1,8 +1,7 @@
 export const OSPackage: IPackage<SpawnerExtension_Memory> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
         processRegistry.register(PKG_CreepBuilder, Builder);
-    },
-    rootImageName: PKG_CreepBuilder
+    }
 }
 
 import { CreepBase } from "Creeps/CreepBase";
@@ -90,7 +89,7 @@ export class Builder extends CreepBase<Builder_memory> {
                 this.kernel.killProcess(this.pid);
                 return;
             }
-            
+
             let keys = Object.keys(roomData.cSites);
             let dist = 100;
             for (let i = 0; i < keys.length; i++) {

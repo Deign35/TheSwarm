@@ -38,6 +38,9 @@ class CreepRunner extends BasicProcess<{}> {
         return this.spawnerMemory.spawnedCreeps;
     }
     protected get spawnCosts(): SDictionary<number> {
+        if (!this.cache.costs) {
+            this.cache.costs = {};
+        }
         return this.cache.costs;
     }
 
@@ -50,6 +53,21 @@ class CreepRunner extends BasicProcess<{}> {
     }
 
     executeProcess(): void {
+
+        /*if (this.memory.creep) {
+            this._creep = Game.creeps[this.memory.creep.n];
+        }
+        // Clean up any existing spawn requests
+        if (this.memory.creep) {
+            let creepStatus = this.spawner.getRequestStatus(this.memory.creep);
+            if (creepStatus == SP_ERROR || creepStatus == SP_COMPLETE) {
+                this.spawner.cancelRequest(this.memory.creep);
+                if (!Game.creeps[this.memory.creep]) {
+                    delete this.memory.creep;
+                }
+            }
+        }*/
+
         let unassignedCreeps: SDictionary<Creep> = {};
 
         // This confines the CreepRunner to only manage creeps that
@@ -60,6 +78,12 @@ class CreepRunner extends BasicProcess<{}> {
             let creep = Game.creeps[creepName];
             if (!creep) {
                 delete this.spawnedCreeps[creepName];
+            }
+            let status = this.spawner.getRequestStatus(creepName);
+            if (status) {
+                if (status == SP_ERROR || status == SP_COMPLETE) {
+                    this.spawner.cancelRequest(creepName);
+                }
             }
             if (!this.kernel.getProcessById(this.spawnCreeps[creepName])) {
                 unassignedCreeps[creepName] = creep
@@ -166,7 +190,7 @@ class CreepRunner extends BasicProcess<{}> {
                         m: 0,
                         w: 0,
                         n: spawnRequest.req.name
-                    }
+                    } as CreepContext_Worker;
                 }
             }
         }

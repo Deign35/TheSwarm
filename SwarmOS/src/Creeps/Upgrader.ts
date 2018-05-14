@@ -1,8 +1,7 @@
 export const OSPackage: IPackage<SpawnerExtension_Memory> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
         processRegistry.register(PKG_CreepUpgrader, Upgrader);
-    },
-    rootImageName: PKG_CreepUpgrader
+    }
 }
 
 import { CreepBase } from "Creeps/CreepBase";
