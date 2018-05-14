@@ -1,8 +1,7 @@
-export const bundle: IPackage<SpawnerExtension_Memory> = {
+export const OSPackage: IPackage<SpawnerExtension_Memory> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
         processRegistry.register(PKG_CreepRefiller, Refiller);
-    },
-    rootImageName: PKG_CreepRefiller
+    }
 }
 
 import { CreepBase } from "./CreepBase";
@@ -11,7 +10,9 @@ import { TransferAction } from "Actions/TransferAction";
 
 class Refiller extends CreepBase<SpawnRefiller_Memory> {
     protected get CreepPrefix() { return 'Ref_'; }
-    protected get SpawnBody() {
+    /*
+         protected get SpawnRequest() { should replace these }
+     protected get SpawnBody() {
         let spawnCap = Game.rooms[this.memory.loc].energyCapacityAvailable;
         if (spawnCap >= 2000) {
             return {
@@ -73,35 +74,26 @@ class Refiller extends CreepBase<SpawnRefiller_Memory> {
             }
             return Priority_Highest;
         }
-    }
+    }*/
     protected activateCreep(): void {
-        let creep = Game.creeps[this.memory.CC!];
-        if (!creep) {
-            // This should never happen
-            this.log.fatal(`Creep activation occurred without an assigned creep`);
-            this.memory.CC = undefined;
-            return;
-        }
-        if (creep.spawning) {
-            return;
-        }
-        if (creep.room.name != this.memory.loc) {
-            new MoveToPositionAction(creep, new RoomPosition(25, 25, this.memory.loc)).Run();
+        let creep = this.creep;
+
+        if (this.memory.en) {
+            if (creep.carry.energy == creep.carryCapacity) {
+                this.memory.tar = undefined;
+                this.memory.en = false;
+            } else {
+                return;
+            }
+        } else if (creep.carry.energy == 0) {
+            this.memory.tar = undefined;
+            this.memory.en = true;
+            this.getEnergy(creep.carryCapacity / 2);
             return;
         }
 
-        if (this.memory.en) {
-            if (this.creep.carry.energy == this.creep.carryCapacity) {
-                this.memory.en = false;
-                this.memory.tar = undefined;
-            } else {
-                this.getEnergy(this.creep.carryCapacity / 2);
-                return;
-            }
-        } else if (this.creep.carry.energy == 0) {
-            this.memory.tar = undefined;
-            this.memory.en = true;
-            this.getEnergy(this.creep.carryCapacity / 2);
+        if (this.memory.tar && creep.room.name != this.memory.loc) {
+            new MoveToPositionAction(creep, new RoomPosition(25, 25, this.memory.loc)).Run();
             return;
         }
 

@@ -1,4 +1,4 @@
-export const bundle: IPackage<SpawnerExtension_Memory> = {
+export const OSPackage: IPackage<SpawnerExtension_Memory> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
         processRegistry.register(PKG_CreepHarvester, Harvester);
     },
@@ -14,6 +14,7 @@ import { RepairAction } from "Actions/RepairAction";
 
 export class Harvester extends CreepBase<Harvester_Memory> {
     protected get CreepPrefix() { return 'Harv_'; }
+    /*
     protected get SpawnPriority(): Priority {
         return Priority_High;
     }
@@ -35,6 +36,7 @@ export class Harvester extends CreepBase<Harvester_Memory> {
             cost: 300
         }
     }
+    
     OnOSLoad() {
         super.OnOSLoad();
         let target = Game.getObjectById(this.memory.tar) as Source | Mineral;
@@ -66,18 +68,9 @@ export class Harvester extends CreepBase<Harvester_Memory> {
                 }
             }
         }
-    }
+    }*/
     protected activateCreep(): void {
-        let creep = Game.creeps[this.memory.CC!];
-        if (!creep) {
-            // This should never happen
-            this.log.fatal(`Creep activation occurred without an assigned creep`);
-            this.memory.CC = undefined;
-            return;
-        }
-        if (creep.spawning) {
-            return;
-        }
+        let creep = this.creep;
         if (creep.room.name != this.memory.loc) {
             new MoveToPositionAction(creep, new RoomPosition(25, 25, this.memory.loc)).Run();
             return;
@@ -95,6 +88,7 @@ export class Harvester extends CreepBase<Harvester_Memory> {
             new MoveToPositionAction(creep, new RoomPosition(25, 25, this.memory.loc)).Run();
             return;
         }
+
         let action: ActionBase = new HarvestAction(creep, target);
         switch (action.ValidateAction()) {
             case (SR_NONE):

@@ -1,7 +1,7 @@
-import { bundle as Harvester } from "Creeps/Harvester";
-import { bundle as Refiller } from "Creeps/Refiller";
-import { bundle as Upgrader } from "Creeps/Upgrader";
-import { bundle as Builder } from "Creeps/Builder";
+import { OSPackage as Harvester } from "Creeps/Harvester";
+import { OSPackage as Refiller } from "Creeps/Refiller";
+import { OSPackage as Upgrader } from "Creeps/Upgrader";
+import { OSPackage as Builder } from "Creeps/Builder";
 
 export const creepBundle: IPackage<{}> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {

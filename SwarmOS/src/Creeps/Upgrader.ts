@@ -1,4 +1,4 @@
-export const bundle: IPackage<SpawnerExtension_Memory> = {
+export const OSPackage: IPackage<SpawnerExtension_Memory> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
         processRegistry.register(PKG_CreepUpgrader, Upgrader);
     },
@@ -78,20 +78,9 @@ export class Upgrader extends CreepBase<Upgrader_Memory> {
         return Priority_Lowest;
     }
     protected activateCreep(): void {
-        let creep = Game.creeps[this.memory.CC!];
-        if (!creep) {
-            // This should never happen
-            this.log.fatal(`Creep activation occurred without an assigned creep`);
-            this.memory.CC = undefined;
-            return;
-        }
-        if (creep.spawning) {
-            return;
-        }
-
-        if (!creep.room.controller) {
-            this.log.fatal(`Target is missing`);
-            this.kernel.killProcess(this.pid);
+        let creep = this.creep;
+        if (creep.room.name != this.memory.loc) {
+            new MoveToPositionAction(creep, new RoomPosition(25, 25, this.memory.loc)).Run();
             return;
         }
 
@@ -101,7 +90,6 @@ export class Upgrader extends CreepBase<Upgrader_Memory> {
                 this.memory.en = false;
                 //this.memory.targetRoom = this.
             } else {
-                this.getEnergy(this.creep.carryCapacity / 2);
                 return;
             }
         } else if (this.creep.carry.energy == 0) {
@@ -116,13 +104,24 @@ export class Upgrader extends CreepBase<Upgrader_Memory> {
             return;
         }
 
-        let target = creep.room.controller;
+        let target = creep.room.controller!;
+        if (!target) {
+            this.log.fatal(`Target is missing`);
+            this.kernel.killProcess(this.pid);
+            return;
+        }
+
         let action: ActionBase = new UpgradeAction(creep, target);
         switch (action.ValidateAction()) {
             case (SR_NONE):
             case (SR_MOVE):
                 break;
-            case (SR_REQUIRES_ENERGY): // (TODO): Implement refilling Upgrader's resources somehow.
+            case (SR_REQUIRES_ENERGY):
+                this.memory.en = true;
+                this.memory.tar = undefined;
+                return;
+            default:
+                this.log.warn(`Unhandled action validation error: ${action.ValidateAction()}`);
                 break;
         }
 

@@ -9,7 +9,7 @@ export abstract class CreepBase<T extends CreepProcess_Memory> extends BasicProc
     @extensionInterface(EXT_RoomView)
     RoomView!: IRoomDataExtension;
 
-    /**  Convert this over to the CreepRunner to ensure creeps are pushed to the appropriate process?
+    /**  (TODO): Convert this over to the CreepRunner to ensure creeps are pushed to the appropriate process?
     OnOSLoad() {
         this._lastUpdate = Game.time;
         if (this.memory.creep) {
@@ -58,7 +58,6 @@ export abstract class CreepBase<T extends CreepProcess_Memory> extends BasicProc
                     this.memory.en = false;
                 } else {
                     this.getEnergy(this.creep.carryCapacity / 2);
-                    return;
                 }
             }
             this.activateCreep(this.creep);

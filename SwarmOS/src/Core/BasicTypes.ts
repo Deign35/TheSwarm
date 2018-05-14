@@ -12,6 +12,7 @@ export abstract class BasicProcess<ProcessMemory> implements IProcess {
 
     constructor(protected context: IProcessContext) {
         this._logger = context.getPackageInterface(EXT_Logger).CreateLogContext(this.logID, this.logLevel);
+        this._cache = this.createProcessCache(); // Data that hangs in ambient memory as long as the process remains alive and doesn't get reloaded by the OS.
         this.OnOSLoad();
     }
     protected OnOSLoad(): void { }
@@ -20,6 +21,9 @@ export abstract class BasicProcess<ProcessMemory> implements IProcess {
     protected get log(): ILogger { return this._logger; }
     protected get logID() { return DEFAULT_LOG_ID; }
     protected get logLevel(): LogLevel { return DEFAULT_LOG_LEVEL; }
+
+    private _cache: SDictionary<any>;
+    protected get cache(): SDictionary<any> { return this._cache; }
     protected get memory(): ProcessMemory { return this.context.memory as ProcessMemory; }
 
     get pkgName(): string { return this.context.pkgName; }
@@ -39,8 +43,14 @@ export abstract class BasicProcess<ProcessMemory> implements IProcess {
         if (this.isInDebugMode) {
             let endCPU = Game.cpu.getUsed();
             this.log.debug(() => `End ${this.pkgName}(${this.pid}): ${endCPU - startCPU}`);
+            this.executeDebugCode();
+            let endDebugCPU = Game.cpu.getUsed();
+            this.log.debug(() => `End Debug ${this.pkgName}(${this.pid}): ${endDebugCPU - endCPU}`);
         }
     }
+
+    protected createProcessCache(): SDictionary<any> { return {} }
+    protected executeDebugCode(): void { }
     protected abstract executeProcess(): void;
 }
 

@@ -88,6 +88,7 @@ declare interface SpawnerRequest extends MemBase {
     loc: RoomID;        // Where the spawn request originates
     pri: Priority;      // How much of a priority is this spawn??
     sta: SpawnState;    // Current Spawn state
+    pid: PID;           // RequestorPID
 
     dm?: any;           // Default memory
     max?: number;       // Max spawning distance allowed for this spawn.

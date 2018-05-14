@@ -16,6 +16,7 @@
             "isArray": true,
             "entries": [
                 "FlagManager",
+                "CreepRunner",
                 "SwarmManager",
                 "SpawnManager",
                 "RoomManager",

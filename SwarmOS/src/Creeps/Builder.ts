@@ -1,4 +1,4 @@
-export const bundle: IPackage<SpawnerExtension_Memory> = {
+export const OSPackage: IPackage<SpawnerExtension_Memory> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
         processRegistry.register(PKG_CreepBuilder, Builder);
     },
@@ -13,6 +13,7 @@ import { BuildAction } from "Actions/BuildAction";
 
 export class Builder extends CreepBase<Builder_memory> {
     protected get CreepPrefix() { return 'Bui_'; }
+    /*
     protected get SpawnPriority(): Priority {
         return Priority_Low;
     }
@@ -58,13 +59,13 @@ export class Builder extends CreepBase<Builder_memory> {
             cost: 250
         }
     }
+    */
     protected activateCreep(creep: Creep): void {
         if (this.memory.en) {
             if (this.creep.carry.energy == this.creep.carryCapacity) {
                 this.memory.tar = undefined;
                 this.memory.en = false;
             } else {
-                this.getEnergy(this.creep.carryCapacity / 2);
                 return;
             }
         } else if (this.creep.carry.energy == 0) {
@@ -74,14 +75,23 @@ export class Builder extends CreepBase<Builder_memory> {
             return;
         }
 
-        if (creep.room.name != this.memory.loc) {
+        if (this.memory.tar && creep.room.name != this.memory.loc) {
             new MoveToPositionAction(creep, new RoomPosition(25, 25, this.memory.loc)).Run();
             return;
         }
 
         let targetSite = Game.constructionSites[this.memory.tar!];
         if (!targetSite) {
-            let keys = Object.keys(Game.constructionSites);
+            this.memory.tar = undefined;
+            let roomData = this.RoomView.GetRoomData(this.creep.room.name);
+            if (!roomData) {
+                // This should never happen
+                this.log.fatal(`Roomdata missing`);
+                this.kernel.killProcess(this.pid);
+                return;
+            }
+            
+            let keys = Object.keys(roomData.cSites);
             let dist = 100;
             for (let i = 0; i < keys.length; i++) {
                 let nextSite = Game.constructionSites[keys[i]];
