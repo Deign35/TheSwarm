@@ -15,26 +15,46 @@ export abstract class CreepBase<T extends CreepProcess_Memory> extends BasicProc
     protected GetNewCreepName() {
         return this.CreepPrefix + GetSUID();
     }
-    protected get creep(): Creep {
-        if (this._lastUpdate != Game.time) {
-            if (this.memory.CC) {
-                this._creep = this.creeper.getCreep(this.memory.CC.n, this.pid);
-            }
-            this._lastUpdate = Game.time;
-        }
-
-        return this._creep!; // Little cheaty, but best way to get Typescript to compile the assumption that the program won't run without the creep
-    }
-    private _lastUpdate!: number;
-    private _creep?: Creep;
 
     protected get SpawnPriority(): Priority {
         return Priority_Low;
     }
 
+    protected get creep(): Creep {
+        return this._creep!;
+    }
+    private _creep: Creep | undefined;
+
     protected executeProcess(): void {
-        if (this.creep) {
-            if (this.creep.spawning) {
+        let requestID: string | undefined = this.memory.SR;
+        if (requestID) {
+            let creep = this.creeper.getCreep(this.memory.SR, this.pid);
+            let spawnStatus = this.spawner.getRequestStatus(this.memory.SR);
+            switch (spawnStatus) {
+                case (SP_ERROR):
+                    this.spawner.cancelRequest(this.memory.SR);
+                case (undefined):
+                    requestID = undefined;
+                case (SP_QUEUED):
+                    break;
+                case (SP_COMPLETE):
+                    if (creep) {
+                        this.spawner.cancelRequest(this.memory.SR);
+                    }
+                case (SP_SPAWNING):
+                default:
+                    if (creep) {
+                        this._creep = Game.creeps[creep!.n];
+                    }
+                    break;
+            }
+        }
+        this.memory.SR = requestID || this.spawner.requestSpawn(this.creepContext, this.memory.loc, this.pid, this.SpawnPriority);
+
+        let creepContext = this.creeper.getCreep(this.memory.SR, this.pid);
+        if (creepContext && Game.creeps[creepContext.n]) {
+            let creep = Game.creeps[creepContext.n];
+            if (creep.spawning) {
                 return;
             }
             if (this.memory.en) {
@@ -45,28 +65,10 @@ export abstract class CreepBase<T extends CreepProcess_Memory> extends BasicProc
                     this.getEnergy(this.creep.carryCapacity / 2);
                 }
             }
-            this.activateCreep(this.creep);
-        } else {
-            if (this.memory.SR) {
-                let spawnStatus = this.spawner.getRequestStatus(this.memory.SR);
-                if (!spawnStatus) {
-                    this.memory.SR = undefined;
-                    this.kernel.killProcess(this.pid);
-                    return;
-                } else {
-                    if (spawnStatus != SP_QUEUED) {
-                        if (spawnStatus != SP_SPAWNING) {
-                            this.spawner.cancelRequest(this.memory.SR);
-                            this.memory.SR = undefined;
-                        }
-                    }
-                }
-            }
-            if (!this.memory.SR) {
-                this.memory.SR = this.spawner.requestSpawn(this.creepContext, this.memory.loc, this.pid, this.SpawnPriority);
-            }
+            this.activateCreep();
         }
     }
+
     protected get creepContext(): CreepContext {
         return {
             n: GetSUID(),
@@ -78,7 +80,7 @@ export abstract class CreepBase<T extends CreepProcess_Memory> extends BasicProc
         }
     }
 
-    protected abstract activateCreep(creep: Creep): void;
+    protected abstract activateCreep(): void;
     protected getEnergy(minEnergy: number = 0) {
         let withdrawTarget = undefined;
 

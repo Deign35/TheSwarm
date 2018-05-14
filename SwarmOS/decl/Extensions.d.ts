@@ -109,7 +109,7 @@ declare interface ISpawnExtension extends IPackageExtension {
 }
 
 declare interface ICreepRegistry extends IPackageExtension {
-    getCreep(creepName: CreepID, requestingPID: PID): Creep | undefined
+    getCreep(spawnRequestID: SpawnRequestID, requestingPID: PID): CreepContext | undefined
 }
 
 

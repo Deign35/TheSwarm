@@ -43,7 +43,8 @@ class BasicOwnedRoom extends RoomBase<BasicOwnedRoom_Memory> {
                         tar: sourceID,
                         loc: room.name,
                         home: room.name,
-                        en: false
+                        en: false,
+                        SR: '0'
                     }
                     let newPID = this.kernel.startProcess(PKG_CreepHarvester, sourceContext);
                     if (!newPID || !newPID.pid || !newPID.process) {
@@ -78,7 +79,8 @@ class BasicOwnedRoom extends RoomBase<BasicOwnedRoom_Memory> {
             let newMemory: CreepProcess_Memory = {
                 home: this.room!.name,
                 loc: this.room!.name,
-                en: true
+                en: true,
+                SR: '0'
             }
             let newPID = this.kernel.startProcess(pkgType, newMemory);
             if (!newPID || !newPID.pid || !newPID.process) {

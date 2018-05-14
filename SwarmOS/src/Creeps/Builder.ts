@@ -59,12 +59,13 @@ export class Builder extends CreepBase<Builder_memory> {
         }
     }
     */
-    protected activateCreep(creep: Creep): void {
+    protected activateCreep(): void {
         if (this.memory.en) {
             if (this.creep.carry.energy == this.creep.carryCapacity) {
                 this.memory.tar = undefined;
                 this.memory.en = false;
             } else {
+                this.getEnergy(this.creep.carryCapacity / 2);
                 return;
             }
         } else if (this.creep.carry.energy == 0) {
@@ -74,8 +75,8 @@ export class Builder extends CreepBase<Builder_memory> {
             return;
         }
 
-        if (this.memory.tar && creep.room.name != this.memory.loc) {
-            new MoveToPositionAction(creep, new RoomPosition(25, 25, this.memory.loc)).Run();
+        if (this.memory.tar && this.creep.room.name != this.memory.loc) {
+            new MoveToPositionAction(this.creep, new RoomPosition(25, 25, this.memory.loc)).Run();
             return;
         }
 

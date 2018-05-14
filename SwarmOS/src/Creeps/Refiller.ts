@@ -83,6 +83,7 @@ class Refiller extends CreepBase<SpawnRefiller_Memory> {
                 this.memory.tar = undefined;
                 this.memory.en = false;
             } else {
+                this.getEnergy(this.creep.carryCapacity / 2);
                 return;
             }
         } else if (creep.carry.energy == 0) {

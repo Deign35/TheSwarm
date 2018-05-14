@@ -91,7 +91,7 @@ declare interface CreepContext_Attacker extends CreepContext {
 
 declare interface SpawnerRequest extends MemBase {
     con: CreepContext;  // Context
-    id: SpawnRequestID;         // requestID
+    id: SpawnRequestID; // requestID
     loc: RoomID;        // Where the spawn request originates
     pid: PID;           // RequestorPID
     pri: Priority;      // How much of a priority is this spawn??
@@ -118,8 +118,7 @@ declare interface CreepMemory extends MemBase {
 }
 
 declare interface CreepProcess_Memory extends MemBase {
-    CC?: CreepContext;  // The creep context corresponding to the creep assigned to this process
-    SR?: SpawnRequestID;        // Spawn request ID
+    SR: SpawnRequestID;// Spawn request ID
     tar?: ObjectID;     // The current target
     home: RoomID;       // Room from where this creep was spawned
     loc: RoomID;        // Room location of where this creep is doing its shtuff

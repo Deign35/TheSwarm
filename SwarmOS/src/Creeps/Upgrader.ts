@@ -87,8 +87,8 @@ export class Upgrader extends CreepBase<Upgrader_Memory> {
             if (this.creep.carry.energy == this.creep.carryCapacity) {
                 this.memory.tar = undefined;
                 this.memory.en = false;
-                //this.memory.targetRoom = this.
             } else {
+                this.getEnergy(this.creep.carryCapacity / 2);
                 return;
             }
         } else if (this.creep.carry.energy == 0) {

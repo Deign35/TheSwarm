@@ -7,8 +7,10 @@ import { BasicProcess, ExtensionBase } from "Core/BasicTypes";
 export const OSPackage: IPackage<SpawnerExtension_Memory> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
         processRegistry.register(PKG_CreepRunner, CreepRunner);
+
         let CreepRunnerExtension = new SpawnExtension(extensionRegistry);
         extensionRegistry.register(EXT_CreepSpawner, CreepRunnerExtension);
+        extensionRegistry.register(EXT_CreepRegistry, CreepRunnerExtension);
     }
 }
 
@@ -98,19 +100,16 @@ class CreepRunner extends BasicProcess<{}> {
         // have been spawned by it.
         let spawnedIDs = Object.keys(this.spawnedCreeps);
         for (let i = 0; i < spawnedIDs.length; i++) {
-            let creepName = spawnedIDs[i];
+            let creepContext = this.spawnedCreeps[spawnedIDs[i]];
+            let creepName = creepContext.n;
             let creep = Game.creeps[creepName];
             if (!creep) {
                 delete this.spawnedCreeps[creepName];
-            }
-            let status = this.spawner.getRequestStatus(creepName);
-            if (status) {
-                if (status == SP_ERROR || status == SP_COMPLETE) {
-                    this.spawner.cancelRequest(creepName);
+            } else {
+                // (TODO): Find a way to clear dead spawn requests
+                if (!this.spawnedCreeps[spawnedIDs[i]].o || !this.kernel.getProcessById(this.spawnedCreeps[spawnedIDs[i]].o!)) {
+                    unassignedCreeps[creepName] = creep
                 }
-            }
-            if (!this.spawnedCreeps[creepName].o || !this.kernel.getProcessById(this.spawnedCreeps[creepName].o!)) {
-                unassignedCreeps[creepName] = creep
             }
         }
         this.spawnCreeps(unassignedCreeps);
@@ -216,6 +215,7 @@ class CreepRunner extends BasicProcess<{}> {
                 if (spawnResult == OK) {
                     this.log.debug(`Spawn Creep successful for ${spawnRequest.req.con.n} - pid(${spawnRequest.req.pid})`);
                     spawnRequest.req.sta = SP_SPAWNING;
+                    this.spawnedCreeps[spawnRequest.req.id] = spawnRequest.req.con;
                 }
             }
         }
@@ -271,12 +271,12 @@ class SpawnExtension extends ExtensionBase implements ISpawnExtension, ICreepReg
 
         return spawnRequest.sta;
     }
-    getCreep(creepName: CreepID, requestingPID: PID): Creep | undefined {
-        if (!Game.creeps[creepName] || !this.spawnedCreeps[creepName] ||
-            !this.spawnedCreeps[creepName].o || this.spawnedCreeps[creepName].o != requestingPID) {
+    getCreep(spawnRequestID: string, requestingPID: PID): CreepContext | undefined {
+        let request = this.spawnedCreeps[spawnRequestID];
+        if (!request || !Game.creeps[request.n] || !request.o || request.o != requestingPID) {
             return undefined;
         }
-        return Game.creeps[creepName];
+        return request;
     }
     requestSpawn(context: CreepContext, location: RoomID, requestorPID: PID, spawnPriority: Priority,
         maxSpawnDistance: number = 3, startMem?: any): SpawnRequestID {
