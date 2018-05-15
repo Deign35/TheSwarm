@@ -2,6 +2,16 @@
 var lineCount;
 var charCount;
 var fileCount;
+var BODYPART_COST = {
+    "m": 50,
+    "w": 100,
+    "a": 80,
+    "c": 50,
+    "h": 250,
+    "r": 150,
+    "t": 10,
+    "cl": 600
+}
 module.exports = function (grunt) {
     gObj = grunt;
     grunt.loadNpmTasks('grunt-contrib-clean');
@@ -143,14 +153,12 @@ module.exports = function (grunt) {
                 let description = declarations[creepType].entries[i];
                 let numEntries2 = Object.keys(declarations[creepType].entries[i]).length;
                 let descCount = 0;
+                let cost = 0;
                 for (let desc in description) {
-                    compiled += desc + ':' + description[desc];
-                    if (descCount < numEntries2 - 1) {
-                        compiled += ',';
-                    }
-                    descCount++;
+                    compiled += desc + ':' + description[desc] + ',';
+                    cost += description[desc] * BODYPART_COST[desc];
                 }
-                compiled += '}';
+                compiled += 'cost:' + cost + '}';
                 if (i < numEntries - 1) {
                     compiled += ',';
                 }
