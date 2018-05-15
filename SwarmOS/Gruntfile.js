@@ -142,7 +142,15 @@ module.exports = function (grunt) {
         declarations = require("./CreepBodies.json");
         globalsFile.push("// Begin creep definitions");
 
+        /**
+         * Last thing for compiling this will be to create consts that correspond to the given bodies.
+         * e.g.
+         * const CT_H = [{}];
+         * const H = 'CT_H';
+         * global['Creeps'][H] = CT_H;
+         */
         let compiledType = 'declare type CreepBodyDefinition =';
+        let globalDeclaration = 'global["CreepBodies"] = {'
         let numCreepTypes = Object.keys(declarations).length;
         let creepCounter = 0;
         for (let creepType in declarations) {
@@ -164,18 +172,22 @@ module.exports = function (grunt) {
                 }
             }
             compiled += ']';
-            globalsFile.push('global["CT_' + creepType + '"] = ' + compiled);
+            globalsFile.push('const CT_' + creepType + ' = ' + compiled);
             declarationsFile.push('declare const CT_' + creepType + ': ' + compiled);
             declarationsFile.push('declare type CT_' + creepType + ' = ' + compiled);
 
             compiledType += ' CT_' + creepType;
+            globalDeclaration += 'CT_' + creepType;
             if (creepCounter++ < numCreepTypes - 1) {
                 compiledType += ' |';
+                globalDeclaration += ',';
             } else {
                 compiledType += ';';
+                globalDeclaration += '};';
             }
         }
 
+        globalsFile.push(globalDeclaration);
         globalsFile.push("// End creep definitions");
         declarationsFile.push(compiledType);
 

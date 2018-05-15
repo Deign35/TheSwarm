@@ -30,27 +30,6 @@ const BodyLegend = {
     h: HEAL,
     m: MOVE,
 }
-
-const ConvertContextToSpawnCost = function (context: CreepContext) {
-    let cost = 0;
-    for (let bodyID in BodyLegend) {
-        if (context[bodyID]) {
-            cost += BODYPART_COST[BodyLegend[bodyID]] * context[bodyID];
-        }
-    }
-
-    return cost;
-}
-const ConvertContextToHash = function (context: CreepContext) {
-    let hashID = '';
-    for (let bodyID in BodyLegend) {
-        if (context[bodyID]) {
-            hashID += context[bodyID] + bodyID;
-        }
-    }
-
-    return hashID;
-}
 const ConvertContextToSpawnBody = function (context: CreepContext) {
     let body = [];
     for (let bodyID in BodyLegend) {
@@ -150,9 +129,6 @@ class CreepRunner extends BasicProcess<{}> {
             this.log.warn(`No spawn requests in the queue.  You have spawn capacity available.`);
             return;
         }
-        let idToHashMap = {}; // This needs to not be saved because the body might change
-        // But because the cost is saved via the hash, that can be saved to flash memory
-
 
         let creepIDs = Object.keys(unassignedCreeps);
         let minSpawnCost = 20000;
@@ -182,13 +158,7 @@ class CreepRunner extends BasicProcess<{}> {
                 req.sta = SP_COMPLETE;
                 continue;
             }
-
-            idToHashMap[req.id] = ConvertContextToHash(req.con);
-            if (!this.spawnCosts[idToHashMap[req.id]]) {
-                this.spawnCosts[idToHashMap[req.id]] = ConvertContextToSpawnCost(req.con); // Calculate the cost of the spawn and cache it.
-
-            }
-            minSpawnCost = Math.min(minSpawnCost, this.spawnCosts[idToHashMap[req.id]]);
+            minSpawnCost = Math.min(minSpawnCost, CreepBodies[req.con.b][req.con.l].cost); //this.spawnCosts[idToHashMap[req.id]]);
         }
 
         let availableSpawns: SDictionary<StructureSpawn> = {};
@@ -215,7 +185,7 @@ class CreepRunner extends BasicProcess<{}> {
                 if (req.sta != SP_QUEUED) {
                     continue;
                 }
-                let diff = this.spawnCosts[idToHashMap[req.id]];
+                let diff = CreepBodies[req.con.b][req.con.l].cost;
                 let dist = Game.map.getRoomLinearDistance(spawn.room.name, req.loc) || 0
                 if (req.max && dist > req.max) {
                     continue;

@@ -14,16 +14,7 @@ export class Builder extends CreepBase<Builder_memory> {
     protected get SpawnPriority(): Priority {
         return Priority_Low;
     }
-    protected createNewCreepContext(): CreepContext_Worker {
-        return {
-            c: 2,
-            m: 2,
-            w: 1,
 
-            n: this.GetNewCreepName(),
-            o: this.pid
-        }
-    }
     protected get CreepPrefix() { return 'Bui_'; }
     protected activateCreep(): void {
         if (this.memory.get) {

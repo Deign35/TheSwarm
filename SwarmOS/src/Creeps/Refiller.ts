@@ -13,66 +13,7 @@ class Refiller extends CreepBase<SpawnRefiller_Memory> {
     protected get SpawnPriority(): Priority {
         return Priority_Highest;
     }
-    protected createNewCreepContext(): CreepContext_Worker {
-        return {
-            c: 2,
-            m: 2,
-            w: 1,
-
-            n: this.GetNewCreepName(),
-            o: this.pid
-        }
-    }
     /*
-         protected get SpawnRequest() { should replace these }
-     protected get SpawnBody() {
-        let spawnCap = Game.rooms[this.memory.loc].energyCapacityAvailable;
-        if (spawnCap >= 2000) {
-            return {
-                body: [
-                    CARRY, CARRY, CARRY, CARRY, CARRY,
-                    MOVE, MOVE, MOVE, MOVE, MOVE,
-                    CARRY, CARRY, CARRY, CARRY, CARRY,
-                    MOVE, MOVE, MOVE, MOVE, MOVE,
-                    CARRY, CARRY, CARRY, CARRY, CARRY,
-                    MOVE, MOVE, MOVE, MOVE, MOVE,
-                    CARRY, CARRY, CARRY, CARRY, CARRY,
-                    MOVE, MOVE, MOVE, MOVE, MOVE
-                ],
-                cost: 2000
-            }
-        } else if (spawnCap > 1000) {
-            return {
-                body: [
-                    CARRY, CARRY, CARRY, CARRY, CARRY,
-                    MOVE, MOVE, MOVE, MOVE, MOVE,
-                    CARRY, CARRY, CARRY, CARRY, CARRY,
-                    MOVE, MOVE, MOVE, MOVE, MOVE,
-                ],
-                cost: 1000
-            }
-        } else if (spawnCap >= 500) {
-            return {
-                body: [
-                    CARRY, CARRY, CARRY, CARRY, CARRY,
-                    MOVE, MOVE, MOVE, MOVE, MOVE,
-                ],
-                cost: 500
-            }
-        } else {
-            if (Object.keys(Game.creeps).length == 0) {
-                return {
-                    body: [WORK, WORK, CARRY, MOVE],
-                    cost: 300
-                }
-            } else {
-                return {
-                    body: [CARRY, MOVE, CARRY, MOVE],
-                    cost: 200
-                }
-            }
-        }
-    }
     protected get SpawnPriority() {
         let spawnCap = Game.rooms[this.memory.loc].energyCapacityAvailable;
         if (spawnCap > 4000) {

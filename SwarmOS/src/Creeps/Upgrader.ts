@@ -11,80 +11,8 @@ import { UpgradeAction } from "Actions/UpgradeAction";
 
 export class Upgrader extends CreepBase<Upgrader_Memory> {
     protected get CreepPrefix() { return 'Upg_'; }
-    protected get SpawnBody() {
-        let spawnCap = Game.rooms[this.memory.loc].energyCapacityAvailable;
-        let level = Game.rooms[this.memory.loc].controller!.level;
-        switch (level) {
-            case (8):
-                if (spawnCap >= 200) {
-                    return {
-                        body: [WORK, CARRY, MOVE],
-                        cost: 200
-                    }
-                }
-            case (7):
-            case (6):
-            case (5):
-                if (spawnCap >= 1600) {
-                    return {
-                        body: [WORK, WORK, WORK, WORK, WORK,
-                            CARRY, CARRY, CARRY, CARRY, CARRY,
-                            CARRY, CARRY, CARRY, CARRY, CARRY,
-                            MOVE, MOVE, MOVE, MOVE, MOVE,
-                            MOVE, MOVE, MOVE, MOVE, MOVE],
-                        cost: 1600
-                    }
-                }
-            case (4):
-                if (spawnCap >= 1200) {
-                    return {
-                        body: [WORK, WORK, WORK, WORK,
-                            CARRY, CARRY, CARRY, CARRY,
-                            CARRY, CARRY, CARRY, CARRY,
-                            MOVE, MOVE, MOVE, MOVE,
-                            MOVE, MOVE, MOVE, MOVE],
-                        cost: 1200
-                    }
-                }
-            case (3):
-                if (spawnCap >= 800) {
-                    return {
-                        body: [WORK, WORK, WORK,
-                            CARRY, CARRY, CARRY, CARRY, CARRY,
-                            MOVE, MOVE, MOVE, MOVE, MOVE],
-                        cost: 800
-                    }
-                }
-            case (2):
-                if (spawnCap >= 400) {
-                    return {
-                        body: [WORK, CARRY, CARRY, CARRY, MOVE, MOVE],
-                        cost: 400
-                    }
-                }
-            case (1):
-            default:
-                return {
-                    body: [WORK, CARRY, MOVE],
-                    cost: 200
-                }
-        }
-    }
-    protected get SpawnPriority() {
-        if (Game.rooms[this.memory.loc].controller!.ticksToDowngrade < 3000) {
-            return Priority_EMERGENCY;
-        }
+    protected get SpawnPriority(): Priority {
         return Priority_Lowest;
-    }
-    protected createNewCreepContext(): CreepContext_Worker {
-        return {
-            c: 2,
-            m: 2,
-            w: 1,
-
-            n: this.GetNewCreepName(),
-            o: this.pid
-        }
     }
     protected activateCreep(): void {
         let creep = this.creep;

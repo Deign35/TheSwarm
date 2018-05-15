@@ -22,16 +22,6 @@ export class Harvester extends CreepBase<Harvester_Memory> {
     protected get SpawnPriority(): Priority {
         return Priority_High;
     }
-    protected createNewCreepContext(): CreepContext_Worker {
-        return {
-            c: 1,
-            m: 1,
-            w: 2,
-
-            n: this.GetNewCreepName(),
-            o: this.pid
-        }
-    }
 
     protected refreshSourceView() {
         if ((Game.time + this._updateOffset) % 61 != 0) {

@@ -47,6 +47,7 @@ class BasicOwnedRoom extends RoomBase<BasicOwnedRoom_Memory> {
                         get: false,
                         SR: '0',
                         en: true,
+                        SB: CreepBodies[]
                     }
                     let newPID = this.kernel.startProcess(PKG_CreepHarvester, sourceContext);
                     if (!newPID || !newPID.pid || !newPID.process) {
