@@ -13,31 +13,20 @@ import { RepairAction } from "Actions/RepairAction";
 
 export class Harvester extends CreepBase<Harvester_Memory> {
     protected get CreepPrefix() { return 'Harv_'; }
-    /*
+    private _updateOffset!: number;
+    OnOSLoad() {
+        this._updateOffset = GetRandomIndex(primes_3000) || 113
+        super.OnOSLoad();
+    }
+
     protected get SpawnPriority(): Priority {
         return Priority_High;
     }
-    protected get SpawnBody() {
-        let energyCap = Game.rooms[this.memory.loc].energyCapacityAvailable
-        if (energyCap >= 700) {
-            return {
-                body: [WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE],
-                cost: 700
-            }
-        } else if (energyCap >= 550) {
-            return {
-                body: [WORK, WORK, WORK, WORK, WORK, MOVE],
-                cost: 550
-            }
+
+    protected refreshSourceView() {
+        if ((Game.time + this._updateOffset) % 61 != 0) {
+            return;
         }
-        return {
-            body: [WORK, WORK, CARRY, MOVE],
-            cost: 300
-        }
-    }
-    
-    OnOSLoad() {
-        super.OnOSLoad();
         let target = Game.getObjectById(this.memory.tar) as Source | Mineral;
         if ((target as Source).energyCapacity) {
             // Make a link if possible
@@ -67,8 +56,10 @@ export class Harvester extends CreepBase<Harvester_Memory> {
                 }
             }
         }
-    }*/
+    }
+
     protected activateCreep(): void {
+        this.refreshSourceView();
         let creep = this.creep;
         if (creep.room.name != this.memory.loc) {
             new MoveToPositionAction(creep, new RoomPosition(25, 25, this.memory.loc)).Run();

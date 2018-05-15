@@ -129,6 +129,12 @@ class CreepRunner extends BasicProcess<{}> {
         let minSpawnCost = 20000;
         for (let i = 0; i < requests.length; i++) {
             let req = this.spawnQueue[requests[i]];
+            if (req.sta != SP_QUEUED) {
+                if (req.sta == SP_SPAWNING && !Game.creeps[req.con.n]) {
+                    req.sta = SP_ERROR;
+                }
+                continue;
+            }
             let con = req.con;
 
             if (!this.spawnCosts[requests[i]]) {
@@ -173,6 +179,9 @@ class CreepRunner extends BasicProcess<{}> {
 
             for (let j = 0; j < requests.length; j++) {
                 let req = this.spawnQueue[requests[j]];
+                if (req.sta != SP_QUEUED) {
+                    continue;
+                }
                 let diff = this.spawnCosts[req.id];
                 let dist = Game.map.getRoomLinearDistance(spawn.room.name, req.loc) || 0
                 if (req.max && dist > req.max) {
@@ -265,7 +274,7 @@ class SpawnExtension extends ExtensionBase implements ISpawnExtension, ICreepReg
             if (creep && !creep.spawning) {
                 this.spawnQueue[id].sta = SP_COMPLETE;
                 spawnRequest.sta = SP_COMPLETE;
-                this.spawnedCreeps[this.spawnQueue[id].con.n] = this.spawnQueue[id].con;
+                this.spawnedCreeps[spawnRequest.id] = this.spawnQueue[id].con;
             }
         }
 

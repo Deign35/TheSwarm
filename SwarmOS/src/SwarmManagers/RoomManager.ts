@@ -169,9 +169,11 @@ class RoomExtension extends ExtensionBase implements IRoomDataExtension {
         forceRefresh = forceRefresh || !this.memory[roomID] || (this.memory[roomID].lastUpdated == 0);
         let { room, roomData } = this.getRoomData(roomID);
         if (room) {
-            this.RefreshRoom(roomID, forceRefresh);
-            if (forceRefresh || this.shouldRefresh(FRE_RoomStructures, roomData!.minUpdateOffset)) {
-                this.RefreshRoomStructures(roomID);
+            if (roomData!.lastUpdated != Game.time) {
+                this.RefreshRoom(roomID, forceRefresh);
+                if (forceRefresh || this.shouldRefresh(FRE_RoomStructures, roomData!.minUpdateOffset)) {
+                    this.RefreshRoomStructures(roomID);
+                }
             }
         } else {
             this.log.debug(`Room out of view [${roomID}]`);

@@ -26,6 +26,20 @@ export abstract class CreepBase<T extends CreepProcess_Memory> extends BasicProc
     private _creep: Creep | undefined;
 
     protected executeProcess(): void {
+        this.EnsureCreep();
+
+        let creepContext = this.creeper.getCreep(this.memory.SR, this.pid);
+        if (creepContext && Game.creeps[creepContext.n]) {
+            this._creep = Game.creeps[creepContext.n];
+            if (this._creep.spawning) {
+                return;
+            }
+
+            this.activateCreep();
+        }
+    }
+
+    protected EnsureCreep() {
         let requestID: string | undefined = this.memory.SR;
         if (requestID) {
             let creep = this.creeper.getCreep(this.memory.SR, this.pid);
@@ -34,7 +48,9 @@ export abstract class CreepBase<T extends CreepProcess_Memory> extends BasicProc
                 case (SP_ERROR):
                     this.spawner.cancelRequest(this.memory.SR);
                 case (undefined):
-                    requestID = undefined;
+                    if (!creep || !Game.creeps[creep.n]) {
+                        requestID = undefined;
+                    }
                 case (SP_QUEUED):
                     break;
                 case (SP_COMPLETE):
@@ -49,29 +65,16 @@ export abstract class CreepBase<T extends CreepProcess_Memory> extends BasicProc
                     break;
             }
         }
-        this.memory.SR = requestID || this.spawner.requestSpawn(this.creepContext, this.memory.loc, this.pid, this.SpawnPriority);
 
-        let creepContext = this.creeper.getCreep(this.memory.SR, this.pid);
-        if (creepContext && Game.creeps[creepContext.n]) {
-            let creep = Game.creeps[creepContext.n];
-            if (creep.spawning) {
-                return;
-            }
-            if (this.memory.en) {
-                if (this.creep.carry.energy == this.creep.carryCapacity) {
-                    this.memory.tar = undefined;
-                    this.memory.en = false;
-                } else {
-                    this.getEnergy(this.creep.carryCapacity / 2);
-                }
-            }
-            this.activateCreep();
-        }
+        this.memory.SR = requestID || this.trySpawnCreep();
     }
 
-    protected get creepContext(): CreepContext {
+    protected trySpawnCreep() {
+        return this.spawner.requestSpawn(this.createNewCreepContext(), this.memory.loc, this.pid, this.SpawnPriority);
+    }
+    protected createNewCreepContext(): CreepContext {
         return {
-            n: GetSUID(),
+            n: this.GetNewCreepName(),
             o: this.pid,
 
             c: 1,
