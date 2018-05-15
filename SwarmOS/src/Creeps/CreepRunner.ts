@@ -43,21 +43,23 @@ const ConvertContextToSpawnBody = function (context: CreepContext) {
 
     return body;
 }
-const CompareContextCompatibility = function (left: CreepContext, right: CreepContext) {
+//                                                                                           LTOE = Less than or equal (e.g. the creep is bigger than required)
+const CompareContextCompatibility = function (context: CreepContext, creep: Creep, strictLTOE: boolean = false) {
     let score = 0;
 
+    let desiredCreepDef = CreepBodies.get(context.b)[context.l];
     for (let bodyID in BodyLegend) {
-        if (!left[bodyID] || !right[bodyID]) {
-            if (left[bodyID] || right[bodyID]) {
+        let desiredCount = desiredCreepDef[bodyID] || 0;
+        let hasCount = creep.getActiveBodyparts(BodyLegend[bodyID]) || 0;
+        if (desiredCount > 0 || hasCount > 0) {
+            if (desiredCount == 0 || hasCount == 0 || (strictLTOE && desiredCount > hasCount)) {
                 return 0;
             }
         }
 
-        if (left[bodyID] && right[bodyID]) {
-            score = BODYPART_COST[BodyLegend[bodyID]] * Math.min(left[bodyID], right[bodyID]);
-        }
-
+        score += BODYPART_COST[BodyLegend[bodyID]] * Math.abs(desiredCount - hasCount);
     }
+
     return score;
 }
 
@@ -106,16 +108,17 @@ class CreepRunner extends BasicProcess<{}> {
         // have been spawned by it.
         let spawnedIDs = Object.keys(this.spawnedCreeps);
         for (let i = 0; i < spawnedIDs.length; i++) {
-            let creepContext = this.spawnedCreeps[spawnedIDs[i]];
+            let spawnID = spawnedIDs[i] as SpawnRequestID;
+            let creepContext = this.spawnedCreeps[spawnID];
             let creepName = creepContext.n;
             let creep = Game.creeps[creepName];
             if (!creep) {
                 delete this.spawnedCreeps[creepName];
-            } else {
-                // (TODO): Find a way to clear dead spawn requests
-                if (!this.spawnedCreeps[spawnedIDs[i]].o || !this.kernel.getProcessById(this.spawnedCreeps[spawnedIDs[i]].o!)) {
-                    unassignedCreeps[creepName] = creep
-                }
+            }
+            // (TODO): Find a way to clear dead spawn requests
+            if (!this.spawnedCreeps[spawnID].o || !this.kernel.getProcessById(this.spawnedCreeps[spawnID].o!)) {
+                debugger;
+                unassignedCreeps[spawnID] = creep
             }
         }
         this.spawnCreeps(unassignedCreeps);
@@ -131,7 +134,6 @@ class CreepRunner extends BasicProcess<{}> {
             return;
         }
 
-        let creepIDs = Object.keys(unassignedCreeps);
         let minSpawnCost = 20000;
         for (let i = 0; i < requests.length; i++) {
             let req = this.spawnQueue[requests[i]];
@@ -143,19 +145,29 @@ class CreepRunner extends BasicProcess<{}> {
             }
 
             let compatibleCreep = undefined;
+            let compatibleIndex = '';
             let bestScore = 0;
+            let creepIDs = Object.keys(unassignedCreeps);
             for (let j = 0; j < creepIDs.length; j++) {
-                let context = this.spawnedCreeps[creepIDs[j]];
-                let score = CompareContextCompatibility(this.spawnedCreeps[creepIDs[j]], req.con);
+                let creepReqID = creepIDs[j];
+                let creep = unassignedCreeps[creepReqID];
+                let score = CompareContextCompatibility(req.con, creep);
                 if (score > bestScore) {
                     bestScore = score;
-                    compatibleCreep = this.spawnedCreeps[creepIDs[j]];
+                    compatibleCreep = this.spawnedCreeps[creepReqID];
+                    compatibleIndex = creepReqID;
                 }
             }
 
             if (compatibleCreep) {
-                // Assign the creep
-                compatibleCreep.o = req.pid;
+                this.spawnedCreeps[requests[i]] = {
+                    b: compatibleCreep.b,
+                    l: compatibleCreep.l,
+                    n: compatibleCreep.n,
+                    o: req.pid
+                }
+                delete unassignedCreeps[compatibleIndex];
+                delete this.spawnedCreeps[compatibleIndex]
                 req.sta = SP_COMPLETE;
                 continue;
             }

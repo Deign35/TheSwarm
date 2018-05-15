@@ -160,6 +160,16 @@ declare interface BasicOwnedRoom_Memory extends RoomProcess_Memory {
     sources: SDictionary<PID | undefined>;
 }
 
+declare interface RoomProcess_CreepAssignment {
+    pid?: PID,
+    CT: CT_ALL,
+    lvl: number
+}
+declare interface SimpleOwnedRoom_Memory extends RoomProcess_Memory {
+    creepAssignments: { [id: string]: RoomProcess_CreepAssignment[] };
+    sources: SDictionary<PID | undefined>;
+}
+
 declare interface PackageProviderMemory extends MemBase {
     services: {
         [id: string]: {

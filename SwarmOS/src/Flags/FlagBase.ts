@@ -7,6 +7,7 @@ export const OSPackage: IPackage<SpawnerExtension_Memory> = {
 }
 
 /**
+ * (TODO): Building priority
  * BLUE_ -- Basic constructionSites
  *      BLUE_ -- StructureContainer
  *      BROWN_ -- StructureExtension

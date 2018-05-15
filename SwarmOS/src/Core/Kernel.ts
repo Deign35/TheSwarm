@@ -163,6 +163,7 @@ export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepEx
                 }
                 delete this.processTable[pid];
                 delete this.processMemory[pid];
+                delete this._processCache[pid];
                 continue;
             }
             hasActiveProcesses = true;

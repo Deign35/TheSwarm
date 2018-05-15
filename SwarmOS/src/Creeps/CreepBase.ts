@@ -42,6 +42,7 @@ export abstract class CreepBase<T extends CreepProcess_Memory> extends BasicProc
                     return;
                 }
 
+                this._creep.say(this.pkgName);
                 this.activateCreep();
             }
         }
@@ -58,6 +59,7 @@ export abstract class CreepBase<T extends CreepProcess_Memory> extends BasicProc
                     this.spawner.cancelRequest(requestID);
                 case (undefined):
                     if (!context || !Game.creeps[context.n]) {
+
                         requestID = undefined;
                     }
                 case (SP_QUEUED):

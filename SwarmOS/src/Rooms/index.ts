@@ -1,7 +1,7 @@
-import { bundle as BasicOwnedRoom } from "Rooms/BasicOwnedRoom"
+import { SimpleRoomPackage as SimpleOwnedRoom } from "Rooms/SimpleOwnedRoom"
 
 export const roomBundle: IPackage<{}> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
-        BasicOwnedRoom.install(processRegistry, extensionRegistry);
+        SimpleOwnedRoom.install(processRegistry, extensionRegistry);
     }
 }

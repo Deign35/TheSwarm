@@ -32,11 +32,12 @@ class RoomManager extends BasicProcess<{}> {
                 }
             }
             if (!data.pid || !this.kernel.getProcessById(data.pid)) {
-                let newRoomMemory: BasicOwnedRoom_Memory = {
+                let newRoomMemory: SimpleOwnedRoom_Memory = {
                     roomName: roomID,
                     creeps: {
                         bui: []
                     },
+                    creepAssignments: {},
                     sources: {}
                 }
 
