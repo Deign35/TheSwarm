@@ -29,7 +29,7 @@ export abstract class BasicProcess<ProcessMemory> implements IProcess {
     get pkgName(): string { return this.context.pkgName; }
     get pid(): PID { return this.context.pid; }
     get parentPID(): PID { return this.context.pPID; }
-    get isInDebugMode() { return true; }
+    get isInDebugMode() { return false; }
 
     run(): void {
         let startCPU = 0;

@@ -41,6 +41,16 @@ const ConvertContextToSpawnCost = function (context: CreepContext) {
 
     return cost;
 }
+const ConvertContextToHash = function (context: CreepContext) {
+    let hashID = '';
+    for (let bodyID in BodyLegend) {
+        if (context[bodyID]) {
+            hashID += context[bodyID] + bodyID;
+        }
+    }
+
+    return hashID;
+}
 const ConvertContextToSpawnBody = function (context: CreepContext) {
     let body = [];
     for (let bodyID in BodyLegend) {
@@ -52,6 +62,23 @@ const ConvertContextToSpawnBody = function (context: CreepContext) {
     }
 
     return body;
+}
+const CompareContextCompatibility = function (left: CreepContext, right: CreepContext) {
+    let score = 0;
+
+    for (let bodyID in BodyLegend) {
+        if (!left[bodyID] || !right[bodyID]) {
+            if (left[bodyID] || right[bodyID]) {
+                return 0;
+            }
+        }
+
+        if (left[bodyID] && right[bodyID]) {
+            score = BODYPART_COST[BodyLegend[bodyID]] * Math.min(left[bodyID], right[bodyID]);
+        }
+
+    }
+    return score;
 }
 
 class CreepRunner extends BasicProcess<{}> {
@@ -92,7 +119,6 @@ class CreepRunner extends BasicProcess<{}> {
 
     executeProcess(): void {
         this.log.debug(`Begin CreepRunner`);
-        this.cache.costs = {}; // Prevent hashing of incorrect data, yikes
         let unassignedCreeps: SDictionary<Creep> = {};
 
         // (TODO) Revert all managers from using global memory.  Just do it right(?)
@@ -124,6 +150,9 @@ class CreepRunner extends BasicProcess<{}> {
             this.log.warn(`No spawn requests in the queue.  You have spawn capacity available.`);
             return;
         }
+        let idToHashMap = {}; // This needs to not be saved because the body might change
+        // But because the cost is saved via the hash, that can be saved to flash memory
+
 
         let creepIDs = Object.keys(unassignedCreeps);
         let minSpawnCost = 20000;
@@ -135,27 +164,31 @@ class CreepRunner extends BasicProcess<{}> {
                 }
                 continue;
             }
-            let con = req.con;
-
-            if (!this.spawnCosts[requests[i]]) {
-                this.spawnCosts[requests[i]] = ConvertContextToSpawnCost(con); // Calculate the cost of the spawn and cache it.
-
-            }
-            let spawnCost = this.spawnCosts[requests[i]]; // (TODO): Will this slow down the running script if it never gets cleaned and the OS doesn't reload?
 
             let compatibleCreep = undefined;
+            let bestScore = 0;
             for (let j = 0; j < creepIDs.length; j++) {
-                // Check if bodies are compatible, if so, don't bother spawning it, just assign the damn pid
-                if (!this.isInDebugMode) {
-                    compatibleCreep = Game.creeps[creepIDs[j]];
+                let context = this.spawnedCreeps[creepIDs[j]];
+                let score = CompareContextCompatibility(this.spawnedCreeps[creepIDs[j]], req.con);
+                if (score > bestScore) {
+                    bestScore = score;
+                    compatibleCreep = this.spawnedCreeps[creepIDs[j]];
                 }
             }
 
             if (compatibleCreep) {
                 // Assign the creep
+                compatibleCreep.o = req.pid;
+                req.sta = SP_COMPLETE;
                 continue;
             }
-            minSpawnCost = Math.min(minSpawnCost, spawnCost);
+
+            idToHashMap[req.id] = ConvertContextToHash(req.con);
+            if (!this.spawnCosts[idToHashMap[req.id]]) {
+                this.spawnCosts[idToHashMap[req.id]] = ConvertContextToSpawnCost(req.con); // Calculate the cost of the spawn and cache it.
+
+            }
+            minSpawnCost = Math.min(minSpawnCost, this.spawnCosts[idToHashMap[req.id]]);
         }
 
         let availableSpawns: SDictionary<StructureSpawn> = {};
@@ -182,7 +215,7 @@ class CreepRunner extends BasicProcess<{}> {
                 if (req.sta != SP_QUEUED) {
                     continue;
                 }
-                let diff = this.spawnCosts[req.id];
+                let diff = this.spawnCosts[idToHashMap[req.id]];
                 let dist = Game.map.getRoomLinearDistance(spawn.room.name, req.loc) || 0
                 if (req.max && dist > req.max) {
                     continue;
