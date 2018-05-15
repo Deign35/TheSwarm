@@ -64,29 +64,18 @@ declare interface SpawnerExtension_Memory extends MemBase {
     spawnedCreeps: SDictionary<CreepContext>;
 }
 declare interface CreepContext extends MemBase {
-    m: number;      // (m)ove
+    //m: number;      // (m)ove
     n: CreepID;     // (n)ame
-    o?: PID;         // (o)wner process
-
-    a?: number;      // (a)ttack
+    o?: PID;        // (o)wner process
+    b: string;      // (b)ody definition
+    l: number;      // body (l)evel
+    /*a?: number;      // (a)ttack
     c?: number;      // (c)arry
     cl?: number;     // (cl)aim
     h?: number;      // (h)eal
     r?: number;      // (r)angedAttack
     t?: number;     // (t)ough
-    w?: number;      // (w)ork
-}
-declare interface CreepContext_Worker extends CreepContext {
-    w: number;      // (w)ork
-    c: number;      // (c)arry
-}
-declare interface CreepContext_Claimer extends CreepContext {
-    cl: number;     // (cl)aim
-}
-declare interface CreepContext_Attacker extends CreepContext {
-    a: number;      // (a)ttack
-    r: number;      // (r)angedAttack
-    h: number;      // (h)eal
+    w?: number;      // (w)ork*/
 }
 
 declare interface SpawnerRequest extends MemBase {
@@ -119,6 +108,9 @@ declare interface CreepMemory extends MemBase {
 
 declare interface CreepProcess_Memory extends MemBase {
     SR?: SpawnRequestID;// Spawn request ID
+    SB: string;      // (b)ody definition
+    SL: number;      // body (l)evel
+
     tar?: ObjectID;     // The current target
     home: RoomID;       // Room from where this creep was spawned
     loc: RoomID;        // Room location of where this creep is doing its shtuff
@@ -146,7 +138,15 @@ declare interface RoomProcess_Memory extends MemBase {
     roomName: string;
     creeps: RoomProcess_CreepMemory
 }
-
+/*
+declare interface RoomProcess_Memory extends MemBase {
+    roomName: string;
+    creeps: SDictionary<RoomProcess_CreepData[]>;
+}
+declare interface RoomProcess_CreepData {
+    pid: PID;
+    lvl: number;    // Corresponds to the index of the creep definition currently being used
+}*/
 declare interface RoomProcess_CreepMemory extends MemBase {
     bui: PID[]; // Builders
     ref?: PID[]; // Refillers

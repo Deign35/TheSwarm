@@ -74,13 +74,12 @@ export abstract class CreepBase<T extends CreepProcess_Memory> extends BasicProc
         return this.spawner.requestSpawn(this.createNewCreepContext(), this.memory.loc, this.pid, this.SpawnPriority);
     }
     protected createNewCreepContext(): CreepContext {
+        // Adjust this class for spawn context initialization?
         return {
             n: this.GetNewCreepName(),
             o: this.pid,
-
-            c: 1,
-            m: 1,
-            w: 2
+            b: this.memory.SB,
+            l: this.memory.SL
         }
     }
 
