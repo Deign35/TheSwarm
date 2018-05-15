@@ -1,4 +1,7 @@
 declare var Memory: {
+    // Put common memory here -- Desired body sizes
+
+    // Or do I kill old processes and start new ones
     roomData: RoomViewData_Memory
 }
 

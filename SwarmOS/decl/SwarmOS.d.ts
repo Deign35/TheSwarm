@@ -10,6 +10,7 @@ declare interface IProcessRegistry {
     createNewProcess(name: string, context: IProcessContext): IProcess | undefined;
 }
 declare interface IProcess {
+    onProcessEnd(): void
     run(): void;
 }
 declare interface _ProcessConstructor {

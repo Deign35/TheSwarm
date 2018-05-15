@@ -157,6 +157,10 @@ export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepEx
             let pid = processIDs[i];
             let pInfo = this.processTable[pid];
             if (!pInfo.ex) {
+                let proc = this.getProcessById(pid);
+                if (proc) {
+                    proc.onProcessEnd();
+                }
                 delete this.processTable[pid];
                 delete this.processMemory[pid];
                 continue;

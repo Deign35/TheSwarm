@@ -84,6 +84,19 @@ export abstract class CreepBase<T extends CreepProcess_Memory> extends BasicProc
         }
     }
 
+    onProcessEnd() {
+        if (this.memory.SR) {
+            let req = this.spawner.getRequestStatus(this.memory.SR);
+            if (req) {
+                this.spawner.cancelRequest(this.memory.SR);
+            }
+            let creep = this.creeper.getCreep(this.memory.SR, this.pid);
+            if (creep) {
+                this.creeper.releaseCreep(this.memory.SR);
+            }
+        }
+    }
+
     protected abstract activateCreep(): void;
     protected getEnergy(minEnergy: number = 0) {
         let withdrawTarget = undefined;

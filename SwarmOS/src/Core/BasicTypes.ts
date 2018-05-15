@@ -31,6 +31,7 @@ export abstract class BasicProcess<ProcessMemory> implements IProcess {
     get parentPID(): PID { return this.context.pPID; }
     get isInDebugMode() { return false; }
 
+    onProcessEnd(): void { }
     run(): void {
         let startCPU = 0;
         if (this.isInDebugMode) {

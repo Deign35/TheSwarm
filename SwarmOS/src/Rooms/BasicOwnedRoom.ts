@@ -16,7 +16,8 @@ class BasicOwnedRoom extends RoomBase<BasicOwnedRoom_Memory> {
             return;
         }
         if (roomData.cSites.length > 0) {
-            this.SpawnClass(this.memory.creeps.bui, 1, PKG_CreepBuilder);
+            let numBuilders = Math.ceil(4 / roomData.cSites.length);
+            this.SpawnClass(this.memory.creeps.bui, numBuilders, PKG_CreepBuilder);
         }
 
         if (roomData.owner && roomData.owner == MY_USERNAME) {
