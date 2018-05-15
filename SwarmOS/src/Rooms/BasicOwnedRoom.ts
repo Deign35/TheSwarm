@@ -43,16 +43,16 @@ class BasicOwnedRoom extends RoomBase<BasicOwnedRoom_Memory> {
                         tar: sourceID,
                         loc: room.name,
                         home: room.name,
-                        en: false,
-                        SR: '0'
+                        get: false,
+                        SR: '0',
+                        en: true,
                     }
                     let newPID = this.kernel.startProcess(PKG_CreepHarvester, sourceContext);
                     if (!newPID || !newPID.pid || !newPID.process) {
-                        this.log.fatal(`Room failed to create a harvester process (${room.name})`);
-                        this.kernel.killProcess(this.pid);
-                        return;
+                        this.log.error(`Room failed to create a harvester process (${room.name})`);
+                    } else {
+                        this.memory.sources[sourceID] = newPID.pid;
                     }
-                    this.memory.sources[sourceID] = newPID.pid;
                 }
             }
 
@@ -79,8 +79,9 @@ class BasicOwnedRoom extends RoomBase<BasicOwnedRoom_Memory> {
             let newMemory: CreepProcess_Memory = {
                 home: this.room!.name,
                 loc: this.room!.name,
-                en: true,
-                SR: '0'
+                get: true,
+                SR: '0',
+                en: true
             }
             let newPID = this.kernel.startProcess(pkgType, newMemory);
             if (!newPID || !newPID.pid || !newPID.process) {

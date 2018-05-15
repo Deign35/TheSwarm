@@ -10,6 +10,19 @@ import { TransferAction } from "Actions/TransferAction";
 
 class Refiller extends CreepBase<SpawnRefiller_Memory> {
     protected get CreepPrefix() { return 'Ref_'; }
+    protected get SpawnPriority(): Priority {
+        return Priority_Highest;
+    }
+    protected createNewCreepContext(): CreepContext_Worker {
+        return {
+            c: 2,
+            m: 2,
+            w: 1,
+
+            n: this.GetNewCreepName(),
+            o: this.pid
+        }
+    }
     /*
          protected get SpawnRequest() { should replace these }
      protected get SpawnBody() {
@@ -78,17 +91,17 @@ class Refiller extends CreepBase<SpawnRefiller_Memory> {
     protected activateCreep(): void {
         let creep = this.creep;
 
-        if (this.memory.en) {
+        if (this.memory.get) {
             if (creep.carry.energy == creep.carryCapacity) {
                 this.memory.tar = undefined;
-                this.memory.en = false;
+                this.memory.get = false;
             } else {
                 this.getEnergy(this.creep.carryCapacity / 2);
                 return;
             }
         } else if (creep.carry.energy == 0) {
             this.memory.tar = undefined;
-            this.memory.en = true;
+            this.memory.get = true;
             this.getEnergy(creep.carryCapacity / 2);
             return;
         }

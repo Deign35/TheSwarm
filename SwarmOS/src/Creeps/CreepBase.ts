@@ -26,42 +26,43 @@ export abstract class CreepBase<T extends CreepProcess_Memory> extends BasicProc
     private _creep: Creep | undefined;
 
     protected executeProcess(): void {
+        if (!this.memory.en) {
+            if (this.memory.SR) {
+                this.creeper.releaseCreep(this.memory.SR);
+            }
+            return;
+        }
         this.EnsureCreep();
 
-        let creepContext = this.creeper.getCreep(this.memory.SR, this.pid);
-        if (creepContext && Game.creeps[creepContext.n]) {
-            this._creep = Game.creeps[creepContext.n];
-            if (this._creep.spawning) {
-                return;
-            }
+        if (this.memory.SR) {
+            let creepContext = this.creeper.getCreep(this.memory.SR, this.pid);
+            if (creepContext && Game.creeps[creepContext.n]) {
+                this._creep = Game.creeps[creepContext.n];
+                if (this._creep.spawning) {
+                    return;
+                }
 
-            this.activateCreep();
+                this.activateCreep();
+            }
         }
     }
 
     protected EnsureCreep() {
         let requestID: string | undefined = this.memory.SR;
         if (requestID) {
-            let creep = this.creeper.getCreep(this.memory.SR, this.pid);
-            let spawnStatus = this.spawner.getRequestStatus(this.memory.SR);
+            let context = this.creeper.getCreep(requestID, this.pid);
+            let spawnStatus = this.spawner.getRequestStatus(requestID);
             switch (spawnStatus) {
+                case (SP_COMPLETE):
                 case (SP_ERROR):
-                    this.spawner.cancelRequest(this.memory.SR);
+                    this.spawner.cancelRequest(requestID);
                 case (undefined):
-                    if (!creep || !Game.creeps[creep.n]) {
+                    if (!context || !Game.creeps[context.n]) {
                         requestID = undefined;
                     }
                 case (SP_QUEUED):
-                    break;
-                case (SP_COMPLETE):
-                    if (creep) {
-                        this.spawner.cancelRequest(this.memory.SR);
-                    }
                 case (SP_SPAWNING):
                 default:
-                    if (creep) {
-                        this._creep = Game.creeps[creep!.n];
-                    }
                     break;
             }
         }

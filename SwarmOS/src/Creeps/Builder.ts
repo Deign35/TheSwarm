@@ -11,66 +11,32 @@ import { UpgradeAction } from "Actions/UpgradeAction";
 import { BuildAction } from "Actions/BuildAction";
 
 export class Builder extends CreepBase<Builder_memory> {
-    protected get CreepPrefix() { return 'Bui_'; }
-    /*
     protected get SpawnPriority(): Priority {
         return Priority_Low;
     }
-    protected get SpawnBody() {
-        let spawnCap = Game.rooms[this.memory.loc].energyCapacityAvailable;
-        if (spawnCap >= 2000) {
-            return {
-                body: [WORK, WORK, WORK, WORK, WORK,
-                    CARRY, CARRY, CARRY, CARRY, CARRY,
-                    CARRY, CARRY, CARRY, CARRY, CARRY,
-                    CARRY, CARRY, CARRY, CARRY, CARRY,
-                    MOVE, MOVE, MOVE, MOVE, MOVE,
-                    MOVE, MOVE, MOVE, MOVE, MOVE,
-                    MOVE, MOVE, MOVE, MOVE, MOVE],
-                cost: 2000
-            }
-        } else if (spawnCap >= 1200) {
-            return {
-                body: [WORK, WORK,
-                    CARRY, CARRY, CARRY, CARRY, CARRY,
-                    CARRY, CARRY, CARRY, CARRY, CARRY,
-                    MOVE, MOVE, MOVE, MOVE, MOVE,
-                    MOVE, MOVE, MOVE, MOVE, MOVE],
-                cost: 1200
-            }
-        } else if (spawnCap >= 600) {
-            return {
-                body: [WORK,
-                    CARRY, CARRY, CARRY, CARRY, CARRY,
-                    MOVE, MOVE, MOVE, MOVE, MOVE],
-                cost: 600
-            }
-        } else if (spawnCap >= 450) {
-            return {
-                body: [WORK, WORK,
-                    CARRY, CARRY,
-                    MOVE, MOVE, MOVE],
-                cost: 450
-            }
-        }
+    protected createNewCreepContext(): CreepContext_Worker {
         return {
-            body: [WORK, CARRY, CARRY, MOVE],
-            cost: 250
+            c: 2,
+            m: 2,
+            w: 1,
+
+            n: this.GetNewCreepName(),
+            o: this.pid
         }
     }
-    */
+    protected get CreepPrefix() { return 'Bui_'; }
     protected activateCreep(): void {
-        if (this.memory.en) {
+        if (this.memory.get) {
             if (this.creep.carry.energy == this.creep.carryCapacity) {
                 this.memory.tar = undefined;
-                this.memory.en = false;
+                this.memory.get = false;
             } else {
                 this.getEnergy(this.creep.carryCapacity / 2);
                 return;
             }
         } else if (this.creep.carry.energy == 0) {
             this.memory.tar = undefined;
-            this.memory.en = true;
+            this.memory.get = true;
             this.getEnergy(this.creep.carryCapacity / 2);
             return;
         }
@@ -91,10 +57,9 @@ export class Builder extends CreepBase<Builder_memory> {
                 return;
             }
 
-            let keys = Object.keys(roomData.cSites);
             let dist = 100;
-            for (let i = 0; i < keys.length; i++) {
-                let nextSite = Game.constructionSites[keys[i]];
+            for (let i = 0; i < roomData.cSites.length; i++) {
+                let nextSite = Game.constructionSites[roomData.cSites[i].id];
                 let siteDist = this.creep.pos.getRangeTo(nextSite);
                 if (siteDist < dist) {
                     targetSite = nextSite;

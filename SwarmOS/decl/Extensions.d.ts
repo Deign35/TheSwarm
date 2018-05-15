@@ -105,11 +105,12 @@ declare interface ISpawnExtension extends IPackageExtension {
     cancelRequest(id: SpawnRequestID): boolean;
     getRequestStatus(id: SpawnRequestID): SpawnState;
     requestSpawn(context: CreepContext, location: RoomID, requestorPID: PID, spawnPriority: Priority,
-        maxSpawnDistance?: number, startMem?: any): SpawnRequestID
+        maxSpawnDistance?: number, startMem?: any): SpawnRequestID;
 }
 
 declare interface ICreepRegistry extends IPackageExtension {
-    getCreep(spawnRequestID: SpawnRequestID, requestingPID: PID): CreepContext | undefined
+    getCreep(spawnRequestID: SpawnRequestID, requestingPID: PID): CreepContext | undefined;
+    releaseCreep(id: string): void;
 }
 
 

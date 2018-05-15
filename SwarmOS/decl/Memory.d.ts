@@ -118,11 +118,12 @@ declare interface CreepMemory extends MemBase {
 }
 
 declare interface CreepProcess_Memory extends MemBase {
-    SR: SpawnRequestID;// Spawn request ID
+    SR?: SpawnRequestID;// Spawn request ID
     tar?: ObjectID;     // The current target
     home: RoomID;       // Room from where this creep was spawned
     loc: RoomID;        // Room location of where this creep is doing its shtuff
-    en: boolean;        // Getting energy
+    get: boolean;       // Getting energy
+    en: boolean;        // Enabled
 }
 declare interface SpawnRefiller_Memory extends CreepProcess_Memory {
 }

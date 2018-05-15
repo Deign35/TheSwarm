@@ -76,6 +76,16 @@ export class Upgrader extends CreepBase<Upgrader_Memory> {
         }
         return Priority_Lowest;
     }
+    protected createNewCreepContext(): CreepContext_Worker {
+        return {
+            c: 2,
+            m: 2,
+            w: 1,
+
+            n: this.GetNewCreepName(),
+            o: this.pid
+        }
+    }
     protected activateCreep(): void {
         let creep = this.creep;
         if (creep.room.name != this.memory.loc) {
@@ -83,17 +93,17 @@ export class Upgrader extends CreepBase<Upgrader_Memory> {
             return;
         }
 
-        if (this.memory.en) {
+        if (this.memory.get) {
             if (this.creep.carry.energy == this.creep.carryCapacity) {
                 this.memory.tar = undefined;
-                this.memory.en = false;
+                this.memory.get = false;
             } else {
                 this.getEnergy(this.creep.carryCapacity / 2);
                 return;
             }
         } else if (this.creep.carry.energy == 0) {
             this.memory.tar = undefined;
-            this.memory.en = true;
+            this.memory.get = true;
             this.getEnergy(this.creep.carryCapacity / 2);
             return;
         }
@@ -116,7 +126,7 @@ export class Upgrader extends CreepBase<Upgrader_Memory> {
             case (SR_MOVE):
                 break;
             case (SR_REQUIRES_ENERGY):
-                this.memory.en = true;
+                this.memory.get = true;
                 this.memory.tar = undefined;
                 return;
             default:
