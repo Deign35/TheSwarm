@@ -28,7 +28,7 @@
                 "CreepRefiller",
                 "CreepUpgrader",
                 "EnergyDistribution",
-                "BasicOwnedRoom",
+                "SimpleOwnedRoom",
                 "FlagBase"
             ]
         },

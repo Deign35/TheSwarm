@@ -113,11 +113,11 @@ class CreepRunner extends BasicProcess<{}> {
             let creepName = creepContext.n;
             let creep = Game.creeps[creepName];
             if (!creep) {
-                delete this.spawnedCreeps[creepName];
+                delete this.spawnedCreeps[spawnID];
+                continue;
             }
             // (TODO): Find a way to clear dead spawn requests
             if (!this.spawnedCreeps[spawnID].o || !this.kernel.getProcessById(this.spawnedCreeps[spawnID].o!)) {
-                debugger;
                 unassignedCreeps[spawnID] = creep
             }
         }

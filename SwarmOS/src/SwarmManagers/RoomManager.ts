@@ -38,10 +38,10 @@ class RoomManager extends BasicProcess<{}> {
                         bui: []
                     },
                     creepAssignments: {},
-                    sources: {}
+                    sourcePIDs: {}
                 }
 
-                let newRoomProcess = this.kernel.startProcess(PKG_BasicOwnedRoom, newRoomMemory);
+                let newRoomProcess = this.kernel.startProcess(PKG_SimpleOwnedRoom, newRoomMemory);
                 if (newRoomProcess && newRoomProcess.pid && newRoomProcess.process) {
                     data.pid = newRoomProcess.pid;
                 }

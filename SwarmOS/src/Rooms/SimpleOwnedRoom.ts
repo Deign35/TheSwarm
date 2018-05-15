@@ -2,7 +2,7 @@ import { BasicProcess } from "Core/BasicTypes";
 
 export const SimpleRoomPackage: IPackage<SpawnerExtension_Memory> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
-        processRegistry.register(PKG_BasicOwnedRoom, SimpleOwnedRoom);
+        processRegistry.register(PKG_SimpleOwnedRoom, SimpleOwnedRoom);
     }
 }
 
@@ -42,6 +42,8 @@ class SimpleOwnedRoom extends RoomBase<SimpleOwnedRoom_Memory> {
             // (TODO): Use en somehow?
             if (curAssignments[i].lvl != spawnLevel || i > desired) {
                 this.kernel.killProcess(curAssignments[i].pid!);
+
+                // Find a better way to communicate what to do with unemployed creeps.  Perhaps an API room.GetTempWork(creep);
                 curAssignments.splice(i--, 1);
                 continue;
             }
@@ -80,11 +82,12 @@ class SimpleOwnedRoom extends RoomBase<SimpleOwnedRoom_Memory> {
         }
 
         if (roomData.cSites.length > 0) {
-            let numBuilders = Math.ceil(4 / roomData.cSites.length);
+            let numBuilders = Math.ceil(roomData.cSites.length / 4);
             this.ensureCreeps(CT_Builder, numBuilders, PKG_CreepBuilder);
         }
 
         if (roomData.owner && roomData.owner == MY_USERNAME) {
+            // Find a way to not die if my refiller dies with less than the min needed to spawn...
             if (this.controlLevel == 1) {
                 this.ensureCreeps(CT_Refiller, 1, PKG_CreepRefiller, 0);
             } else {
@@ -97,16 +100,17 @@ class SimpleOwnedRoom extends RoomBase<SimpleOwnedRoom_Memory> {
                 let sourceID = roomData.sourceIDs[i];
 
                 let sourceProcess;
-                let sourcePID = this.memory.sources[sourceID];
+                let sourcePID = this.memory.sourcePIDs[sourceID];
                 if (sourcePID) {
                     sourceProcess = this.kernel.getProcessById(sourcePID);
                 }
                 if (!sourceProcess) {
-
                     let spawnLevel = 0;
-                    for (let i = 0; i < CreepBodies.Harvester.length; i++) {
-                        if (this.spawnCapacityAvailable >= CreepBodies.Harvester[i].cost) {
-                            spawnLevel = i;
+                    if (this.spawnCapacityAvailable > 300) {
+                        for (let i = 0; i < CreepBodies.Harvester.length; i++) {
+                            if (this.spawnCapacityAvailable >= CreepBodies.Harvester[i].cost) {
+                                spawnLevel = i;
+                            }
                         }
                     }
                     let sourceContext: Harvester_Memory = {
@@ -123,7 +127,7 @@ class SimpleOwnedRoom extends RoomBase<SimpleOwnedRoom_Memory> {
                     if (!newPID || !newPID.pid || !newPID.process) {
                         this.log.error(`Room failed to create a harvester process (${room.name})`);
                     } else {
-                        this.memory.sources[sourceID] = newPID.pid;
+                        this.memory.sourcePIDs[sourceID] = newPID.pid;
                     }
                 }
             }
