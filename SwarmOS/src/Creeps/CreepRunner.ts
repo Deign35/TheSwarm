@@ -269,12 +269,6 @@ class SpawnExtension extends ExtensionBase implements ISpawnExtension, ICreepReg
         return this.memory.spawnedCreeps;
     }
 
-    releaseCreep(id: string): void {
-        if (this.spawnedCreeps[id]) {
-            this.spawnedCreeps[id].o = undefined;
-        }
-    }
-
     cancelRequest(id: string): boolean {
         if (this.spawnQueue[id]) {
             delete this.spawnQueue[id];
@@ -306,6 +300,19 @@ class SpawnExtension extends ExtensionBase implements ISpawnExtension, ICreepReg
             return undefined;
         }
         return request;
+    }
+
+    releaseCreep(id: string): void {
+        if (this.spawnedCreeps[id]) {
+            this.spawnedCreeps[id].o = undefined;
+        }
+    }
+
+    requestCreep(id: string, requestingPID: PID) {
+        if (!this.spawnedCreeps[id].o) {
+            // (TODO): Add a priority here to ensure higher priority tasks take precedence.
+            this.spawnedCreeps[id].o = requestingPID;
+        }
     }
     requestSpawn(context: CreepContext, location: RoomID, requestorPID: PID, spawnPriority: Priority,
         maxSpawnDistance: number = 3, startMem?: any): SpawnRequestID {
