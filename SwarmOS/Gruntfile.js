@@ -72,22 +72,6 @@ module.exports = function (grunt) {
         let declarationsFile = [];
         let globalsFile = [];
         let declarations = require("./SwarmDeclarations.json");
-        let enums = declarations['Enums'];
-        globalsFile.push("// Begin Enums");
-        for (let enumName in enums) {
-            declarationsFile.push("declare enum " + enumName + " {");
-            globalsFile.push("const " + enumName + " = {");
-            let enumValues = enums[enumName];
-            for (let valueName in enumValues) {
-                declarationsFile.push("    " + valueName + " = " + enumValues[valueName] + ',');
-                globalsFile.push("    " + valueName + ": " + enumValues[valueName] + ',');
-            }
-
-            declarationsFile.push("}\n");
-            globalsFile.push("}");
-            globalsFile.push("global[\"" + enumName + "\"] = " + enumName + ";\n");
-        }
-        globalsFile.push("// End Enums\n");
 
         globalsFile.push("// Begin Consts");
         declarationsFile.push("declare const SWARM_VERSION_DATE = \"CURRENT_VERSION\";");
@@ -145,14 +129,48 @@ module.exports = function (grunt) {
         globalsFile.push("// End Consts\n");
         declarationsFile.push("");
 
-        let compoundTypes = declarations['CompoundTypes'];
-        for (let compoundName in compoundTypes) {
-            let compoundDeclaration = "declare type " + compoundName + " = ";
-            for (let i = 0; i < compoundTypes[compoundName].length; i++) {
-                compoundDeclaration += compoundTypes[compoundName][i] + " | ";
+        declarations = require("./CreepBodies.json");
+        globalsFile.push("// Begin creep definitions");
+
+        let compiledType = 'declare type CreepBodyDefinition =';
+        let numCreepTypes = Object.keys(declarations).length;
+        let creepCounter = 0;
+        for (let creepType in declarations) {
+            let compiled = '[';
+            let numEntries = declarations[creepType].entries.length;
+            for (let i = 0; i < numEntries; i++) {
+                compiled += '{';
+                let description = declarations[creepType].entries[i];
+                let numEntries2 = Object.keys(declarations[creepType].entries[i]).length;
+                let descCount = 0;
+                for (let desc in description) {
+                    compiled += desc + ':' + description[desc];
+                    if (descCount < numEntries2 - 1) {
+                        compiled += ',';
+                    }
+                    descCount++;
+                }
+                compiled += '}';
+                if (i < numEntries - 1) {
+                    compiled += ',';
+                }
             }
-            declarationsFile.push(compoundDeclaration.slice(0, -3) + ';');
+            compiled += ']';
+            globalsFile.push('global["CT_' + creepType + '"] = ' + compiled);
+            declarationsFile.push('declare const CT_' + creepType + ': ' + compiled);
+            declarationsFile.push('declare type CT_' + creepType + ' = ' + compiled);
+
+            compiledType += ' CT_' + creepType;
+            if (creepCounter++ < numCreepTypes - 1) {
+                compiledType += ' |';
+            } else {
+                compiledType += ';';
+            }
         }
+
+        globalsFile.push("// End creep definitions");
+        declarationsFile.push(compiledType);
+
         globalsFile.push("// Primes");
         declarationsFile.push("");
 
@@ -176,7 +194,7 @@ module.exports = function (grunt) {
             100: "",
             300: "",
             500: "",
-            1000:"",
+            1000: "",
             1500: "",
             2000: "",
             2500: "",
