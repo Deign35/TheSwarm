@@ -174,6 +174,10 @@ class CreepRunner extends BasicProcess<{}> {
             minSpawnCost = Math.min(minSpawnCost, CreepBodies.get(req.con.b)[req.con.l].cost); //this.spawnCosts[idToHashMap[req.id]]);
         }
 
+        // (TODO): any remaining unassignedCreeps need something to do.
+        for (let id in unassignedCreeps) {
+            unassignedCreeps[id].say('I\'M LOST');
+        }
         let availableSpawns: SDictionary<StructureSpawn> = {};
         let spawnIDs = Object.keys(Game.spawns);
 

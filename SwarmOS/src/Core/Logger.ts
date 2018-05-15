@@ -10,7 +10,7 @@ const LOGGER_SEPARATOR = `<font color="yellow">---------------------------------
 const CONTEXT_SEPARATOR = `<font color="green">-----------------------------------------------------------------------</font>`;
 
 const DEFAULT_LOG_FONT_SIZE = 2;
-const LOGGER_SETTINGS: SDictionary<ILogLevelSetting> = {
+const LOGGER_SETTINGS: EDictionary<ILogLevelSetting> = {
     [LOG_ALERT]: {
         level: 6,
         font: {
@@ -62,10 +62,8 @@ const LOGGER_SETTINGS: SDictionary<ILogLevelSetting> = {
     }
 }
 interface LoggerContext {
-    logLevel: LogLevel,
-    logs: {
-        [id: number]: (string | (() => string))[]
-    }
+    logLevel: LogLevel;
+    logs: (string | (() => string))[];
 }
 
 export class Logger implements IKernelLoggerExtensions {
@@ -78,7 +76,8 @@ export class Logger implements IKernelLoggerExtensions {
     protected InitQueue(): void {
         let ids = Object.keys(this.logContexts);
         for (let i = 0, length = ids.length; i < length; i++) {
-            this.logContexts[ids[i]].logs = {};
+
+            this.logContexts[ids[i]].logs = []
         }
 
         if (!this.logContexts[DEFAULT_LOG_ID]) {
@@ -96,10 +95,11 @@ export class Logger implements IKernelLoggerExtensions {
             context = this.logContexts[contextID];
         }
         if (this.ShouldLog(context.logLevel, severity)) {
-            if (!context.logs[severity]) {
-                context.logs[severity] = [];
+            if (typeof message === "function") {
+                message = `[DL]${message()}`;
             }
-            context.logs[severity].push(message);
+            message = this.MakeFontTag(LOGGER_SETTINGS[severity].level as LogLevel) + message + '</font>';
+            context.logs.push(message);
         }
     }
 
@@ -171,32 +171,17 @@ export class Logger implements IKernelLoggerExtensions {
 
     private compileContext(logID: string, context: LoggerContext) {
         let queues = context.logs;
-        let hasLogs = false;
+        if (queues.length == 0) { return undefined; }
         let output = () => {
             let outStr = `${CONTEXT_SEPARATOR}\n${this.MakeFontTag(LOG_WARN)}Begin Log[${logID}] - {${context.logLevel}}</font>\n`;
-            for (let settingID in LOGGER_SETTINGS) {
-                if (!queues[settingID] || queues[settingID].length == 0) {
-                    continue;
-                }
-
-                outStr += this.MakeFontTag(settingID as LogLevel);
-                while (queues[settingID].length > 0) {
-                    let nextMessage = queues[settingID].shift();
-                    if (nextMessage) {
-                        if (typeof nextMessage === "function") {
-                            nextMessage = `[DL]${nextMessage()}`;
-                        }
-                        hasLogs = true;
-                        outStr += `${nextMessage}\n`;
-                    }
-                }
-                outStr += `</font>`;
+            while (queues.length > 0) {
+                outStr += queues.shift() + '\n';
             }
             outStr += `${CONTEXT_SEPARATOR}\n`;
             return outStr;
         }
 
         let compiledLog = output();
-        return hasLogs ? compiledLog : undefined;
+        return compiledLog;
     }
 }

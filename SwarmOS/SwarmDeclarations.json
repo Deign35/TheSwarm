@@ -6,7 +6,7 @@
             "string": true,
             "entries": {
                 "USERNAME": "Deign",
-                "SIGNATURE": "The Swarm rises from the ashes -- SwarmOSv0.2.0"
+                "SIGNATURE": "The Swarm rises from the ashes -- SwarmOSv0.4.0"
             }
         },
         "PKG": {
@@ -14,6 +14,8 @@
             "enabled": true,
             "string": true,
             "isArray": true,
+            "type": true,
+            "combinedType": "OSPackage",
             "entries": [
                 "FlagManager",
                 "CreepRunner",
@@ -34,6 +36,8 @@
             "comment": "Extensions provided by packages for processless package interactions",
             "enabled": true,
             "string": true,
+            "type": true,
+            "combinedType": "OSExtension",
             "entries": {
                 "Flags": "flag",
                 "CreepSpawner": "spawner",
@@ -59,17 +63,16 @@
         "LOG": {
             "comment": "Logger Priority",
             "enabled": true,
-            "string": true,
             "type": true,
             "combinedType": "LogLevel",
             "entries": {
-                "ALERT": "alert",
-                "DEBUG": "debug",
-                "ERROR": "error",
-                "FATAL": "fatal",
-                "INFO": "info",
-                "TRACE": "trace",
-                "WARN": "warn"
+                "ALERT": "6",
+                "DEBUG": "1",
+                "ERROR": "4",
+                "FATAL": "5",
+                "INFO": "2",
+                "TRACE": "0",
+                "WARN": "3"
             }
         },
         "SP": {
@@ -113,7 +116,7 @@
             "comment": "Default values",
             "enabled": true,
             "entries": {
-                "LOG_LEVEL": "\"info\"",
+                "LOG_LEVEL": "0",
                 "LOG_ID": "\"SwarmOS\""
             }
         },
