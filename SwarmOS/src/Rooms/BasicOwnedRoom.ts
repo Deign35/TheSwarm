@@ -17,19 +17,19 @@ class BasicOwnedRoom extends RoomBase<BasicOwnedRoom_Memory> {
         }
         if (roomData.cSites.length > 0) {
             let numBuilders = Math.ceil(4 / roomData.cSites.length);
-            this.SpawnClass(this.memory.creeps.bui, numBuilders, PKG_CreepBuilder);
+            this.SpawnClass(this.memory.creeps.bui, numBuilders, PKG_CreepBuilder, CT_Builder);
         }
 
         if (roomData.owner && roomData.owner == MY_USERNAME) {
             if (!this.memory.creeps.ref) {
                 this.memory.creeps.ref = [];
             }
-            this.SpawnClass(this.memory.creeps.ref, 1, PKG_CreepRefiller);
+            this.SpawnClass(this.memory.creeps.ref, 1, PKG_CreepRefiller, CT_Refiller);
 
             if (!this.memory.creeps.upg) {
                 this.memory.creeps.upg = [];
             }
-            this.SpawnClass(this.memory.creeps.upg, 2, PKG_CreepUpgrader);
+            this.SpawnClass(this.memory.creeps.upg, 2, PKG_CreepUpgrader, CT_Upgrader);
 
             for (let i = 0; i < roomData.sourceIDs.length; i++) {
                 let sourceID = roomData.sourceIDs[i];
@@ -47,7 +47,8 @@ class BasicOwnedRoom extends RoomBase<BasicOwnedRoom_Memory> {
                         get: false,
                         SR: '0',
                         en: true,
-                        SB: CreepBodies[]
+                        SB: CT_Harvester,
+                        SL: 0
                     }
                     let newPID = this.kernel.startProcess(PKG_CreepHarvester, sourceContext);
                     if (!newPID || !newPID.pid || !newPID.process) {
@@ -69,7 +70,7 @@ class BasicOwnedRoom extends RoomBase<BasicOwnedRoom_Memory> {
         }
     }
 
-    SpawnClass(creepArr: PID[], numToHave: number, pkgType: string) {
+    SpawnClass(creepArr: PID[], numToHave: number, pkgType: string, bodyID: CT_ALL) {
         for (let i = 0; i < creepArr.length; i++) {
             let proc = this.kernel.getProcessById(creepArr[i]); {
                 if (!proc) {
@@ -83,7 +84,9 @@ class BasicOwnedRoom extends RoomBase<BasicOwnedRoom_Memory> {
                 loc: this.room!.name,
                 get: true,
                 SR: '0',
-                en: true
+                en: true,
+                SL: 0,
+                SB: bodyID
             }
             let newPID = this.kernel.startProcess(pkgType, newMemory);
             if (!newPID || !newPID.pid || !newPID.process) {

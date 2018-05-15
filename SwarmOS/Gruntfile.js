@@ -149,47 +149,80 @@ module.exports = function (grunt) {
          * const H = 'CT_H';
          * global['Creeps'][H] = CT_H;
          */
-        let compiledType = 'declare type CreepBodyDefinition =';
-        let globalDeclaration = 'global["CreepBodies"] = {'
-        let numCreepTypes = Object.keys(declarations).length;
-        let creepCounter = 0;
-        for (let creepType in declarations) {
+        let compiledDefinitions = {};
+        let ids = Object.keys(declarations);
+        let numCreepTypes = ids.length;
+        for (let i = 0; i < numCreepTypes; i++) {
+            let creepID = ids[i];
             let compiled = '[';
-            let numEntries = declarations[creepType].entries.length;
-            for (let i = 0; i < numEntries; i++) {
+
+            let numEntries = declarations[creepID].entries.length;
+            for (let j = 0; j < numEntries; j++) {
+                let entry = declarations[creepID].entries[j];
                 compiled += '{';
-                let description = declarations[creepType].entries[i];
-                let numEntries2 = Object.keys(declarations[creepType].entries[i]).length;
-                let descCount = 0;
-                let cost = 0;
-                for (let desc in description) {
-                    compiled += desc + ':' + description[desc] + ',';
-                    cost += description[desc] * BODYPART_COST[desc];
+
+                let components = Object.keys(entry);
+                let entryCost = 0;
+                let numComponents = components.length;
+                for (let k = 0; k < numComponents; k++) {
+                    let componentID = components[k];
+                    compiled += componentID + ':' + entry[componentID] + ',';
+                    if (BODYPART_COST[componentID]) {
+                        entryCost += entry[componentID] * BODYPART_COST[componentID];
+                    }
                 }
-                compiled += 'cost:' + cost + '}';
-                if (i < numEntries - 1) {
+
+                compiled += 'cost:' + entryCost + '}';
+                if (j < numEntries - 1) {
                     compiled += ',';
                 }
             }
             compiled += ']';
-            globalsFile.push('const CT_' + creepType + ' = ' + compiled);
-            declarationsFile.push('declare const CT_' + creepType + ': ' + compiled);
-            declarationsFile.push('declare type CT_' + creepType + ' = ' + compiled);
-
-            compiledType += ' CT_' + creepType;
-            globalDeclaration += 'CT_' + creepType;
-            if (creepCounter++ < numCreepTypes - 1) {
-                compiledType += ' |';
-                globalDeclaration += ',';
-            } else {
-                compiledType += ';';
-                globalDeclaration += '};';
-            }
+            compiledDefinitions[creepID] = compiled;
         }
 
-        globalsFile.push(globalDeclaration);
+        let globalID = "CreepBodies";
+        let interfaceID = "I" + globalID;
+        let typeID = "T" + globalID;
+        let fullObject = 'global["' + globalID + '"] = {';
+        let fullType = 'declare type CT_ALL = ';
+        let fullDefinitionsType = 'declare type DEFINITION_ALL = ';
+
+        let creepDeclarationVar = '{[id: string]: DEFINITION_ALL,';
+        for (let i = 0; i < numCreepTypes; i++) {
+            let id = ids[i]; // string identifier
+            let CT_id = 'CT_' + id; // Const for the string
+            let DEFINITION_id = 'DEFINITION_' + id; // the definition for this id
+
+            globalsFile.push('global ["' + CT_id + '"] = "' + id + '";');
+            globalsFile.push('const ' + DEFINITION_id + ' = ' + compiledDefinitions[id] + ';');
+
+            declarationsFile.push('declare const ' + CT_id + ' = "' + id + '";');
+            declarationsFile.push('declare type ' + CT_id + ' = "' + id + '";');
+            declarationsFile.push('declare type ' + DEFINITION_id + ' = ' + compiledDefinitions[id] + ';');
+
+            fullObject += id + ':' + DEFINITION_id;
+            creepDeclarationVar += id + ':' + DEFINITION_id;
+
+            fullType += CT_id;
+            fullDefinitionsType += DEFINITION_id;
+
+            if (i < numCreepTypes - 1) {
+                fullObject += ',';
+                creepDeclarationVar += ',';
+
+                fullType += ' | ';
+                fullDefinitionsType += ' | ';
+            }
+        }
+        globalsFile.push(fullObject + ', get: function(id) { return this[id]; }}');
         globalsFile.push("// End creep definitions");
-        declarationsFile.push(compiledType);
+
+        declarationsFile.push(fullType + ';');
+        declarationsFile.push(fullDefinitionsType + ';');
+        declarationsFile.push('declare interface ' + interfaceID + ' ' + creepDeclarationVar + '}');
+        declarationsFile.push('declare type ' + typeID + ' = ' + interfaceID + ' & {get<T extends keyof ' + interfaceID + '>(id: T): ' + interfaceID + '[T];}')
+        declarationsFile.push('declare var ' + globalID + ': ' + typeID + ';');
 
         globalsFile.push("// Primes");
         declarationsFile.push("");

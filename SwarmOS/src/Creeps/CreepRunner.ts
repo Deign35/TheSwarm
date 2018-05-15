@@ -32,9 +32,10 @@ const BodyLegend = {
 }
 const ConvertContextToSpawnBody = function (context: CreepContext) {
     let body = [];
+    let bodyDef = CreepBodies.get(context.b)[context.l];
     for (let bodyID in BodyLegend) {
-        if (context[bodyID]) {
-            for (let i = 0; i < context[bodyID]; i++) {
+        if (bodyDef[bodyID]) {
+            for (let i = 0; i < bodyDef[bodyID]; i++) {
                 body.push(BodyLegend[bodyID]);
             }
         }
@@ -158,7 +159,7 @@ class CreepRunner extends BasicProcess<{}> {
                 req.sta = SP_COMPLETE;
                 continue;
             }
-            minSpawnCost = Math.min(minSpawnCost, CreepBodies[req.con.b][req.con.l].cost); //this.spawnCosts[idToHashMap[req.id]]);
+            minSpawnCost = Math.min(minSpawnCost, CreepBodies.get(req.con.b)[req.con.l].cost); //this.spawnCosts[idToHashMap[req.id]]);
         }
 
         let availableSpawns: SDictionary<StructureSpawn> = {};
@@ -185,7 +186,7 @@ class CreepRunner extends BasicProcess<{}> {
                 if (req.sta != SP_QUEUED) {
                     continue;
                 }
-                let diff = CreepBodies[req.con.b][req.con.l].cost;
+                let diff = CreepBodies.get(req.con.b)[req.con.l].cost;
                 let dist = Game.map.getRoomLinearDistance(spawn.room.name, req.loc) || 0
                 if (req.max && dist > req.max) {
                     continue;

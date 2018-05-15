@@ -49,19 +49,3 @@ declare function GetSUID(): string;
 declare function GetRandomIndex(list: any[]): number;
 declare function GetRandomID<T>(dictionaryObject: IDictionary<T>): T | undefined;
 declare function ForEach<T>(collection: IDictionary<T>, action: (val: T, index: number) => void): void
-
-declare interface CreepBody {
-    m: number,
-    c?: number,
-    a?: number,
-    r?: number,
-    cl?: number,
-    w?: number,
-    h?: number,
-    t?: number
-
-    cost: number,
-}
-declare var CreepBodies: {
-    [id: string]: CreepBody[]
-}

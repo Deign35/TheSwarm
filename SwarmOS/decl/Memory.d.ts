@@ -67,7 +67,7 @@ declare interface CreepContext extends MemBase {
     //m: number;      // (m)ove
     n: CreepID;     // (n)ame
     o?: PID;        // (o)wner process
-    b: string;      // (b)ody definition
+    b: CT_ALL;      // (b)ody definition
     l: number;      // body (l)evel
     /*a?: number;      // (a)ttack
     c?: number;      // (c)arry
@@ -108,7 +108,7 @@ declare interface CreepMemory extends MemBase {
 
 declare interface CreepProcess_Memory extends MemBase {
     SR?: SpawnRequestID;// Spawn request ID
-    SB: string;      // (b)ody definition
+    SB: CT_ALL;      // (b)ody definition
     SL: number;      // body (l)evel
 
     tar?: ObjectID;     // The current target
