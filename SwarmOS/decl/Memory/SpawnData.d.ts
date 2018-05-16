@@ -1,12 +1,15 @@
 
 /** SpawnData */
-declare interface SpawnerExtension_Memory extends MemBase {
+declare interface SpawnRegistryExtension_Memory extends MemBase {
     queue: SDictionary<SpawnerRequest>;
+}
+declare interface CreeperExtension_Memory extends MemBase {
     spawnedCreeps: SDictionary<CreepContext>;
 }
 declare interface CreepContext extends MemBase {
-    n: CreepID;     // (n)ame
     o?: PID;        // (o)wner process
+
+    n: CreepID;     // (n)ame
     b: CT_ALL;      // (b)ody definition
     l: number;      // body (l)evel
 }

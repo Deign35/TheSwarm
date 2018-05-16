@@ -1,6 +1,6 @@
 import { BasicProcess } from "Core/BasicTypes";
 
-export const OSPackage: IPackage<SpawnerExtension_Memory> = {
+export const OSPackage: IPackage<SpawnRegistryExtension_Memory> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
         processRegistry.register(PKG_FlagBase, FlagBase);
     }

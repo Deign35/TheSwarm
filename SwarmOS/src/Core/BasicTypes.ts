@@ -4,15 +4,18 @@ export abstract class BasicProcess<ProcessMemory> implements IProcess {
     @extensionInterface(EXT_Registry)
     protected extensions!: IExtensionRegistry;
     @extensionInterface(EXT_CreepSpawner)
-    protected spawner!: ISpawnExtension;
+    protected spawner!: ISpawnRegistryExtensions;
+    @extensionInterface(EXT_CreepRegistry)
+
+    protected creeper!: ICreepRegistryExtensions;
     @extensionInterface(EXT_Interrupt)
     protected interrupter!: IKernelNotificationsExtension;
     @extensionInterface(EXT_Sleep)
     protected sleeper!: IKernelSleepExtension;
 
     constructor(protected context: IProcessContext) {
+        this._cache = {};
         this._logger = context.getPackageInterface(EXT_Logger).CreateLogContext(this.logID, this.logLevel);
-        this._cache = this.initProcessCacheData(); // Data that hangs in ambient memory as long as the process remains alive and doesn't get reloaded by the OS.
         this.OnOSLoad();
     }
     protected OnOSLoad(): void { }
@@ -39,6 +42,7 @@ export abstract class BasicProcess<ProcessMemory> implements IProcess {
             this.log.debug(() => `Begin ${this.pkgName}(${this.pid}): ${startCPU}`);
         }
 
+        this._cache = this.initProcessCacheDataForTick();
         this.executeProcess();
 
         if (this.isInDebugMode) {
@@ -50,7 +54,7 @@ export abstract class BasicProcess<ProcessMemory> implements IProcess {
         }
     }
 
-    protected initProcessCacheData(): SDictionary<any> { return {} }
+    protected initProcessCacheDataForTick(): SDictionary<any> { return {} }
     protected executeDebugCode(): void { }
     protected abstract executeProcess(): void;
 }

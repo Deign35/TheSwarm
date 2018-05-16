@@ -1,21 +1,21 @@
 declare var Memory: {
-    spawnData: SpawnerExtension_Memory,
+    spawnData: SpawnRegistryExtension_Memory,
 }
 
 import { BasicProcess, ExtensionBase } from "Core/BasicTypes";
 
-export const OSPackage: IPackage<SpawnerExtension_Memory> = {
+export const OSPackage: IPackage<SpawnRegistryExtension_Memory> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
-        processRegistry.register(PKG_CreepRunner, CreepRunner);
+        processRegistry.register(PKG_SpawnManager, Spawner);
 
-        let CreepRunnerExtension = new SpawnExtension(extensionRegistry);
-        extensionRegistry.register(EXT_CreepSpawner, CreepRunnerExtension);
-        extensionRegistry.register(EXT_CreepRegistry, CreepRunnerExtension);
+        let SpawnerExtension = new SpawnExtension(extensionRegistry);
+        extensionRegistry.register(EXT_CreepSpawner, SpawnerExtension);
+        extensionRegistry.register(EXT_CreepRegistry, SpawnerExtension);
     }
 }
 
-const PKG_CreepRunner_LogContext: LogContext = {
-    logID: PKG_CreepRunner,
+const PKG_Spawner_LogContext: LogContext = {
+    logID: PKG_SpawnManager,
     logLevel: LOG_DEBUG
 }
 
@@ -43,36 +43,16 @@ const ConvertContextToSpawnBody = function (context: CreepContext) {
 
     return body;
 }
-//                                                                                           LTOE = Less than or equal (e.g. the creep is bigger than required)
-const CompareContextCompatibility = function (context: CreepContext, creep: Creep, strictLTOE: boolean = false) {
-    let score = 0;
 
-    let desiredCreepDef = CreepBodies.get(context.b)[context.l];
-    for (let bodyID in BodyLegend) {
-        let desiredCount = desiredCreepDef[bodyID] || 0;
-        let hasCount = creep.getActiveBodyparts(BodyLegend[bodyID]) || 0;
-        if (desiredCount > 0 || hasCount > 0) {
-            if (desiredCount == 0 || hasCount == 0 || (strictLTOE && desiredCount > hasCount)) {
-                return 0;
-            }
-        }
-
-        score += BODYPART_COST[BodyLegend[bodyID]] * Math.abs(desiredCount - hasCount);
-    }
-
-    return score;
-}
-
-class CreepRunner extends BasicProcess<{}> {
+class Spawner extends BasicProcess<{}> {
     @extensionInterface(EXT_CreepSpawner)
     SpawnerExtensions!: SpawnExtension;
 
-    protected get spawnerMemory(): SpawnerExtension_Memory {
+    protected get spawnerMemory(): SpawnRegistryExtension_Memory {
         if (!Memory.spawnData) {
-            this.log.warn(`Initializing CreepRunner spawnerMemory`);
+            this.log.warn(`Initializing Spawner spawnerMemory`);
             Memory.spawnData = {
-                queue: {},
-                spawnedCreeps: {}
+                queue: {}
             }
         }
         return Memory.spawnData;
@@ -80,51 +60,21 @@ class CreepRunner extends BasicProcess<{}> {
     protected get spawnQueue(): SDictionary<SpawnerRequest> {
         return this.spawnerMemory.queue;
     }
-    protected get spawnedCreeps(): SDictionary<CreepContext> {
-        return this.spawnerMemory.spawnedCreeps;
-    }
-    protected get spawnCosts(): SDictionary<number> {
-        return this.cache.costs;
-    }
-    protected initProcessCacheData() {
-        return {
-            costs: {}
-        }
-    }
 
     protected get logID(): string {
-        return PKG_CreepRunner_LogContext.logID;
+        return PKG_Spawner_LogContext.logID;
     }
     protected get logLevel(): LogLevel {
-        return PKG_CreepRunner_LogContext.logLevel!;
+        return PKG_Spawner_LogContext.logLevel!;
     }
 
     executeProcess(): void {
-        this.log.debug(`Begin CreepRunner`);
+        this.log.debug(`Begin Spawner`);
         let unassignedCreeps: SDictionary<Creep> = {};
-
-        // (TODO) Revert all managers from using global memory.  Just do it right(?)
-        // This confines the CreepRunner to only manage creeps that
-        // have been spawned by it.
-        let spawnedIDs = Object.keys(this.spawnedCreeps);
-        for (let i = 0; i < spawnedIDs.length; i++) {
-            let spawnID = spawnedIDs[i] as SpawnRequestID;
-            let creepContext = this.spawnedCreeps[spawnID];
-            let creepName = creepContext.n;
-            let creep = Game.creeps[creepName];
-            if (!creep) {
-                delete this.spawnedCreeps[spawnID];
-                continue;
-            }
-            // (TODO): Find a way to clear dead spawn requests
-            if (!this.spawnedCreeps[spawnID].o || !this.kernel.getProcessById(this.spawnedCreeps[spawnID].o!)) {
-                unassignedCreeps[spawnID] = creep
-            }
-        }
         this.spawnCreeps(unassignedCreeps);
         this.sleeper.sleep(3);
 
-        this.log.debug(`End CreepRunner`);
+        this.log.debug(`End Spawner`);
     }
 
     protected spawnCreeps(unassignedCreeps: SDictionary<Creep>): void {
@@ -134,7 +84,7 @@ class CreepRunner extends BasicProcess<{}> {
             return;
         }
 
-        let minSpawnCost = 20000;
+        let minSpawnCost = 36000;
         for (let i = 0; i < requests.length; i++) {
             let req = this.spawnQueue[requests[i]];
             if (req.sta != SP_QUEUED) {
@@ -144,40 +94,9 @@ class CreepRunner extends BasicProcess<{}> {
                 continue;
             }
 
-            let compatibleCreep = undefined;
-            let compatibleIndex = '';
-            let bestScore = 0;
-            let creepIDs = Object.keys(unassignedCreeps);
-            for (let j = 0; j < creepIDs.length; j++) {
-                let creepReqID = creepIDs[j];
-                let creep = unassignedCreeps[creepReqID];
-                let score = CompareContextCompatibility(req.con, creep);
-                if (score > bestScore) {
-                    bestScore = score;
-                    compatibleCreep = this.spawnedCreeps[creepReqID];
-                    compatibleIndex = creepReqID;
-                }
-            }
-
-            if (compatibleCreep) {
-                this.spawnedCreeps[requests[i]] = {
-                    b: compatibleCreep.b,
-                    l: compatibleCreep.l,
-                    n: compatibleCreep.n,
-                    o: req.pid
-                }
-                delete unassignedCreeps[compatibleIndex];
-                delete this.spawnedCreeps[compatibleIndex]
-                req.sta = SP_COMPLETE;
-                continue;
-            }
-            minSpawnCost = Math.min(minSpawnCost, CreepBodies.get(req.con.b)[req.con.l].cost); //this.spawnCosts[idToHashMap[req.id]]);
+            minSpawnCost = Math.min(minSpawnCost, CreepBodies.get(req.con.b)[req.con.l].cost);
         }
 
-        // (TODO): any remaining unassignedCreeps need something to do.
-        for (let id in unassignedCreeps) {
-            unassignedCreeps[id].say('I\'M LOST');
-        }
         let availableSpawns: SDictionary<StructureSpawn> = {};
         let spawnIDs = Object.keys(Game.spawns);
 
@@ -244,17 +163,16 @@ class CreepRunner extends BasicProcess<{}> {
                 if (spawnResult == OK) {
                     this.log.debug(`Spawn Creep successful for ${spawnRequest.req.con.n} - pid(${spawnRequest.req.pid})`);
                     spawnRequest.req.sta = SP_SPAWNING;
-                    this.spawnedCreeps[spawnRequest.req.id] = spawnRequest.req.con;
                 }
             }
         }
     }
 }
 
-class SpawnExtension extends ExtensionBase implements ISpawnExtension, ICreepRegistry {
-    protected get memory(): SpawnerExtension_Memory {
+class SpawnExtension extends ExtensionBase implements ISpawnRegistryExtensions {
+    protected get memory(): SpawnRegistryExtension_Memory {
         if (!Memory.spawnData) {
-            this.log.warn(`Initializing CreepRunner memory`);
+            this.log.warn(`Initializing Spawner memory`);
             Memory.spawnData = {
                 queue: {},
                 spawnedCreeps: {}
@@ -264,9 +182,6 @@ class SpawnExtension extends ExtensionBase implements ISpawnExtension, ICreepReg
     }
     protected get spawnQueue(): SDictionary<SpawnerRequest> {
         return this.memory.queue;
-    }
-    protected get spawnedCreeps(): SDictionary<CreepContext> {
-        return this.memory.spawnedCreeps;
     }
 
     getRequestStatus(id: SpawnRequestID): SpawnState {
@@ -280,7 +195,6 @@ class SpawnExtension extends ExtensionBase implements ISpawnExtension, ICreepReg
             if (creep && !creep.spawning) {
                 this.spawnQueue[id].sta = SP_COMPLETE;
                 spawnRequest.sta = SP_COMPLETE;
-                this.spawnedCreeps[spawnRequest.id] = this.spawnQueue[id].con;
             }
         }
 
@@ -332,29 +246,5 @@ class SpawnExtension extends ExtensionBase implements ISpawnExtension, ICreepReg
 
         this.spawnQueue[newRequest.id] = newRequest;
         return newRequest.id;
-    }
-
-    // Creeper extensions
-    getCreep(id: SpawnRequestID, requestingPID: PID): CreepContext | undefined {
-        let request = this.spawnedCreeps[id];
-        if (!request || !Game.creeps[request.n] || !request.o || request.o != requestingPID) {
-            return undefined;
-        }
-        return request;
-    }
-
-    releaseCreep(id: SpawnRequestID): void {
-        // (TODO): Move these to a CreepGroup that manages temporary workers
-        if (this.spawnedCreeps[id]) {
-            this.spawnedCreeps[id].o = undefined;
-        }
-    }
-
-    requestCreep(id: SpawnRequestID, requestingPID: PID): boolean {
-        if (!this.spawnedCreeps[id].o) {
-            // (TODO): Add a priority here to ensure higher priority tasks take precedence.
-            this.spawnedCreeps[id].o = requestingPID;
-        }
-        return false;
     }
 }

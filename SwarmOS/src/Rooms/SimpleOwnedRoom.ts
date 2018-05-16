@@ -1,6 +1,6 @@
 import { BasicProcess } from "Core/BasicTypes";
 
-export const SimpleRoomPackage: IPackage<SpawnerExtension_Memory> = {
+export const SimpleRoomPackage: IPackage<SpawnRegistryExtension_Memory> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
         processRegistry.register(PKG_SimpleOwnedRoom, SimpleOwnedRoom);
     }
@@ -10,7 +10,7 @@ import { RoomBase } from "Rooms/RoomBase";
 
 class SimpleOwnedRoom extends RoomBase<SimpleOwnedRoom_Memory> {
     @extensionInterface(EXT_CreepRegistry)
-    protected creeper!: ICreepRegistry;
+    protected creeper!: ICreepRegistryExtensions;
     protected get creepAssignments() {
         return this.memory.creepAssignments;
     }

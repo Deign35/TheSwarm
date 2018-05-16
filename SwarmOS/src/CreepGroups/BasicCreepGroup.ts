@@ -2,7 +2,7 @@ import { BasicProcess } from "Core/BasicTypes";
 
 export abstract class BasicCreepGroup extends BasicProcess<CreepGroup_Memory> {
     @extensionInterface(EXT_CreepRegistry)
-    protected creeper!: ICreepRegistry;
+    protected creeper!: ICreepRegistryExtensions;
     protected get assignments() {
         return this.memory.assignments;
     }

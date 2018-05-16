@@ -15,14 +15,14 @@ declare interface IPackageInterfaces {
     [index: string]: IPackageExtension | undefined;
     [EXT_Registry]: IExtensionRegistry;
 
-    [EXT_CreepSpawner]: ISpawnExtension;
+    [EXT_CreepSpawner]: ISpawnRegistryExtensions;
     [EXT_Flags]: undefined;
     [EXT_Interrupt]: IKernelNotificationsExtension;
     [EXT_Kernel]: IKernelProcessExtensions;
     [EXT_RoomView]: IRoomDataExtension;
     [EXT_Sleep]: IKernelSleepExtension;
     [EXT_Logger]: IKernelLoggerExtensions;
-    [EXT_CreepRegistry]: ICreepRegistry;
+    [EXT_CreepRegistry]: ICreepRegistryExtensions;
 }
 
 /**
@@ -101,7 +101,7 @@ declare interface IRoomDataExtension extends IPackageExtension {
  * Extension for processes to be able to request creep spawning.
  */
 declare type SpawnRequestID = string;
-declare interface ISpawnExtension extends IPackageExtension {
+declare interface ISpawnRegistryExtensions extends IPackageExtension {
     cancelRequest(id: SpawnRequestID): boolean;
     getRequestStatus(id: SpawnRequestID): SpawnState;
     requestSpawn(context: CreepContext, location: RoomID, requestorPID: PID, spawnPriority: Priority,
@@ -110,7 +110,7 @@ declare interface ISpawnExtension extends IPackageExtension {
     resetRequest(id: SpawnRequestID, priority?: Priority, newContext?: CreepContext, defaultMemory?: any): void;
 }
 
-declare interface ICreepRegistry extends IPackageExtension {
+declare interface ICreepRegistryExtensions extends IPackageExtension {
     getCreep(spawnRequestID: SpawnRequestID, requestingPID: PID): CreepContext | undefined;
     releaseCreep(id: SpawnRequestID): void;
     requestCreep(spawnRequestID: SpawnRequestID, requestingPID: PID): boolean;

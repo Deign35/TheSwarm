@@ -7,7 +7,7 @@ import { SayAction } from "Actions/SayAction";
 
 export abstract class CreepBase<T extends CreepProcess_Memory> extends BasicProcess<T> {
     @extensionInterface(EXT_CreepRegistry)
-    protected creeper!: ICreepRegistry;
+    protected creeper!: ICreepRegistryExtensions;
     @extensionInterface(EXT_RoomView)
     RoomView!: IRoomDataExtension;
 
