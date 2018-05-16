@@ -106,26 +106,12 @@ declare interface ISpawnExtension extends IPackageExtension {
     getRequestStatus(id: SpawnRequestID): SpawnState;
     requestSpawn(context: CreepContext, location: RoomID, requestorPID: PID, spawnPriority: Priority,
         maxSpawnDistance?: number, startMem?: any): SpawnRequestID;
+    giveRequestToPID(id: SpawnRequestID, pid: PID): void;
+    resetRequest(id: SpawnRequestID, newName?: CreepID): void;
 }
 
 declare interface ICreepRegistry extends IPackageExtension {
     getCreep(spawnRequestID: SpawnRequestID, requestingPID: PID): CreepContext | undefined;
-    releaseCreep(id: string): void;
+    releaseCreep(id: SpawnRequestID): void;
     requestCreep(spawnRequestID: SpawnRequestID, requestingPID: PID): void;
 }
-
-
-
-/*
-declare interface IPosisCooperativeScheduling {
-    /** CPU used by process so far. Might include setup time kernel chooses to charge to the process. *
-    readonly used: number;
-    /** CPU budget scheduler allocated to this process. *
-    readonly budget: number;
-    /**
-     * Process can wrap function and yield when it is ready to give up for the tick or can continue if CPU is available.
-     * optionally yield a shutdown function to perform shutdown tasks like saving current state
-     *
-    wrap?(makeIterator: () => IterableIterator<void | (() => void)>): void;
-}
-*/

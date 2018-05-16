@@ -50,7 +50,7 @@ export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepEx
     }
 
     startProcess(processName: string, startContext: any): ProcessWithID | undefined {
-        let pid = GetSUID() as PID;
+        let pid = 'p' + GetSUID() as PID;
         let pInfo: ProcInfo = {
             pid: pid,
             pP: this.curProcessID,

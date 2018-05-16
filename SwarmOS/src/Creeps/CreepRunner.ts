@@ -269,15 +269,7 @@ class SpawnExtension extends ExtensionBase implements ISpawnExtension, ICreepReg
         return this.memory.spawnedCreeps;
     }
 
-    cancelRequest(id: string): boolean {
-        if (this.spawnQueue[id]) {
-            delete this.spawnQueue[id];
-            return true;
-        }
-
-        return false;
-    }
-    getRequestStatus(id: string): SpawnState {
+    getRequestStatus(id: SpawnRequestID): SpawnState {
         if (!this.spawnQueue[id]) {
             return SP_ERROR;
         }
@@ -294,25 +286,26 @@ class SpawnExtension extends ExtensionBase implements ISpawnExtension, ICreepReg
 
         return spawnRequest.sta;
     }
-    getCreep(spawnRequestID: string, requestingPID: PID): CreepContext | undefined {
-        let request = this.spawnedCreeps[spawnRequestID];
-        if (!request || !Game.creeps[request.n] || !request.o || request.o != requestingPID) {
-            return undefined;
+    resetRequest(id: SpawnRequestID, newName?: CreepID) {
+        if (this.spawnQueue[id]) {
+            this.spawnQueue[id].sta = SP_QUEUED;
         }
-        return request;
-    }
-
-    releaseCreep(id: string): void {
-        if (this.spawnedCreeps[id]) {
-            this.spawnedCreeps[id].o = undefined;
+        if (newName) {
+            this.spawnQueue[id].con.n = newName;
         }
     }
-
-    requestCreep(id: string, requestingPID: PID) {
-        if (!this.spawnedCreeps[id].o) {
-            // (TODO): Add a priority here to ensure higher priority tasks take precedence.
-            this.spawnedCreeps[id].o = requestingPID;
+    cancelRequest(id: SpawnRequestID): boolean {
+        if (this.spawnQueue[id]) {
+            delete this.spawnQueue[id];
+            return true;
         }
+
+        return false;
+    }
+
+    giveRequestToPID(id: SpawnRequestID, pid: PID) {
+        // (TODO): Check that context.o doesn't get overwritten by the spawner when the creep is spawned
+        this.spawnQueue[id].con.o = pid;
     }
     requestSpawn(context: CreepContext, location: RoomID, requestorPID: PID, spawnPriority: Priority,
         maxSpawnDistance: number = 3, startMem?: any): SpawnRequestID {
@@ -329,5 +322,28 @@ class SpawnExtension extends ExtensionBase implements ISpawnExtension, ICreepReg
 
         this.spawnQueue[newRequest.id] = newRequest;
         return newRequest.id;
+    }
+
+    // Creeper extensions
+    getCreep(id: SpawnRequestID, requestingPID: PID): CreepContext | undefined {
+        let request = this.spawnedCreeps[id];
+        if (!request || !Game.creeps[request.n] || !request.o || request.o != requestingPID) {
+            return undefined;
+        }
+        return request;
+    }
+
+    releaseCreep(id: SpawnRequestID): void {
+        // (TODO): Move these to a CreepGroup that manages temporary workers
+        if (this.spawnedCreeps[id]) {
+            this.spawnedCreeps[id].o = undefined;
+        }
+    }
+
+    requestCreep(id: SpawnRequestID, requestingPID: PID) {
+        if (!this.spawnedCreeps[id].o) {
+            // (TODO): Add a priority here to ensure higher priority tasks take precedence.
+            this.spawnedCreeps[id].o = requestingPID;
+        }
     }
 }

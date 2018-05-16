@@ -33,13 +33,17 @@ declare interface Builder_memory extends CreepProcess_Memory {
 
 
 
-/** Group Roles */
-declare interface GroupRole_Memory extends MemBase {
-    en: boolean, // (en)abled
+/** CreepGroups */
+declare interface CreepGroup_Memory extends MemBase {
+    enabled: boolean; // (en)abled
+    assignments: SDictionary<CreepGroup_CreepRef>;
+    homeRoom: RoomID;
+    targetRoom: RoomID;
 }
 
-declare interface GroupRole_CreepDefinition extends MemBase {
+declare interface CreepGroup_CreepRef extends MemBase {
     pid?: PID;      // The pid associated with this role
+    SR: SpawnRequestID; // ID corresponding to the spawn request
     CT: CT_ALL;     // (C)reep (T)ype
     lvl: number;    // role level
 }
