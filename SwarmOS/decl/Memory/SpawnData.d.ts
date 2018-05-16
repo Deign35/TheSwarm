@@ -3,8 +3,8 @@
 declare interface SpawnRegistryMemory extends MemBase {
     [id: string]: SpawnerRequest
 }
-declare interface CreeperExtension_Memory extends MemBase {
-    spawnedCreeps: SDictionary<CreepContext>;
+declare interface CreepRegistry_Memory extends MemBase {
+    [id: string]: CreepContext
 }
 declare interface CreepContext extends MemBase {
     o?: PID;        // (o)wner process

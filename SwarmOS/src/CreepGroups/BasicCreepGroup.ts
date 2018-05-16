@@ -26,7 +26,7 @@ export abstract class BasicCreepGroup extends BasicProcess<CreepGroup_Memory> {
         let assignment = this.assignments[aID];
         if (assignment) {
             if (assignment.pid) {
-                if (this.creeper.getCreep(assignment.SR, assignment.pid)) {
+                if (this.creeper.tryGetCreep(assignment.SR, assignment.pid)) {
                     // (TODO): Give abandoned creeps to a temp worker group
                     this.creeper.releaseCreep(assignment.SR);
                 }
@@ -80,7 +80,7 @@ export abstract class BasicCreepGroup extends BasicProcess<CreepGroup_Memory> {
         if (assignment.CT != creepType || assignment.lvl != spawnLevel) {
             // Move the creep over to a different assignment
             if (assignment.pid) {
-                let creep = this.creeper.getCreep(assignment.SR, assignment.pid!);
+                let creep = this.creeper.tryGetCreep(assignment.SR, assignment.pid!);
                 this.kernel.killProcess(assignment.pid!);
                 assignment.pid = undefined;
             }

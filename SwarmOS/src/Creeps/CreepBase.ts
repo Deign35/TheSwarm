@@ -35,7 +35,7 @@ export abstract class CreepBase<T extends CreepProcess_Memory> extends BasicProc
         this.EnsureCreep();
 
         if (this.memory.SR) {
-            let creepContext = this.creeper.getCreep(this.memory.SR, this.pid);
+            let creepContext = this.creeper.tryGetCreep(this.memory.SR, this.pid);
             if (creepContext && Game.creeps[creepContext.n]) {
                 this._creep = Game.creeps[creepContext.n];
                 if (this._creep.spawning) {
@@ -51,7 +51,7 @@ export abstract class CreepBase<T extends CreepProcess_Memory> extends BasicProc
     protected EnsureCreep() {
         let requestID: string | undefined = this.memory.SR;
         if (requestID) {
-            let context = this.creeper.getCreep(requestID, this.pid);
+            let context = this.creeper.tryGetCreep(requestID, this.pid);
             let spawnStatus = this.spawner.getRequestStatus(requestID);
             switch (spawnStatus) {
                 case (SP_COMPLETE):
@@ -91,7 +91,7 @@ export abstract class CreepBase<T extends CreepProcess_Memory> extends BasicProc
             if (req) {
                 this.spawner.cancelRequest(this.memory.SR);
             }
-            let creep = this.creeper.getCreep(this.memory.SR, this.pid);
+            let creep = this.creeper.tryGetCreep(this.memory.SR, this.pid);
             if (creep) {
                 this.creeper.releaseCreep(this.memory.SR);
             }

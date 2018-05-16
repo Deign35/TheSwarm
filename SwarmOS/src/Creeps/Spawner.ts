@@ -1,7 +1,3 @@
-declare var Memory: {
-    spawnData: SpawnRegistryMemory,
-}
-
 import { BasicProcess, ExtensionBase } from "Core/BasicTypes";
 
 export const OSPackage: IPackage<SpawnRegistryMemory> = {
@@ -207,8 +203,10 @@ class Spawner extends BasicProcess<SpawnRegistryMemory> {
 const UNSPAWNABLE_COST = -1;
 
 class SpawnExtension extends ExtensionBase implements ISpawnRegistryExtensions {
+    CreepRegistry!: ICreepRegistryExtensions;
     constructor(extRegistry: IExtensionRegistry, private _memory: SpawnRegistryMemory) {
         super(extRegistry);
+        this.CreepRegistry = extRegistry.get(EXT_CreepRegistry) as ICreepRegistryExtensions;
     }
     protected get memory(): SpawnRegistryMemory {
         return this._memory
