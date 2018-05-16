@@ -459,7 +459,7 @@ var GenerateConstantsFile = function () {
 
         g_file.push("// Begin Consts");
         // Time stamp the compiled version
-        g_file.push("global[\"SWARM_VERSION_DATE\"] = \"" + new Date().toLocaleDateString() + "\";\n");
+        g_file.push("global[\"SWARM_VERSION_DATE\"] = \"" + new Date().toLocaleString() + "\";\n");
         d_file.push("declare const SWARM_VERSION_DATE = \"CURRENT_VERSION\";");
 
         var constants = require("./SwarmDeclarations.json").Constants;
