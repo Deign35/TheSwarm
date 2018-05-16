@@ -1,7 +1,7 @@
 
 /** SpawnData */
-declare interface SpawnRegistryExtension_Memory extends MemBase {
-    queue: SDictionary<SpawnerRequest>;
+declare interface SpawnRegistryMemory extends MemBase {
+    [id: string]: SpawnerRequest
 }
 declare interface CreeperExtension_Memory extends MemBase {
     spawnedCreeps: SDictionary<CreepContext>;

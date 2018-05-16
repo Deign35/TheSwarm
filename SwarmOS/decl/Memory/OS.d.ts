@@ -1,13 +1,5 @@
 declare interface MemBase { }
 
-declare type ObjectID = string;
-declare type CreepID = ObjectID;
-declare type StructureID = ObjectID;
-declare type FlagID = ObjectID;
-
-declare type RoomID = string;
-declare type PlayerID = string;
-
 /** Core OS */
 declare interface KernelMemory extends MemBase {
     processTable: ProcessTable;

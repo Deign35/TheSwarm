@@ -42,7 +42,7 @@ export abstract class BasicProcess<ProcessMemory> implements IProcess {
             this.log.debug(() => `Begin ${this.pkgName}(${this.pid}): ${startCPU}`);
         }
 
-        this._cache = this.initProcessCacheDataForTick();
+        this._cache = this.initStateForTick();
         this.executeProcess();
 
         if (this.isInDebugMode) {
@@ -54,7 +54,7 @@ export abstract class BasicProcess<ProcessMemory> implements IProcess {
         }
     }
 
-    protected initProcessCacheDataForTick(): SDictionary<any> { return {} }
+    protected initStateForTick(): SDictionary<any> { return {} }
     protected executeDebugCode(): void { }
     protected abstract executeProcess(): void;
 }

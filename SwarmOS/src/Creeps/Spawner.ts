@@ -1,16 +1,12 @@
 declare var Memory: {
-    spawnData: SpawnRegistryExtension_Memory,
+    spawnData: SpawnRegistryMemory,
 }
 
 import { BasicProcess, ExtensionBase } from "Core/BasicTypes";
 
-export const OSPackage: IPackage<SpawnRegistryExtension_Memory> = {
+export const OSPackage: IPackage<SpawnRegistryMemory> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
         processRegistry.register(PKG_SpawnManager, Spawner);
-
-        let SpawnerExtension = new SpawnExtension(extensionRegistry);
-        extensionRegistry.register(EXT_CreepSpawner, SpawnerExtension);
-        extensionRegistry.register(EXT_CreepRegistry, SpawnerExtension);
     }
 }
 
@@ -44,21 +40,20 @@ const ConvertContextToSpawnBody = function (context: CreepContext) {
     return body;
 }
 
-class Spawner extends BasicProcess<{}> {
+interface ISpawnerFlashMemory {
+    activeRequests: SDictionary<SpawnerRequest>,
+    activeSpawns: SDictionary<StructureSpawn>,
+
+    usedRequestIDs: SpawnRequestID[],
+    sortedSpawnIDs: SpawnID[]
+}
+class Spawner extends BasicProcess<SpawnRegistryMemory> {
     @extensionInterface(EXT_CreepSpawner)
     SpawnerExtensions!: SpawnExtension;
 
-    protected get spawnerMemory(): SpawnRegistryExtension_Memory {
-        if (!Memory.spawnData) {
-            this.log.warn(`Initializing Spawner spawnerMemory`);
-            Memory.spawnData = {
-                queue: {}
-            }
-        }
-        return Memory.spawnData;
-    }
-    protected get spawnQueue(): SDictionary<SpawnerRequest> {
-        return this.spawnerMemory.queue;
+    protected OnOSLoad() {
+        this.SpawnerExtensions = new SpawnExtension(this.extensions, this.memory);
+        this.extensions.register(EXT_CreepSpawner, this.SpawnerExtensions);
     }
 
     protected get logID(): string {
@@ -67,73 +62,90 @@ class Spawner extends BasicProcess<{}> {
     protected get logLevel(): LogLevel {
         return PKG_Spawner_LogContext.logLevel!;
     }
-
-    executeProcess(): void {
-        this.log.debug(`Begin Spawner`);
-        let unassignedCreeps: SDictionary<Creep> = {};
-        this.spawnCreeps(unassignedCreeps);
-        this.sleeper.sleep(3);
-
-        this.log.debug(`End Spawner`);
+    protected get cache(): ISpawnerFlashMemory {
+        return super.cache as ISpawnerFlashMemory;
     }
 
-    protected spawnCreeps(unassignedCreeps: SDictionary<Creep>): void {
-        let requests = Object.keys(this.spawnQueue);
-        if (requests.length == 0) {
-            this.log.warn(`No spawn requests in the queue.  You have spawn capacity available.`);
-            return;
-        }
+    protected get activeRequests() {
+        return this.cache.activeRequests;
+    }
+    protected get activeSpawns() {
+        return this.cache.activeSpawns;
+    }
+    protected get usedRequestIDs() {
+        return this.cache.usedRequestIDs;
+    }
+    protected set usedRequestIDs(ids: SpawnRequestID[]) {
+        this.cache.usedRequestIDs = ids;
+    }
+    protected get sortedSpawnIDs() {
+        return this.cache.sortedSpawnIDs;
+    }
+    protected set sortedSpawnIDs(ids: SpawnID[]) {
+        this.cache.sortedSpawnIDs = ids;
+    }
 
+    initStateForTick(): ISpawnerFlashMemory {
+        let requests = Object.keys(this.memory);
+        let activeRequests = {};
+        let activeSpawns = {};
         let minSpawnCost = 36000;
         for (let i = 0; i < requests.length; i++) {
-            let req = this.spawnQueue[requests[i]];
+            let req = this.memory[requests[i]];
             if (req.sta != SP_QUEUED) {
                 if (req.sta == SP_SPAWNING && !Game.creeps[req.con.n]) {
                     req.sta = SP_ERROR;
                 }
                 continue;
             }
-
+            activeRequests[requests[i]] = req;
             minSpawnCost = Math.min(minSpawnCost, CreepBodies.get(req.con.b)[req.con.l].cost);
         }
 
-        let availableSpawns: SDictionary<StructureSpawn> = {};
         let spawnIDs = Object.keys(Game.spawns);
 
         for (let i = 0, length = spawnIDs.length; i < length; i++) {
             let spawn = Game.spawns[spawnIDs[i]];
             if (spawn.isActive() && !spawn.spawning && spawn.room.energyAvailable >= minSpawnCost) {
-                availableSpawns[spawnIDs[i]] = spawn;
+                activeSpawns[spawnIDs[i]] = spawn;
             }
         }
 
-        spawnIDs = Object.keys(availableSpawns).sort((a, b) => {
-            return availableSpawns[a].room.energyAvailable > availableSpawns[b].room.energyAvailable ? -1 : 1;
+        let sortedSpawnIDs = Object.keys(activeSpawns).sort((a, b) => {
+            return activeSpawns[a].room.energyAvailable > activeSpawns[b].room.energyAvailable ? -1 : 1;
         });
+        return {
+            activeRequests: activeRequests,
+            activeSpawns: activeSpawns,
+            sortedSpawnIDs: sortedSpawnIDs,
 
-        this.log.debug(`AvailableSpawnerCount(${spawnIDs.length}) - SpawnRequestCount(${requests.length})`);
-        for (let i = 0; i < spawnIDs.length; i++) {
+            usedRequestIDs: [],
+        }
+    }
+
+    executeProcess(): void {
+        this.log.debug(`Begin Spawner`);
+        let requests = Object.keys(this.memory);
+        if (requests.length == 0) {
+            // Inform the temp worker group
+            this.log.warn(`No spawn requests in the queue.  You have spawn capacity available.`);
+            return;
+        }
+
+        for (let i = 0; i < this.sortedSpawnIDs.length; i++) {
+            let spawn = this.activeSpawns[this.sortedSpawnIDs[i]];
             let spawnRequest: { req?: SpawnerRequest, diff: number } = { req: undefined, diff: 0 };
-            let spawn = availableSpawns[spawnIDs[i]];
 
-            for (let j = 0; j < requests.length; j++) {
-                let req = this.spawnQueue[requests[j]];
-                if (req.sta != SP_QUEUED) {
-                    continue;
-                }
-                let diff = CreepBodies.get(req.con.b)[req.con.l].cost;
-                let dist = Game.map.getRoomLinearDistance(spawn.room.name, req.loc) || 0
-                if (req.max && dist > req.max) {
-                    continue;
-                }
-                diff += E2C_MaxSpawnDistance * (req.max || 0);
-                diff -= E2C_SpawnDistance * dist;
+            let activeIDs = Object.keys(this.activeRequests);
+            for (let j = 0; j < activeIDs.length; j++) {
+                let req = this.memory[activeIDs[j]];
                 if (spawnRequest.req && req.pri != spawnRequest.req.pri) {
                     if (req.pri > spawnRequest.req.pri) {
-                        spawnRequest = { req, diff }
+                        spawnRequest = { req: req, diff: this.GetConvertedSpawnCost(spawn, req) }
                     }
                     continue;
                 }
+                let diff = this.GetConvertedSpawnCost(spawn, req);
 
                 if (!spawnRequest.req || diff > spawnRequest.diff) {
                     spawnRequest = { req, diff }
@@ -141,86 +153,101 @@ class Spawner extends BasicProcess<{}> {
             }
 
             if (spawnRequest.req && spawnRequest.diff > 0) {
-                // Spawn it
-                let spawnResult = ERR_INVALID_ARGS as ScreepsReturnCode;
-                while (spawnResult != OK && spawnRequest.req.sta == SP_QUEUED) {
-                    // construct the body here somehow
-                    spawnResult = spawn.spawnCreep(ConvertContextToSpawnBody(spawnRequest.req.con),
-                        spawnRequest.req.con.n,
-                        { memory: spawnRequest.req.dm });
-                    switch (spawnResult) {
-                        case (ERR_NAME_EXISTS):
-                            spawnRequest.req.con.n += `_` + (Game.time % GetRandomIndex(primes_100));
-                        case (OK):
-                            break;
-                        default:
-                            this.log.error(`Spawn Creep has failed (${spawnResult})`);
-                            spawnRequest.req.sta = SP_ERROR;
-                            break;
-                    }
-                }
-
-                if (spawnResult == OK) {
-                    this.log.debug(`Spawn Creep successful for ${spawnRequest.req.con.n} - pid(${spawnRequest.req.pid})`);
-                    spawnRequest.req.sta = SP_SPAWNING;
-                }
+                this.spawnCreep(spawn, spawnRequest.req);
             }
         }
+        this.sleeper.sleep(3);
+        this.log.debug(`End Spawner`);
+    }
+
+    protected spawnCreep(spawn: StructureSpawn, req: SpawnerRequest) {
+        let spawnResult = ERR_INVALID_ARGS as ScreepsReturnCode;
+        while (spawnResult != OK && req.sta == SP_QUEUED) {
+            // construct the body here somehow
+            spawnResult = spawn.spawnCreep(ConvertContextToSpawnBody(req.con),
+                req.con.n,
+                { memory: req.dm });
+            switch (spawnResult) {
+                case (ERR_NAME_EXISTS):
+                    req.con.n += `_` + (Game.time % GetRandomIndex(primes_100));
+                case (OK):
+                    break;
+                default:
+                    this.log.error(`Spawn Creep has failed (${spawnResult})`);
+                    req.sta = SP_ERROR;
+                    break;
+            }
+        }
+
+        if (spawnResult == OK) {
+            this.log.debug(`Spawn Creep successful for ${req.con.n} - pid(${req.pid})`);
+            this.usedRequestIDs.push(req.id);
+            req.sta = SP_SPAWNING;
+        }
+    }
+
+    protected GetConvertedSpawnCost(spawn: StructureSpawn, req: SpawnerRequest) {
+        if (req.sta != SP_QUEUED) {
+            return UNSPAWNABLE_COST;
+        }
+        if (this.usedRequestIDs.includes(req.id)) {
+            return UNSPAWNABLE_COST;
+        }
+        let diff = CreepBodies.get(req.con.b)[req.con.l].cost;
+        let dist = Game.map.getRoomLinearDistance(spawn.room.name, req.loc) || 0
+        if (req.max && dist > req.max) {
+            return UNSPAWNABLE_COST;
+        }
+        diff += E2C_MaxSpawnDistance * (req.max || 0);
+        diff -= E2C_SpawnDistance * dist;
+
+        return diff || UNSPAWNABLE_COST;
     }
 }
+const UNSPAWNABLE_COST = -1;
 
 class SpawnExtension extends ExtensionBase implements ISpawnRegistryExtensions {
-    protected get memory(): SpawnRegistryExtension_Memory {
-        if (!Memory.spawnData) {
-            this.log.warn(`Initializing Spawner memory`);
-            Memory.spawnData = {
-                queue: {},
-                spawnedCreeps: {}
-            }
-        }
-        return Memory.spawnData;
+    constructor(extRegistry: IExtensionRegistry, private _memory: SpawnRegistryMemory) {
+        super(extRegistry);
     }
-    protected get spawnQueue(): SDictionary<SpawnerRequest> {
-        return this.memory.queue;
+    protected get memory(): SpawnRegistryMemory {
+        return this._memory
     }
 
     getRequestStatus(id: SpawnRequestID): SpawnState {
-        if (!this.spawnQueue[id]) {
+        if (!this.memory[id]) {
             return SP_ERROR;
         }
-        let spawnRequest = this.spawnQueue[id];
+        let spawnRequest = this.memory[id];
 
         if (spawnRequest.sta == SP_SPAWNING) {
             let creep = Game.creeps[spawnRequest.con.n];
             if (creep && !creep.spawning) {
-                this.spawnQueue[id].sta = SP_COMPLETE;
+                this.memory[id].sta = SP_COMPLETE;
                 spawnRequest.sta = SP_COMPLETE;
             }
         }
 
         return spawnRequest.sta;
     }
-    /*
-        Spawn requests need to be split from creep references.
-        Spawn requests should be renewable absent an existing creep.
-    */
+
     resetRequest(id: SpawnRequestID, priority?: Priority, newContext?: CreepContext, defaultMemory?: any) {
-        if (this.spawnQueue[id]) {
-            this.spawnQueue[id].sta = SP_QUEUED;
+        if (this.memory[id]) {
+            this.memory[id].sta = SP_QUEUED;
         }
         if (priority) {
-            this.spawnQueue[id].pri = priority;
+            this.memory[id].pri = priority;
         }
         if (newContext) {
-            this.spawnQueue[id].con = newContext;
+            this.memory[id].con = newContext;
         }
         if (defaultMemory) {
-            this.spawnQueue[id].dm = defaultMemory;
+            this.memory[id].dm = defaultMemory;
         }
     }
     cancelRequest(id: SpawnRequestID): boolean {
-        if (this.spawnQueue[id]) {
-            delete this.spawnQueue[id];
+        if (this.memory[id]) {
+            delete this.memory[id];
             return true;
         }
 
@@ -228,8 +255,7 @@ class SpawnExtension extends ExtensionBase implements ISpawnRegistryExtensions {
     }
 
     giveRequestToPID(id: SpawnRequestID, pid: PID) {
-        // (TODO): Check that context.o doesn't get overwritten by the spawner when the creep is spawned
-        this.spawnQueue[id].con.o = pid;
+        this.memory[id].con.o = pid;
     }
     requestSpawn(context: CreepContext, location: RoomID, requestorPID: PID, spawnPriority: Priority,
         maxSpawnDistance: number = 3, startMem?: any): SpawnRequestID {
@@ -244,7 +270,7 @@ class SpawnExtension extends ExtensionBase implements ISpawnRegistryExtensions {
             sta: SP_QUEUED,
         }
 
-        this.spawnQueue[newRequest.id] = newRequest;
+        this.memory[newRequest.id] = newRequest;
         return newRequest.id;
     }
 }

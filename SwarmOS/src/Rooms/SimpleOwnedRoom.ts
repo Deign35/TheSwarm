@@ -1,6 +1,6 @@
 import { BasicProcess } from "Core/BasicTypes";
 
-export const SimpleRoomPackage: IPackage<SpawnRegistryExtension_Memory> = {
+export const SimpleRoomPackage: IPackage<SpawnRegistryMemory> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
         processRegistry.register(PKG_SimpleOwnedRoom, SimpleOwnedRoom);
     }

@@ -5,6 +5,15 @@ declare interface EDictionary<T> { [id: number]: T }
 declare type IDictionary<T> = EDictionary<T> | SDictionary<T>;
 declare type Dictionary = IDictionary<any>;
 
+declare type ObjectID = string;
+declare type CreepID = ObjectID;
+declare type StructureID = ObjectID;
+declare type FlagID = ObjectID;
+declare type SpawnID = ObjectID;
+
+declare type RoomID = string;
+declare type PlayerID = string;
+
 declare interface Profiler {
     clear(): void;
     output(): void;
