@@ -107,11 +107,11 @@ declare interface ISpawnExtension extends IPackageExtension {
     requestSpawn(context: CreepContext, location: RoomID, requestorPID: PID, spawnPriority: Priority,
         maxSpawnDistance?: number, startMem?: any): SpawnRequestID;
     giveRequestToPID(id: SpawnRequestID, pid: PID): void;
-    resetRequest(id: SpawnRequestID, newName?: CreepID): void;
+    resetRequest(id: SpawnRequestID, priority?: Priority, newContext?: CreepContext, defaultMemory?: any): void;
 }
 
 declare interface ICreepRegistry extends IPackageExtension {
     getCreep(spawnRequestID: SpawnRequestID, requestingPID: PID): CreepContext | undefined;
     releaseCreep(id: SpawnRequestID): void;
-    requestCreep(spawnRequestID: SpawnRequestID, requestingPID: PID): void;
+    requestCreep(spawnRequestID: SpawnRequestID, requestingPID: PID): boolean;
 }

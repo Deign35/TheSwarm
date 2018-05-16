@@ -286,12 +286,22 @@ class SpawnExtension extends ExtensionBase implements ISpawnExtension, ICreepReg
 
         return spawnRequest.sta;
     }
-    resetRequest(id: SpawnRequestID, newName?: CreepID) {
+    /*
+        Spawn requests need to be split from creep references.
+        Spawn requests should be renewable absent an existing creep.
+    */
+    resetRequest(id: SpawnRequestID, priority?: Priority, newContext?: CreepContext, defaultMemory?: any) {
         if (this.spawnQueue[id]) {
             this.spawnQueue[id].sta = SP_QUEUED;
         }
-        if (newName) {
-            this.spawnQueue[id].con.n = newName;
+        if (priority) {
+            this.spawnQueue[id].pri = priority;
+        }
+        if (newContext) {
+            this.spawnQueue[id].con = newContext;
+        }
+        if (defaultMemory) {
+            this.spawnQueue[id].dm = defaultMemory;
         }
     }
     cancelRequest(id: SpawnRequestID): boolean {
@@ -340,10 +350,11 @@ class SpawnExtension extends ExtensionBase implements ISpawnExtension, ICreepReg
         }
     }
 
-    requestCreep(id: SpawnRequestID, requestingPID: PID) {
+    requestCreep(id: SpawnRequestID, requestingPID: PID): boolean {
         if (!this.spawnedCreeps[id].o) {
             // (TODO): Add a priority here to ensure higher priority tasks take precedence.
             this.spawnedCreeps[id].o = requestingPID;
         }
+        return false;
     }
 }
