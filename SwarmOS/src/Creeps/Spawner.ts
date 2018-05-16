@@ -1,13 +1,13 @@
 import { BasicProcess, ExtensionBase } from "Core/BasicTypes";
 
-export const OSPackage: IPackage<SpawnRegistryMemory> = {
+export const OSPackage: IPackage<SpawnRegistry_Memory> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
-        processRegistry.register(PKG_SpawnManager, Spawner);
+        processRegistry.register(PKG_SpawnRegistry, SpawnRegistry);
     }
 }
 
-const PKG_Spawner_LogContext: LogContext = {
-    logID: PKG_SpawnManager,
+const PKG_SpawnRegistry_LogContext: LogContext = {
+    logID: PKG_SpawnRegistry,
     logLevel: LOG_DEBUG
 }
 
@@ -36,30 +36,30 @@ const ConvertContextToSpawnBody = function (context: CreepContext) {
     return body;
 }
 
-interface ISpawnerFlashMemory {
-    activeRequests: SDictionary<SpawnerRequest>,
+interface SpawnRegistry_FlashMemory {
+    activeRequests: SDictionary<SpawnRequest>,
     activeSpawns: SDictionary<StructureSpawn>,
 
     usedRequestIDs: SpawnRequestID[],
     sortedSpawnIDs: SpawnID[]
 }
-class Spawner extends BasicProcess<SpawnRegistryMemory> {
-    @extensionInterface(EXT_CreepSpawner)
-    SpawnerExtensions!: SpawnExtension;
+class SpawnRegistry extends BasicProcess<SpawnRegistry_Memory> {
+    @extensionInterface(EXT_SpawnRegistry)
+    Extensions!: SpawnRegistryExtensions;
 
     protected OnOSLoad() {
-        this.SpawnerExtensions = new SpawnExtension(this.extensions, this.memory);
-        this.extensions.register(EXT_CreepSpawner, this.SpawnerExtensions);
+        this.Extensions = new SpawnRegistryExtensions(this.extensions, this.memory);
+        this.extensions.register(EXT_SpawnRegistry, this.Extensions);
     }
 
     protected get logID(): string {
-        return PKG_Spawner_LogContext.logID;
+        return PKG_SpawnRegistry_LogContext.logID;
     }
     protected get logLevel(): LogLevel {
-        return PKG_Spawner_LogContext.logLevel!;
+        return PKG_SpawnRegistry_LogContext.logLevel!;
     }
-    protected get cache(): ISpawnerFlashMemory {
-        return super.cache as ISpawnerFlashMemory;
+    protected get cache(): SpawnRegistry_FlashMemory {
+        return super.cache as SpawnRegistry_FlashMemory;
     }
 
     protected get activeRequests() {
@@ -81,7 +81,7 @@ class Spawner extends BasicProcess<SpawnRegistryMemory> {
         this.cache.sortedSpawnIDs = ids;
     }
 
-    initStateForTick(): ISpawnerFlashMemory {
+    initStateForTick(): SpawnRegistry_FlashMemory {
         let requests = Object.keys(this.memory);
         let activeRequests = {};
         let activeSpawns = {};
@@ -130,7 +130,7 @@ class Spawner extends BasicProcess<SpawnRegistryMemory> {
 
         for (let i = 0; i < this.sortedSpawnIDs.length; i++) {
             let spawn = this.activeSpawns[this.sortedSpawnIDs[i]];
-            let spawnRequest: { req?: SpawnerRequest, diff: number } = { req: undefined, diff: 0 };
+            let spawnRequest: { req?: SpawnRequest, diff: number } = { req: undefined, diff: 0 };
 
             let activeIDs = Object.keys(this.activeRequests);
             for (let j = 0; j < activeIDs.length; j++) {
@@ -156,7 +156,7 @@ class Spawner extends BasicProcess<SpawnRegistryMemory> {
         this.log.debug(`End Spawner`);
     }
 
-    protected spawnCreep(spawn: StructureSpawn, req: SpawnerRequest) {
+    protected spawnCreep(spawn: StructureSpawn, req: SpawnRequest) {
         let spawnResult = ERR_INVALID_ARGS as ScreepsReturnCode;
         while (spawnResult != OK && req.sta == SP_QUEUED) {
             // construct the body here somehow
@@ -182,7 +182,7 @@ class Spawner extends BasicProcess<SpawnRegistryMemory> {
         }
     }
 
-    protected GetConvertedSpawnCost(spawn: StructureSpawn, req: SpawnerRequest) {
+    protected GetConvertedSpawnCost(spawn: StructureSpawn, req: SpawnRequest) {
         if (req.sta != SP_QUEUED) {
             return UNSPAWNABLE_COST;
         }
@@ -202,13 +202,11 @@ class Spawner extends BasicProcess<SpawnRegistryMemory> {
 }
 const UNSPAWNABLE_COST = -1;
 
-class SpawnExtension extends ExtensionBase implements ISpawnRegistryExtensions {
-    CreepRegistry!: ICreepRegistryExtensions;
-    constructor(extRegistry: IExtensionRegistry, private _memory: SpawnRegistryMemory) {
+class SpawnRegistryExtensions extends ExtensionBase implements ISpawnRegistryExtensions {
+    constructor(extRegistry: IExtensionRegistry, private _memory: SpawnRegistry_Memory) {
         super(extRegistry);
-        this.CreepRegistry = extRegistry.get(EXT_CreepRegistry) as ICreepRegistryExtensions;
     }
-    protected get memory(): SpawnRegistryMemory {
+    protected get memory(): SpawnRegistry_Memory {
         return this._memory
     }
 
@@ -257,7 +255,7 @@ class SpawnExtension extends ExtensionBase implements ISpawnRegistryExtensions {
     }
     requestSpawn(context: CreepContext, location: RoomID, requestorPID: PID, spawnPriority: Priority,
         maxSpawnDistance: number = 3, startMem?: any): SpawnRequestID {
-        let newRequest: SpawnerRequest = {
+        let newRequest: SpawnRequest = {
             con: context,
             dm: startMem,
             id: GetSUID(),

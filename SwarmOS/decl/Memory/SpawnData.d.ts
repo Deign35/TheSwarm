@@ -1,7 +1,7 @@
 
 /** SpawnData */
-declare interface SpawnRegistryMemory extends MemBase {
-    [id: string]: SpawnerRequest
+declare interface SpawnRegistry_Memory extends MemBase {
+    [id: string]: SpawnRequest
 }
 declare interface CreepRegistry_Memory extends MemBase {
     [id: string]: CreepContext
@@ -14,7 +14,7 @@ declare interface CreepContext extends MemBase {
     l: number;      // body (l)evel
 }
 
-declare interface SpawnerRequest extends MemBase {
+declare interface SpawnRequest extends MemBase {
     con: CreepContext;  // Context
     id: SpawnRequestID; // requestID
     loc: RoomID;        // Where the spawn request originates

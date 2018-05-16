@@ -18,9 +18,9 @@
             "combinedType": "OSPackage",
             "entries": [
                 "FlagManager",
-                "CreepRunner",
+                "CreepRegistry",
                 "SwarmManager",
-                "SpawnManager",
+                "SpawnRegistry",
                 "RoomManager",
                 "FirstRoom",
                 "CreepBuilder",
@@ -40,7 +40,7 @@
             "combinedType": "OSExtension",
             "entries": {
                 "Flags": "flag",
-                "CreepSpawner": "spawner",
+                "SpawnRegistry": "spawner",
                 "CreepRegistry": "creeps",
                 "RoomView": "roomView",
                 "Registry": "extRegistry",

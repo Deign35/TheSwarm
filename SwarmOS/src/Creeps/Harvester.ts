@@ -1,4 +1,4 @@
-export const OSPackage: IPackage<SpawnRegistryMemory> = {
+export const OSPackage: IPackage<SpawnRegistry_Memory> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
         processRegistry.register(PKG_CreepHarvester, Harvester);
     }

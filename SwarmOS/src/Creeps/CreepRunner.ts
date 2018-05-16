@@ -1,13 +1,13 @@
 import { BasicProcess, ExtensionBase } from "Core/BasicTypes";
 
-export const OSPackage: IPackage<SpawnRegistryMemory> = {
+export const OSPackage: IPackage<SpawnRegistry_Memory> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
-        processRegistry.register(PKG_CreepRunner, CreepRunner);
+        processRegistry.register(PKG_CreepRegistry, CreepRunner);
     }
 }
 
-const PKG_CreepRunner_LogContext: LogContext = {
-    logID: PKG_CreepRunner,
+const PKG_CreepRegistry_LogContext: LogContext = {
+    logID: PKG_CreepRegistry,
     logLevel: LOG_DEBUG
 }
 
@@ -44,23 +44,23 @@ const CompareContextCompatibility = function (context: CreepContext, creep: Cree
 
 class CreepRunner extends BasicProcess<CreepRegistry_Memory> {
     @extensionInterface(EXT_CreepRegistry)
-    CreepRegistry!: ICreepRegistryExtensions;
+    Extensions!: ICreepRegistryExtensions;
 
     protected OnOSLoad() {
-        this.CreepRegistry = new CreepRegistryExtensions(this.extensions, this.memory);
-        this.extensions.register(EXT_CreepSpawner, this.CreepRegistry);
+        this.Extensions = new CreepRegistryExtensions(this.extensions, this.memory);
+        this.extensions.register(EXT_CreepRegistry, this.Extensions);
     }
 
     protected get logID(): string {
-        return PKG_CreepRunner_LogContext.logID;
+        return PKG_CreepRegistry_LogContext.logID;
     }
     protected get logLevel(): LogLevel {
-        return PKG_CreepRunner_LogContext.logLevel!;
+        return PKG_CreepRegistry_LogContext.logLevel!;
     }
 
     executeProcess(): void {
         this.log.debug(`Begin CreepRunner`);
-        
+
         let creepIDs = Object.keys(this.memory);
         for (let i = 0, length = creepIDs.length; i < length; i++) {
             if (!Game.creeps[creepIDs[i]]) {
