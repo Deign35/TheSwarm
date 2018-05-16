@@ -1,0 +1,25 @@
+
+/** SpawnData */
+declare interface SpawnerExtension_Memory extends MemBase {
+    queue: SDictionary<SpawnerRequest>;
+    spawnedCreeps: SDictionary<CreepContext>;
+}
+declare interface CreepContext extends MemBase {
+    n: CreepID;     // (n)ame
+    o?: PID;        // (o)wner process
+    b: CT_ALL;      // (b)ody definition
+    l: number;      // body (l)evel
+}
+
+declare interface SpawnerRequest extends MemBase {
+    con: CreepContext;  // Context
+    id: SpawnRequestID; // requestID
+    loc: RoomID;        // Where the spawn request originates
+    pid: PID;           // RequestorPID
+    pri: Priority;      // How much of a priority is this spawn??
+    sta: SpawnState;    // Current Spawn state
+
+    dm?: any;           // Default memory
+    max?: number;       // Max spawning distance allowed for this spawn.
+    spawner?: StructureID; // ID of the spawner that this creep is being spawned at.
+}
