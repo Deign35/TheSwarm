@@ -43,3 +43,8 @@ declare interface ProcessTable {
 declare interface ProcessMemory {
     [id: string]: {};
 }
+
+declare interface CreepBodiesReference {
+    CT_id: string,
+    lvl: number
+}

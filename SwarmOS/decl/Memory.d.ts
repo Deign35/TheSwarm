@@ -1,4 +1,3 @@
-//declare var Memory: { [id: string]: MemBase }
 declare interface MemBase { }
 
 declare type ObjectID = string;
@@ -64,18 +63,10 @@ declare interface SpawnerExtension_Memory extends MemBase {
     spawnedCreeps: SDictionary<CreepContext>;
 }
 declare interface CreepContext extends MemBase {
-    //m: number;      // (m)ove
     n: CreepID;     // (n)ame
     o?: PID;        // (o)wner process
     b: CT_ALL;      // (b)ody definition
     l: number;      // body (l)evel
-    /*a?: number;      // (a)ttack
-    c?: number;      // (c)arry
-    cl?: number;     // (cl)aim
-    h?: number;      // (h)eal
-    r?: number;      // (r)angedAttack
-    t?: number;     // (t)ough
-    w?: number;      // (w)ork*/
 }
 
 declare interface SpawnerRequest extends MemBase {
@@ -179,7 +170,16 @@ declare interface PackageProviderMemory extends MemBase {
     }
 }
 
+/** Room Roles */
+declare interface GroupRole_Memory extends MemBase {
+    en: boolean, // (en)abled
+}
 
+declare interface RoomRole_CreepDefinition extends MemBase {
+    pid?: PID;      // The pid associated with this role
+    CT: CT_ALL;     // (C)reep (T)ype
+    lvl: number;    // role level
+}
 
 
 
