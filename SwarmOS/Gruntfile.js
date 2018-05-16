@@ -376,6 +376,7 @@ var GenerateConstantsFile = function () {
         var fullObjectString = '{';
         var fullObjectTypeString = '';
         var fullDefinitionsTypeString = '';
+        var fullReferencesTypeString = '';
 
         for (var declID = 0; declID < declIDs.length; declID++) {
             var creepID = declIDs[declID];
@@ -390,35 +391,42 @@ var GenerateConstantsFile = function () {
             fullObjectTypeString += CT_id + ' | ';
 
             // Definition id corresponding to the body definition
-            var DEFINITION_id = 'DEFINITION_' + creepID; // the definition for this id
+            var DEFINITION_id = 'DEFINITION_' + creepID;
             fullObjectString += creepID + ':' + DEFINITION_id + ',';
             fullDefinitionsTypeString += DEFINITION_id + ' | ';
 
             defs[creepID] = compileCreepDef(creepBodies[creepID]);
+            g_file.push(setConst(DEFINITION_id, '[' + defs[creepID] + ']'));
             d_file.push(declareString(DEFINITION_id, '[' + defs[creepID] + ']', 'type', ' = '));
 
-            let combinedGlobal = '[';
+            // Reference id corresponding to a specific DEFINITION_id and index
+            var REFERENCE_id = 'CTREF_' + creepID;
+            let combinedType = '';
             for (var entryIndex = 0; entryIndex < defs[creepID].length; entryIndex++) {
-                var bodyID = DEFINITION_id + '_' + entryIndex;
-                combinedGlobal += bodyID + ',';
+                var bodyID = REFERENCE_id + '_' + entryIndex;
+                combinedType += bodyID + ' | ';
 
-                g_file.push(setGlobal(bodyID, defs[creepID][entryIndex]));
+                var bodyAttributes = '{CT_id:' + quotedCreepID + ', lvl:' + entryIndex + '}';
+                g_file.push(setGlobal(bodyID, bodyAttributes));
 
-                d_file.push(declareString(bodyID, defs[creepID][entryIndex], 'const', ': '));
-                d_file.push(declareString(bodyID, DEFINITION_id + '[' + entryIndex + ']', 'type', ' = '));
+                d_file.push(declareString(bodyID, bodyAttributes, 'const', ': '));
+                d_file.push(declareString(bodyID, bodyAttributes, 'type', ' = '));
             }
-            g_file.push(setConst(DEFINITION_id, combinedGlobal.slice(0, -1) + ']'));
+
+            d_file.push(declareString(REFERENCE_id + '_ALL', combinedType.slice(0, -3), 'type', ' = '));
+            fullReferencesTypeString += REFERENCE_id + '_ALL | ';
         }
 
         var globalID = 'CreepBodies';
         g_file.push(setGlobal(globalID, fullObjectString + 'get: function(id) { return this[id]; }}'));
         g_file.push("// End creep definitions");
 
-        var interfaceID = 'I' + globalID;
-        var typeID = 'T' + globalID;
         d_file.push(declareString('CT_ALL', fullObjectTypeString.slice(0, -2), 'type', ' = '));
         d_file.push(declareString('DEFINITION_ALL', fullDefinitionsTypeString.slice(0, -3), 'type', ' = '));
+        d_file.push(declareString('REFERENCE_ALL', fullReferencesTypeString.slice(0, -3), 'type', ' = '));
 
+        var interfaceID = 'I' + globalID;
+        var typeID = 'T' + globalID;
         d_file.push(declareString(interfaceID, '{[id: string]: DEFINITION_ALL,' + fullObjectString.slice(1, -1) + '}', 'interface', ''));
         d_file.push(declareString(typeID, interfaceID + ' & {get<T extends keyof ' + interfaceID + '>(id: T): ' + interfaceID + '[T];}', 'type', ' = '));
         d_file.push(declareString(globalID, typeID, 'var', ': '));
