@@ -3,7 +3,7 @@ export abstract class BasicProcess<ProcessMemory> implements IProcess {
     protected kernel!: IKernelProcessExtensions;
     @extensionInterface(EXT_Registry)
     protected extensions!: IExtensionRegistry;
-    @extensionInterface(EXT_CreepSpawner)
+    @extensionInterface(EXT_SpawnRegistry)
     protected spawner!: ISpawnRegistryExtensions;
     @extensionInterface(EXT_CreepRegistry)
 

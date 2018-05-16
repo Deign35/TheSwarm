@@ -32,23 +32,20 @@ export abstract class CreepBase<T extends CreepProcess_Memory> extends BasicProc
             }
             return;
         }
-        this.EnsureCreep();
+        //this.EnsureCreep();
 
         if (this.memory.SR) {
-            let creepContext = this.creeper.tryGetCreep(this.memory.SR, this.pid);
-            if (creepContext && Game.creeps[creepContext.n]) {
-                this._creep = Game.creeps[creepContext.n];
-                if (this._creep.spawning) {
-                    return;
-                }
-
-                this._creep.say(this.pkgName);
-                this.activateCreep();
+            this._creep = this.creeper.tryGetCreep(this.memory.SR, this.pid);
+            if (!this._creep || this._creep.spawning) {
+                return;
             }
+
+            this._creep.say(this.pkgName);
+            this.activateCreep();
         }
     }
 
-    protected EnsureCreep() {
+    /*protected EnsureCreep() {
         let requestID: string | undefined = this.memory.SR;
         if (requestID) {
             let context = this.creeper.tryGetCreep(requestID, this.pid);
@@ -70,7 +67,7 @@ export abstract class CreepBase<T extends CreepProcess_Memory> extends BasicProc
         }
 
         this.memory.SR = requestID || this.trySpawnCreep();
-    }
+    }*/
 
     protected trySpawnCreep() {
         return this.spawner.requestSpawn(this.createNewCreepContext(), this.memory.loc, this.pid, this.SpawnPriority);

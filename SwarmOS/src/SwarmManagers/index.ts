@@ -22,7 +22,7 @@ class SwarmManager extends PackageProviderBase<PackageProviderMemory> {
                 processName: PKG_RoomManager
             },
             spawnManager: {
-                processName: PKG_CreepRunner
+                processName: PKG_SpawnRegistry
             },
             flagManager: {
                 processName: PKG_FlagManager

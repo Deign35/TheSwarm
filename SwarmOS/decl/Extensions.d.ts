@@ -15,7 +15,7 @@ declare interface IPackageInterfaces {
     [index: string]: IPackageExtension | undefined;
     [EXT_Registry]: IExtensionRegistry;
 
-    [EXT_CreepSpawner]: ISpawnRegistryExtensions;
+    [EXT_SpawnRegistry]: ISpawnRegistryExtensions;
     [EXT_Flags]: undefined;
     [EXT_Interrupt]: IKernelNotificationsExtension;
     [EXT_Kernel]: IKernelProcessExtensions;
