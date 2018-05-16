@@ -79,205 +79,7 @@ module.exports = function (grunt) {
     });
 
     grunt.registerTask('generateGlobals', 'Outputs the needed files for screeps and declarations', function () {
-        let declarationsFile = [];
-        let globalsFile = [];
-        let declarations = require("./SwarmDeclarations.json");
-
-        globalsFile.push("// Begin Consts");
-        declarationsFile.push("declare const SWARM_VERSION_DATE = \"CURRENT_VERSION\";");
-        globalsFile.push("global[\"SWARM_VERSION_DATE\"] = \"" + new Date().toLocaleString() + "\";\n");
-
-        let consts = declarations['Constants'];
-        for (let constGroup in consts) {
-            let constDef = consts[constGroup];
-
-            if (!constDef.enabled) {
-                continue;
-            }
-            if (constDef.comment) {
-                declarationsFile.push("/** " + constDef.comment + " */");
-                globalsFile.push("/** " + constDef.comment + " */");
-            }
-            let entryIDs = [];
-            for (let entryID in constDef.entries) {
-                let constName = constGroup + "_" + entryID;
-                let constVal = constDef.entries[entryID];
-
-                if (constDef.isArray) {
-                    constName = constGroup + "_" + constVal;
-                }
-                entryIDs.push(constName);
-                let constDecl = "declare const " + constName + " = ";
-                let globalDecl = "global[\"" + constName + "\"] = ";
-                if (constDef.string) {
-                    constDecl += "\"" + constVal + "\";";
-                    globalDecl += "\"" + constVal + "\";";
-                } else {
-                    constDecl += constVal + ";";
-                    globalDecl += constVal + ";";
-                }
-                if (constDef.type) {
-                    if (constDef.string) {
-                        declarationsFile.push("declare type " + constName + " = \"" + constVal + "\";");
-                    } else {
-                        declarationsFile.push("declare type " + constName + " = " + constVal + ";");
-                    }
-                }
-
-                declarationsFile.push(constDecl);
-                globalsFile.push(globalDecl);
-            }
-            if (constDef.combinedType) {
-                let compoundDeclaration = "declare type " + constDef.combinedType + " = ";
-                for (let i = 0; i < entryIDs.length; i++) {
-                    compoundDeclaration += entryIDs[i] + " | ";
-                }
-                declarationsFile.push(compoundDeclaration.slice(0, -3) + ';');
-            }
-            globalsFile.push("");
-        }
-        globalsFile.push("// End Consts\n");
-        declarationsFile.push("");
-
-        declarations = require("./CreepBodies.json");
-        globalsFile.push("// Begin creep definitions");
-
-        /**
-         * Last thing for compiling this will be to create consts that correspond to the given bodies.
-         * e.g.
-         * const CT_H = [{}];
-         * const H = 'CT_H';
-         * global['Creeps'][H] = CT_H;
-         */
-        let compiledDefinitions = {};
-        let ids = Object.keys(declarations);
-        let numCreepTypes = ids.length;
-        for (let i = 0; i < numCreepTypes; i++) {
-            let creepID = ids[i];
-            let compiled = '[';
-
-            let numEntries = declarations[creepID].entries.length;
-            for (let j = 0; j < numEntries; j++) {
-                let entry = declarations[creepID].entries[j];
-                compiled += '{';
-
-                let components = Object.keys(entry);
-                let entryCost = 0;
-                let numComponents = components.length;
-                for (let k = 0; k < numComponents; k++) {
-                    let componentID = components[k];
-                    compiled += componentID + ':' + entry[componentID] + ',';
-                    if (BODYPART_COST[componentID]) {
-                        entryCost += entry[componentID] * BODYPART_COST[componentID];
-                    }
-                }
-
-                compiled += 'cost:' + entryCost + '}';
-                if (j < numEntries - 1) {
-                    compiled += ',';
-                }
-            }
-            compiled += ']';
-            compiledDefinitions[creepID] = compiled;
-        }
-
-        let globalID = "CreepBodies";
-        let interfaceID = "I" + globalID;
-        let typeID = "T" + globalID;
-        let fullObject = 'global["' + globalID + '"] = {';
-        let fullType = 'declare type CT_ALL = ';
-        let fullDefinitionsType = 'declare type DEFINITION_ALL = ';
-
-        let creepDeclarationVar = '{[id: string]: DEFINITION_ALL,';
-        for (let i = 0; i < numCreepTypes; i++) {
-            let id = ids[i]; // string identifier
-            let CT_id = 'CT_' + id; // Const for the string
-            let DEFINITION_id = 'DEFINITION_' + id; // the definition for this id
-
-            globalsFile.push('global ["' + CT_id + '"] = "' + id + '";');
-            globalsFile.push('const ' + DEFINITION_id + ' = ' + compiledDefinitions[id] + ';');
-
-            declarationsFile.push('declare const ' + CT_id + ' = "' + id + '";');
-            declarationsFile.push('declare type ' + CT_id + ' = "' + id + '";');
-            declarationsFile.push('declare type ' + DEFINITION_id + ' = ' + compiledDefinitions[id] + ';');
-
-            fullObject += id + ':' + DEFINITION_id;
-            creepDeclarationVar += id + ':' + DEFINITION_id;
-
-            fullType += CT_id;
-            fullDefinitionsType += DEFINITION_id;
-
-            if (i < numCreepTypes - 1) {
-                fullObject += ',';
-                creepDeclarationVar += ',';
-
-                fullType += ' | ';
-                fullDefinitionsType += ' | ';
-            }
-        }
-        globalsFile.push(fullObject + ', get: function(id) { return this[id]; }}');
-        globalsFile.push("// End creep definitions");
-
-        declarationsFile.push(fullType + ';');
-        declarationsFile.push(fullDefinitionsType + ';');
-        declarationsFile.push('declare interface ' + interfaceID + ' ' + creepDeclarationVar + '}');
-        declarationsFile.push('declare type ' + typeID + ' = ' + interfaceID + ' & {get<T extends keyof ' + interfaceID + '>(id: T): ' + interfaceID + '[T];}')
-        declarationsFile.push('declare var ' + globalID + ': ' + typeID + ';');
-
-        globalsFile.push("// Primes");
-        declarationsFile.push("");
-
-        console.log(`Begin primes: ${new Date()}`);
-        let primes = [3, 5, 7, 11];
-        let curNum = 13;
-        while (primes.length < 3000) {
-            for (let i = 0, length = primes.length; i < length; i++) {
-                if (curNum % primes[i] == 0) {
-                    curNum += 2;
-                    continue;
-                }
-            }
-            primes.push(curNum);
-            curNum += 2;
-        }
-        primes = [2].concat(primes);
-        console.log(`End primes: ${new Date()}`);
-
-        let primeLists = {
-            100: "",
-            300: "",
-            500: "",
-            1000: "",
-            1500: "",
-            2000: "",
-            2500: "",
-            3000: "",
-        };
-
-        for (let i = 0, length = primes.length; i < length; i++) {
-            for (let maxNumber in primeLists) {
-                if (maxNumber > primes[i]) {
-                    primeLists[maxNumber] += `${primes[i]}, `;
-                }
-            }
-        }
-
-        for (let maxNumber in primeLists) {
-            primeLists[maxNumber] = primeLists[maxNumber].slice(0, -2);
-            globalsFile.push(`global["primes_${maxNumber}"] = [ ${primeLists[maxNumber]} ];`);
-            declarationsFile.push(`declare const primes_${maxNumber}: [ ${primeLists[maxNumber]} ];`);
-        }
-
-        let declarationContents = "";
-        for (let i = 0; i < declarationsFile.length; i++) {
-            declarationContents += declarationsFile[i] + '\n';
-        }
-        grunt.file.write("./decl/SwarmConsts.d.ts", declarationContents);
-        let globalContents = "";
-        for (let i = 0; i < globalsFile.length; i++) {
-            globalContents += globalsFile[i] + '\n';
-        }
-        grunt.file.write("./build/compiled/globalConstants.js", globalContents);
+        GenerateConstantsFile();
     });
 
     grunt.registerTask('help', 'Help info', function () {
@@ -454,4 +256,226 @@ let ReplaceImports = function (abspath, rootdir, subdir, filename) {
     }
 
     gObj.file.write((rootdir + '/' + (subdir ? subdir + '/' : '') + filename), updatedFile);
+}
+
+var GenerateConstantsFile = function () {
+    var g_file = [];
+    var d_file = [];
+
+    var declareConst = function (id, val) {
+        return declareString('const', id, val);
+    };
+    var declareInterface = function (id, val) {
+        return declareString('interface', id, val);
+    };
+    var declareString = function (type, id, val) {
+        return "declare " + type + " " + id + " = " + val + ";";
+    };
+    var declareType = function (id, val) {
+        return declareString('type', id, val);
+    };
+
+    var setConst = function (id, val) {
+        return "const " + id + " = " + val + ";";
+    };
+    var setGlobal = function (id, val) {
+        return "global[\"" + id + "\"] = " + val + "; ";
+    };
+
+    var compileConstDef = function (id, constDef) {
+        if (!constDef.enabled || constDef.entries.length == 0) {
+            return;
+        }
+
+        if (constDef.comment) {
+            g_file.push("/** " + constDef.comment + " */");
+        }
+
+        var entryIDs = [];
+        for (var entryID in constDef.entries) {
+            var constName = id + "_" + entryID;
+            var constVal = constDef.entries[entryID];
+            if (constDef.isArray) {
+                constName = id + "_" + constVal;
+            }
+            entryIDs.push(constName);
+
+            if (constDef.string) {
+                constVal = "\"" + constVal + "\"";
+            }
+
+            g_file.push(setGlobal(constName, constVal));
+            d_file.push(declareConst(constName, constVal));
+            if (constDef.type) {
+                d_file.push(declareType(constName, constVal));
+            }
+        }
+        if (constDef.combinedType) {
+            var combinedTypeVal = "";
+            for (var entryIndex = 0; entryIndex < entryIDs.length; entryIndex++) {
+                combinedTypeVal += entryIDs[entryIndex] + " | ";
+            }
+            d_file.push(declareType(constDef.combinedType, combinedTypeVal.slice(0, -3)));
+        }
+        g_file.push('');
+    };
+
+    var compileCreepDef = function (creepID, creepDef) {
+        var compiled = '[';
+        var creepEntries = creepDef.entries.length;
+        for (var bodyIndex = 0; bodyIndex < creepEntries; bodyIndex++) {
+            var bodyEntry = creepDef.entries[bodyIndex];
+            compiled += compileCreepBody(creepID, bodyEntry) + ',';
+        }
+        compiled = compiled.slice(0, -1) + ']';
+        return compiled;
+    };
+
+    var compileCreepBody = function (prefix, bodyDef) {
+        var bodyString = '{';
+        var components = Object.keys(bodyDef);
+        var bodyCost = 0;
+        for (var compIndex = 0; compIndex < components.length; compIndex++) {
+            var compID = components[compIndex];
+            bodyString += compID + ':' + bodyDef[compID] + ',';
+            if (BODYPART_COST[compID]) {
+                bodyCost += bodyDef[compID] * BODYPART_COST[compID];
+            }
+        }
+
+        bodyString += 'cost:' + bodyCost + '}';
+        return bodyString;
+    };
+
+    var OutputCreepDefinition = function (id, def) {};
+
+    var OutputAllCreepDefinitions = function () {
+        var creepBodies = require("./CreepBodies.json");
+        var declIDs = Object.keys(creepBodies);
+        if (declIDs.length == 0) {
+            return;
+        }
+        var defs = {};
+        g_file.push("// Begin creep definitions");
+
+        var fullObject = '{';
+        //get: function(id) { return this[id]; },'
+        var fullType = '';
+        var fullDefinitionsType = '';
+        for (var declID = 0; declID < declIDs.length; declID++) {
+            var creepID = declIDs[declID];
+            var quotedCreepID = "\"" + creepID + "\"";
+            defs[creepID] = compileCreepDef(creepID, creepBodies[creepID]);
+
+            var CT_id = 'CT_' + creepID; // Const for the string
+            var DEFINITION_id = 'DEFINITION_' + creepID; // the definition for this id
+
+            g_file.push(setGlobal(CT_id, quotedCreepID));
+            g_file.push(setConst(DEFINITION_id, defs[creepID]));
+
+            d_file.push(declareConst(CT_id, quotedCreepID));
+            d_file.push(declareType(CT_id, quotedCreepID));
+            d_file.push(declareType(DEFINITION_id, defs[creepID]));
+
+            fullObject += creepID + ':' + DEFINITION_id + ',';
+            fullType += CT_id + ' | ';
+            fullDefinitionsType += DEFINITION_id + ' | ';
+        }
+
+        var globalID = 'CreepBodies';
+        g_file.push(setGlobal(globalID, fullObject + 'get: function(id) { return this[id]; }}'));
+        g_file.push("// End creep definitions");
+
+        var interfaceID = 'I' + globalID;
+        var typeID = 'T' + globalID;
+        d_file.push(declareType('CT_ALL', fullType.slice(0, -2)));
+        d_file.push(declareType('DEFINITION_ALL', fullDefinitionsType.slice(0, -3)));
+
+        d_file.push('declare interface ' + interfaceID + ' {[id: string]: DEFINITION_ALL,' + fullObject.slice(1, -1) + '}');
+        d_file.push(declareType(typeID, interfaceID + ' & {get<T extends keyof ' + interfaceID + '>(id: T): ' + interfaceID + '[T];}'));
+        d_file.push('declare var ' + globalID + ': ' + typeID);
+    };
+
+    var primeLists = {
+        100: "",
+        300: "",
+        500: "",
+        1000: "",
+        1500: "",
+        2000: "",
+        2500: "",
+        3000: "",
+    };
+    var GeneratePrimes = function () {
+        g_file.push("// Primes");
+        d_file.push("");
+
+        var primes = [3, 5, 7, 11];
+        var curNum = 13;
+        while (primes.length < 3000) {
+            for (var primeIndex = 0, length = primes.length; primeIndex < length; primeIndex++) {
+                if (curNum % primes[primeIndex] == 0) {
+                    curNum += 2;
+                    continue;
+                }
+            }
+            primes.push(curNum);
+            curNum += 2;
+        }
+        primes = [2].concat(primes);
+
+        for (var primeListIndex = 0; primeListIndex < primes.length; primeListIndex++) {
+            for (var maxNumber in primeLists) {
+                if (maxNumber > primes[primeListIndex]) {
+                    primeLists[maxNumber] += primes[primeListIndex] + ', ';
+                }
+            }
+        }
+
+        for (var maxDigit in primeLists) {
+            primeLists[maxDigit] = '[' + primeLists[maxDigit].slice(0, -2) + ']';
+            g_file.push(setGlobal('primes_' + maxDigit, primeLists[maxDigit]));
+            d_file.push("declare const primes_" + maxDigit + ": " + primeLists[maxDigit] + '');
+        }
+    };
+
+    var OutputToFile = function () {
+        var declarationContents = "";
+        for (var contentIndex = 0; contentIndex < d_file.length; contentIndex++) {
+            declarationContents += d_file[contentIndex] + '\n';
+        }
+        gObj.file.write("./decl/SwarmConsts.d.ts", declarationContents);
+
+        var globalContents = "";
+        for (contentIndex = 0; contentIndex < g_file.length; contentIndex++) {
+            globalContents += g_file[contentIndex] + '\n';
+        }
+        gObj.file.write("./build/compiled/globalConstants.js", globalContents);
+    };
+
+    var run = function () {
+        g_file = [];
+        d_file = [];
+
+        g_file.push("// Begin Consts");
+        // Time stamp the compiled version
+        g_file.push("global[\"SWARM_VERSION_DATE\"] = \"" + new Date().toLocaleDateString() + "\";\n");
+        d_file.push("declare const SWARM_VERSION_DATE = \"CURRENT_VERSION\";");
+
+        var constants = require("./SwarmDeclarations.json").Constants;
+        for (var constGroup in constants) {
+            var constDef = constants[constGroup];
+            compileConstDef(constGroup, constDef);
+        }
+
+        g_file.push("// End Consts\n");
+        d_file.push("");
+
+        OutputAllCreepDefinitions();
+        g_file.push('');
+        GeneratePrimes();
+        OutputToFile();
+    }
+
+    run();
 }
