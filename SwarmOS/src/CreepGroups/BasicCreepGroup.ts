@@ -46,7 +46,7 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Basic
                     delete this.assignments[assignmentIDs[i]];
                     continue;
                 }
-                if (!this.kernel.getProcessById(assignment.pid)) {
+                if (!this.kernel.getProcessByPID(assignment.pid)) {
                     // Creep died
                     assignment.pid = undefined;
                     this.createNewCreepProcess(assignmentIDs[i]);

@@ -48,3 +48,7 @@ declare interface CreepBodiesReference {
     CT_id: string,
     lvl: number
 }
+
+declare interface CreepGroupProcessContext extends IProcessContext {
+    loc: RoomID;
+}

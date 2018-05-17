@@ -55,7 +55,7 @@ class CreepRegistry extends BasicProcess<CreepRegistry_Memory> {
                 continue;
             }
 
-            if (!context.o || !this.kernel.getProcessById(context.o)) {
+            if (!context.o || !this.kernel.getProcessByPID(context.o)) {
                 // This creep is an orphan, find a job for it
             }
         }

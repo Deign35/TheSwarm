@@ -35,11 +35,13 @@ if (!Memory.VERSION || Memory.VERSION != SWARM_VERSION_DATE) {
 
 import { kernel } from "Core/index";
 import { CreepsPackage } from "Creeps/index";
+
+import { CreepGroupsPackage } from "CreepGroups/index";
 import { roomBundle } from "Rooms/index";
 import { bundle as SwarmManager } from "SwarmManagers/index";
 import { flagBundle } from "Flags/index";
 
-kernel.installPackages([SwarmManager, CreepsPackage, roomBundle, flagBundle]);
+kernel.installPackages([SwarmManager, CreepsPackage, CreepGroupsPackage, roomBundle, flagBundle]);
 
 export function loop() {
     try {

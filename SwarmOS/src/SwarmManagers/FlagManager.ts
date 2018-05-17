@@ -43,7 +43,7 @@ class FlagManager extends BasicProcess<FlagMemory> {
             let flagProcess;
             let flagPID = this.memory[id];
             if (flagPID) {
-                flagProcess = this.kernel.getProcessById(flagPID);
+                flagProcess = this.kernel.getProcessByPID(flagPID);
             }
             if (!flagProcess) {
                 let flagContext: FlagProcess_Memory = {

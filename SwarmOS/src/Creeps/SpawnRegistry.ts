@@ -51,8 +51,7 @@ class SpawnRegistry extends BasicProcess<SpawnRegistry_Memory> {
     Extensions!: SpawnRegistryExtensions;
 
     protected OnProcessInstantiation() {
-        this.Extensions = new SpawnRegistryExtensions(this.extensions, this.memory);
-        this.extensions.register(EXT_SpawnRegistry, this.Extensions);
+        this.extensions.register(EXT_SpawnRegistry, new SpawnRegistryExtensions(this.extensions, this.memory));
     }
 
     protected get logID(): string {

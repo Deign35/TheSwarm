@@ -49,7 +49,7 @@ export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepEx
         }
     }
 
-    startProcess(processName: string, startContext: any): ProcessWithID | undefined {
+    startProcess(processName: string, startMemory: any): ProcessWithID | undefined {
         let pid = 'p' + GetSUID() as PID;
         let pInfo: ProcInfo = {
             pid: pid,
@@ -60,7 +60,7 @@ export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepEx
         };
 
         this.processTable[pid] = pInfo;
-        this.processMemory[pid] = startContext || {};
+        this.processMemory[pid] = startMemory || {};
 
         let process = this.createProcess(pid);
         this.log.debug(`CreateNewProcess: ${processName}`);
@@ -119,7 +119,7 @@ export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepEx
         }
     }
 
-    getProcessById(pid: PID): IProcess | undefined {
+    getProcessByPID(pid: PID): IProcess | undefined {
         if (!this.processTable[pid]) {
             return;
         }
@@ -157,7 +157,7 @@ export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepEx
             let pid = processIDs[i];
             let pInfo = this.processTable[pid];
             if (!pInfo.ex) {
-                let proc = this.getProcessById(pid);
+                let proc = this.getProcessByPID(pid);
                 if (proc) {
                     proc.onProcessEnd();
                 }
@@ -168,7 +168,7 @@ export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepEx
             }
             hasActiveProcesses = true;
             try {
-                let proc = this.getProcessById(pid);
+                let proc = this.getProcessByPID(pid);
                 if (!proc) throw new Error(`Could not get process ${pid} ${pInfo.PKG}`);
                 this.curProcessID = pid;
 

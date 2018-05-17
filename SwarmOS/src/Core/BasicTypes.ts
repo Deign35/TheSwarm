@@ -85,7 +85,7 @@ export abstract class PackageProviderBase<T extends PackageProviderMemory> exten
         let ids = Object.keys(this.RequiredServices)
         for (let i = 0, length = ids.length; i < length; i++) {
             let service = this.memory.services[ids[i]];
-            let process = (service && service.pid) ? this.kernel.getProcessById(service.pid) : undefined;
+            let process = (service && service.pid) ? this.kernel.getProcessByPID(service.pid) : undefined;
 
             if (!service || !process) {
                 this.log.info(() => `Initializing package service ${ids[i]}`);
@@ -93,7 +93,7 @@ export abstract class PackageProviderBase<T extends PackageProviderMemory> exten
                 let initData = this.RequiredServices[ids[i]];
                 this.addPKGService(ids[i], initData.processName, initData.startContext);
                 service = this.memory.services[ids[i]];
-                process = (service && service.pid) ? this.kernel.getProcessById(service.pid) : undefined;
+                process = (service && service.pid) ? this.kernel.getProcessByPID(service.pid) : undefined;
 
                 if (!service || !process) {
                     this.log.error(() => `Failed to restart package service ${ids[i]}`);

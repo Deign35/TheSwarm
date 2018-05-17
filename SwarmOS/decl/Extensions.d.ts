@@ -48,7 +48,7 @@ declare interface IKernelProcessExtensions extends IPackageExtension {
     installPackages(packages: IPackage<any>[]): void;
     startProcess(packageName: string, startContext: any): { pid: PID; process: IProcess } | undefined;
     killProcess(pid: PID): void;
-    getProcessById(pid: PID): IProcess | undefined;
+    getProcessByPID(pid: PID): IProcess | undefined;
     setParent(pid: PID, parentId?: PID): boolean;
 }
 

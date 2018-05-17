@@ -31,14 +31,10 @@ class RoomManager extends BasicProcess<{}> {
                     this.log.warn(`(ASSUMPTION RECOVERY): GetRoomData refresh fixed it (${roomID})`)
                 }
             }
-            if (!data.pid || !this.kernel.getProcessById(data.pid)) {
-                let newRoomMemory: SimpleOwnedRoom_Memory = {
+            if (!data.pid || !this.kernel.getProcessByPID(data.pid)) {
+                let newRoomMemory: RoomProcess_Memory = {
                     roomName: roomID,
-                    creeps: {
-                        bui: []
-                    },
-                    creepAssignments: {},
-                    sourcePIDs: {}
+                    groups: {}
                 }
 
                 let newRoomProcess = this.kernel.startProcess(PKG_SimpleOwnedRoom, newRoomMemory);
