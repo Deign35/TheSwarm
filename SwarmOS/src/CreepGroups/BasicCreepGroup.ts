@@ -50,7 +50,16 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Basic
             if (this.assignments[assignmentIDs[i]].pid) {
                 if (!this.kernel.getProcessByPID(this.assignments[assignmentIDs[i]].pid!)) {
                     // process died
+                    let SR = this.assignments[assignmentIDs[i]].SR;
                     delete this.assignments[assignmentIDs[i]].pid;
+                    let curSpawnState = this.spawnRegistry.getRequestStatus(SR);
+                    if (curSpawnState == SP_ERROR) {
+                        if (!this.spawnRegistry.tryResetRequest(SR)) {
+                            // Create new context
+                            this.log.fatal(`SpawnRequest has disappeard`);
+                            this.kernel.killProcess(this.pid);
+                        }
+                    }
                 }
             }
 
@@ -87,7 +96,10 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Basic
         if (!this.spawnRegistry.getRequestContext(assignment.SR)) {
             assignment.SR = this.spawnRegistry.requestSpawn(newCreepContext, this.memory.targetRoom, this.pid, this.memory.pri)
         } else {
-            this.spawnRegistry.resetRequest(assignment.SR, newCreepContext);
+            if (!this.spawnRegistry.tryResetRequest(assignment.SR, newCreepContext)) {
+                this.kernel.killProcess(this.pid);
+                return;
+            }
         }
 
         let newCreepMemory: CreepProcess_Memory = this.CreateNewCreepMemory(aID);

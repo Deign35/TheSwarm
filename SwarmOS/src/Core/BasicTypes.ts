@@ -11,7 +11,6 @@ export abstract class BasicProcess<ProcessMemory> implements IProcess {
     protected sleeper!: IKernelSleepExtension;
 
     constructor(protected context: IProcessContext) {
-        this._cache = {};
         this._logger = context.getPackageInterface(EXT_Logger).CreateLogContext(this.logID, this.logLevel);
         this.OnProcessInstantiation();
     }
@@ -22,14 +21,12 @@ export abstract class BasicProcess<ProcessMemory> implements IProcess {
     protected get logID() { return DEFAULT_LOG_ID; }
     protected get logLevel(): LogLevel { return DEFAULT_LOG_LEVEL; }
 
-    private _cache: SDictionary<any>;
-    protected get cache(): SDictionary<any> { return this._cache; }
     protected get memory(): ProcessMemory { return this.context.memory as ProcessMemory; }
 
     get pkgName(): string { return this.context.pkgName; }
     get pid(): PID { return this.context.pid; }
     get parentPID(): PID { return this.context.pPID; }
-    get isInDebugMode() { return false; }
+    get isInDebugMode(): boolean { return false; }
 
     onProcessEnd(): void { }
     run(): void {
@@ -39,7 +36,6 @@ export abstract class BasicProcess<ProcessMemory> implements IProcess {
             this.log.debug(() => `Begin ${this.pkgName}(${this.pid}): ${startCPU}`);
         }
 
-        this._cache = this.InitCache();
         this.executeProcess();
 
         if (this.isInDebugMode) {
@@ -51,7 +47,6 @@ export abstract class BasicProcess<ProcessMemory> implements IProcess {
         }
     }
 
-    protected InitCache(): SDictionary<any> { return {} }
     protected executeDebugCode(): void { }
     protected abstract executeProcess(): void;
 }

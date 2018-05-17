@@ -1,3 +1,9 @@
+declare var Memory: {
+    spawnData: SpawnRegistry_Memory;
+}
+if (!Memory.spawnData) {
+    Memory.spawnData = {};
+}
 import { BasicProcess, ExtensionBase } from "Core/BasicTypes";
 
 export const OSPackage: IPackage<SpawnRegistry_Memory> = {
@@ -53,6 +59,7 @@ class SpawnRegistry extends BasicProcess<SpawnRegistry_Memory> {
     protected OnProcessInstantiation() {
         this.extensions.register(EXT_SpawnRegistry, new SpawnRegistryExtensions(this.extensions, this.memory));
     }
+    protected get memory() { return Memory.spawnData; }
 
     protected get logID(): string {
         return PKG_SpawnRegistry_LogContext.logID;
@@ -60,43 +67,11 @@ class SpawnRegistry extends BasicProcess<SpawnRegistry_Memory> {
     protected get logLevel(): LogLevel {
         return PKG_SpawnRegistry_LogContext.logLevel!;
     }
-    protected get cache(): SpawnRegistry_FlashMemory {
-        return super.cache as SpawnRegistry_FlashMemory;
-    }
 
-    protected get activeRequests() {
-        return this.cache.activeRequests;
-    }
-    protected get activeSpawns() {
-        return this.cache.activeSpawns;
-    }
-    protected get usedRequestIDs() {
-        return this.cache.usedRequestIDs;
-    }
-    protected get sortedSpawnIDs() {
-        return this.cache.sortedSpawnIDs;
-    }
-
-    protected set sortedSpawnIDs(ids: SpawnID[]) {
-        this.cache.sortedSpawnIDs = ids;
-    }
-    protected set usedRequestIDs(ids: SpawnRequestID[]) {
-        this.cache.usedRequestIDs = ids;
-    }
-
-    // Get the state of the tick before processing
-    protected InitCache(): SpawnRegistry_FlashMemory {
-        return {
-            activeRequests: {},
-            activeSpawns: {},
-            sortedSpawnIDs: [],
-            usedRequestIDs: []
-        }
-    }
-
-    protected PopuplateCacheData() {
+    protected AnalyzeSpawnRequests(): SpawnRegistry_FlashMemory {
         let requests = Object.keys(this.memory);
         let minSpawnCost = 36000;
+        let activeRequests = {};
         for (let i = 0; i < requests.length; i++) {
             let req = this.memory[requests[i]];
             if (req.sta != SP_QUEUED) {
@@ -105,27 +80,35 @@ class SpawnRegistry extends BasicProcess<SpawnRegistry_Memory> {
                 }
                 continue;
             }
-            this.activeRequests[requests[i]] = req;
+            activeRequests[requests[i]] = req;
             minSpawnCost = Math.min(minSpawnCost, CreepBodies.get(req.con.b)[req.con.l].cost);
         }
 
         let spawnIDs = Object.keys(Game.spawns);
+        let activeSpawns = {};
 
         for (let i = 0, length = spawnIDs.length; i < length; i++) {
             let spawn = Game.spawns[spawnIDs[i]];
             if (spawn.isActive() && !spawn.spawning && spawn.room.energyAvailable >= minSpawnCost) {
-                this.activeSpawns[spawnIDs[i]] = spawn;
+                activeSpawns[spawnIDs[i]] = spawn;
             }
         }
 
-        this.sortedSpawnIDs = Object.keys(this.activeSpawns).sort((a, b) => {
-            return this.activeSpawns[a].room.energyAvailable > this.activeSpawns[b].room.energyAvailable ? -1 : 1;
+        let sortedSpawnIDs = Object.keys(activeSpawns).sort((a, b) => {
+            return activeSpawns[a].room.energyAvailable > activeSpawns[b].room.energyAvailable ? -1 : 1;
         });
+
+        return {
+            activeRequests,
+            activeSpawns,
+            sortedSpawnIDs,
+            usedRequestIDs: []
+        }
     }
 
     executeProcess(): void {
         this.log.debug(`Begin Spawner`);
-        this.PopuplateCacheData();
+        let { activeRequests, activeSpawns, sortedSpawnIDs, usedRequestIDs } = this.AnalyzeSpawnRequests();
 
         let requests = Object.keys(this.memory);
         if (requests.length == 0) {
@@ -134,13 +117,16 @@ class SpawnRegistry extends BasicProcess<SpawnRegistry_Memory> {
             return;
         }
 
-        for (let i = 0; i < this.sortedSpawnIDs.length; i++) {
-            let spawn = this.activeSpawns[this.sortedSpawnIDs[i]];
+        for (let i = 0; i < sortedSpawnIDs.length; i++) {
+            let spawn = activeSpawns[sortedSpawnIDs[i]];
             let spawnRequest: { req?: SpawnRequest, diff: number } = { req: undefined, diff: 0 };
 
-            let activeIDs = Object.keys(this.activeRequests);
+            let activeIDs = Object.keys(activeRequests);
             for (let j = 0; j < activeIDs.length; j++) {
                 let req = this.memory[activeIDs[j]];
+                if (usedRequestIDs.includes(req.id)) {
+                    continue;
+                }
                 if (spawnRequest.req && req.pri != spawnRequest.req.pri) {
                     if (req.pri > spawnRequest.req.pri) {
                         spawnRequest = { req: req, diff: this.GetConvertedSpawnCost(spawn, req) }
@@ -156,6 +142,7 @@ class SpawnRegistry extends BasicProcess<SpawnRegistry_Memory> {
 
             if (spawnRequest.req && spawnRequest.diff > 0) {
                 this.spawnCreep(spawn, spawnRequest.req);
+                usedRequestIDs.push(spawnRequest.req.id);
             }
         }
         this.sleeper.sleep(3);
@@ -183,16 +170,12 @@ class SpawnRegistry extends BasicProcess<SpawnRegistry_Memory> {
 
         if (spawnResult == OK) {
             this.log.debug(`Spawn Creep successful for ${req.con.n} - pid(${req.pid})`);
-            this.usedRequestIDs.push(req.id);
             req.sta = SP_SPAWNING;
         }
     }
 
     protected GetConvertedSpawnCost(spawn: StructureSpawn, req: SpawnRequest) {
         if (req.sta != SP_QUEUED) {
-            return UNSPAWNABLE_COST;
-        }
-        if (this.usedRequestIDs.includes(req.id)) {
             return UNSPAWNABLE_COST;
         }
         let diff = CreepBodies.get(req.con.b)[req.con.l].cost;
@@ -240,11 +223,11 @@ class SpawnRegistryExtensions extends ExtensionBase implements ISpawnRegistryExt
         return undefined;
     }
 
-    resetRequest(id: SpawnRequestID, newContext?: CreepContext, priority?: Priority, defaultMemory?: any) {
+    tryResetRequest(id: SpawnRequestID, newContext?: CreepContext, priority?: Priority, defaultMemory?: any) {
         if (this.memory[id]) {
             this.memory[id].sta = SP_QUEUED;
         } else {
-            return;
+            return false;
         }
         if (priority) {
             this.memory[id].pri = priority;
@@ -255,6 +238,7 @@ class SpawnRegistryExtensions extends ExtensionBase implements ISpawnRegistryExt
         if (defaultMemory) {
             this.memory[id].dm = defaultMemory;
         }
+        return true;
     }
     cancelRequest(id: SpawnRequestID): boolean {
         if (this.memory[id]) {

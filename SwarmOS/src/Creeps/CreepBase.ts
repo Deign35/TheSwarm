@@ -22,7 +22,10 @@ export abstract class CreepBase<T extends CreepProcess_Memory> extends BasicProc
             if (!this._creep) {
                 delete this.memory.CR;
                 if (this.memory.SR) {
-                    this.spawnRegistry.resetRequest(this.memory.SR);
+                    if (!this.spawnRegistry.tryResetRequest(this.memory.SR)) {
+                        this.kernel.killProcess(this.pid);
+                        return;
+                    }
                 }
             }
         }
