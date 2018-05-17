@@ -15,14 +15,8 @@ declare var Memory: {
 
 import { BasicProcess, ExtensionBase } from "Core/BasicTypes";
 
-export const bundle: IPackage<ISchedulerMemory> = {
-    install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
-        extensionRegistry.register(EXT_Scheduler, SchedulerExtension);
-    }
-}
-
-class SchedulerExtension extends ExtensionBase implements SchedulerExtension {
-    protected constructor(extReg: IExtensionRegistry) {
+export class SchedulerExtension extends ExtensionBase implements SchedulerExtension {
+    constructor(extReg: IExtensionRegistry) {
         super(extReg);
     }
     private get memory() {
@@ -47,7 +41,7 @@ class SchedulerExtension extends ExtensionBase implements SchedulerExtension {
 
 export abstract class ScheduledProcess<T extends ScheduledProcessMemBase> extends BasicProcess<T> {
     @extensionInterface(EXT_Scheduler)
-    protected scheduler!: ISchedulerExtension;
+    protected scheduler!: IKernelSchedulerExtensions;
     protected executeProcess(): void {
         let self = this;
         this.scheduler.ScheduleLogic(this.memory.sID, function* () {
