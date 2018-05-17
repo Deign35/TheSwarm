@@ -10,7 +10,7 @@ import { ActionBase } from "Actions/ActionBase";
 import { UpgradeAction } from "Actions/UpgradeAction";
 import { BuildAction } from "Actions/BuildAction";
 
-export class Builder extends CreepBase<Builder_memory> {
+export class Builder extends CreepBase<Builder_Memory> {
     protected activateCreep(): void {
         if (this.memory.get) {
             if (this.creep.carry.energy == this.creep.carryCapacity) {

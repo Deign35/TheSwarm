@@ -25,22 +25,33 @@ declare interface Upgrader_Memory extends CreepProcess_Memory {
     isReserving?: boolean;
     isClaiming?: boolean;
 }
-declare interface Builder_memory extends CreepProcess_Memory {
+declare interface Builder_Memory extends CreepProcess_Memory {
 
 }
 
 /** CreepGroups */
 declare interface CreepGroup_Memory extends MemBase {
     enabled: boolean; // (en)abled
-    assignments: SDictionary<CreepGroup_CreepRef>;
+    assignments: SDictionary<CreepGroup_Assignment>;
     homeRoom: RoomID;
     targetRoom: RoomID;
+    CT: CT_ALL;
+    lvl: number;
+    numReq: number;
+    pri: Priority
 }
 
-declare interface CreepGroup_CreepRef extends MemBase {
+declare interface CreepGroup_Assignment extends MemBase {
     pid?: PID;          // ID corresponding to the assigned PID
     //CR?: CreepID;       // ID corresponding to the creep
     SR: SpawnRequestID; // ID corresponding to the spawn request
     CT: CT_ALL;         // (C)reep (T)ype
     lvl: number;        // role level
+}
+
+declare interface HarvesterGroup_Memory extends CreepGroup_Memory {
+    sIDs: ObjectID[]; // Sources
+}
+declare interface HarvesterGroup_Assignment extends CreepGroup_Assignment {
+    sID: ObjectID       // Source id for harvesting
 }
