@@ -1,6 +1,12 @@
 import { BasicCreepGroup } from "./BasicCreepGroup";
+export const OSPackage: IPackage<SpawnRegistry_Memory> = {
+    install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
+        processRegistry.register(CG_Builder, BuilderGroup);
+    }
+}
 
-export class BuilderGroup extends BasicCreepGroup<CreepGroup_Memory> {
+
+class BuilderGroup extends BasicCreepGroup<CreepGroup_Memory> {
     protected CreateNewCreepMemory(aID: string): Builder_Memory {
         return {
             get: false,

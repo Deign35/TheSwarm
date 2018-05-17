@@ -6,7 +6,7 @@ import { OSPackage as Harvester } from "Creeps/Harvester";
 import { OSPackage as Refiller } from "Creeps/Refiller";
 import { OSPackage as Upgrader } from "Creeps/Upgrader";
 
-export const SwarmOSCreepsPackage: IPackage<{}> = {
+export const CreepsPackage: IPackage<{}> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
         CreepRegistry.install(processRegistry, extensionRegistry);
         SpawnRegistry.install(processRegistry, extensionRegistry);

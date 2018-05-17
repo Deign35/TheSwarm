@@ -1,6 +1,11 @@
 import { BasicCreepGroup } from "./BasicCreepGroup";
+export const OSPackage: IPackage<SpawnRegistry_Memory> = {
+    install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
+        processRegistry.register(CG_Harvester, HarvesterGroup);
+    }
+}
 
-export class HarvesterCreepGroup extends BasicCreepGroup<HarvesterGroup_Memory> {
+class HarvesterGroup extends BasicCreepGroup<HarvesterGroup_Memory> {
     protected EnsureAssignments(): void {
         for (let i = 0; i < this.memory.sIDs.length; i++) {
             if (!this.assignments[this.memory.sIDs[i]]) {

@@ -291,6 +291,9 @@ var GenerateConstantsFile = function () {
             }
             entryIDs.push(constName);
 
+            if (constDef.usePrefix) {
+                constVal = id + "_" + constVal;
+            }
             if (constDef.string) {
                 constVal = "\"" + constVal + "\"";
             }

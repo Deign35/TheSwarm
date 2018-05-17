@@ -32,6 +32,21 @@
                 "FlagBase"
             ]
         },
+        "CG": {
+            "comment": "Creep group packages",
+            "enabled": true,
+            "string": true,
+            "isArray": true,
+            "type": true,
+            "usePrefix": true,
+            "combinedType": "CreepGroupPackage",
+            "entries": [
+                "Builder",
+                "Harvester",
+                "Refiller",
+                "Upgrader"
+            ]
+        },
         "EXT": {
             "comment": "Extensions provided by packages for processless package interactions",
             "enabled": true,
