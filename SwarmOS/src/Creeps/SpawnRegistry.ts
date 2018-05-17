@@ -72,11 +72,11 @@ class SpawnRegistry extends BasicProcess<SpawnRegistry_Memory> {
     }
 
     protected AnalyzeSpawnRequests(): SpawnRegistry_FlashMemory {
-        let requests = Object.keys(this.memory.spawnData);
+        let requests = Object.keys(this.memory);
         let minSpawnCost = 36000;
         let activeRequests = {};
         for (let i = 0; i < requests.length; i++) {
-            let req = this.memory.spawnData[requests[i]];
+            let req = this.memory[requests[i]];
             if (req.sta != SP_QUEUED) {
                 if (req.sta == SP_SPAWNING && !Game.creeps[req.con.n]) {
                     req.sta = SP_ERROR;
@@ -113,7 +113,7 @@ class SpawnRegistry extends BasicProcess<SpawnRegistry_Memory> {
         this.log.debug(`Begin Spawner`);
         let { activeRequests, activeSpawns, sortedSpawnIDs, usedRequestIDs } = this.AnalyzeSpawnRequests();
 
-        let requests = Object.keys(this.memory.spawnData);
+        let requests = Object.keys(this.memory);
         if (requests.length == 0) {
             // Inform the temp worker group
             this.log.warn(`No spawn requests in the queue.  You have spawn capacity available.`);
@@ -126,7 +126,7 @@ class SpawnRegistry extends BasicProcess<SpawnRegistry_Memory> {
 
             let activeIDs = Object.keys(activeRequests);
             for (let j = 0; j < activeIDs.length; j++) {
-                let req = this.memory.spawnData[activeIDs[j]];
+                let req = this.memory[activeIDs[j]];
                 if (usedRequestIDs.includes(req.id)) {
                     continue;
                 }
@@ -208,15 +208,15 @@ class SpawnRegistryExtensions extends ExtensionBase implements ISpawnRegistryExt
 
 
     getRequestStatus(id: SpawnRequestID): SpawnState {
-        if (!this.memory.spawnData[id]) {
+        if (!this.memory[id]) {
             return SP_ERROR;
         }
-        let spawnRequest = this.memory.spawnData[id];
+        let spawnRequest = this.memory[id];
 
         if (spawnRequest.sta == SP_SPAWNING) {
             let creep = Game.creeps[spawnRequest.con.n];
             if (creep && !creep.spawning) {
-                this.memory.spawnData[id].sta = SP_COMPLETE;
+                this.memory[id].sta = SP_COMPLETE;
                 spawnRequest.sta = SP_COMPLETE;
             }
         }
@@ -224,33 +224,33 @@ class SpawnRegistryExtensions extends ExtensionBase implements ISpawnRegistryExt
         return spawnRequest.sta;
     }
     getRequestContext(id: SpawnRequestID): CreepContext | undefined {
-        if (this.memory.spawnData[id]) {
-            return this.memory.spawnData[id].con;
+        if (this.memory[id]) {
+            return this.memory[id].con;
         }
 
         return undefined;
     }
 
-    tryResetRequest(id: SpawnRequestID, newContext?: CreepContext, priority?: Priority, defaultMemory?: any) {
-        if (this.memory.spawnData[id]) {
-            this.memory.spawnData[id].sta = SP_QUEUED;
+    tryResetRequest(id: SpawnRequestID, newContext: CreepContext, priority?: Priority, defaultMemory?: any) {
+        if (this.memory[id]) {
+            this.memory[id].sta = SP_QUEUED;
         } else {
             return false;
         }
         if (priority) {
-            this.memory.spawnData[id].pri = priority;
+            this.memory[id].pri = priority;
         }
         if (newContext) {
-            this.memory.spawnData[id].con = newContext;
+            this.memory[id].con = newContext;
         }
         if (defaultMemory) {
-            this.memory.spawnData[id].dm = defaultMemory;
+            this.memory[id].dm = defaultMemory;
         }
         return true;
     }
     cancelRequest(id: SpawnRequestID): boolean {
-        if (this.memory.spawnData[id]) {
-            delete this.memory.spawnData[id];
+        if (this.memory[id]) {
+            delete this.memory[id];
             return true;
         }
 
@@ -270,7 +270,7 @@ class SpawnRegistryExtensions extends ExtensionBase implements ISpawnRegistryExt
             sta: SP_QUEUED,
         }
 
-        this.memory.spawnData[newRequest.id] = newRequest;
+        this.memory[newRequest.id] = newRequest;
         return newRequest.id;
     }
 }

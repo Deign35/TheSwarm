@@ -37,6 +37,15 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Basic
             SR: this.assignments[aID].SR,
         }
     }
+    protected RefreshCreepContext(aID: string): CreepContext {
+        let assignment = this.assignments[aID];
+        return {
+            b: assignment.CT,
+            l: assignment.lvl,
+            n: this.GroupPrefix + GetSUID(),
+            o: assignment.pid
+        }
+    }
     protected EnsureAssignments(): void {
         while (Object.keys(this.assignments).length < this.memory.numReq) {
             this.createNewAssignment(this.GroupPrefix + GetSUID());
@@ -54,7 +63,7 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Basic
                     delete this.assignments[assignmentIDs[i]].pid;
                     let curSpawnState = this.spawnRegistry.getRequestStatus(SR);
                     if (curSpawnState == SP_ERROR) {
-                        if (!this.spawnRegistry.tryResetRequest(SR)) {
+                        if (!this.spawnRegistry.tryResetRequest(SR, this.RefreshCreepContext(assignmentIDs[i]))) {
                             // Create new context
                             this.log.fatal(`SpawnRequest has disappeard`);
                             this.kernel.killProcess(this.pid);

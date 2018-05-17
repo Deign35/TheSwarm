@@ -16,13 +16,20 @@ export abstract class CreepBase<T extends CreepProcess_Memory> extends BasicProc
     }
     private _creep: Creep | undefined;
 
+    protected refreshSpawnRequest(context: CreepContext) {
+        context.n = context.n.slice(0, 5) + GetSUID();
+    }
     protected executeProcess(): void {
         if (this.memory.CR) {
             this._creep = this.creepRegistry.tryGetCreep(this.memory.CR, this.pid);
             if (!this._creep) {
                 delete this.memory.CR;
                 if (this.memory.SR) {
-                    if (!this.spawnRegistry.tryResetRequest(this.memory.SR)) {
+                    let curContext = this.spawnRegistry.getRequestContext(this.memory.SR);
+                    if (curContext) {
+                        this.refreshSpawnRequest(curContext);
+                    }
+                    if (!curContext || !this.spawnRegistry.tryResetRequest(this.memory.SR, curContext)) {
                         this.kernel.killProcess(this.pid);
                         return;
                     }
@@ -34,12 +41,22 @@ export abstract class CreepBase<T extends CreepProcess_Memory> extends BasicProc
             let reqStatus = this.spawnRegistry.getRequestStatus(this.memory.SR);
             switch (reqStatus) {
                 case (SP_COMPLETE):
+                // (TODO): Need to make sure that we dont end up in an inf loop.        
                 case (SP_SPAWNING):
                     let context = this.spawnRegistry.getRequestContext(this.memory.SR);
-                    if (context && this.creepRegistry.tryRegisterCreep(context)) {
-                        if (this.creepRegistry.tryReserveCreep(context.n, this.pid)) {
-                            this.memory.CR = context.n;
+                    if (context) {
+                        this.creepRegistry.tryRegisterCreep(context)
+                        this.creepRegistry.tryReserveCreep(context.n, this.pid);
+                        this.memory.CR = context.n;
+                        this._creep = this.creepRegistry.tryGetCreep(this.memory.CR, this.pid);
+                    }
+                    if (reqStatus == SP_COMPLETE && !this._creep) {
+                        if (!context) {
+                            this.kernel.killProcess(this.pid);
+                            return;
                         }
+                        this.refreshSpawnRequest(context);
+                        this.spawnRegistry.tryResetRequest(this.memory.SR, context);
                     }
                     break;
                 case (undefined):
