@@ -7,10 +7,10 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Launch Program",
-            "program": "${workspaceFolder}\\ScreepTools\\public\\js\\app.js",
+            "name": "TryMiscJSCode",
+            "program": "${workspaceFolder}\\SwarmOS\\test\\MiscTestFile.js",
             "outFiles": [
-                "${workspaceFolder}/garbage/poop/garbage/**.js"
+                "${workspaceFolder}/**/*.js"
             ]
         }
     ]

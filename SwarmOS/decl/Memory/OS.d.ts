@@ -8,6 +8,10 @@ declare interface KernelMemory extends MemBase {
     notifications: string[]
 }
 
+declare interface ScheduledProcessMemBase extends MemBase {
+    schID: string
+}
+
 
 declare interface PackageProviderMemory extends MemBase {
     services: {

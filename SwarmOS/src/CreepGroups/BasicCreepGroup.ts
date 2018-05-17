@@ -103,7 +103,7 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Basic
             n: this.GroupPrefix + GetSUID()
         }
         if (!this.spawnRegistry.getRequestContext(assignment.SR)) {
-            assignment.SR = this.spawnRegistry.requestSpawn(newCreepContext, this.memory.targetRoom, this.pid, this.memory.pri)
+            assignment.SR = this.spawnRegistry.requestSpawn(newCreepContext, this.memory.targetRoom, this.memory.pri)
         } else {
             if (!this.spawnRegistry.tryResetRequest(assignment.SR, newCreepContext)) {
                 this.kernel.killProcess(this.pid);

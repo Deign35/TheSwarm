@@ -22,12 +22,10 @@
                 "SwarmManager",
                 "SpawnRegistry",
                 "RoomManager",
-                "FirstRoom",
                 "CreepBuilder",
                 "CreepHarvester",
                 "CreepRefiller",
                 "CreepUpgrader",
-                "EnergyDistribution",
                 "SimpleOwnedRoom",
                 "FlagBase"
             ]
@@ -54,16 +52,16 @@
             "type": true,
             "combinedType": "OSExtension",
             "entries": {
-                "Flags": "flag",
+                "Flags": "flags",
                 "SpawnRegistry": "spawner",
                 "CreepRegistry": "creeps",
                 "RoomView": "roomView",
                 "Registry": "extRegistry",
                 "Kernel": "kernel",
                 "Sleep": "sleep",
-                "EnergyDist": "energyDist",
                 "Interrupt": "interrupt",
-                "Logger": "logger"
+                "Logger": "logger",
+                "Scheduler": "scheduler"
             }
         },
         "FT": {

@@ -18,7 +18,7 @@ declare interface SpawnRequest extends MemBase {
     con: CreepContext;  // Context
     id: SpawnRequestID; // requestID
     loc: RoomID;        // Where the spawn request originates
-    pid: PID;           // RequestorPID
+    //pid: PID;           // RequestorPID
     pri: Priority;      // How much of a priority is this spawn??
     sta: SpawnState;    // Current Spawn state
 

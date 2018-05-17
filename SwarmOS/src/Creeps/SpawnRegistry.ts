@@ -172,7 +172,7 @@ class SpawnRegistry extends BasicProcess<SpawnRegistry_Memory> {
         }
 
         if (spawnResult == OK) {
-            this.log.debug(`Spawn Creep successful for ${req.con.n} - pid(${req.pid})`);
+            this.log.debug(`Spawn Creep successful for ${req.id})`);
             req.sta = SP_SPAWNING;
         }
     }
@@ -257,7 +257,7 @@ class SpawnRegistryExtensions extends ExtensionBase implements ISpawnRegistryExt
         return false;
     }
 
-    requestSpawn(context: CreepContext, location: RoomID, requestorPID: PID, spawnPriority: Priority,
+    requestSpawn(context: CreepContext, location: RoomID, spawnPriority: Priority,
         maxSpawnDistance: number = 3, startMem?: any): SpawnRequestID {
         let newRequest: SpawnRequest = {
             con: context,
@@ -265,7 +265,6 @@ class SpawnRegistryExtensions extends ExtensionBase implements ISpawnRegistryExt
             id: GetSUID(),
             loc: location,
             max: maxSpawnDistance,
-            pid: requestorPID,
             pri: spawnPriority,
             sta: SP_QUEUED,
         }

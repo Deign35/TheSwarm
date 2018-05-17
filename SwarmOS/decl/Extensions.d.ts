@@ -23,6 +23,7 @@ declare interface IPackageInterfaces {
     [EXT_Sleep]: IKernelSleepExtension;
     [EXT_Logger]: IKernelLoggerExtensions;
     [EXT_CreepRegistry]: ICreepRegistryExtensions;
+    [EXT_Scheduler]: ISchedulerExtension;
 }
 
 /**
@@ -104,16 +105,23 @@ declare type SpawnRequestID = string;
 declare interface ISpawnRegistryExtensions extends IPackageExtension {
     cancelRequest(id: SpawnRequestID): boolean;
     getRequestStatus(id: SpawnRequestID): SpawnState;
-    requestSpawn(context: CreepContext, location: RoomID, requestorPID: PID, spawnPriority: Priority,
+    requestSpawn(context: CreepContext, location: RoomID, spawnPriority: Priority,
         maxSpawnDistance?: number, startMem?: any): SpawnRequestID;
     tryResetRequest(id: SpawnRequestID, newContext: CreepContext, priority?: Priority, defaultMemory?: any): boolean;
     getRequestContext(id: SpawnRequestID): CreepContext | undefined;
 }
 
+/**
+ * Registry for creep management and ownership control
+ */
 declare interface ICreepRegistryExtensions extends IPackageExtension {
     tryFindCompatibleCreep(creepType: CT_ALL, level: number, targetRoom: RoomID, maxDistance?: number): string | undefined
     tryRegisterCreep(creepContext: CreepContext): boolean;
     tryGetCreep(id: CreepID, requestingPID: PID): Creep | undefined;
     tryReserveCreep(id: CreepID, requestingPID: PID): boolean;
     releaseCreep(id: CreepID): void;
+}
+
+declare interface ISchedulerExtension extends IPackageExtension {
+    
 }
