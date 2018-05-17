@@ -10,10 +10,6 @@ import { ActionBase } from "Actions/ActionBase";
 import { UpgradeAction } from "Actions/UpgradeAction";
 
 export class Upgrader extends CreepBase<Upgrader_Memory> {
-    protected get CreepPrefix() { return 'Upg_'; }
-    protected get SpawnPriority(): Priority {
-        return Priority_Lowest;
-    }
     protected activateCreep(): void {
         let creep = this.creep;
         if (creep.room.name != this.memory.loc) {

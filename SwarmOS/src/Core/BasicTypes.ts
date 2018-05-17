@@ -4,10 +4,7 @@ export abstract class BasicProcess<ProcessMemory> implements IProcess {
     @extensionInterface(EXT_Registry)
     protected extensions!: IExtensionRegistry;
     @extensionInterface(EXT_SpawnRegistry)
-    protected spawner!: ISpawnRegistryExtensions;
-    @extensionInterface(EXT_CreepRegistry)
-
-    protected creeper!: ICreepRegistryExtensions;
+    protected spawnRegistry!: ISpawnRegistryExtensions;
     @extensionInterface(EXT_Interrupt)
     protected interrupter!: IKernelNotificationsExtension;
     @extensionInterface(EXT_Sleep)
@@ -16,9 +13,9 @@ export abstract class BasicProcess<ProcessMemory> implements IProcess {
     constructor(protected context: IProcessContext) {
         this._cache = {};
         this._logger = context.getPackageInterface(EXT_Logger).CreateLogContext(this.logID, this.logLevel);
-        this.OnOSLoad();
+        this.OnProcessInstantiation();
     }
-    protected OnOSLoad(): void { }
+    protected OnProcessInstantiation(): void { }
 
     private _logger: ILogger;
     protected get log(): ILogger { return this._logger; }
@@ -42,7 +39,7 @@ export abstract class BasicProcess<ProcessMemory> implements IProcess {
             this.log.debug(() => `Begin ${this.pkgName}(${this.pid}): ${startCPU}`);
         }
 
-        this._cache = this.initStateForTick();
+        this._cache = this.InitCache();
         this.executeProcess();
 
         if (this.isInDebugMode) {
@@ -54,7 +51,7 @@ export abstract class BasicProcess<ProcessMemory> implements IProcess {
         }
     }
 
-    protected initStateForTick(): SDictionary<any> { return {} }
+    protected InitCache(): SDictionary<any> { return {} }
     protected executeDebugCode(): void { }
     protected abstract executeProcess(): void;
 }
@@ -66,7 +63,7 @@ export interface InitData {
 
 const SCAN_FREQUENCY = 15;
 export abstract class PackageProviderBase<T extends PackageProviderMemory> extends BasicProcess<T> {
-    protected OnOSLoad() {
+    protected OnProcessInstantiation() {
         if (!this.memory.services) {
             this.memory.services = {};
         }

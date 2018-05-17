@@ -11,11 +11,6 @@ import { UpgradeAction } from "Actions/UpgradeAction";
 import { BuildAction } from "Actions/BuildAction";
 
 export class Builder extends CreepBase<Builder_memory> {
-    protected get SpawnPriority(): Priority {
-        return Priority_Low;
-    }
-
-    protected get CreepPrefix() { return 'Bui_'; }
     protected activateCreep(): void {
         if (this.memory.get) {
             if (this.creep.carry.energy == this.creep.carryCapacity) {

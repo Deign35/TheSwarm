@@ -30,7 +30,6 @@ const IN____Empty___Manager_LogContext: LogContext = {
 }
 
 class ___Empty___Manager extends BasicProcess<I___Empty___Data_Memory> {
-    protected OnOSLoad(): void { }
     protected get memory() {
         return Memory.___Empty___Data;
     }

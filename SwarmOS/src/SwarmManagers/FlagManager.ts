@@ -18,7 +18,6 @@ const PKG_FlagManager_LogContext: LogContext = {
 }
 
 class FlagManager extends BasicProcess<FlagMemory> {
-    protected OnOSLoad(): void { }
     protected get memory(): FlagMemory {
         if (!Memory.flagData) {
             this.log.warn(`Initializing FlagManager memory`);

@@ -22,6 +22,8 @@ const BodyLegend = {
     h: HEAL,
     m: MOVE,
 }
+
+// (TODO) -- Convert this to auto generated -- maybe also optional ordering??
 const ConvertContextToSpawnBody = function (context: CreepContext) {
     let body = [];
     let bodyDef = CreepBodies.get(context.b)[context.l];
@@ -36,6 +38,7 @@ const ConvertContextToSpawnBody = function (context: CreepContext) {
     return body;
 }
 
+// Temporary memory
 interface SpawnRegistry_FlashMemory {
     activeRequests: SDictionary<SpawnRequest>,
     activeSpawns: SDictionary<StructureSpawn>,
@@ -47,7 +50,7 @@ class SpawnRegistry extends BasicProcess<SpawnRegistry_Memory> {
     @extensionInterface(EXT_SpawnRegistry)
     Extensions!: SpawnRegistryExtensions;
 
-    protected OnOSLoad() {
+    protected OnProcessInstantiation() {
         this.Extensions = new SpawnRegistryExtensions(this.extensions, this.memory);
         this.extensions.register(EXT_SpawnRegistry, this.Extensions);
     }
@@ -71,20 +74,29 @@ class SpawnRegistry extends BasicProcess<SpawnRegistry_Memory> {
     protected get usedRequestIDs() {
         return this.cache.usedRequestIDs;
     }
-    protected set usedRequestIDs(ids: SpawnRequestID[]) {
-        this.cache.usedRequestIDs = ids;
-    }
     protected get sortedSpawnIDs() {
         return this.cache.sortedSpawnIDs;
     }
+
     protected set sortedSpawnIDs(ids: SpawnID[]) {
         this.cache.sortedSpawnIDs = ids;
     }
+    protected set usedRequestIDs(ids: SpawnRequestID[]) {
+        this.cache.usedRequestIDs = ids;
+    }
 
-    initStateForTick(): SpawnRegistry_FlashMemory {
+    // Get the state of the tick before processing
+    protected InitCache(): SpawnRegistry_FlashMemory {
+        return {
+            activeRequests: {},
+            activeSpawns: {},
+            sortedSpawnIDs: [],
+            usedRequestIDs: []
+        }
+    }
+
+    protected PopuplateCacheData() {
         let requests = Object.keys(this.memory);
-        let activeRequests = {};
-        let activeSpawns = {};
         let minSpawnCost = 36000;
         for (let i = 0; i < requests.length; i++) {
             let req = this.memory[requests[i]];
@@ -94,7 +106,7 @@ class SpawnRegistry extends BasicProcess<SpawnRegistry_Memory> {
                 }
                 continue;
             }
-            activeRequests[requests[i]] = req;
+            this.activeRequests[requests[i]] = req;
             minSpawnCost = Math.min(minSpawnCost, CreepBodies.get(req.con.b)[req.con.l].cost);
         }
 
@@ -103,24 +115,19 @@ class SpawnRegistry extends BasicProcess<SpawnRegistry_Memory> {
         for (let i = 0, length = spawnIDs.length; i < length; i++) {
             let spawn = Game.spawns[spawnIDs[i]];
             if (spawn.isActive() && !spawn.spawning && spawn.room.energyAvailable >= minSpawnCost) {
-                activeSpawns[spawnIDs[i]] = spawn;
+                this.activeSpawns[spawnIDs[i]] = spawn;
             }
         }
 
-        let sortedSpawnIDs = Object.keys(activeSpawns).sort((a, b) => {
-            return activeSpawns[a].room.energyAvailable > activeSpawns[b].room.energyAvailable ? -1 : 1;
+        let sortedSpawnIDs = Object.keys(this.activeSpawns).sort((a, b) => {
+            return this.activeSpawns[a].room.energyAvailable > this.activeSpawns[b].room.energyAvailable ? -1 : 1;
         });
-        return {
-            activeRequests: activeRequests,
-            activeSpawns: activeSpawns,
-            sortedSpawnIDs: sortedSpawnIDs,
-
-            usedRequestIDs: [],
-        }
     }
 
     executeProcess(): void {
         this.log.debug(`Begin Spawner`);
+        this.PopuplateCacheData();
+
         let requests = Object.keys(this.memory);
         if (requests.length == 0) {
             // Inform the temp worker group
@@ -225,6 +232,13 @@ class SpawnRegistryExtensions extends ExtensionBase implements ISpawnRegistryExt
         }
 
         return spawnRequest.sta;
+    }
+    getRequestContext(id: SpawnRequestID): CreepContext | undefined {
+        if (this.memory[id]) {
+            return this.memory[id].con;
+        }
+
+        return undefined;
     }
 
     resetRequest(id: SpawnRequestID, priority?: Priority, newContext?: CreepContext, defaultMemory?: any) {

@@ -1,8 +1,8 @@
 import { BasicProcess, ExtensionBase } from "Core/BasicTypes";
 
-export const OSPackage: IPackage<SpawnRegistry_Memory> = {
+export const OSPackage: IPackage<CreepRegistry_Memory> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
-        processRegistry.register(PKG_CreepRegistry, CreepRunner);
+        processRegistry.register(PKG_CreepRegistry, CreepRegistry);
     }
 }
 
@@ -22,31 +22,12 @@ const BodyLegend = {
     h: HEAL,
     m: MOVE,
 }
-//                                                                                       LTOE = Less than or equal (e.g. the creep is bigger than required)
-const CompareContextCompatibility = function (context: CreepContext, creep: Creep, strictLTOE: boolean = false) {
-    let score = 0;
 
-    let desiredCreepDef = CreepBodies.get(context.b)[context.l];
-    for (let bodyID in BodyLegend) {
-        let desiredCount = desiredCreepDef[bodyID] || 0;
-        let hasCount = creep.getActiveBodyparts(BodyLegend[bodyID]) || 0;
-        if (desiredCount > 0 || hasCount > 0) {
-            if (desiredCount == 0 || hasCount == 0 || (strictLTOE && desiredCount > hasCount)) {
-                return 0;
-            }
-        }
-
-        score += BODYPART_COST[BodyLegend[bodyID]] * Math.abs(desiredCount - hasCount);
-    }
-
-    return score;
-}
-
-class CreepRunner extends BasicProcess<CreepRegistry_Memory> {
+class CreepRegistry extends BasicProcess<CreepRegistry_Memory> {
     @extensionInterface(EXT_CreepRegistry)
     Extensions!: ICreepRegistryExtensions;
 
-    protected OnOSLoad() {
+    protected OnProcessInstantiation() {
         this.Extensions = new CreepRegistryExtensions(this.extensions, this.memory);
         this.extensions.register(EXT_CreepRegistry, this.Extensions);
     }

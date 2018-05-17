@@ -11,82 +11,51 @@ export abstract class CreepBase<T extends CreepProcess_Memory> extends BasicProc
     @extensionInterface(EXT_RoomView)
     RoomView!: IRoomDataExtension;
 
-    protected abstract get CreepPrefix(): string
-    protected GetNewCreepName() {
-        return this.CreepPrefix + GetSUID();
-    }
-
-    protected get SpawnPriority(): Priority {
-        return Priority_Low;
-    }
-
     protected get creep(): Creep {
         return this._creep!;
     }
     private _creep: Creep | undefined;
 
     protected executeProcess(): void {
-        if (!this.memory.en) {
-            if (this.memory.SR) {
-                this.creeper.releaseCreep(this.memory.SR);
-            }
-            return;
-        }
-        //this.EnsureCreep();
-
         if (this.memory.SR) {
-            this._creep = this.creeper.tryGetCreep(this.memory.SR, this.pid);
-            if (!this._creep || this._creep.spawning) {
-                return;
+            let reqStatus = this.spawnRegistry.getRequestStatus(this.memory.SR);
+            switch (reqStatus) {
+                case (SP_COMPLETE):
+                case (SP_SPAWNING):
+                    let context = this.spawnRegistry.getRequestContext(this.memory.SR);
+                    if (context && this.creeper.tryRegisterCreep(context)) {
+                        if (this.creeper.tryReserveCreep(context.n, this.pid)) {
+                            this.memory.CR = context.n;
+                            this.memory.SR = undefined;
+                        }
+                    }
+                    break;
+                case (undefined):
+                case (SP_ERROR):
+                    this.kernel.killProcess(this.pid);
+                case (SP_QUEUED):
+                    return;
             }
+        }
 
-            this._creep.say(this.pkgName);
+        if (this.memory.CR) {
+            this._creep = this.creeper.tryGetCreep(this.memory.CR, this.pid);
+        }
+
+        if (this._creep) {
             this.activateCreep();
         }
-    }
 
-    /*protected EnsureCreep() {
-        let requestID: string | undefined = this.memory.SR;
-        if (requestID) {
-            let context = this.creeper.tryGetCreep(requestID, this.pid);
-            let spawnStatus = this.spawner.getRequestStatus(requestID);
-            switch (spawnStatus) {
-                case (SP_COMPLETE):
-                case (SP_ERROR):
-                    this.spawner.cancelRequest(requestID);
-                case (undefined):
-                    if (!context || !Game.creeps[context.n]) {
-
-                        requestID = undefined;
-                    }
-                case (SP_QUEUED):
-                case (SP_SPAWNING):
-                default:
-                    break;
-            }
-        }
-
-        this.memory.SR = requestID || this.trySpawnCreep();
-    }*/
-
-    protected trySpawnCreep() {
-        return this.spawner.requestSpawn(this.createNewCreepContext(), this.memory.loc, this.pid, this.SpawnPriority);
-    }
-    protected createNewCreepContext(): CreepContext {
-        // Adjust this class for spawn context initialization?
-        return {
-            n: this.GetNewCreepName(),
-            o: this.pid,
-            b: this.memory.SB,
-            l: this.memory.SL
+        if (!this.memory.SR && !this._creep) {
+            this.kernel.killProcess(this.pid);
         }
     }
 
     onProcessEnd() {
         if (this.memory.SR) {
-            let req = this.spawner.getRequestStatus(this.memory.SR);
+            let req = this.spawnRegistry.getRequestStatus(this.memory.SR);
             if (req) {
-                this.spawner.cancelRequest(this.memory.SR);
+                this.spawnRegistry.cancelRequest(this.memory.SR);
             }
             let creep = this.creeper.tryGetCreep(this.memory.SR, this.pid);
             if (creep) {

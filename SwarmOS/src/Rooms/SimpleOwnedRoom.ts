@@ -10,7 +10,7 @@ import { RoomBase } from "Rooms/RoomBase";
 
 class SimpleOwnedRoom extends RoomBase<SimpleOwnedRoom_Memory> {
     @extensionInterface(EXT_CreepRegistry)
-    protected creeper!: ICreepRegistryExtensions;
+    protected creepRegistry!: ICreepRegistryExtensions;
     protected get creepAssignments() {
         return this.memory.creepAssignments;
     }

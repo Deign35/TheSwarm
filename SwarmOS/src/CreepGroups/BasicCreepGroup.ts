@@ -2,7 +2,7 @@ import { BasicProcess } from "Core/BasicTypes";
 
 export abstract class BasicCreepGroup extends BasicProcess<CreepGroup_Memory> {
     @extensionInterface(EXT_CreepRegistry)
-    protected creeper!: ICreepRegistryExtensions;
+    protected creepRegistry!: ICreepRegistryExtensions;
     protected get assignments() {
         return this.memory.assignments;
     }
@@ -26,19 +26,19 @@ export abstract class BasicCreepGroup extends BasicProcess<CreepGroup_Memory> {
         let assignment = this.assignments[aID];
         if (assignment) {
             if (assignment.pid) {
-                if (this.creeper.tryGetCreep(assignment.SR, assignment.pid)) {
+                if (this.creepRegistry.tryGetCreep(assignment.SR, assignment.pid)) {
                     // (TODO): Give abandoned creeps to a temp worker group
-                    this.creeper.releaseCreep(assignment.SR);
+                    this.creepRegistry.releaseCreep(assignment.SR);
                 }
                 this.kernel.killProcess(assignment.pid);
             }
-            this.spawner.cancelRequest(assignment.SR);
+            this.spawnRegistry.cancelRequest(assignment.SR);
         }
 
         assignment = {
             CT: creepType,
             lvl: spawnLevel,
-            SR: this.spawner.requestSpawn({
+            SR: this.spawnRegistry.requestSpawn({
                 b: creepType,
                 l: spawnLevel,
                 n: this.CreateNewCreepName(),
@@ -63,7 +63,7 @@ export abstract class BasicCreepGroup extends BasicProcess<CreepGroup_Memory> {
         }
 
         assignment.pid = newProcess.pid;
-        this.spawner.giveRequestToPID(assignment.SR, assignment.pid);
+        this.spawnRegistry.giveRequestToPID(assignment.SR, assignment.pid);
     }
 
     /** Old code, dont use.  But there may be some logic, so check it before deleting   */
@@ -74,13 +74,13 @@ export abstract class BasicCreepGroup extends BasicProcess<CreepGroup_Memory> {
         }
 
         if (assignment.pid) {
-            let request = this.spawner.getRequestStatus(assignment.SR);
+            let request = this.spawnRegistry.getRequestStatus(assignment.SR);
         }
 
         if (assignment.CT != creepType || assignment.lvl != spawnLevel) {
             // Move the creep over to a different assignment
             if (assignment.pid) {
-                let creep = this.creeper.tryGetCreep(assignment.SR, assignment.pid!);
+                let creep = this.spawnRegistry.tryGetCreep(assignment.SR, assignment.pid!);
                 this.kernel.killProcess(assignment.pid!);
                 assignment.pid = undefined;
             }

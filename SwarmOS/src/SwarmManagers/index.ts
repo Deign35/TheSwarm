@@ -16,7 +16,7 @@ class SwarmManager extends PackageProviderBase<PackageProviderMemory> {
     }
     private _reqServices!: SDictionary<InitData>;
 
-    OnOSLoad() {
+    OnProcessInstantiation() {
         this._reqServices = {
             roomManager: {
                 processName: PKG_RoomManager
@@ -33,7 +33,7 @@ class SwarmManager extends PackageProviderBase<PackageProviderMemory> {
             this._reqServices['testListener'] = { processName: FT_InterruptListener }
             this._reqServices['testNotifier'] = { processName: FT_InterruptNotifier }
         }
-        super.OnOSLoad();
+        super.OnProcessInstantiation();
     }
 }
 

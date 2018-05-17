@@ -12,15 +12,10 @@ import { BuildAction } from "Actions/BuildAction";
 import { RepairAction } from "Actions/RepairAction";
 
 export class Harvester extends CreepBase<Harvester_Memory> {
-    protected get CreepPrefix() { return 'Harv_'; }
     private _updateOffset!: number;
-    OnOSLoad() {
+    OnProcessInstantiation() {
         this._updateOffset = GetRandomIndex(primes_3000) || 113
-        super.OnOSLoad();
-    }
-
-    protected get SpawnPriority(): Priority {
-        return Priority_High;
+        super.OnProcessInstantiation();
     }
 
     protected refreshSourceView() {

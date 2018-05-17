@@ -1,7 +1,6 @@
 import { BasicProcess } from "Core/BasicTypes";
 
 export abstract class RoomBase<T extends RoomProcess_Memory> extends BasicProcess<T> {
-    OnOSLoad() { }
     @extensionInterface(EXT_RoomView)
     View!: IRoomDataExtension;
 

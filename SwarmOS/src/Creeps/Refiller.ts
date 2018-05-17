@@ -9,26 +9,6 @@ import { MoveToPositionAction } from "Actions/MoveToPositionAction";
 import { TransferAction } from "Actions/TransferAction";
 
 class Refiller extends CreepBase<SpawnRefiller_Memory> {
-    protected get CreepPrefix() { return 'Ref_'; }
-    protected get SpawnPriority(): Priority {
-        return Priority_Highest;
-    }
-    /*
-    protected get SpawnPriority() {
-        let spawnCap = Game.rooms[this.memory.loc].energyCapacityAvailable;
-        if (spawnCap > 4000) {
-            return Priority_Low;
-        } else if (spawnCap > 2000) {
-            return Priority_Medium;
-        } else if (spawnCap > 1000) {
-            return Priority_High;
-        } else {
-            if (Object.keys(Game.creeps).length == 0) {
-                return Priority_EMERGENCY;
-            }
-            return Priority_Highest;
-        }
-    }*/
     protected activateCreep(): void {
         let creep = this.creep;
 
