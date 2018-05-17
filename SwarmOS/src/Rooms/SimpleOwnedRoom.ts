@@ -51,12 +51,9 @@ class SimpleOwnedRoom extends RoomBase<SimpleOwnedRoom_Memory> {
 
         while (curAssignments.length < desired) {
             let newCreepContext: CreepProcess_Memory = {
-                en: true,
                 get: false,
                 home: this.room!.name,
                 loc: this.room!.name,
-                SB: creepType,
-                SL: spawnLevel,
             }
 
             let newProcess = this.kernel.startProcess(creepPackage, newCreepContext);
@@ -119,9 +116,6 @@ class SimpleOwnedRoom extends RoomBase<SimpleOwnedRoom_Memory> {
                         home: room.name,
                         get: false,
                         SR: '0',
-                        en: true,
-                        SB: CT_Harvester,
-                        SL: spawnLevel
                     }
                     let newPID = this.kernel.startProcess(PKG_CreepHarvester, sourceContext);
                     if (!newPID || !newPID.pid || !newPID.process) {

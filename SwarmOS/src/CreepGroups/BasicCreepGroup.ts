@@ -46,17 +46,14 @@ export abstract class BasicCreepGroup extends BasicProcess<CreepGroup_Memory> {
             }, this.memory.targetRoom, this.pid, priority)
         }
 
-        let newCreepContext: CreepProcess_Memory = {
-            en: true,
+        let newCreepMemory: CreepProcess_Memory = {
             get: false,
             home: this.memory.homeRoom,
             loc: this.memory.targetRoom,
-            SB: creepType,
-            SL: spawnLevel,
             SR: assignment.SR,
         }
 
-        let newProcess = this.kernel.startProcess(creepPackage, newCreepContext);
+        let newProcess = this.kernel.startProcess(creepPackage, newCreepMemory);
         if (!newProcess || !newProcess.pid) {
             this.log.error(`Process failed to start: ${creepType}:${spawnLevel}`);
             return;
@@ -80,7 +77,7 @@ export abstract class BasicCreepGroup extends BasicProcess<CreepGroup_Memory> {
         if (assignment.CT != creepType || assignment.lvl != spawnLevel) {
             // Move the creep over to a different assignment
             if (assignment.pid) {
-                let creep = this.spawnRegistry.tryGetCreep(assignment.SR, assignment.pid!);
+                let creep = this.creepRegistry.tryGetCreep(assignment.SR, assignment.pid!);
                 this.kernel.killProcess(assignment.pid!);
                 assignment.pid = undefined;
             }
@@ -88,12 +85,9 @@ export abstract class BasicCreepGroup extends BasicProcess<CreepGroup_Memory> {
 
         if (!assignment.pid || !this.kernel.getProcessById(assignment.pid!)) {
             let newCreepContext: CreepProcess_Memory = {
-                en: true,
                 get: false,
                 home: '',
                 loc: '',
-                SB: creepType,
-                SL: spawnLevel,
                 SR: ''
             }
 
