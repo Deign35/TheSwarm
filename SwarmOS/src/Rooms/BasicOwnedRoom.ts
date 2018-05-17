@@ -7,6 +7,7 @@ export const OSPackage: IPackage<SpawnRegistry_Memory> = {
 
 class BasicOwnedRoom extends RoomBase<RoomProcess_Memory> {
     protected activateRoom(roomData: RVD_RoomMemory, room?: Room | undefined): void {
+        // (TODO): Need to update the group if needs change, either from here or the group
         this.EnsureCreepGroup('Bui', CG_Builder, () => {
             return {
                 assignments: {},
@@ -14,7 +15,7 @@ class BasicOwnedRoom extends RoomBase<RoomProcess_Memory> {
                 enabled: true,
                 homeRoom: this.memory.roomName,
                 lvl: 0,
-                numReq: Math.ceil((roomData.cSites.length / 4)),
+                numReq: Math.ceil((roomData.cSites.length / 4)) + 1,
                 pri: Priority_Lowest,
                 targetRoom: this.memory.roomName,
             }
