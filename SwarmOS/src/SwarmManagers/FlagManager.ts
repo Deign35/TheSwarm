@@ -1,9 +1,6 @@
 declare var Memory: {
     flagData: FlagMemory
 }
-if (!Memory.flagData) {
-    Memory.flagData = {};
-}
 import { BasicProcess, ExtensionBase } from "Core/BasicTypes";
 
 export const bundle: IPackage<FlagMemory> = {
@@ -32,12 +29,6 @@ class FlagManager extends BasicProcess<FlagMemory> {
         return PKG_FlagManager_LogContext.logLevel!;
     }
 
-    handleMissingMemory() {
-        if (!Memory.flagData) {
-            Memory.flagData = {};
-        }
-        return Memory.flagData;
-    }
     executeProcess(): void {
         for (let id in Game.flags) {
             let flagProcess;

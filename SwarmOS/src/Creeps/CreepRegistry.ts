@@ -1,3 +1,7 @@
+declare var Memory: {
+    creepData: CreepRegistry_Memory;
+}
+
 import { BasicProcess, ExtensionBase } from "Core/BasicTypes";
 
 export const OSPackage: IPackage<CreepRegistry_Memory> = {
@@ -8,7 +12,7 @@ export const OSPackage: IPackage<CreepRegistry_Memory> = {
 
 const PKG_CreepRegistry_LogContext: LogContext = {
     logID: PKG_CreepRegistry,
-    logLevel: LOG_DEBUG
+    logLevel: LOG_INFO
 }
 
 // This order determines the default order of body parts
@@ -27,9 +31,16 @@ const BodyLegend = {
 class CreepRegistry extends BasicProcess<CreepRegistry_Memory> {
     @extensionInterface(EXT_CreepRegistry)
     Extensions!: ICreepRegistryExtensions;
+    protected get memory(): CreepRegistry_Memory {
+        if (!Memory.creepData) {
+            this.log.warn(`Initializing CreepRegistry memory`);
+            Memory.creepData = {}
+        }
+        return Memory.creepData;
+    }
 
     protected OnProcessInstantiation() {
-        this.extensions.register(EXT_CreepRegistry, new CreepRegistryExtensions(this.extensions, this.memory));
+        this.extensions.register(EXT_CreepRegistry, new CreepRegistryExtensions(this.extensions));
     }
 
     protected get logID(): string {
@@ -63,9 +74,13 @@ class CreepRegistry extends BasicProcess<CreepRegistry_Memory> {
     }
 }
 class CreepRegistryExtensions extends ExtensionBase implements ICreepRegistryExtensions {
-    constructor(extRegistry: IExtensionRegistry, private _memory: CreepRegistry_Memory) { super(extRegistry); }
+    constructor(extRegistry: IExtensionRegistry) { super(extRegistry); }
     protected get memory(): CreepRegistry_Memory {
-        return this._memory
+        if (!Memory.creepData) {
+            this.log.warn(`Initializing CreepRegistry memory`);
+            Memory.creepData = {}
+        }
+        return Memory.creepData;
     }
 
     tryFindCompatibleCreep(creepType: CT_ALL, level: number, targetRoom: RoomID, maxDistance: number = 3): string | undefined {

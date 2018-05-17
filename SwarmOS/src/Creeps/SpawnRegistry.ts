@@ -1,9 +1,6 @@
 declare var Memory: {
     spawnData: SpawnRegistry_Memory;
 }
-if (!Memory.spawnData) {
-    Memory.spawnData = {};
-}
 import { BasicProcess, ExtensionBase } from "Core/BasicTypes";
 
 export const OSPackage: IPackage<SpawnRegistry_Memory> = {
@@ -14,7 +11,7 @@ export const OSPackage: IPackage<SpawnRegistry_Memory> = {
 
 const PKG_SpawnRegistry_LogContext: LogContext = {
     logID: PKG_SpawnRegistry,
-    logLevel: LOG_DEBUG
+    logLevel: LOG_INFO
 }
 
 // This order determines the default order of body parts
@@ -57,9 +54,15 @@ class SpawnRegistry extends BasicProcess<SpawnRegistry_Memory> {
     Extensions!: SpawnRegistryExtensions;
 
     protected OnProcessInstantiation() {
-        this.extensions.register(EXT_SpawnRegistry, new SpawnRegistryExtensions(this.extensions, this.memory));
+        this.extensions.register(EXT_SpawnRegistry, new SpawnRegistryExtensions(this.extensions));
     }
-    protected get memory() { return Memory.spawnData; }
+    protected get memory() {
+        if (!Memory.spawnData) {
+            this.log.warn(`Initializing RoomManager memory`);
+            Memory.spawnData = {}
+        }
+        return Memory.spawnData;
+    }
 
     protected get logID(): string {
         return PKG_SpawnRegistry_LogContext.logID;
@@ -69,11 +72,11 @@ class SpawnRegistry extends BasicProcess<SpawnRegistry_Memory> {
     }
 
     protected AnalyzeSpawnRequests(): SpawnRegistry_FlashMemory {
-        let requests = Object.keys(this.memory);
+        let requests = Object.keys(this.memory.spawnData);
         let minSpawnCost = 36000;
         let activeRequests = {};
         for (let i = 0; i < requests.length; i++) {
-            let req = this.memory[requests[i]];
+            let req = this.memory.spawnData[requests[i]];
             if (req.sta != SP_QUEUED) {
                 if (req.sta == SP_SPAWNING && !Game.creeps[req.con.n]) {
                     req.sta = SP_ERROR;
@@ -110,7 +113,7 @@ class SpawnRegistry extends BasicProcess<SpawnRegistry_Memory> {
         this.log.debug(`Begin Spawner`);
         let { activeRequests, activeSpawns, sortedSpawnIDs, usedRequestIDs } = this.AnalyzeSpawnRequests();
 
-        let requests = Object.keys(this.memory);
+        let requests = Object.keys(this.memory.spawnData);
         if (requests.length == 0) {
             // Inform the temp worker group
             this.log.warn(`No spawn requests in the queue.  You have spawn capacity available.`);
@@ -123,7 +126,7 @@ class SpawnRegistry extends BasicProcess<SpawnRegistry_Memory> {
 
             let activeIDs = Object.keys(activeRequests);
             for (let j = 0; j < activeIDs.length; j++) {
-                let req = this.memory[activeIDs[j]];
+                let req = this.memory.spawnData[activeIDs[j]];
                 if (usedRequestIDs.includes(req.id)) {
                     continue;
                 }
@@ -192,23 +195,28 @@ class SpawnRegistry extends BasicProcess<SpawnRegistry_Memory> {
 const UNSPAWNABLE_COST = -1;
 
 class SpawnRegistryExtensions extends ExtensionBase implements ISpawnRegistryExtensions {
-    constructor(extRegistry: IExtensionRegistry, private _memory: SpawnRegistry_Memory) {
+    constructor(extRegistry: IExtensionRegistry) {
         super(extRegistry);
     }
     protected get memory(): SpawnRegistry_Memory {
-        return this._memory
+        if (!Memory.spawnData) {
+            this.log.warn(`Initializing RoomManager memory`);
+            Memory.spawnData = {}
+        }
+        return Memory.spawnData;
     }
 
+
     getRequestStatus(id: SpawnRequestID): SpawnState {
-        if (!this.memory[id]) {
+        if (!this.memory.spawnData[id]) {
             return SP_ERROR;
         }
-        let spawnRequest = this.memory[id];
+        let spawnRequest = this.memory.spawnData[id];
 
         if (spawnRequest.sta == SP_SPAWNING) {
             let creep = Game.creeps[spawnRequest.con.n];
             if (creep && !creep.spawning) {
-                this.memory[id].sta = SP_COMPLETE;
+                this.memory.spawnData[id].sta = SP_COMPLETE;
                 spawnRequest.sta = SP_COMPLETE;
             }
         }
@@ -216,33 +224,33 @@ class SpawnRegistryExtensions extends ExtensionBase implements ISpawnRegistryExt
         return spawnRequest.sta;
     }
     getRequestContext(id: SpawnRequestID): CreepContext | undefined {
-        if (this.memory[id]) {
-            return this.memory[id].con;
+        if (this.memory.spawnData[id]) {
+            return this.memory.spawnData[id].con;
         }
 
         return undefined;
     }
 
     tryResetRequest(id: SpawnRequestID, newContext?: CreepContext, priority?: Priority, defaultMemory?: any) {
-        if (this.memory[id]) {
-            this.memory[id].sta = SP_QUEUED;
+        if (this.memory.spawnData[id]) {
+            this.memory.spawnData[id].sta = SP_QUEUED;
         } else {
             return false;
         }
         if (priority) {
-            this.memory[id].pri = priority;
+            this.memory.spawnData[id].pri = priority;
         }
         if (newContext) {
-            this.memory[id].con = newContext;
+            this.memory.spawnData[id].con = newContext;
         }
         if (defaultMemory) {
-            this.memory[id].dm = defaultMemory;
+            this.memory.spawnData[id].dm = defaultMemory;
         }
         return true;
     }
     cancelRequest(id: SpawnRequestID): boolean {
-        if (this.memory[id]) {
-            delete this.memory[id];
+        if (this.memory.spawnData[id]) {
+            delete this.memory.spawnData[id];
             return true;
         }
 
@@ -262,7 +270,7 @@ class SpawnRegistryExtensions extends ExtensionBase implements ISpawnRegistryExt
             sta: SP_QUEUED,
         }
 
-        this.memory[newRequest.id] = newRequest;
+        this.memory.spawnData[newRequest.id] = newRequest;
         return newRequest.id;
     }
 }

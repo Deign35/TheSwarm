@@ -52,8 +52,4 @@ class ___Empty___Manager extends BasicProcess<I___Empty___Data_Memory> {
     }
 }
 
-class ___Empty___Extension extends ExtensionBase {
-    protected get memory(): I___Empty___Data_Memory {
-        return Memory.___Empty___Data;
-    }
-}
+class ___Empty___Extension extends ExtensionBase { }

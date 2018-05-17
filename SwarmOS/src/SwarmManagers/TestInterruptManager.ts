@@ -11,7 +11,7 @@ declare var Memory: {
     TestData: ITestData_Memory
 }
 
-import { BasicProcess, ExtensionBase } from "Core/BasicTypes";
+import { BasicProcess } from "Core/BasicTypes";
 export const bundle: IPackage<ITestData_Memory> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
         processRegistry.register(FT_InterruptListener, TestSleeper);

@@ -45,11 +45,11 @@ kernel.installPackages([SwarmManager, CreepsPackage, CreepGroupsPackage, roomBun
 
 export function loop() {
     try {
-        for (let name in Memory.creeps) {
+        /*for (let name in Memory.creeps) {
             if (!Game.creeps[name]) {
                 delete Memory.creeps[name];
             }
-        }
+        }*/
         kernel.loop();
     } finally {
         kernel.log.DumpLogToConsole();
@@ -57,5 +57,5 @@ export function loop() {
 };
 
 let endLoad = Game.cpu.getUsed();
-kernel.log.info(() => `SwarmOS reloaded - Begin: ${startLoad}cpu`)
-kernel.log.info(() => `SwarmOS reloaded - Used: ${endLoad - startLoad}cpu`)
+kernel.log.info(() => `SwarmOS reloaded - Begin: ${startLoad}cpu`);
+kernel.log.info(() => `SwarmOS reloaded - Used: ${endLoad - startLoad}cpu`);
