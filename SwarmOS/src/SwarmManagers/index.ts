@@ -27,6 +27,9 @@ class SwarmManager extends PackageProviderBase<PackageProviderMemory> {
             flagManager: {
                 processName: PKG_FlagManager
             },
+            creepManager: {
+                processName: PKG_CreepRegistry
+            }
         }
         if (TESTING_ENABLED) {
             this.kernel.installPackages([testPackage]);

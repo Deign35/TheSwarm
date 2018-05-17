@@ -118,7 +118,7 @@ class SpawnRegistry extends BasicProcess<SpawnRegistry_Memory> {
             }
         }
 
-        let sortedSpawnIDs = Object.keys(this.activeSpawns).sort((a, b) => {
+        this.sortedSpawnIDs = Object.keys(this.activeSpawns).sort((a, b) => {
             return this.activeSpawns[a].room.energyAvailable > this.activeSpawns[b].room.energyAvailable ? -1 : 1;
         });
     }
@@ -243,7 +243,7 @@ class SpawnRegistryExtensions extends ExtensionBase implements ISpawnRegistryExt
     resetRequest(id: SpawnRequestID, cName: CreepID, priority?: Priority, newContext?: CreepContext, defaultMemory?: any) {
         if (this.memory[id]) {
             this.memory[id].sta = SP_QUEUED;
-        }
+        } else { }
         if (priority) {
             this.memory[id].pri = priority;
         }
@@ -264,10 +264,7 @@ class SpawnRegistryExtensions extends ExtensionBase implements ISpawnRegistryExt
 
         return false;
     }
-
-    giveRequestToPID(id: SpawnRequestID, pid: PID) {
-        this.memory[id].con.o = pid;
-    }
+    
     requestSpawn(context: CreepContext, location: RoomID, requestorPID: PID, spawnPriority: Priority,
         maxSpawnDistance: number = 3, startMem?: any): SpawnRequestID {
         let newRequest: SpawnRequest = {

@@ -29,8 +29,7 @@ class CreepRegistry extends BasicProcess<CreepRegistry_Memory> {
     Extensions!: ICreepRegistryExtensions;
 
     protected OnProcessInstantiation() {
-        this.Extensions = new CreepRegistryExtensions(this.extensions, this.memory);
-        this.extensions.register(EXT_CreepRegistry, this.Extensions);
+        this.extensions.register(EXT_CreepRegistry, new CreepRegistryExtensions(this.extensions, this.memory));
     }
 
     protected get logID(): string {

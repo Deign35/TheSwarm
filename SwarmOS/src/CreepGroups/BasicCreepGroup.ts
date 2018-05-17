@@ -20,8 +20,8 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Basic
             // When setting the role to inactive, kill all child processes (release the creeps);
             return;
         }
-        this.KillOrRestartDeadProcesses();
         this.EnsureAssignments();
+        this.KillOrRestartDeadProcesses();
     }
     protected IsRoleActive(): boolean {
         return true;
@@ -87,8 +87,6 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Basic
             this.log.alert(`Failed to create new creep process`);
             return;
         }
-
         assignment.pid = newProcess.pid;
-        this.spawnRegistry.giveRequestToPID(assignment.SR, assignment.pid);
     }
 }

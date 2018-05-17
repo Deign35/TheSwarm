@@ -9,6 +9,7 @@ import { OSPackage as Upgrader } from "Creeps/Upgrader";
 export const CreepsPackage: IPackage<{}> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
         CreepRegistry.install(processRegistry, extensionRegistry);
+        
         SpawnRegistry.install(processRegistry, extensionRegistry);
 
         Builder.install(processRegistry, extensionRegistry);

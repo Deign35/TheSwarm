@@ -7,7 +7,7 @@ import { SayAction } from "Actions/SayAction";
 
 export abstract class CreepBase<T extends CreepProcess_Memory> extends BasicProcess<T> {
     @extensionInterface(EXT_CreepRegistry)
-    protected creeper!: ICreepRegistryExtensions;
+    protected creepRegistry!: ICreepRegistryExtensions;
     @extensionInterface(EXT_RoomView)
     RoomView!: IRoomDataExtension;
 
@@ -17,14 +17,15 @@ export abstract class CreepBase<T extends CreepProcess_Memory> extends BasicProc
     private _creep: Creep | undefined;
 
     protected executeProcess(): void {
+        debugger;
         if (this.memory.SR) {
             let reqStatus = this.spawnRegistry.getRequestStatus(this.memory.SR);
             switch (reqStatus) {
                 case (SP_COMPLETE):
                 case (SP_SPAWNING):
                     let context = this.spawnRegistry.getRequestContext(this.memory.SR);
-                    if (context && this.creeper.tryRegisterCreep(context)) {
-                        if (this.creeper.tryReserveCreep(context.n, this.pid)) {
+                    if (context && this.creepRegistry.tryRegisterCreep(context)) {
+                        if (this.creepRegistry.tryReserveCreep(context.n, this.pid)) {
                             this.memory.CR = context.n;
                             this.memory.SR = undefined;
                         }
@@ -39,7 +40,7 @@ export abstract class CreepBase<T extends CreepProcess_Memory> extends BasicProc
         }
 
         if (this.memory.CR) {
-            this._creep = this.creeper.tryGetCreep(this.memory.CR, this.pid);
+            this._creep = this.creepRegistry.tryGetCreep(this.memory.CR, this.pid);
         }
 
         if (this._creep) {
@@ -57,9 +58,9 @@ export abstract class CreepBase<T extends CreepProcess_Memory> extends BasicProc
             if (req) {
                 this.spawnRegistry.cancelRequest(this.memory.SR);
             }
-            let creep = this.creeper.tryGetCreep(this.memory.SR, this.pid);
+            let creep = this.creepRegistry.tryGetCreep(this.memory.SR, this.pid);
             if (creep) {
-                this.creeper.releaseCreep(this.memory.SR);
+                this.creepRegistry.releaseCreep(this.memory.SR);
             }
         }
     }

@@ -29,7 +29,7 @@ class BasicOwnedRoom extends RoomBase<RoomProcess_Memory> {
                 numReq: roomData.sourceIDs.length,
                 pri: Priority_High,
                 targetRoom: this.memory.roomName,
-                sIDs: []
+                sIDs: roomData.sourceIDs
             }
         });
         this.EnsureCreepGroup('Ref', CG_Refiller, () => {

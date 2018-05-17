@@ -18,6 +18,7 @@ class HarvesterGroup extends BasicCreepGroup<HarvesterGroup_Memory> {
             get: false,
             home: this.memory.homeRoom,
             loc: this.memory.targetRoom,
+            SR: this.assignments[aID].SR,
             tar: aID
         }
     }

@@ -12,6 +12,7 @@ class BuilderGroup extends BasicCreepGroup<CreepGroup_Memory> {
             get: false,
             home: this.memory.homeRoom,
             loc: this.memory.targetRoom,
+            SR: this.assignments[aID].SR,
         }
     }
     protected get CreepPackageID(): string { return PKG_CreepBuilder; }
