@@ -20,8 +20,8 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Basic
             // When setting the role to inactive, kill all child processes (release the creeps);
             return;
         }
-        this.EnsureAssignments();
         this.KillOrRestartDeadProcesses();
+        this.EnsureAssignments();
     }
     protected IsRoleActive(): boolean {
         return true;
@@ -29,7 +29,14 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Basic
     // (TODO): Add these to creep body definition generation -- A group definition table(?)
     protected abstract get CreepPackageID(): string;
     protected abstract get GroupPrefix(): string;
-    protected abstract CreateNewCreepMemory(aID: string): CreepProcess_Memory;
+    protected CreateNewCreepMemory(aID: string): CreepProcess_Memory {
+        return {
+            get: false,
+            home: this.memory.homeRoom,
+            loc: this.memory.targetRoom,
+            SR: this.assignments[aID].SR,
+        }
+    }
     protected EnsureAssignments(): void {
         while (Object.keys(this.assignments).length < this.memory.numReq) {
             this.createNewAssignment(this.GroupPrefix + GetSUID());
@@ -40,31 +47,24 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Basic
         let assignmentIDs = Object.keys(this.assignments);
         for (let i = 0; i < assignmentIDs.length; i++) {
             let assignment = this.assignments[assignmentIDs[i]];
-            if (assignment.pid) {
-                if (i > this.memory.numReq) {
-                    this.kernel.killProcess(assignment.pid);
-                    delete this.assignments[assignmentIDs[i]];
-                    continue;
+            if (this.assignments[assignmentIDs[i]].pid) {
+                if (!this.kernel.getProcessByPID(this.assignments[assignmentIDs[i]].pid!)) {
+                    // process died
+                    delete this.assignments[assignmentIDs[i]].pid;
                 }
-                if (!this.kernel.getProcessByPID(assignment.pid)) {
-                    // Creep died
-                    assignment.pid = undefined;
-                    this.createNewCreepProcess(assignmentIDs[i]);
-                }
+            }
+
+            if (!this.assignments[assignmentIDs[i]].pid) {
+                this.createNewCreepProcess(assignmentIDs[i]);
             }
         }
     }
 
     protected createNewAssignment(newAssignmentID: string) {
-        let newCreepContext: CreepContext = {
-            b: this.memory.CT,
-            l: this.memory.lvl,
-            n: newAssignmentID
-        }
         let newAssignment: CreepGroup_Assignment = {
-            CT: newCreepContext.b,
-            lvl: newCreepContext.l,
-            SR: this.spawnRegistry.requestSpawn(newCreepContext, this.memory.targetRoom, this.pid, this.memory.pri)
+            CT: this.memory.CT,
+            lvl: this.memory.lvl,
+            SR: ''
         }
 
         this.assignments[newAssignmentID] = newAssignment;
@@ -79,7 +79,17 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Basic
             }
         }
 
-        this.spawnRegistry.resetRequest(assignment.SR, this.GroupPrefix + GetSUID());
+        let newCreepContext: CreepContext = {
+            b: this.memory.CT,
+            l: this.memory.lvl,
+            n: this.GroupPrefix + GetSUID()
+        }
+        if (!this.spawnRegistry.getRequestContext(assignment.SR)) {
+            assignment.SR = this.spawnRegistry.requestSpawn(newCreepContext, this.memory.targetRoom, this.pid, this.memory.pri)
+        } else {
+            this.spawnRegistry.resetRequest(assignment.SR, newCreepContext);
+        }
+
         let newCreepMemory: CreepProcess_Memory = this.CreateNewCreepMemory(aID);
 
         let newProcess = this.kernel.startProcess(this.CreepPackageID, newCreepMemory);

@@ -240,10 +240,12 @@ class SpawnRegistryExtensions extends ExtensionBase implements ISpawnRegistryExt
         return undefined;
     }
 
-    resetRequest(id: SpawnRequestID, cName: CreepID, priority?: Priority, newContext?: CreepContext, defaultMemory?: any) {
+    resetRequest(id: SpawnRequestID, newContext?: CreepContext, priority?: Priority, defaultMemory?: any) {
         if (this.memory[id]) {
             this.memory[id].sta = SP_QUEUED;
-        } else { }
+        } else {
+            return;
+        }
         if (priority) {
             this.memory[id].pri = priority;
         }
@@ -253,8 +255,6 @@ class SpawnRegistryExtensions extends ExtensionBase implements ISpawnRegistryExt
         if (defaultMemory) {
             this.memory[id].dm = defaultMemory;
         }
-
-        this.memory[id].con.n = cName;
     }
     cancelRequest(id: SpawnRequestID): boolean {
         if (this.memory[id]) {
@@ -264,7 +264,7 @@ class SpawnRegistryExtensions extends ExtensionBase implements ISpawnRegistryExt
 
         return false;
     }
-    
+
     requestSpawn(context: CreepContext, location: RoomID, requestorPID: PID, spawnPriority: Priority,
         maxSpawnDistance: number = 3, startMem?: any): SpawnRequestID {
         let newRequest: SpawnRequest = {

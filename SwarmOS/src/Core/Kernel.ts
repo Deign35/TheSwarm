@@ -152,6 +152,11 @@ export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepEx
         this.memory.notifications = [];
         let processIDs = Object.keys(this.processTable);
 
+        // (TODO): This is a temporary solution for fixing an issue with services requiring instantiation before processes run.
+        for (let i = 0; i < processIDs.length; i++) {
+            this.getProcessByPID(processIDs[i]);
+        }
+
         let hasActiveProcesses = false;
         for (let i = 0; i < processIDs.length; i++) {
             let pid = processIDs[i];

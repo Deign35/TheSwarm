@@ -17,8 +17,17 @@ export abstract class CreepBase<T extends CreepProcess_Memory> extends BasicProc
     private _creep: Creep | undefined;
 
     protected executeProcess(): void {
-        debugger;
-        if (this.memory.SR) {
+        if (this.memory.CR) {
+            this._creep = this.creepRegistry.tryGetCreep(this.memory.CR, this.pid);
+            if (!this._creep) {
+                delete this.memory.CR;
+                if (this.memory.SR) {
+                    this.spawnRegistry.resetRequest(this.memory.SR);
+                }
+            }
+        }
+
+        if (!this.memory.CR && this.memory.SR) {
             let reqStatus = this.spawnRegistry.getRequestStatus(this.memory.SR);
             switch (reqStatus) {
                 case (SP_COMPLETE):
@@ -27,7 +36,6 @@ export abstract class CreepBase<T extends CreepProcess_Memory> extends BasicProc
                     if (context && this.creepRegistry.tryRegisterCreep(context)) {
                         if (this.creepRegistry.tryReserveCreep(context.n, this.pid)) {
                             this.memory.CR = context.n;
-                            this.memory.SR = undefined;
                         }
                     }
                     break;
@@ -39,29 +47,8 @@ export abstract class CreepBase<T extends CreepProcess_Memory> extends BasicProc
             }
         }
 
-        if (this.memory.CR) {
-            this._creep = this.creepRegistry.tryGetCreep(this.memory.CR, this.pid);
-        }
-
         if (this._creep) {
             this.activateCreep();
-        }
-
-        if (!this.memory.SR && !this._creep) {
-            this.kernel.killProcess(this.pid);
-        }
-    }
-
-    onProcessEnd() {
-        if (this.memory.SR) {
-            let req = this.spawnRegistry.getRequestStatus(this.memory.SR);
-            if (req) {
-                this.spawnRegistry.cancelRequest(this.memory.SR);
-            }
-            let creep = this.creepRegistry.tryGetCreep(this.memory.SR, this.pid);
-            if (creep) {
-                this.creepRegistry.releaseCreep(this.memory.SR);
-            }
         }
     }
 
