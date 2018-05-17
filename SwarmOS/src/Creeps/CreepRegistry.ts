@@ -23,6 +23,7 @@ const BodyLegend = {
     m: MOVE,
 }
 
+// This can eventually become a CreepGroup, but one that controls all the creeps -- Scheduler!!!!
 class CreepRegistry extends BasicProcess<CreepRegistry_Memory> {
     @extensionInterface(EXT_CreepRegistry)
     Extensions!: ICreepRegistryExtensions;
@@ -44,19 +45,34 @@ class CreepRegistry extends BasicProcess<CreepRegistry_Memory> {
 
         let creepIDs = Object.keys(this.memory);
         for (let i = 0, length = creepIDs.length; i < length; i++) {
-            if (!Game.creeps[creepIDs[i]]) {
+            let creep = Game.creeps[creepIDs[i]];
+            if (!creep) {
                 delete this.memory[creepIDs[i]];
+                continue;
+            }
+            let context = this.memory[creepIDs[i]];
+            if (!context) {
+                continue;
+            }
+
+            if (!context.o || !this.kernel.getProcessById(context.o)) {
+                // This creep is an orphan, find a job for it
             }
         }
 
         this.log.debug(`End CreepRunner`);
     }
 }
-
 class CreepRegistryExtensions extends ExtensionBase implements ICreepRegistryExtensions {
     constructor(extRegistry: IExtensionRegistry, private _memory: CreepRegistry_Memory) { super(extRegistry); }
     protected get memory(): CreepRegistry_Memory {
         return this._memory
+    }
+
+    tryFindCompatibleCreep(creepType: CT_ALL, level: number, targetRoom: RoomID, maxDistance: number = 3): string | undefined {
+        //Cycle through temp workers and provide it
+
+        return undefined;
     }
 
     tryRegisterCreep(creepContext: CreepContext): boolean {

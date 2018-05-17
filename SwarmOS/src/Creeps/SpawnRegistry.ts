@@ -241,7 +241,7 @@ class SpawnRegistryExtensions extends ExtensionBase implements ISpawnRegistryExt
         return undefined;
     }
 
-    resetRequest(id: SpawnRequestID, priority?: Priority, newContext?: CreepContext, defaultMemory?: any) {
+    resetRequest(id: SpawnRequestID, cName: CreepID, priority?: Priority, newContext?: CreepContext, defaultMemory?: any) {
         if (this.memory[id]) {
             this.memory[id].sta = SP_QUEUED;
         }
@@ -254,6 +254,8 @@ class SpawnRegistryExtensions extends ExtensionBase implements ISpawnRegistryExt
         if (defaultMemory) {
             this.memory[id].dm = defaultMemory;
         }
+
+        this.memory[id].con.n = cName;
     }
     cancelRequest(id: SpawnRequestID): boolean {
         if (this.memory[id]) {

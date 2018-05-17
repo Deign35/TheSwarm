@@ -29,8 +29,6 @@ declare interface Builder_memory extends CreepProcess_Memory {
 
 }
 
-
-
 /** CreepGroups */
 declare interface CreepGroup_Memory extends MemBase {
     enabled: boolean; // (en)abled
@@ -40,8 +38,9 @@ declare interface CreepGroup_Memory extends MemBase {
 }
 
 declare interface CreepGroup_CreepRef extends MemBase {
-    pid?: PID;      // The pid associated with this role
+    pid?: PID;          // ID corresponding to the assigned PID
+    //CR?: CreepID;       // ID corresponding to the creep
     SR: SpawnRequestID; // ID corresponding to the spawn request
-    CT: CT_ALL;     // (C)reep (T)ype
-    lvl: number;    // role level
+    CT: CT_ALL;         // (C)reep (T)ype
+    lvl: number;        // role level
 }

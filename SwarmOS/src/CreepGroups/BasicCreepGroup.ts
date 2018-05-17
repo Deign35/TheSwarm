@@ -1,5 +1,11 @@
 import { BasicProcess } from "Core/BasicTypes";
 
+
+// (TODO): Need to be able to communicate creep state with the group 
+// Coop can be turned into a schedule manager.
+// Coop will load the programs and run based on priority and such!
+// Once this is done, a CreepGroup can then be a tree of groups instead of all one type of creep
+// CreepGroup -> SpecificCreep vs CreepGroup -> CreepGroup | AnyCreep
 export abstract class BasicCreepGroup extends BasicProcess<CreepGroup_Memory> {
     @extensionInterface(EXT_CreepRegistry)
     protected creepRegistry!: ICreepRegistryExtensions;
@@ -7,8 +13,43 @@ export abstract class BasicCreepGroup extends BasicProcess<CreepGroup_Memory> {
         return this.memory.assignments;
     }
     protected executeProcess(): void {
-        if (this.IsRoleActive()) {
+        if (!this.IsRoleActive()) {
             return;
+        }
+
+        let assignmentIDs = Object.keys(this.assignments);
+        let numCreepsRequired = this.GetAmountRequired();
+        for (let i = 0; i < assignmentIDs.length; i++) {
+            let assignment = this.assignments[assignmentIDs[i]];
+            if (assignment.pid) {
+                if (i > numCreepsRequired) {
+                    this.kernel.killProcess(assignment.pid);
+                    delete this.assignments[assignmentIDs[i]];
+                    continue;
+                }
+                if (!this.kernel.getProcessById(assignment.pid)) {
+                    // Creep died
+                    assignment.pid = undefined;
+                    this.createNewCreepProcess(assignmentIDs[i]);
+                }
+            }
+        }
+
+        while (Object.keys(this.assignments).length < numCreepsRequired) {
+            let newCreepContext: CreepContext = {
+                b: this.GetCreepType(),
+                l: this.GetCreepLevel(),
+                n: this.CreateNewCreepName()
+            }
+            let newAssignment: CreepGroup_CreepRef = {
+                CT: newCreepContext.b,
+                lvl: newCreepContext.l,
+                SR: this.spawnRegistry.requestSpawn(newCreepContext, this.memory.targetRoom, this.pid, Priority_Hold)
+            }
+            let newAssignmentID = this.CreateNewCreepName();
+
+            this.assignments[newAssignmentID] = newAssignment;
+            this.createNewCreepProcess(newAssignmentID);
         }
     }
     protected IsRoleActive(): boolean {
@@ -17,35 +58,29 @@ export abstract class BasicCreepGroup extends BasicProcess<CreepGroup_Memory> {
     protected GetAmountRequired(): number {
         return 0;
     }
+    protected GetCreepPackageID(): string {
+        return PKG_CreepHarvester;
+    }
+    protected GetCreepType(): CT_ALL {
+        return CT_Harvester;
+    }
+    protected GetCreepLevel(): number {
+        return 0;
+    }
 
     protected CreateNewCreepName() {
         return 'BCG_' + GetSUID();
     }
 
-    protected createNewCreepProcess(aID: string, creepType: CT_ALL, creepPackage: string, spawnLevel: number, priority: Priority) {
+    protected createNewCreepProcess(aID: string, priority?: Priority) {
         let assignment = this.assignments[aID];
         if (assignment) {
             if (assignment.pid) {
-                if (this.creepRegistry.tryGetCreep(assignment.SR, assignment.pid)) {
-                    // (TODO): Give abandoned creeps to a temp worker group
-                    this.creepRegistry.releaseCreep(assignment.SR);
-                }
                 this.kernel.killProcess(assignment.pid);
             }
-            this.spawnRegistry.cancelRequest(assignment.SR);
         }
 
-        assignment = {
-            CT: creepType,
-            lvl: spawnLevel,
-            SR: this.spawnRegistry.requestSpawn({
-                b: creepType,
-                l: spawnLevel,
-                n: this.CreateNewCreepName(),
-                o: this.pid
-            }, this.memory.targetRoom, this.pid, priority)
-        }
-
+        this.spawnRegistry.resetRequest(assignment.SR, this.CreateNewCreepName());
         let newCreepMemory: CreepProcess_Memory = {
             get: false,
             home: this.memory.homeRoom,
@@ -53,53 +88,13 @@ export abstract class BasicCreepGroup extends BasicProcess<CreepGroup_Memory> {
             SR: assignment.SR,
         }
 
-        let newProcess = this.kernel.startProcess(creepPackage, newCreepMemory);
+        let newProcess = this.kernel.startProcess(this.GetCreepPackageID(), newCreepMemory);
         if (!newProcess || !newProcess.pid) {
-            this.log.error(`Process failed to start: ${creepType}:${spawnLevel}`);
+            this.log.alert(`Failed to create new creep process`);
             return;
         }
 
         assignment.pid = newProcess.pid;
         this.spawnRegistry.giveRequestToPID(assignment.SR, assignment.pid);
-    }
-
-    /** Old code, dont use.  But there may be some logic, so check it before deleting   */
-    protected ensureCreep(aID: string, creepType: CT_ALL, creepPackage: string, spawnLevel: number) {
-        let assignment = this.assignments[aID];
-        if (!assignment) {
-            // Create a new process
-        }
-
-        if (assignment.pid) {
-            let request = this.spawnRegistry.getRequestStatus(assignment.SR);
-        }
-
-        if (assignment.CT != creepType || assignment.lvl != spawnLevel) {
-            // Move the creep over to a different assignment
-            if (assignment.pid) {
-                let creep = this.creepRegistry.tryGetCreep(assignment.SR, assignment.pid!);
-                this.kernel.killProcess(assignment.pid!);
-                assignment.pid = undefined;
-            }
-        }
-
-        if (!assignment.pid || !this.kernel.getProcessById(assignment.pid!)) {
-            let newCreepContext: CreepProcess_Memory = {
-                get: false,
-                home: '',
-                loc: '',
-                SR: ''
-            }
-
-            let newProcess = this.kernel.startProcess(creepPackage, newCreepContext);
-            if (!newProcess || !newProcess.pid) {
-                this.log.error(`Process failed to start: ${creepType}:${spawnLevel}`);
-                return;
-            }
-
-            assignment.pid = newProcess.pid;
-        }
-
-        this.assignments[aID] = assignment;
     }
 }
