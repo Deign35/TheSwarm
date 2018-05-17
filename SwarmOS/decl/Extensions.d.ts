@@ -123,5 +123,5 @@ declare interface ICreepRegistryExtensions extends IPackageExtension {
 }
 
 declare interface ISchedulerExtension extends IPackageExtension {
-    
+    ScheduleLogic(sID: ScheduleID, logic: IterableIterator<number>): void
 }

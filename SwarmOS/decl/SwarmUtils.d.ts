@@ -13,6 +13,8 @@ declare type SpawnID = ObjectID;
 
 declare type RoomID = string;
 declare type PlayerID = string;
+declare type PID = string;
+declare type ScheduleID = string;
 
 declare interface Profiler {
     clear(): void;

@@ -23,7 +23,6 @@ declare interface IProcessContext {
     readonly pPID: PID;
     readonly isActive: boolean;
 }
-declare type PID = string;
 
 declare interface ProcInfo {
     ex: boolean;// Executing -- If this process is currently executing

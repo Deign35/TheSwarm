@@ -9,7 +9,7 @@ declare interface KernelMemory extends MemBase {
 }
 
 declare interface ScheduledProcessMemBase extends MemBase {
-    schID: string
+    sID: string
 }
 
 
