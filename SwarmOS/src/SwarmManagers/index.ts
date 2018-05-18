@@ -2,7 +2,7 @@ import { bundle as RoomManager } from "SwarmManagers/RoomManager";
 import { bundle as FlagManager } from "SwarmManagers/FlagManager";
 import { bundle as TestInterrupt } from "SwarmManagers/TestInterruptManager"
 
-import { PackageProviderBase, InitData } from "Core/BasicTypes";
+import { PackageProviderBase } from "Core/BasicTypes";
 
 const TESTING_ENABLED = false;
 class SwarmManager extends PackageProviderBase<PackageProviderMemory> {
@@ -11,10 +11,10 @@ class SwarmManager extends PackageProviderBase<PackageProviderMemory> {
         RoomManager.install(processRegistry, extensionRegistry);
         FlagManager.install(processRegistry, extensionRegistry);
     }
-    protected get RequiredServices(): SDictionary<InitData> {
+    protected get RequiredServices(): SDictionary<ProviderService> {
         return this._reqServices;
     }
-    private _reqServices!: SDictionary<InitData>;
+    private _reqServices!: SDictionary<ProviderService>;
 
     OnProcessInstantiation() {
         this._reqServices = {

@@ -10,12 +10,13 @@ declare interface IProcessRegistry {
     createNewProcess(name: string, context: IProcessContext): IProcess | undefined;
 }
 declare interface IProcess {
-    onProcessEnd(): void
     run(): void;
 }
 declare interface IThreadProcess extends IProcess {
     GetThread(): IterableIterator<number>;
 }
+
+declare type ProcessWithID = { pid: PID; process: IProcess; };
 declare interface _ProcessConstructor {
     new(context: IProcessContext): IProcess;
 }
@@ -50,4 +51,8 @@ declare interface CreepBodiesReference {
 
 declare interface CreepGroupProcessContext extends IProcessContext {
     loc: RoomID;
+}
+declare interface ProviderService {
+    processName: string,
+    startContext?: any
 }

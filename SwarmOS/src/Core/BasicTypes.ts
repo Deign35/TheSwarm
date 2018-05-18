@@ -26,9 +26,7 @@ export abstract class BasicProcess<ProcessMemory> implements IProcess {
     get pkgName(): string { return this.context.pkgName; }
     get pid(): PID { return this.context.pid; }
     get parentPID(): PID { return this.context.pPID; }
-    get isInDebugMode(): boolean { return false; }
 
-    onProcessEnd(): void { }
     run(): void {
         let startCPU = 0;
         if (this.isInDebugMode) {
@@ -46,15 +44,12 @@ export abstract class BasicProcess<ProcessMemory> implements IProcess {
             this.log.debug(() => `End Debug ${this.pkgName}(${this.pid}): ${endDebugCPU - endCPU}`);
         }
     }
-
+    get isInDebugMode(): boolean { return false; }
     protected executeDebugCode(): void { }
+
     protected abstract executeProcess(): void;
 }
 
-export interface InitData {
-    processName: string,
-    startContext?: any
-}
 
 const SCAN_FREQUENCY = 15;
 export abstract class PackageProviderBase<T extends PackageProviderMemory> extends BasicProcess<T> {
@@ -64,7 +59,7 @@ export abstract class PackageProviderBase<T extends PackageProviderMemory> exten
         }
     }
 
-    protected abstract RequiredServices: SDictionary<InitData>;
+    protected abstract RequiredServices: SDictionary<ProviderService>;
     get ScanFrequency() { return SCAN_FREQUENCY; }
 
     addPKGService(serviceID: string, id: string, parentPID?: PID, startContext: any = {}) {

@@ -14,7 +14,7 @@ declare type ProcessMemory = {
     [id in PID]: MemBase
 }
 
-declare interface HostThread_Memory {
+declare interface HostThread_Memory extends ThreadMemory {
     tid: ThreadID;
     childThreads: {
         [tid in ThreadID]: {
@@ -23,7 +23,7 @@ declare interface HostThread_Memory {
         }
     }
 }
-declare interface ChildThread_Memory {
+declare interface ThreadMemory {
     tid: ThreadID;
 }
 declare interface PackageProviderMemory extends MemBase {

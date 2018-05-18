@@ -6,18 +6,20 @@ export class ProcessRegistry implements IProcessRegistry {
     constructor(logger: IKernelLoggerExtensions) {
         this._logger = logger.CreateLogContext(this.logID, this.logLevel);
     }
+
+    private _logger: ILogger;
     protected get log() {
         return this._logger;
     }
-    private _logger: ILogger;
     protected get logID() {
         return ProcessRegistry_LogContext.logID;
     }
     protected get logLevel(): LogLevel {
         return ProcessRegistry_LogContext.logLevel!;
     }
+
     private registry: { [name: string]: _ProcessConstructor } = {};
-    register(name: string, constructor: _ProcessConstructor): boolean {
+    register(name: OSPackage, constructor: _ProcessConstructor): boolean {
         if (this.registry[name]) {
             this.log.error(`Name already registered: ${name}`);
             return false;

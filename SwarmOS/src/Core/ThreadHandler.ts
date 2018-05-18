@@ -2,47 +2,23 @@ declare var Memory: {
     ThreadProcs: { [tid in ThreadID]: IThreadProc_Data };
 }
 
-import { BasicProcess, ExtensionBase } from "Core/BasicTypes";
-
-export class ThreadExtensions extends ExtensionBase implements IKernelThreadExtensions {
-    constructor(extReg: IExtensionRegistry) {
-        super(extReg);
-    }
-    private get memory() {
-        if (!Memory.ThreadProcs) {
-            this.log.warn(`Initializing ThreadExtensions memory`);
-            Memory.ThreadProcs = {};
-        }
-        return Memory.ThreadProcs;
-    }
-
-    EnsureThreadGroup(host: PID, tid?: ThreadID) {
-        this.log.debug(`New thread request ${host}`);
-        if (!tid || !this.memory[tid]) {
-            if (!tid) {
-                tid = 'TH_' + GetSUID();
-            }
-            this.memory[tid] = {
-                hostProcess: host
-            }
-            this.log.debug(`New thread created for ${host} [${tid}]`);
-        }
-        return tid
-    }
-
-    CloseThreadGroup(tID: ThreadID) {
-        if (this.memory[tID]) {
-            delete this.memory[tID];
-        }
-    }
-}
+import { BasicProcess } from "Core/BasicTypes";
 
 declare interface ChildThreadState {
     pri: Priority;
     childThread: IterableIterator<number>;
 }
 
-export abstract class HostedThreadProcess<T extends HostThread_Memory> extends BasicProcess<T> implements IThreadProcess {
+
+export abstract class ThreadProcess<T extends ThreadMemory> extends BasicProcess<T> implements IThreadProcess {
+    protected executeProcess(): void {
+        // Prep data for the thread activation
+    }
+
+    abstract GetThread(): IterableIterator<number>
+}
+
+export abstract class HostedThreadProcess<T extends HostThread_Memory> extends ThreadProcess<T>  {
     @extensionInterface(EXT_ThreadHandler)
     protected thread!: IKernelThreadExtensions;
     protected get threadID() { return this.memory.tid; }
@@ -61,7 +37,7 @@ export abstract class HostedThreadProcess<T extends HostThread_Memory> extends B
         let activePIDS = [];
         let curChildState: IDictionary<PID, ChildThreadState> = {};
         for (let i = 0; i < threadIDs.length; i++) {
-            let child = this.kernel.getProcessByPID(this.memory.childThreads[threadIDs[i]].pid) as ChildThreadProcess<HostThread_Memory>;
+            let child = this.kernel.getProcessByPID(this.memory.childThreads[threadIDs[i]].pid) as ThreadProcess<ThreadMemory>;
             if (!child) {
                 delete this.memory[threadIDs[i]];
                 continue;
@@ -88,12 +64,4 @@ export abstract class HostedThreadProcess<T extends HostThread_Memory> extends B
             }
         })();
     }
-}
-
-export abstract class ChildThreadProcess<T extends ChildThread_Memory> extends BasicProcess<T> {
-    protected executeProcess(): void {
-        // Prep data for the thread activation
-    }
-
-    abstract GetThread(): IterableIterator<number>
 }

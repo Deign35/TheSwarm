@@ -2,6 +2,7 @@ const ExtensionRegistry_LogContext: LogContext = {
     logID: "ExtensionRegistry",
     logLevel: LOG_INFO
 }
+
 export class ExtensionRegistry implements IPackageExtension {
     constructor(logger: IKernelLoggerExtensions) {
         this._logger = logger.CreateLogContext(this.logID, this.logLevel);

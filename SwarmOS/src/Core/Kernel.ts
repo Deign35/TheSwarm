@@ -11,9 +11,6 @@ declare type ProcessCache = {
     }
 }
 
-declare type ProcessWithID = { pid: PID; process: IProcess; };
-
-const PROCESS_GHOST_TIMER = 100;
 export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepExtension {
     constructor(private processRegistry: IProcessRegistry, private extensionRegistry: IExtensionRegistry,
         private _logger: IKernelLoggerExtensions) {
@@ -54,12 +51,12 @@ export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepEx
         }
     }
 
-    startProcess(processName: string, startMemory: any): ProcessWithID | undefined {
+    startProcess(packageName: OSPackage, startMemory: any): ProcessWithID | undefined {
         let pid = 'p' + GetSUID() as PID;
         let pInfo: ProcInfo = {
             pid: pid,
             pP: this.curProcessID,
-            PKG: processName,
+            PKG: packageName,
             ex: true,
             st: Game.time,
         };
@@ -68,7 +65,7 @@ export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepEx
         this.processMemory[pid] = startMemory || {};
 
         let process = this.createProcess(pid);
-        this.log.debug(`CreateNewProcess: ${processName}`);
+        this.log.debug(`CreateNewProcess: ${packageName}`);
         return { pid, process };
     }
 
@@ -142,38 +139,19 @@ export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepEx
     }
 
     loop() {
-        /*let notifications = {};
-        for (let i = 0; i < this.memory.notifications.length; i++) {
-            let notifyID = this.memory.notifications[i];
-            if (!this.memory.subscriptions[notifyID]) { continue; }
-
-            for (let j = 0; j < this.memory.subscriptions[notifyID].length; j++) {
-                let subscriberPID = this.memory.subscriptions[notifyID][j];
-                if (!notifications[subscriberPID]) {
-                    notifications[subscriberPID] = true;
-                }
-            }
-        }
-        this.memory.notifications = [];*/
         let processIDs = Object.keys(this.processTable);
-
-        // (TODO): This is a temporary solution for fixing an issue with services requiring instantiation before processes run.
-        for (let i = 0; i < processIDs.length; i++) {
-            this.getProcessByPID(processIDs[i]);
-        }
 
         let hasActiveProcesses = false;
         for (let i = 0; i < processIDs.length; i++) {
             let pid = processIDs[i];
             let pInfo = this.processTable[pid];
             if (!pInfo.ex) {
-                let proc = this.getProcessByPID(pid);
-                if (proc) {
-                    proc.onProcessEnd();
-                }
                 delete this.processTable[pid];
                 delete this.processMemory[pid];
                 delete this._processCache[pid];
+                if (this.processThreads[pid]) {
+                    delete this.processThreads[pid];
+                }
                 continue;
             }
             hasActiveProcesses = true;
@@ -183,7 +161,7 @@ export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepEx
                 this.curProcessID = pid;
 
                 if (this.processTable[pid].sl) {
-                    if (/*notifications[pid] ||*/ (this.processTable[pid].sl! <= Game.time)) {
+                    if ((this.processTable[pid].sl! <= Game.time)) {
                         this.wake(this.curProcessID);
                     }
                 }
@@ -255,39 +233,4 @@ export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepEx
             delete this.processThreads[tID];
         }
     }
-
-    /*protected IsSubscribed(id: string, pid: PID) {
-        if (this.memory.subscriptions[id]) {
-            for (let i = 0; i < this.memory.subscriptions[id].length; i++) {
-                if (this.memory.subscriptions[id][id] == pid) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    Subscribe(id: string) {
-        if (!this.memory.subscriptions[id]) {
-            this.memory.subscriptions[id] = []
-        }
-        if (!this.IsSubscribed(id, this.curProcessID)) {
-            this.memory.subscriptions[id].push(this.curProcessID);
-        }
-    }
-    UnSubscribe(id: string) {
-        if (this.memory.subscriptions[id]) {
-            for (let i = 0; i < this.memory.subscriptions[id].length; i++) {
-                if (this.memory.subscriptions[id][i] == this.curProcessID) {
-                    this.memory.subscriptions[id].splice(i, 1);
-                    return;
-                }
-            }
-        }
-    }
-
-    Notify(id: string) {
-        this.memory.notifications.push(id);
-    }*/
 }
