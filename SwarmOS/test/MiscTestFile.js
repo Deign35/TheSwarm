@@ -39,21 +39,39 @@ console.log(iterator.next()); // {value: undefined, done: true},
 // g4() returned {value: 'foo', done: true} at this point
 
 console.log(result); // "foo"*/
-let runTest = true;
 
-function* test1() {
-    let num = 0;
-    while (runTest) {
-        console.log('ping ping[' + (num) + ']');
-        yield num++;
-    }
-    console.log('ping2');
+
+
+let logCounter = 0;
+const log = function (message) {
+    console.log(`(${logCounter++} - ${message}`);
 }
+
+let runTest = true;
+let combinedData = {
+    a: 0,
+    b: 0,
+    c: 0
+}
+
+let subCopy = combinedData;
+function* test1() {
+    let privateCopy = subCopy;
+    while (runTest) {
+        log('Combined - ' + (JSON.stringify(combinedData)));
+        log('Sub - ' + (JSON.stringify(subCopy)));
+        log(('Private - ' + JSON.stringify(privateCopy)));
+        yield true;
+        combinedData.c += 1;
+    }
+}
+
 
 function* test2() {
     let iterator = test1()
     for (let i = 0; i < 10; i++) {
         yield iterator.next();
+        combinedData.b += 1;
     }
 
     return false;
@@ -62,6 +80,7 @@ function* test2() {
 let numYields = 0;
 var iterator = test2();
 while (iterator.next().value) {
+    combinedData.a += 1;
     numYields++;
     if (numYields > 7) {
         runTest = false;

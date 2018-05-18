@@ -119,51 +119,6 @@ export abstract class ExtensionBase implements IPackageExtension {
     }
 }
 
-export abstract class Threaded<T extends PackageProviderMemory> extends BasicProcess<T> {
-    protected OnProcessInstantiation() {
-        if (!this.memory.services) {
-            this.memory.services = {};
-        }
-    }
-
-    protected abstract RequiredServices: SDictionary<InitData>;
-    get ScanFrequency() { return SCAN_FREQUENCY; }
-
-    addPKGService(serviceID: string, id: string, parentPID?: PID, startContext: any = {}) {
-        this.log.info(() => `Adding service ${id}`);
-        let result = this.kernel.startProcess(id, Object.assign({}, startContext));
-        if (result) {
-            this.kernel.setParent(result.pid, parentPID);
-            this.memory.services[serviceID] = { pid: result.pid, serviceID };
-        }
-    }
-
-    protected executeProcess() {
-        let ids = Object.keys(this.RequiredServices)
-        for (let i = 0, length = ids.length; i < length; i++) {
-            let service = this.memory.services[ids[i]];
-            let process = (service && service.pid) ? this.kernel.getProcessByPID(service.pid) : undefined;
-
-            if (!service || !process) {
-                this.log.info(() => `Initializing package service ${ids[i]}`);
-
-                let initData = this.RequiredServices[ids[i]];
-                this.addPKGService(ids[i], initData.processName, initData.startContext);
-                service = this.memory.services[ids[i]];
-                process = (service && service.pid) ? this.kernel.getProcessByPID(service.pid) : undefined;
-
-                if (!service || !process) {
-                    this.log.error(() => `Failed to restart package service ${ids[i]}`);
-                    this.kernel.killProcess(this.pid);
-                    continue;
-                }
-            }
-        }
-
-        this.sleeper.sleep(this.ScanFrequency);
-    }
-}
-
 function extensionInterface(interfaceId: string): (target: any, propertyKey: string) => any {
     return function (target: any, propertyKey: string): any {
         let value: IPackageExtension

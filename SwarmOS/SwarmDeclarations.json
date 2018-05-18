@@ -61,7 +61,7 @@
                 "Sleep": "sleep",
                 "Interrupt": "interrupt",
                 "Logger": "logger",
-                "Scheduler": "scheduler"
+                "ThreadHandler": "thread"
             }
         },
         "FT": {
