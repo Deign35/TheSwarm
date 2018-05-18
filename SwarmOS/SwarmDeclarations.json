@@ -129,7 +129,7 @@
             "comment": "Default values",
             "enabled": true,
             "entries": {
-                "LOG_LEVEL": "0",
+                "LOG_LEVEL": "2",
                 "LOG_ID": "\"SwarmOS\""
             }
         },
