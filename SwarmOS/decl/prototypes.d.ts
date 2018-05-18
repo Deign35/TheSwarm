@@ -4,8 +4,8 @@
  * Flag - Tools/Prototypes.ts
  */
 interface Room {
-    id: string;
+    id: RoomID;
 }
 interface Flag {
-    id: string;
+    id: FlagID;
 }

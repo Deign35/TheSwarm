@@ -8,7 +8,7 @@ let startLoad = Game.cpu.getUsed(); // Will not use any prototype defined versio
 require('globalConstants');
 
 import * as Profiler from "Tools/Profiler";
-global.Profiler = Profiler.init();
+global['Profiler'] = Profiler.init();
 
 import "Tools/GlobalTools";
 import "Tools_Prototypes";

@@ -1,7 +1,7 @@
 declare interface IPackage<MemBase> {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry): void;
 }
-declare interface IKernel extends IKernelProcessExtensions, IKernelSleepExtension, IKernelNotificationsExtension {
+declare interface IKernel extends IKernelProcessExtensions, IKernelSleepExtension/*, IKernelNotificationsExtension*/ {
     loop(): void;
     log: IKernelLoggerExtensions;
 }

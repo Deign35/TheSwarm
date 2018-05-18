@@ -5,7 +5,7 @@ declare var Memory: {
 }
 
 declare type ProcessCache = {
-    [id: string]: {
+    [id in PID]: {
         context: IProcessContext,
         process: IProcess
     }
@@ -138,7 +138,7 @@ export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepEx
     }
 
     loop() {
-        let notifications = {};
+        /*let notifications = {};
         for (let i = 0; i < this.memory.notifications.length; i++) {
             let notifyID = this.memory.notifications[i];
             if (!this.memory.subscriptions[notifyID]) { continue; }
@@ -150,7 +150,7 @@ export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepEx
                 }
             }
         }
-        this.memory.notifications = [];
+        this.memory.notifications = [];*/
         let processIDs = Object.keys(this.processTable);
 
         // (TODO): This is a temporary solution for fixing an issue with services requiring instantiation before processes run.
@@ -179,7 +179,7 @@ export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepEx
                 this.curProcessID = pid;
 
                 if (this.processTable[pid].sl) {
-                    if (notifications[pid] || (this.processTable[pid].sl! <= Game.time)) {
+                    if (/*notifications[pid] ||*/ (this.processTable[pid].sl! <= Game.time)) {
                         this.wake(this.curProcessID);
                     }
                 }
@@ -209,7 +209,7 @@ export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepEx
         }
     }
 
-    protected IsSubscribed(id: string, pid: PID) {
+    /*protected IsSubscribed(id: string, pid: PID) {
         if (this.memory.subscriptions[id]) {
             for (let i = 0; i < this.memory.subscriptions[id].length; i++) {
                 if (this.memory.subscriptions[id][id] == pid) {
@@ -242,5 +242,5 @@ export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepEx
 
     Notify(id: string) {
         this.memory.notifications.push(id);
-    }
+    }*/
 }

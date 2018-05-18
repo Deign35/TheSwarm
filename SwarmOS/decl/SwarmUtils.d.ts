@@ -1,5 +1,5 @@
 declare const require: (module: string) => any;
-declare var global: { [id: string]: any }
+declare var global: Dictionary
 
 declare type IDictionary<T extends string, U> = { [id in T]: U };
 declare type EDictionary<T> = { [id: number]: T };
