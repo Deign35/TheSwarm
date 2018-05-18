@@ -1,9 +1,9 @@
 declare var Memory: {
-    flagData: FlagMemory
+    flagData: FlagExtensionsMemory
 }
 import { BasicProcess, ExtensionBase } from "Core/BasicTypes";
 
-export const bundle: IPackage<FlagMemory> = {
+export const bundle: IPackage<FlagExtensionsMemory> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
         processRegistry.register(PKG_FlagManager, FlagManager);
         extensionRegistry.register(EXT_Flags, FlagExtension);
@@ -14,8 +14,8 @@ const PKG_FlagManager_LogContext: LogContext = {
     logLevel: LOG_DEBUG
 }
 
-class FlagManager extends BasicProcess<FlagMemory> {
-    protected get memory(): FlagMemory {
+class FlagManager extends BasicProcess<FlagExtensionsMemory> {
+    protected get memory(): FlagExtensionsMemory {
         if (!Memory.flagData) {
             this.log.warn(`Initializing FlagManager memory`);
             Memory.flagData = {}
@@ -54,7 +54,7 @@ class FlagManager extends BasicProcess<FlagMemory> {
 }
 
 class FlagExtension extends ExtensionBase {
-    protected get memory(): FlagMemory {
+    protected get memory(): FlagExtensionsMemory {
         if (!Memory.flagData) {
             this.log.warn(`Initializing FlagManager memory`);
             Memory.flagData = {}

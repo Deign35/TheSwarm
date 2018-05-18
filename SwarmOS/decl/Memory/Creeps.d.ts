@@ -1,6 +1,6 @@
 
 /** Creep extension Memory */
-declare interface CreepMemory extends MemBase {
+declare type CreepMemory = MemBase & {
     [id: string]: CreepProcess_Memory
 }
 
@@ -32,7 +32,7 @@ declare interface Builder_Memory extends CreepProcess_Memory {
 /** CreepGroups */
 declare interface CreepGroup_Memory extends MemBase {
     enabled: boolean; // (en)abled
-    assignments: SDictionary<CreepGroup_Assignment>;
+    assignments: IDictionary<CreepID, CreepGroup_Assignment>;
     homeRoom: RoomID;
     targetRoom: RoomID;
     CT: CT_ALL;
@@ -43,7 +43,6 @@ declare interface CreepGroup_Memory extends MemBase {
 
 declare interface CreepGroup_Assignment extends MemBase {
     pid?: PID;          // ID corresponding to the assigned PID
-    //CR?: CreepID;       // ID corresponding to the creep
     SR: SpawnRequestID; // ID corresponding to the spawn request
     CT: CT_ALL;         // (C)reep (T)ype
     lvl: number;        // role level

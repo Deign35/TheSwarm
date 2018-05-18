@@ -6,7 +6,7 @@ declare interface KernelMemory extends MemBase {
     processMemory: ProcessMemory;
     schedulerMemory: { [id in ThreadID]: IThreadProc_Data }
 
-    subscriptions: SDictionary<PID[]>;
+    subscriptions: IDictionary<string, PID[]>;
     notifications: string[]
 }
 

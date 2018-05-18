@@ -1,7 +1,7 @@
 
 /** RoomViewData */
-declare interface RoomViewData_Memory extends MemBase {
-    [roomID: string]: RVD_RoomMemory
+declare type RoomViewData_Memory = MemBase & {
+    [id in RoomID]: RVD_RoomMemory
 }
 
 interface RVD_RoomMemory extends MemBase {

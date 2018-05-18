@@ -1,10 +1,10 @@
 
 /** SpawnData */
-declare interface SpawnRegistry_Memory extends MemBase {
-    [id: string]: SpawnRequest
+declare type SpawnRegistry_Memory = MemBase & {
+    [id in SpawnID]: SpawnRequest
 }
-declare interface CreepRegistry_Memory extends MemBase {
-    [id: string]: CreepContext
+declare type CreepRegistry_Memory = MemBase & {
+    [id in CreepID]: CreepContext
 }
 declare interface CreepContext extends MemBase {
     o?: PID;        // (o)wner process
@@ -22,7 +22,7 @@ declare interface SpawnRequest extends MemBase {
     pri: Priority;      // How much of a priority is this spawn??
     sta: SpawnState;    // Current Spawn state
 
-    dm?: any;           // Default memory
+    dm?: CreepMemory_2;           // Default memory
     max?: number;       // Max spawning distance allowed for this spawn.
     spawner?: StructureID; // ID of the spawner that this creep is being spawned at.
 }

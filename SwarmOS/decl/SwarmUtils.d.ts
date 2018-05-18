@@ -1,12 +1,10 @@
 declare const require: (module: string) => any;
 declare var global: { [id: string]: any }
-declare interface SDictionary<T> { [id: string]: T }
-declare interface EDictionary<T> { [id: number]: T }
-declare type IDictionary<T> = EDictionary<T> | SDictionary<T>;
-declare type Dictionary = IDict2<string, any>;
 
-declare type IDict2<T extends string, U> = { [id in T]: U }
-declare type Dict2 = IDict2<string, any>;
+declare type IDictionary<T extends string, U> = { [id in T]: U };
+declare type EDictionary<T> = { [id: number]: T };
+declare type SDictionary<T> = IDictionary<string, T> | EDictionary<T>
+declare type Dictionary = SDictionary<any>
 
 declare type ObjectID = string;
 declare type CreepID = ObjectID;
@@ -61,5 +59,4 @@ declare function DoTest(testID: string, memObject: any, testFunction: () => void
     workingVersion?: (exc: Error) => void): void
 declare function GetSUID(): string;
 declare function GetRandomIndex(list: any[]): number;
-declare function GetRandomID<T>(dictionaryObject: IDictionary<T>): T | undefined;
-declare function ForEach<T>(collection: IDictionary<T>, action: (val: T, index: number) => void): void
+declare function GetRandomID<T>(dictionaryObject: SDictionary<T>): T | undefined;

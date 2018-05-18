@@ -44,16 +44,6 @@ export class GlobalTools {
         let index = this.GetRandomIndex(Object.keys(dictionaryObject));
         return (dictionaryObject && dictionaryObject[index]) || undefined;
     }
-
-    static ForEach<T>(collection: SDictionary<T>, action: (val: T, index: number) => void): void {
-        let ids = Object.keys(collection);
-        for (let i = 0, length = ids.length; i < length; i++) {
-            if (!collection[ids[i]]) {
-                throw new Error(`Collection modified while executing ForEach`);
-            }
-            action(collection[ids[i]], i);
-        }
-    }
 }
 global['CopyObject'] = GlobalTools.CopyObject;
 global['GetSpawnCost'] = GlobalTools.GetSpawnCost;
@@ -61,4 +51,3 @@ global['ConstructBodyArray'] = GlobalTools.ConstructBodyArray;
 global['GetSUID'] = GlobalTools.GetSUID;
 global['GetRandomIndex'] = GlobalTools.GetRandomIndex;
 global['GetRandomID'] = GlobalTools.GetRandomID;
-global['ForEach'] = GlobalTools.ForEach;
