@@ -40,12 +40,7 @@ class FlagManager extends BasicProcess<FlagExtensionsMemory> {
                 let flagContext: FlagProcess_Memory = {
                     flagID: id
                 }
-                let newPID = this.kernel.startProcess(PKG_FlagBase, flagContext);
-                if (!newPID || !newPID.pid || !newPID.process) {
-                    this.log.error(`Failed to create a flag process (${Game.flags[id].name})`);
-                    continue;
-                }
-                this.memory[id] = newPID.pid;
+                this.memory[id] = this.kernel.startProcess(PKG_FlagBase, flagContext);
             }
         }
 

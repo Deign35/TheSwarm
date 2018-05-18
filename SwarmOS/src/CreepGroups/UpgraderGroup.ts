@@ -5,7 +5,7 @@ export const OSPackage: IPackage<SpawnRegistry_Memory> = {
     }
 }
 export class UpgraderGroup extends BasicCreepGroup<CreepGroup_Memory> {
-    protected get CreepPackageID(): string { return PKG_CreepUpgrader; }
+    protected get CreepPackageID(): OSPackage { return PKG_CreepUpgrader; }
     protected get GroupPrefix(): string { return 'Upg'; }
 
 }

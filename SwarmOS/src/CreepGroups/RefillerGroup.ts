@@ -6,7 +6,7 @@ export const OSPackage: IPackage<SpawnRegistry_Memory> = {
 }
 
 export class RefillerGroup extends BasicCreepGroup<CreepGroup_Memory> {
-    protected get CreepPackageID(): string { return PKG_CreepRefiller; }
+    protected get CreepPackageID(): OSPackage { return PKG_CreepRefiller; }
     protected get GroupPrefix(): string { return 'Ref'; }
 
 }

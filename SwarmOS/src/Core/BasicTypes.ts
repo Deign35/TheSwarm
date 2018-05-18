@@ -64,11 +64,9 @@ export abstract class PackageProviderBase<T extends PackageProviderMemory> exten
 
     addPKGService(serviceID: string, id: string, parentPID?: PID, startContext: any = {}) {
         this.log.info(() => `Adding service ${id}`);
-        let result = this.kernel.startProcess(id, Object.assign({}, startContext));
-        if (result) {
-            this.kernel.setParent(result.pid, parentPID);
-            this.memory.services[serviceID] = { pid: result.pid, serviceID };
-        }
+        let pid = this.kernel.startProcess(id, Object.assign({}, startContext));
+        this.kernel.setParent(pid, parentPID);
+        this.memory.services[serviceID] = { pid: pid, serviceID };
     }
 
     protected executeProcess() {

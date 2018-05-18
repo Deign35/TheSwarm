@@ -38,10 +38,7 @@ class RoomManager extends BasicProcess<{}> {
                     tid: roomID + GetSUID()
                 }
 
-                let newRoomProcess = this.kernel.startProcess(PKG_SimpleOwnedRoom, newRoomMemory);
-                if (newRoomProcess && newRoomProcess.pid && newRoomProcess.process) {
-                    data.pid = newRoomProcess.pid;
-                }
+                data.pid = this.kernel.startProcess(PKG_SimpleOwnedRoom, newRoomMemory);
             }
         }
     }

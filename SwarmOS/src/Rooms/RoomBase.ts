@@ -36,15 +36,10 @@ export abstract class RoomBase<T extends RoomProcess_Memory> extends ParentThrea
             }
         }
         if (!this.CreepGroups[groupID] || !this.kernel.getProcessByPID(this.CreepGroups[groupID].pid)) {
-            let newPID = this.kernel.startProcess(groupPackageID, makeNewMem());
-            if (!newPID || !newPID.pid || !newPID.process) {
-                this.log.error(`Room failed to create a harvester group (${this.memory.roomName})`);
-            } else {
-                this.CreepGroups[groupID] = {
-                    priority: Priority_Medium,
-                    pid: newPID.pid
-                };
-            }
+            this.CreepGroups[groupID] = {
+                priority: Priority_Medium,
+                pid: this.kernel.startProcess(groupPackageID, makeNewMem())
+            };
         }
     }
 

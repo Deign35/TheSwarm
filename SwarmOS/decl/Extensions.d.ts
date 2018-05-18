@@ -46,8 +46,8 @@ declare interface IExtensionRegistry extends IPackageExtension {
  * Extensions for processes to interface with the OS kernel
  */
 declare interface IKernelProcessExtensions extends IPackageExtension {
-    installPackages(packages: IPackage<any>[]): void;
-    startProcess(packageName: string, startContext: any): { pid: PID; process: IProcess } | undefined;
+    installPackages(packages: IPackage<MemBase>[]): void;
+    startProcess(packageName: string, startContext: MemBase): PID;
     killProcess(pid: PID): void;
     getProcessByPID(pid: PID): IProcess | undefined;
     setParent(pid: PID, parentId?: PID): boolean;

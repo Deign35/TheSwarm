@@ -51,7 +51,7 @@ export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepEx
         }
     }
 
-    startProcess(packageName: OSPackage, startMemory: any): ProcessWithID | undefined {
+    startProcess(packageName: OSPackage, startMemory: MemBase): PID {
         let pid = 'p' + GetSUID() as PID;
         let pInfo: ProcInfo = {
             pid: pid,
@@ -66,7 +66,7 @@ export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepEx
 
         let process = this.createProcess(pid);
         this.log.debug(`CreateNewProcess: ${packageName}`);
-        return { pid, process };
+        return pid;
     }
 
     createProcess(id: PID): IProcess {
