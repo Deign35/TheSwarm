@@ -52,16 +52,17 @@
             "type": true,
             "combinedType": "OSExtension",
             "entries": {
-                "Flags": "flags",
-                "SpawnRegistry": "spawner",
                 "CreepRegistry": "creeps",
-                "RoomView": "roomView",
                 "Registry": "extRegistry",
+                "SpawnRegistry": "spawner",
+                "ThreadRegistry": "thread",
+
+                "RoomView": "roomView",
+                "Flags": "flags",
                 "Kernel": "kernel",
                 "Sleep": "sleep",
                 "Interrupt": "interrupt",
-                "Logger": "logger",
-                "ThreadHandler": "thread"
+                "Logger": "logger"
             }
         },
         "FT": {

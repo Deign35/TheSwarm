@@ -38,16 +38,16 @@ export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepEx
     get processMemory(): ProcessMemory {
         return this.memory.processMemory;
     }
-    get processThreads() {
-        return this.memory.ThreadProcs;
+    get threadTable() {
+        return this.memory.threadTable;
     }
 
-    installBundle(bundle: IPackage<{}>) {
-        bundle.install(this.processRegistry, this.extensionRegistry);
+    installPackage(pack: IPackage<{}>) {
+        pack.install(this.processRegistry, this.extensionRegistry);
     }
-    installPackages(bundles: IPackage<{}>[]) {
-        for (let id in bundles) {
-            this.installBundle(bundles[id]);
+    installPackages(pack: IPackage<{}>[]) {
+        for (let id in pack) {
+            this.installPackage(pack[id]);
         }
     }
 
@@ -141,6 +141,9 @@ export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepEx
     loop() {
         let processIDs = Object.keys(this.processTable);
 
+        let threadIDs = Object.keys(this.memory.threadTable);
+        let activeThreads: IDictionary<PID, ChildThreadState> = {}
+
         let hasActiveProcesses = false;
         for (let i = 0; i < processIDs.length; i++) {
             let pid = processIDs[i];
@@ -149,8 +152,8 @@ export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepEx
                 delete this.processTable[pid];
                 delete this.processMemory[pid];
                 delete this._processCache[pid];
-                if (this.processThreads[pid]) {
-                    delete this.processThreads[pid];
+                if (this.threadTable[pid]) {
+                    delete this.threadTable[pid];
                 }
                 continue;
             }
@@ -167,6 +170,13 @@ export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepEx
                 }
                 if (!this.processTable[pid].sl) {
                     proc.run();
+                    if (this.threadTable[this.curProcessID] && (proc as IThreadProcess).RunThread) {
+                        activeThreads[threadIDs[i]] = {
+                            pri: Priority_Medium,
+                            sta: ThreadState_Active as ThreadState,
+                            proc: proc as IThreadProcess
+                        }
+                    }
                 }
 
                 this.curProcessID = "";
@@ -176,29 +186,24 @@ export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepEx
                 this.log.error(`[${pid}] ${pInfo.PKG} crashed\n${e.stack}`);
             }
         }
-        let threadIDs = Object.keys(this.processThreads);
-        for (let i = 0; i < threadIDs.length; i++) {
-            let pid = this.processThreads[threadIDs[i]].hostProcess;
-            let pInfo = this.processTable[pid];
-            if (!pInfo.ex) {
-                continue;
-            }
-            try {
-                let proc = this.getProcessByPID(pid) as IThreadProcess
-                if (!proc) throw new Error(`Could not get process ${pid} ${pInfo.PKG}`);
-                this.curProcessID = pid;
 
-                let procIter = proc.GetThread();
-                while (!procIter.next().done) { }
-                // Need to do something about sleeping threads here!
+        let activeThreadIDs = Object.keys(activeThreads);
+        while (activeThreadIDs.length > 0) {
+            let curThread = activeThreads[activeThreadIDs[0]];
+            curThread.sta = curThread.proc.RunThread();
+            switch (curThread.sta) {
+                case (ThreadState_Inactive):
+                case (ThreadState_Done):
+                case (ThreadState_Overrun): // (TODO): Turn Overrun into a thread state that allows the thread to do extra work as cpu is available.
+                    activeThreadIDs.shift();
+                case (ThreadState_Active): continue;;
+                default:
+                    activeThreadIDs.shift();
+                    break;
 
-                this.curProcessID = "";
-            } catch (e) {
-                this.killProcess(pid);
-                pInfo.err = e.stack || e.toString();
-                this.log.error(`[${pid}] ${pInfo.PKG} crashed\n${e.stack}`);
             }
         }
+
         if (!hasActiveProcesses)
             this.startProcess(PKG_SwarmManager, {});
     }
@@ -213,24 +218,26 @@ export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepEx
             // (TODO): Don't let newly awoken processes run this tick.
         }
     }
-
-    EnsureThreadGroup(host: PID, tid?: ThreadID) {
-        this.log.debug(`New thread request ${host}`);
-        if (!tid || !this.processThreads[tid]) {
+    RegisterAsThread(host: PID, tid?: ThreadID) {
+        if (!tid || !this.threadTable[tid]) {
+            this.log.debug(`New thread request ${host}`);
             if (!tid) {
                 tid = 'TH_' + GetSUID();
             }
-            this.processThreads[tid] = {
-                hostProcess: host
-            }
+            this.threadTable[tid] = host;
             this.log.debug(`New thread created for ${host} [${tid}]`);
         }
         return tid
     }
 
-    CloseThreadGroup(tID: ThreadID) {
-        if (this.processThreads[tID]) {
-            delete this.processThreads[tID];
+    CloseThread(tID: ThreadID) {
+        if (this.threadTable[tID]) {
+            delete this.threadTable[tID];
         }
     }
+}
+declare interface ChildThreadState {
+    proc: IThreadProcess;
+    pri: Priority;
+    sta: ThreadState;
 }

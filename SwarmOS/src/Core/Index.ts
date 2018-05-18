@@ -8,7 +8,7 @@ export var extensionRegistry = new ExtensionRegistry(OS_Logger);
 export var processRegistry = new ProcessRegistry(OS_Logger);
 export var kernel = new Kernel(processRegistry, extensionRegistry, OS_Logger);
 
+extensionRegistry.register(EXT_Logger, OS_Logger);
 extensionRegistry.register(EXT_Kernel, kernel);
 extensionRegistry.register(EXT_Sleep, kernel);
-extensionRegistry.register(EXT_ThreadHandler, kernel);
-extensionRegistry.register(EXT_Logger, OS_Logger);
+extensionRegistry.register(EXT_ThreadRegistry, kernel);

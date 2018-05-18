@@ -1,33 +1,53 @@
-declare var Memory: {
-    ThreadProcs: { [tid in ThreadID]: IThreadProc_Data };
+import { BasicProcess, ThreadProcess, ExtensionBase } from "Core/BasicTypes";
+import { ExtensionRegistry } from "./ExtensionRegistry";
+
+const SCAN_FREQUENCY = 15;
+export abstract class PackageProviderBase<T extends PackageProviderMemory> extends BasicProcess<T> {
+    protected OnProcessInstantiation() {
+        if (!this.memory.services) {
+            this.memory.services = {};
+        }
+    }
+
+    protected abstract RequiredServices: SDictionary<ProviderService>;
+    get ScanFrequency() { return SCAN_FREQUENCY; }
+
+    addPKGService(serviceID: string, id: string, parentPID?: PID, startContext: any = {}) {
+        this.log.info(() => `Adding service ${id}`);
+        let pid = this.kernel.startProcess(id, Object.assign({}, startContext));
+        this.kernel.setParent(pid, parentPID);
+        this.memory.services[serviceID] = { pid: pid, serviceID };
+    }
+
+    protected executeProcess() {
+        let ids = Object.keys(this.RequiredServices)
+        for (let i = 0, length = ids.length; i < length; i++) {
+            let service = this.memory.services[ids[i]];
+            let process = (service && service.pid) ? this.kernel.getProcessByPID(service.pid) : undefined;
+
+            if (!service || !process) {
+                this.log.info(() => `Initializing package service ${ids[i]}`);
+
+                let initData = this.RequiredServices[ids[i]];
+                this.addPKGService(ids[i], initData.processName, initData.startContext);
+                service = this.memory.services[ids[i]];
+                process = (service && service.pid) ? this.kernel.getProcessByPID(service.pid) : undefined;
+
+                if (!service || !process) {
+                    this.log.error(() => `Failed to restart package service ${ids[i]}`);
+                    this.kernel.killProcess(this.pid);
+                    continue;
+                }
+            }
+        }
+
+        this.sleeper.sleep(this.ScanFrequency);
+    }
 }
-
-import { BasicProcess } from "Core/BasicTypes";
-
 declare interface ChildThreadState {
     childThread: ThreadProcess<ThreadMemory>;
     pri: Priority;
     sta: ThreadState;
-}
-
-
-export abstract class ThreadProcess<T extends ThreadMemory> extends BasicProcess<T> implements IThreadProcess {
-    @extensionInterface(EXT_ThreadHandler)
-    protected thread!: IKernelThreadExtensions;
-    get ThreadID() { return this.memory.registeredThreadID; }
-
-    protected executeProcess(): void { }
-    abstract RunThread(): ThreadState;
-
-    OnProcessInstantiation() {
-        this.RegisterThread();
-    }
-
-    RegisterThread() {
-        if (this.ThreadID) {
-            this.thread.EnsureThreadGroup(this.pid, this.ThreadID);
-        }
-    }
 }
 
 export abstract class ParentThreadProcess<T extends ThreadMemory_Parent> extends ThreadProcess<T>  {
@@ -91,7 +111,7 @@ export abstract class ParentThreadProcess<T extends ThreadMemory_Parent> extends
         return ThreadState_Active;
     }
 
-    protected CreateChildThread(packageID: PackageType, startContext: MemBase) {
+    protected CreateChildThread(packageID: ScreepsPackage, startContext: MemBase) {
         let newThreadID = this.childThreadPrefix + GetSUID();
         let newProc = this.kernel.startProcess(packageID, startContext);
         this.children[newThreadID] = {

@@ -16,7 +16,7 @@ declare type RoomID = string;
 declare type PlayerID = string;
 declare type PID = string;
 declare type ThreadID = string;
-declare type PackageType = OSPackage | CreepGroupPackage
+declare type ScreepsPackage = OSPackage | CreepGroupPackage
 
 declare interface Profiler {
     clear(): void;

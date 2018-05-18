@@ -7,7 +7,7 @@ declare var Memory: {
 
 import { BasicProcess, ExtensionBase } from "Core/BasicTypes";
 
-export const bundle: IPackage<RoomViewData_Memory> = {
+export const OSPackage: IPackage<RoomViewData_Memory> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
         processRegistry.register(PKG_RoomManager, RoomManager);
         extensionRegistry.register(EXT_RoomView, new RoomExtension(extensionRegistry));
@@ -17,6 +17,8 @@ export const bundle: IPackage<RoomViewData_Memory> = {
 class RoomManager extends BasicProcess<{}> {
     @extensionInterface(EXT_RoomView)
     View!: IRoomDataExtension;
+    @extensionInterface(EXT_ThreadRegistry)
+    protected thread!: IThreadRegistryExtensions;
     executeProcess(): void {
         for (let roomID in Game.rooms) {
             let data = this.View.GetRoomData(roomID);
@@ -34,11 +36,16 @@ class RoomManager extends BasicProcess<{}> {
             if (!data.pid || !this.kernel.getProcessByPID(data.pid)) {
                 let newRoomMemory: RoomProcess_Memory = {
                     roomName: roomID,
-                    childThreads: {},
-                    tid: roomID + GetSUID()
+                    childThreads: {}
                 }
 
                 data.pid = this.kernel.startProcess(PKG_SimpleOwnedRoom, newRoomMemory);
+                let newTID = this.thread.RegisterAsThread(data.pid);
+                newRoomMemory.childThreads[newTID] = {
+                    pid: data.pid,
+                    priority: Priority_Medium,
+                    tid: newTID
+                }
             }
         }
     }

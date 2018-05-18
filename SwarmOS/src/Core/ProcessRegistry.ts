@@ -19,7 +19,7 @@ export class ProcessRegistry implements IProcessRegistry {
     }
 
     private registry: { [name: string]: _ProcessConstructor } = {};
-    register(name: OSPackage, constructor: _ProcessConstructor): boolean {
+    register(name: ScreepsPackage, constructor: _ProcessConstructor): boolean {
         if (this.registry[name]) {
             this.log.error(`Name already registered: ${name}`);
             return false;

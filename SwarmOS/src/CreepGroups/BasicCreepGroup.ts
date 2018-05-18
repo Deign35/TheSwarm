@@ -1,5 +1,4 @@
-import { ThreadProcess } from "Core/ThreadProcess";
-import { ParentThreadProcess } from "Core/ThreadProcess";
+import { ParentThreadProcess } from "Core/AdvancedTypes";
 
 
 // (TODO): Need to be able to communicate creep state with the group 
@@ -118,6 +117,7 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Paren
             l: this.memory.lvl,
             n: this.GroupPrefix + GetSUID()
         }
+
         if (!this.spawnRegistry.getRequestContext(assignment.SR)) {
             assignment.SR = this.spawnRegistry.requestSpawn(newCreepContext, this.memory.targetRoom, this.memory.pri)
         } else {
@@ -127,13 +127,6 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Paren
             }
         }
 
-        let newCreepMemory: CreepProcess_Memory = this.CreateNewCreepMemory(aID);
-
-        let newProcess = this.kernel.startProcess(this.CreepPackageID, newCreepMemory);
-        if (!newProcess || !newProcess.pid) {
-            this.log.alert(`Failed to create new creep process`);
-            return;
-        }
-        assignment.pid = newProcess.pid;
+        assignment.pid = this.kernel.startProcess(this.CreepPackageID, this.CreateNewCreepMemory(aID));
     }
 }

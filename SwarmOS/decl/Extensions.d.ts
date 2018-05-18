@@ -23,7 +23,7 @@ declare interface IPackageInterfaces {
     [EXT_Sleep]: IKernelSleepExtension;
     [EXT_Logger]: IKernelLoggerExtensions;
     [EXT_CreepRegistry]: ICreepRegistryExtensions;
-    [EXT_ThreadHandler]: IKernelThreadExtensions;
+    [EXT_ThreadRegistry]: IThreadRegistryExtensions;
 }
 
 /**
@@ -122,7 +122,7 @@ declare interface ICreepRegistryExtensions extends IPackageExtension {
     releaseCreep(id: CreepID): void;
 }
 
-declare interface IKernelThreadExtensions extends IPackageExtension {
-    EnsureThreadGroup(pid: PID, tid?: ThreadID): ThreadID;
-    CloseThreadGroup(tID: ThreadID): void;
+declare interface IThreadRegistryExtensions extends IPackageExtension {
+    RegisterAsThread(pid: PID, tid?: ThreadID): ThreadID;
+    CloseThread(tID: ThreadID): void;
 }

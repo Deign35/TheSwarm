@@ -1,4 +1,4 @@
-import { ParentThreadProcess } from "Core/ThreadProcess";
+import { ParentThreadProcess } from "Core/AdvancedTypes";
 
 export abstract class RoomBase<T extends RoomProcess_Memory> extends ParentThreadProcess<T> {
     @extensionInterface(EXT_RoomView)
@@ -25,20 +25,21 @@ export abstract class RoomBase<T extends RoomProcess_Memory> extends ParentThrea
             return;
         }
 
-        this.memory.tid = this.thread.EnsureThreadGroup(this.pid, this.threadID);
         this.prepHostThread(roomData, this.room);
     }
     protected EnsureCreepGroup(groupID: string, groupPackageID: string, makeNewMem: () => CreepGroup_Memory) {
         if (!this.CreepGroups[groupID]) {
             this.CreepGroups[groupID] = {
                 priority: Priority_Medium,
-                pid: ''
+                pid: '',
+                tid: groupID
             }
         }
         if (!this.CreepGroups[groupID] || !this.kernel.getProcessByPID(this.CreepGroups[groupID].pid)) {
             this.CreepGroups[groupID] = {
                 priority: Priority_Medium,
-                pid: this.kernel.startProcess(groupPackageID, makeNewMem())
+                pid: this.kernel.startProcess(groupPackageID, makeNewMem()),
+                tid: groupID
             };
         }
     }

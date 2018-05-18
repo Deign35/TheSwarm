@@ -3,7 +3,7 @@ declare var Memory: {
 }
 import { BasicProcess, ExtensionBase } from "Core/BasicTypes";
 
-export const bundle: IPackage<FlagExtensionsMemory> = {
+export const OSPackage: IPackage<FlagExtensionsMemory> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
         processRegistry.register(PKG_FlagManager, FlagManager);
         extensionRegistry.register(EXT_Flags, FlagExtension);
