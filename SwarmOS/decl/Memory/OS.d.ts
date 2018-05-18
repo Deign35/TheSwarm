@@ -4,7 +4,7 @@ declare interface MemBase { }
 declare interface KernelMemory extends MemBase {
     processTable: ProcessTable;
     processMemory: ProcessMemory;
-    schedulerMemory: { [id in ThreadID]: IThreadProc_Data }
+    ThreadProcs: { [tid in ThreadID]: IThreadProc_Data }
 
     subscriptions: IDictionary<string, PID[]>;
     notifications: string[]
@@ -13,8 +13,13 @@ declare interface KernelMemory extends MemBase {
 declare type ProcessMemory = {
     [id in PID]: MemBase
 }
-declare interface IThreadProc_Data {
-    hostProcess: PID;
+
+declare interface HostThread_Memory {
+    childThreads: {
+        [tid in ThreadID]: {
+            priority: Priority,
+        }
+    }
 }
 declare interface PackageProviderMemory extends MemBase {
     services: {
@@ -23,6 +28,9 @@ declare interface PackageProviderMemory extends MemBase {
             serviceID: string
         }
     }
+}
+declare interface IThreadProc_Data {
+    hostProcess: PID;
 }
 /** Stats */
 declare type RoomStats = {}

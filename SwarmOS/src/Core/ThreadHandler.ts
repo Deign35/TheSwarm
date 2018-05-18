@@ -1,17 +1,6 @@
 declare var Memory: {
     ThreadProcs: { [tid in ThreadID]: IThreadProc_Data };
 }
-declare interface IThreadProc_Data {
-    hostProcess: PID;
-}
-
-declare interface HostThread_Memory {
-    childThreads: {
-        [tid in ThreadID]: {
-            priority: Priority,
-        }
-    }
-}
 
 import { BasicProcess, ExtensionBase } from "Core/BasicTypes";
 
