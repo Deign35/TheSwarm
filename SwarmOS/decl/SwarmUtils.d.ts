@@ -3,7 +3,10 @@ declare var global: { [id: string]: any }
 declare interface SDictionary<T> { [id: string]: T }
 declare interface EDictionary<T> { [id: number]: T }
 declare type IDictionary<T> = EDictionary<T> | SDictionary<T>;
-declare type Dictionary = IDictionary<any>;
+declare type Dictionary = IDict2<string, any>;
+
+declare type IDict2<T extends string, U> = { [id in T]: U }
+declare type Dict2 = IDict2<string, any>;
 
 declare type ObjectID = string;
 declare type CreepID = ObjectID;
@@ -14,7 +17,7 @@ declare type SpawnID = ObjectID;
 declare type RoomID = string;
 declare type PlayerID = string;
 declare type PID = string;
-declare type ScheduleID = string;
+declare type ThreadID = string;
 
 declare interface Profiler {
     clear(): void;

@@ -23,7 +23,7 @@ declare interface IPackageInterfaces {
     [EXT_Sleep]: IKernelSleepExtension;
     [EXT_Logger]: IKernelLoggerExtensions;
     [EXT_CreepRegistry]: ICreepRegistryExtensions;
-    [EXT_Scheduler]: IKernelSchedulerExtensions;
+    [EXT_Scheduler]: IKernelThreadExtensions;
 }
 
 /**
@@ -122,6 +122,7 @@ declare interface ICreepRegistryExtensions extends IPackageExtension {
     releaseCreep(id: CreepID): void;
 }
 
-declare interface IKernelSchedulerExtensions extends IPackageExtension {
-    ScheduleLogic(sID: ScheduleID, logic: IterableIterator<number>): void
+declare interface IKernelThreadExtensions extends IPackageExtension {
+    CreateNewThreadGroup(sID: ThreadID, pid: PID): boolean;
+    SubmitWork(sID: ThreadID, logic: IterableIterator<any>): void;
 }

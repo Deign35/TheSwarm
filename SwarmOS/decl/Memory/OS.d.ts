@@ -4,15 +4,18 @@ declare interface MemBase { }
 declare interface KernelMemory extends MemBase {
     processTable: ProcessTable;
     processMemory: ProcessMemory;
+    schedulerMemory: { [id in ThreadID]: IThreadProc_Data }
+
     subscriptions: SDictionary<PID[]>;
     notifications: string[]
 }
 
-declare interface ScheduledProcessMemBase extends MemBase {
-    sID: string
+declare type ProcessMemory = {
+    [id in PID]: MemBase
 }
-
-
+declare interface IThreadProc_Data {
+    hostProcess: PID;
+}
 declare interface PackageProviderMemory extends MemBase {
     services: {
         [id: string]: {

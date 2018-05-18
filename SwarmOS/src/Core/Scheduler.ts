@@ -1,13 +1,14 @@
-
-declare interface ISchedulerMemory extends SDictionary<any> {
-    registeredLogs: { [id: string]: ISchedulerMemory_LogData };
+/*declare interface ISchedulerMemory extends MemBase {
+    threadProcs: { [sid in ThreadID]: IThreadProc_Data };
 }
 
-declare interface ISchedulerMemory_LogData {
-    entries: { [id: string]: ISchedulerMemory_EntryData };
+declare interface IThreadProc_Data {
+    hostProcess: PID;
 }
-declare interface ISchedulerMemory_EntryData {
 
+declare interface IScheduler_Entry {
+    sID: ThreadID;
+    it: Iterator<number>;
 }
 declare var Memory: {
     SchedulerData: ISchedulerMemory
@@ -15,39 +16,40 @@ declare var Memory: {
 
 import { BasicProcess, ExtensionBase } from "Core/BasicTypes";
 
-export class SchedulerExtension extends ExtensionBase implements SchedulerExtension {
+export class ThreadExtensions extends ExtensionBase implements IKernelThreadExtensions {
     constructor(extReg: IExtensionRegistry) {
         super(extReg);
     }
     private get memory() {
         return Memory.SchedulerData;
     }
-    ScheduleLogic(sID: ScheduleID, logic: Iterable<number>): void {
-        if (!this.memory[sID]) {
-            this.CreateNewScheduleLog(sID);
+    private get registeredLogs() {
+        return this.memory.threadProcs;
+    }
+    SubmitWork(sID: ThreadID, logic: Iterable<number>): void {
+        if (!this.registeredLogs[sID]) {
+            throw new Error(`ScheduleID not instantiated`);
         }
-
-
-
-
     }
 
-    private CreateNewScheduleLog(sID: ScheduleID) {
-        this.memory.registeredLogs[sID] = {
-            entries: {}
-        };
+    private CreateNewThreadGroup(sID: ThreadID, host: PID) {
+        if (!this.registeredLogs[sID]) {
+            this.registeredLogs[sID] = {
+                hostProcess: host
+            }
+        }
     }
 }
 
 export abstract class ScheduledProcess<T extends ScheduledProcessMemBase> extends BasicProcess<T> {
     @extensionInterface(EXT_Scheduler)
-    protected scheduler!: IKernelSchedulerExtensions;
+    protected scheduler!: IKernelThreadExtensions;
     protected executeProcess(): void {
         let self = this;
-        this.scheduler.ScheduleLogic(this.memory.sID, function* () {
+        this.scheduler.SubmitWork(this.memory.sID, function* () {
             yield* self.ScheduledProcessLogic();
         }());
     }
 
     protected abstract ScheduledProcessLogic(): Iterable<number>;
-}
+}*/

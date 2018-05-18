@@ -35,13 +35,10 @@ declare interface ProcInfo {
     sl?: number;// Sleep -- Process sleeping until 
 }
 
-declare interface ProcessTable {
-    [id: string]: ProcInfo;
+declare type ProcessTable = {
+    [pid in PID]: ProcInfo;
 }
 
-declare interface ProcessMemory {
-    [id: string]: {};
-}
 
 declare interface CreepBodiesReference {
     CT_id: string,

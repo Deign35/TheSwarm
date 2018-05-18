@@ -16,7 +16,7 @@ declare type ProcessWithID = { pid: PID; process: IProcess; };
 const PROCESS_GHOST_TIMER = 100;
 export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepExtension {
     constructor(private processRegistry: IProcessRegistry, private extensionRegistry: IExtensionRegistry,
-        private _logger: IKernelLoggerExtensions, private _scheduler: IKernelSchedulerExtensions) {
+        private _logger: IKernelLoggerExtensions) {
         this._processCache = {};
     }
     private _processCache: ProcessCache;
