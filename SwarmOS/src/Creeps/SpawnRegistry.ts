@@ -29,7 +29,7 @@ const BodyLegend = {
 // (TODO) -- Convert this to auto generated -- maybe also optional ordering??
 const ConvertContextToSpawnBody = function (context: CreepContext) {
     let body = [];
-    let bodyDef = CreepBodies.get(context.b)[context.l];
+    let bodyDef = CreepBodies.get(context.ct)[context.l];
     for (let bodyID in BodyLegend) {
         if (bodyDef[bodyID]) {
             for (let i = 0; i < bodyDef[bodyID]; i++) {
@@ -84,7 +84,7 @@ class SpawnRegistry extends BasicProcess<SpawnRegistry_Memory> {
                 continue;
             }
             activeRequests[requests[i]] = req;
-            minSpawnCost = Math.min(minSpawnCost, CreepBodies.get(req.con.b)[req.con.l].cost);
+            minSpawnCost = Math.min(minSpawnCost, CreepBodies.get(req.con.ct)[req.con.l].cost);
         }
 
         let spawnIDs = Object.keys(Game.spawns);
@@ -181,7 +181,7 @@ class SpawnRegistry extends BasicProcess<SpawnRegistry_Memory> {
         if (req.sta != SP_QUEUED) {
             return UNSPAWNABLE_COST;
         }
-        let diff = CreepBodies.get(req.con.b)[req.con.l].cost;
+        let diff = CreepBodies.get(req.con.ct)[req.con.l].cost;
         let dist = Game.map.getRoomLinearDistance(spawn.room.name, req.loc) || 0
         if (req.max && dist > req.max) {
             return UNSPAWNABLE_COST;

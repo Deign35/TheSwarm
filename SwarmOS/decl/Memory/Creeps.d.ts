@@ -1,9 +1,5 @@
 
 /** Creep extension Memory */
-declare type CreepMemory = MemBase & {
-    [id: string]: CreepProcess_Memory
-}
-
 declare interface CreepProcess_Memory extends MemBase {
     SR?: SpawnRequestID;// Spawn request ID 
     CR?: CreepID;       // Creep name

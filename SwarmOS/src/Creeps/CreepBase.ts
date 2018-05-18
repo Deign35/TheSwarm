@@ -67,7 +67,7 @@ export abstract class CreepBase<T extends CreepProcess_Memory> extends BasicProc
             }
         }
 
-        if (this._creep) {
+        if (this._creep && !this._creep.spawning) {
             this.activateCreep();
         }
     }

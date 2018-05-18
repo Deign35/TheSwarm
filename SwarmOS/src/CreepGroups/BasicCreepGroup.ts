@@ -15,8 +15,6 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Threa
     protected get assignments() {
         return this.memory.assignments;
     }
-    protected executeProcess(): void {
-    }
     protected IsRoleActive(): boolean {
         return true;
     }
@@ -31,7 +29,7 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Threa
             yield* self.EnsureAssignments();
         })();
     }
-    // (TODO): Add these to creep body definition generation -- A group definition table(?)
+
     protected abstract get CreepPackageID(): string;
     protected abstract get GroupPrefix(): string;
     protected CreateNewCreepMemory(aID: string): CreepProcess_Memory {
@@ -45,7 +43,7 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Threa
     protected RefreshCreepContext(aID: string): CreepContext {
         let assignment = this.assignments[aID];
         return {
-            b: assignment.CT,
+            ct: assignment.CT,
             l: assignment.lvl,
             n: this.GroupPrefix + GetSUID(),
             o: assignment.pid
@@ -115,7 +113,7 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Threa
         }
 
         let newCreepContext: CreepContext = {
-            b: this.memory.CT,
+            ct: this.memory.CT,
             l: this.memory.lvl,
             n: this.GroupPrefix + GetSUID()
         }
