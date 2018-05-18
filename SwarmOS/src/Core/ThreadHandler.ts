@@ -11,6 +11,9 @@ declare interface ChildThreadState {
 
 
 export abstract class ThreadProcess<T extends ThreadMemory> extends BasicProcess<T> implements IThreadProcess {
+    @extensionInterface(EXT_ThreadHandler)
+    protected thread!: IKernelThreadExtensions;
+
     protected executeProcess(): void {
         // Prep data for the thread activation
     }
@@ -19,8 +22,6 @@ export abstract class ThreadProcess<T extends ThreadMemory> extends BasicProcess
 }
 
 export abstract class HostedThreadProcess<T extends HostThread_Memory> extends ThreadProcess<T>  {
-    @extensionInterface(EXT_ThreadHandler)
-    protected thread!: IKernelThreadExtensions;
     protected get threadID() { return this.memory.tid; }
     protected executeProcess(): void {
         this.thread.EnsureThreadGroup(this.pid, this.threadID);
