@@ -16,17 +16,18 @@ export class ThreadExtensions extends ExtensionBase implements IKernelThreadExte
         return Memory.ThreadProcs;
     }
 
-    CreateNewThreadGroup(host: PID) {
+    EnsureThreadGroup(host: PID, tid?: ThreadID) {
         this.log.debug(`New thread request ${host}`);
-        let tID = 'Thread_' + GetSUID();
-        if (!this.memory[tID]) {
-            this.memory[tID] = {
+        if (!tid || !this.memory[tid]) {
+            if (!tid) {
+                tid = 'TH_' + GetSUID();
+            }
+            this.memory[tid] = {
                 hostProcess: host
             }
-            this.log.debug(`New thread created for ${host} [${tID}]`);
-            return tID;
+            this.log.debug(`New thread created for ${host} [${tid}]`);
         }
-        return undefined
+        return tid
     }
 
     CloseThreadGroup(tID: ThreadID) {
@@ -36,12 +37,18 @@ export class ThreadExtensions extends ExtensionBase implements IKernelThreadExte
     }
 }
 
+declare interface ChildThreadState {
+    pri: Priority;
+    childThread: IterableIterator<number>;
+}
+
 export abstract class HostedThreadProcess<T extends HostThread_Memory> extends BasicProcess<T> {
+    @extensionInterface(EXT_ThreadHandler)
+    protected thread!: IKernelThreadExtensions;
+    protected get threadID() { return this.memory.tid; }
     protected executeProcess(): void {
-        /*let self = this;
-        this.scheduler.SubmitWork(this.memory.sID, function* () {
-            yield* self.ScheduledProcessLogic();
-        }());*/
+        this.thread.EnsureThreadGroup(this.pid, this.threadID);
+
     }
 
     ActivateThread(): IterableIterator<number> {
@@ -51,32 +58,32 @@ export abstract class HostedThreadProcess<T extends HostThread_Memory> extends B
 
     protected MakeChildThreadIterator(): IterableIterator<number> {
         let pids = Object.keys(this.memory);
-        let curChildState = {};
+        let activePIDS = [];
+        let curChildState: IDictionary<PID, ChildThreadState> = {};
         for (let i = 0; i < pids.length; i++) {
             let child = this.kernel.getProcessByPID(pids[i]) as ChildThreadProcess<HostThread_Memory>;
             if (!child) {
                 delete this.memory[pids[i]];
                 continue;
             }
-            curChildState[pids[i]] = {
-                pri: this.memory.childThreads[pids[i]].priority,
-                proc: child
+            if (!child.GetThread) {
+                throw new Error(`Attempted to active a non threaded process from a host thread`)
             }
 
+            curChildState[pids[i]] = {
+                pri: this.memory.childThreads[pids[i]].priority,
+                childThread: child.GetThread()
+            }
+            activePIDS.push(pids[i]);
         }
 
-        pids = Object.keys(this.memory);
         return (function* () {
-            for (let i = 0; i < pids.length; i++) {
-                let child = curChildState[pids[i]];
-
-                if (!child.GetThread) {
-                    throw new Error(`Attempted to active a non threaded process from a host thread`)
-                }
-
+            for (let i = 0; i < activePIDS.length; i++) {
+                let child = curChildState[activePIDS[i]];
                 let result: IteratorResult<number>;
                 do {
-                    result = yield* child.GetThread()
+                    result = child.childThread.next();
+                    yield result.value;
                 } while (result && !result.done);
             }
         })();

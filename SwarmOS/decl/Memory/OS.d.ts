@@ -15,6 +15,7 @@ declare type ProcessMemory = {
 }
 
 declare interface HostThread_Memory {
+    tid: ThreadID;
     childThreads: {
         [tid in ThreadID]: {
             priority: Priority,
