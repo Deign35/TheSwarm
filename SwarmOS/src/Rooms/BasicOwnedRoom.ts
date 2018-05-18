@@ -19,6 +19,7 @@ class BasicOwnedRoom extends RoomBase<RoomProcess_Memory> {
                 numReq: Math.ceil((roomData.cSites.length / 4)) + 1,
                 pri: Priority_Lowest,
                 targetRoom: this.memory.roomName,
+                childThreads: {}
             }
         });
         this.EnsureCreepGroup('Harv', CG_Harvester, () => {
@@ -32,7 +33,8 @@ class BasicOwnedRoom extends RoomBase<RoomProcess_Memory> {
                 numReq: roomData.sourceIDs.length,
                 pri: Priority_High,
                 targetRoom: this.memory.roomName,
-                sIDs: roomData.sourceIDs
+                sIDs: roomData.sourceIDs,
+                childThreads: {}
             }
         });
         this.EnsureCreepGroup('Ref', CG_Refiller, () => {
@@ -46,6 +48,7 @@ class BasicOwnedRoom extends RoomBase<RoomProcess_Memory> {
                 numReq: 1,
                 pri: Priority_Highest,
                 targetRoom: this.memory.roomName,
+                childThreads: {}
             }
         });
 
@@ -60,6 +63,7 @@ class BasicOwnedRoom extends RoomBase<RoomProcess_Memory> {
                 numReq: 1,
                 pri: Priority_Lowest,
                 targetRoom: this.memory.roomName,
+                childThreads: {}
             }
         });
     }

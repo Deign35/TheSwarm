@@ -1,6 +1,6 @@
-import { HostedThreadProcess } from "Core/ThreadHandler";
+import { ParentThreadProcess } from "Core/ThreadProcess";
 
-export abstract class RoomBase<T extends RoomProcess_Memory> extends HostedThreadProcess<T> {
+export abstract class RoomBase<T extends RoomProcess_Memory> extends ParentThreadProcess<T> {
     @extensionInterface(EXT_RoomView)
     View!: IRoomDataExtension;
 

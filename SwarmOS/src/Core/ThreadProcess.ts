@@ -21,11 +21,10 @@ export abstract class ThreadProcess<T extends ThreadMemory> extends BasicProcess
     abstract GetThread(): IterableIterator<number>
 }
 
-export abstract class HostedThreadProcess<T extends HostThread_Memory> extends ThreadProcess<T>  {
+export class ParentThreadProcess<T extends ThreadMemory_Parent> extends ThreadProcess<T>  {
     protected get threadID() { return this.memory.tid; }
     protected executeProcess(): void {
         this.thread.EnsureThreadGroup(this.pid, this.threadID);
-
     }
 
     GetThread(): IterableIterator<number> {

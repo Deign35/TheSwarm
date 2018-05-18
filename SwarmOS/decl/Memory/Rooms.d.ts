@@ -1,5 +1,5 @@
 
 /** Room Memory */
-declare interface RoomProcess_Memory extends HostThread_Memory {
+declare interface RoomProcess_Memory extends ThreadMemory_Parent {
     roomName: string;
 }

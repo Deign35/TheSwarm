@@ -1,4 +1,5 @@
-import { ThreadProcess } from "Core/ThreadHandler";
+import { ThreadProcess } from "Core/ThreadProcess";
+import { ParentThreadProcess } from "Core/ThreadProcess";
 
 
 // (TODO): Need to be able to communicate creep state with the group 
@@ -6,7 +7,7 @@ import { ThreadProcess } from "Core/ThreadHandler";
 // Coop will load the programs and run based on priority and such!
 // Once this is done, a CreepGroup can then be a tree of groups instead of all one type of creep
 // CreepGroup -> SpecificCreep vs CreepGroup -> CreepGroup | AnyCreep
-export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends ThreadProcess<T> {
+export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends ParentThreadProcess<T> {
     @extensionInterface(EXT_CreepRegistry)
     protected creepRegistry!: ICreepRegistryExtensions;
     @extensionInterface(EXT_RoomView)
