@@ -1,6 +1,7 @@
 {
     "Harvester": {
         "comment": "",
+        "packageID": "PKG_CreepHarvester",
         "entries": [{
                 "w": 2,
                 "c": 1,
@@ -19,6 +20,7 @@
     },
     "Builder": {
         "comment": "",
+        "packageID": "PKG_CreepBuilder",
         "entries": [{
                 "w": 2,
                 "c": 1,
@@ -48,6 +50,7 @@
     },
     "Upgrader": {
         "comment": "",
+        "packageID": "PKG_CreepUpgrader",
         "entries": [{
                 "w": 2,
                 "c": 1,
@@ -87,6 +90,7 @@
     },
     "Refiller": {
         "comment": "",
+        "packageID": "PKG_CreepRefiller",
         "entries": [{
                 "w": 1,
                 "c": 2,
@@ -112,6 +116,7 @@
     },
     "Scout": {
         "comment": "",
+        "packageID": "PKG_CreepHarvester",
         "entries": [{
                 "t": 2,
                 "m": 2
@@ -132,6 +137,7 @@
     },
     "Repair": {
         "comment": "",
+        "packageID": "PKG_CreepHarvester",
         "entries": [{
                 "w": 1,
                 "c": 1,
@@ -156,6 +162,7 @@
     },
     "FastHauler": {
         "comment": "",
+        "packageID": "PKG_CreepHarvester",
         "entries": [{
                 "c": 2,
                 "m": 2
@@ -185,6 +192,7 @@
     },
     "SlowHauler": {
         "comment": "",
+        "packageID": "PKG_CreepHarvester",
         "entries": [{
                 "c": 4,
                 "m": 2
@@ -209,6 +217,7 @@
     },
     "CrawlerHauler": {
         "comment": "",
+        "packageID": "PKG_CreepHarvester",
         "entries": [{
                 "c": 4,
                 "m": 1
@@ -237,6 +246,7 @@
     },
     "SuperHauler": {
         "comment": "",
+        "packageID": "PKG_CreepHarvester",
         "entries": [{
                 "c": 10,
                 "m": 1

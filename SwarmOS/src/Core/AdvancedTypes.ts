@@ -61,6 +61,7 @@ export abstract class ParentThreadProcess<T extends ThreadMemory_Parent> extends
 
     protected executeProcess(): void {
         super.executeProcess();
+        this.PrepareChildren();
         let threadIDs = Object.keys(this.memory.childThreads);
         let activePIDS = [];
         this._activeThreads = {};
@@ -71,7 +72,7 @@ export abstract class ParentThreadProcess<T extends ThreadMemory_Parent> extends
                 continue;
             }
             if (!child.RunThread) {
-                // Child is not a threaded process, skip it
+                // Child is not a threaded process, skip it.
                 continue;
             }
 
@@ -82,6 +83,9 @@ export abstract class ParentThreadProcess<T extends ThreadMemory_Parent> extends
             }
         }
     }
+
+    protected abstract PrepareChildren(): void;
+
     GetChildThread(tid: ThreadID) {
         return this.children[tid];
     }

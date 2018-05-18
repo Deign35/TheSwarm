@@ -338,7 +338,6 @@ var GenerateConstantsFile = function () {
             var bodyEntry = creepDef[bodyIndex];
             defEntries.push(compileCreepBody(bodyEntry));
         }
-        console.log(defEntries);
         return defEntries;
     }
     var compileCreepDef = function (creepDef, ctID, refPrefix) {
@@ -347,12 +346,12 @@ var GenerateConstantsFile = function () {
         for (var bodyIndex = 0; bodyIndex < creepEntries; bodyIndex++) {
             var bodyEntry = creepDef.entries[bodyIndex];
 
-            compiled.push(compileCreepBody(bodyEntry, ctID, MakeNewRefID(refPrefix, bodyIndex)));
+            compiled.push(compileCreepBody(bodyEntry, ctID, MakeNewRefID(refPrefix, bodyIndex), creepDef.packageID));
         }
         return compiled;
     };
 
-    var compileCreepBody = function (bodyDef, ctID, refPrefix) {
+    var compileCreepBody = function (bodyDef, ctID, refPrefix, packageID) {
         var bodyString = '{';
         var components = Object.keys(bodyDef);
         var bodyCost = 0;
@@ -364,7 +363,8 @@ var GenerateConstantsFile = function () {
             }
         }
 
-        bodyString += 'cost:' + bodyCost + ',CT_ID:' + ctID + ',REFERENCE_id:' + refPrefix + '}';
+        bodyString += 'cost:' + bodyCost + ',CT_ID:' + ctID + ',REFERENCE_id:' + refPrefix + ', PKG_ID:' + packageID + '}';
+        console.log(JSON.stringify(bodyDef));
         return bodyString;
     };
 

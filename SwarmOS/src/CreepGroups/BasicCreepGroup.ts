@@ -1,16 +1,13 @@
 import { ParentThreadProcess } from "Core/AdvancedTypes";
 
-
-// (TODO): Need to be able to communicate creep state with the group 
-// Coop can be turned into a schedule manager.
-// Coop will load the programs and run based on priority and such!
-// Once this is done, a CreepGroup can then be a tree of groups instead of all one type of creep
-// CreepGroup -> SpecificCreep vs CreepGroup -> CreepGroup | AnyCreep
 export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends ParentThreadProcess<T> {
     @extensionInterface(EXT_CreepRegistry)
     protected creepRegistry!: ICreepRegistryExtensions;
     @extensionInterface(EXT_RoomView)
-    View!: IRoomDataExtension;
+    protected View!: IRoomDataExtension;
+
+    protected abstract EnsureGroupFormation(): ThreadState;
+    protected abstract get GroupPrefix(): GroupID;
 
     protected get assignments() {
         return this.memory.assignments;
@@ -18,21 +15,21 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Paren
     protected IsRoleActive(): boolean {
         return true;
     }
-    GetThread() {
-        let self = this;
-        return (function* () {
-            if (!self.IsRoleActive()) {
-                // When setting the role to inactive, kill all child processes (release the creeps);
-                return;
+
+    protected PrepareChildren() {
+        if (this.IsRoleActive()) {
+            this.EnsureGroupFormation();
+        }
+
+        let childIDs = Object.keys(this.assignments);
+        for (let i = 0; i < childIDs.length; i++) {
+            if (!this.assignments[childIDs[i]].pid) {
+                this.createNewCreepProcess(childIDs[i]);
             }
-            yield* self.KillOrRestartDeadProcesses();
-            yield* self.EnsureAssignments();
-        })();
+        }
     }
 
-    protected abstract get CreepPackageID(): string;
-    protected abstract get GroupPrefix(): string;
-    protected CreateNewCreepMemory(aID: string): CreepProcess_Memory {
+    protected createNewCreepMemory(aID: GroupID): CreepProcess_Memory {
         return {
             get: false,
             home: this.memory.homeRoom,
@@ -40,71 +37,26 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Paren
             SR: this.assignments[aID].SR,
         }
     }
-    protected RefreshCreepContext(aID: string): CreepContext {
-        let assignment = this.assignments[aID];
+    protected createNewCreepContext(ctID: CT_ALL, level: number, owner?: PID): CreepContext {
         return {
-            ct: assignment.CT,
-            l: assignment.lvl,
+            ct: ctID,
+            l: level,
             n: this.GroupPrefix + GetSUID(),
-            o: assignment.pid
+            o: owner
         }
     }
-    protected EnsureAssignments(): IterableIterator<number> {
-        let self = this;
-        return (function* () {
-            let count = 0;
-            while (Object.keys(self.assignments).length < self.memory.numReq) {
-                self.createNewAssignment(self.GroupPrefix + GetSUID());
-                yield ++count;
-            }
-            return count;
-        })();
-    }
 
-    protected KillOrRestartDeadProcesses(): IterableIterator<number> {
-        let self = this;
-        return (function* () {
-            let assignmentIDs = Object.keys(self.assignments);
-            for (let i = 0; i < assignmentIDs.length; i++) {
-                let assignment = self.assignments[assignmentIDs[i]];
-                if (assignment.pid) {
-                    if (!self.kernel.getProcessByPID(assignment.pid!)) {
-                        // process died
-                        let SR = assignment.SR;
-                        delete self.assignments[assignmentIDs[i]].pid;
-                        let curSpawnState = self.spawnRegistry.getRequestStatus(SR);
-                        if (curSpawnState == SP_ERROR) {
-                            if (!self.spawnRegistry.tryResetRequest(SR, self.RefreshCreepContext(assignmentIDs[i]))) {
-                                // Create new context
-                                self.log.fatal(`SpawnRequest has disappeard`);
-                                self.kernel.killProcess(self.pid);
-                            }
-                        }
-                    }
-                }
-
-                if (!self.assignments[assignmentIDs[i]].pid) {
-                    self.createNewCreepProcess(assignmentIDs[i]);
-                }
-                yield i;
-            }
-
-            return assignmentIDs.length;
-        })();
-    }
-
-    protected createNewAssignment(newAssignmentID: string) {
+    protected createNewAssignment(newAssignmentID: GroupID, ctID: CT_ALL, level: number) {
         let newAssignment: CreepGroup_Assignment = {
-            CT: this.memory.CT,
-            lvl: this.memory.lvl,
+            CT: ctID,
+            lvl: level,
             SR: ''
         }
-
         this.assignments[newAssignmentID] = newAssignment;
         this.createNewCreepProcess(newAssignmentID);
     }
 
-    protected createNewCreepProcess(aID: string) {
+    protected createNewCreepProcess(aID: GroupID) {
         let assignment = this.assignments[aID];
         if (assignment) {
             if (assignment.pid) {
@@ -112,21 +64,13 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Paren
             }
         }
 
-        let newCreepContext: CreepContext = {
-            ct: this.memory.CT,
-            l: this.memory.lvl,
-            n: this.GroupPrefix + GetSUID()
-        }
-
-        if (!this.spawnRegistry.getRequestContext(assignment.SR)) {
-            assignment.SR = this.spawnRegistry.requestSpawn(newCreepContext, this.memory.targetRoom, this.memory.pri)
+        let newContext = this.createNewCreepContext(assignment.CT, assignment.lvl, assignment.pid);
+        if (!this.spawnRegistry.tryResetRequest(assignment.SR, newContext)) {
+            this.spawnRegistry.cancelRequest(assignment.SR);
         } else {
-            if (!this.spawnRegistry.tryResetRequest(assignment.SR, newCreepContext)) {
-                this.kernel.killProcess(this.pid);
-                return;
-            }
+            assignment.SR = this.spawnRegistry.requestSpawn(newContext, this.memory.targetRoom, this.memory.pri)
         }
 
-        assignment.pid = this.kernel.startProcess(this.CreepPackageID, this.CreateNewCreepMemory(aID));
+        assignment.pid = this.kernel.startProcess(CreepBodies[assignment.CT][assignment.lvl].PKG_ID, this.createNewCreepMemory(aID));
     }
 }
