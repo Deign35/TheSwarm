@@ -13,7 +13,7 @@ declare interface IProcess {
     run(): void;
 }
 declare interface IThreadProcess extends IProcess {
-    GetThread(): IterableIterator<number>;
+    RunThread(): ThreadState;
 }
 
 declare type ProcessWithID = { pid: PID; process: IProcess; };

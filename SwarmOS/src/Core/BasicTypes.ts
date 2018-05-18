@@ -5,8 +5,6 @@ export abstract class BasicProcess<ProcessMemory> implements IProcess {
     protected extensions!: IExtensionRegistry;
     @extensionInterface(EXT_SpawnRegistry)
     protected spawnRegistry!: ISpawnRegistryExtensions;
-    @extensionInterface(EXT_Interrupt)
-    protected interrupter!: IKernelNotificationsExtension;
     @extensionInterface(EXT_Sleep)
     protected sleeper!: IKernelSleepExtension;
 

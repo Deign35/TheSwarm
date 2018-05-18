@@ -5,63 +5,100 @@ declare var Memory: {
 import { BasicProcess } from "Core/BasicTypes";
 
 declare interface ChildThreadState {
+    childThread: ThreadProcess<ThreadMemory>;
     pri: Priority;
-    childThread: IterableIterator<number>;
+    sta: ThreadState;
 }
 
 
 export abstract class ThreadProcess<T extends ThreadMemory> extends BasicProcess<T> implements IThreadProcess {
     @extensionInterface(EXT_ThreadHandler)
     protected thread!: IKernelThreadExtensions;
+    get ThreadID() { return this.memory.registeredThreadID; }
 
-    protected executeProcess(): void {
-        // Prep data for the thread activation
+    protected executeProcess(): void { }
+    abstract RunThread(): ThreadState;
+
+    OnProcessInstantiation() {
+        this.RegisterThread();
     }
 
-    abstract GetThread(): IterableIterator<number>
+    RegisterThread() {
+        if (this.ThreadID) {
+            this.thread.EnsureThreadGroup(this.pid, this.ThreadID);
+        }
+    }
 }
 
-export class ParentThreadProcess<T extends ThreadMemory_Parent> extends ThreadProcess<T>  {
-    protected get threadID() { return this.memory.tid; }
+export abstract class ParentThreadProcess<T extends ThreadMemory_Parent> extends ThreadProcess<T>  {
+    protected get childThreadPrefix() { return 'T'; }
+    protected get children() { return this.memory.childThreads; }
+
+    protected get ActiveThreads() {
+        return this._activeThreads;
+    }
+    private _activeThreads!: IDictionary<ThreadID, ChildThreadState>;
+
     protected executeProcess(): void {
-        this.thread.EnsureThreadGroup(this.pid, this.threadID);
-    }
-
-    GetThread(): IterableIterator<number> {
-        let childIter = this.MakeChildThreadIterator();
-        return (function* () { yield* childIter })();
-    }
-
-    protected MakeChildThreadIterator(): IterableIterator<number> {
+        super.executeProcess();
         let threadIDs = Object.keys(this.memory.childThreads);
         let activePIDS = [];
-        let curChildState: IDictionary<PID, ChildThreadState> = {};
+        this._activeThreads = {};
         for (let i = 0; i < threadIDs.length; i++) {
-            let child = this.kernel.getProcessByPID(this.memory.childThreads[threadIDs[i]].pid) as ThreadProcess<ThreadMemory>;
+            let child = this.kernel.getProcessByPID(this.children[threadIDs[i]].pid) as ThreadProcess<ThreadMemory>;
             if (!child) {
                 delete this.memory[threadIDs[i]];
                 continue;
             }
-            if (!child.GetThread) {
-                throw new Error(`Attempted to active a non threaded process from a host thread`)
+            if (!child.RunThread) {
+                // Child is not a threaded process, skip it
+                continue;
             }
 
-            curChildState[threadIDs[i]] = {
-                pri: this.memory.childThreads[threadIDs[i]].priority,
-                childThread: child.GetThread()
+            this._activeThreads[threadIDs[i]] = {
+                pri: this.children[threadIDs[i]].priority,
+                sta: ThreadState_Active as ThreadState,
+                childThread: child
             }
-            activePIDS.push(threadIDs[i]);
+        }
+    }
+    GetChildThread(tid: ThreadID) {
+        return this.children[tid];
+    }
+
+    RunThread(): ThreadState {
+        let activeThreadIDs = Object.keys(this._activeThreads);
+        let curThread;
+        if (activeThreadIDs.length > 0) {
+            curThread = this._activeThreads[activeThreadIDs[0]];
         }
 
-        return (function* () {
-            for (let i = 0; i < activePIDS.length; i++) {
-                let child = curChildState[activePIDS[i]];
-                let result: IteratorResult<number>;
-                do {
-                    result = child.childThread.next();
-                    yield result.value;
-                } while (result && !result.done);
-            }
-        })();
+        if (!curThread) {
+            return ThreadState_Done;
+        }
+
+        curThread.sta = curThread.childThread.RunThread();
+        switch (curThread.sta) {
+            case (ThreadState_Inactive):
+            case (ThreadState_Done):
+            case (ThreadState_Overrun): // (TODO): Turn Overrun into a thread state that allows the thread to do extra work as cpu is available.
+                activeThreadIDs.shift();
+            case (ThreadState_Active): return ThreadState_Active;
+            default:
+                activeThreadIDs.shift();
+                break;
+        }
+        return ThreadState_Active;
+    }
+
+    protected CreateChildThread(packageID: PackageType, startContext: MemBase) {
+        let newThreadID = this.childThreadPrefix + GetSUID();
+        let newProc = this.kernel.startProcess(packageID, startContext);
+        this.children[newThreadID] = {
+            pid: newProc,
+            priority: Priority_Medium,
+            tid: newThreadID
+        };
+        this.kernel.setParent(newProc, this.pid);
     }
 }

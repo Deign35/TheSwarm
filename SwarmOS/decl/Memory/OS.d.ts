@@ -19,11 +19,12 @@ declare interface ThreadMemory_Parent extends ThreadMemory {
         [tid in ThreadID]: {
             priority: Priority,
             pid: PID
+            tid: tid
         }
     }
 }
 declare interface ThreadMemory extends MemBase {
-    tid: ThreadID;
+    registeredThreadID?: ThreadID; // Only processes that are in primary control should be assigned to the kernel
 }
 declare interface PackageProviderMemory extends MemBase {
     services: {
