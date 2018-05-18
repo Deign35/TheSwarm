@@ -30,7 +30,8 @@ export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepEx
             processTable: {},
             processMemory: {},
             subscriptions: {},
-            notifications: []
+            notifications: [],
+            ThreadProcs: {}
         };
         return Memory.kernel;
     }
@@ -39,6 +40,9 @@ export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepEx
     }
     get processMemory(): ProcessMemory {
         return this.memory.processMemory;
+    }
+    get processThreads() {
+        return this.memory.ThreadProcs;
     }
 
     installBundle(bundle: IPackage<{}>) {
@@ -194,6 +198,29 @@ export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepEx
                 this.log.error(`[${pid}] ${pInfo.PKG} crashed\n${e.stack}`);
             }
         }
+        let threadIDs = Object.keys(this.processThreads);
+        for (let i = 0; i < threadIDs.length; i++) {
+            let pid = this.processThreads[threadIDs[i]].hostProcess;
+            let pInfo = this.processTable[pid];
+            if (!pInfo.ex) {
+                continue;
+            }
+            try {
+                let proc = this.getProcessByPID(pid) as IThreadProcess
+                if (!proc) throw new Error(`Could not get process ${pid} ${pInfo.PKG}`);
+                this.curProcessID = pid;
+
+                let procIter = proc.GetThread();
+                while (!procIter.next().done) { }
+                // Need to do something about sleeping threads here!
+
+                this.curProcessID = "";
+            } catch (e) {
+                this.killProcess(pid);
+                pInfo.err = e.stack || e.toString();
+                this.log.error(`[${pid}] ${pInfo.PKG} crashed\n${e.stack}`);
+            }
+        }
         if (!hasActiveProcesses)
             this.startProcess(PKG_SwarmManager, {});
     }
@@ -203,9 +230,29 @@ export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepEx
         pInfo.sl = Game.time + ticks;
     }
     wake(pid: PID): void {
-        if (this.memory.processTable[pid] && this.memory.processTable[pid].sl) {
-            delete this.memory.processTable[pid].sl;
+        if (this.processTable[pid] && this.processTable[pid].sl) {
+            delete this.processTable[pid].sl;
             // (TODO): Don't let newly awoken processes run this tick.
+        }
+    }
+
+    EnsureThreadGroup(host: PID, tid?: ThreadID) {
+        this.log.debug(`New thread request ${host}`);
+        if (!tid || !this.processThreads[tid]) {
+            if (!tid) {
+                tid = 'TH_' + GetSUID();
+            }
+            this.processThreads[tid] = {
+                hostProcess: host
+            }
+            this.log.debug(`New thread created for ${host} [${tid}]`);
+        }
+        return tid
+    }
+
+    CloseThreadGroup(tID: ThreadID) {
+        if (this.processThreads[tID]) {
+            delete this.processThreads[tID];
         }
     }
 

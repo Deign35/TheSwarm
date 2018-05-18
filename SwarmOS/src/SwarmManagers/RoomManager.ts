@@ -34,7 +34,8 @@ class RoomManager extends BasicProcess<{}> {
             if (!data.pid || !this.kernel.getProcessByPID(data.pid)) {
                 let newRoomMemory: RoomProcess_Memory = {
                     roomName: roomID,
-                    groups: {}
+                    childThreads: {},
+                    tid: roomID + GetSUID()
                 }
 
                 let newRoomProcess = this.kernel.startProcess(PKG_SimpleOwnedRoom, newRoomMemory);

@@ -30,7 +30,7 @@ declare interface Builder_Memory extends CreepProcess_Memory {
 }
 
 /** CreepGroups */
-declare interface CreepGroup_Memory extends MemBase {
+declare interface CreepGroup_Memory extends ChildThread_Memory {
     enabled: boolean; // (en)abled
     assignments: IDictionary<CreepID, CreepGroup_Assignment>;
     homeRoom: RoomID;

@@ -123,6 +123,6 @@ declare interface ICreepRegistryExtensions extends IPackageExtension {
 }
 
 declare interface IKernelThreadExtensions extends IPackageExtension {
-    EnsureThreadGroup(pid: PID, tid?: ThreadID): ThreadID | undefined;
+    EnsureThreadGroup(pid: PID, tid?: ThreadID): ThreadID;
     CloseThreadGroup(tID: ThreadID): void;
 }

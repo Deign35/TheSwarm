@@ -6,10 +6,11 @@ export const OSPackage: IPackage<SpawnRegistry_Memory> = {
 }
 
 class BasicOwnedRoom extends RoomBase<RoomProcess_Memory> {
-    protected activateRoom(roomData: RVD_RoomMemory, room?: Room | undefined): void {
+    protected prepHostThread(roomData: RVD_RoomMemory, room?: Room | undefined): void {
         // (TODO): Need to update the group if needs change, either from here or the group
         this.EnsureCreepGroup('Bui', CG_Builder, () => {
             return {
+                tid: 'Bui' + GetSUID(),
                 assignments: {},
                 CT: CT_Builder,
                 enabled: true,
@@ -22,6 +23,7 @@ class BasicOwnedRoom extends RoomBase<RoomProcess_Memory> {
         });
         this.EnsureCreepGroup('Harv', CG_Harvester, () => {
             return {
+                tid: 'Harv' + GetSUID(),
                 assignments: {},
                 CT: CT_Harvester,
                 enabled: true,
@@ -35,6 +37,7 @@ class BasicOwnedRoom extends RoomBase<RoomProcess_Memory> {
         });
         this.EnsureCreepGroup('Ref', CG_Refiller, () => {
             return {
+                tid: 'Ref' + GetSUID(),
                 assignments: {},
                 CT: CT_Refiller,
                 enabled: true,
@@ -48,6 +51,7 @@ class BasicOwnedRoom extends RoomBase<RoomProcess_Memory> {
 
         this.EnsureCreepGroup('Upg', CG_Upgrader, () => {
             return {
+                tid: 'Upg' + GetSUID(),
                 assignments: {},
                 CT: CT_Upgrader,
                 enabled: true,
@@ -58,7 +62,5 @@ class BasicOwnedRoom extends RoomBase<RoomProcess_Memory> {
                 targetRoom: this.memory.roomName,
             }
         });
-
-        this.sleeper.sleep(5);
     }
 }

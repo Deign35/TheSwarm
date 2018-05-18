@@ -42,7 +42,7 @@ declare interface ChildThreadState {
     childThread: IterableIterator<number>;
 }
 
-export abstract class HostedThreadProcess<T extends HostThread_Memory> extends BasicProcess<T> {
+export abstract class HostedThreadProcess<T extends HostThread_Memory> extends BasicProcess<T> implements IThreadProcess {
     @extensionInterface(EXT_ThreadHandler)
     protected thread!: IKernelThreadExtensions;
     protected get threadID() { return this.memory.tid; }
@@ -51,30 +51,30 @@ export abstract class HostedThreadProcess<T extends HostThread_Memory> extends B
 
     }
 
-    ActivateThread(): IterableIterator<number> {
+    GetThread(): IterableIterator<number> {
         let childIter = this.MakeChildThreadIterator();
         return (function* () { yield* childIter })();
     }
 
     protected MakeChildThreadIterator(): IterableIterator<number> {
-        let pids = Object.keys(this.memory);
+        let threadIDs = Object.keys(this.memory.childThreads);
         let activePIDS = [];
         let curChildState: IDictionary<PID, ChildThreadState> = {};
-        for (let i = 0; i < pids.length; i++) {
-            let child = this.kernel.getProcessByPID(pids[i]) as ChildThreadProcess<HostThread_Memory>;
+        for (let i = 0; i < threadIDs.length; i++) {
+            let child = this.kernel.getProcessByPID(this.memory.childThreads[threadIDs[i]].pid) as ChildThreadProcess<HostThread_Memory>;
             if (!child) {
-                delete this.memory[pids[i]];
+                delete this.memory[threadIDs[i]];
                 continue;
             }
             if (!child.GetThread) {
                 throw new Error(`Attempted to active a non threaded process from a host thread`)
             }
 
-            curChildState[pids[i]] = {
-                pri: this.memory.childThreads[pids[i]].priority,
+            curChildState[threadIDs[i]] = {
+                pri: this.memory.childThreads[threadIDs[i]].priority,
                 childThread: child.GetThread()
             }
-            activePIDS.push(pids[i]);
+            activePIDS.push(threadIDs[i]);
         }
 
         return (function* () {
@@ -90,7 +90,7 @@ export abstract class HostedThreadProcess<T extends HostThread_Memory> extends B
     }
 }
 
-export abstract class ChildThreadProcess<T extends HostThread_Memory> extends BasicProcess<T> {
+export abstract class ChildThreadProcess<T extends ChildThread_Memory> extends BasicProcess<T> {
     protected executeProcess(): void {
         // Prep data for the thread activation
     }

@@ -1,4 +1,4 @@
-import { BasicProcess } from "Core/BasicTypes";
+import { ChildThreadProcess } from "Core/ThreadHandler";
 
 
 // (TODO): Need to be able to communicate creep state with the group 
@@ -6,7 +6,7 @@ import { BasicProcess } from "Core/BasicTypes";
 // Coop will load the programs and run based on priority and such!
 // Once this is done, a CreepGroup can then be a tree of groups instead of all one type of creep
 // CreepGroup -> SpecificCreep vs CreepGroup -> CreepGroup | AnyCreep
-export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends BasicProcess<T> {
+export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends ChildThreadProcess<T> {
     @extensionInterface(EXT_CreepRegistry)
     protected creepRegistry!: ICreepRegistryExtensions;
     @extensionInterface(EXT_RoomView)
@@ -16,15 +16,20 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Basic
         return this.memory.assignments;
     }
     protected executeProcess(): void {
-        if (!this.IsRoleActive()) {
-            // When setting the role to inactive, kill all child processes (release the creeps);
-            return;
-        }
-        this.KillOrRestartDeadProcesses();
-        this.EnsureAssignments();
     }
     protected IsRoleActive(): boolean {
         return true;
+    }
+    GetThread() {
+        let self = this;
+        return (function* () {
+            if (!self.IsRoleActive()) {
+                // When setting the role to inactive, kill all child processes (release the creeps);
+                return;
+            }
+            yield* self.KillOrRestartDeadProcesses();
+            yield* self.EnsureAssignments();
+        })();
     }
     // (TODO): Add these to creep body definition generation -- A group definition table(?)
     protected abstract get CreepPackageID(): string;
@@ -46,36 +51,48 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Basic
             o: assignment.pid
         }
     }
-    protected EnsureAssignments(): void {
-        while (Object.keys(this.assignments).length < this.memory.numReq) {
-            this.createNewAssignment(this.GroupPrefix + GetSUID());
-        }
+    protected EnsureAssignments(): IterableIterator<number> {
+        let self = this;
+        return (function* () {
+            let count = 0;
+            while (Object.keys(self.assignments).length < self.memory.numReq) {
+                self.createNewAssignment(self.GroupPrefix + GetSUID());
+                yield ++count;
+            }
+            return count;
+        })();
     }
 
-    protected KillOrRestartDeadProcesses() {
-        let assignmentIDs = Object.keys(this.assignments);
-        for (let i = 0; i < assignmentIDs.length; i++) {
-            let assignment = this.assignments[assignmentIDs[i]];
-            if (this.assignments[assignmentIDs[i]].pid) {
-                if (!this.kernel.getProcessByPID(this.assignments[assignmentIDs[i]].pid!)) {
-                    // process died
-                    let SR = this.assignments[assignmentIDs[i]].SR;
-                    delete this.assignments[assignmentIDs[i]].pid;
-                    let curSpawnState = this.spawnRegistry.getRequestStatus(SR);
-                    if (curSpawnState == SP_ERROR) {
-                        if (!this.spawnRegistry.tryResetRequest(SR, this.RefreshCreepContext(assignmentIDs[i]))) {
-                            // Create new context
-                            this.log.fatal(`SpawnRequest has disappeard`);
-                            this.kernel.killProcess(this.pid);
+    protected KillOrRestartDeadProcesses(): IterableIterator<number> {
+        let self = this;
+        return (function* () {
+            let assignmentIDs = Object.keys(self.assignments);
+            for (let i = 0; i < assignmentIDs.length; i++) {
+                let assignment = self.assignments[assignmentIDs[i]];
+                if (assignment.pid) {
+                    if (!self.kernel.getProcessByPID(assignment.pid!)) {
+                        // process died
+                        let SR = assignment.SR;
+                        delete self.assignments[assignmentIDs[i]].pid;
+                        let curSpawnState = self.spawnRegistry.getRequestStatus(SR);
+                        if (curSpawnState == SP_ERROR) {
+                            if (!self.spawnRegistry.tryResetRequest(SR, self.RefreshCreepContext(assignmentIDs[i]))) {
+                                // Create new context
+                                self.log.fatal(`SpawnRequest has disappeard`);
+                                self.kernel.killProcess(self.pid);
+                            }
                         }
                     }
                 }
+
+                if (!self.assignments[assignmentIDs[i]].pid) {
+                    self.createNewCreepProcess(assignmentIDs[i]);
+                }
+                yield i;
             }
 
-            if (!this.assignments[assignmentIDs[i]].pid) {
-                this.createNewCreepProcess(assignmentIDs[i]);
-            }
-        }
+            return assignmentIDs.length;
+        })();
     }
 
     protected createNewAssignment(newAssignmentID: string) {

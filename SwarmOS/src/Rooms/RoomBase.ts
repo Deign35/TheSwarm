@@ -1,10 +1,10 @@
-import { BasicProcess } from "Core/BasicTypes";
+import { HostedThreadProcess } from "Core/ThreadHandler";
 
-export abstract class RoomBase<T extends RoomProcess_Memory> extends BasicProcess<T> {
+export abstract class RoomBase<T extends RoomProcess_Memory> extends HostedThreadProcess<T> {
     @extensionInterface(EXT_RoomView)
     View!: IRoomDataExtension;
 
-    protected get CreepGroups() { return this.memory.groups; }
+    protected get CreepGroups() { return this.memory.childThreads; }
     protected get memory(): T {
         return super.memory;
     }
@@ -24,20 +24,29 @@ export abstract class RoomBase<T extends RoomProcess_Memory> extends BasicProces
             this.kernel.killProcess(this.pid);
             return;
         }
-        let room = Game.rooms[this.memory.roomName];
-        // Check what type of room this is and convert as needed
-        this.activateRoom(roomData, room);
+
+        this.memory.tid = this.thread.EnsureThreadGroup(this.pid, this.threadID);
+        this.prepHostThread(roomData, this.room);
     }
     protected EnsureCreepGroup(groupID: string, groupPackageID: string, makeNewMem: () => CreepGroup_Memory) {
-        if (!this.CreepGroups[groupID] || !this.kernel.getProcessByPID(this.CreepGroups[groupID])) {
+        if (!this.CreepGroups[groupID]) {
+            this.CreepGroups[groupID] = {
+                priority: Priority_Medium,
+                pid: ''
+            }
+        }
+        if (!this.CreepGroups[groupID] || !this.kernel.getProcessByPID(this.CreepGroups[groupID].pid)) {
             let newPID = this.kernel.startProcess(groupPackageID, makeNewMem());
             if (!newPID || !newPID.pid || !newPID.process) {
                 this.log.error(`Room failed to create a harvester group (${this.memory.roomName})`);
             } else {
-                this.CreepGroups[groupID] = newPID.pid;
+                this.CreepGroups[groupID] = {
+                    priority: Priority_Medium,
+                    pid: newPID.pid
+                };
             }
         }
     }
 
-    protected abstract activateRoom(roomData: RVD_RoomMemory, room?: Room): void;
+    protected abstract prepHostThread(roomData: RVD_RoomMemory, room?: Room): void;
 }

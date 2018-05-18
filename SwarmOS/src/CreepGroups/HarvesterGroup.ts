@@ -6,12 +6,18 @@ export const OSPackage: IPackage<SpawnRegistry_Memory> = {
 }
 
 class HarvesterGroup extends BasicCreepGroup<HarvesterGroup_Memory> {
-    protected EnsureAssignments(): void {
-        for (let i = 0; i < this.memory.sIDs.length; i++) {
-            if (!this.assignments[this.memory.sIDs[i]]) {
-                this.createNewAssignment(this.memory.sIDs[i]);
+    protected EnsureAssignments(): IterableIterator<number> {
+        let self = this;
+        return (function* () {
+            let count = 0;
+            for (let i = 0; i < self.memory.sIDs.length; i++) {
+                if (!self.assignments[self.memory.sIDs[i]]) {
+                    self.createNewAssignment(self.memory.sIDs[i]);
+                }
+                yield count++;
             }
-        }
+            return count;
+        })();
     }
     protected CreateNewCreepMemory(aID: string): Harvester_Memory {
         return {

@@ -1,6 +1,5 @@
 
 /** Room Memory */
-declare interface RoomProcess_Memory extends MemBase {
+declare interface RoomProcess_Memory extends HostThread_Memory {
     roomName: string;
-    groups: IDictionary<RoomID, PID>;
 }

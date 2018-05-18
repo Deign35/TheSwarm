@@ -19,8 +19,12 @@ declare interface HostThread_Memory {
     childThreads: {
         [tid in ThreadID]: {
             priority: Priority,
+            pid: PID
         }
     }
+}
+declare interface ChildThread_Memory {
+    tid: ThreadID;
 }
 declare interface PackageProviderMemory extends MemBase {
     services: {

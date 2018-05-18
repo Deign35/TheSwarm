@@ -13,6 +13,9 @@ declare interface IProcess {
     onProcessEnd(): void
     run(): void;
 }
+declare interface IThreadProcess extends IProcess {
+    GetThread(): IterableIterator<number>;
+}
 declare interface _ProcessConstructor {
     new(context: IProcessContext): IProcess;
 }
@@ -32,7 +35,7 @@ declare interface ProcInfo {
     pP?: PID;   // parent pid
     end?: number; // Ended -- When the process ended
     err?: string; // Error
-    sl?: number;// Sleep -- Process sleeping until 
+    sl?: number;// Sleep -- Process sleeping until
 }
 
 declare type ProcessTable = {
