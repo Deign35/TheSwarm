@@ -3,7 +3,19 @@ declare var Memory: {
 }
 declare interface ITempAgency_Memory extends CreepGroup_Memory {
     hostPID: PID;
-    unprocessedCreeps: CreepContext[];
+    unprocessedCreeps: {
+        context: CreepContext
+        mem: CreepProcess_Memory
+    }[]
+
+    jobs: {
+        [id in RoomID]: {
+            [PKG_CreepBuilder]: GroupID[],
+            [PKG_CreepHarvester]: GroupID[],
+            [PKG_CreepRefiller]: GroupID[],
+            [PKG_CreepUpgrader]: GroupID[]
+        }
+    }
 }
 
 import { BasicCreepGroup } from "./BasicCreepGroup";
@@ -27,18 +39,33 @@ class TempAgencyCreepGroup extends BasicCreepGroup<ITempAgency_Memory> {
                 pri: Priority_Lowest,
                 unprocessedCreeps: [],
                 PKG: CG_TempAgency,
-                sta: ThreadState_Active
+                sta: ThreadState_Active,
+                jobs: {}
             };
         }
         return Memory.TempAgency
     }
+
+    RunThread(): ThreadState {
+        let result = super.RunThread();
+        if (result == ThreadState_Active) {
+            return result;
+        }
+
+        this.EnsureGroupFormation();
+        return ThreadState_Done;
+    }
     protected EnsureGroupFormation(): void {
         for (let i = 0; i < this.memory.unprocessedCreeps.length; i++) {
             // Use creep names as the group id.
-            this.createNewAssignment(this.memory.unprocessedCreeps[i].n, this.memory.unprocessedCreeps[i].ct, this.memory.unprocessedCreeps[i].l);
+            this.createNewAssignment(this.memory.unprocessedCreeps[i].context.n, this.memory.unprocessedCreeps[i].context.ct, this.memory.unprocessedCreeps[i].context.l);
+            // Kill the old job, and make a new one.
+            this.AssignNewTempJob(this.memory.unprocessedCreeps[i].context.n, this.memory.unprocessedCreeps[i].mem);
         }
+
+        this.memory.unprocessedCreeps = [];
     }
-    protected AssignNewTempJob(creepName: GroupID) {
+    protected AssignNewTempJob(creepName: GroupID, creepMem: CreepProcess_Memory) {
         let curJob = this.assignments[creepName];
         let creep;
         if (curJob.pid) {
@@ -60,42 +87,59 @@ class TempAgencyCreepGroup extends BasicCreepGroup<ITempAgency_Memory> {
             return;
         }
 
-        this.FindJobForCreep(creep);
+        this.FindJobForCreep(creep, creepMem);
     }
 
-    protected FindJobForCreep(creep: Creep) {
+    protected FindJobForCreep(creep: Creep, creepMem: ThreadMemory) {
         let curAssignment = this.assignments[creep.name];
         let body = CreepBodies.get(curAssignment.CT)[curAssignment.lvl] as CreepBody;
+        let newJobContext = this.createNewCreepContext(body.ct_ID, body.lvl);
 
-        if (body.a || body.h || body.r || body.cl || creep.carryCapacity == 0) {
+        if (!newJobContext || body.a || body.h || body.r || body.cl || creep.carryCapacity == 0) {
             this.log.error(`Undefined body behaviour`);
             creep.suicide();
             return;
         }
 
+        let room = creep.room;
+        if (!this.memory.jobs[room.name]) {
+            this.memory.jobs[room.name] = {
+                CreepBuilder: [],
+                CreepHarvester: [],
+                CreepRefiller: [],
+                CreepUpgrader: []
+            }
+        }
+
+        let viewData = this.View.GetRoomData(room.name)!;
+        let newJobPackage;
+
         let energy = creep.carry.energy;
-        if (energy == 0) {
-            // Create a Retrieval thread.
-        }
-        if (body.w && body.w > 0) {
+        if (body.w && body.w > 0 && creep.carryCapacity > 0) {
             // Create a work thread.
+            if (viewData.cSites.length > 0 && this.memory.jobs[room.name].CreepBuilder.length * 3 < viewData.cSites.length) {
+                creepMem.PKG = PKG_CreepBuilder;
+            } else if (viewData.owner && viewData.owner == MY_USERNAME) {
+                creepMem.PKG = PKG_CreepUpgrader;
+            } else if (viewData.sourceIDs.length > 0 && this.memory.jobs[room.name].CreepHarvester.length < 1) {
+                creepMem.PKG = PKG_CreepHarvester;
+            } else {
+                creepMem.PKG = PKG_CreepRefiller;
+            }
         } else {
-            // Create a deliver thread.
+            creepMem.PKG = PKG_CreepRefiller;
         }
+
+        if (!creepMem.PKG) {
+            creepMem.PKG = PKG_CreepRefiller;
+        }
+        this.memory.jobs[room.name][creepMem.PKG].push(this.AttachChildThread(creepMem, this.pid));
     }
 
     protected get GroupPrefix(): string { return 'TMP'; }
 }
 
 class TempAgencyExtension extends ExtensionBase {
-    constructor(extRegistry: IExtensionRegistry) {
-        super(extRegistry);
-
-        this.creepRegistry = extRegistry.get(EXT_CreepRegistry) as ICreepRegistryExtensions;
-    }
-
-    private creepRegistry: ICreepRegistryExtensions;
-
     protected get memory() {
         if (!Memory.TempAgency) {
             Memory.TempAgency = {
@@ -108,14 +152,18 @@ class TempAgencyExtension extends ExtensionBase {
                 pri: Priority_Lowest,
                 unprocessedCreeps: [],
                 PKG: CG_TempAgency,
-                sta: ThreadState_Active
+                sta: ThreadState_Active,
+                jobs: {}
             };
         }
 
         return Memory.TempAgency;
     }
 
-    AssignCreep(creepContext: CreepContext) {
-        this.memory.unprocessedCreeps.push(creepContext);
+    AssignCreep(creepContext: CreepContext, creepMem: CreepProcess_Memory) {
+        this.memory.unprocessedCreeps.push({
+            context: creepContext,
+            mem: creepMem
+        });
     }
 }

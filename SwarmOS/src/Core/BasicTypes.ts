@@ -57,7 +57,7 @@ export abstract class ThreadProcess<T extends ThreadMemory> extends BasicProcess
 
     protected executeProcess(): void { }
 
-    abstract RunThread(): void;
+    abstract RunThread(): ThreadState;
 }
 
 

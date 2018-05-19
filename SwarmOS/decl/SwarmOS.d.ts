@@ -15,8 +15,7 @@ declare interface IProcess {
 declare interface IThreadProcess extends IProcess {
     ThreadID?: ThreadID
     PKG: ScreepsPackage;
-    ThreadState: ThreadState;
-    RunThread(): void;
+    RunThread(): ThreadState;
 }
 
 declare type ProcessWithID = { pid: PID; process: IProcess; };
@@ -49,6 +48,7 @@ declare type ProcessTable = {
 declare type CreepDefinition = CreepBody[];
 declare interface CreepBody {
     cost: number;
+    lvl: number;
     ct_ID: CT_ALL;
     ctref_ID: CTREF_ALL;
     pkg_ID: ScreepsPackage;

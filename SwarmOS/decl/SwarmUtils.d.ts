@@ -18,6 +18,8 @@ declare type PID = string;
 declare type ThreadID = string;
 declare type GroupID = string;
 declare type TempAgencyID = string;
+declare type SpawnRequestID = string;
+
 declare type ScreepsPackage = OSPackage | CreepGroupPackage
 
 declare interface Profiler {

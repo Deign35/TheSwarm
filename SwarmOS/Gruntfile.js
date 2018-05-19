@@ -338,12 +338,12 @@ var GenerateConstantsFile = function () {
         for (var bodyIndex = 0; bodyIndex < creepEntries; bodyIndex++) {
             var bodyEntry = creepDef.entries[bodyIndex];
 
-            compiled.push(compileCreepBody(bodyEntry, ctID, MakeNewRefID(refPrefix, bodyIndex), creepDef.packageID));
+            compiled.push(compileCreepBody(bodyEntry, ctID, bodyIndex, MakeNewRefID(refPrefix, bodyIndex), creepDef.packageID));
         }
         return compiled;
     };
 
-    var compileCreepBody = function (bodyDef, ctID, refPrefix, packageID) {
+    var compileCreepBody = function (bodyDef, ctID, lvl, refPrefix, packageID) {
         var bodyString = '{';
         var components = Object.keys(bodyDef);
         var bodyCost = 0;
@@ -355,7 +355,7 @@ var GenerateConstantsFile = function () {
             }
         }
 
-        bodyString += 'cost:' + bodyCost + ',ct_ID:' + ctID + ',ctref_ID:' + refPrefix + ', pkg_ID:' + packageID + '}';
+        bodyString += 'cost:' + bodyCost + ',lvl:' + lvl + ',ct_ID:' + ctID + ',ctref_ID:' + refPrefix + ', pkg_ID:' + packageID + '}';
         return bodyString;
     };
 

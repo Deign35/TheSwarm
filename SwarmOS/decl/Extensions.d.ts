@@ -4,9 +4,7 @@
  * 
  * Add new package extensions to this page and add it to IPackageInterfaces
  */
-declare interface IPackageExtension {
-
-}
+declare interface IPackageExtension { }
 
 /**
  * Package extensions can be accessed from any process via the ExtensionRegistry.
@@ -101,7 +99,6 @@ declare interface IRoomDataExtension extends IPackageExtension {
 /**
  * Extension for processes to be able to request creep spawning.
  */
-declare type SpawnRequestID = string;
 declare interface ISpawnRegistryExtensions extends IPackageExtension {
     cancelRequest(id: SpawnRequestID): boolean;
     getRequestStatus(id: SpawnRequestID): SpawnState;

@@ -115,7 +115,7 @@ export abstract class ParentThreadProcess<T extends ThreadMemory_Parent> extends
         return ThreadState_Active;
     }
 
-    AttachChildThread(startContext: ThreadMemory, parentPID?: PID, pid?: PID) {
+    AttachChildThread(startContext: ThreadMemory, parentPID?: PID, pid?: PID): ThreadID {
         let newThreadID = this.childThreadPrefix + GetSUID();
         let childProc = undefined;
         if (pid) {
@@ -131,5 +131,6 @@ export abstract class ParentThreadProcess<T extends ThreadMemory_Parent> extends
             tid: newThreadID
         };
         this.kernel.setParent(pid!, parentPID);
+        return newThreadID;
     }
 }
