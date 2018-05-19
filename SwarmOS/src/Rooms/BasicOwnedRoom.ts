@@ -6,7 +6,12 @@ export const OSPackage: IPackage<SpawnRegistry_Memory> = {
 }
 
 class BasicOwnedRoom extends RoomBase<RoomProcess_Memory> {
-    protected prepHostThread(roomData: RVD_RoomMemory, room?: Room | undefined): void {
+    //protected prepHostThread(roomData: RVD_RoomMemory, room?: Room | undefined): void {
+    protected PrepareChildren(): void {
+        let roomData = this.View.GetRoomData(this.memory.roomName);
+        if (!roomData) {
+            throw new Error(`Room data retrieval failure`);
+        }
         // (TODO): Need to update the group if needs change, either from here or the group
         this.EnsureCreepGroup('Bui', CG_Builder, () => {
             return {
@@ -16,10 +21,11 @@ class BasicOwnedRoom extends RoomBase<RoomProcess_Memory> {
                 enabled: true,
                 homeRoom: this.memory.roomName,
                 lvl: 0,
-                numReq: Math.ceil((roomData.cSites.length / 4)) + 1,
+                numReq: Math.ceil((roomData!.cSites.length / 4)) + 1,
                 pri: Priority_Lowest,
                 targetRoom: this.memory.roomName,
-                childThreads: {}
+                childThreads: {},
+                PKG: PKG_CreepBuilder
             }
         });
         this.EnsureCreepGroup('Harv', CG_Harvester, () => {
@@ -30,11 +36,12 @@ class BasicOwnedRoom extends RoomBase<RoomProcess_Memory> {
                 enabled: true,
                 homeRoom: this.memory.roomName,
                 lvl: 0,
-                numReq: roomData.sourceIDs.length,
+                numReq: roomData!.sourceIDs.length,
                 pri: Priority_High,
                 targetRoom: this.memory.roomName,
-                sIDs: roomData.sourceIDs,
-                childThreads: {}
+                sIDs: roomData!.sourceIDs,
+                childThreads: {},
+                PKG: PKG_CreepHarvester
             }
         });
         this.EnsureCreepGroup('Ref', CG_Refiller, () => {
@@ -48,7 +55,8 @@ class BasicOwnedRoom extends RoomBase<RoomProcess_Memory> {
                 numReq: 1,
                 pri: Priority_Highest,
                 targetRoom: this.memory.roomName,
-                childThreads: {}
+                childThreads: {},
+                PKG: PKG_CreepRefiller
             }
         });
 
@@ -63,7 +71,8 @@ class BasicOwnedRoom extends RoomBase<RoomProcess_Memory> {
                 numReq: 1,
                 pri: Priority_Lowest,
                 targetRoom: this.memory.roomName,
-                childThreads: {}
+                childThreads: {},
+                PKG: PKG_CreepUpgrader
             }
         });
     }

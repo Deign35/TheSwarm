@@ -36,6 +36,7 @@ declare interface IProcessContext {
  */
 declare interface IExtensionRegistry extends IPackageExtension {
     get(interfaceId: string): IPackageExtension | undefined;
+    getKernel(): IKernel;
     register(interfaceId: string, extension: IPackageExtension): boolean;
     unregister(interfaceId: string): boolean;
 }

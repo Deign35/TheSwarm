@@ -24,8 +24,6 @@ export abstract class RoomBase<T extends RoomProcess_Memory> extends ParentThrea
             this.kernel.killProcess(this.pid);
             return;
         }
-
-        this.prepHostThread(roomData, this.room);
     }
     protected EnsureCreepGroup(groupID: string, groupPackageID: string, makeNewMem: () => CreepGroup_Memory) {
         if (!this.CreepGroups[groupID]) {
@@ -43,6 +41,4 @@ export abstract class RoomBase<T extends RoomProcess_Memory> extends ParentThrea
             };
         }
     }
-
-    protected abstract prepHostThread(roomData: RVD_RoomMemory, room?: Room): void;
 }

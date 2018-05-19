@@ -3,7 +3,7 @@ const ExtensionRegistry_LogContext: LogContext = {
     logLevel: LOG_INFO
 }
 
-export class ExtensionRegistry implements IPackageExtension {
+export class ExtensionRegistry implements IExtensionRegistry {
     constructor(logger: IKernelLoggerExtensions) {
         this._logger = logger.CreateLogContext(this.logID, this.logLevel);
         this.registry = {};
@@ -42,5 +42,8 @@ export class ExtensionRegistry implements IPackageExtension {
     get(interfaceId: string): IPackageExtension | undefined {
         if (!this.registry[interfaceId]) return;
         return this.registry[interfaceId];
+    }
+    getKernel(): IKernel {
+        return this.get(EXT_Kernel) as IKernel;
     }
 }

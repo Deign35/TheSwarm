@@ -20,9 +20,10 @@ declare interface ITempAgency_Memory extends CreepGroup_Memory {
 
 import { ExtensionBase } from "Core/BasicTypes";
 import { BasicCreepGroup } from "CreepGroups/BasicCreepGroup";
+
 export const OSPackage: IPackage<SpawnRegistry_Memory> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
-        processRegistry.register(CG_Builder, TempAgencyCreepGroup);
+        processRegistry.register(PKG_TempAgency, TempAgencyCreepGroup);
     }
 }
 

@@ -28,7 +28,7 @@ export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepEx
             processMemory: {},
             subscriptions: {},
             notifications: [],
-            ThreadProcs: {}
+            threadTable: {}
         };
         return Memory.kernel;
     }
