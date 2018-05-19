@@ -3,8 +3,6 @@ import { ParentThreadProcess } from "Core/AdvancedTypes";
 export abstract class RoomBase<T extends RoomProcess_Memory> extends ParentThreadProcess<T> {
     @extensionInterface(EXT_RoomView)
     View!: IRoomDataExtension;
-
-    protected get CreepGroups() { return this.memory.childThreads; }
     protected get memory(): T {
         return super.memory;
     }
@@ -25,7 +23,8 @@ export abstract class RoomBase<T extends RoomProcess_Memory> extends ParentThrea
             return;
         }
     }
-    protected EnsureCreepGroup(groupID: string, groupPackageID: string, makeNewMem: () => CreepGroup_Memory) {
+
+    /*protected EnsureCreepGroup(groupID: string, groupPackageID: string, makeNewMem: () => CreepGroup_Memory) {
         if (!this.CreepGroups[groupID]) {
             this.CreepGroups[groupID] = {
                 priority: Priority_Medium,
@@ -40,5 +39,5 @@ export abstract class RoomBase<T extends RoomProcess_Memory> extends ParentThrea
                 tid: groupID
             };
         }
-    }
+    }*/
 }
