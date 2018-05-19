@@ -34,12 +34,13 @@ class RoomManager extends BasicProcess<{}> {
                     this.log.warn(`(ASSUMPTION RECOVERY): GetRoomData refresh fixed it (${roomID})`)
                 }
             }
-            if (!data.pid || !this.kernel.getProcessByPID(data.pid)) {
+            /*if (!data.pid || !this.kernel.getProcessByPID(data.pid)) {
                 let newRoomMemory: RoomProcess_Memory = {
                     roomName: roomID,
                     childThreads: {},
                     PKG: PKG_SimpleOwnedRoom,
-                    pri: Priority_Medium
+                    pri: Priority_Medium,
+                    groups: {}
                 }
 
                 data.pid = this.kernel.startProcess(PKG_SimpleOwnedRoom, newRoomMemory);
@@ -49,7 +50,7 @@ class RoomManager extends BasicProcess<{}> {
                     priority: Priority_Medium,
                     tid: newTID
                 }
-            }
+            }*/
         }
     }
 }

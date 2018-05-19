@@ -39,7 +39,7 @@ class TempAgencyCreepGroup extends BasicCreepGroup<ITempAgency_Memory> {
                 hostPID: '',
                 pri: Priority_Lowest,
                 unprocessedCreeps: [],
-                PKG: CG_TempAgency,
+                PKG: PKG_TempAgency,
                 jobs: {}
             };
         }
@@ -151,7 +151,7 @@ class TempAgencyExtension extends ExtensionBase {
                 hostPID: '',
                 pri: Priority_Lowest,
                 unprocessedCreeps: [],
-                PKG: CG_TempAgency,
+                PKG: PKG_TempAgency,
                 jobs: {}
             };
         }

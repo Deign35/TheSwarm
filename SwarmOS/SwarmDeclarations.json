@@ -40,7 +40,7 @@
             "usePrefix": true,
             "combinedType": "CreepGroupPackage",
             "entries": [
-                "TempAgency",
+                "Extraction",
                 "Builder",
                 "Harvester",
                 "Refiller",

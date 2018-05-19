@@ -16,14 +16,13 @@ declare type ProcessMemory = {
     [id in PID]: MemBase;
 }
 
+declare interface ChildThreadState {
+    priority: Priority;
+    pid: PID;
+    tid: ThreadID
+}
 declare interface ThreadMemory_Parent extends ThreadMemory {
-    childThreads: {
-        [tid in ThreadID]: {
-            priority: Priority,
-            pid: PID
-            tid: tid
-        }
-    }
+    childThreads: { [tid in ThreadID]: ChildThreadState }
 }
 declare interface ThreadMemory extends MemBase {
     PKG: ScreepsPackage;

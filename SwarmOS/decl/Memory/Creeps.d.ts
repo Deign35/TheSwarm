@@ -36,6 +36,7 @@ declare interface CreepGroup_Memory extends ThreadMemory_Parent {
 
 declare interface CreepGroup_Assignment extends MemBase {
     pid?: PID;          // ID corresponding to the assigned PID
+    GR: GroupID;        // ID corresponding to the child ThreadID
     SR: SpawnRequestID; // ID corresponding to the spawn request
     CT: CT_ALL;         // (C)reep (T)ype
     lvl: number;        // role level

@@ -3,9 +3,6 @@ import { ParentThreadProcess } from "Core/AdvancedTypes";
 export abstract class RoomBase<T extends RoomProcess_Memory> extends ParentThreadProcess<T> {
     @extensionInterface(EXT_RoomView)
     View!: IRoomDataExtension;
-    protected get memory(): T {
-        return super.memory;
-    }
 
     get room(): Room | undefined {
         return Game.rooms[this.memory.roomName]
@@ -24,20 +21,15 @@ export abstract class RoomBase<T extends RoomProcess_Memory> extends ParentThrea
         }
     }
 
-    /*protected EnsureCreepGroup(groupID: string, groupPackageID: string, makeNewMem: () => CreepGroup_Memory) {
-        if (!this.CreepGroups[groupID]) {
-            this.CreepGroups[groupID] = {
-                priority: Priority_Medium,
-                pid: '',
-                tid: groupID
-            }
+    AttachNewCreepGroup(groupPackage: CreepGroupPackage, creepGroupMemory: CreepGroup_Memory) {
+        if (!this.memory.groups[groupPackage]) {
+            this.memory.groups[groupPackage] = '';
         }
-        if (!this.CreepGroups[groupID] || !this.kernel.getProcessByPID(this.CreepGroups[groupID].pid)) {
-            this.CreepGroups[groupID] = {
-                priority: Priority_Medium,
-                pid: this.kernel.startProcess(groupPackageID, makeNewMem()),
-                tid: groupID
-            };
+        if (this.kernel.getProcessByPID(this.memory.groups[groupPackage]!)) {
+            this.log.warn(`Attempted to add a creep group to a room that already has one.`);
+            return;
         }
-    }*/
+        let newPid = this.kernel.startProcess(groupPackage, creepGroupMemory);
+        this.AttachChildThread(creepGroupMemory, this.pid, newPid);
+    }
 }

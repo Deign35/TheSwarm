@@ -54,7 +54,8 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Paren
         let newAssignment: CreepGroup_Assignment = {
             CT: ctID,
             lvl: level,
-            SR: ''
+            SR: '',
+            GR: ''
         }
         this.assignments[newAssignmentID] = newAssignment;
         this.createNewCreepProcess(newAssignmentID);
@@ -64,15 +65,17 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Paren
         let assignment = this.assignments[aID];
         if (assignment && assignment.pid) {
             this.kernel.killProcess(assignment.pid);
+            // (TODO) Find something to do with dropped creeps
         }
 
         let newContext = this.createNewCreepContext(assignment.CT, assignment.lvl, assignment.pid);
         if (!this.spawnRegistry.tryResetRequest(assignment.SR, newContext)) {
             this.spawnRegistry.cancelRequest(assignment.SR);
-        } else {
             assignment.SR = this.spawnRegistry.requestSpawn(newContext, this.memory.targetRoom, this.memory.pri)
         }
 
-        assignment.pid = this.kernel.startProcess(CreepBodies[assignment.CT][assignment.lvl].pkg_ID, this.createNewCreepMemory(aID));
+        let newCreepMem = this.createNewCreepMemory(aID);
+        assignment.pid = this.kernel.startProcess(CreepBodies[assignment.CT][assignment.lvl].pkg_ID, newCreepMem);
+        assignment.GR = this.AttachChildThread(newCreepMem, this.pid, assignment.pid);
     }
 }

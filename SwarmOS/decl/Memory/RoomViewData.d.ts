@@ -10,7 +10,6 @@ interface RVD_RoomMemory extends MemBase {
     mineralIDs: ObjectID[];
     minUpdateOffset: number;
     owner?: PlayerID;
-    pid?: PID;
     resources: ObjectID[];
     sourceIDs: ObjectID[];
     structures: RVD_StructureMemory

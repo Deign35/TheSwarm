@@ -13,7 +13,7 @@ class BasicOwnedRoom extends RoomBase<RoomProcess_Memory> {
             throw new Error(`Room data retrieval failure`);
         }
         // (TODO): Need to update the group if needs change, either from here or the group
-        this.EnsureCreepGroup('Bui', CG_Builder, () => {
+        /*this.EnsureCreepGroup('Bui', CG_Builder, () => {
             return {
                 tid: 'Bui' + GetSUID(),
                 assignments: {},
@@ -74,6 +74,6 @@ class BasicOwnedRoom extends RoomBase<RoomProcess_Memory> {
                 childThreads: {},
                 PKG: PKG_CreepUpgrader
             }
-        });
+        });*/
     }
 }
