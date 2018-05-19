@@ -1,6 +1,6 @@
 import { Kernel } from "Core/Kernel";
-import { ExtensionRegistry } from "Core/ExtensionRegistry";
-import { ProcessRegistry } from "Core/ProcessRegistry";
+import { ExtensionRegistry } from "Registries/ExtensionRegistry";
+import { ProcessRegistry } from "Registries/ProcessRegistry";
 import { Logger } from "Core/Logger";
 
 var OS_Logger = new Logger();

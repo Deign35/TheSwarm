@@ -1,5 +1,5 @@
 import { BasicProcess, ThreadProcess } from "Core/BasicTypes";
-import { ExtensionRegistry } from "./ExtensionRegistry";
+import { ExtensionRegistry } from "Registries/ExtensionRegistry";
 
 const SCAN_FREQUENCY = 15;
 export abstract class PackageProviderBase<T extends PackageProviderMemory> extends BasicProcess<T> {

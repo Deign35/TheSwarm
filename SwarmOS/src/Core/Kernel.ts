@@ -190,8 +190,8 @@ export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepEx
         let activeThreadIDs = Object.keys(activeThreads);
         while (activeThreadIDs.length > 0) {
             let curThread = activeThreads[activeThreadIDs[0]];
-            curThread.proc.RunThread();
-            switch (curThread.proc.ThreadState) {
+            let threadResult = curThread.proc.RunThread();
+            switch (threadResult) {
                 case (ThreadState_Inactive):
                 case (ThreadState_Done):
                 case (ThreadState_Overrun): // (TODO): Turn Overrun into a thread state that allows the thread to do extra work as cpu is available.

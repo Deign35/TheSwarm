@@ -18,8 +18,8 @@ declare interface ITempAgency_Memory extends CreepGroup_Memory {
     }
 }
 
-import { BasicCreepGroup } from "./BasicCreepGroup";
 import { ExtensionBase } from "Core/BasicTypes";
+import { BasicCreepGroup } from "CreepGroups/BasicCreepGroup";
 export const OSPackage: IPackage<SpawnRegistry_Memory> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
         processRegistry.register(CG_Builder, TempAgencyCreepGroup);
@@ -39,7 +39,6 @@ class TempAgencyCreepGroup extends BasicCreepGroup<ITempAgency_Memory> {
                 pri: Priority_Lowest,
                 unprocessedCreeps: [],
                 PKG: CG_TempAgency,
-                sta: ThreadState_Active,
                 jobs: {}
             };
         }
@@ -152,7 +151,6 @@ class TempAgencyExtension extends ExtensionBase {
                 pri: Priority_Lowest,
                 unprocessedCreeps: [],
                 PKG: CG_TempAgency,
-                sta: ThreadState_Active,
                 jobs: {}
             };
         }

@@ -28,7 +28,6 @@ declare interface ThreadMemory_Parent extends ThreadMemory {
 declare interface ThreadMemory extends MemBase {
     PKG: ScreepsPackage;
     pri: Priority;
-    sta: ThreadState;
 }
 declare interface PackageProviderMemory extends MemBase {
     services: {

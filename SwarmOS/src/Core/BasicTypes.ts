@@ -53,7 +53,6 @@ export abstract class ThreadProcess<T extends ThreadMemory> extends BasicProcess
     protected thread!: IThreadRegistryExtensions;
 
     get PKG() { return this.memory.PKG; }
-    get ThreadState() { return this.memory.sta; }
 
     protected executeProcess(): void { }
 

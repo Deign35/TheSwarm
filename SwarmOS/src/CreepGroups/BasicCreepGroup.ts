@@ -39,7 +39,6 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Paren
             SR: this.assignments[aID].SR,
             PKG: body.pkg_ID,
             pri: Priority_Medium,
-            sta: ThreadState_Active
         }
     }
     protected createNewCreepContext(ctID: CT_ALL, level: number, owner?: PID): CreepContext {

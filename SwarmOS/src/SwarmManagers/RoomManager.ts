@@ -14,6 +14,7 @@ export const OSPackage: IPackage<RoomViewData_Memory> = {
     }
 }
 
+// (TODO): Convert to Room registry
 class RoomManager extends BasicProcess<{}> {
     @extensionInterface(EXT_RoomView)
     View!: IRoomDataExtension;
@@ -36,11 +37,13 @@ class RoomManager extends BasicProcess<{}> {
             if (!data.pid || !this.kernel.getProcessByPID(data.pid)) {
                 let newRoomMemory: RoomProcess_Memory = {
                     roomName: roomID,
-                    childThreads: {}
+                    childThreads: {},
+                    PKG: PKG_SimpleOwnedRoom,
+                    pri: Priority_Medium
                 }
 
                 data.pid = this.kernel.startProcess(PKG_SimpleOwnedRoom, newRoomMemory);
-                let newTID = this.thread.RegisterAsThread(data.pid);
+                let newTID = '1';//this.thread.RegisterAsThread(data.pid);
                 newRoomMemory.childThreads[newTID] = {
                     pid: data.pid,
                     priority: Priority_Medium,
