@@ -332,14 +332,6 @@ var GenerateConstantsFile = function () {
         d_file.push(declareString(creepID + '_ALL', combinedBodyTypeDef.slice(0, -3), 'type', ' = '));
     }
 
-    var compileCreepBodyEntries = function (creepDef) {
-        var defEntries = [];
-        for (var bodyIndex in creepDef) {
-            var bodyEntry = creepDef[bodyIndex];
-            defEntries.push(compileCreepBody(bodyEntry));
-        }
-        return defEntries;
-    }
     var compileCreepDef = function (creepDef, ctID, refPrefix) {
         var compiled = []
         var creepEntries = creepDef.entries.length;
@@ -363,8 +355,7 @@ var GenerateConstantsFile = function () {
             }
         }
 
-        bodyString += 'cost:' + bodyCost + ',CT_ID:' + ctID + ',REFERENCE_id:' + refPrefix + ', PKG_ID:' + packageID + '}';
-        console.log(JSON.stringify(bodyDef));
+        bodyString += 'cost:' + bodyCost + ',ct_ID:' + ctID + ',ctref_ID:' + refPrefix + ', pkg_ID:' + packageID + '}';
         return bodyString;
     };
 
@@ -431,7 +422,7 @@ var GenerateConstantsFile = function () {
 
         d_file.push(declareString('CT_ALL', fullObjectTypeString.slice(0, -2), 'type', ' = '));
         d_file.push(declareString('DEFINITION_ALL', fullDefinitionsTypeString.slice(0, -3), 'type', ' = '));
-        d_file.push(declareString('REFERENCE_ALL', fullReferencesTypeString.slice(0, -3), 'type', ' = '));
+        d_file.push(declareString('CTREF_ALL', fullReferencesTypeString.slice(0, -3), 'type', ' = '));
 
         var interfaceID = 'I' + globalID;
         var typeID = 'T' + globalID;

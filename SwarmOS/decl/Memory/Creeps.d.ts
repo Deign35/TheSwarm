@@ -1,6 +1,6 @@
 
 /** Creep extension Memory */
-declare interface CreepProcess_Memory extends MemBase {
+declare interface CreepProcess_Memory extends ThreadMemory {
     SR?: SpawnRequestID;// Spawn request ID 
     CR?: CreepID;       // Creep name
 

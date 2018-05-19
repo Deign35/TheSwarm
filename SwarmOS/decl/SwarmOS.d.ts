@@ -13,7 +13,10 @@ declare interface IProcess {
     run(): void;
 }
 declare interface IThreadProcess extends IProcess {
-    RunThread(): ThreadState;
+    ThreadID?: ThreadID
+    PKG: ScreepsPackage;
+    ThreadState: ThreadState;
+    RunThread(): void;
 }
 
 declare type ProcessWithID = { pid: PID; process: IProcess; };
@@ -43,16 +46,28 @@ declare type ProcessTable = {
     [pid in PID]: ProcInfo;
 }
 
+declare type CreepDefinition = CreepBody[];
+declare interface CreepBody {
+    cost: number;
+    ct_ID: CT_ALL;
+    ctref_ID: CTREF_ALL;
+    pkg_ID: ScreepsPackage;
 
+    m: number;      // Move
+    a?: number      // Attack
+    c?: number;     // Carry
+    cl?: number;    // Claim
+    h?: number;     // Heal
+    r?: number;     // RangedAttack
+    t?: number;     // Tough
+    w?: number;     // Work
+}
 declare interface CreepBodiesReference {
     CT_id: string,
     lvl: number
 }
 
-declare interface CreepGroupProcessContext extends IProcessContext {
-    loc: RoomID;
-}
-declare interface ProviderService {
+declare interface ProviderService extends IProcess {
     processName: string,
     startContext?: any
 }

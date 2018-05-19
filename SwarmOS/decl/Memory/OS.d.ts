@@ -26,7 +26,9 @@ declare interface ThreadMemory_Parent extends ThreadMemory {
     }
 }
 declare interface ThreadMemory extends MemBase {
-    registeredThreadID?: ThreadID; // Only processes that are in primary control should be assigned to the kernel
+    PKG: ScreepsPackage;
+    pri: Priority;
+    sta: ThreadState;
 }
 declare interface PackageProviderMemory extends MemBase {
     services: {

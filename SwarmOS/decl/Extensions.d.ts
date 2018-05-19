@@ -123,6 +123,6 @@ declare interface ICreepRegistryExtensions extends IPackageExtension {
 }
 
 declare interface IThreadRegistryExtensions extends IPackageExtension {
-    RegisterAsThread(pid: PID, tid?: ThreadID): ThreadID;
+    RegisterThread(pid: PID, tid?: ThreadID): ThreadID;
     CloseThread(tID: ThreadID): void;
 }

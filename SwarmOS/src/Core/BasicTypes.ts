@@ -47,28 +47,17 @@ export abstract class BasicProcess<ProcessMemory> implements IProcess {
 
     protected abstract executeProcess(): void;
 }
-declare interface IThreadProcess extends IProcess {
-    ThreadID?: ThreadID
-    RunThread(): ThreadState;
-}
 
 export abstract class ThreadProcess<T extends ThreadMemory> extends BasicProcess<T> implements IThreadProcess {
     @extensionInterface(EXT_ThreadRegistry)
     protected thread!: IThreadRegistryExtensions;
-    get ThreadID() { return this.memory.registeredThreadID; }
+
+    get PKG() { return this.memory.PKG; }
+    get ThreadState() { return this.memory.sta; }
 
     protected executeProcess(): void { }
-    abstract RunThread(): ThreadState;
 
-    OnProcessInstantiation() {
-        this.RegisterThread();
-    }
-
-    RegisterThread() {
-        if (this.ThreadID) {
-            this.thread.RegisterAsThread(this.pid, this.ThreadID);
-        }
-    }
+    abstract RunThread(): void;
 }
 
 

@@ -1,4 +1,4 @@
-import { BasicProcess, ThreadProcess, ExtensionBase } from "Core/BasicTypes";
+import { BasicProcess, ThreadProcess } from "Core/BasicTypes";
 import { ExtensionRegistry } from "./ExtensionRegistry";
 
 const SCAN_FREQUENCY = 15;
@@ -115,14 +115,21 @@ export abstract class ParentThreadProcess<T extends ThreadMemory_Parent> extends
         return ThreadState_Active;
     }
 
-    protected CreateChildThread(packageID: ScreepsPackage, startContext: MemBase) {
+    AttachChildThread(startContext: ThreadMemory, parentPID?: PID, pid?: PID) {
         let newThreadID = this.childThreadPrefix + GetSUID();
-        let newProc = this.kernel.startProcess(packageID, startContext);
+        let childProc = undefined;
+        if (pid) {
+            childProc = this.kernel.getProcessByPID(pid);
+        }
+
+        if (!childProc) {
+            pid = this.kernel.startProcess(startContext.PKG, startContext);
+        }
         this.children[newThreadID] = {
-            pid: newProc,
+            pid: pid!,
             priority: Priority_Medium,
             tid: newThreadID
         };
-        this.kernel.setParent(newProc, this.pid);
+        this.kernel.setParent(pid!, parentPID);
     }
 }

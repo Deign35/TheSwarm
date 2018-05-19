@@ -6,7 +6,7 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Paren
     @extensionInterface(EXT_RoomView)
     protected View!: IRoomDataExtension;
 
-    protected abstract EnsureGroupFormation(): ThreadState;
+    protected abstract EnsureGroupFormation(): void;
     protected abstract get GroupPrefix(): GroupID;
 
     protected get assignments() {
@@ -30,11 +30,16 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Paren
     }
 
     protected createNewCreepMemory(aID: GroupID): CreepProcess_Memory {
+        let assignment = this.assignments[aID];
+        let body = CreepBodies[assignment.CT][assignment.lvl] as CreepBody
         return {
             get: false,
             home: this.memory.homeRoom,
             loc: this.memory.targetRoom,
             SR: this.assignments[aID].SR,
+            PKG: body.pkg_ID,
+            pri: Priority_Medium,
+            sta: ThreadState_Active
         }
     }
     protected createNewCreepContext(ctID: CT_ALL, level: number, owner?: PID): CreepContext {
@@ -58,10 +63,8 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Paren
 
     protected createNewCreepProcess(aID: GroupID) {
         let assignment = this.assignments[aID];
-        if (assignment) {
-            if (assignment.pid) {
-                this.kernel.killProcess(assignment.pid);
-            }
+        if (assignment && assignment.pid) {
+            this.kernel.killProcess(assignment.pid);
         }
 
         let newContext = this.createNewCreepContext(assignment.CT, assignment.lvl, assignment.pid);
@@ -71,6 +74,6 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Paren
             assignment.SR = this.spawnRegistry.requestSpawn(newContext, this.memory.targetRoom, this.memory.pri)
         }
 
-        assignment.pid = this.kernel.startProcess(CreepBodies[assignment.CT][assignment.lvl].PKG_ID, this.createNewCreepMemory(aID));
+        assignment.pid = this.kernel.startProcess(CreepBodies[assignment.CT][assignment.lvl].pkg_ID, this.createNewCreepMemory(aID));
     }
 }

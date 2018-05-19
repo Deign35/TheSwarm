@@ -74,7 +74,6 @@ class CreepRegistry extends BasicProcess<CreepRegistry_Memory> {
     }
 }
 class CreepRegistryExtensions extends ExtensionBase implements ICreepRegistryExtensions {
-    constructor(extRegistry: IExtensionRegistry) { super(extRegistry); }
     protected get memory(): CreepRegistry_Memory {
         if (!Memory.creepData) {
             this.log.warn(`Initializing CreepRegistry memory`);

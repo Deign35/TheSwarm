@@ -11,12 +11,13 @@ declare type CreepID = ObjectID;
 declare type StructureID = ObjectID;
 declare type FlagID = ObjectID;
 declare type SpawnID = ObjectID;
-
 declare type RoomID = string;
+
 declare type PlayerID = string;
 declare type PID = string;
 declare type ThreadID = string;
 declare type GroupID = string;
+declare type TempAgencyID = string;
 declare type ScreepsPackage = OSPackage | CreepGroupPackage
 
 declare interface Profiler {

@@ -195,9 +195,6 @@ class SpawnRegistry extends BasicProcess<SpawnRegistry_Memory> {
 const UNSPAWNABLE_COST = -1;
 
 class SpawnRegistryExtensions extends ExtensionBase implements ISpawnRegistryExtensions {
-    constructor(extRegistry: IExtensionRegistry) {
-        super(extRegistry);
-    }
     protected get memory(): SpawnRegistry_Memory {
         if (!Memory.spawnData) {
             this.log.warn(`Initializing RoomManager memory`);
@@ -205,7 +202,6 @@ class SpawnRegistryExtensions extends ExtensionBase implements ISpawnRegistryExt
         }
         return Memory.spawnData;
     }
-
 
     getRequestStatus(id: SpawnRequestID): SpawnState {
         if (!this.memory[id]) {

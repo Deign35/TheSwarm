@@ -39,6 +39,7 @@
             "usePrefix": true,
             "combinedType": "CreepGroupPackage",
             "entries": [
+                "TempAgency",
                 "Builder",
                 "Harvester",
                 "Refiller",
