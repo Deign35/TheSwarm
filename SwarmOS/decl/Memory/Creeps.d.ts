@@ -61,7 +61,8 @@ declare interface CreepGroup_Assignment extends MemBase {
 }
 
 declare interface AssignmentContext extends MemBase {
-    pri: Priority
+    pri: Priority,
+    res: boolean        // respawn
 }
 declare interface AssignmentContext_Harvester extends AssignmentContext {
     tar: ObjectID;

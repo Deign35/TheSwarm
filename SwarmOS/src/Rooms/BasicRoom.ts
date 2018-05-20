@@ -79,4 +79,10 @@ class BasicRoom extends BasicCreepGroup<RoomThreadMemory> {
             }
         }
     }
+
+    ReceiveCreep(creep: Creep, oldAssignment: CreepGroup_Assignment) {
+        if (this.roomData.groups.CG_Infrastructure) {
+            (this.kernel.getProcessByPID(this.roomData.groups.CG_Infrastructure) as BasicCreepGroup<any>).ReceiveCreep(creep, oldAssignment);
+        }
+    }
 }

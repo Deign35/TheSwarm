@@ -1,4 +1,4 @@
-declare var Memory: {
+/*declare var Memory: {
     TempAgency: ITempAgency_Memory;
 }
 declare interface ITempAgency_Memory extends CreepGroup_Memory {
@@ -161,4 +161,4 @@ class TempAgencyExtension extends ExtensionBase {
             mem: creepMem
         });
     }
-}
+}*/

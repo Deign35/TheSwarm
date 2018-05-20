@@ -27,9 +27,6 @@ class SwarmManager extends PackageProviderBase<PackageProviderMemory> {
             },
             creepManager: {
                 processName: PKG_CreepRegistry
-            },
-            tempAgency: {
-                processName: PKG_TempAgency
             }
         }
         super.OnProcessInstantiation();

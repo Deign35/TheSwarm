@@ -110,7 +110,7 @@ class CreepRegistryExtensions extends ExtensionBase implements ICreepRegistryExt
             this.memory[id].o = requestingPID;
             return true;
         }
-        return false;
+        return this.memory[id].o == requestingPID;
     }
 
     releaseCreep(id: CreepID): void {

@@ -7,7 +7,7 @@ export const OSPackage: IPackage<InfrastructureGroup_Memory> = {
     }
 }
 
-class TempBranchGroup extends BasicCreepGroup<InfrastructureGroup_Memory> {
+export class TempBranchGroup extends BasicCreepGroup<InfrastructureGroup_Memory> {
     protected EnsureGroupFormation(): void {
         for (let i = 0; i < this.memory.unprocessedCreeps.length; i++) {
             // Use creep names as the group id.
@@ -15,18 +15,28 @@ class TempBranchGroup extends BasicCreepGroup<InfrastructureGroup_Memory> {
                 this.memory.unprocessedCreeps[i].context.ct,
                 this.memory.unprocessedCreeps[i].context.l,
                 {
-                    pri: Priority_Low
+                    pri: Priority_Low,
+                    res: false
                 });
             // Kill the old job, and make a new one.
             this.AssignNewTempJob(this.memory.unprocessedCreeps[i].context.n, this.memory.unprocessedCreeps[i].mem);
         }
 
         this.memory.unprocessedCreeps = [];
+
+        for (let group in this.memory.jobs) {
+            for (let i = 0; i < this.memory.jobs[group].length; i++) {// id in this.memory.jobs[group]) {
+                let threadID = this.memory.jobs[group][i];
+                if (!this.kernel.getProcessByPID(this.children[threadID].pid)) {
+                    this.memory.jobs[group].splice(i--, 1);
+                }
+            }
+        }
     }
     protected AssignNewTempJob(creepName: GroupID, creepMem: CreepProcess_Memory) {
         let curJob = this.assignments[creepName];
         let creep;
-        if (curJob.pid) {
+        if (curJob.pid && curJob.pid != this.pid) {
             this.kernel.killProcess(curJob.pid);
             creep = this.creepRegistry.tryGetCreep(creepName, curJob.pid);
             if (creep) {
@@ -80,6 +90,25 @@ class TempBranchGroup extends BasicCreepGroup<InfrastructureGroup_Memory> {
             creepMem.PKG = PKG_CreepRefiller;
         }
         this.memory.jobs[creepMem.PKG].push(this.AttachChildThread(creepMem, this.pid));
+    }
+
+    ReceiveCreep(creep: Creep, oldAssignment: CreepGroup_Assignment) {
+        this.memory.unprocessedCreeps.push({
+            context: {
+                ct: oldAssignment.CT,
+                l: oldAssignment.lvl,
+                n: creep.name,
+                o: this.pid
+            },
+            mem: {
+                CR: creep.name,
+                get: false,
+                home: creep.room.name,
+                loc: creep.room.name,
+                PKG: PKG_CreepRefiller, // Temporary,  Should be replaced by Find new Job
+                pri: Priority_Lowest,
+            }
+        })
     }
 
     protected get GroupPrefix(): string { return 'TMP'; }

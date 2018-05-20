@@ -47,12 +47,12 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Paren
         return {
             ct: ctID,
             l: level,
-            n: this.GroupPrefix + GetSUID(),
+            n: ctID + '_' + level + '_' + GetSUID(),
             o: owner
         }
     }
 
-    protected EnsureAssignment(assignmentID: GroupID, ctID: CT_ALL, level: number, context: AssignmentContext = { pri: Priority_Lowest }) {
+    protected EnsureAssignment(assignmentID: GroupID, ctID: CT_ALL, level: number, context: AssignmentContext = { pri: Priority_Lowest, res: false }) {
         let assignment = this.assignments[assignmentID];
         if (!assignment) {
             assignment = {
@@ -104,5 +104,42 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Paren
         let newCreepMem = this.createNewCreepMemory(aID);
         assignment.pid = this.kernel.startProcess(CreepBodies[assignment.CT][assignment.lvl].pkg_ID, newCreepMem);
         assignment.GR = this.AttachChildThread(newCreepMem, this.pid, assignment.pid);
+    }
+
+    protected releaseCreepToParent(aID: GroupID) {
+        let assignment = this.assignments[aID];
+        if (assignment) {
+            let spawnRequest = this.spawnRegistry.getRequestContext(assignment.SR);
+            if (spawnRequest) {
+                this.spawnRegistry.cancelRequest(assignment.SR);
+                if (assignment.pid) {
+                    this.kernel.killProcess(assignment.pid);
+                    let creep = this.creepRegistry.tryGetCreep(spawnRequest.n, assignment.pid);
+                    if (creep) {
+                        this.creepRegistry.releaseCreep(creep.name);
+                        let parentProc = this.parentPID ? this.kernel.getProcessByPID(this.parentPID) as IThreadProcess : undefined;
+                        if ((parentProc as BasicCreepGroup<any>).ReceiveCreep) {
+                            (parentProc as BasicCreepGroup<any>).ReceiveCreep(creep, assignment);
+                        } else {
+                            this.log.error(`Creep left to oblivion ${creep.name}`);
+                            creep.suicide();
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    ReceiveCreep(creep: Creep, oldAssignment: CreepGroup_Assignment) {
+        let parentProc = this.parentPID ? this.kernel.getProcessByPID(this.parentPID) as IThreadProcess : undefined;
+        if ((parentProc as BasicCreepGroup<any>).ReceiveCreep) {
+            (parentProc as BasicCreepGroup<any>).ReceiveCreep(creep, oldAssignment);
+            return;
+        } else {
+            this.log.error(`Creep left to oblivion ${creep.name}`);
+            creep.suicide();
+            return;
+        }
     }
 }

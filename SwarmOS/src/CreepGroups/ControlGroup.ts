@@ -35,7 +35,8 @@ class ControlGroup extends BasicCreepGroup<ControlGroup_Memory> {
         }
 
         this.EnsureAssignment('Upgrader', CT_Upgrader, level, {
-            pri: Priority_Low
+            pri: Priority_Low,
+            res: true
         })
     }
     protected get GroupPrefix(): string { return 'Ctrl'; }
