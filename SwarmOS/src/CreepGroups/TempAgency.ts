@@ -6,7 +6,7 @@ declare interface ITempAgency_Memory extends CreepGroup_Memory {
     unprocessedCreeps: {
         context: CreepContext
         mem: CreepProcess_Memory
-    }[]
+    }[];
 
     jobs: {
         [id in RoomID]: {
@@ -46,19 +46,15 @@ class TempAgencyCreepGroup extends BasicCreepGroup<ITempAgency_Memory> {
         return Memory.TempAgency
     }
 
-    RunThread(): ThreadState {
-        let result = super.RunThread();
-        if (result == ThreadState_Active) {
-            return result;
-        }
-
-        this.EnsureGroupFormation();
-        return ThreadState_Done;
-    }
     protected EnsureGroupFormation(): void {
         for (let i = 0; i < this.memory.unprocessedCreeps.length; i++) {
             // Use creep names as the group id.
-            this.createNewAssignment(this.memory.unprocessedCreeps[i].context.n, this.memory.unprocessedCreeps[i].context.ct, this.memory.unprocessedCreeps[i].context.l);
+            this.EnsureAssignment(this.memory.unprocessedCreeps[i].context.n,
+                this.memory.unprocessedCreeps[i].context.ct,
+                this.memory.unprocessedCreeps[i].context.l,
+                {
+                    pri: Priority_Low
+                });
             // Kill the old job, and make a new one.
             this.AssignNewTempJob(this.memory.unprocessedCreeps[i].context.n, this.memory.unprocessedCreeps[i].mem);
         }

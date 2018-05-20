@@ -13,29 +13,27 @@ class RefillThread extends CreepThread<SpawnRefiller_Memory> {
         if (!this.creep || this.creep.spawning) {
             return ThreadState_Done;
         }
-        let creep = this.creep;
 
         if (this.memory.get) {
-            if (creep.carry.energy == creep.carryCapacity) {
+            if (this.creep.carry.energy == this.creep.carryCapacity) {
                 this.memory.tar = undefined;
                 this.memory.get = false;
-            } else {
-                this.getEnergy(this.creep.carryCapacity / 2);
-                return ThreadState_Done;
             }
-        } else if (creep.carry.energy == 0) {
+        } else if (this.creep.carry.energy == 0) {
             this.memory.tar = undefined;
             this.memory.get = true;
-            this.getEnergy(creep.carryCapacity / 2);
-            return ThreadState_Done;
         }
 
-        if (this.memory.tar && creep.room.name != this.memory.loc) {
-            new MoveToPositionAction(creep, new RoomPosition(25, 25, this.memory.loc)).Run();
-            return ThreadState_Done;
+        let targetRoom = (this.memory.get ? this.memory.home : this.memory.loc);
+        if (this.creep.room.name != targetRoom) {
+            new MoveToPositionAction(this.creep, new RoomPosition(25, 25, targetRoom)).Run();
         }
 
-        return this.RefillSpawnOrExtension();
+        if (this.memory.get) {
+            return this.getEnergy(this.creep.carryCapacity / 2);
+        } else {
+            return this.RefillSpawnOrExtension();
+        }
     }
 
     RefillSpawnOrExtension(): ThreadState {

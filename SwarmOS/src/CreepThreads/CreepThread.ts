@@ -216,7 +216,6 @@ export abstract class CreepThread<T extends CreepProcess_Memory> extends ThreadP
             }
         }
 
-        this.memory.loc = targetRoom;
         return closestTarget;
     }
 }

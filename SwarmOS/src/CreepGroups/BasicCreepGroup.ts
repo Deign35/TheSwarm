@@ -40,7 +40,7 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Paren
             loc: this.memory.targetRoom,
             SR: this.assignments[aID].SR,
             PKG: body.pkg_ID,
-            pri: Priority_Medium as Priority,
+            pri: assignment.con.pri,
         }, assignment.con);
     }
     protected createNewCreepContext(ctID: CT_ALL, level: number, owner?: PID): CreepContext {
@@ -52,16 +52,31 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Paren
         }
     }
 
-    protected createNewAssignment(newAssignmentID: GroupID, ctID: CT_ALL, level: number) {
-        let newAssignment: CreepGroup_Assignment = {
-            CT: ctID,
-            lvl: level,
-            SR: '',
-            GR: '',
-            con: {}
+    protected EnsureAssignment(assignmentID: GroupID, ctID: CT_ALL, level: number, context: AssignmentContext = { pri: Priority_Lowest }) {
+        if (!this.assignments[assignmentID]) {
+            let newAssignment: CreepGroup_Assignment = {
+                CT: ctID,
+                lvl: level,
+                SR: '',
+                GR: '',
+                con: context
+            }
+            this.assignments[assignmentID] = newAssignment;
         }
-        this.assignments[newAssignmentID] = newAssignment;
-        this.createNewCreepProcess(newAssignmentID);
+
+        let childSR = this.spawnRegistry.getRequestContext(this.assignments[assignmentID].SR);
+        if (!childSR) {
+            this.createNewCreepProcess(assignmentID);
+            childSR = this.spawnRegistry.getRequestContext(this.assignments[assignmentID].SR);
+            if (!childSR) {
+                throw new Error(`Restarting of creep thread failed.`);
+            }
+        }
+
+        if (childSR.l != level) {
+            this.assignments[assignmentID].lvl = level;
+            this.createNewCreepProcess(assignmentID);
+        }
     }
 
     protected createNewCreepProcess(aID: GroupID) {
