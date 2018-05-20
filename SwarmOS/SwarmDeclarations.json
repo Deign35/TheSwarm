@@ -26,6 +26,7 @@
                 "CreepBuilder",
                 "CreepHarvester",
                 "CreepRefiller",
+                "CreepRepair",
                 "CreepUpgrader",
                 "SimpleOwnedRoom",
                 "FlagBase"

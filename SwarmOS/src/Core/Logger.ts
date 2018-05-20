@@ -116,7 +116,6 @@ export class Logger implements IKernelLoggerExtensions {
             this.logContexts[logID] = {
                 logLevel: logLevel || DEFAULT_LOG_LEVEL,
                 logs: [],
-                //counter: false // (TODO) prepend a counter to logs.
             }
         }
 

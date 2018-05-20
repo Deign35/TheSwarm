@@ -37,7 +37,6 @@ import { kernel } from "Core/index";
 
 import { CreepThreadsPackage } from "CreepThreads/index";
 import { CreepGroupsPackage } from "CreepGroups/index";
-//import { roomBundle } from "Rooms/index";
 import { bundle as SwarmManager } from "SwarmManagers/index";
 import { flagBundle } from "Flags/index";
 import { RegistriesPackage as Registries } from "Registries/index";

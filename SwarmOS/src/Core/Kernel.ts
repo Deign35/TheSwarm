@@ -75,7 +75,6 @@ export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepEx
         }
 
         let kernelContext = this;
-        // (TODO): Reevaluate and ensure start context is correct
         let context: IProcessContext = {
             pid: pInfo.pid,
             pkgName: pInfo.PKG,

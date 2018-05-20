@@ -15,7 +15,6 @@ export abstract class CreepThread<T extends CreepProcess_Memory> extends ThreadP
         return this._creep!;
     }
     private _creep: Creep | undefined;
-    abstract RunThread(): ThreadState;
 
     protected refreshSpawnRequest(context: CreepContext) {
         context.n = context.n.slice(0, 5) + GetSUID();
@@ -43,7 +42,7 @@ export abstract class CreepThread<T extends CreepProcess_Memory> extends ThreadP
             let reqStatus = this.spawnRegistry.getRequestStatus(this.memory.SR);
             switch (reqStatus) {
                 case (SP_COMPLETE):
-                // (TODO): Need to make sure that we dont end up in an inf loop.        
+                // (TODO): Need to make sure that we dont end up in an inf loop.
                 case (SP_SPAWNING):
                     let context = this.spawnRegistry.getRequestContext(this.memory.SR);
                     if (context) {
