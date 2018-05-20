@@ -1,6 +1,6 @@
 declare var Memory: {
     // Put common memory here -- Desired body sizes
-
+    roomGroups: RoomGroupListing
     // Or do I kill old processes and start new ones
     roomData: RoomViewData_Memory
 }
@@ -28,6 +28,14 @@ class RoomManager extends BasicProcess<{}> {
         }
         return Memory.roomData;
     }
+    protected get groups(): RoomGroupListing {
+        if (!Memory.roomGroups) {
+            this.log.warn(`Initializing RoomGroup memory`);
+            Memory.roomGroups = {};
+        }
+
+        return Memory.roomGroups;
+    }
     executeProcess(): void {
         for (let roomID in Game.rooms) {
             let requiresNewRoomProcesses = false;
@@ -47,6 +55,7 @@ class RoomManager extends BasicProcess<{}> {
                 }
             }
             if (requiresNewRoomProcesses) {
+                this.groups[roomID] = {};
                 if (data.sourceIDs.length > 0 || data.mineralIDs.length > 0) {
                     let newMem: ExtractionGroup_Memory = {
                         assignments: {},
@@ -60,6 +69,7 @@ class RoomManager extends BasicProcess<{}> {
                     let newPID = this.kernel.startProcess(CG_Extraction, newMem);
                     this.kernel.setParent(newPID);
                     this.thread.RegisterAsThread(newPID);
+                    this.groups[roomID][CG_Extraction] = newPID;
                 }
                 let newMem: ControlGroup_Memory = {
                     assignments: {},
@@ -73,6 +83,7 @@ class RoomManager extends BasicProcess<{}> {
                 let newPID = this.kernel.startProcess(CG_Control, newMem);
                 this.kernel.setParent(newPID);
                 this.thread.RegisterAsThread(newPID);
+                this.groups[roomID][CG_Control] = newPID;
 
                 let infMem: InfrastructureGroup_Memory = {
                     assignments: {},
@@ -92,6 +103,7 @@ class RoomManager extends BasicProcess<{}> {
                 let infPID = this.kernel.startProcess(CG_Infrastructure, infMem);
                 this.kernel.setParent(infPID);
                 this.thread.RegisterAsThread(infPID);
+                this.groups[roomID][CG_Infrastructure] = infPID;
             }
         }
     }

@@ -38,3 +38,9 @@ interface RVD_StructureMemory extends MemBase {
     [STRUCTURE_TOWER]?: RVD_StructureData[];
     [STRUCTURE_WALL]?: RVD_StructureData[];
 }
+
+declare interface RoomGroupListing {
+    [id: string]: {
+        [id in CreepGroupPackage]?: PID
+    }
+}

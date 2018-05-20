@@ -86,7 +86,13 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Paren
         let assignment = this.assignments[aID];
         if (assignment && assignment.pid) {
             this.kernel.killProcess(assignment.pid);
-            // (TODO) Find something to do with dropped creeps
+            let childSR = this.spawnRegistry.getRequestContext(assignment.SR);
+            if (childSR) {
+                let creep = this.creepRegistry.tryGetCreep(childSR.n, assignment.pid);
+                if (creep) {
+                    this.creepRegistry.releaseCreep(creep.name);
+                }
+            }
         }
 
         let newContext = this.createNewCreepContext(assignment.CT, assignment.lvl, assignment.pid);
