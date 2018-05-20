@@ -81,7 +81,13 @@ class RoomManager extends BasicProcess<{}> {
                     homeRoom: roomID,
                     PKG: CG_Infrastructure,
                     pri: Priority_Medium,
-                    targetRoom: roomID
+                    targetRoom: roomID,
+                    jobs: {
+                        CreepBuilder: [],
+                        CreepRefiller: [],
+                        CreepUpgrader: []
+                    },
+                    unprocessedCreeps: []
                 }
                 let infPID = this.kernel.startProcess(CG_Infrastructure, infMem);
                 this.kernel.setParent(infPID);

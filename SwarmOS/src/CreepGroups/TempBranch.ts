@@ -1,29 +1,13 @@
-declare interface ITempAgency_Memory extends CreepGroup_Memory {
-    hostPID: PID;
-    unprocessedCreeps: {
-        context: CreepContext
-        mem: CreepProcess_Memory
-    }[];
-
-    jobs: {
-        [id in RoomID]: {
-            [PKG_CreepBuilder]: GroupID[],
-            [PKG_CreepRefiller]: GroupID[],
-            [PKG_CreepUpgrader]: GroupID[]
-        }
-    }
-}
-
 import { ExtensionBase } from "Core/BasicTypes";
 import { BasicCreepGroup } from "CreepGroups/BasicCreepGroup";
 
-export const OSPackage: IPackage<ITempAgency_Memory> = {
+export const OSPackage: IPackage<InfrastructureGroup_Memory> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
         processRegistry.register(CG_Infrastructure, TempBranchGroup);
     }
 }
 
-class TempBranchGroup extends BasicCreepGroup<ITempAgency_Memory> {
+class TempBranchGroup extends BasicCreepGroup<InfrastructureGroup_Memory> {
     protected EnsureGroupFormation(): void {
         for (let i = 0; i < this.memory.unprocessedCreeps.length; i++) {
             // Use creep names as the group id.
@@ -75,23 +59,13 @@ class TempBranchGroup extends BasicCreepGroup<ITempAgency_Memory> {
             return;
         }
 
-        let room = creep.room;
-        if (!this.memory.jobs[room.name]) {
-            this.memory.jobs[room.name] = {
-                CreepBuilder: [],
-                CreepHarvester: [],
-                CreepRefiller: [],
-                CreepUpgrader: []
-            }
-        }
-
-        let viewData = this.View.GetRoomData(room.name)!;
+        let viewData = this.View.GetRoomData(creep.room.name)!;
         let newJobPackage;
 
         let energy = creep.carry.energy;
         if (body.w && body.w > 0 && creep.carryCapacity > 0) {
             // Create a work thread.
-            if (viewData.cSites.length > 0 && this.memory.jobs[room.name].CreepBuilder.length * 3 < viewData.cSites.length) {
+            if (viewData.cSites.length > 0 && this.memory.jobs.CreepBuilder.length * 3 < viewData.cSites.length) {
                 creepMem.PKG = PKG_CreepBuilder;
             } else if (viewData.owner && viewData.owner == MY_USERNAME) {
                 creepMem.PKG = PKG_CreepUpgrader;
@@ -105,7 +79,7 @@ class TempBranchGroup extends BasicCreepGroup<ITempAgency_Memory> {
         if (!creepMem.PKG) {
             creepMem.PKG = PKG_CreepRefiller;
         }
-        this.memory.jobs[room.name][creepMem.PKG].push(this.AttachChildThread(creepMem, this.pid));
+        this.memory.jobs[creepMem.PKG].push(this.AttachChildThread(creepMem, this.pid));
     }
 
     protected get GroupPrefix(): string { return 'TMP'; }

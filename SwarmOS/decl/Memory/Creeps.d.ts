@@ -37,7 +37,16 @@ declare interface ControlGroup_Memory extends CreepGroup_Memory {
 
 }
 declare interface InfrastructureGroup_Memory extends CreepGroup_Memory {
+    unprocessedCreeps: {
+        context: CreepContext
+        mem: CreepProcess_Memory
+    }[];
 
+    jobs: {
+        [PKG_CreepBuilder]: GroupID[],
+        [PKG_CreepRefiller]: GroupID[],
+        [PKG_CreepUpgrader]: GroupID[]
+    }
 }
 declare interface ExtractionGroup_Memory extends CreepGroup_Memory {
 }
