@@ -1,7 +1,7 @@
 
 /** RoomViewData */
 declare type RoomViewData_Memory = MemBase & {
-    [id in RoomID]: RVD_RoomMemory
+    [id in RoomID]: RoomState
 }
 
 interface RVD_RoomMemory extends MemBase {
@@ -81,12 +81,10 @@ interface RoomState_StructureData extends MemBase {
     [STRUCTURE_TERMINAL]?: ObjectID;
 }
 
-declare interface RoomState_AttachedCreepGroups {
-    [id: string]: {
-        [id in CreepGroupPackage]?: PID
-    }
+declare type RoomState_AttachedCreepGroups = {
+    [id in CreepGroupPackage]?: PID
 }
 
-declare interface RoomThreadMemory extends ThreadMemory_Parent {
 
+declare interface RoomThreadMemory extends CreepGroup_Memory {
 }

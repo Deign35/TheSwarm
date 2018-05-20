@@ -26,7 +26,7 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Paren
         let childIDs = Object.keys(this.assignments);
         for (let i = 0; i < childIDs.length; i++) {
             if (!this.assignments[childIDs[i]].pid) {
-                this.createNewCreepProcess(childIDs[i]);
+                this.createNewCreepProcess(childIDs[i], this.assignments[childIDs[i]].con.pri);
             }
         }
     }
@@ -67,7 +67,7 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Paren
 
         let childSR = this.spawnRegistry.getRequestContext(assignment.SR);
         if (!childSR) {
-            this.createNewCreepProcess(assignmentID);
+            this.createNewCreepProcess(assignmentID, context.pri);
             childSR = this.spawnRegistry.getRequestContext(assignment.SR);
             if (!childSR) {
                 throw new Error(`Restarting of creep thread failed.`);
@@ -76,13 +76,13 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Paren
 
         if (childSR.l != level) {
             assignment.lvl = level;
-            this.createNewCreepProcess(assignmentID);
+            this.createNewCreepProcess(assignmentID, context.pri);
         }
 
         this.assignments[assignmentID] = assignment;
     }
 
-    protected createNewCreepProcess(aID: GroupID) {
+    protected createNewCreepProcess(aID: GroupID, pri: Priority) {
         let assignment = this.assignments[aID];
         if (assignment && assignment.pid) {
             this.kernel.killProcess(assignment.pid);
@@ -98,7 +98,7 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Paren
         let newContext = this.createNewCreepContext(assignment.CT, assignment.lvl, assignment.pid);
         if (!this.spawnRegistry.tryResetRequest(assignment.SR, newContext)) {
             this.spawnRegistry.cancelRequest(assignment.SR);
-            assignment.SR = this.spawnRegistry.requestSpawn(newContext, this.memory.targetRoom, this.memory.pri)
+            assignment.SR = this.spawnRegistry.requestSpawn(newContext, this.memory.targetRoom, pri)
         }
 
         let newCreepMem = this.createNewCreepMemory(aID);

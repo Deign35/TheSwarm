@@ -51,10 +51,10 @@ class RefillThread extends CreepThread<SpawnRefiller_Memory> {
             let extensions = roomData.structures.extension;
             if (extensions) {
                 for (let i = 0; i < extensions.length; i++) {
-                    target = Game.getObjectById(extensions[i].id) as StructureExtension;
+                    target = Game.getObjectById(extensions[i]) as StructureExtension;
                     if (!target) { continue; }
                     if (target.energy < target.energyCapacity) {
-                        this.memory.tar = extensions[i].id;
+                        this.memory.tar = extensions[i];
                         break;
                     }
                 }
@@ -64,10 +64,10 @@ class RefillThread extends CreepThread<SpawnRefiller_Memory> {
                 let spawns = roomData.structures.spawn;
                 if (spawns) {
                     for (let i = 0; i < spawns.length; i++) {
-                        target = Game.getObjectById(spawns[i].id) as StructureSpawn;
+                        target = Game.getObjectById(spawns[i]) as StructureSpawn;
                         if (!target) { continue; }
                         if (target.energy < target.energyCapacity) {
-                            this.memory.tar = spawns[i].id;
+                            this.memory.tar = spawns[i];
                             break;
                         }
                     }

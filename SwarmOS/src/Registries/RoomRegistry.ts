@@ -33,13 +33,18 @@ class RoomRegistry extends ParentThreadProcess<ThreadMemory_Parent> {
             let data = this.RoomView.GetRoomData(roomID);
             if (data && !data.hostPID) {
                 let newMem: RoomThreadMemory = {
-                    childThreads: {},
                     PKG: PKG_SimpleOwnedRoom,
-                    pri: Priority_Medium
+                    pri: Priority_Medium,
+                    assignments: {},
+                    childThreads: {},
+                    enabled: true,
+                    homeRoom: roomID,
+                    targetRoom: roomID
                 }
                 let newPID = this.kernel.startProcess(PKG_SimpleOwnedRoom, newMem);
                 this.kernel.setParent(newPID);
                 this.thread.RegisterAsThread(newPID);
+                this.memory.roomStateData[roomID]!.hostPID = newPID;
             }
         }
     }

@@ -48,7 +48,7 @@ export class BuilderThread extends CreepThread<Builder_Memory> {
 
             let dist = 100;
             for (let i = 0; i < roomData.cSites.length; i++) {
-                let nextSite = Game.constructionSites[roomData.cSites[i].id];
+                let nextSite = Game.constructionSites[roomData.cSites[i]];
                 let siteDist = this.creep.pos.getRangeTo(nextSite);
                 if (siteDist < dist) {
                     targetSite = nextSite;

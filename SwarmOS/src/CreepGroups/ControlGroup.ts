@@ -38,5 +38,5 @@ class ControlGroup extends BasicCreepGroup<ControlGroup_Memory> {
             pri: Priority_Low
         })
     }
-    protected get GroupPrefix(): string { return 'Extr'; }
+    protected get GroupPrefix(): string { return 'Ctrl'; }
 }

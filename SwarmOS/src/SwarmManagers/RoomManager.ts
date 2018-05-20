@@ -1,4 +1,4 @@
-declare var Memory: {
+/*declare var Memory: {
     // Put common memory here -- Desired body sizes
     roomGroups: RoomGroupListing
     // Or do I kill old processes and start new ones
@@ -214,7 +214,7 @@ class RoomExtension extends ExtensionBase implements IRoomDataExtension {
                     structure.structureType == STRUCTURE_TOWER ||
                     /*structure.structureType == STRUCTURE_WALL ||
                     structure.structureType == STRUCTURE_ROAD ||
-                    structure.structureType == STRUCTURE_RAMPART ||*/
+                    structure.structureType == STRUCTURE_RAMPART ||*
                     structure.structureType == STRUCTURE_LAB) {
 
                     structureData.room = structure.pos.roomName;
@@ -293,4 +293,4 @@ class RoomExtension extends ExtensionBase implements IRoomDataExtension {
         }
         // Update path stuff somehow.
     }
-}
+}*/

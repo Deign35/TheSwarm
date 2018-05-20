@@ -158,7 +158,7 @@ export abstract class CreepThread<T extends CreepProcess_Memory> extends ThreadP
             }
         }
         for (let i = 0; i < view.structures.container.length; i++) {
-            let container = Game.getObjectById(view.structures.container[i].id) as StructureContainer;
+            let container = Game.getObjectById(view.structures.container[i]) as StructureContainer;
             if (!container) { continue; }
             if (container.store.energy >= minEnergy) {
                 let containerDist = this.creep.pos.getRangeTo(container);
@@ -170,7 +170,7 @@ export abstract class CreepThread<T extends CreepProcess_Memory> extends ThreadP
         }
         if (view.structures.link) {
             for (let i = 0; i < view.structures.link.length; i++) {
-                let link = Game.getObjectById(view.structures.link[i].id) as StructureLink;
+                let link = Game.getObjectById(view.structures.link[i]) as StructureLink;
                 if (!link) { continue; }
                 if (link.energy >= minEnergy) {
                     let linkDist = this.creep.pos.getRangeTo(link);
