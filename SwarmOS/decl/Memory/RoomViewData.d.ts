@@ -44,3 +44,49 @@ declare interface RoomGroupListing {
         [id in CreepGroupPackage]?: PID
     }
 }
+
+/** RoomViewData */
+declare interface RoomStateMemory extends ThreadMemory_Parent {
+    roomStateData: {
+        [id in RoomID]: RoomState
+    }
+}
+
+interface RoomState extends MemBase {
+    lastUpdated: number;
+    cSites: ObjectID[];
+    mineralIDs: ObjectID[];
+    resources: ObjectID[];
+    sourceIDs: ObjectID[];
+    tombstones: ObjectID[];
+    minUpdateOffset: number;
+    owner?: PlayerID;
+    structures: RoomState_StructureData;
+    groups: RoomState_AttachedCreepGroups;
+    hostPID: PID;
+}
+interface RoomState_StructureData extends MemBase {
+    [STRUCTURE_CONTAINER]: ObjectID[];
+    [STRUCTURE_ROAD]: ObjectID[];
+    [STRUCTURE_CONTROLLER]?: ObjectID; // (TODO) Create a fake controller for when there isn't one?  All rooms have a controller, either mine or the StructureController.
+
+    [STRUCTURE_EXTENSION]?: ObjectID[];
+    [STRUCTURE_LAB]?: ObjectID[];
+    [STRUCTURE_LINK]?: ObjectID[];
+    [STRUCTURE_RAMPART]?: ObjectID[];
+    [STRUCTURE_SPAWN]?: ObjectID[];
+    [STRUCTURE_TOWER]?: ObjectID[];
+    [STRUCTURE_WALL]?: ObjectID[];
+    [STRUCTURE_STORAGE]?: ObjectID;
+    [STRUCTURE_TERMINAL]?: ObjectID;
+}
+
+declare interface RoomState_AttachedCreepGroups {
+    [id: string]: {
+        [id in CreepGroupPackage]?: PID
+    }
+}
+
+declare interface RoomThreadMemory extends ThreadMemory_Parent {
+
+}
