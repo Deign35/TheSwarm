@@ -4,13 +4,9 @@ declare interface MemBase { }
 declare interface KernelMemory extends MemBase {
     processTable: ProcessTable;
     processMemory: ProcessMemory;
-    threadTable: ThreadTable;
 
     subscriptions: IDictionary<string, PID[]>;
     notifications: string[]
-}
-declare type ThreadTable = {
-    [id in ThreadID]: PID;
 }
 declare type ProcessMemory = {
     [id in PID]: MemBase;

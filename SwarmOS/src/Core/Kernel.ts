@@ -23,13 +23,14 @@ export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepEx
     }
 
     get memory(): KernelMemory {
-        Memory.kernel = Memory.kernel || {
-            processTable: {},
-            processMemory: {},
-            subscriptions: {},
-            notifications: [],
-            threadTable: {}
-        };
+        if (!Memory.kernel) {
+            Memory.kernel = {
+                processTable: {},
+                processMemory: {},
+                subscriptions: {},
+                notifications: []
+            };
+        }
         return Memory.kernel;
     }
     get processTable(): ProcessTable {
@@ -37,9 +38,6 @@ export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepEx
     }
     get processMemory(): ProcessMemory {
         return this.memory.processMemory;
-    }
-    get threadTable() {
-        return this.memory.threadTable;
     }
 
     installPackage(pack: IPackage<{}>) {
@@ -140,8 +138,6 @@ export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepEx
 
     loop() {
         let processIDs = Object.keys(this.processTable);
-
-        let threadIDs = Object.keys(this.memory.threadTable);
         let activeThreads: IDictionary<PID, ChildThreadState> = {}
 
         let hasActiveProcesses = false;
@@ -152,9 +148,6 @@ export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepEx
                 delete this.processTable[pid];
                 delete this.processMemory[pid];
                 delete this._processCache[pid];
-                if (this.threadTable[pid]) {
-                    delete this.threadTable[pid];
-                }
                 continue;
             }
             hasActiveProcesses = true;
@@ -163,14 +156,14 @@ export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepEx
                 if (!proc) throw new Error(`Could not get process ${pid} ${pInfo.PKG}`);
                 this.curProcessID = pid;
 
-                if (this.processTable[pid].sl) {
-                    if ((this.processTable[pid].sl! <= Game.time)) {
+                if (pInfo.sl) {
+                    if ((pInfo.sl! <= Game.time)) {
                         this.wake(this.curProcessID);
                     }
                 }
-                if (!this.processTable[pid].sl) {
+                if (!pInfo.sl) {
                     proc.run();
-                    if (this.threadTable[this.curProcessID] && (proc as IThreadProcess).RunThread) {
+                    if (pInfo.th) {
                         activeThreads[this.curProcessID] = {
                             pri: Priority_Medium,
                             sta: ThreadState_Active as ThreadState,
@@ -200,7 +193,6 @@ export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepEx
                 default:
                     activeThreadIDs.shift();
                     break;
-
             }
         }
 
@@ -218,21 +210,17 @@ export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepEx
             // (TODO): Don't let newly awoken processes run this tick.
         }
     }
-    RegisterAsThread(host: PID, tid?: ThreadID) {
-        if (!tid || !this.threadTable[host]) {
-            this.log.debug(`New thread request ${host}`);
-            if (!tid) {
-                tid = 'TH_' + GetSUID();
-            }
-            this.threadTable[host] = tid;
-            this.log.debug(`New thread created for ${host} [${tid}]`);
+    RegisterAsThread(pid: PID): void {
+        let proc = this.getProcessByPID(pid);
+
+        if (proc && (proc as IThreadProcess).RunThread && this.processTable[pid]) {
+            this.processTable[pid].th = true;
         }
-        return tid
     }
 
-    CloseThread(tID: ThreadID) {
-        if (this.threadTable[tID]) {
-            delete this.threadTable[tID];
+    CloseThread(pid: PID) {
+        if (this.processTable[pid]) {
+            delete this.processTable[pid].th;
         }
     }
 }

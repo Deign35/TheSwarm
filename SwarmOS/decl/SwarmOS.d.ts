@@ -39,6 +39,7 @@ declare interface ProcInfo {
     end?: number; // Ended -- When the process ended
     err?: string; // Error
     sl?: number;// Sleep -- Process sleeping until
+    th?: boolean;//Active thread
 }
 
 declare type ProcessTable = {
