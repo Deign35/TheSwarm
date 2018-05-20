@@ -73,6 +73,19 @@ class RoomManager extends BasicProcess<{}> {
                 let newPID = this.kernel.startProcess(CG_Control, newMem);
                 this.kernel.setParent(newPID);
                 this.thread.RegisterAsThread(newPID);
+
+                let infMem: InfrastructureGroup_Memory = {
+                    assignments: {},
+                    childThreads: {},
+                    enabled: true,
+                    homeRoom: roomID,
+                    PKG: CG_Infrastructure,
+                    pri: Priority_Medium,
+                    targetRoom: roomID
+                }
+                let infPID = this.kernel.startProcess(CG_Infrastructure, infMem);
+                this.kernel.setParent(infPID);
+                this.thread.RegisterAsThread(infPID);
             }
         }
     }

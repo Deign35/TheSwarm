@@ -6,8 +6,7 @@ export const OSPackage: IPackage<SpawnRegistry_Memory> = {
     }
 }
 
-
-class ControlGroup extends BasicCreepGroup<ExtractionGroup_Memory> {
+class ControlGroup extends BasicCreepGroup<ControlGroup_Memory> {
     protected EnsureGroupFormation(): void {
         let viewData = this.View.GetRoomData(this.memory.targetRoom)!;
 
@@ -38,22 +37,6 @@ class ControlGroup extends BasicCreepGroup<ExtractionGroup_Memory> {
         this.EnsureAssignment('Upgrader', CT_Upgrader, level, {
             pri: Priority_Low
         })
-
-        /*
-        this.EnsureAssignment('Hauler', CT_Refiller, spawnRoom.controller!.level > 1 ? 1 : 0, {
-            pri: Priority_High,
-        });
-
-        let extractionLevel = 0;
-        if (spawnRoom.energyCapacityAvailable >= 800) {
-            extractionLevel = 2;
-        } else if (spawnRoom.energyCapacityAvailable >= 550) {
-            extractionLevel = 1;
-        }
-
-        for (let i = 0; i < viewData.sourceIDs.length; i++) {
-            this.EnsureAssignment(viewData.sourceIDs[i], CT_Harvester, extractionLevel, { tar: viewData.sourceIDs[i], pri: Priority_Medium } as AssignmentContext_Harvester)
-        }*/
     }
     protected get GroupPrefix(): string { return 'Extr'; }
 }

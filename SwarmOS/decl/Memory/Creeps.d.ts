@@ -34,7 +34,10 @@ declare interface CreepGroup_Memory extends ThreadMemory_Parent {
     pri: Priority;
 }
 declare interface ControlGroup_Memory extends CreepGroup_Memory {
-    
+
+}
+declare interface InfrastructureGroup_Memory extends CreepGroup_Memory {
+
 }
 declare interface ExtractionGroup_Memory extends CreepGroup_Memory {
 }
@@ -50,7 +53,7 @@ declare interface CreepGroup_Assignment extends MemBase {
 
 declare interface AssignmentContext extends MemBase {
     pri: Priority
- }
+}
 declare interface AssignmentContext_Harvester extends AssignmentContext {
     tar: ObjectID;
 }

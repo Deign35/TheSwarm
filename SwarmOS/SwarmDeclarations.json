@@ -41,7 +41,8 @@
             "combinedType": "CreepGroupPackage",
             "entries": [
                 "Extraction",
-                "Control"
+                "Control",
+                "Infrastructure"
             ]
         },
         "EXT": {
