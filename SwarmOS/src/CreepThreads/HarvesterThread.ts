@@ -54,6 +54,9 @@ export class Harvester extends CreepThread<Harvester_Memory> {
     }
 
     RunThread(): ThreadState {
+        if (!this.creep || this.creep.spawning) {
+            return ThreadState_Done;
+        }
         this.refreshSourceView();
         let creep = this.creep;
         if (creep.room.name != this.memory.loc) {

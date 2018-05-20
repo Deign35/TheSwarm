@@ -11,7 +11,7 @@ declare type ProcessCache = {
     }
 }
 
-export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepExtension {
+export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepExtension, IThreadRegistryExtensions {
     constructor(private processRegistry: IProcessRegistry, private extensionRegistry: IExtensionRegistry,
         private _logger: IKernelLoggerExtensions) {
         this._processCache = {};
@@ -171,7 +171,7 @@ export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepEx
                 if (!this.processTable[pid].sl) {
                     proc.run();
                     if (this.threadTable[this.curProcessID] && (proc as IThreadProcess).RunThread) {
-                        activeThreads[threadIDs[i]] = {
+                        activeThreads[this.curProcessID] = {
                             pri: Priority_Medium,
                             sta: ThreadState_Active as ThreadState,
                             proc: proc as IThreadProcess
@@ -219,12 +219,12 @@ export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepEx
         }
     }
     RegisterAsThread(host: PID, tid?: ThreadID) {
-        if (!tid || !this.threadTable[tid]) {
+        if (!tid || !this.threadTable[host]) {
             this.log.debug(`New thread request ${host}`);
             if (!tid) {
                 tid = 'TH_' + GetSUID();
             }
-            this.threadTable[tid] = host;
+            this.threadTable[host] = tid;
             this.log.debug(`New thread created for ${host} [${tid}]`);
         }
         return tid

@@ -10,6 +10,9 @@ import { CreepThread } from "./CreepThread";
 
 class RefillThread extends CreepThread<SpawnRefiller_Memory> {
     RunThread(): ThreadState {
+        if (!this.creep || this.creep.spawning) {
+            return ThreadState_Done;
+        }
         let creep = this.creep;
 
         if (this.memory.get) {

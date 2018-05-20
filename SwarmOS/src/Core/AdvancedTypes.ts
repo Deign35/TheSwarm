@@ -106,10 +106,10 @@ export abstract class ParentThreadProcess<T extends ThreadMemory_Parent> extends
             case (ThreadState_Inactive):
             case (ThreadState_Done):
             case (ThreadState_Overrun): // (TODO): Turn Overrun into a thread state that allows the thread to do extra work as cpu is available.
-                activeThreadIDs.shift();
+                delete this._activeThreads[activeThreadIDs[0]];
             case (ThreadState_Active): return ThreadState_Active;
             default:
-                activeThreadIDs.shift();
+                delete this._activeThreads[activeThreadIDs[0]];
                 break;
         }
         return ThreadState_Active;

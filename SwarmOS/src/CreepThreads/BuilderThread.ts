@@ -12,6 +12,9 @@ import { CreepThread } from "CreepThreads/CreepThread";
 
 export class BuilderThread extends CreepThread<Builder_Memory> {
     RunThread(): ThreadState {
+        if (!this.creep || this.creep.spawning) {
+            return ThreadState_Done;
+        }
         if (this.memory.get) {
             if (this.creep.carry.energy == this.creep.carryCapacity) {
                 this.memory.tar = undefined;

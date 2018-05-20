@@ -20,8 +20,20 @@ class RoomManager extends BasicProcess<{}> {
     View!: IRoomDataExtension;
     @extensionInterface(EXT_ThreadRegistry)
     protected thread!: IThreadRegistryExtensions;
+
+    protected get memory(): RoomViewData_Memory {
+        if (!Memory.roomData) {
+            this.log.warn(`Initializing RoomManager memory`);
+            Memory.roomData = {}
+        }
+        return Memory.roomData;
+    }
     executeProcess(): void {
         for (let roomID in Game.rooms) {
+            let createNewExtractionProcess = false;
+            if (!this.memory[roomID]) {
+                createNewExtractionProcess = true;
+            }
             let data = this.View.GetRoomData(roomID);
             if (!data) {
                 this.log.fatal(`(ASSUMPTION FAILURE): A room is visible but has no data (${roomID})`);
@@ -34,23 +46,22 @@ class RoomManager extends BasicProcess<{}> {
                     this.log.warn(`(ASSUMPTION RECOVERY): GetRoomData refresh fixed it (${roomID})`)
                 }
             }
-            /*if (!data.pid || !this.kernel.getProcessByPID(data.pid)) {
-                let newRoomMemory: RoomProcess_Memory = {
-                    roomName: roomID,
-                    childThreads: {},
-                    PKG: PKG_SimpleOwnedRoom,
-                    pri: Priority_Medium,
-                    groups: {}
+            if (createNewExtractionProcess) {
+                if (data.sourceIDs.length > 0) {
+                    let newMem: ExtractionGroup_Memory = {
+                        assignments: {},
+                        childThreads: {},
+                        enabled: true,
+                        homeRoom: roomID,
+                        PKG: CG_Extraction,
+                        pri: Priority_Medium,
+                        targetRoom: roomID
+                    }
+                    let newPID = this.kernel.startProcess(CG_Extraction, newMem);
+                    this.kernel.setParent(newPID);
+                    this.thread.RegisterAsThread(newPID);
                 }
-
-                data.pid = this.kernel.startProcess(PKG_SimpleOwnedRoom, newRoomMemory);
-                let newTID = '1';//this.thread.RegisterAsThread(data.pid);
-                newRoomMemory.childThreads[newTID] = {
-                    pid: data.pid,
-                    priority: Priority_Medium,
-                    tid: newTID
-                }
-            }*/
+            }
         }
     }
 }

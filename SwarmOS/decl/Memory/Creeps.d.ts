@@ -33,6 +33,8 @@ declare interface CreepGroup_Memory extends ThreadMemory_Parent {
     targetRoom: RoomID;
     pri: Priority;
 }
+declare interface ExtractionGroup_Memory extends CreepGroup_Memory {
+}
 
 declare interface CreepGroup_Assignment extends MemBase {
     pid?: PID;          // ID corresponding to the assigned PID
@@ -40,11 +42,10 @@ declare interface CreepGroup_Assignment extends MemBase {
     SR: SpawnRequestID; // ID corresponding to the spawn request
     CT: CT_ALL;         // (C)reep (T)ype
     lvl: number;        // role level
+    con: AssignmentContext
 }
 
-declare interface HarvesterGroup_Memory extends CreepGroup_Memory {
-    sIDs: ObjectID[]; // Sources
-}
-declare interface HarvesterGroup_Assignment extends CreepGroup_Assignment {
-    sID: ObjectID       // Source id for harvesting
+declare interface AssignmentContext extends MemBase { }
+declare interface AssignmentContext_Harvester extends AssignmentContext {
+    tar: ObjectID;
 }

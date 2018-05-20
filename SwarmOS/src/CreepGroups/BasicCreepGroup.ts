@@ -9,6 +9,12 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Paren
     protected abstract EnsureGroupFormation(): void;
     protected abstract get GroupPrefix(): GroupID;
 
+    protected executeProcess() {
+        super.executeProcess();
+        // Must be done after as this will create new processes and threads
+        this.EnsureGroupFormation();
+    }
+
     protected get assignments() {
         return this.memory.assignments;
     }
@@ -17,10 +23,6 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Paren
     }
 
     protected PrepareChildren() {
-        if (this.IsRoleActive()) {
-            this.EnsureGroupFormation();
-        }
-
         let childIDs = Object.keys(this.assignments);
         for (let i = 0; i < childIDs.length; i++) {
             if (!this.assignments[childIDs[i]].pid) {
@@ -32,14 +34,14 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Paren
     protected createNewCreepMemory(aID: GroupID): CreepProcess_Memory {
         let assignment = this.assignments[aID];
         let body = CreepBodies[assignment.CT][assignment.lvl] as CreepBody
-        return {
+        return Object.assign({
             get: false,
             home: this.memory.homeRoom,
             loc: this.memory.targetRoom,
             SR: this.assignments[aID].SR,
             PKG: body.pkg_ID,
-            pri: Priority_Medium,
-        }
+            pri: Priority_Medium as Priority,
+        }, assignment.con);
     }
     protected createNewCreepContext(ctID: CT_ALL, level: number, owner?: PID): CreepContext {
         return {
@@ -55,7 +57,8 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Paren
             CT: ctID,
             lvl: level,
             SR: '',
-            GR: ''
+            GR: '',
+            con: {}
         }
         this.assignments[newAssignmentID] = newAssignment;
         this.createNewCreepProcess(newAssignmentID);

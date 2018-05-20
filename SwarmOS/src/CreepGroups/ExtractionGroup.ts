@@ -1,17 +1,12 @@
 import { BasicCreepGroup } from "./BasicCreepGroup";
 
-declare interface UnitDef { unit?: PID, lvl: number }
-declare interface Formation_ExtractionUnit {
-    harv: UnitDef;
+export const OSPackage: IPackage<SpawnRegistry_Memory> = {
+    install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
+        processRegistry.register(CG_Extraction, ExtractionGroup);
+    }
 }
-declare interface ExtractionUnit {
-    target: ObjectID;
-    harv?: GroupID;
-}
-declare interface ExtractionGroup_Memory extends CreepGroup_Memory {
-    targetGroups: { [id: string]: ExtractionUnit }; // Source or Mineral
-    haul?: UnitDef;
-}
+
+
 class ExtractionGroup extends BasicCreepGroup<ExtractionGroup_Memory> {
     protected EnsureGroupFormation(): void {
         let viewData = this.View.GetRoomData(this.memory.targetRoom)!;
@@ -30,8 +25,17 @@ class ExtractionGroup extends BasicCreepGroup<ExtractionGroup_Memory> {
 
         for (let i = 0; i < viewData.sourceIDs.length; i++) {
             let targetID = viewData.sourceIDs[i];
-            if (!this.memory.targetGroups[targetID]) {
-                this.createNewAssignment(targetID, CT_Harvester, extractionLevel);
+            if (!this.assignments[targetID]) {
+                let newAssignment: CreepGroup_Assignment = {
+                    CT: CT_Harvester,
+                    lvl: extractionLevel,
+                    SR: '',
+                    GR: '',
+                    con: {
+                        tar: targetID
+                    }
+                }
+                this.assignments[targetID] = newAssignment;
             }
 
             let childSR = this.spawnRegistry.getRequestContext(this.assignments[targetID].SR);

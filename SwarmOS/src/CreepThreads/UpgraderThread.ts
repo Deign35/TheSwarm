@@ -11,6 +11,9 @@ import { CreepThread } from "./CreepThread";
 
 export class Upgrader extends CreepThread<Upgrader_Memory> {
     RunThread(): ThreadState {
+        if (!this.creep || this.creep.spawning) {
+            return ThreadState_Done;
+        }
         let creep = this.creep;
         if (creep.room.name != this.memory.loc) {
             new MoveToPositionAction(creep, new RoomPosition(25, 25, this.memory.loc)).Run();
