@@ -19,6 +19,7 @@ export abstract class CreepThread<T extends CreepProcess_Memory> extends ThreadP
 
     protected refreshSpawnRequest(context: CreepContext) {
         context.n = context.n.slice(0, 5) + GetSUID();
+        context.o = this.pid;
     }
     protected executeProcess(): void {
         if (this.memory.CR) {
@@ -121,7 +122,6 @@ export abstract class CreepThread<T extends CreepProcess_Memory> extends ThreadP
 
         action.Run();
         return ThreadState_Done;
-        //(TODO): Update actions to return thread states.
     }
 
     // (TODO): This needs to be extracted out to a seperate service, perhaps provided by the RoomViewData

@@ -15,24 +15,24 @@ export class BuilderThread extends CreepThread<Builder_Memory> {
         if (!this.creep || this.creep.spawning) {
             return ThreadState_Done;
         }
+
         if (this.memory.get) {
             if (this.creep.carry.energy == this.creep.carryCapacity) {
                 this.memory.tar = undefined;
                 this.memory.get = false;
-            } else {
-                this.getEnergy(this.creep.carryCapacity / 2);
-                return ThreadState_Done;
             }
         } else if (this.creep.carry.energy == 0) {
             this.memory.tar = undefined;
             this.memory.get = true;
-            this.getEnergy(this.creep.carryCapacity / 2);
-            return ThreadState_Done;
         }
 
-        if (this.memory.tar && this.creep.room.name != this.memory.loc) {
-            new MoveToPositionAction(this.creep, new RoomPosition(25, 25, this.memory.loc)).Run();
-            return ThreadState_Done;
+        let targetRoom = (this.memory.get ? this.memory.home : this.memory.loc);
+        if (this.creep.room.name != targetRoom) {
+            new MoveToPositionAction(this.creep, new RoomPosition(25, 25, targetRoom)).Run();
+        }
+
+        if (this.memory.get) {
+            return this.getEnergy(this.creep.carryCapacity / 2);
         }
 
         let targetSite = Game.constructionSites[this.memory.tar!];

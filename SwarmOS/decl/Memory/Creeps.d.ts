@@ -33,6 +33,9 @@ declare interface CreepGroup_Memory extends ThreadMemory_Parent {
     targetRoom: RoomID;
     pri: Priority;
 }
+declare interface ControlGroup_Memory extends CreepGroup_Memory {
+    
+}
 declare interface ExtractionGroup_Memory extends CreepGroup_Memory {
 }
 

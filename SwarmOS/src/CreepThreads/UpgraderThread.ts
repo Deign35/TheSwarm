@@ -14,40 +14,33 @@ export class Upgrader extends CreepThread<Upgrader_Memory> {
         if (!this.creep || this.creep.spawning) {
             return ThreadState_Done;
         }
-        let creep = this.creep;
-        if (creep.room.name != this.memory.loc) {
-            new MoveToPositionAction(creep, new RoomPosition(25, 25, this.memory.loc)).Run();
-            return ThreadState_Done;
-        }
-
         if (this.memory.get) {
             if (this.creep.carry.energy == this.creep.carryCapacity) {
                 this.memory.tar = undefined;
                 this.memory.get = false;
-            } else {
-                this.getEnergy(this.creep.carryCapacity / 2);
-                return ThreadState_Done;
             }
         } else if (this.creep.carry.energy == 0) {
             this.memory.tar = undefined;
             this.memory.get = true;
-            this.getEnergy(this.creep.carryCapacity / 2);
-            return ThreadState_Done;
         }
 
-        if (creep.room.name != this.memory.loc) {
-            new MoveToPositionAction(creep, new RoomPosition(25, 25, this.memory.loc)).Run();
-            return ThreadState_Done;
+        let targetRoom = (this.memory.get ? this.memory.home : this.memory.loc);
+        if (this.creep.room.name != targetRoom) {
+            new MoveToPositionAction(this.creep, new RoomPosition(25, 25, targetRoom)).Run();
         }
 
-        let target = creep.room.controller!;
+        if (this.memory.get) {
+            return this.getEnergy(this.creep.carryCapacity / 2);
+        }
+
+        let target = this.creep.room.controller!;
         if (!target) {
             this.log.fatal(`Target is missing`);
             this.kernel.killProcess(this.pid);
             return ThreadState_Done;
         }
 
-        let action: ActionBase = new UpgradeAction(creep, target);
+        let action: ActionBase = new UpgradeAction(this.creep, target);
         switch (action.ValidateAction()) {
             case (SR_NONE):
             case (SR_MOVE):

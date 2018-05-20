@@ -41,10 +41,7 @@
             "combinedType": "CreepGroupPackage",
             "entries": [
                 "Extraction",
-                "Builder",
-                "Harvester",
-                "Refiller",
-                "Upgrader"
+                "Control"
             ]
         },
         "EXT": {

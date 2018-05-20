@@ -30,9 +30,9 @@ class RoomManager extends BasicProcess<{}> {
     }
     executeProcess(): void {
         for (let roomID in Game.rooms) {
-            let createNewExtractionProcess = false;
+            let requiresNewRoomProcesses = false;
             if (!this.memory[roomID]) {
-                createNewExtractionProcess = true;
+                requiresNewRoomProcesses = true;
             }
             let data = this.View.GetRoomData(roomID);
             if (!data) {
@@ -46,8 +46,8 @@ class RoomManager extends BasicProcess<{}> {
                     this.log.warn(`(ASSUMPTION RECOVERY): GetRoomData refresh fixed it (${roomID})`)
                 }
             }
-            if (createNewExtractionProcess) {
-                if (data.sourceIDs.length > 0) {
+            if (requiresNewRoomProcesses) {
+                if (data.sourceIDs.length > 0 || data.mineralIDs.length > 0) {
                     let newMem: ExtractionGroup_Memory = {
                         assignments: {},
                         childThreads: {},
@@ -61,6 +61,18 @@ class RoomManager extends BasicProcess<{}> {
                     this.kernel.setParent(newPID);
                     this.thread.RegisterAsThread(newPID);
                 }
+                let newMem: ControlGroup_Memory = {
+                    assignments: {},
+                    childThreads: {},
+                    enabled: true,
+                    homeRoom: roomID,
+                    PKG: CG_Control,
+                    pri: Priority_Medium,
+                    targetRoom: roomID
+                }
+                let newPID = this.kernel.startProcess(CG_Control, newMem);
+                this.kernel.setParent(newPID);
+                this.thread.RegisterAsThread(newPID);
             }
         }
     }

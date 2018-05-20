@@ -78,8 +78,12 @@ class SpawnRegistry extends BasicProcess<SpawnRegistry_Memory> {
         for (let i = 0; i < requests.length; i++) {
             let req = this.memory[requests[i]];
             if (req.sta != SP_QUEUED) {
-                if (req.sta == SP_SPAWNING && !Game.creeps[req.con.n]) {
-                    req.sta = SP_ERROR;
+                if (req.sta == SP_SPAWNING) {
+                    if (!Game.creeps[req.con.n]) {
+                        req.sta = SP_ERROR;
+                    } else if (!Game.creeps[req.con.n].spawning) {
+                        req.sta = SP_COMPLETE;
+                    }
                 }
                 continue;
             }
@@ -238,10 +242,13 @@ class SpawnRegistryExtensions extends ExtensionBase implements ISpawnRegistryExt
         }
         if (newContext) {
             this.memory[id].con = newContext;
+        } else {
+            this.memory[id].con.o = undefined;
         }
         if (defaultMemory) {
             this.memory[id].dm = defaultMemory;
         }
+
         return true;
     }
     cancelRequest(id: SpawnRequestID): boolean {

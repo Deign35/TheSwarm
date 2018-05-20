@@ -53,30 +53,33 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Paren
     }
 
     protected EnsureAssignment(assignmentID: GroupID, ctID: CT_ALL, level: number, context: AssignmentContext = { pri: Priority_Lowest }) {
-        if (!this.assignments[assignmentID]) {
-            let newAssignment: CreepGroup_Assignment = {
-                CT: ctID,
-                lvl: level,
+        let assignment = this.assignments[assignmentID];
+        if (!assignment) {
+            assignment = {
                 SR: '',
-                GR: '',
-                con: context
-            }
-            this.assignments[assignmentID] = newAssignment;
+                GR: ''
+            } as CreepGroup_Assignment
         }
+        assignment.CT = ctID;
+        assignment.lvl = level;
+        assignment.con = context;
+        this.assignments[assignmentID] = assignment;
 
-        let childSR = this.spawnRegistry.getRequestContext(this.assignments[assignmentID].SR);
+        let childSR = this.spawnRegistry.getRequestContext(assignment.SR);
         if (!childSR) {
             this.createNewCreepProcess(assignmentID);
-            childSR = this.spawnRegistry.getRequestContext(this.assignments[assignmentID].SR);
+            childSR = this.spawnRegistry.getRequestContext(assignment.SR);
             if (!childSR) {
                 throw new Error(`Restarting of creep thread failed.`);
             }
         }
 
         if (childSR.l != level) {
-            this.assignments[assignmentID].lvl = level;
+            assignment.lvl = level;
             this.createNewCreepProcess(assignmentID);
         }
+
+        this.assignments[assignmentID] = assignment;
     }
 
     protected createNewCreepProcess(aID: GroupID) {
