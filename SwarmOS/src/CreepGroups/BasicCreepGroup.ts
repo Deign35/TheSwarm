@@ -91,6 +91,8 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Paren
                 let creep = this.creepRegistry.tryGetCreep(childSR.n, assignment.pid);
                 if (creep) {
                     this.creepRegistry.releaseCreep(creep.name);
+                    this.releaseCreepToParent(aID);
+                    // (TODO): Find a better way to deal with dropped creeps
                 }
             }
         }
