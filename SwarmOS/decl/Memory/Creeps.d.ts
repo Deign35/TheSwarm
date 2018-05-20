@@ -37,6 +37,9 @@ declare interface ControlGroup_Memory extends CreepGroup_Memory {
 
 }
 declare interface InfrastructureGroup_Memory extends CreepGroup_Memory {
+
+}
+declare interface TempBranchGroup_Memory extends CreepGroup_Memory {
     unprocessedCreeps: {
         context: CreepContext
         mem: CreepProcess_Memory

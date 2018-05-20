@@ -9,8 +9,8 @@ export const OSPackage: IPackage<SpawnRegistry_Memory> = {
 /**
  * (TODO): Building priority
  * BLUE_ -- Basic constructionSites
- *      BLUE_ -- StructureContainer
- *      BROWN_ -- StructureExtension
+ *      BLUE_ -- StructureExtension
+ *      BROWN_ --StructureContainer
  *      CYAN_ -- StructreLab
  *      GREEN_ -- StructureLink
  *      GREY_ -- StructureRampart
@@ -22,10 +22,10 @@ export const OSPackage: IPackage<SpawnRegistry_Memory> = {
  * 
  * BROWN_ -- Advancd constructionSite
  *      BLUE_ -- StructureExtractor
- *      BROWN_ -- StructureNuker
+ *      BROWN_ -- StructureSpawn
  *      CYAN_ -- StructreObserver
  *      GREEN_ -- StructurePowerSpawn
- *      GREY_ -- StructureSpawn
+ *      GREY_ -- StructureNuker
  *      ORANGE_ -- StructureStorage
  *      PURPLE_ -- StructureTerminal
  *      RED_ --
@@ -80,10 +80,10 @@ class FlagBase extends BasicProcess<FlagProcess_Memory> {
         let csCreated = ERR_INVALID_ARGS as ScreepsReturnCode;
         switch (flag.secondaryColor) {
             case (COLOR_BLUE):
-                csCreated = flag.room.createConstructionSite(flag.pos, STRUCTURE_CONTAINER);
+                csCreated = flag.room.createConstructionSite(flag.pos, STRUCTURE_EXTENSION);
                 break;
             case (COLOR_BROWN):
-                csCreated = flag.room.createConstructionSite(flag.pos, STRUCTURE_EXTENSION);
+                csCreated = flag.room.createConstructionSite(flag.pos, STRUCTURE_CONTAINER);
                 break;
             case (COLOR_CYAN):
                 csCreated = flag.room.createConstructionSite(flag.pos, STRUCTURE_LAB);
@@ -126,7 +126,7 @@ class FlagBase extends BasicProcess<FlagProcess_Memory> {
                 csCreated = flag.room.createConstructionSite(flag.pos, STRUCTURE_EXTRACTOR);
                 break;
             case (COLOR_BROWN):
-                csCreated = flag.room.createConstructionSite(flag.pos, STRUCTURE_NUKER);
+                csCreated = flag.room.createConstructionSite(flag.pos, STRUCTURE_SPAWN);
                 break;
             case (COLOR_CYAN):
                 csCreated = flag.room.createConstructionSite(flag.pos, STRUCTURE_OBSERVER);
@@ -135,7 +135,7 @@ class FlagBase extends BasicProcess<FlagProcess_Memory> {
                 csCreated = flag.room.createConstructionSite(flag.pos, STRUCTURE_POWER_SPAWN);
                 break;
             case (COLOR_GREY):
-                csCreated = flag.room.createConstructionSite(flag.pos, STRUCTURE_SPAWN);
+                csCreated = flag.room.createConstructionSite(flag.pos, STRUCTURE_NUKER);
                 break;
             case (COLOR_ORANGE):
                 csCreated = flag.room.createConstructionSite(flag.pos, STRUCTURE_STORAGE);

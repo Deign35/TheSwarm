@@ -43,12 +43,13 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Paren
             pri: assignment.con.pri,
         }, assignment.con);
     }
-    protected createNewCreepContext(ctID: CT_ALL, level: number, owner?: PID): CreepContext {
+    protected createNewCreepContext(ctID: CT_ALL, level: number, respawn: boolean, owner?: PID): CreepContext {
         return {
             ct: ctID,
             l: level,
             n: ctID + '_' + level + '_' + GetSUID(),
-            o: owner
+            o: owner,
+            r: respawn
         }
     }
 
@@ -97,7 +98,7 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Paren
             }
         }
 
-        let newContext = this.createNewCreepContext(assignment.CT, assignment.lvl, assignment.pid);
+        let newContext = this.createNewCreepContext(assignment.CT, assignment.lvl, assignment.con.res, assignment.pid);
         if (!this.spawnRegistry.tryResetRequest(assignment.SR, newContext)) {
             this.spawnRegistry.cancelRequest(assignment.SR);
             assignment.SR = this.spawnRegistry.requestSpawn(newContext, this.memory.targetRoom, pri)

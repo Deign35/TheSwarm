@@ -12,6 +12,7 @@ declare interface CreepContext extends MemBase {
     n: CreepID;     // (n)ame
     ct: CT_ALL;     // (b)ody definition
     l: number;      // body (l)evel
+    r: boolean;     // (r)espawn
 }
 
 declare interface SpawnRequest extends MemBase {

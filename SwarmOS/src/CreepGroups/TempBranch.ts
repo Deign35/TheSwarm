@@ -1,13 +1,13 @@
 import { ExtensionBase } from "Core/BasicTypes";
 import { BasicCreepGroup } from "CreepGroups/BasicCreepGroup";
 
-export const OSPackage: IPackage<InfrastructureGroup_Memory> = {
+export const OSPackage: IPackage<TempBranchGroup_Memory> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
-        processRegistry.register(CG_Infrastructure, TempBranchGroup);
+        processRegistry.register(CG_TempBranch, TempBranchGroup);
     }
 }
 
-export class TempBranchGroup extends BasicCreepGroup<InfrastructureGroup_Memory> {
+export class TempBranchGroup extends BasicCreepGroup<TempBranchGroup_Memory> {
     protected EnsureGroupFormation(): void {
         for (let i = 0; i < this.memory.unprocessedCreeps.length; i++) {
             // Use creep names as the group id.
@@ -61,7 +61,7 @@ export class TempBranchGroup extends BasicCreepGroup<InfrastructureGroup_Memory>
     protected FindJobForCreep(creep: Creep, creepMem: ThreadMemory) {
         let curAssignment = this.assignments[creep.name];
         let body = CreepBodies.get(curAssignment.CT)[curAssignment.lvl] as CreepBody;
-        let newJobContext = this.createNewCreepContext(body.ct_ID, body.lvl);
+        let newJobContext = this.createNewCreepContext(body.ct_ID, body.lvl, false);
 
         if (!newJobContext || body.a || body.h || body.r || body.cl || creep.carryCapacity == 0) {
             this.log.error(`Undefined body behaviour`);
@@ -98,7 +98,8 @@ export class TempBranchGroup extends BasicCreepGroup<InfrastructureGroup_Memory>
                 ct: oldAssignment.CT,
                 l: oldAssignment.lvl,
                 n: creep.name,
-                o: this.pid
+                o: this.pid,
+                r: false
             },
             mem: {
                 CR: creep.name,

@@ -6,6 +6,7 @@ export const OSPackage: IPackage<RoomStateMemory> = {
 }
 
 import { BasicCreepGroup } from "CreepGroups/BasicCreepGroup";
+import { TempBranchGroup } from "CreepGroups/TempBranch";
 
 class BasicRoom extends BasicCreepGroup<RoomThreadMemory> {
     protected get GroupPrefix(): string { return 'BSC' }
@@ -24,7 +25,34 @@ class BasicRoom extends BasicCreepGroup<RoomThreadMemory> {
     protected get roomData() {
         return this.RoomView.GetRoomData(this.roomName)!;
     }
+
+    protected get TempGroup(): TempBranchGroup | undefined {
+        if (this.roomData.groups.CG_TempBranch) {
+            return (this.kernel.getProcessByPID(this.roomData.groups.CG_TempBranch) as TempBranchGroup);
+        }
+        return undefined;
+    }
     protected EnsureGroupFormation(): void {
+        if (!this.roomData.groups.CG_TempBranch) {
+            let tempMem: TempBranchGroup_Memory = {
+                assignments: {},
+                childThreads: {},
+                enabled: true,
+                homeRoom: this.roomName,
+                PKG: CG_TempBranch,
+                pri: Priority_Medium,
+                targetRoom: this.roomName,
+                unprocessedCreeps: [],
+                jobs: {
+                    CreepBuilder: [],
+                    CreepRefiller: [],
+                    CreepUpgrader: [],
+                }
+            }
+            let tempPID = this.kernel.startProcess(CG_TempBranch, tempMem);
+            this.roomData.groups.CG_TempBranch = tempPID;
+            this.AttachChildThread(tempMem, this.pid, tempPID);
+        }
         if (this.roomData.owner == MY_USERNAME) {
             if (!this.roomData.groups.CG_Control) {
                 let newMem: ControlGroup_Memory = {
@@ -40,26 +68,7 @@ class BasicRoom extends BasicCreepGroup<RoomThreadMemory> {
                 this.roomData.groups.CG_Control = newPID;
                 this.AttachChildThread(newMem, this.pid, newPID);
             }
-            if (!this.roomData.groups.CG_Infrastructure) {
-                let infMem: InfrastructureGroup_Memory = {
-                    assignments: {},
-                    childThreads: {},
-                    enabled: true,
-                    homeRoom: this.roomName,
-                    PKG: CG_Infrastructure,
-                    pri: Priority_Medium,
-                    targetRoom: this.roomName,
-                    unprocessedCreeps: [],
-                    jobs: {
-                        CreepBuilder: [],
-                        CreepRefiller: [],
-                        CreepUpgrader: [],
-                    }
-                }
-                let infPID = this.kernel.startProcess(CG_Infrastructure, infMem);
-                this.roomData.groups.CG_Infrastructure = infPID;
-                this.AttachChildThread(infMem, this.pid, infPID);
-            }
+
         }
 
         if (!this.roomData.owner || this.roomData.owner == MY_USERNAME) {
@@ -77,12 +86,27 @@ class BasicRoom extends BasicCreepGroup<RoomThreadMemory> {
                 this.roomData.groups.CG_Extraction = extrPID;
                 this.AttachChildThread(extrMem, this.pid, extrPID);
             }
+            if (!this.roomData.groups.CG_Infrastructure) {
+                let infrMem: InfrastructureGroup_Memory = {
+                    assignments: {},
+                    childThreads: {},
+                    enabled: true,
+                    homeRoom: this.roomName,
+                    PKG: CG_Infrastructure,
+                    pri: Priority_Medium,
+                    targetRoom: this.roomName,
+                }
+                let infrPID = this.kernel.startProcess(CG_Infrastructure, infrMem);
+                this.roomData.groups.CG_Infrastructure = infrPID;
+                this.AttachChildThread(infrMem, this.pid, infrPID);
+            }
         }
+
     }
 
     ReceiveCreep(creep: Creep, oldAssignment: CreepGroup_Assignment) {
-        if (this.roomData.groups.CG_Infrastructure) {
-            (this.kernel.getProcessByPID(this.roomData.groups.CG_Infrastructure) as BasicCreepGroup<any>).ReceiveCreep(creep, oldAssignment);
+        if (this.roomData.groups.CG_TempBranch) {
+            (this.kernel.getProcessByPID(this.roomData.groups.CG_TempBranch) as BasicCreepGroup<any>).ReceiveCreep(creep, oldAssignment);
         }
     }
 }
