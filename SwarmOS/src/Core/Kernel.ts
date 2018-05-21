@@ -97,8 +97,6 @@ export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepEx
         return process;
     }
 
-    // killProcess also kills all children of this process
-    // note to the wise: probably absorb any calls to this that would wipe out your entire process tree.
     killProcess(id: PID): void {
         let pinfo = this.processTable[id];
         if (!pinfo) return;

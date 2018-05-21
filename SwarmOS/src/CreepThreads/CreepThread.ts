@@ -18,26 +18,25 @@ export abstract class CreepThread<T extends CreepProcess_Memory> extends ThreadP
 
     protected refreshSpawnRequest(context: CreepContext) {
         context.n = context.n.slice(0, 5) + GetSUID();
-        context.o = this.pid;
+        context.o = undefined;
     }
     protected executeProcess(): void {
         if (this.memory.CR) {
             this._creep = this.creepRegistry.tryGetCreep(this.memory.CR, this.pid);
+            let curContext = this.memory.SR ? this.spawnRegistry.getRequestContext(this.memory.SR) : undefined;
             if (!this._creep) {
+                let deadProcess = true;
                 delete this.memory.CR;
-                if (this.memory.SR) {
-                    let curContext = this.spawnRegistry.getRequestContext(this.memory.SR);
-                    if (curContext) {
-                        if (!curContext.r) {
-                            this.kernel.killProcess(this.pid);
-                            return;
-                        }
-                        this.refreshSpawnRequest(curContext);
+                if (curContext && curContext.r) {
+                    this.refreshSpawnRequest(curContext);
+                    if (this.spawnRegistry.tryResetRequest(this.memory.SR!, curContext)) {
+                        deadProcess = false;
                     }
-                    if (!curContext || !this.spawnRegistry.tryResetRequest(this.memory.SR, curContext)) {
-                        this.kernel.killProcess(this.pid);
-                        return;
-                    }
+                }
+
+                if (deadProcess) {
+                    this.kernel.killProcess(this.pid);
+                    return;
                 }
             }
         }
@@ -46,7 +45,6 @@ export abstract class CreepThread<T extends CreepProcess_Memory> extends ThreadP
             let reqStatus = this.spawnRegistry.getRequestStatus(this.memory.SR);
             switch (reqStatus) {
                 case (SP_COMPLETE):
-                // (TODO): Need to make sure that we dont end up in an inf loop.
                 case (SP_SPAWNING):
                     let context = this.spawnRegistry.getRequestContext(this.memory.SR);
                     if (context) {
@@ -76,6 +74,9 @@ export abstract class CreepThread<T extends CreepProcess_Memory> extends ThreadP
                 case (SP_QUEUED):
                     return;
             }
+        }
+        if (!this.memory.CR && !this.memory.SR) {
+            this.kernel.killProcess(this.pid);
         }
     }
 

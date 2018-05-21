@@ -26,7 +26,7 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Paren
         let childIDs = Object.keys(this.assignments);
         for (let i = 0; i < childIDs.length; i++) {
             if (!this.assignments[childIDs[i]].pid) {
-                this.createNewCreepProcess(childIDs[i], this.assignments[childIDs[i]].con.pri);
+                delete this.assignments[childIDs[i]];
             }
         }
     }
@@ -43,12 +43,12 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Paren
             pri: assignment.con.pri,
         }, assignment.con);
     }
-    protected createNewCreepContext(ctID: CT_ALL, level: number, respawn: boolean, owner?: PID): CreepContext {
+    protected createNewCreepContext(ctID: CT_ALL, level: number, respawn: boolean): CreepContext {
         return {
             ct: ctID,
             l: level,
             n: ctID + '_' + level + '_' + GetSUID(),
-            o: owner,
+            o: undefined,
             r: respawn
         }
     }
@@ -66,21 +66,9 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Paren
         assignment.con = context;
         this.assignments[assignmentID] = assignment;
 
-        let childSR = this.spawnRegistry.getRequestContext(assignment.SR);
-        if (!childSR) {
-            this.createNewCreepProcess(assignmentID, context.pri);
-            childSR = this.spawnRegistry.getRequestContext(assignment.SR);
-            if (!childSR) {
-                throw new Error(`Restarting of creep thread failed.`);
-            }
-        }
-
-        if (childSR.l != level) {
-            assignment.lvl = level;
+        if (!assignment.pid || !this.kernel.getProcessByPID(assignment.pid)) {
             this.createNewCreepProcess(assignmentID, context.pri);
         }
-
-        this.assignments[assignmentID] = assignment;
     }
 
     protected createNewCreepProcess(aID: GroupID, pri: Priority) {
@@ -96,18 +84,29 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Paren
                 curCreep = this.creepRegistry.tryGetCreep(childSR.n, assignment.pid || this.pid);
                 if (curCreep) {
                     this.creepRegistry.releaseCreep(curCreep.name);
-                    this.releaseCreepToParent(aID);
+                    //this.releaseCreepToParent(aID);
                 }
             }
             delete assignment.SR;
         }
 
-        let newContext = this.createNewCreepContext(assignment.CT, assignment.lvl, assignment.con.res, assignment.pid);
-        assignment.SR = this.spawnRegistry.requestSpawn(newContext, this.memory.targetRoom, pri)
-
         let newCreepMem = this.createNewCreepMemory(aID);
+        if (curCreep) {
+            newCreepMem.CR = curCreep.name;
+        } else {
+            let newContext = this.createNewCreepContext(assignment.CT, assignment.lvl, assignment.con.res);
+            assignment.SR = this.spawnRegistry.requestSpawn(newContext, this.memory.targetRoom, pri);
+        }
+        newCreepMem.SR = assignment.SR;
         assignment.pid = this.kernel.startProcess(CreepBodies[assignment.CT][assignment.lvl].pkg_ID, newCreepMem);
         assignment.GR = this.AttachChildThread(newCreepMem, this.pid, assignment.pid);
+        if (curCreep) {
+            if (!this.creepRegistry.tryReserveCreep(curCreep.name, assignment.pid)) {
+                this.log.warn(`This is an issue...  Creep should have been able to be reserved.  Otherwise I wouldn't have it`);
+                this.kernel.killProcess(assignment.pid);
+                return;
+            }
+        }
     }
 
     protected releaseCreepToParent(aID: GroupID) {
