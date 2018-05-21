@@ -21,25 +21,31 @@ class InfrastructureGroup extends BasicCreepGroup<InfrastructureGroup_Memory> {
             }
         }
 
-        let infLevel = 0;
+        let buildLevel = 0;
         if (spawnRoom.energyCapacityAvailable >= 1700) {
-            infLevel = 3;
+            buildLevel = 3;
         } else if (spawnRoom.energyCapacityAvailable >= 1050) {
-            infLevel = 2;
+            buildLevel = 2;
         } else if (spawnRoom.energyCapacityAvailable >= 550) {
-            infLevel = 1;
+            buildLevel = 1;
         }
 
         if (viewData.cSites.length > 0) {
-            this.EnsureAssignment('Builder_1', CT_Builder, infLevel, {
+            this.EnsureAssignment('Builder_1', CT_Builder, buildLevel, {
                 pri: Priority_Low,
                 res: false
             });
             if (viewData.cSites.length > 3) {
-                this.EnsureAssignment('Builder_2', CT_Builder, infLevel, {
+                this.EnsureAssignment('Builder_2', CT_Builder, buildLevel, {
                     pri: Priority_Medium,
                     res: false
-                })
+                });
+                if (viewData.cSites.length > 7) {
+                    this.EnsureAssignment('Builder_3', CT_Builder, buildLevel, {
+                        pri: Priority_Low,
+                        res: false
+                    })
+                }
             }
         }
     }

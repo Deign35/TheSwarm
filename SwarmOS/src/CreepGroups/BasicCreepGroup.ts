@@ -25,7 +25,8 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Paren
     protected PrepareChildren() {
         let childIDs = Object.keys(this.assignments);
         for (let i = 0; i < childIDs.length; i++) {
-            if (!this.assignments[childIDs[i]].pid) {
+            if (!this.assignments[childIDs[i]].pid || !this.kernel.getProcessByPID(this.assignments[childIDs[i]].pid!)) {
+                // (TODO) Dropped creeps here.
                 delete this.assignments[childIDs[i]];
             }
         }

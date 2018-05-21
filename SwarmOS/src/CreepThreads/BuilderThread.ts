@@ -58,6 +58,11 @@ export class BuilderThread extends CreepThread<Builder_Memory> {
 
             if (targetSite) {
                 this.memory.tar = targetSite.id;
+            } else {
+                this.creepRegistry.releaseCreep(this.creep.name);
+                // (TODO): THIS IS BAD.  Unmanaged creep drop.
+                this.kernel.killProcess(this.pid);
+                return ThreadState_Done;
             }
         }
 
