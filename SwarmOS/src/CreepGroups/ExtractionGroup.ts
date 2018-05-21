@@ -14,7 +14,7 @@ class ExtractionGroup extends BasicCreepGroup<ExtractionGroup_Memory> {
         if (viewData.owner && viewData.owner == MY_USERNAME) {
             spawnRoom = Game.rooms[this.memory.targetRoom];
         }
-        this.EnsureAssignment('Hauler', CT_Refiller, spawnRoom.controller!.level > 1 ? 1 : 0, {
+        this.EnsureAssignment('Hauler', CT_Refiller, spawnRoom.controller!.level > 2 ? 1 : 0, {
             pri: Priority_High,
             res: true
         });

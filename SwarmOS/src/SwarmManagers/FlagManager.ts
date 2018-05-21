@@ -44,6 +44,11 @@ class FlagManager extends BasicProcess<FlagExtensionsMemory> {
                 this.memory[id] = this.kernel.startProcess(PKG_FlagBase, flagContext);
             }
         }
+        for (let id in this.memory) {
+            if (!Game.flags[id]) {
+                delete this.memory[id];
+            }
+        }
 
         this.sleeper.sleep(30);
     }

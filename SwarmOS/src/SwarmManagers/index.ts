@@ -1,4 +1,3 @@
-//import { OSPackage as RoomManager } from "SwarmManagers/RoomManager";
 import { OSPackage as FlagManager } from "SwarmManagers/FlagManager";
 
 import { PackageProviderBase } from "Core/AdvancedTypes";
@@ -6,7 +5,6 @@ import { PackageProviderBase } from "Core/AdvancedTypes";
 class SwarmManager extends PackageProviderBase<PackageProviderMemory> {
     static install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
         processRegistry.register(PKG_SwarmManager, SwarmManager);
-        //RoomManager.install(processRegistry, extensionRegistry);
         FlagManager.install(processRegistry, extensionRegistry);
     }
     protected get RequiredServices(): SDictionary<ProviderService> {

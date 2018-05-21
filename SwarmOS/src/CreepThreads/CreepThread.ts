@@ -28,6 +28,10 @@ export abstract class CreepThread<T extends CreepProcess_Memory> extends ThreadP
                 if (this.memory.SR) {
                     let curContext = this.spawnRegistry.getRequestContext(this.memory.SR);
                     if (curContext) {
+                        if (!curContext.r) {
+                            this.kernel.killProcess(this.pid);
+                            return;
+                        }
                         this.refreshSpawnRequest(curContext);
                     }
                     if (!curContext || !this.spawnRegistry.tryResetRequest(this.memory.SR, curContext)) {
@@ -50,9 +54,15 @@ export abstract class CreepThread<T extends CreepProcess_Memory> extends ThreadP
                         this.creepRegistry.tryReserveCreep(context.n, this.pid);
                         this.memory.CR = context.n;
                         this._creep = this.creepRegistry.tryGetCreep(this.memory.CR, this.pid);
+
+                        if (this._creep && !context.r) {
+                            this.spawnRegistry.cancelRequest(this.memory.SR);
+                            delete this.memory.SR;
+                            break;
+                        }
                     }
                     if (reqStatus == SP_COMPLETE && !this._creep) {
-                        if (!context) {
+                        if (!context || !context.r) {
                             this.kernel.killProcess(this.pid);
                             return;
                         }

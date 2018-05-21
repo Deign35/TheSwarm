@@ -140,6 +140,7 @@ class RoomExtension extends ExtensionBase {
             let structure = allStructures[i];
             if (roomData.structures[structure.structureType]) {
                 if (structure.structureType == STRUCTURE_CONTAINER ||
+                    structure.structureType == STRUCTURE_EXTENSION ||
                     structure.structureType == STRUCTURE_KEEPER_LAIR ||
                     structure.structureType == STRUCTURE_LINK ||
                     structure.structureType == STRUCTURE_NUKER ||
