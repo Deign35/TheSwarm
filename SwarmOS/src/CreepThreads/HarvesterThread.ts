@@ -37,6 +37,7 @@ export class Harvester extends CreepThread<Harvester_Memory> {
             });
             if (containers.length > 0) {
                 this.memory.containerID = containers[0].id;
+                delete this.memory.constructionSite;
             } else if (!this.memory.constructionSite) {
                 let sites = target.pos.findInRange(FIND_CONSTRUCTION_SITES, 1);
                 for (let i = 0; i < sites.length; i++) {
@@ -93,7 +94,8 @@ export class Harvester extends CreepThread<Harvester_Memory> {
                             hasReplacementAction = true;
                             action = new BuildAction(creep, site);
                         }
-                    } else if (this.memory.containerID) {
+                    }
+                    if (this.memory.containerID) {
                         let container = Game.getObjectById(this.memory.containerID) as StructureContainer;
                         if (container && container.hits < container.hitsMax) {
                             hasReplacementAction = true;

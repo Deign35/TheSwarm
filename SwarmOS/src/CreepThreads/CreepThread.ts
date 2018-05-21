@@ -114,6 +114,7 @@ export abstract class CreepThread<T extends CreepProcess_Memory> extends ThreadP
                 this.log.fatal(`NO ENERGY!!!!!!!!!!!!!!!!!!!`);
                 return ThreadState_Done;
             }
+            this.memory.tar = withdrawTarget.id;
         }
 
         let action: ActionBase | undefined = undefined;
@@ -156,7 +157,7 @@ export abstract class CreepThread<T extends CreepProcess_Memory> extends ThreadP
                 if (resource.amount > minEnergy) {
                     // (TODO): Fix this!
                     closestTarget = resource;
-                    break;
+                    return closestTarget;
                 }
             }
         }

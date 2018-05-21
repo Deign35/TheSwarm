@@ -27,9 +27,9 @@
         "comment": "",
         "packageID": "PKG_CreepBuilder",
         "entries": [{
-                "w": 2,
-                "c": 1,
-                "m": 1
+                "w": 1,
+                "c": 2,
+                "m": 2
             },
             {
                 "w": 2,
@@ -57,7 +57,7 @@
         "comment": "",
         "packageID": "PKG_CreepUpgrader",
         "entries": [{
-                "w": 2,
+                "w": 1,
                 "c": 1,
                 "m": 1
             },

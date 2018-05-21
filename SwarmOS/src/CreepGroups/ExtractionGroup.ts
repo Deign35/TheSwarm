@@ -14,7 +14,7 @@ class ExtractionGroup extends BasicCreepGroup<ExtractionGroup_Memory> {
         if (viewData.owner && viewData.owner == MY_USERNAME) {
             spawnRoom = Game.rooms[this.memory.targetRoom];
         }
-        this.EnsureAssignment('Hauler', CT_Refiller, spawnRoom.controller!.level > 2 ? 1 : 0, {
+        this.EnsureAssignment('Hauler', CT_Refiller, spawnRoom.controller!.level > 1 ? 1 : 0, {
             pri: Priority_High,
             res: true
         });
@@ -33,6 +33,18 @@ class ExtractionGroup extends BasicCreepGroup<ExtractionGroup_Memory> {
                 res: true
             }
             this.EnsureAssignment(viewData.sourceIDs[i], CT_Harvester, extractionLevel, context);
+            if (extractionLevel == 0) {
+                this.EnsureAssignment(viewData.sourceIDs[i] + '_1', CT_Harvester, 0, {
+                    pri: Priority_High,
+                    tar: viewData.sourceIDs[i],
+                    res: false
+                } as AssignmentContext_Harvester);
+                this.EnsureAssignment(viewData.sourceIDs[i] + '_2', CT_Harvester, 0, {
+                    pri: Priority_High,
+                    tar: viewData.sourceIDs[i],
+                    res: false
+                } as AssignmentContext_Harvester);
+            }
         }
     }
     protected get GroupPrefix(): string { return 'Extr'; }
