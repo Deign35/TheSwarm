@@ -13,13 +13,14 @@ export const OSPackage: IPackage<RoomStateMemory> = {
 }
 
 class RoomRegistry extends BasicProcess<MemBase> {
+    get logID() { return 'RoomRegistry' };
+    get logLevel() { return LOG_INFO as LogLevel; }
     @extensionInterface(EXT_RoomView)
     RoomView!: RoomExtension;
     protected get memory(): RoomStateMemory {
         if (!Memory.roomData) {
             this.log.warn(`Initializing RoomManager memory`);
             Memory.roomData = {
-                pri: Priority_Medium,
                 roomStateData: {}
             }
         }
@@ -28,9 +29,8 @@ class RoomRegistry extends BasicProcess<MemBase> {
     RunThread(): ThreadState {
         for (let roomID in Game.rooms) {
             let data = this.RoomView.GetRoomData(roomID);
-            if (data && !data.hostPID) {
+            if (data && (!data.hostPID || !this.kernel.getProcessByPID(data.hostPID))) {
                 let newMem: RoomThreadMemory = {
-                    pri: Priority_Medium,
                     assignments: {},
                     enabled: true,
                     homeRoom: roomID,
@@ -52,7 +52,6 @@ class RoomExtension extends ExtensionBase {
         if (!Memory.roomData) {
             this.log.warn(`Initializing RoomManager memory`);
             Memory.roomData = {
-                pri: Priority_Medium,
                 roomStateData: {}
             }
         }

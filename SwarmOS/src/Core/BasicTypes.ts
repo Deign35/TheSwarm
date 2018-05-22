@@ -24,8 +24,8 @@ export abstract class BasicProcess<T extends MemBase> implements IProcess {
     get pkgName(): string { return this.context.pkgName; }
     get pid(): PID { return this.context.pid; }
     get parentPID(): PID { return this.context.pPID; }
-    get threadState(): ThreadState { return this.memory.sta || ThreadState_Inactive; }
-    get threadPriority(): Priority { return this.memory.pri || Priority_Hold; }
+    get threadState(): ThreadState { return ThreadState_Active; }// this.memory.sta || ThreadState_Inactive; }
+    get threadPriority(): Priority { return Priority_Hold; }//this.memory.pri || Priority_Hold; }
 
     PrepTick?(): void;
     EndTick?(): void;

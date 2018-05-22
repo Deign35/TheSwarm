@@ -1,7 +1,4 @@
-declare interface MemBase {
-    sta?: ThreadState;
-    pri?: Priority;
-}
+declare interface MemBase { }
 
 /** Core OS */
 declare interface KernelMemory extends MemBase {

@@ -31,7 +31,6 @@ declare interface CreepGroup_Memory extends MemBase {
     assignments: IDictionary<GroupID, CreepGroup_Assignment>;
     homeRoom: RoomID;
     targetRoom: RoomID;
-    pri: Priority;
 }
 declare interface ControlGroup_Memory extends CreepGroup_Memory {
 
