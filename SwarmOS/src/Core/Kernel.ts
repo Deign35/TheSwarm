@@ -193,8 +193,20 @@ export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepEx
             }
         }
 
-        if (!hasActiveProcesses)
+        if (!hasActiveProcesses) {
             this.startProcess(PKG_SwarmManager, {});
+    }
+
+        for (let i = 0; i < processIDs.length; i++) {
+            let pid = processIDs[i];
+            let pInfo = this.processTable[pid];
+            if (!pInfo.ex) {
+                delete this.processTable[pid];
+                delete this.processMemory[pid];
+                delete this._processCache[pid];
+                continue;
+            }
+        }
     }
 
     sleep(ticks: number): void {

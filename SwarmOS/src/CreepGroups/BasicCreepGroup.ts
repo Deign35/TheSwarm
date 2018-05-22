@@ -26,8 +26,7 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Paren
         let childIDs = Object.keys(this.assignments);
         for (let i = 0; i < childIDs.length; i++) {
             if (!this.assignments[childIDs[i]].pid || !this.kernel.getProcessByPID(this.assignments[childIDs[i]].pid!)) {
-                // (TODO) Dropped creeps here.
-                delete this.assignments[childIDs[i]];
+                this.CloseChildThread(this.assignments[childIDs[i]].GR);
             }
         }
     }
@@ -145,5 +144,20 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Paren
             creep.suicide();
             return;
         }
+    }
+    CloseChildThread(tid: ThreadID) {
+        let ids = Object.keys(this.assignments);
+        for (let i = 0; i < ids.length; i++) {
+            if (this.assignments[ids[i]].GR == tid) {
+                this.CloseAssignment(ids[i]);
+            }
+        }
+
+        super.CloseChildThread(tid);
+    }
+
+    CloseAssignment(aID: GroupID) {
+        // (TODO) Dropped creeps here.
+        delete this.assignments[aID];
     }
 }

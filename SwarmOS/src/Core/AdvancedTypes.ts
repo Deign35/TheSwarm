@@ -62,13 +62,13 @@ export abstract class ParentThreadProcess<T extends ThreadMemory_Parent> extends
     protected executeProcess(): void {
         super.executeProcess();
         this.PrepareChildren();
-        let threadIDs = Object.keys(this.memory.childThreads);
+        let threadIDs = Object.keys(this.children);
         let activePIDS = [];
         this._activeThreads = {};
         for (let i = 0; i < threadIDs.length; i++) {
             let child = this.kernel.getProcessByPID(this.children[threadIDs[i]].pid) as ThreadProcess<ThreadMemory>;
             if (!child) {
-                delete this.memory[threadIDs[i]];
+                this.CloseChildThread(threadIDs[i]);
                 continue;
             }
             if (!child.RunThread) {
@@ -132,5 +132,10 @@ export abstract class ParentThreadProcess<T extends ThreadMemory_Parent> extends
         };
         this.kernel.setParent(pid!, parentPID);
         return newThreadID;
+    }
+
+    CloseChildThread(tid: ThreadID) {
+        this.kernel.killProcess(this.children[tid].pid);
+        delete this.children[tid];
     }
 }
