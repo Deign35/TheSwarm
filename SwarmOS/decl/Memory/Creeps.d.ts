@@ -25,6 +25,17 @@ declare interface Builder_Memory extends CreepProcess_Memory {
 
 }
 
+declare interface ManualCreep_Memory extends MemBase {
+    a: ActionType;          // (a)ctionType
+    c: CreepID;             // (c)reepName
+    t: ObjectID | CreepID;  // (t)arget
+    h: RoomID;              // (h)ome
+    l: RoomID;              // target (l)ocation
+    g: boolean;             // (g)etting resources
+
+    t2?: ObjectID | CreepID; // sub-(t)arget
+}
+
 /** CreepGroups */
 declare interface CreepGroup_Memory extends MemBase {
     enabled: boolean; // (en)abled

@@ -161,6 +161,28 @@
                 "Done": 3,
                 "Overrun": 4
             }
+        },
+        "AT": {
+            "comment": "Action type",
+            "enabled": true,
+            "combinedType": "ActionType",
+            "string": true,
+            "isArray": true,
+            "type": true,
+            "entries": [
+                "Attack",
+                "Build",
+                "Drop",
+                "Harvest",
+                "MoveToPosition",
+                "Pickup",
+                "Repair",
+                "RequestTransfer",
+                "Say",
+                "Transfer",
+                "Upgrade",
+                "Withdraw"
+            ]
         }
     }
 }
