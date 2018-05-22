@@ -1,6 +1,6 @@
 
 /** Creep extension Memory */
-declare interface CreepProcess_Memory extends ThreadMemory {
+declare interface CreepProcess_Memory extends MemBase {
     SR?: SpawnRequestID;// Spawn request ID 
     CR?: CreepID;       // Creep name
 
@@ -26,7 +26,7 @@ declare interface Builder_Memory extends CreepProcess_Memory {
 }
 
 /** CreepGroups */
-declare interface CreepGroup_Memory extends ThreadMemory_Parent {
+declare interface CreepGroup_Memory extends MemBase {
     enabled: boolean; // (en)abled
     assignments: IDictionary<GroupID, CreepGroup_Assignment>;
     homeRoom: RoomID;
@@ -56,7 +56,6 @@ declare interface ExtractionGroup_Memory extends CreepGroup_Memory {
 
 declare interface CreepGroup_Assignment extends MemBase {
     pid?: PID;          // ID corresponding to the assigned PID
-    GR: GroupID;        // ID corresponding to the child ThreadID
     SR: SpawnRequestID; // ID corresponding to the spawn request
     CT: CT_ALL;         // (C)reep (T)ype
     lvl: number;        // role level

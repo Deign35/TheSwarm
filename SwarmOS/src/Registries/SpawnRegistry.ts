@@ -77,12 +77,12 @@ class SpawnRegistry extends BasicProcess<SpawnRegistry_Memory> {
         let activeRequests = {};
         for (let i = 0; i < requests.length; i++) {
             let req = this.memory[requests[i]];
-            if (req.sta != SP_QUEUED) {
-                if (req.sta == SP_SPAWNING) {
+            if (req.spSta != SP_QUEUED) {
+                if (req.spSta == SP_SPAWNING) {
                     if (!Game.creeps[req.con.n]) {
-                        req.sta = SP_ERROR;
+                        req.spSta = SP_ERROR;
                     } else if (!Game.creeps[req.con.n].spawning) {
-                        req.sta = SP_COMPLETE;
+                        req.spSta = SP_COMPLETE;
                     }
                 }
                 continue;
@@ -158,7 +158,7 @@ class SpawnRegistry extends BasicProcess<SpawnRegistry_Memory> {
 
     protected spawnCreep(spawn: StructureSpawn, req: SpawnRequest) {
         let spawnResult = ERR_INVALID_ARGS as ScreepsReturnCode;
-        while (spawnResult != OK && req.sta == SP_QUEUED) {
+        while (spawnResult != OK && req.spSta == SP_QUEUED) {
             // construct the body here somehow
             spawnResult = spawn.spawnCreep(ConvertContextToSpawnBody(req.con),
                 req.con.n,
@@ -170,19 +170,19 @@ class SpawnRegistry extends BasicProcess<SpawnRegistry_Memory> {
                     break;
                 default:
                     this.log.error(`Spawn Creep has failed (${spawnResult})`);
-                    req.sta = SP_ERROR;
+                    req.spSta = SP_ERROR;
                     break;
             }
         }
 
         if (spawnResult == OK) {
             this.log.debug(`Spawn Creep successful for ${req.id})`);
-            req.sta = SP_SPAWNING;
+            req.spSta = SP_SPAWNING;
         }
     }
 
     protected GetConvertedSpawnCost(spawn: StructureSpawn, req: SpawnRequest) {
-        if (req.sta != SP_QUEUED) {
+        if (req.spSta != SP_QUEUED) {
             return UNSPAWNABLE_COST;
         }
         let diff = CreepBodies.get(req.con.ct)[req.con.l].cost;
@@ -213,15 +213,15 @@ class SpawnRegistryExtensions extends ExtensionBase implements ISpawnRegistryExt
         }
         let spawnRequest = this.memory[id];
 
-        if (spawnRequest.sta == SP_SPAWNING) {
+        if (spawnRequest.spSta == SP_SPAWNING) {
             let creep = Game.creeps[spawnRequest.con.n];
             if (creep && !creep.spawning) {
-                this.memory[id].sta = SP_COMPLETE;
-                spawnRequest.sta = SP_COMPLETE;
+                this.memory[id].spSta = SP_COMPLETE;
+                spawnRequest.spSta = SP_COMPLETE;
             }
         }
 
-        return spawnRequest.sta;
+        return spawnRequest.spSta;
     }
     getRequestContext(id: SpawnRequestID): CreepContext | undefined {
         if (this.memory[id]) {
@@ -233,7 +233,7 @@ class SpawnRegistryExtensions extends ExtensionBase implements ISpawnRegistryExt
 
     tryResetRequest(id: SpawnRequestID, newContext: CreepContext, priority?: Priority, defaultMemory?: any) {
         if (this.memory[id]) {
-            this.memory[id].sta = SP_QUEUED;
+            this.memory[id].spSta = SP_QUEUED;
         } else {
             return false;
         }
@@ -269,7 +269,7 @@ class SpawnRegistryExtensions extends ExtensionBase implements ISpawnRegistryExt
             loc: location,
             max: maxSpawnDistance,
             pri: spawnPriority,
-            sta: SP_QUEUED,
+            spSta: SP_QUEUED,
         }
 
         this.memory[newRequest.id] = newRequest;

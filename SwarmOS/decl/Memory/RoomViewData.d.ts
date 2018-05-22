@@ -46,7 +46,7 @@ declare interface RoomGroupListing {
 }
 
 /** RoomViewData */
-declare interface RoomStateMemory extends ThreadMemory_Parent {
+declare interface RoomStateMemory extends MemBase {
     roomStateData: {
         [id in RoomID]: RoomState
     }

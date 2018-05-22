@@ -19,7 +19,7 @@ export class TempBranchGroup extends BasicCreepGroup<TempBranchGroup_Memory> {
                     res: false
                 });
             // Kill the old job, and make a new one.
-            this.AssignNewTempJob(this.memory.unprocessedCreeps[i].context.n, this.memory.unprocessedCreeps[i].mem);
+            //this.AssignNewTempJob(this.memory.unprocessedCreeps[i].context.n, this.memory.unprocessedCreeps[i].mem);
         }
 
         this.memory.unprocessedCreeps = [];
@@ -27,12 +27,12 @@ export class TempBranchGroup extends BasicCreepGroup<TempBranchGroup_Memory> {
         for (let group in this.memory.jobs) {
             for (let i = 0; i < this.memory.jobs[group].length; i++) {// id in this.memory.jobs[group]) {
                 let threadID = this.memory.jobs[group][i];
-                if (!this.kernel.getProcessByPID(this.children[threadID].pid)) {
+                /*if (!this.kernel.getProcessByPID(this.children[threadID].pid)) {
                     this.memory.jobs[group].splice(i--, 1);
-                }
+                }*/
             }
         }
-    }
+    }/*
     protected AssignNewTempJob(creepName: GroupID, creepMem: CreepProcess_Memory) {
         let curJob = this.assignments[creepName];
         let creep;
@@ -58,7 +58,7 @@ export class TempBranchGroup extends BasicCreepGroup<TempBranchGroup_Memory> {
         this.FindJobForCreep(creep, creepMem);
     }
 
-    protected FindJobForCreep(creep: Creep, creepMem: ThreadMemory) {
+    protected FindJobForCreep(creep: Creep, creepMem: MemBase) {
         let curAssignment = this.assignments[creep.name];
         let body = CreepBodies.get(curAssignment.CT)[curAssignment.lvl] as CreepBody;
         let newJobContext = this.createNewCreepContext(body.ct_ID, body.lvl, false);
@@ -90,7 +90,7 @@ export class TempBranchGroup extends BasicCreepGroup<TempBranchGroup_Memory> {
             creepMem.PKG = PKG_CreepRefiller;
         }
         this.memory.jobs[creepMem.PKG].push(this.AttachChildThread(creepMem, this.pid));
-    }
+    }*/
 
     ReceiveCreep(creep: Creep, oldAssignment: CreepGroup_Assignment) {
         this.memory.unprocessedCreeps.push({

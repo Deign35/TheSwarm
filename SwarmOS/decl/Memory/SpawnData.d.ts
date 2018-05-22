@@ -20,7 +20,7 @@ declare interface SpawnRequest extends MemBase {
     id: SpawnRequestID; // requestID
     loc: RoomID;        // Where the spawn request originates
     pri: Priority;      // How much of a priority is this spawn??
-    sta: SpawnState;    // Current Spawn state
+    spSta: SpawnState;    // Current Spawn state
 
     dm?: ScreepsObject_CreepMemory;           // Default memory
     max?: number;       // Max spawning distance allowed for this spawn.

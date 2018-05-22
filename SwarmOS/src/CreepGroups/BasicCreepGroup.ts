@@ -1,6 +1,6 @@
-import { ParentThreadProcess } from "Core/AdvancedTypes";
+import { BasicProcess } from "Core/BasicTypes";
 
-export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends ParentThreadProcess<T> {
+export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends BasicProcess<T> {
     @extensionInterface(EXT_CreepRegistry)
     protected creepRegistry!: ICreepRegistryExtensions;
     @extensionInterface(EXT_RoomView)
@@ -8,25 +8,21 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Paren
 
     protected abstract EnsureGroupFormation(): void;
     protected abstract get GroupPrefix(): GroupID;
-
-    protected executeProcess() {
-        super.executeProcess();
-        // Must be done after as this will create new processes and threads
-        this.EnsureGroupFormation();
-    }
+    EndTick(): void { }
 
     protected get assignments() {
         return this.memory.assignments;
     }
-    protected IsRoleActive(): boolean {
-        return true;
-    }
 
-    protected PrepareChildren() {
+    RunThread() {
+        this.EnsureGroupFormation();
+        return ThreadState_Done as ThreadState;
+    }
+    PrepTick() {
         let childIDs = Object.keys(this.assignments);
         for (let i = 0; i < childIDs.length; i++) {
             if (!this.assignments[childIDs[i]].pid || !this.kernel.getProcessByPID(this.assignments[childIDs[i]].pid!)) {
-                this.CloseChildThread(this.assignments[childIDs[i]].GR);
+                this.CloseAssignment(childIDs[i]);
             }
         }
     }
@@ -58,7 +54,6 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Paren
         if (!assignment) {
             assignment = {
                 SR: '',
-                GR: ''
             } as CreepGroup_Assignment
         }
         assignment.CT = ctID;
@@ -99,7 +94,6 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Paren
         }
         newCreepMem.SR = assignment.SR;
         assignment.pid = this.kernel.startProcess(CreepBodies[assignment.CT][assignment.lvl].pkg_ID, newCreepMem);
-        assignment.GR = this.AttachChildThread(newCreepMem, this.pid, assignment.pid);
         if (curCreep) {
             if (!this.creepRegistry.tryReserveCreep(curCreep.name, assignment.pid)) {
                 this.log.warn(`This is an issue...  Creep should have been able to be reserved.  Otherwise I wouldn't have it`);
@@ -120,7 +114,7 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Paren
                     let creep = this.creepRegistry.tryGetCreep(spawnRequest.n, assignment.pid);
                     if (creep) {
                         this.creepRegistry.releaseCreep(creep.name);
-                        let parentProc = this.parentPID ? this.kernel.getProcessByPID(this.parentPID) as IThreadProcess : undefined;
+                        let parentProc = this.parentPID ? this.kernel.getProcessByPID(this.parentPID) as IProcess : undefined;
                         if ((parentProc as BasicCreepGroup<any>).ReceiveCreep) {
                             (parentProc as BasicCreepGroup<any>).ReceiveCreep(creep, assignment);
                         } else {
@@ -135,7 +129,7 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Paren
     }
 
     ReceiveCreep(creep: Creep, oldAssignment: CreepGroup_Assignment) {
-        let parentProc = this.parentPID ? this.kernel.getProcessByPID(this.parentPID) as IThreadProcess : undefined;
+        let parentProc = this.parentPID ? this.kernel.getProcessByPID(this.parentPID) as IProcess : undefined;
         if ((parentProc as BasicCreepGroup<any>).ReceiveCreep) {
             (parentProc as BasicCreepGroup<any>).ReceiveCreep(creep, oldAssignment);
             return;
@@ -144,16 +138,6 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Paren
             creep.suicide();
             return;
         }
-    }
-    CloseChildThread(tid: ThreadID) {
-        let ids = Object.keys(this.assignments);
-        for (let i = 0; i < ids.length; i++) {
-            if (this.assignments[ids[i]].GR == tid) {
-                this.CloseAssignment(ids[i]);
-            }
-        }
-
-        super.CloseChildThread(tid);
     }
 
     CloseAssignment(aID: GroupID) {
