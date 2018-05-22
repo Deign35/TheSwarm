@@ -45,11 +45,11 @@ class FlagBase extends BasicProcess<FlagProcess_Memory> {
     protected get flag(): Flag {
         return Game.flags[this.memory.flagID];
     }
-    protected executeProcess(): void {
+    RunThread(): ThreadState {
         let flag = this.flag;
         if (!flag) {
             this.kernel.killProcess(this.pid);
-            return;
+            return ThreadState_Done;
         }
 
         switch (flag.color) {
@@ -70,6 +70,8 @@ class FlagBase extends BasicProcess<FlagProcess_Memory> {
             default:
                 break;
         }
+
+        return ThreadState_Done;
     }
 
     protected createBasicSite() {

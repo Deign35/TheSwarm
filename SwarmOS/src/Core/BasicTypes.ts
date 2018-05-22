@@ -29,8 +29,8 @@ export abstract class BasicProcess<T extends MemBase> implements IProcess {
     get threadState(): ThreadState { return this.memory.sta || ThreadState_Inactive; }
     get threadPriority(): Priority { return this.memory.pri || Priority_Hold; }
 
-    abstract PrepTick?(): void;
-    abstract EndTick?(): void;
+    PrepTick?(): void;
+    EndTick?(): void;
     abstract RunThread(): ThreadState;
 }
 

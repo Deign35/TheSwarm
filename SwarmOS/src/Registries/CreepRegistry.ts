@@ -50,7 +50,7 @@ class CreepRegistry extends BasicProcess<CreepRegistry_Memory> {
         return PKG_CreepRegistry_LogContext.logLevel!;
     }
 
-    executeProcess(): void {
+    RunThread(): ThreadState {
         this.log.debug(`Begin CreepRunner`);
 
         let creepIDs = Object.keys(this.memory);
@@ -72,6 +72,7 @@ class CreepRegistry extends BasicProcess<CreepRegistry_Memory> {
         }
 
         this.log.debug(`End CreepRunner`);
+        return ThreadState_Done;
     }
 }
 class CreepRegistryExtensions extends ExtensionBase implements ICreepRegistryExtensions {

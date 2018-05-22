@@ -8,7 +8,6 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Basic
 
     protected abstract EnsureGroupFormation(): void;
     protected abstract get GroupPrefix(): GroupID;
-    EndTick(): void { }
 
     protected get assignments() {
         return this.memory.assignments;

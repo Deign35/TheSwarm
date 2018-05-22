@@ -1,11 +1,11 @@
-import { ThreadProcess } from "Core/BasicTypes";
+import { BasicProcess } from "Core/BasicTypes";
 import { ActionBase } from "Actions/ActionBase";
 import { WithdrawAction } from "Actions/WithdrawAction";
 import { HarvestAction } from "Actions/HarvestAction";
 import { PickupAction } from "Actions/PickupAction";
 import { SayAction } from "Actions/SayAction";
 
-export abstract class CreepThread<T extends CreepProcess_Memory> extends ThreadProcess<T> {
+export abstract class CreepThread<T extends CreepProcess_Memory> extends BasicProcess<T> {
     @extensionInterface(EXT_CreepRegistry)
     protected creepRegistry!: ICreepRegistryExtensions;
     @extensionInterface(EXT_RoomView)
@@ -20,7 +20,7 @@ export abstract class CreepThread<T extends CreepProcess_Memory> extends ThreadP
         context.n = context.n.slice(0, 5) + GetSUID();
         context.o = undefined;
     }
-    protected executeProcess(): void {
+    PrepTick(): void {
         if (this.memory.CR) {
             this._creep = this.creepRegistry.tryGetCreep(this.memory.CR, this.pid);
             let curContext = this.memory.SR ? this.spawnRegistry.getRequestContext(this.memory.SR) : undefined;

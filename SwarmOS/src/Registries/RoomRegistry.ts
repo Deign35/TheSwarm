@@ -3,8 +3,7 @@ declare var Memory: {
 }
 
 
-import { ExtensionBase } from "Core/BasicTypes";
-import { ParentThreadProcess } from "Core/AdvancedTypes";
+import { ExtensionBase, BasicProcess } from "Core/BasicTypes";
 
 export const OSPackage: IPackage<RoomStateMemory> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
@@ -13,30 +12,26 @@ export const OSPackage: IPackage<RoomStateMemory> = {
     }
 }
 
-class RoomRegistry extends ParentThreadProcess<ThreadMemory_Parent> {
+class RoomRegistry extends BasicProcess<MemBase> {
     @extensionInterface(EXT_RoomView)
     RoomView!: RoomExtension;
     protected get memory(): RoomStateMemory {
         if (!Memory.roomData) {
             this.log.warn(`Initializing RoomManager memory`);
             Memory.roomData = {
-                childThreads: {},
-                PKG: PKG_RoomManager,
                 pri: Priority_Medium,
                 roomStateData: {}
             }
         }
         return Memory.roomData;
     }
-    protected PrepareChildren(): void {
+    RunThread(): ThreadState {
         for (let roomID in Game.rooms) {
             let data = this.RoomView.GetRoomData(roomID);
             if (data && !data.hostPID) {
                 let newMem: RoomThreadMemory = {
-                    PKG: PKG_SimpleOwnedRoom,
                     pri: Priority_Medium,
                     assignments: {},
-                    childThreads: {},
                     enabled: true,
                     homeRoom: roomID,
                     targetRoom: roomID
@@ -47,6 +42,8 @@ class RoomRegistry extends ParentThreadProcess<ThreadMemory_Parent> {
                 this.memory.roomStateData[roomID]!.hostPID = newPID;
             }
         }
+
+        return ThreadState_Done;
     }
 }
 
@@ -56,8 +53,6 @@ class RoomExtension extends ExtensionBase {
         if (!Memory.roomData) {
             this.log.warn(`Initializing RoomManager memory`);
             Memory.roomData = {
-                childThreads: {},
-                PKG: PKG_RoomManager,
                 pri: Priority_Medium,
                 roomStateData: {}
             }

@@ -30,7 +30,7 @@ class FlagManager extends BasicProcess<FlagExtensionsMemory> {
         return PKG_FlagManager_LogContext.logLevel!;
     }
 
-    executeProcess(): void {
+    RunThread(): ThreadState {
         for (let id in Game.flags) {
             let flagProcess;
             let flagPID = this.memory[id];
@@ -51,6 +51,8 @@ class FlagManager extends BasicProcess<FlagExtensionsMemory> {
         }
 
         this.sleeper.sleep(30);
+
+        return ThreadState_Done;
     }
 }
 

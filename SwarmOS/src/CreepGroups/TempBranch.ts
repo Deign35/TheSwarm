@@ -106,7 +106,6 @@ export class TempBranchGroup extends BasicCreepGroup<TempBranchGroup_Memory> {
                 get: false,
                 home: creep.room.name,
                 loc: creep.room.name,
-                PKG: PKG_CreepRefiller, // Temporary,  Should be replaced by Find new Job
                 pri: Priority_Lowest,
             }
         })

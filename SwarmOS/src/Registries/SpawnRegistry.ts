@@ -113,7 +113,7 @@ class SpawnRegistry extends BasicProcess<SpawnRegistry_Memory> {
         }
     }
 
-    executeProcess(): void {
+    RunThread(): ThreadState {
         this.log.debug(`Begin Spawner`);
         let { activeRequests, activeSpawns, sortedSpawnIDs, usedRequestIDs } = this.AnalyzeSpawnRequests();
 
@@ -121,7 +121,7 @@ class SpawnRegistry extends BasicProcess<SpawnRegistry_Memory> {
         if (requests.length == 0) {
             // Inform the temp worker group
             this.log.warn(`No spawn requests in the queue.  You have spawn capacity available.`);
-            return;
+            return ThreadState_Done;
         }
 
         for (let i = 0; i < sortedSpawnIDs.length; i++) {
@@ -154,6 +154,8 @@ class SpawnRegistry extends BasicProcess<SpawnRegistry_Memory> {
         }
         this.sleeper.sleep(3);
         this.log.debug(`End Spawner`);
+
+        return ThreadState_Done;
     }
 
     protected spawnCreep(spawn: StructureSpawn, req: SpawnRequest) {

@@ -19,7 +19,7 @@ export abstract class PackageProviderBase<T extends PackageProviderMemory> exten
         this.memory.services[serviceID] = { pid: pid, serviceID };
     }
 
-    protected executeProcess() {
+    RunThread(): ThreadState {
         let ids = Object.keys(this.RequiredServices)
         for (let i = 0, length = ids.length; i < length; i++) {
             let service = this.memory.services[ids[i]];
@@ -42,5 +42,6 @@ export abstract class PackageProviderBase<T extends PackageProviderMemory> exten
         }
 
         this.sleeper.sleep(this.ScanFrequency);
+        return ThreadState_Done;
     }
 }

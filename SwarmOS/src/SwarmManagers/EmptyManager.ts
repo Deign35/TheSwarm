@@ -47,8 +47,9 @@ class ___Empty___Manager extends BasicProcess<I___Empty___Data_Memory> {
         }
         return Memory.___Empty___Data;
     }
-    executeProcess(): void {
+    RunThread(): ThreadState {
         this.log.warn(`${IN____Empty___Manager} has not been implemented.`);
+        return ThreadState_Done;
     }
 }
 
