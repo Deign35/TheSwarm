@@ -10,15 +10,16 @@ declare interface IProcessRegistry {
     createNewProcess(name: string, context: IProcessContext): IProcess | undefined;
 }
 declare interface IProcess {
-    run(): void;
-}
-declare interface IThreadProcess extends IProcess {
-    ThreadID?: ThreadID
-    PKG: ScreepsPackage;
+    pkgName: string;
+    pid: PID;
+    parentPID: PID;
+    threadState: ThreadState
+    threadPriority: Priority
+
+    PrepTick?(): void;
+    EndTick?(): void;
     RunThread(): ThreadState;
 }
-
-declare type ProcessWithID = { pid: PID; process: IProcess; };
 declare interface _ProcessConstructor {
     new(context: IProcessContext): IProcess;
 }
@@ -39,7 +40,6 @@ declare interface ProcInfo {
     end?: number; // Ended -- When the process ended
     err?: string; // Error
     sl?: number;// Sleep -- Process sleeping until
-    th?: boolean;//Active thread
 }
 
 declare type ProcessTable = {

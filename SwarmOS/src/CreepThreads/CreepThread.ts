@@ -1,4 +1,4 @@
-import { BasicProcess, ThreadProcess } from "Core/BasicTypes";
+import { ThreadProcess } from "Core/BasicTypes";
 import { ActionBase } from "Actions/ActionBase";
 import { WithdrawAction } from "Actions/WithdrawAction";
 import { HarvestAction } from "Actions/HarvestAction";

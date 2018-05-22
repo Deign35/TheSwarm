@@ -1,12 +1,14 @@
-declare interface MemBase { }
+declare interface MemBase {
+    sta?: ThreadState;
+    pri?: Priority;
+}
 
 /** Core OS */
 declare interface KernelMemory extends MemBase {
     processTable: ProcessTable;
     processMemory: ProcessMemory;
 
-    subscriptions: IDictionary<string, PID[]>;
-    notifications: string[]
+    ErrorLog: string[];
 }
 declare type ProcessMemory = {
     [id in PID]: MemBase;
@@ -16,13 +18,6 @@ declare interface ChildThreadState {
     priority: Priority;
     pid: PID;
     tid: ThreadID
-}
-declare interface ThreadMemory_Parent extends ThreadMemory {
-    childThreads: { [tid in ThreadID]: ChildThreadState }
-}
-declare interface ThreadMemory extends MemBase {
-    PKG: ScreepsPackage;
-    pri: Priority;
 }
 declare interface PackageProviderMemory extends MemBase {
     services: {

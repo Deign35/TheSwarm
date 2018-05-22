@@ -1,4 +1,4 @@
-export abstract class BasicProcess<ProcessMemory> implements IProcess {
+export abstract class BasicProcess<T extends MemBase> implements IProcess {
     @extensionInterface(EXT_Kernel)
     protected kernel!: IKernelProcessExtensions;
     @extensionInterface(EXT_Registry)
@@ -7,6 +7,8 @@ export abstract class BasicProcess<ProcessMemory> implements IProcess {
     protected spawnRegistry!: ISpawnRegistryExtensions;
     @extensionInterface(EXT_Sleep)
     protected sleeper!: IKernelSleepExtension;
+    @extensionInterface(EXT_ThreadRegistry)
+    protected thread!: IThreadRegistryExtensions;
 
     constructor(protected context: IProcessContext) {
         this._logger = context.getPackageInterface(EXT_Logger).CreateLogContext(this.logID, this.logLevel);
@@ -19,46 +21,18 @@ export abstract class BasicProcess<ProcessMemory> implements IProcess {
     protected get logID() { return DEFAULT_LOG_ID; }
     protected get logLevel(): LogLevel { return DEFAULT_LOG_LEVEL; }
 
-    protected get memory(): ProcessMemory { return this.context.memory as ProcessMemory; }
+    protected get memory(): T { return this.context.memory as T; }
 
     get pkgName(): string { return this.context.pkgName; }
     get pid(): PID { return this.context.pid; }
     get parentPID(): PID { return this.context.pPID; }
+    get threadState(): ThreadState { return this.memory.sta || ThreadState_Inactive; }
+    get threadPriority(): Priority { return this.memory.pri || Priority_Hold; }
 
-    run(): void {
-        let startCPU = 0;
-        if (this.isInDebugMode) {
-            startCPU = Game.cpu.getUsed();
-            this.log.debug(() => `Begin ${this.pkgName}(${this.pid}): ${startCPU}`);
-        }
-
-        this.executeProcess();
-
-        if (this.isInDebugMode) {
-            let endCPU = Game.cpu.getUsed();
-            this.log.debug(() => `End ${this.pkgName}(${this.pid}): ${endCPU - startCPU}`);
-            this.executeDebugCode();
-            let endDebugCPU = Game.cpu.getUsed();
-            this.log.debug(() => `End Debug ${this.pkgName}(${this.pid}): ${endDebugCPU - endCPU}`);
-        }
-    }
-    get isInDebugMode(): boolean { return false; }
-    protected executeDebugCode(): void { }
-
-    protected abstract executeProcess(): void;
-}
-
-export abstract class ThreadProcess<T extends ThreadMemory> extends BasicProcess<T> implements IThreadProcess {
-    @extensionInterface(EXT_ThreadRegistry)
-    protected thread!: IThreadRegistryExtensions;
-
-    get PKG() { return this.memory.PKG; }
-
-    protected executeProcess(): void { }
-
+    abstract PrepTick?(): void;
+    abstract EndTick?(): void;
     abstract RunThread(): ThreadState;
 }
-
 
 export abstract class ExtensionBase implements IPackageExtension {
     constructor(protected extensionRegistry: IExtensionRegistry) {
