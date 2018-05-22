@@ -7,7 +7,7 @@ interface ILogLevelSetting {
 }
 
 const LOGGER_SEPARATOR = `<font color="yellow">-----------------------------------------------------------------------</font>`;
-const CONTEXT_SEPARATOR = `<font color="green">-----------------------------------------------------------------------</font>`;
+const CONTEXT_SEPARATOR = `<font color="white">-----------------------------------------------------------------------</font>`;
 
 const DEFAULT_LOG_FONT_SIZE = 2;
 const LOGGER_SETTINGS: EDictionary<ILogLevelSetting> = {
@@ -145,7 +145,7 @@ export class Logger implements IKernelLoggerExtensions {
             }
         }
 
-        let introStr = `${LOGGER_SEPARATOR}\n${this.MakeFontTag(LOG_ALERT)}Begin SwarmOS Log - [${Game.time}]`
+        let introStr = `${LOGGER_SEPARATOR}\n${this.MakeFontTag(LOG_INFO)}Begin SwarmOS Log - [${Game.time}]`
         if (endTick) {
             introStr += `\nCPU: (${startLoggingTime}\/${Game.cpu.limit} -- [${Game.cpu.bucket}])`;
         }
@@ -158,7 +158,7 @@ export class Logger implements IKernelLoggerExtensions {
 
         // Reset the logger
         this.InitQueue();
-        console.log(`${this.MakeFontTag(LOG_ALERT)}End Logging(${Game.cpu.getUsed() - startLoggingTime})</font>\n${LOGGER_SEPARATOR}`);
+        console.log(`${this.MakeFontTag(LOG_INFO)}End Logging(${Game.cpu.getUsed() - startLoggingTime})</font>\n${LOGGER_SEPARATOR}`);
     }
 
     private ShouldLog(minLevel: LogLevel, messageLevel: LogLevel) {
