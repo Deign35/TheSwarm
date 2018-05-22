@@ -1,5 +1,5 @@
 const ProcessRegistry_LogContext: LogContext = {
-    logID: "ExtensionRegistry",
+    logID: "ProcessRegistry",
     logLevel: LOG_INFO
 }
 export class ProcessRegistry implements IProcessRegistry {

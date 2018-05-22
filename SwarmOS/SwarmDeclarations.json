@@ -57,7 +57,6 @@
                 "CreepRegistry": "creeps",
                 "Registry": "extRegistry",
                 "SpawnRegistry": "spawner",
-                "ThreadRegistry": "thread",
                 "RoomView": "roomView",
                 "Flags": "flags",
                 "Kernel": "kernel",

@@ -50,7 +50,7 @@ class FlagManager extends BasicProcess<FlagExtensionsMemory> {
             }
         }
 
-        this.sleeper.sleep(30);
+        this.sleeper.sleep(this.pid, 30);
 
         return ThreadState_Done;
     }

@@ -38,7 +38,6 @@ class RoomRegistry extends BasicProcess<MemBase> {
                 }
                 let newPID = this.kernel.startProcess(PKG_SimpleOwnedRoom, newMem);
                 this.kernel.setParent(newPID);
-                this.thread.RegisterAsThread(newPID);
                 this.memory.roomStateData[roomID]!.hostPID = newPID;
             }
         }

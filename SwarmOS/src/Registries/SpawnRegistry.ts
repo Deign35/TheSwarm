@@ -6,6 +6,7 @@ import { BasicProcess, ExtensionBase } from "Core/BasicTypes";
 export const OSPackage: IPackage<SpawnRegistry_Memory> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
         processRegistry.register(PKG_SpawnRegistry, SpawnRegistry);
+        extensionRegistry.register(EXT_SpawnRegistry, new SpawnRegistryExtensions(extensionRegistry));
     }
 }
 
@@ -53,9 +54,6 @@ class SpawnRegistry extends BasicProcess<SpawnRegistry_Memory> {
     @extensionInterface(EXT_SpawnRegistry)
     Extensions!: SpawnRegistryExtensions;
 
-    protected OnProcessInstantiation() {
-        this.extensions.register(EXT_SpawnRegistry, new SpawnRegistryExtensions(this.extensions));
-    }
     protected get memory() {
         if (!Memory.spawnData) {
             this.log.warn(`Initializing RoomManager memory`);
@@ -152,7 +150,7 @@ class SpawnRegistry extends BasicProcess<SpawnRegistry_Memory> {
                 usedRequestIDs.push(spawnRequest.req.id);
             }
         }
-        this.sleeper.sleep(3);
+        this.sleeper.sleep(this.pid, 3);
         this.log.debug(`End Spawner`);
 
         return ThreadState_Done;

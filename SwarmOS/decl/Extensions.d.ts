@@ -21,7 +21,6 @@ declare interface IPackageInterfaces {
     [EXT_Sleep]: IKernelSleepExtension;
     [EXT_Logger]: IKernelLoggerExtensions;
     [EXT_CreepRegistry]: ICreepRegistryExtensions;
-    [EXT_ThreadRegistry]: IThreadRegistryExtensions;
 }
 
 /**
@@ -83,7 +82,7 @@ declare interface IKernelNotificationsExtension extends IPackageExtension {
  * Allows a process to be put to sleep or awoken
  */
 declare interface IKernelSleepExtension extends IPackageExtension {
-    sleep(ticks: number): void;
+    sleep(pid: PID, ticks: number): void;
     wake(pid: PID): void;
 }
 
@@ -118,9 +117,4 @@ declare interface ICreepRegistryExtensions extends IPackageExtension {
     tryGetCreep(id: CreepID, requestingPID: PID): Creep | undefined;
     tryReserveCreep(id: CreepID, requestingPID: PID): boolean;
     releaseCreep(id: CreepID): void;
-}
-
-declare interface IThreadRegistryExtensions extends IPackageExtension {
-    RegisterAsThread(pid: PID): void;
-    CloseThread(pid: PID): void;
 }

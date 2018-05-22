@@ -114,7 +114,7 @@ class FlagBase extends BasicProcess<FlagProcess_Memory> {
         if (csCreated == OK) {
             flag.remove();
         } else {
-            this.sleeper.sleep(20);
+            this.sleeper.sleep(this.pid, 20);
         }
     }
     protected createAdvancedSite() {
@@ -155,7 +155,7 @@ class FlagBase extends BasicProcess<FlagProcess_Memory> {
         if (csCreated == OK) {
             flag.remove();
         } else {
-            this.sleeper.sleep(200);
+            this.sleeper.sleep(this.pid, 200);
         }
     }
 }

@@ -1,6 +1,6 @@
 import { OSPackage as FlagManager } from "SwarmManagers/FlagManager";
 
-import { PackageProviderBase } from "Core/AdvancedTypes";
+import { PackageProviderBase } from "Core/BasicTypes";
 
 class SwarmManager extends PackageProviderBase<PackageProviderMemory> {
     static install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {

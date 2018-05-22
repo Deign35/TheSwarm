@@ -7,6 +7,7 @@ import { BasicProcess, ExtensionBase } from "Core/BasicTypes";
 export const OSPackage: IPackage<CreepRegistry_Memory> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
         processRegistry.register(PKG_CreepRegistry, CreepRegistry);
+        extensionRegistry.register(EXT_CreepRegistry, new CreepRegistryExtensions(extensionRegistry));
     }
 }
 
@@ -37,10 +38,6 @@ class CreepRegistry extends BasicProcess<CreepRegistry_Memory> {
             Memory.creepData = {}
         }
         return Memory.creepData;
-    }
-
-    protected OnProcessInstantiation() {
-        this.extensions.register(EXT_CreepRegistry, new CreepRegistryExtensions(this.extensions));
     }
 
     protected get logID(): string {
