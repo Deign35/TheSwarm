@@ -192,6 +192,21 @@ export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepEx
             let proc = this.getProcessByPID(pid)!;
             if (proc.PrepTick) {
                 proc.PrepTick();
+            }
+            this._curTickIDs.push(pid);
+
+        } catch (e) {
+            this.killProcess(pid);
+            pInfo.err = e.stack || e.toString();
+            this.log.error(`[${pid}] ${pInfo.PKG} crashed\n${e.stack}`);
+        }
+    }
+    private EndTick(pid: PID) {
+        let pInfo = this.processTable[pid];
+        let proc = this.getProcessByPID(pid);
+        if (proc && proc.EndTick) {
+            try {
+                proc.EndTick();
 
                 if (!pInfo.ex) {
                     if (pInfo.err) {
@@ -202,32 +217,7 @@ export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepEx
                     delete this._processCache[pid];
                     return;
                 }
-            }
-            this._curTickIDs.push(pid);
-
-            /*let priority = proc.threadPriority;
-            let state = proc.threadState;
-            if (state != ThreadState_Done && state != ThreadState_Inactive && priority != Priority_Hold) {
-                if (!this._curThreadData[priority]) {
-                    this._curThreadData[priority] = []
-                }
-
-                this._curThreadData[priority].push(pid);
-                this._curThreadData.push(pid);
-            }*/
-        } catch (e) {
-            this.killProcess(pid);
-            pInfo.err = e.stack || e.toString();
-            this.log.error(`[${pid}] ${pInfo.PKG} crashed\n${e.stack}`);
-        }
-    }
-    private EndTick(pid: PID) {
-        let proc = this.getProcessByPID(pid);
-        if (proc && proc.EndTick) {
-            try {
-                proc.EndTick();
             } catch (e) {
-                let pInfo = this.processTable[pid];
                 this.killProcess(pid);
                 pInfo.err = e.stack || e.toString();
                 this.log.error(`[${pid}] ${pInfo.PKG} crashed\n${e.stack}`);
