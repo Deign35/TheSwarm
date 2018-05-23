@@ -12,7 +12,7 @@ class BuildJob extends BasicJob<CreepJob_Memory> {
     protected GetActionType(): ActionType {
         return AT_Build;
     }
-    protected CheckIsTargetStillValid(): boolean {
+    CheckIsTargetStillValid(): boolean {
         return !!Game.getObjectById(this.memory.t);
     }
 }
@@ -22,7 +22,7 @@ class RefillerJob extends BasicJob<CreepJob_Memory> {
         return AT_Transfer;
     }
 
-    protected CheckIsTargetStillValid() {
+    CheckIsTargetStillValid() {
         // (TODO): Check to make sure the controller is mine
         return !!Game.getObjectById(this.memory.t);
     }
@@ -32,7 +32,7 @@ class UpgradeJob extends BasicJob<CreepJob_Memory> {
         return AT_Upgrade;
     }
 
-    protected CheckIsTargetStillValid() {
+    CheckIsTargetStillValid() {
         // (TODO): Check to make sure the controller is mine
         return !!Game.getObjectById(this.memory.t);
     }

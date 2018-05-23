@@ -32,7 +32,6 @@ class RoomRegistry extends BasicProcess<MemBase> {
             if (data && (!data.hostPID || !this.kernel.getProcessByPID(data.hostPID))) {
                 let newMem: RoomThreadMemory = {
                     assignments: {},
-                    enabled: true,
                     homeRoom: roomID,
                     targetRoom: roomID
                 }

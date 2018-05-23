@@ -29,6 +29,7 @@ declare interface CreepJob_Memory extends MemBase {
     h: RoomID;
     t: ObjectID;
     j: JobState;
+    p: Priority;     // spawn (p)riority
 
     ct: CT_ALL;
     lvl: number;
@@ -43,6 +44,11 @@ declare interface CreepThread_JobMemory extends MemBase {
     t?: ObjectID;
 }
 
+declare interface NewCreepGroup_Assignment extends MemBase {
+    pid?: PID;
+    ct: CT_ALL;
+    lvl: number;
+}
 
 
 
@@ -78,8 +84,7 @@ declare interface Builder_Memory extends CreepProcess_Memory {
 
 /** CreepGroups */
 declare interface CreepGroup_Memory extends MemBase {
-    enabled: boolean; // (en)abled
-    assignments: IDictionary<GroupID, CreepGroup_Assignment>;
+    assignments: IDictionary<GroupID, NewCreepGroup_Assignment>;
     homeRoom: RoomID;
     targetRoom: RoomID;
 }

@@ -10,7 +10,7 @@ class HarvesterJob extends BasicJob<CreepJob_Memory> {
     protected GetActionType(): ActionType {
         return AT_Harvest;
     }
-    protected CheckIsTargetStillValid(): boolean {
+    CheckIsTargetStillValid(): boolean {
         return true;
     }
 
@@ -45,6 +45,8 @@ class HarvesterJob extends BasicJob<CreepJob_Memory> {
         }
 
         this.memory.a = this.kernel.startProcess(PKG_CreepThread, startCreepMemory);
+        this.creepRegistry.releaseCreep(this.memory.c);
+        this.creepRegistry.tryReserveCreep(this.memory.c, this.memory.a);
         return ThreadState_Done;
     }
 }

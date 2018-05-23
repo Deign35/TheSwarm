@@ -30,7 +30,7 @@ class InfrastructureGroup extends BasicCreepGroup<InfrastructureGroup_Memory> {
             buildLevel = 1;
         }
 
-        if (viewData.cSites.length > 0) {
+        /*if (viewData.cSites.length > 0) {
             this.EnsureAssignment('Builder_1', CT_Builder, buildLevel, {
                 pri: Priority_Low,
                 res: false
@@ -47,7 +47,7 @@ class InfrastructureGroup extends BasicCreepGroup<InfrastructureGroup_Memory> {
                     })
                 }
             }
-        }
+        }*/
     }
 
     protected get GroupPrefix(): string { return 'INF'; }

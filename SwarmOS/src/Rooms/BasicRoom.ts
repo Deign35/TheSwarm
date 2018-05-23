@@ -30,7 +30,6 @@ class BasicRoom extends BasicCreepGroup<RoomThreadMemory> {
             if (!this.roomData.groups.CG_Control) {
                 let newMem: ControlGroup_Memory = {
                     assignments: {},
-                    enabled: true,
                     homeRoom: this.roomName,
                     targetRoom: this.roomName
                 }
@@ -44,30 +43,22 @@ class BasicRoom extends BasicCreepGroup<RoomThreadMemory> {
             if (!this.roomData.groups.CG_Extraction) {
                 let extrMem: ExtractionGroup_Memory = {
                     assignments: {},
-                    enabled: true,
                     homeRoom: this.roomName,
                     targetRoom: this.roomName,
                 }
                 let extrPID = this.kernel.startProcess(CG_Extraction, extrMem);
                 this.roomData.groups.CG_Extraction = extrPID;
             }
-            if (!this.roomData.groups.CG_Infrastructure) {
+            /*if (!this.roomData.groups.CG_Infrastructure) {
                 let infrMem: InfrastructureGroup_Memory = {
-                    enabled: true,
                     homeRoom: this.roomName,
                     targetRoom: this.roomName,
                     assignments: {}
                 }
                 let infrPID = this.kernel.startProcess(CG_Infrastructure, infrMem);
                 this.roomData.groups.CG_Infrastructure = infrPID;
-            }
+            }*/
         }
 
-    }
-
-    ReceiveCreep(creep: Creep, oldAssignment: CreepGroup_Assignment) {
-        if (this.roomData.groups.CG_TempBranch) {
-            (this.kernel.getProcessByPID(this.roomData.groups.CG_TempBranch) as BasicCreepGroup<any>).ReceiveCreep(creep, oldAssignment);
-        }
     }
 }

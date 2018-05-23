@@ -117,7 +117,7 @@ export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepEx
     }
 
     getProcessByPID(pid: PID): IProcess | undefined {
-        if (!this.processTable[pid] || !this.processTable[pid].ex) {
+        if (!this.processTable[pid]) {
             return;
         }
         if (this._processCache[pid]) {
@@ -172,15 +172,6 @@ export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepEx
     private PrepTick(pid: PID) {
         let pInfo = this.processTable[pid];
         try {
-            if (!pInfo.ex) {
-                if (pInfo.err) {
-                    this.memory.ErrorLog.push(`[${pid}] - ${pInfo.err}`);
-                }
-                delete this.processTable[pid];
-                delete this.processMemory[pid];
-                delete this._processCache[pid];
-                return;
-            }
             if (pInfo.sl) {
                 if (pInfo.sl! <= Game.time) {
                     this.wake(pid);
@@ -194,7 +185,6 @@ export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepEx
                 proc.PrepTick();
             }
             this._curTickIDs.push(pid);
-
         } catch (e) {
             this.killProcess(pid);
             pInfo.err = e.stack || e.toString();
@@ -207,21 +197,21 @@ export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepEx
         if (proc && proc.EndTick) {
             try {
                 proc.EndTick();
-
-                if (!pInfo.ex) {
-                    if (pInfo.err) {
-                        this.memory.ErrorLog.push(`[${pid}] - ${pInfo.err}`);
-                    }
-                    delete this.processTable[pid];
-                    delete this.processMemory[pid];
-                    delete this._processCache[pid];
-                    return;
-                }
             } catch (e) {
                 this.killProcess(pid);
                 pInfo.err = e.stack || e.toString();
                 this.log.error(`[${pid}] ${pInfo.PKG} crashed\n${e.stack}`);
             }
+        }
+
+        if (!pInfo.ex) {
+            if (pInfo.err) {
+                this.memory.ErrorLog.push(`[${pid}] - ${pInfo.err}`);
+            }
+            delete this.processTable[pid];
+            delete this.processMemory[pid];
+            delete this._processCache[pid];
+            return;
         }
     }
 

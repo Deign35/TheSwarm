@@ -1,4 +1,5 @@
 import { BasicProcess } from "Core/BasicTypes";
+import { BasicJob } from "Jobs/BasicJob";
 
 export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends BasicProcess<T> {
     @extensionInterface(EXT_CreepRegistry)
@@ -26,116 +27,79 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Basic
         }
     }
 
-    protected createNewCreepMemory(aID: GroupID): CreepProcess_Memory {
-        let assignment = this.assignments[aID];
-        let body = CreepBodies[assignment.CT][assignment.lvl] as CreepBody
-        return Object.assign({
-            get: false,
-            home: this.memory.homeRoom,
-            loc: this.memory.targetRoom,
-            SR: this.assignments[aID].SR,
-            PKG: body.pkg_ID,
-            pri: assignment.con.pri,
-        }, assignment.con);
-    }
-    protected createNewCreepContext(ctID: CT_ALL, level: number, respawn: boolean): CreepContext {
-        return {
-            ct: ctID,
-            l: level,
-            n: ctID + '_' + level + '_' + GetSUID(),
-            o: undefined,
-            r: respawn
-        }
-    }
-
-    protected EnsureAssignment(assignmentID: GroupID, ctID: CT_ALL, level: number, context: AssignmentContext = { pri: Priority_Lowest, res: false }) {
+    protected EnsureAssignment(assignmentID: string, ctID: CT_ALL, level: number, priority: Priority, jobType: CreepJobsPackage) {
         let assignment = this.assignments[assignmentID];
         if (!assignment) {
             assignment = {
-                SR: '',
-            } as CreepGroup_Assignment
+                ct: ctID,
+                lvl: level
+            }
         }
-        assignment.CT = ctID;
-        assignment.lvl = level;
-        assignment.con = context;
         this.assignments[assignmentID] = assignment;
 
         if (!assignment.pid || !this.kernel.getProcessByPID(assignment.pid)) {
-            this.createNewCreepProcess(assignmentID, context.pri);
+            this.CreateProcessForAssignment(assignmentID, priority, jobType);
         }
     }
 
-    protected createNewCreepProcess(aID: GroupID, pri: Priority) {
+    protected CreateProcessForAssignment(aID: string, priority: Priority, jobType: CreepJobsPackage) {
         let assignment = this.assignments[aID];
         let curCreep;
-        if (assignment) {
-            if (assignment.pid) {
-                this.kernel.killProcess(assignment.pid);
-            }
-            let childSR = this.spawnRegistry.getRequestContext(assignment.SR);
-            if (childSR) {
-                this.spawnRegistry.cancelRequest(assignment.SR);
-                curCreep = this.creepRegistry.tryGetCreep(childSR.n, assignment.pid || this.pid);
-                if (curCreep) {
-                    this.creepRegistry.releaseCreep(curCreep.name);
-                    //this.releaseCreepToParent(aID);
-                }
-            }
-            delete assignment.SR;
+        if (assignment.pid) {
+            this.kernel.killProcess(assignment.pid);
         }
 
-        let newCreepMem = this.createNewCreepMemory(aID);
-        if (curCreep) {
-            newCreepMem.CR = curCreep.name;
-        } else {
-            let newContext = this.createNewCreepContext(assignment.CT, assignment.lvl, assignment.con.res);
-            assignment.SR = this.spawnRegistry.requestSpawn(newContext, this.memory.targetRoom, pri);
+        let newCreepMem: CreepJob_Memory = {
+            ct: assignment.ct,
+            lvl: assignment.lvl,
+            h: this.memory.homeRoom,
+            l: this.memory.targetRoom,
+            j: JobState_Inactive,
+            p: priority,
+            c: '',
+            t: ''
         }
-        newCreepMem.SR = assignment.SR;
-        assignment.pid = this.kernel.startProcess(CreepBodies[assignment.CT][assignment.lvl].pkg_ID, newCreepMem);
-        if (curCreep) {
-            if (!this.creepRegistry.tryReserveCreep(curCreep.name, assignment.pid)) {
-                this.log.warn(`This is an issue...  Creep should have been able to be reserved.  Otherwise I wouldn't have it`);
-                this.kernel.killProcess(assignment.pid);
-                return;
+        assignment.pid = this.kernel.startProcess(jobType, newCreepMem);
+    }
+
+    protected GetAssignmentState(aID: string) {
+        if (this.assignments[aID] && this.assignments[aID].pid) {
+            let proc = this.kernel.getProcessByPID(this.assignments[aID].pid!) as BasicJob<any>;
+            if (proc && proc.GetJobState) {
+                return proc.GetJobState();
+            }
+        }
+
+        return JobState_Inactive;
+    }
+
+    protected AssignmentHasValidTarget(aID: string) {
+        if (this.assignments[aID] && this.assignments[aID].pid) {
+            let proc = this.kernel.getProcessByPID(this.assignments[aID].pid!) as BasicJob<any>;
+            if (proc && proc.CheckIsTargetStillValid) {
+                return proc.CheckIsTargetStillValid();
+            }
+        }
+
+        return false;
+    }
+    // (TODO): Cache the assignment processes?
+
+    protected StartAssignmentIfInactive(aID: string) {
+        if (this.assignments[aID] && this.assignments[aID].pid) {
+            let proc = this.kernel.getProcessByPID(this.assignments[aID].pid!) as BasicJob<any>;
+            if (proc && proc.StartIfInactive) {
+                proc.StartIfInactive();
             }
         }
     }
 
-    protected releaseCreepToParent(aID: GroupID) {
-        let assignment = this.assignments[aID];
-        if (assignment) {
-            let spawnRequest = this.spawnRegistry.getRequestContext(assignment.SR);
-            if (spawnRequest) {
-                this.spawnRegistry.cancelRequest(assignment.SR);
-                if (assignment.pid) {
-                    this.kernel.killProcess(assignment.pid);
-                    let creep = this.creepRegistry.tryGetCreep(spawnRequest.n, assignment.pid);
-                    if (creep) {
-                        this.creepRegistry.releaseCreep(creep.name);
-                        let parentProc = this.parentPID ? this.kernel.getProcessByPID(this.parentPID) as IProcess : undefined;
-                        if ((parentProc as BasicCreepGroup<any>).ReceiveCreep) {
-                            (parentProc as BasicCreepGroup<any>).ReceiveCreep(creep, assignment);
-                        } else {
-                            this.log.error(`Creep left to oblivion ${creep.name}`);
-                            creep.suicide();
-                            return;
-                        }
-                    }
-                }
+    protected SetAssignmentTarget(aID: string, target: Structure | Creep | Source) {
+        if (this.assignments[aID] && this.assignments[aID].pid) {
+            let proc = this.kernel.getProcessByPID(this.assignments[aID].pid!) as BasicJob<any>;
+            if (proc && proc.AssignNewTarget) {
+                proc.AssignNewTarget(target);
             }
-        }
-    }
-
-    ReceiveCreep(creep: Creep, oldAssignment: CreepGroup_Assignment) {
-        let parentProc = this.parentPID ? this.kernel.getProcessByPID(this.parentPID) as IProcess : undefined;
-        if ((parentProc as BasicCreepGroup<any>).ReceiveCreep) {
-            (parentProc as BasicCreepGroup<any>).ReceiveCreep(creep, oldAssignment);
-            return;
-        } else {
-            this.log.error(`Creep left to oblivion ${creep.name}`);
-            creep.suicide();
-            return;
         }
     }
 

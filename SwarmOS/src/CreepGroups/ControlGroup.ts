@@ -34,10 +34,19 @@ class ControlGroup extends BasicCreepGroup<ControlGroup_Memory> {
             level = 1;
         }
 
-        this.EnsureAssignment('Upgrader', CT_Upgrader, level, {
-            pri: Priority_Low,
-            res: true
-        })
+        this.EnsureAssignment('Upgrader', CT_Upgrader, level, Priority_Low, CJ_Upgrade);
+        let curState = this.GetAssignmentState('Upgrader');
+        switch (curState) {
+            case (JobState_Inactive):
+                if (!this.AssignmentHasValidTarget('Upgrader')) {
+                    // (TODO): Fix this `!` issue!
+                    this.SetAssignmentTarget('Upgrader', Game.rooms[this.memory.targetRoom]!.controller!)
+                }
+                this.StartAssignmentIfInactive('Upgrader');
+                return;
+            default:
+                return;
+        }
     }
     protected get GroupPrefix(): string { return 'Ctrl'; }
 }
