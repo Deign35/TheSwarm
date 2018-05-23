@@ -1,5 +1,26 @@
 
 /** Creep extension Memory */
+declare interface CreepThread_Memory extends MemBase {
+    c: CreepID;
+    l: RoomID;
+    h: RoomID;
+    n?: number;
+    t?: ObjectID;
+    t2?: ObjectID;
+}
+declare interface HarvesterThread_Memory extends CreepThread_Memory {
+    t: ObjectID;
+}
+declare interface BuilderThread_Memory extends CreepThread_Memory {
+    t: ObjectID;
+}
+declare interface RefillerThread_Memory extends CreepThread_Memory { }
+declare interface RepairThread_Memory extends CreepThread_Memory {
+    t: ObjectID;
+}
+declare interface UpgraderThread_Memory extends CreepThread_Memory {
+    t: ObjectID;
+}
 declare interface CreepProcess_Memory extends MemBase {
     SR?: SpawnRequestID;// Spawn request ID 
     CR?: CreepID;       // Creep name
@@ -56,6 +77,7 @@ declare interface ExtractionGroup_Memory extends CreepGroup_Memory {
 declare interface CreepGroup_Assignment extends MemBase {
     pid?: PID;          // ID corresponding to the assigned PID
     SR: SpawnRequestID; // ID corresponding to the spawn request
+    CN?: CreepID;        // (C)reep (N)ame
     CT: CT_ALL;         // (C)reep (T)ype
     lvl: number;        // role level
     con: AssignmentContext
