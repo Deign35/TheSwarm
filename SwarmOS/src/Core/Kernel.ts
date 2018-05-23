@@ -117,7 +117,7 @@ export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepEx
     }
 
     getProcessByPID(pid: PID): IProcess | undefined {
-        if (!this.processTable[pid]) {
+        if (!this.processTable[pid] || !this.processTable[pid].ex) {
             return;
         }
         if (this._processCache[pid]) {
