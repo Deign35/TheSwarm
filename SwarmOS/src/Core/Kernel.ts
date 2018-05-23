@@ -219,6 +219,7 @@ export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepEx
         let pInfo = this.processTable[pid];
         pInfo.sl = Game.time + ticks;
     }
+    // (TODO): Add awoken threads back to the list of activeThreadIDs.  Do prep if necessary.
     wake(pid: PID): void {
         if (this.processTable[pid] && this.processTable[pid].sl) {
             delete this.processTable[pid].sl;

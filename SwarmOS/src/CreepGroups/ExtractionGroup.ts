@@ -15,7 +15,6 @@ class ExtractionGroup extends BasicCreepGroup<ExtractionGroup_Memory> {
             spawnRoom = Game.rooms[this.memory.targetRoom];
         }
 
-
         this.EnsureAssignment('Hauler', CT_Refiller, spawnRoom.controller!.level > 1 ? 1 : 0, Priority_High, CJ_Refiller);
         let curState = this.GetAssignmentState('Hauler');
         switch (curState) {

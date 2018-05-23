@@ -30,8 +30,11 @@ export abstract class BasicJob<T extends CreepJob_Memory> extends BasicProcess<T
     RunThread(): ThreadState {
         if (!this.memory.c && this.memory.j != JobState_Starting) {
             this.memory.j = JobState_Inactive;
-        } else if (this.memory.c) {
-            this._creep = this.creepRegistry.tryGetCreep(this.memory.c, this.memory.a || this.pid);
+        }
+
+        if (this.memory.c) {
+            this._creep = this.creepRegistry.tryGetCreep(this.memory.c, this.memory.a) ||
+                this.creepRegistry.tryGetCreep(this.memory.c, this.pid);
         }
         if (!this.CheckIsTargetStillValid()) {
             this.memory.j = JobState_Inactive;
@@ -47,7 +50,22 @@ export abstract class BasicJob<T extends CreepJob_Memory> extends BasicProcess<T
                 return this.RunState_Running();
             case (JobState_Preparing):
                 return this.RunState_Preparing();
+            case (JobState_Starting):
+                if (!this.memory.c) {
+                    this.memory.c = this.spawnRegistry.requestSpawn({
+                        ct: this.memory.ct,
+                        l: this.memory.lvl,
+                        n: this.memory.ct + GetSUID(),
+                    }, this.memory.l, this.memory.p);
+                    this.memory.j = JobState_Spawning;
+                    this.sleeper.sleep(this.pid, 6); // (TODO): update this to match the length of time for the spawn
+                    return ThreadState_Done;
+                }
             case (JobState_Spawning):
+                if (this.creep) {
+                    this.memory.j = JobState_Preparing;
+                    return ThreadState_Active;
+                }
                 let requestStatus = this.spawnRegistry.getRequestStatus(this.memory.c);
                 switch (requestStatus) {
                     case (SP_SPAWNING):
@@ -61,18 +79,11 @@ export abstract class BasicJob<T extends CreepJob_Memory> extends BasicProcess<T
                         return ThreadState_Done;
                     case (SP_ERROR):
                     default:
+                        delete this.memory.c;
                         this.memory.j = JobState_Starting;
                         return ThreadState_Active;
                 }
-            case (JobState_Starting):
-                this.memory.c = this.spawnRegistry.requestSpawn({
-                    ct: this.memory.ct,
-                    l: this.memory.lvl,
-                    n: 'c' + GetSUID(),
-                }, this.memory.l, this.memory.p);
-                this.memory.j = JobState_Spawning;
-                this.sleeper.sleep(this.pid, 6); // (TODO): update this to match the length of time for the spawn
-                return ThreadState_Done;
+
             case (JobState_Inactive):
             default:
                 return ThreadState_Done;
@@ -86,6 +97,7 @@ export abstract class BasicJob<T extends CreepJob_Memory> extends BasicProcess<T
                 this.kernel.killProcess(this.memory.a);
                 delete this.memory.a;
             }
+            delete this.memory.c;
             this.memory.j = JobState_Starting;
             return ThreadState_Active;
         }
@@ -116,7 +128,7 @@ export abstract class BasicJob<T extends CreepJob_Memory> extends BasicProcess<T
                 return ThreadState_Done;
             }
             let requiredAction: ActionType;
-            if ((target as StructureContainer).structureType) {
+            if ((target as Structure).structureType) {
                 requiredAction = AT_Withdraw;
             } else if ((target as Resource).resourceType) {
                 requiredAction = AT_Pickup;
@@ -146,6 +158,7 @@ export abstract class BasicJob<T extends CreepJob_Memory> extends BasicProcess<T
                 this.kernel.killProcess(this.memory.a);
                 delete this.memory.a;
             }
+            delete this.memory.c;
             this.memory.j = JobState_Starting;
             return ThreadState_Active;
         }
@@ -168,7 +181,11 @@ export abstract class BasicJob<T extends CreepJob_Memory> extends BasicProcess<T
             }
         }
         if (!this.CheckIsTargetStillValid()) {
-            this.memory.j = JobState_Complete;
+            this.memory.j = JobState_Inactive;
+            if (this.memory.a) {
+                this.kernel.killProcess(this.memory.a);
+                delete this.memory.a;
+            }
             return ThreadState_Done;
         }
         let startCreepMemory: CreepThread_JobMemory = {

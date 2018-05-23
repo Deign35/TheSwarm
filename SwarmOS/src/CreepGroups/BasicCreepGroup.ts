@@ -56,7 +56,7 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Basic
             l: this.memory.targetRoom,
             j: JobState_Inactive,
             p: priority,
-            c: '',
+            c: '', //(TODO): This needs to be updated to use the previously spawned creep.  Extremely important.
             t: ''
         }
         assignment.pid = this.kernel.startProcess(jobType, newCreepMem);

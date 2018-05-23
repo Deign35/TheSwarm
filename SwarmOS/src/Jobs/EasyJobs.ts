@@ -23,8 +23,8 @@ class RefillerJob extends BasicJob<CreepJob_Memory> {
     }
 
     CheckIsTargetStillValid() {
-        // (TODO): Check to make sure the controller is mine
-        return !!Game.getObjectById(this.memory.t);
+        let obj = Game.getObjectById(this.memory.t) as StructureExtension | StructureSpawn;
+        return (!!obj && obj.energy < obj.energyCapacity);
     }
 }
 class UpgradeJob extends BasicJob<CreepJob_Memory> {
@@ -33,7 +33,7 @@ class UpgradeJob extends BasicJob<CreepJob_Memory> {
     }
 
     CheckIsTargetStillValid() {
-        // (TODO): Check to make sure the controller is mine
-        return !!Game.getObjectById(this.memory.t);
+        let controller = Game.getObjectById(this.memory.t) as StructureController;
+        return (!!controller && controller.owner && controller.owner.username == MY_USERNAME);
     }
 }

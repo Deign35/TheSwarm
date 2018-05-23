@@ -24,6 +24,7 @@ class HarvesterJob extends BasicJob<CreepJob_Memory> {
                 this.kernel.killProcess(this.memory.a);
                 delete this.memory.a;
             }
+            delete this.memory.c;
             this.memory.j = JobState_Starting;
             return ThreadState_Active;
         }
