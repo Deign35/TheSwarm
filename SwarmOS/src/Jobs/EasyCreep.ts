@@ -30,6 +30,7 @@ export class EasyCreep<T extends CreepThread_JobMemory> extends BasicProcess<T> 
         if (this.memory.c) {
             this._creep = this.creepRegistry.tryGetCreep(this.memory.c, this.pid);
             if (!this._creep) {
+                this.log.info(`KillProcess (EasyCreep.PrepTick())`);
                 this.kernel.killProcess(this.pid);
                 this.sleeper.wake(this.parentPID);
                 return;
@@ -69,6 +70,7 @@ export class EasyCreep<T extends CreepThread_JobMemory> extends BasicProcess<T> 
     protected RunAction(actionType: ActionType, id: string) {
         let target = Game.getObjectById(id) as RoomObject | Creep;
         if (!target) {
+            this.log.info(`KillProcess (EasyCreep.RunAction())`);
             this.kernel.killProcess(this.pid);
             this.sleeper.wake(this.parentPID);
             return;
@@ -96,6 +98,7 @@ export class EasyCreep<T extends CreepThread_JobMemory> extends BasicProcess<T> 
 
         let targetID = this.GetTargetID();
         if (!targetID) {
+            this.log.info(`KillProcess (EasyCreep.RunThread())`);
             this.kernel.killProcess(this.pid);
             this.sleeper.wake(this.parentPID);
             return ThreadState_Done;

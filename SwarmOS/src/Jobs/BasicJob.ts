@@ -1,4 +1,5 @@
 import { BasicProcess } from "Core/BasicTypes";
+import { BasicCreepGroup } from "CreepGroups/BasicCreepGroup";
 
 export abstract class BasicJob<T extends CreepJob_Memory> extends BasicProcess<T> {
     @extensionInterface(EXT_CreepRegistry)
@@ -37,12 +38,11 @@ export abstract class BasicJob<T extends CreepJob_Memory> extends BasicProcess<T
                 this.creepRegistry.tryGetCreep(this.memory.c, this.pid);
         }
         if (!this.CheckIsTargetStillValid()) {
-            this.memory.j = JobState_Inactive;
+            this.HandleMissingTarget();
         }
         if (this.creep && this.creep.spawning) {
             return ThreadState_Done;
         }
-        debugger;
         switch (this.GetJobState()) {
             case (JobState_Complete):
                 return this.RunState_Complete();
@@ -73,6 +73,7 @@ export abstract class BasicJob<T extends CreepJob_Memory> extends BasicProcess<T
                         this.memory.c = this.spawnRegistry.getRequestContext(this.memory.c)!.n;
                         this.creepRegistry.tryRegisterCreep({ ct: this.memory.ct, l: this.memory.lvl, n: this.memory.c });
                         this.creepRegistry.tryReserveCreep(this.memory.c, this.pid);
+                        this.GetParentProcess<BasicCreepGroup<any>>()!.AddCreep(this.memory.id, this.memory.c);
                         this.memory.j = JobState_Preparing;
                         return ThreadState_Active;
                     case (SP_QUEUED):
@@ -90,10 +91,16 @@ export abstract class BasicJob<T extends CreepJob_Memory> extends BasicProcess<T
         }
     }
 
+    protected HandleMissingTarget(): ThreadState {
+        this.memory.j = JobState_Inactive;
+        return ThreadState_Done;
+    }
+
     protected RunState_Preparing(): ThreadState {
         if (!this.creep) {
             // if not, kill the child process and start over
             if (this.memory.a) {
+                this.log.info(`KillProcess (BasicJob.RunState_Preparing_1())`);
                 this.kernel.killProcess(this.memory.a);
                 delete this.memory.a;
             }
@@ -106,6 +113,7 @@ export abstract class BasicJob<T extends CreepJob_Memory> extends BasicProcess<T
             if (this.memory.a) {
                 this.kernel.killProcess(this.memory.a);
                 delete this.memory.a;
+                // (TODO): Change this to put the thread to sleep until its needed again
             }
             this.memory.j = JobState_Running;
             this.creepRegistry.releaseCreep(this.creep.name);
@@ -147,6 +155,7 @@ export abstract class BasicJob<T extends CreepJob_Memory> extends BasicProcess<T
             this.memory.a = this.kernel.startProcess(PKG_CreepThread, startCreepMemory);
             this.creepRegistry.releaseCreep(this.memory.c);
             this.creepRegistry.tryReserveCreep(this.memory.c, this.memory.a);
+            this.kernel.setParent(this.memory.a, this.pid);
             return ThreadState_Done;
         }
     }
@@ -155,6 +164,7 @@ export abstract class BasicJob<T extends CreepJob_Memory> extends BasicProcess<T
         if (!this.creep) {
             // if not, kill the child process and start over
             if (this.memory.a) {
+                this.log.info(`KillProcess (BasicJob.RunState_Running_1())`);
                 this.kernel.killProcess(this.memory.a);
                 delete this.memory.a;
             }
@@ -183,6 +193,7 @@ export abstract class BasicJob<T extends CreepJob_Memory> extends BasicProcess<T
         if (!this.CheckIsTargetStillValid()) {
             this.memory.j = JobState_Inactive;
             if (this.memory.a) {
+                this.log.info(`KillProcess (BasicJob.RunState_Running_3())`);
                 this.kernel.killProcess(this.memory.a);
                 delete this.memory.a;
             }
@@ -198,10 +209,13 @@ export abstract class BasicJob<T extends CreepJob_Memory> extends BasicProcess<T
         this.memory.a = this.kernel.startProcess(PKG_CreepThread, startCreepMemory);
         this.creepRegistry.releaseCreep(this.memory.c);
         this.creepRegistry.tryReserveCreep(this.memory.c, this.memory.a);
+
+        this.kernel.setParent(this.memory.a, this.pid);
         return ThreadState_Done;
     }
 
     protected RunState_Complete(): ThreadState {
+        this.log.info(`KillProcess (BasicJob.RunState_Complete())`);
         this.kernel.killProcess(this.pid);
         this.sleeper.wake(this.parentPID);
         return ThreadState_Done;

@@ -46,6 +46,7 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Basic
         let assignment = this.assignments[aID];
         let curCreep;
         if (assignment.pid) {
+            this.log.info(`KillProcess (BasicCreepGroup.CreateProcessForAssignment(${aID}, ${priority}, ${jobType}))`);
             this.kernel.killProcess(assignment.pid);
         }
 
@@ -56,10 +57,12 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Basic
             l: this.memory.targetRoom,
             j: JobState_Inactive,
             p: priority,
-            c: '', //(TODO): This needs to be updated to use the previously spawned creep.  Extremely important.
-            t: ''
+            c: assignment.c || '', //(TODO): This isn't working.  This needs to be updated for fucks sake
+            t: '',
+            id: aID
         }
         assignment.pid = this.kernel.startProcess(jobType, newCreepMem);
+        this.kernel.setParent(assignment.pid, this.pid);
     }
 
     protected GetAssignmentState(aID: string) {
@@ -100,6 +103,12 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Basic
             if (proc && proc.AssignNewTarget) {
                 proc.AssignNewTarget(target);
             }
+        }
+    }
+
+    AddCreep(aID: string, id: CreepID) {
+        if (this.assignments[aID]) {
+            this.assignments[aID].c = id;
         }
     }
 

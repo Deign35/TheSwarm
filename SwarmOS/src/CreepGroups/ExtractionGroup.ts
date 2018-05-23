@@ -57,11 +57,6 @@ class ExtractionGroup extends BasicCreepGroup<ExtractionGroup_Memory> {
         }
 
         for (let i = 0; i < viewData.sourceIDs.length; i++) {
-            let context: AssignmentContext_Harvester = {
-                pri: Priority_Medium,
-                tar: viewData.sourceIDs[i],
-                res: true
-            }
             this.EnsureAssignment(viewData.sourceIDs[i], CT_Harvester, extractionLevel, Priority_High, CJ_Harvester);
             let curState = this.GetAssignmentState(viewData.sourceIDs[i]);
             switch (curState) {

@@ -48,6 +48,7 @@ class HarvesterJob extends BasicJob<CreepJob_Memory> {
         this.memory.a = this.kernel.startProcess(PKG_CreepThread, startCreepMemory);
         this.creepRegistry.releaseCreep(this.memory.c);
         this.creepRegistry.tryReserveCreep(this.memory.c, this.memory.a);
+        this.kernel.setParent(this.memory.a, this.pid);
         return ThreadState_Done;
     }
 }

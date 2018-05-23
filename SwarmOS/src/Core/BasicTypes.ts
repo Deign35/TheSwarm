@@ -27,6 +27,10 @@ export abstract class BasicProcess<T extends MemBase> implements IProcess {
     get threadState(): ThreadState { return ThreadState_Active; }// this.memory.sta || ThreadState_Inactive; }
     get threadPriority(): Priority { return Priority_Hold; }//this.memory.pri || Priority_Hold; }
 
+    GetParentProcess<T extends IProcess>(): T | undefined {
+        return this.parentPID ? this.kernel.getProcessByPID(this.parentPID) as T : undefined;
+    }
+
     PrepTick?(): void;
     EndTick?(): void;
     abstract RunThread(): ThreadState;

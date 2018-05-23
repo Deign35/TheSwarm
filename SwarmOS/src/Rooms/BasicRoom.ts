@@ -35,6 +35,7 @@ class BasicRoom extends BasicCreepGroup<RoomThreadMemory> {
                 }
                 let newPID = this.kernel.startProcess(CG_Control, newMem);
                 this.roomData.groups.CG_Control = newPID;
+                this.kernel.setParent(newPID, this.pid);
             }
 
         }
@@ -48,8 +49,9 @@ class BasicRoom extends BasicCreepGroup<RoomThreadMemory> {
                 }
                 let extrPID = this.kernel.startProcess(CG_Extraction, extrMem);
                 this.roomData.groups.CG_Extraction = extrPID;
+                this.kernel.setParent(extrPID, this.pid);
             }
-            /*if (!this.roomData.groups.CG_Infrastructure) {
+            if (!this.roomData.groups.CG_Infrastructure) {
                 let infrMem: InfrastructureGroup_Memory = {
                     homeRoom: this.roomName,
                     targetRoom: this.roomName,
@@ -57,7 +59,8 @@ class BasicRoom extends BasicCreepGroup<RoomThreadMemory> {
                 }
                 let infrPID = this.kernel.startProcess(CG_Infrastructure, infrMem);
                 this.roomData.groups.CG_Infrastructure = infrPID;
-            }*/
+                this.kernel.setParent(infrPID, this.pid);
+            }
         }
 
     }

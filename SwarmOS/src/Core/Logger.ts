@@ -145,20 +145,18 @@ export class Logger implements IKernelLoggerExtensions {
             }
         }
 
-        let introStr = `${LOGGER_SEPARATOR}\n${this.MakeFontTag(LOG_INFO)}Begin SwarmOS Log - [${Game.time}]`
-        if (endTick) {
-            introStr += `\nCPU: (${startLoggingTime}\/${Game.cpu.limit} -- [${Game.cpu.bucket}])`;
-        }
-        introStr += `</font>`
+        let headerStyle: TextStyle = { align: 'left', color: 'white', backgroundColor: 'black', opacity: 0.7 };
+        let vis = new RoomVisual();
+        vis.text(`[${Game.time}]`, 0, 0, headerStyle);
+        vis.text(`CPU: (${startLoggingTime}\/${Game.cpu.limit} -- [${Game.cpu.bucket}])`, 0, 1, headerStyle);
 
-        console.log(introStr);
         for (let i = 0; i < logOutputs.length; i++) {
             console.log(logOutputs[i]);
         }
 
         // Reset the logger
         this.InitQueue();
-        console.log(`${this.MakeFontTag(LOG_INFO)}End Logging(${Game.cpu.getUsed() - startLoggingTime})</font>\n${LOGGER_SEPARATOR}`);
+        vis.text(`End: (${Game.cpu.getUsed() - startLoggingTime})`, 0, 2, headerStyle);
     }
 
     private ShouldLog(minLevel: LogLevel, messageLevel: LogLevel) {
