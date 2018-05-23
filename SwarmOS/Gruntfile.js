@@ -355,7 +355,7 @@ var GenerateConstantsFile = function () {
             }
         }
 
-        bodyString += 'cost:' + bodyCost + ',lvl:' + lvl + ',ct_ID:' + ctID + ',ctref_ID:' + refPrefix + ', pkg_ID:' + packageID + '}';
+        bodyString += 'cost:' + bodyCost + ',lvl:' + lvl + ',ct_ID:' + ctID + ',ctref_ID:' + refPrefix + '}';
         return bodyString;
     };
 

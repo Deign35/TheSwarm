@@ -96,7 +96,7 @@ class CreepRegistryExtensions extends ExtensionBase implements ICreepRegistryExt
         return false;
     }
 
-    tryGetCreep(id: CreepID, requestingPID: PID): Creep | undefined {
+    tryGetCreep(id: CreepID, requestingPID?: PID): Creep | undefined {
         let request = this.memory[id];
         if (!request || !Game.creeps[request.n] || !request.o || request.o != requestingPID) {
             return undefined;

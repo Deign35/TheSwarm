@@ -114,7 +114,7 @@ declare interface ISpawnRegistryExtensions extends IPackageExtension {
 declare interface ICreepRegistryExtensions extends IPackageExtension {
     tryFindCompatibleCreep(creepType: CT_ALL, level: number, targetRoom: RoomID, maxDistance?: number): string | undefined
     tryRegisterCreep(creepContext: CreepContext): boolean;
-    tryGetCreep(id: CreepID, requestingPID: PID): Creep | undefined;
+    tryGetCreep(id: CreepID, requestingPID?: PID): Creep | undefined;
     tryReserveCreep(id: CreepID, requestingPID: PID): boolean;
     releaseCreep(id: CreepID): void;
 }

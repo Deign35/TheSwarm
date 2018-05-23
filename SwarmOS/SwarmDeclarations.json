@@ -23,13 +23,24 @@
                 "SpawnRegistry",
                 "RoomManager",
                 "TempAgency",
-                "CreepBuilder",
-                "CreepHarvester",
-                "CreepRefiller",
-                "CreepRepair",
-                "CreepUpgrader",
+                "CreepThread",
                 "SimpleOwnedRoom",
                 "FlagBase"
+            ]
+        },
+        "CJ": {
+            "comment": "Creep job packages",
+            "enabled": true,
+            "string": true,
+            "isArray": true,
+            "type": true,
+            "usePrefix": true,
+            "combinedType": "CreepJobsPackage",
+            "entries": [
+                "Harvester",
+                "Refiller",
+                "Upgrade",
+                "Build"
             ]
         },
         "CG": {
@@ -160,6 +171,20 @@
                 "Waiting": 2,
                 "Done": 3,
                 "Overrun": 4
+            }
+        },
+        "JobState": {
+            "comment": "The state of a creep's job assignment",
+            "enabled": true,
+            "combinedType": "JobState",
+            "type": true,
+            "entries": {
+                "Inactive": 0,
+                "Starting": 1,
+                "Spawning": 2,
+                "Preparing": 3,
+                "Running": 4,
+                "Complete": 5
             }
         },
         "AT": {

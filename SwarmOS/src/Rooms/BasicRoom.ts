@@ -6,7 +6,6 @@ export const OSPackage: IPackage<RoomStateMemory> = {
 }
 
 import { BasicCreepGroup } from "CreepGroups/BasicCreepGroup";
-import { TempBranchGroup } from "CreepGroups/TempBranch";
 
 class BasicRoom extends BasicCreepGroup<RoomThreadMemory> {
     protected get GroupPrefix(): string { return 'BSC' }
@@ -26,29 +25,7 @@ class BasicRoom extends BasicCreepGroup<RoomThreadMemory> {
         return this.RoomView.GetRoomData(this.roomName)!;
     }
 
-    protected get TempGroup(): TempBranchGroup | undefined {
-        if (this.roomData.groups.CG_TempBranch) {
-            return (this.kernel.getProcessByPID(this.roomData.groups.CG_TempBranch) as TempBranchGroup);
-        }
-        return undefined;
-    }
     protected EnsureGroupFormation(): void {
-        if (!this.roomData.groups.CG_TempBranch) {
-            let tempMem: TempBranchGroup_Memory = {
-                assignments: {},
-                enabled: true,
-                homeRoom: this.roomName,
-                targetRoom: this.roomName,
-                unprocessedCreeps: [],
-                jobs: {
-                    CreepBuilder: [],
-                    CreepRefiller: [],
-                    CreepUpgrader: [],
-                }
-            }
-            let tempPID = this.kernel.startProcess(CG_TempBranch, tempMem);
-            this.roomData.groups.CG_TempBranch = tempPID;
-        }
         if (this.roomData.owner == MY_USERNAME) {
             if (!this.roomData.groups.CG_Control) {
                 let newMem: ControlGroup_Memory = {

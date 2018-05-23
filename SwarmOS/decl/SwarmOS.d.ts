@@ -52,7 +52,6 @@ declare interface CreepBody {
     lvl: number;
     ct_ID: CT_ALL;
     ctref_ID: CTREF_ALL;
-    pkg_ID: ScreepsPackage;
 
     m: number;      // Move
     a?: number      // Attack

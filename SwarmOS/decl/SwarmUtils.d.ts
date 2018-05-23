@@ -20,7 +20,7 @@ declare type GroupID = string;
 declare type TempAgencyID = string;
 declare type SpawnRequestID = string;
 
-declare type ScreepsPackage = OSPackage | CreepGroupPackage
+declare type ScreepsPackage = OSPackage | CreepGroupPackage | CreepJobsPackage
 
 declare interface Profiler {
     clear(): void;
