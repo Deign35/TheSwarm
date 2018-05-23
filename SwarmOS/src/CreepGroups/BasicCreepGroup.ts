@@ -39,6 +39,8 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Basic
 
         if (!assignment.pid || !this.kernel.getProcessByPID(assignment.pid)) {
             this.CreateProcessForAssignment(assignmentID, priority, jobType);
+        } else {
+            // (TODO): Check if the level or CTID have changed.
         }
     }
 
@@ -106,7 +108,7 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Basic
         }
     }
 
-    AddCreep(aID: string, id: CreepID) {
+    SetCreep(aID: string, id: CreepID) {
         if (this.assignments[aID]) {
             this.assignments[aID].c = id;
         }

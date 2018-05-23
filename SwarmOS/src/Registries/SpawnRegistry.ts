@@ -160,9 +160,13 @@ class SpawnRegistry extends BasicProcess<SpawnRegistry_Memory> {
         let spawnResult = ERR_INVALID_ARGS as ScreepsReturnCode;
         while (spawnResult != OK && req.spSta == SP_QUEUED) {
             // construct the body here somehow
+            let spawnMem = Object.assign(req.dm || {}, {
+                ct: req.con.ct,
+                lvl: req.con.l
+            })
             spawnResult = spawn.spawnCreep(ConvertContextToSpawnBody(req.con),
                 req.con.n,
-                { memory: req.dm });
+                { memory: spawnMem });
             switch (spawnResult) {
                 case (ERR_NAME_EXISTS):
                     req.con.n += `_` + (Game.time % GetRandomIndex(primes_100));

@@ -12,6 +12,21 @@ export abstract class BasicJob<T extends CreepJob_Memory> extends BasicProcess<T
     protected GetTargetID(): string | undefined {
         return this.memory.t;
     }
+    GetBodyCT(): CT_ALL {
+        return this.memory.ct;
+    }
+    SetBodyCT(newCT: CT_ALL) {
+        // (TODO): Handle currently queued spawns
+        this.memory.ct = newCT;
+    }
+
+    GetBodyLevel(): number {
+        return this.memory.lvl;
+    }
+    SetBodyLevel(newLevel: number) {
+        // (TODO): Handle currently queued spawns
+        this.memory.lvl = newLevel;
+    }
     GetJobState() {
         return this.memory.j;
     }
@@ -28,14 +43,14 @@ export abstract class BasicJob<T extends CreepJob_Memory> extends BasicProcess<T
         return this._creep!;
     }
     private _creep: Creep | undefined;
+
     RunThread(): ThreadState {
         if (!this.memory.c && this.memory.j != JobState_Starting) {
             this.memory.j = JobState_Inactive;
         }
 
         if (this.memory.c) {
-            this._creep = this.creepRegistry.tryGetCreep(this.memory.c, this.memory.a) ||
-                this.creepRegistry.tryGetCreep(this.memory.c, this.pid);
+            this._creep = this.creepRegistry.tryGetCreep(this.memory.c, this.memory.a || this.pid);
         }
         if (!this.CheckIsTargetStillValid()) {
             this.HandleMissingTarget();
@@ -52,10 +67,11 @@ export abstract class BasicJob<T extends CreepJob_Memory> extends BasicProcess<T
                 return this.RunState_Preparing();
             case (JobState_Starting):
                 if (!this.memory.c) {
+                    let ct = this.GetBodyCT();
                     this.memory.c = this.spawnRegistry.requestSpawn({
-                        ct: this.memory.ct,
-                        l: this.memory.lvl,
-                        n: this.memory.ct + GetSUID(),
+                        ct: ct,
+                        l: this.GetBodyLevel(),
+                        n: ct + GetSUID(),
                     }, this.memory.l, this.memory.p);
                     this.memory.j = JobState_Spawning;
                     this.sleeper.sleep(this.pid, 6); // (TODO): update this to match the length of time for the spawn
@@ -71,9 +87,9 @@ export abstract class BasicJob<T extends CreepJob_Memory> extends BasicProcess<T
                     case (SP_SPAWNING):
                     case (SP_COMPLETE):
                         this.memory.c = this.spawnRegistry.getRequestContext(this.memory.c)!.n;
-                        this.creepRegistry.tryRegisterCreep({ ct: this.memory.ct, l: this.memory.lvl, n: this.memory.c });
+                        this.creepRegistry.tryRegisterCreep({ ct: this.GetBodyCT(), l: this.GetBodyLevel(), n: this.memory.c });
                         this.creepRegistry.tryReserveCreep(this.memory.c, this.pid);
-                        this.GetParentProcess<BasicCreepGroup<any>>()!.AddCreep(this.memory.id, this.memory.c);
+                        this.GetParentProcess<BasicCreepGroup<any>>()!.SetCreep(this.memory.id, this.memory.c);
                         this.memory.j = JobState_Preparing;
                         return ThreadState_Active;
                     case (SP_QUEUED):
