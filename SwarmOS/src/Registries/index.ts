@@ -1,7 +1,7 @@
 import { OSPackage as CreepRegistry } from "Registries/CreepRegistry";
 import { OSPackage as RoomRegistry } from "Registries/RoomRegistry";
 import { OSPackage as SpawnRegistry } from "Registries/SpawnRegistry";
-import { OSPackage as RoomBase } from "Rooms/BasicRoom"
+import { OSPackage as RoomBase } from "Rooms/BasicCreepScript"
 
 export const RegistriesPackage: IPackage<{}> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {

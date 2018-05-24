@@ -31,14 +31,6 @@ declare interface NewCreepGroup_Assignment extends MemBase {
     lvl: number;
 }
 
-
-
-
-
-
-
-
-
 /** CreepGroups */
 declare interface CreepGroup_Memory extends MemBase {
     assignments: IDictionary<GroupID, NewCreepGroup_Assignment>;
@@ -59,11 +51,14 @@ declare interface MaintenanceGroup_Memory extends CreepGroup_Memory {
     repairQueue: string[];
 }
 
-
-
 declare interface CreepGroupCreepState extends MemBase {
     name: CreepID;
     active: boolean;
     aID: string;
     idle?: number;
+}
+
+/** Creep Scripts */
+declare interface CreepScript_Memory extends CreepGroup_Memory {
+    targetTypes: IDictionary<string, string>;
 }

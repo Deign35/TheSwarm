@@ -49,7 +49,7 @@ export function loop() {
     } finally {
         kernel.log.DumpLogToConsole();
     }
-};
+}
 
 let endLoad = Game.cpu.getUsed();
 kernel.log.info(() => `SwarmOS reloaded - Begin: ${startLoad}cpu`);

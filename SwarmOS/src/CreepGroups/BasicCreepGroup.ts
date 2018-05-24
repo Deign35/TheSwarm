@@ -41,19 +41,24 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Basic
     }
 
     protected EnsureAssignment(assignmentID: string, ctID: CT_ALL, level: number, priority: Priority, jobType: CreepJobsPackage) {
-        let assignment = this.assignments[assignmentID];
-        if (!assignment) {
-            assignment = {
+        if (!this.assignments[assignmentID]) {
+            this.assignments[assignmentID] = {
                 ct: ctID,
                 lvl: level
             }
         }
-        this.assignments[assignmentID] = assignment;
+        let assignment = this.assignments[assignmentID];
+        if (assignment.pid && (assignment.ct != ctID || assignment.lvl != level)) {
+            this.kernel.killProcess(assignment.pid, 'Assignment needs to be upgraded');
+            this.HandleDeadJob(assignmentID);
+            this.assignments[assignmentID] = {
+                ct: ctID,
+                lvl: level
+            }
+        }
 
         if (!assignment.pid || !this.kernel.getProcessByPID(assignment.pid)) {
             this.CreateProcessForAssignment(assignmentID, priority, jobType);
-        } else {
-            // (TODO): Check if the level or CTID have changed.
         }
 
         let curState = this.GetAssignmentState(assignmentID);
@@ -108,6 +113,9 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Basic
         }
         assignment.pid = this.kernel.startProcess(jobType, newCreepMem);
         this.kernel.setParent(assignment.pid, this.pid);
+        if (assignment.c) {
+            this.creepRegistry.tryReserveCreep(assignment.c, assignment.pid);
+        }
     }
 
     protected GetAssignmentState(aID: string) {
@@ -172,6 +180,15 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Basic
                 this.creepRegistry.releaseCreep(orphanedCreep.name);
                 this.memory.creeps[orphanedCreep.name].active = false;
                 this.memory.creeps[orphanedCreep.name].idle = Game.time;
+            } else {
+                let spawnRequest = this.spawnRegistry.getRequestContext(assignment.c);
+                if (spawnRequest) {
+                    this.spawnRegistry.cancelRequest(assignment.c);
+                }
+            }
+
+            if (assignment.pid) {
+                this.kernel.killProcess(assignment.pid, "HandleDeadJob");
             }
             delete this.assignments[aID];
         }

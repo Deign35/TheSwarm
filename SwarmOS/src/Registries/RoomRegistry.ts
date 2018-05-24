@@ -2,7 +2,6 @@ declare var Memory: {
     roomData: RoomStateMemory
 }
 
-
 import { ExtensionBase, BasicProcess } from "Core/BasicTypes";
 
 export const OSPackage: IPackage<RoomStateMemory> = {
@@ -30,11 +29,12 @@ class RoomRegistry extends BasicProcess<MemBase> {
         for (let roomID in Game.rooms) {
             let data = this.RoomView.GetRoomData(roomID);
             if (data && (!data.hostPID || !this.kernel.getProcessByPID(data.hostPID))) {
-                let newMem: RoomThreadMemory = {
+                let newMem: CreepScript_Memory = {
                     assignments: {},
                     homeRoom: roomID,
                     targetRoom: roomID,
-                    creeps: {}
+                    creeps: {},
+                    targetTypes: {}
                 }
                 let newPID = this.kernel.startProcess(PKG_SimpleOwnedRoom, newMem);
                 this.kernel.setParent(newPID);
@@ -103,7 +103,7 @@ class RoomExtension extends ExtensionBase {
             this.log.debug(() => (room ? `Room has not been initialized[${roomID}]` : `Room out of view [${roomID}]`));
             return;
         }
-        this.log.info(`Update room structures ${roomID}`);
+        this.log.debug(`Update room structures ${roomID}`);
 
         if (roomData.owner && room.controller!.owner) {
             roomData.structures = {

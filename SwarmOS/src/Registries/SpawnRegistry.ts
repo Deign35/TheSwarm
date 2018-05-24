@@ -118,7 +118,7 @@ class SpawnRegistry extends BasicProcess<SpawnRegistry_Memory> {
         let requests = Object.keys(this.memory);
         if (requests.length == 0) {
             // Inform the temp worker group
-            this.log.warn(`No spawn requests in the queue.  You have spawn capacity available.`);
+            //this.log.warn(`No spawn requests in the queue.  You have spawn capacity available.`);
             return ThreadState_Done;
         }
 
@@ -133,17 +133,20 @@ class SpawnRegistry extends BasicProcess<SpawnRegistry_Memory> {
                 if (usedRequestIDs.includes(req.id)) {
                     continue;
                 }
+                let body = CreepBodies[req.con.ct][req.con.l];
+                if (spawn.room.energyCapacityAvailable < body.cost) {
+                    continue;
+                }
                 if (req.pri < minPriority) {
                     continue;
                 }
                 minPriority = req.pri;
-                let body = CreepBodies[req.con.ct][req.con.l];
                 if (body.cost > spawn.room.energyAvailable) {
                     continue;
                 }
                 let diff = this.GetConvertedSpawnCost(spawn, req);
 
-                if (!spawnRequest.req || diff > spawnRequest.diff) {
+                if (!spawnRequest.req || diff > spawnRequest.diff || req.pri > spawnRequest.req.pri) {
                     spawnRequest = { req, diff }
                 }
             }

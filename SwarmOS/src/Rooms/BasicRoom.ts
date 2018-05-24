@@ -1,4 +1,3 @@
-
 export const OSPackage: IPackage<RoomStateMemory> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
         processRegistry.register(PKG_SimpleOwnedRoom, BasicRoom);
