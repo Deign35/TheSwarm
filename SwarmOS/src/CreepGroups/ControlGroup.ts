@@ -7,6 +7,9 @@ export const OSPackage: IPackage<SpawnRegistry_Memory> = {
 }
 
 class ControlGroup extends BasicCreepGroup<ControlGroup_Memory> {
+    protected GetNewTarget(assignmentID: string): string {
+        return Game.rooms[this.memory.homeRoom].controller!.id;
+    }
     protected EnsureGroupFormation(): void {
         let viewData = this.View.GetRoomData(this.memory.targetRoom)!;
 
@@ -35,18 +38,5 @@ class ControlGroup extends BasicCreepGroup<ControlGroup_Memory> {
         }
 
         this.EnsureAssignment('Upgrader', CT_Upgrader, level, Priority_Low, CJ_Upgrade);
-        let curState = this.GetAssignmentState('Upgrader');
-        switch (curState) {
-            case (JobState_Inactive):
-                if (!this.AssignmentHasValidTarget('Upgrader')) {
-                    // (TODO): Fix this `!` issue!
-                    this.SetAssignmentTarget('Upgrader', Game.rooms[this.memory.targetRoom]!.controller!)
-                }
-                this.StartAssignmentIfInactive('Upgrader');
-                return;
-            default:
-                return;
-        }
     }
-    protected get GroupPrefix(): string { return 'Ctrl'; }
 }

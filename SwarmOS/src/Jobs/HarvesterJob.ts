@@ -12,7 +12,7 @@ class HarvesterJob extends BasicJob<HarvesterJob_Memory> {
         return AT_Harvest;
     }
     CheckIsTargetStillValid(): boolean {
-        return true;
+        return !!Game.getObjectById(this.memory.t);
     }
 
     protected RunState_Preparing(): ThreadState {
@@ -27,6 +27,10 @@ class HarvesterJob extends BasicJob<HarvesterJob_Memory> {
             return ThreadState_Done;
         }
         let target: Source | StructureContainer | ConstructionSite | undefined = Game.getObjectById(this.memory.t) as Source;
+        if (!target) {
+            this.JobState = JobState_Inactive;
+            return ThreadState_Done;
+        }
         if (!this.memory.cont) {
             let containers = target.pos.findInRange(FIND_STRUCTURES, 1, {
                 filter: function (struct: Structure) {

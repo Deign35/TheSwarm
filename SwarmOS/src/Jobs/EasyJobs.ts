@@ -50,10 +50,11 @@ class RefillerJob extends BasicJob<CreepJob_Memory> {
         return ThreadState_Done as ThreadState;
     }
 
-    AssignNewTarget(target: StructureExtension | StructureSpawn) {
-        super.AssignNewTarget(target);
-        if (target.energyCapacity) {
-            if (this.creep && this.creep.carry.energy >= target.energyCapacity - target.energy) {
+    AssignNewTarget(targetID: string) {
+        super.AssignNewTarget(targetID);
+        let obj = Game.getObjectById(targetID) as StructureExtension | StructureSpawn;
+        if (obj && obj.energyCapacity) {
+            if (this.creep && this.creep.carry.energy >= obj.energyCapacity - obj.energy) {
                 this.JobState = JobState_Running;
             }
         }

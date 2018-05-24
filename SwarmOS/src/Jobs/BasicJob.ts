@@ -50,8 +50,8 @@ export abstract class BasicJob<T extends CreepJob_Memory> extends BasicProcess<T
             this.JobState = JobState_Starting;
         }
     }
-    AssignNewTarget(target: ObjectTypeWithID) {
-        this.memory.t = target.id;
+    AssignNewTarget(targetID: string) {
+        this.memory.t = targetID;
     }
 
     protected get creep(): Creep {
@@ -184,7 +184,7 @@ export abstract class BasicJob<T extends CreepJob_Memory> extends BasicProcess<T
                 return ThreadState_Done;
             }
             let requiredAction: ActionType;
-            if ((target as Structure).structureType) {
+            if ((target as Structure).structureType || (target as Tombstone).deathTime) {
                 requiredAction = AT_Withdraw;
             } else if ((target as Resource).resourceType) {
                 requiredAction = AT_Pickup;
@@ -267,7 +267,7 @@ export abstract class BasicJob<T extends CreepJob_Memory> extends BasicProcess<T
     }
 
     protected FindNearestEnergyDispenser(minEnergy: number = 0): StructureContainer | StructureStorage |
-        StructureTerminal | StructureLink | Source | Resource | undefined {
+        StructureTerminal | StructureLink | Source | Resource | Tombstone | undefined {
         let view = this.RoomView.GetRoomData(this.creep.room.name)!;
         let closestTarget = undefined;
         let dist = 150;
@@ -285,6 +285,20 @@ export abstract class BasicJob<T extends CreepJob_Memory> extends BasicProcess<T
             }
         }
 
+        if (closestTarget) {
+            return closestTarget;
+        }
+
+        for (let i = 0; i < view.tombstones.length; i++) {
+            let tombstone = Game.getObjectById(view.tombstones[i]) as Tombstone;
+            if (tombstone && (tombstone.store.energy || 0) >= minEnergy) {
+                let dist2 = this.creep.pos.getRangeTo(tombstone.pos);
+                if (dist2 < dist) {
+                    closestTarget = tombstone;
+                    dist = dist2;
+                }
+            }
+        }
         if (closestTarget) {
             return closestTarget;
         }

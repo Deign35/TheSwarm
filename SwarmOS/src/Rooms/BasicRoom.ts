@@ -8,7 +8,9 @@ export const OSPackage: IPackage<RoomStateMemory> = {
 import { BasicCreepGroup } from "CreepGroups/BasicCreepGroup";
 
 class BasicRoom extends BasicCreepGroup<RoomThreadMemory> {
-    protected get GroupPrefix(): string { return 'BSC' }
+    protected GetNewTarget(assignmentID: string): string {
+        return '';
+    }
     @extensionInterface(EXT_RoomView)
     RoomView!: IRoomDataExtension;
 

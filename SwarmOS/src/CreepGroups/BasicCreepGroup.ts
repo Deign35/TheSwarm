@@ -8,7 +8,6 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Basic
     protected View!: IRoomDataExtension;
 
     protected abstract EnsureGroupFormation(): void;
-    protected abstract get GroupPrefix(): GroupID;
 
     protected get assignments() {
         return this.memory.assignments;
@@ -56,7 +55,25 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Basic
         } else {
             // (TODO): Check if the level or CTID have changed.
         }
+
+        let curState = this.GetAssignmentState(assignmentID);
+        switch (curState) {
+            case (JobState_Inactive):
+                if (!this.AssignmentHasValidTarget(assignmentID)) {
+                    // (TODO): Fix this `!` issue!
+                    let newTarget = this.GetNewTarget(assignmentID);
+                    if (!newTarget) {
+                        break;
+                    }
+                    this.SetAssignmentTarget(assignmentID, newTarget)
+                }
+                this.StartAssignmentIfInactive(assignmentID);
+                return;
+            default:
+                return;
+        }
     }
+    protected abstract GetNewTarget(assignmentID: string): string;
 
     protected CreateProcessForAssignment(aID: string, priority: Priority, jobType: CreepJobsPackage) {
         let assignment = this.assignments[aID];
@@ -125,11 +142,11 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Basic
         }
     }
 
-    protected SetAssignmentTarget(aID: string, target: ObjectTypeWithID) {
+    protected SetAssignmentTarget(aID: string, targetID: string) {
         if (this.assignments[aID] && this.assignments[aID].pid) {
             let proc = this.kernel.getProcessByPID(this.assignments[aID].pid!) as BasicJob<any>;
             if (proc && proc.AssignNewTarget) {
-                proc.AssignNewTarget(target);
+                proc.AssignNewTarget(targetID);
             }
         }
     }

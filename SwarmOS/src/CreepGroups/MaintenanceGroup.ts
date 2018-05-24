@@ -8,6 +8,13 @@ export const OSPackage: IPackage<InfrastructureGroup_Memory> = {
 }
 
 class MaintenanceGroup extends BasicCreepGroup<MaintenanceGroup_Memory> {
+    protected GetNewTarget(assignmentID: string): string {
+        if (this.repairQueue.length > 0) {
+            return this.repairQueue.shift()!;
+        }
+
+        return '';
+    }
     protected get repairQueue() {
         return this.memory.repairQueue;
     }
@@ -41,16 +48,6 @@ class MaintenanceGroup extends BasicCreepGroup<MaintenanceGroup_Memory> {
         }
         if (this.repairQueue.length > 0) {
             this.EnsureAssignment('Repair', CT_Repair, repairLevel, Priority_Low, CJ_Repair);
-            let curState1 = this.GetAssignmentState('Repair');
-            switch (curState1) {
-                case (JobState_Inactive):
-                    this.SetAssignmentTarget('Repair', Game.getObjectById(this.repairQueue.shift()!) as Structure);
-                    this.StartAssignmentIfInactive('Repair');
-                default:
-                    break;
-            }
         }
     }
-
-    protected get GroupPrefix(): string { return 'REP'; }
 }
