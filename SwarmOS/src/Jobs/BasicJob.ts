@@ -63,9 +63,6 @@ export abstract class BasicJob<T extends CreepJob_Memory> extends BasicProcess<T
         if (!this.memory.c && this.JobState > JobState_Starting) {
             this.JobState = JobState_Inactive;
         }
-        if (this.memory.a && !this.kernel.getProcessByPID(this.memory.a)) {
-            delete this.memory.a;
-        }
 
         if (this.memory.c) {
             this._creep = this.creepRegistry.tryGetCreep(this.memory.c, this.memory.a || this.pid);
@@ -74,6 +71,9 @@ export abstract class BasicJob<T extends CreepJob_Memory> extends BasicProcess<T
                     this.JobState = JobState_Preparing;
                 }
             }
+        }
+        if (this.memory.a && !this.kernel.getProcessByPID(this.memory.a)) {
+            delete this.memory.a;
         }
     }
 
