@@ -37,7 +37,8 @@ class RefillerJob extends BasicJob<CreepJob_Memory> {
             this.creepRegistry.releaseCreep(this.creep.name);
             this.creepRegistry.tryReserveCreep(this.creep.name, this.pid);
         }
-        return super.HandleMissingTarget();
+        this.memory.j = JobState_Preparing;
+        return ThreadState_Done as ThreadState;
     }
 
     AssignNewTarget(target: StructureExtension | StructureSpawn) {

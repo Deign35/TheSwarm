@@ -123,8 +123,9 @@ class SpawnRegistry extends BasicProcess<SpawnRegistry_Memory> {
         }
 
         for (let i = 0; i < sortedSpawnIDs.length; i++) {
-            let spawn = activeSpawns[sortedSpawnIDs[i]];
+            let spawn = activeSpawns[sortedSpawnIDs[i]] as StructureSpawn;
             let spawnRequest: { req?: SpawnRequest, diff: number } = { req: undefined, diff: 0 };
+            let minPriority = Priority_Hold;
 
             let activeIDs = Object.keys(activeRequests);
             for (let j = 0; j < activeIDs.length; j++) {
@@ -132,10 +133,12 @@ class SpawnRegistry extends BasicProcess<SpawnRegistry_Memory> {
                 if (usedRequestIDs.includes(req.id)) {
                     continue;
                 }
-                if (spawnRequest.req && req.pri != spawnRequest.req.pri) {
-                    if (req.pri > spawnRequest.req.pri) {
-                        spawnRequest = { req: req, diff: this.GetConvertedSpawnCost(spawn, req) }
-                    }
+                if (req.pri < minPriority) {
+                    continue;
+                }
+                minPriority = req.pri;
+                let body = CreepBodies[req.con.ct][req.con.l];
+                if (body.cost > spawn.room.energyCapacityAvailable) {
                     continue;
                 }
                 let diff = this.GetConvertedSpawnCost(spawn, req);
@@ -145,9 +148,10 @@ class SpawnRegistry extends BasicProcess<SpawnRegistry_Memory> {
                 }
             }
 
-            if (spawnRequest.req && spawnRequest.diff > 0) {
-                this.spawnCreep(spawn, spawnRequest.req);
-                usedRequestIDs.push(spawnRequest.req.id);
+            if (spawnRequest.req && spawnRequest.diff > 0 && spawnRequest.req.pri == minPriority) {
+                if (this.spawnCreep(spawn, spawnRequest.req)) {
+                    usedRequestIDs.push(spawnRequest.req.id);
+                }
             }
         }
         this.sleeper.sleep(this.pid, 3);
@@ -156,7 +160,7 @@ class SpawnRegistry extends BasicProcess<SpawnRegistry_Memory> {
         return ThreadState_Done;
     }
 
-    protected spawnCreep(spawn: StructureSpawn, req: SpawnRequest) {
+    protected spawnCreep(spawn: StructureSpawn, req: SpawnRequest): boolean {
         let spawnResult = ERR_INVALID_ARGS as ScreepsReturnCode;
         while (spawnResult != OK && req.spSta == SP_QUEUED) {
             // construct the body here somehow
@@ -170,6 +174,8 @@ class SpawnRegistry extends BasicProcess<SpawnRegistry_Memory> {
             switch (spawnResult) {
                 case (ERR_NAME_EXISTS):
                     req.con.n += `_` + (Game.time % GetRandomIndex(primes_100));
+                case (ERR_NOT_ENOUGH_ENERGY):
+                    return false;
                 case (OK):
                     break;
                 default:
@@ -182,7 +188,9 @@ class SpawnRegistry extends BasicProcess<SpawnRegistry_Memory> {
         if (spawnResult == OK) {
             this.log.debug(`Spawn Creep successful for ${req.id})`);
             req.spSta = SP_SPAWNING;
+            return true;
         }
+        return false;
     }
 
     protected GetConvertedSpawnCost(spawn: StructureSpawn, req: SpawnRequest) {

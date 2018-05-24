@@ -16,6 +16,17 @@ class HarvesterJob extends BasicJob<HarvesterJob_Memory> {
     }
 
     protected RunState_Preparing(): ThreadState {
+        if (!this.creep) {
+            // if not, kill the child process and start over
+            if (this.memory.a) {
+                this.log.info(`KillProcess (HarvesterJob.RunState_Running())`);
+                this.kernel.killProcess(this.memory.a);
+                delete this.memory.a;
+            }
+            delete this.memory.c;
+            this.memory.j = JobState_Inactive;
+            return ThreadState_Done;
+        }
         let target: Source | StructureContainer | ConstructionSite | undefined = Game.getObjectById(this.memory.t) as Source;
         if (!this.memory.cont) {
             let containers = target.pos.findInRange(FIND_STRUCTURES, 1, {
