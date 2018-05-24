@@ -13,6 +13,9 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Basic
     protected get assignments() {
         return this.memory.assignments;
     }
+    protected get creeps() {
+        return this.memory.creeps;
+    }
 
     RunThread() {
         this.EnsureGroupFormation();
@@ -22,7 +25,18 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Basic
         let childIDs = Object.keys(this.assignments);
         for (let i = 0; i < childIDs.length; i++) {
             if (!this.assignments[childIDs[i]].pid || !this.kernel.getProcessByPID(this.assignments[childIDs[i]].pid!)) {
-                this.CloseAssignment(childIDs[i]);
+                this.HandleDeadJob(childIDs[i]);
+            }
+        }
+
+        let creepIDs = Object.keys(this.creeps);
+        for (let i = 0; i < creepIDs.length; i++) {
+            let id = creepIDs[i];
+            const delayTime = 10;
+            if (!this.creeps[id].active && Game.time - delayTime >= (this.creeps[id].idle || 0)) {
+                let assignment = this.assignments[this.creeps[id].aID];
+                this.log.warn(`Creep(${id}) has been idle for ${delayTime} ticks`);
+                // Do something with this creep...
             }
         }
     }
@@ -52,6 +66,18 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Basic
             this.kernel.killProcess(assignment.pid);
         }
 
+        let creepIDs = Object.keys(this.creeps);
+        for (let i = 0; i < creepIDs.length; i++) {
+            if (this.creeps[creepIDs[i]].aID == aID) {
+                if (this.creeps[creepIDs[i]].active) {
+                    this.log.error(`Creep was not properly let go`);
+                }
+                assignment.c = this.creeps[creepIDs[i]].name;
+                this.creeps[creepIDs[i]].active = true;
+                delete this.creeps[creepIDs[i]].idle;
+                break;
+            }
+        }
         let newCreepMem: CreepJob_Memory = {
             ct: assignment.ct,
             lvl: assignment.lvl,
@@ -111,11 +137,26 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Basic
     SetCreep(aID: string, id: CreepID) {
         if (this.assignments[aID]) {
             this.assignments[aID].c = id;
+            if (!this.creeps[id]) {
+                this.creeps[id] = {
+                    active: true,
+                    aID: aID,
+                    name: id
+                }
+            }
         }
     }
 
-    CloseAssignment(aID: GroupID) {
-        // (TODO) Dropped creeps here.
-        delete this.assignments[aID];
+    protected HandleDeadJob(aID: GroupID): void {
+        let assignment = this.assignments[aID];
+        if (assignment && assignment.c) {
+            let orphanedCreep = this.creepRegistry.tryGetCreep(assignment.c, assignment.pid || this.pid);
+            if (orphanedCreep) {
+                this.creepRegistry.releaseCreep(orphanedCreep.name);
+                this.memory.creeps[orphanedCreep.name].active = false;
+                this.memory.creeps[orphanedCreep.name].idle = Game.time;
+            }
+            delete this.assignments[aID];
+        }
     }
 }

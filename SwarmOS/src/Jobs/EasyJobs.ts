@@ -33,8 +33,10 @@ class RefillerJob extends BasicJob<CreepJob_Memory> {
             this.kernel.killProcess(this.memory.a);
             delete this.memory.a;
         }
-        this.creepRegistry.releaseCreep(this.creep.name);
-        this.creepRegistry.tryReserveCreep(this.creep.name, this.pid);
+        if (this.creep) {
+            this.creepRegistry.releaseCreep(this.creep.name);
+            this.creepRegistry.tryReserveCreep(this.creep.name, this.pid);
+        }
         return super.HandleMissingTarget();
     }
 

@@ -5,8 +5,9 @@ export const OSPackage: IPackage<SpawnRegistry_Memory> = {
 }
 
 import { BasicJob } from "./BasicJob";
+import { MoveToPositionAction } from "Actions/MoveToPositionAction";
 
-class HarvesterJob extends BasicJob<CreepJob_Memory> {
+class HarvesterJob extends BasicJob<HarvesterJob_Memory> {
     protected GetActionType(): ActionType {
         return AT_Harvest;
     }
@@ -15,7 +16,44 @@ class HarvesterJob extends BasicJob<CreepJob_Memory> {
     }
 
     protected RunState_Preparing(): ThreadState {
-        return this.RunState_Running();
+        let target: Source | StructureContainer | ConstructionSite | undefined = Game.getObjectById(this.memory.t) as Source;
+        if (!this.memory.cont) {
+            let containers = target.pos.findInRange(FIND_STRUCTURES, 1, {
+                filter: function (struct: Structure) {
+                    return struct.structureType == STRUCTURE_CONTAINER;
+                }
+            });
+            if (containers.length > 0) {
+                this.memory.cont = containers[0].id;
+            } else if (!this.memory.cont) {
+                let sites = target.pos.findInRange(FIND_CONSTRUCTION_SITES, 1);
+                for (let i = 0; i < sites.length; i++) {
+                    if (sites[i].structureType == STRUCTURE_CONTAINER) {
+                        this.memory.cont = sites[i].id;
+                    }
+                }
+                if (!this.memory.cont) {
+                    target.pos.findInRange(FIND_FLAGS, 1);
+                    // define what flags do damn it...
+                    this.log.warn(`No constructionSite exists.  Harvester unable to see flags.`);
+                    this.memory.j = JobState_Running;
+                    return ThreadState_Active;
+                }
+            }
+        }
+
+        if (this.memory.cont) {
+            target = Game.getObjectById(this.memory.cont) as StructureContainer | ConstructionSite;
+            if (!target) {
+                delete this.memory.cont;
+            }
+        }
+        if (target && !target.pos.isEqualTo(this.creep.pos)) {
+            new MoveToPositionAction(this.creep, target.pos).Run();
+            return ThreadState_Done;
+        }
+        this.memory.j = JobState_Running;
+        return ThreadState_Active;
     }
     protected RunState_Running(): ThreadState {
         if (!this.creep) {

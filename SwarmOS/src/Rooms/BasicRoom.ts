@@ -31,7 +31,8 @@ class BasicRoom extends BasicCreepGroup<RoomThreadMemory> {
                 let newMem: ControlGroup_Memory = {
                     assignments: {},
                     homeRoom: this.roomName,
-                    targetRoom: this.roomName
+                    targetRoom: this.roomName,
+                    creeps: {}
                 }
                 let newPID = this.kernel.startProcess(CG_Control, newMem);
                 this.roomData.groups.CG_Control = newPID;
@@ -46,6 +47,7 @@ class BasicRoom extends BasicCreepGroup<RoomThreadMemory> {
                     assignments: {},
                     homeRoom: this.roomName,
                     targetRoom: this.roomName,
+                    creeps: {}
                 }
                 let extrPID = this.kernel.startProcess(CG_Extraction, extrMem);
                 this.roomData.groups.CG_Extraction = extrPID;
@@ -55,7 +57,8 @@ class BasicRoom extends BasicCreepGroup<RoomThreadMemory> {
                 let infrMem: InfrastructureGroup_Memory = {
                     homeRoom: this.roomName,
                     targetRoom: this.roomName,
-                    assignments: {}
+                    assignments: {},
+                    creeps: {}
                 }
                 let infrPID = this.kernel.startProcess(CG_Infrastructure, infrMem);
                 this.roomData.groups.CG_Infrastructure = infrPID;
