@@ -55,6 +55,9 @@ declare interface InfrastructureGroup_Memory extends CreepGroup_Memory {
 }
 declare interface ExtractionGroup_Memory extends CreepGroup_Memory {
 }
+declare interface MaintenanceGroup_Memory extends CreepGroup_Memory {
+    repairQueue: string[];
+}
 
 
 

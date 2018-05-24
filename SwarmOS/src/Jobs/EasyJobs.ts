@@ -3,11 +3,21 @@ export const OSPackage: IPackage<SpawnRegistry_Memory> = {
         processRegistry.register(CJ_Build, BuildJob);
         processRegistry.register(CJ_Refiller, RefillerJob);
         processRegistry.register(CJ_Upgrade, UpgradeJob);
+        processRegistry.register(CJ_Repair, RepairJob);
     }
 }
 
 import { BasicJob } from "./BasicJob";
 
+class RepairJob extends BasicJob<CreepJob_Memory> {
+    protected GetActionType(): ActionType {
+        return AT_Repair
+    }
+    CheckIsTargetStillValid(): boolean {
+        let obj = Game.getObjectById(this.memory.t) as Structure;
+        return (!!obj && obj.hits < obj.hitsMax);
+    }
+}
 class BuildJob extends BasicJob<CreepJob_Memory> {
     protected GetActionType(): ActionType {
         return AT_Build;

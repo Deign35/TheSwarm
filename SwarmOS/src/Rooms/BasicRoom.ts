@@ -64,6 +64,18 @@ class BasicRoom extends BasicCreepGroup<RoomThreadMemory> {
                 this.roomData.groups.CG_Infrastructure = infrPID;
                 this.kernel.setParent(infrPID, this.pid);
             }
+            if (!this.roomData.groups.CG_Maintenance) {
+                let maintenanceMem: MaintenanceGroup_Memory = {
+                    homeRoom: this.roomName,
+                    targetRoom: this.roomName,
+                    assignments: {},
+                    creeps: {},
+                    repairQueue: []
+                }
+                let maintenancePID = this.kernel.startProcess(CG_Maintenance, maintenanceMem);
+                this.roomData.groups.CG_Maintenance = maintenancePID;
+                this.kernel.setParent(maintenancePID, this.pid);
+            }
         }
 
     }

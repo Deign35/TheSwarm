@@ -12,13 +12,8 @@ class InfrastructureGroup extends BasicCreepGroup<InfrastructureGroup_Memory> {
         let viewData = this.View.GetRoomData(this.memory.targetRoom)!;
 
         let spawnRoom = Game.rooms[this.memory.homeRoom];
-        let needsClaimer = !viewData.owner;
-        if (viewData.owner) {
-            if (viewData.owner != MY_USERNAME) {
-                return;
-            } else {
-                spawnRoom = Game.rooms[this.memory.targetRoom];
-            }
+        if (viewData.owner && viewData.owner == MY_USERNAME) {
+            spawnRoom = Game.rooms[this.memory.targetRoom];
         }
 
         let buildLevel = 0;
@@ -36,6 +31,8 @@ class InfrastructureGroup extends BasicCreepGroup<InfrastructureGroup_Memory> {
                 case (JobState_Inactive):
                     this.SetAssignmentTarget('Builder1', Game.getObjectById(viewData.cSites[0]) as ConstructionSite);
                     this.StartAssignmentIfInactive('Builder1');
+                default:
+                    break;
             }
             if (viewData.cSites.length > 3) {
                 this.EnsureAssignment('Builder2', CT_Builder, buildLevel, Priority_Medium, CJ_Build);
@@ -44,6 +41,8 @@ class InfrastructureGroup extends BasicCreepGroup<InfrastructureGroup_Memory> {
                     case (JobState_Inactive):
                         this.SetAssignmentTarget('Builder2', Game.getObjectById(viewData.cSites[1]) as ConstructionSite);
                         this.StartAssignmentIfInactive('Builder2');
+                    default:
+                        break;
                 }
                 if (viewData.cSites.length > 7) {
                     this.EnsureAssignment('Builder3', CT_Builder, buildLevel, Priority_Lowest, CJ_Build);
@@ -52,6 +51,8 @@ class InfrastructureGroup extends BasicCreepGroup<InfrastructureGroup_Memory> {
                         case (JobState_Inactive):
                             this.SetAssignmentTarget('Builder3', Game.getObjectById(viewData.cSites[2]) as ConstructionSite);
                             this.StartAssignmentIfInactive('Builder3');
+                        default:
+                            break;
                     }
                     if (viewData.cSites.length > 10) {
                         this.EnsureAssignment('Builder4', CT_Builder, buildLevel, Priority_Lowest, CJ_Build);
@@ -60,6 +61,8 @@ class InfrastructureGroup extends BasicCreepGroup<InfrastructureGroup_Memory> {
                             case (JobState_Inactive):
                                 this.SetAssignmentTarget('Builder4', Game.getObjectById(viewData.cSites[2]) as ConstructionSite);
                                 this.StartAssignmentIfInactive('Builder4');
+                            default:
+                                break;
                         }
                     }
                 }
