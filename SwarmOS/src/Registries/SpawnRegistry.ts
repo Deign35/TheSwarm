@@ -53,6 +53,8 @@ interface SpawnRegistry_FlashMemory {
 class SpawnRegistry extends BasicProcess<SpawnRegistry_Memory> {
     @extensionInterface(EXT_SpawnRegistry)
     Extensions!: SpawnRegistryExtensions;
+    @extensionInterface(EXT_CreepRegistry)
+    protected creepRegistry!: ICreepRegistryExtensions;
 
     protected get memory() {
         if (!Memory.spawnData) {
@@ -83,6 +85,14 @@ class SpawnRegistry extends BasicProcess<SpawnRegistry_Memory> {
                         req.spSta = SP_COMPLETE;
                     }
                 }
+                continue;
+            }
+
+            let foundCreep = this.creepRegistry.tryFindCompatibleCreep(req.con.ct, req.con.l, req.loc, req.max);
+            if (foundCreep) {
+                req.con.n = foundCreep;
+                req.spSta = SP_COMPLETE;
+                // (TODO): Handle default memory issues?
                 continue;
             }
             activeRequests[requests[i]] = req;

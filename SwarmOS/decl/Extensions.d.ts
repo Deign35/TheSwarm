@@ -117,4 +117,5 @@ declare interface ICreepRegistryExtensions extends IPackageExtension {
     tryGetCreep(id: CreepID, requestingPID?: PID): Creep | undefined;
     tryReserveCreep(id: CreepID, requestingPID: PID): boolean;
     releaseCreep(id: CreepID): void;
+    tryReleaseCreepToPID(id: CreepID, owner: PID, newOwner: PID): boolean;
 }

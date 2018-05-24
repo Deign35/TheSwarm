@@ -35,9 +35,18 @@ class CreepRegistry extends BasicProcess<CreepRegistry_Memory> {
     protected get memory(): CreepRegistry_Memory {
         if (!Memory.creepData) {
             this.log.warn(`Initializing CreepRegistry memory`);
-            Memory.creepData = {}
+            Memory.creepData = {
+                inactiveCreeps: [],
+                registeredCreeps: {}
+            }
         }
         return Memory.creepData;
+    }
+    protected get inactiveCreeps() {
+        return this.memory.inactiveCreeps;
+    }
+    protected get registeredCreeps() {
+        return this.memory.registeredCreeps;
     }
 
     protected get logID(): string {
@@ -47,28 +56,27 @@ class CreepRegistry extends BasicProcess<CreepRegistry_Memory> {
         return PKG_CreepRegistry_LogContext.logLevel!;
     }
 
-    RunThread(): ThreadState {
-        this.log.debug(`Begin CreepRunner`);
-
-        let creepIDs = Object.keys(this.memory);
+    PrepTick() {
+        let creepIDs = Object.keys(this.registeredCreeps);
         for (let i = 0, length = creepIDs.length; i < length; i++) {
             let creep = Game.creeps[creepIDs[i]];
             if (!creep) {
-                delete this.memory[creepIDs[i]];
+                delete this.registeredCreeps[creepIDs[i]];
                 continue;
             }
-            let context = this.memory[creepIDs[i]];
+            let context = this.registeredCreeps[creepIDs[i]];
             if (!context) {
+                this.log.error(`Creep unregistered.  Creep is spawning - ${creep.spawning}`);
                 continue;
             }
 
             if (context.o && !this.kernel.getProcessByPID(context.o)) {
-                // This creep is an orphan, find a job for it
                 context.o = undefined;
             }
         }
+    }
 
-        this.log.debug(`End CreepRunner`);
+    RunThread(): ThreadState {
         return ThreadState_Done;
     }
 }
@@ -76,20 +84,58 @@ class CreepRegistryExtensions extends ExtensionBase implements ICreepRegistryExt
     protected get memory(): CreepRegistry_Memory {
         if (!Memory.creepData) {
             this.log.warn(`Initializing CreepRegistry memory`);
-            Memory.creepData = {}
+            Memory.creepData = {
+                inactiveCreeps: [],
+                registeredCreeps: {}
+            }
         }
         return Memory.creepData;
     }
+    protected get inactiveCreeps() {
+        return this.memory.inactiveCreeps;
+    }
+    protected get registeredCreeps() {
+        return this.memory.registeredCreeps;
+    }
 
     tryFindCompatibleCreep(creepType: CT_ALL, level: number, targetRoom: RoomID, maxDistance: number = 3): string | undefined {
-        //Cycle through temp workers and provide it
+        let bestMatch: CreepContext | undefined = undefined;
+        let dist = maxDistance + 1;
+        for (let i = 0; i < this.inactiveCreeps.length; i++) {
+            let creep = this.registeredCreeps[this.inactiveCreeps[i]];
+            let compareDist = Game.map.getRoomLinearDistance(Game.creeps[creep.n].room.name, targetRoom);
+            let betterMatch = false;
+            if (creep.ct == creepType) {
+                if (!bestMatch) {
+                    betterMatch = true;
+                } else {
+                    if (bestMatch.l != level || bestMatch.l == creep.l) {
+                        if (compareDist < dist) {
+                            betterMatch = true;
+                        }
+                    } else {
+                        if (bestMatch.l < level && creep.l > bestMatch.l) {
+                            betterMatch = true;
+                        } else if (bestMatch.l > level && creep.l < bestMatch.l) {
+                            betterMatch = true;
+                        }
+                    }
+                }
+            }
 
-        return undefined;
+            if (betterMatch) {
+                bestMatch = creep;
+                dist = compareDist;
+            }
+        }
+
+        return bestMatch ? bestMatch.n : undefined;
     }
 
     tryRegisterCreep(creepContext: CreepContext): boolean {
-        if (!this.memory[creepContext.n]) {
-            this.memory[creepContext.n] = creepContext;
+        if (!this.registeredCreeps[creepContext.n]) {
+            this.registeredCreeps[creepContext.n] = creepContext;
+            this.inactiveCreeps.push(creepContext.n);
             return true;
         }
 
@@ -97,7 +143,7 @@ class CreepRegistryExtensions extends ExtensionBase implements ICreepRegistryExt
     }
 
     tryGetCreep(id: CreepID, requestingPID?: PID): Creep | undefined {
-        let request = this.memory[id];
+        let request = this.registeredCreeps[id];
         if (!request || !Game.creeps[request.n] || !request.o || request.o != requestingPID) {
             return undefined;
         }
@@ -105,16 +151,27 @@ class CreepRegistryExtensions extends ExtensionBase implements ICreepRegistryExt
     }
 
     tryReserveCreep(id: CreepID, requestingPID: PID): boolean {
-        if (!this.memory[id].o) {
-            this.memory[id].o = requestingPID;
+        if (!this.registeredCreeps[id].o) {
+            this.registeredCreeps[id].o = requestingPID;
+            this.inactiveCreeps.splice(this.inactiveCreeps.indexOf(id), 1);
             return true;
         }
-        return this.memory[id].o == requestingPID;
+        return this.registeredCreeps[id].o == requestingPID;
     }
 
     releaseCreep(id: CreepID): void {
-        if (this.memory[id]) {
-            this.memory[id].o = undefined;
+        if (this.registeredCreeps[id]) {
+            this.registeredCreeps[id].o = undefined;
+            this.inactiveCreeps.push(id);
         }
+    }
+
+    tryReleaseCreepToPID(id: CreepID, owner: PID, newOwner: PID) {
+        if (!this.registeredCreeps[id].o) {
+            this.tryReserveCreep(id, newOwner);
+        } else if (this.registeredCreeps[id].o == owner) {
+            this.registeredCreeps[id].o = newOwner;
+        }
+        return this.registeredCreeps[id].o == newOwner;
     }
 }

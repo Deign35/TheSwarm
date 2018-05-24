@@ -3,8 +3,9 @@
 declare type SpawnRegistry_Memory = MemBase & {
     [id in SpawnID]: SpawnRequest
 }
-declare type CreepRegistry_Memory = MemBase & {
-    [id in CreepID]: CreepContext
+declare interface CreepRegistry_Memory extends MemBase {
+    registeredCreeps: { [id in CreepID]: CreepContext };
+    inactiveCreeps: CreepID[];
 }
 declare interface CreepContext extends MemBase {
     o?: PID;        // (o)wner process
