@@ -29,15 +29,14 @@ class RefillerJob extends BasicJob<CreepJob_Memory> {
 
     HandleMissingTarget() {
         if (this.memory.a) {
-            this.log.info(`KillProcess (RefillerJob.HandleMissingTarget())`);
-            this.kernel.killProcess(this.memory.a);
+            this.kernel.killProcess(this.memory.a, `KillProcess (RefillerJob.HandleMissingTarget())`);
             delete this.memory.a;
         }
         if (this.creep) {
             this.creepRegistry.releaseCreep(this.creep.name);
             this.creepRegistry.tryReserveCreep(this.creep.name, this.pid);
         }
-        this.memory.j = JobState_Preparing;
+        this.JobState = JobState_Inactive;
         return ThreadState_Done as ThreadState;
     }
 
@@ -45,7 +44,7 @@ class RefillerJob extends BasicJob<CreepJob_Memory> {
         super.AssignNewTarget(target);
         if (target.energyCapacity) {
             if (this.creep && this.creep.carry.energy >= target.energyCapacity - target.energy) {
-                this.memory.j = JobState_Running;
+                this.JobState = JobState_Running;
             }
         }
     }

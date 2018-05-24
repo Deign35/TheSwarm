@@ -69,8 +69,7 @@ export abstract class PackageProviderBase<T extends PackageProviderMemory> exten
                 process = (service && service.pid) ? this.kernel.getProcessByPID(service.pid) : undefined;
 
                 if (!service || !process) {
-                    this.log.error(() => `Failed to restart package service ${ids[i]}`);
-                    this.kernel.killProcess(this.pid);
+                    this.kernel.killProcess(this.pid, `Failed to restart package service ${ids[i]}`);
                     continue;
                 }
             }

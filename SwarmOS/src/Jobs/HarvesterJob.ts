@@ -19,12 +19,11 @@ class HarvesterJob extends BasicJob<HarvesterJob_Memory> {
         if (!this.creep) {
             // if not, kill the child process and start over
             if (this.memory.a) {
-                this.log.info(`KillProcess (HarvesterJob.RunState_Running())`);
-                this.kernel.killProcess(this.memory.a);
+                this.kernel.killProcess(this.memory.a, `KillProcess (HarvesterJob.RunState_Preparing())`);
                 delete this.memory.a;
             }
             delete this.memory.c;
-            this.memory.j = JobState_Inactive;
+            this.JobState = JobState_Inactive;
             return ThreadState_Done;
         }
         let target: Source | StructureContainer | ConstructionSite | undefined = Game.getObjectById(this.memory.t) as Source;
@@ -47,7 +46,7 @@ class HarvesterJob extends BasicJob<HarvesterJob_Memory> {
                     target.pos.findInRange(FIND_FLAGS, 1);
                     // define what flags do damn it...
                     this.log.warn(`No constructionSite exists.  Harvester unable to see flags.`);
-                    this.memory.j = JobState_Running;
+                    this.JobState = JobState_Running;
                     return ThreadState_Active;
                 }
             }
@@ -63,18 +62,18 @@ class HarvesterJob extends BasicJob<HarvesterJob_Memory> {
             new MoveToPositionAction(this.creep, target.pos).Run();
             return ThreadState_Done;
         }
-        this.memory.j = JobState_Running;
+        this.JobState = JobState_Running;
         return ThreadState_Active;
     }
     protected RunState_Running(): ThreadState {
         if (!this.creep) {
             // if not, kill the child process and start over
             if (this.memory.a) {
-                this.kernel.killProcess(this.memory.a);
+                this.kernel.killProcess(this.memory.a, `KillProcess (HarvesterJob.RunState_Running())`);
                 delete this.memory.a;
             }
             delete this.memory.c;
-            this.memory.j = JobState_Starting;
+            this.JobState = JobState_Starting;
             return ThreadState_Active;
         }
 

@@ -30,8 +30,7 @@ export class EasyCreep<T extends CreepThread_JobMemory> extends BasicProcess<T> 
         if (this.memory.c) {
             this._creep = this.creepRegistry.tryGetCreep(this.memory.c, this.pid);
             if (!this._creep) {
-                this.log.info(`KillProcess (EasyCreep.PrepTick())`);
-                this.kernel.killProcess(this.pid);
+                this.kernel.killProcess(this.pid, `KillProcess (EasyCreep.PrepTick())`);
                 this.sleeper.wake(this.parentPID);
                 return;
             }
@@ -70,8 +69,7 @@ export class EasyCreep<T extends CreepThread_JobMemory> extends BasicProcess<T> 
     protected RunAction(actionType: ActionType, id: string) {
         let target = Game.getObjectById(id) as RoomObject | Creep;
         if (!target) {
-            this.log.info(`KillProcess (EasyCreep.RunAction())`);
-            this.kernel.killProcess(this.pid);
+            this.kernel.killProcess(this.pid, `KillProcess (EasyCreep.RunAction())`);
             this.sleeper.wake(this.parentPID);
             return;
         }
@@ -81,8 +79,7 @@ export class EasyCreep<T extends CreepThread_JobMemory> extends BasicProcess<T> 
         if (action) {
             action.Run();
         } else {
-            this.log.error(`EasyCreep action not found ${this.creep.name} -- pid(${this.pid} -- actoin${this.GetActionType()}`);
-            this.kernel.killProcess(this.pid);
+            this.kernel.killProcess(this.pid, `EasyCreep action not found ${this.creep.name} -- pid(${this.pid} -- actoin${this.GetActionType()}`);
             this.sleeper.wake(this.parentPID);
         }
     }
@@ -98,8 +95,7 @@ export class EasyCreep<T extends CreepThread_JobMemory> extends BasicProcess<T> 
 
         let targetID = this.GetTargetID();
         if (!targetID) {
-            this.log.info(`KillProcess (EasyCreep.RunThread())`);
-            this.kernel.killProcess(this.pid);
+            this.kernel.killProcess(this.pid, `KillProcess (EasyCreep.RunThread())`);
             this.sleeper.wake(this.parentPID);
             return ThreadState_Done;
         }

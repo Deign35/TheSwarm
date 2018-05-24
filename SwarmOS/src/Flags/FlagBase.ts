@@ -48,7 +48,7 @@ class FlagBase extends BasicProcess<FlagProcess_Memory> {
     RunThread(): ThreadState {
         let flag = this.flag;
         if (!flag) {
-            this.kernel.killProcess(this.pid);
+            this.kernel.killProcess(this.pid, `FlagBase.RunThread()`);
             return ThreadState_Done;
         }
 

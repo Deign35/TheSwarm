@@ -138,7 +138,7 @@ class SpawnRegistry extends BasicProcess<SpawnRegistry_Memory> {
                 }
                 minPriority = req.pri;
                 let body = CreepBodies[req.con.ct][req.con.l];
-                if (body.cost > spawn.room.energyCapacityAvailable) {
+                if (body.cost > spawn.room.energyAvailable) {
                     continue;
                 }
                 let diff = this.GetConvertedSpawnCost(spawn, req);
@@ -172,10 +172,10 @@ class SpawnRegistry extends BasicProcess<SpawnRegistry_Memory> {
                 req.con.n,
                 { memory: spawnMem });
             switch (spawnResult) {
-                case (ERR_NAME_EXISTS):
-                    req.con.n += `_` + (Game.time % GetRandomIndex(primes_100));
                 case (ERR_NOT_ENOUGH_ENERGY):
                     return false;
+                case (ERR_NAME_EXISTS):
+                    req.con.n += `_` + (Game.time % GetRandomIndex(primes_100));
                 case (OK):
                     break;
                 default:

@@ -63,7 +63,7 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Basic
         let curCreep;
         if (assignment.pid) {
             this.log.info(`KillProcess (BasicCreepGroup.CreateProcessForAssignment(${aID}, ${priority}, ${jobType}))`);
-            this.kernel.killProcess(assignment.pid);
+            this.kernel.killProcess(assignment.pid, `BasicCrepGroup.CreateProcessForAssignment()`);
         }
 
         let creepIDs = Object.keys(this.creeps);
@@ -96,8 +96,8 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Basic
     protected GetAssignmentState(aID: string) {
         if (this.assignments[aID] && this.assignments[aID].pid) {
             let proc = this.kernel.getProcessByPID(this.assignments[aID].pid!) as BasicJob<any>;
-            if (proc && proc.GetJobState) {
-                return proc.GetJobState();
+            if (proc && proc.JobState) {
+                return proc.JobState;
             }
         }
 

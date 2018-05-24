@@ -98,10 +98,10 @@ export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepEx
         return process;
     }
 
-    killProcess(id: PID): void {
+    killProcess(id: PID, msg: string): void {
         let pinfo = this.processTable[id];
         if (!pinfo) return;
-        this.log.warn(`${id} killed`);
+        this.log.warn(`${id} killed - ${msg}`);
         pinfo.ex = false;
         pinfo.end = Game.time;
         let ids = Object.keys(this.processTable);
@@ -110,7 +110,7 @@ export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepEx
             let pi = this.processTable[id]
             if (pi.pP === pinfo.pid) {
                 if (pi.ex) {
-                    this.killProcess(id);
+                    this.killProcess(id, msg);
                 }
             }
         }
@@ -166,7 +166,7 @@ export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepEx
                 }
             } catch (e) {
                 let pInfo = this.processTable[pid];
-                this.killProcess(pid);
+                this.killProcess(pid, `Kernel.loop()`);
                 pInfo.err = e.stack || e.toString();
                 this.log.error(`[${pid}] ${pInfo.PKG} crashed\n${e.stack}`);
             }
@@ -194,7 +194,7 @@ export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepEx
             }
             this._curTickIDs.push(pid);
         } catch (e) {
-            this.killProcess(pid);
+            this.killProcess(pid, `Kernel.PrepTick()`);
             pInfo.err = e.stack || e.toString();
             this.log.error(`[${pid}] ${pInfo.PKG} crashed\n${e.stack}`);
         }
@@ -206,7 +206,7 @@ export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepEx
             try {
                 proc.EndTick();
             } catch (e) {
-                this.killProcess(pid);
+                this.killProcess(pid, `Kernel.EndTick()`);
                 pInfo.err = e.stack || e.toString();
                 this.log.error(`[${pid}] ${pInfo.PKG} crashed\n${e.stack}`);
             }
