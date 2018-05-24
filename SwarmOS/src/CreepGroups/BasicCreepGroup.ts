@@ -125,7 +125,7 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Basic
         }
     }
 
-    protected SetAssignmentTarget(aID: string, target: Structure | Creep | Source) {
+    protected SetAssignmentTarget(aID: string, target: ObjectTypeWithID) {
         if (this.assignments[aID] && this.assignments[aID].pid) {
             let proc = this.kernel.getProcessByPID(this.assignments[aID].pid!) as BasicJob<any>;
             if (proc && proc.AssignNewTarget) {

@@ -29,25 +29,42 @@ class InfrastructureGroup extends BasicCreepGroup<InfrastructureGroup_Memory> {
         } else if (spawnRoom.energyCapacityAvailable >= 550) {
             buildLevel = 1;
         }
-
-        /*if (viewData.cSites.length > 0) {
-            this.EnsureAssignment('Builder_1', CT_Builder, buildLevel, {
-                pri: Priority_Low,
-                res: false
-            });
+        if (viewData.cSites.length > 0) {
+            this.EnsureAssignment('Builder1', CT_Builder, buildLevel, Priority_Low, CJ_Build);
+            let curState1 = this.GetAssignmentState('Builder1');
+            switch (curState1) {
+                case (JobState_Inactive):
+                    this.SetAssignmentTarget('Builder1', Game.getObjectById(viewData.cSites[0]) as ConstructionSite);
+                    this.StartAssignmentIfInactive('Builder1');
+            }
             if (viewData.cSites.length > 3) {
-                this.EnsureAssignment('Builder_2', CT_Builder, buildLevel, {
-                    pri: Priority_Medium,
-                    res: false
-                });
+                this.EnsureAssignment('Builder2', CT_Builder, buildLevel, Priority_Medium, CJ_Build);
+                let curState2 = this.GetAssignmentState('Builder2');
+                switch (curState2) {
+                    case (JobState_Inactive):
+                        this.SetAssignmentTarget('Builder2', Game.getObjectById(viewData.cSites[1]) as ConstructionSite);
+                        this.StartAssignmentIfInactive('Builder2');
+                }
                 if (viewData.cSites.length > 7) {
-                    this.EnsureAssignment('Builder_3', CT_Builder, buildLevel, {
-                        pri: Priority_Low,
-                        res: false
-                    })
+                    this.EnsureAssignment('Builder3', CT_Builder, buildLevel, Priority_Lowest, CJ_Build);
+                    let curState3 = this.GetAssignmentState('Builder3');
+                    switch (curState3) {
+                        case (JobState_Inactive):
+                            this.SetAssignmentTarget('Builder3', Game.getObjectById(viewData.cSites[2]) as ConstructionSite);
+                            this.StartAssignmentIfInactive('Builder3');
+                    }
+                    if (viewData.cSites.length > 10) {
+                        this.EnsureAssignment('Builder4', CT_Builder, buildLevel, Priority_Lowest, CJ_Build);
+                        let curState4 = this.GetAssignmentState('Builder4');
+                        switch (curState4) {
+                            case (JobState_Inactive):
+                                this.SetAssignmentTarget('Builder4', Game.getObjectById(viewData.cSites[2]) as ConstructionSite);
+                                this.StartAssignmentIfInactive('Builder4');
+                        }
+                    }
                 }
             }
-        }*/
+        }
     }
 
     protected get GroupPrefix(): string { return 'INF'; }

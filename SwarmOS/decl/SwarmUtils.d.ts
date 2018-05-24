@@ -22,6 +22,8 @@ declare type SpawnRequestID = string;
 
 declare type ScreepsPackage = OSPackage | CreepGroupPackage | CreepJobsPackage
 
+declare type ObjectTypeWithID = Structure | Creep | Source | ConstructionSite | Mineral | Nuke | Resource | Tombstone;
+
 declare interface Profiler {
     clear(): void;
     output(): void;

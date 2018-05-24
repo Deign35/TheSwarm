@@ -50,7 +50,7 @@ export abstract class BasicJob<T extends CreepJob_Memory> extends BasicProcess<T
             this.JobState = JobState_Starting;
         }
     }
-    AssignNewTarget(target: Structure | Creep | Source | Mineral | Resource) {
+    AssignNewTarget(target: ObjectTypeWithID) {
         this.memory.t = target.id;
     }
 
