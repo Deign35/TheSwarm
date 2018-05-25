@@ -180,17 +180,17 @@ export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepEx
     private PrepTick(pid: PID) {
         let pInfo = this.processTable[pid];
         try {
+            let proc = this.getProcessByPID(pid)!;
+            if (proc.PrepTick) {
+                proc.PrepTick();
+            }
+
             if (pInfo.sl) {
                 if (pInfo.sl! <= Game.time) {
                     this.wake(pid);
                 } else {
                     return;
                 }
-            }
-
-            let proc = this.getProcessByPID(pid)!;
-            if (proc.PrepTick) {
-                proc.PrepTick();
             }
             this._curTickIDs.push(pid);
         } catch (e) {
