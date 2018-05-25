@@ -6,10 +6,19 @@ declare var Memory: {
 
 declare type ProcessCache = {
     [id in PID]: {
-        context: IProcessContext,
-        process: IProcess
+        state: TS_State;
+        context: IProcessContext;
+        process: IProcess;
     }
 }
+
+const TS_Active = 1;
+const TS_Waiting = 2;
+const TS_Done = 3;
+declare type TS_Active = 1;
+declare type TS_Waiting = 2;
+declare type TS_Done = 3;
+declare type TS_State = TS_Active | TS_Waiting | TS_Done;
 
 export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepExtension {
     constructor(private processRegistry: IProcessRegistry, private extensionRegistry: IExtensionRegistry,
@@ -19,7 +28,7 @@ export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepEx
     private _processCache: ProcessCache;
     private _curTickIDs!: PID[];
     private _curThreadData!: any;
-    private curProcessID: string = "";
+
     get log() {
         return this._logger;
     }
@@ -54,7 +63,6 @@ export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepEx
         let pid = 'p' + GetSUID() as PID;
         let pInfo: ProcInfo = {
             pid: pid,
-            pP: this.curProcessID,
             PKG: packageName,
             ex: true,
             st: Game.time
@@ -94,7 +102,7 @@ export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepEx
         Object.freeze(context);
         let process = this.processRegistry.createNewProcess(pInfo.PKG, context);
         if (!process) throw new Error(`Could not create process ${pInfo.pid} ${pInfo.PKG}`);
-        this._processCache[id] = { context, process, };
+        this._processCache[id] = { context, process, state: TS_Done };
         return process;
     }
 
@@ -117,7 +125,7 @@ export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepEx
     }
 
     getProcessByPID(pid: PID): IProcess | undefined {
-        if (!this.processTable[pid]) {
+        if (!this.processTable[pid] || !this.processTable[pid].ex) {
             return;
         }
         if (this._processCache[pid]) {
@@ -152,6 +160,9 @@ export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepEx
             let pid = activeThreadIDs.shift()!;
             try {
                 let curThread = this.getProcessByPID(pid)!;
+                if (!curThread) {
+                    continue;
+                }
                 let threadResult = curThread.RunThread();
                 switch (threadResult) {
                     case (ThreadState_Active):
@@ -172,8 +183,9 @@ export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepEx
             }
         }
 
-        for (let i = 0; i < this._curTickIDs.length; i++) {
-            this.EndTick(this._curTickIDs[i]);
+        processIDs = Object.keys(this.processTable);
+        for (let i = 0; i < processIDs.length; i++) {
+            this.EndTick(processIDs[i]);
         }
     }
 
