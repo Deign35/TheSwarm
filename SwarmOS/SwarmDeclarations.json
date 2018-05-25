@@ -77,6 +77,20 @@
                 "Logger": "logger"
             }
         },
+        "TT": {
+            "comment": "Type of targetting (e.g. how to find new targets)",
+            "enabled": true,
+            "type": true,
+            "combinedType": "TargetType",
+            "entries": {
+                "None": 0,
+                "SpawnRefill": 1,
+                "Harvest": 2,
+                "Repair": 3,
+                "Builder": 4,
+                "Upgrader": 5
+            }
+        },
         "FT": {
             "comment": "Functional Tests",
             "enabled": true,

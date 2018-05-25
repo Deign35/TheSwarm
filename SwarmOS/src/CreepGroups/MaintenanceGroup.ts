@@ -47,7 +47,7 @@ class MaintenanceGroup extends BasicCreepGroup<MaintenanceGroup_Memory> {
             }
         }
         if (this.repairQueue.length > 0) {
-            this.EnsureAssignment('Repair', CT_Repair, repairLevel, Priority_Low, CJ_Repair);
+            this.EnsureAssignment('Repair', CT_Repair, repairLevel, Priority_Low, CJ_Repair, TT_Repair);
         }
     }
 }

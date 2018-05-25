@@ -15,6 +15,9 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Basic
     protected get creeps() {
         return this.memory.creeps;
     }
+    protected get repairQueue() {
+        return this.memory.repairQueue;
+    }
 
     RunThread() {
         this.EnsureGroupFormation();
@@ -24,7 +27,7 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Basic
         let childIDs = Object.keys(this.assignments);
         for (let i = 0; i < childIDs.length; i++) {
             if (!this.assignments[childIDs[i]].pid || !this.kernel.getProcessByPID(this.assignments[childIDs[i]].pid!)) {
-                this.HandleDeadJob(childIDs[i]);
+                this.RemoveCreepFromAssignment(childIDs[i]);
             }
         }
 
@@ -38,23 +41,76 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Basic
                 // Do something with this creep...
             }
         }
+
+        // (TODO): Make this a thread that can be slept
+        if (this.repairQueue.length == 0) {
+            let targetRoom = Game.rooms[this.memory.targetRoom];
+            if (targetRoom) {
+                let structs = targetRoom.find(FIND_STRUCTURES);
+                for (let i = 0; i < structs.length; i++) {
+                    if (structs[i].hits < structs[i].hitsMax) {
+                        this.repairQueue.push(structs[i].id);
+                    }
+                }
+            }
+        }
+    }
+    protected ChangeCreepAssignment(oldAssignmentID: string, newAssignmentID: string): boolean {
+        let pid = this.pid;
+        let creepName;
+
+        let oldAssignment = this.assignments[oldAssignmentID];
+        if (oldAssignment && oldAssignment.c) {
+            if (oldAssignment.pid) {
+                pid = oldAssignment.pid;
+            }
+            creepName = oldAssignment.c;
+        } else {
+            let creepIDs = Object.keys(this.creeps);
+            for (let i = 0; i < creepIDs.length; i++) {
+                if (this.creeps[creepIDs[i]].aID == oldAssignmentID) {
+                    creepName = this.creeps[creepIDs[i]].name;
+                    break;
+                }
+            }
+        }
+
+        if ((!creepName) || (this.assignments[newAssignmentID] && this.assignments[newAssignmentID].c) && this.assignments[newAssignmentID].c != creepName) {
+            return false;
+        }
+
+        let creep = this.creepRegistry.tryGetCreep(creepName, pid);
+        if (creep) {
+            if (this.creepRegistry.tryReleaseCreepToPID(creepName, pid, this.pid)) {
+                this.creeps[creepName].aID = newAssignmentID;
+                this.creeps[creepName].active = false;
+                if (this.assignments[newAssignmentID]) {
+                    this.assignments[newAssignmentID].c = creep.name;
+                }
+                return true;
+            } else {
+                this.log.error(`ASSUMPTION: This should not be possible -- BCG.ChangeCreepAssignment`);
+            }
+        }
+
+        return false;
     }
 
-    protected EnsureAssignment(assignmentID: string, ctID: CT_ALL, level: number, priority: Priority, jobType: CreepJobsPackage) {
+    protected EnsureAssignment(assignmentID: string, ctID: CT_ALL, level: number, priority: Priority, jobType: CreepJobsPackage, targetType: TargetType) {
         if (!this.assignments[assignmentID]) {
             this.assignments[assignmentID] = {
                 ct: ctID,
-                lvl: level
+                lvl: level,
+                tt: targetType
             }
         }
         let assignment = this.assignments[assignmentID];
         if (assignment.pid && (assignment.ct != ctID || assignment.lvl != level)) {
+            this.RemoveCreepFromAssignment(assignmentID);
             this.kernel.killProcess(assignment.pid, 'Assignment needs to be upgraded');
-            this.HandleDeadJob(assignmentID);
-            this.assignments[assignmentID] = {
-                ct: ctID,
-                lvl: level
-            }
+            assignment.ct = ctID;
+            assignment.lvl = level;
+            assignment.tt = targetType;
         }
 
         if (!assignment.pid || !this.kernel.getProcessByPID(assignment.pid)) {
@@ -78,13 +134,65 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Basic
                 return;
         }
     }
-    protected abstract GetNewTarget(assignmentID: string): string;
+
+    protected GetNewTarget(aID: string): string | undefined {
+        let assignment = this.assignments[aID];
+        let viewData = this.View.GetRoomData(this.memory.targetRoom)!;
+        if (assignment) {
+            switch (assignment.tt) {
+                case (TT_Builder):
+                    if (viewData.cSites.length > 0) {
+                        return viewData.cSites[0];
+                    }
+                    break;
+                case (TT_Harvest):
+                    this.log.warn(`Unset (TT_Harvest)`);
+                    break;
+                case (TT_Repair):
+                    if (this.repairQueue.length > 0) {
+                        return this.repairQueue.shift()!;
+                    }
+
+                    break;
+                case (TT_SpawnRefill):
+                    if (!viewData.structures.extension || !viewData.structures.spawn) {
+                        return;
+                    }
+                    for (let i = 0; i < viewData.structures.extension.length; i++) {
+                        let extension = Game.getObjectById(viewData.structures.extension[i]) as StructureExtension;
+                        if (extension && extension.energy < extension.energyCapacity) {
+                            return extension.id;
+                        }
+                    }
+                    for (let i = 0; i < viewData.structures.spawn.length; i++) {
+                        let spawn = Game.getObjectById(viewData.structures.spawn[i]) as StructureSpawn;
+                        if (spawn && spawn.energy < spawn.energyCapacity) {
+                            return spawn.id;
+                        }
+                    }
+
+                    return (Game.getObjectById(viewData.structures.spawn[0]) as StructureSpawn).id; // Guaranteed to exist
+                case (TT_Upgrader):
+                    let room = Game.rooms[this.memory.targetRoom];
+                    if (room.controller && room.controller.owner.username == MY_USERNAME) {
+                        return room.controller.id;
+                    }
+                    break;
+                case (TT_None):
+                default:
+                    break;
+            }
+        }
+
+        return;
+    }
 
     protected CreateProcessForAssignment(aID: string, priority: Priority, jobType: CreepJobsPackage) {
         let assignment = this.assignments[aID];
         let curCreep;
         if (assignment.pid) {
             this.log.info(`KillProcess (BasicCreepGroup.CreateProcessForAssignment(${aID}, ${priority}, ${jobType}))`);
+            this.log.alert(`THIS IS REALLY BAD`);
             this.kernel.killProcess(assignment.pid, `BasicCrepGroup.CreateProcessForAssignment()`);
         }
 
@@ -93,6 +201,14 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Basic
             if (this.creeps[creepIDs[i]].aID == aID) {
                 if (this.creeps[creepIDs[i]].active) {
                     this.log.error(`Creep was not properly let go`);
+                }
+
+                if (assignment.c && this.spawnRegistry.getRequestContext(assignment.c)) {
+                    this.spawnRegistry.cancelRequest(assignment.c);
+                    this.log.info(`Overwrite spawn request with an existing creep`);
+                } else if (assignment.c && assignment.c != this.creeps[creepIDs[i]].name) {
+                    this.creepRegistry.releaseCreep(assignment.c);
+                    this.log.info(`Overwrite a different creep (old[${assignment.c}] - new[${this.creeps[creepIDs[i]].name}]`);
                 }
                 assignment.c = this.creeps[creepIDs[i]].name;
                 this.creeps[creepIDs[i]].active = true;
@@ -107,14 +223,16 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Basic
             l: this.memory.targetRoom,
             j: JobState_Inactive,
             p: priority,
-            c: assignment.c || '', //(TODO): This isn't working.  This needs to be updated for fucks sake
+            c: assignment.c || '',
             t: '',
             id: aID
         }
         assignment.pid = this.kernel.startProcess(jobType, newCreepMem);
         this.kernel.setParent(assignment.pid, this.pid);
         if (assignment.c) {
-            this.creepRegistry.tryReserveCreep(assignment.c, assignment.pid);
+            this.creepRegistry.tryReleaseCreepToPID(assignment.c, this.pid, assignment.pid);
+            this.creeps[assignment.c].aID = aID;
+            delete this.creeps[assignment.c].idle;
         }
     }
 
@@ -172,12 +290,12 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Basic
         }
     }
 
-    protected HandleDeadJob(aID: GroupID): void {
+    protected RemoveCreepFromAssignment(aID: GroupID): void {
         let assignment = this.assignments[aID];
         if (assignment && assignment.c) {
             let orphanedCreep = this.creepRegistry.tryGetCreep(assignment.c, assignment.pid || this.pid);
             if (orphanedCreep) {
-                this.creepRegistry.releaseCreep(orphanedCreep.name);
+                this.creepRegistry.tryReleaseCreepToPID(orphanedCreep.name, assignment.pid || this.pid, this.pid);
                 this.memory.creeps[orphanedCreep.name].active = false;
                 this.memory.creeps[orphanedCreep.name].idle = Game.time;
             } else {
@@ -186,11 +304,7 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Basic
                     this.spawnRegistry.cancelRequest(assignment.c);
                 }
             }
-
-            if (assignment.pid) {
-                this.kernel.killProcess(assignment.pid, "HandleDeadJob");
-            }
-            delete this.assignments[aID];
+            assignment.c = undefined;
         }
     }
 }

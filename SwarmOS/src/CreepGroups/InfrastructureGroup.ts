@@ -33,13 +33,13 @@ class InfrastructureGroup extends BasicCreepGroup<InfrastructureGroup_Memory> {
             buildLevel = 1;
         }
         if (viewData.cSites.length > 0) {
-            this.EnsureAssignment('Builder1', CT_Builder, buildLevel, Priority_Low, CJ_Build);
+            this.EnsureAssignment('Builder1', CT_Builder, buildLevel, Priority_Low, CJ_Build, TT_Builder);
             if (viewData.cSites.length > 3) {
-                this.EnsureAssignment('Builder2', CT_Builder, buildLevel, Priority_Medium, CJ_Build);
+                this.EnsureAssignment('Builder2', CT_Builder, buildLevel, Priority_Medium, CJ_Build, TT_Builder);
                 if (viewData.cSites.length > 7) {
-                    this.EnsureAssignment('Builder3', CT_Builder, buildLevel, Priority_Lowest, CJ_Build);
+                    this.EnsureAssignment('Builder3', CT_Builder, buildLevel, Priority_Lowest, CJ_Build, TT_Builder);
                     if (viewData.cSites.length > 10) {
-                        this.EnsureAssignment('Builder4', CT_Builder, buildLevel, Priority_Lowest, CJ_Build);
+                        this.EnsureAssignment('Builder4', CT_Builder, buildLevel, Priority_Lowest, CJ_Build, TT_Builder);
                     }
                 }
             }

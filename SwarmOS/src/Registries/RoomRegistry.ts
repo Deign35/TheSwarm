@@ -34,7 +34,7 @@ class RoomRegistry extends BasicProcess<MemBase> {
                     homeRoom: roomID,
                     targetRoom: roomID,
                     creeps: {},
-                    targetTypes: {}
+                    repairQueue: []
                 }
                 let newPID = this.kernel.startProcess(PKG_SimpleOwnedRoom, newMem);
                 this.kernel.setParent(newPID);

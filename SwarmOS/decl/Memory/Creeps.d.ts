@@ -24,19 +24,21 @@ declare interface CreepThread_JobMemory extends MemBase {
     t?: ObjectID;
 }
 
-declare interface NewCreepGroup_Assignment extends MemBase {
+declare interface CreepGroup_Assignment extends MemBase {
     pid?: PID;
     c?: CreepID;
     ct: CT_ALL;
     lvl: number;
+    tt: TargetType; // target type
 }
 
 /** CreepGroups */
 declare interface CreepGroup_Memory extends MemBase {
-    assignments: IDictionary<GroupID, NewCreepGroup_Assignment>;
+    assignments: IDictionary<GroupID, CreepGroup_Assignment>;
     homeRoom: RoomID;
     targetRoom: RoomID;
     creeps: IDictionary<CreepID, CreepGroupCreepState>;
+    repairQueue: string[];
 }
 
 declare interface ControlGroup_Memory extends CreepGroup_Memory {
@@ -60,5 +62,4 @@ declare interface CreepGroupCreepState extends MemBase {
 
 /** Creep Scripts */
 declare interface CreepScript_Memory extends CreepGroup_Memory {
-    targetTypes: IDictionary<string, string>;
 }

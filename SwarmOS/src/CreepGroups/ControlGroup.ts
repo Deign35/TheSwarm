@@ -37,6 +37,6 @@ class ControlGroup extends BasicCreepGroup<ControlGroup_Memory> {
             level = 1;
         }
 
-        this.EnsureAssignment('Upgrader', CT_Upgrader, level, Priority_Low, CJ_Upgrade);
+        this.EnsureAssignment('Upgrader', CT_Upgrader, level, Priority_Low, CJ_Upgrade, TT_Upgrader);
     }
 }

@@ -15,7 +15,7 @@ class ExtractionGroup extends BasicCreepGroup<ExtractionGroup_Memory> {
             spawnRoom = Game.rooms[this.memory.targetRoom];
         }
 
-        this.EnsureAssignment('Hauler', CT_Refiller, spawnRoom.controller!.level > 1 ? 1 : 0, Priority_High, CJ_Refiller);
+        this.EnsureAssignment('Hauler', CT_Refiller, spawnRoom.controller!.level > 1 ? 1 : 0, Priority_High, CJ_Refiller, TT_SpawnRefill);
         let extractionLevel = 0;
         if (spawnRoom.energyCapacityAvailable >= 800) {
             extractionLevel = 2;
@@ -24,11 +24,10 @@ class ExtractionGroup extends BasicCreepGroup<ExtractionGroup_Memory> {
         }
 
         for (let i = 0; i < viewData.sourceIDs.length; i++) {
-            this.EnsureAssignment(viewData.sourceIDs[i], CT_Harvester, extractionLevel, Priority_High, CJ_Harvester);
+            this.EnsureAssignment(viewData.sourceIDs[i], CT_Harvester, extractionLevel, Priority_High, CJ_Harvester, TT_Harvest);
         }
     }
     protected GetNewTarget(assignmentID: string): string {
-        debugger;
         let viewData = this.View.GetRoomData(this.memory.targetRoom)!;
         switch (assignmentID) {
             case ('Hauler'):// Get a new Target for refilling

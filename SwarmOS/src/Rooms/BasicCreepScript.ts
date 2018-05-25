@@ -9,46 +9,6 @@ import { BasicCreepGroup } from "CreepGroups/BasicCreepGroup";
 const EmergencyHauler = 'E_Hauler';
 const NormalHauler = 'N_Hauler';
 export class BasicCreepScript extends BasicCreepGroup<CreepScript_Memory> {
-    protected GetNewTarget(assignmentID: string): string {
-        switch (this.targetTypes[assignmentID]) {
-            case ('Harvest'):
-                return assignmentID;
-            case ('Refill'):
-                let viewData = this.View.GetRoomData(this.memory.targetRoom)!;
-                let nextTarget = undefined;
-                if (!viewData.structures.extension || !viewData.structures.spawn) {
-                    throw new Error(`Missing data`);
-                }
-                for (let i = 0; i < viewData.structures.extension.length; i++) {
-                    let extension = Game.getObjectById(viewData.structures.extension[i]) as StructureExtension;
-                    if (extension && extension.energy < extension.energyCapacity) {
-                        nextTarget = extension;
-                        break;
-                    }
-                }
-                for (let i = 0; i < viewData.structures.spawn.length; i++) {
-                    let spawn = Game.getObjectById(viewData.structures.spawn[i]) as StructureSpawn;
-                    if (spawn && spawn.energy < spawn.energyCapacity) {
-                        nextTarget = spawn;
-                        break;
-                    }
-                }
-                if (!nextTarget) {
-                    if (viewData.structures.spawn.length > 0) {
-                        nextTarget = Game.getObjectById(viewData.structures.spawn[0]) as StructureSpawn;
-                    }
-                }
-
-                if (!nextTarget) {
-                    throw new Error(`Couldn't find anyting to refill`);
-                }
-                return nextTarget.id;
-            case ('Upgrade'):
-                return this.room.controller!.id;
-        }
-
-        return '';
-    }
     protected get GroupPrefix(): string { return 'BCS' }
     @extensionInterface(EXT_RoomView)
     RoomView!: IRoomDataExtension;
@@ -65,10 +25,6 @@ export class BasicCreepScript extends BasicCreepGroup<CreepScript_Memory> {
     protected get roomData() {
         return this.RoomView.GetRoomData(this.roomName)!;
     }
-    protected get targetTypes() {
-        return this.memory.targetTypes;
-    }
-
     protected EnsureGroupFormation(): void {
         this.EnsureHarvesters();
         this.EnsureRefiller();
@@ -91,7 +47,8 @@ export class BasicCreepScript extends BasicCreepGroup<CreepScript_Memory> {
                 homeRoom: this.roomName,
                 targetRoom: this.roomName,
                 assignments: {},
-                creeps: {}
+                creeps: {},
+                repairQueue: []
             }
             let infraPID = this.kernel.startProcess(CG_Infrastructure, infraMem);
             this.roomData.groups.CG_Infrastructure = infraPID;
@@ -108,20 +65,27 @@ export class BasicCreepScript extends BasicCreepGroup<CreepScript_Memory> {
 
         let sourceIDs = this.View.GetRoomData(this.roomName)!.sourceIDs;
         for (let i = 0; i < sourceIDs.length; i++) {
-            this.EnsureAssignment(sourceIDs[i], CT_Harvester, extractionLevel, Priority_Medium, CJ_Harvester);
-            this.targetTypes[sourceIDs[i]] = 'Harvest';
+            this.EnsureAssignment(sourceIDs[i], CT_Harvester, extractionLevel, Priority_Medium, CJ_Harvester, TT_Harvest);
+            this.SetAssignmentTarget(sourceIDs[i], sourceIDs[i]);
         }
     }
 
     protected EnsureRefiller(): void {
         let creepIDs = Object.keys(this.creeps);
-        if (creepIDs.length < 2) {
+        if (creepIDs.length < 2 && !this.assignments[NormalHauler]) { // (TODO): Detect a room that cannot fill itself
             // Check for an existing hauler
-            this.EnsureAssignment(EmergencyHauler, CT_Refiller, 0, Priority_EMERGENCY, CJ_Refiller);
-            this.targetTypes[EmergencyHauler] = 'Refill';
+            this.EnsureAssignment(EmergencyHauler, CT_Refiller, 0, Priority_EMERGENCY, CJ_Refiller, TT_SpawnRefill);
         } else {
-            this.EnsureAssignment(NormalHauler, CT_FastHauler, 1, Priority_Highest, CJ_Refiller);
-            this.targetTypes[NormalHauler] = 'Refill';
+            this.EnsureAssignment(NormalHauler, CT_FastHauler, 1, Priority_Highest, CJ_Refiller, TT_SpawnRefill);
+            if (this.assignments[EmergencyHauler] && this.assignments[EmergencyHauler].c) {
+                this.ChangeCreepAssignment(EmergencyHauler, NormalHauler);
+                this.kernel.killProcess(this.assignments[EmergencyHauler].pid!, 'Killing EmergencyHauler');
+                delete this.assignments[EmergencyHauler];
+                this.kernel.killProcess(this.assignments[NormalHauler].pid!, 'Replacing EmergencyHauler');
+                delete this.assignments[NormalHauler].pid;
+                this.CreateProcessForAssignment(NormalHauler, Priority_Highest, CJ_Refiller);
+            }
+            /*this.targetTypes[NormalHauler] = 'Refill';
             if (this.assignments[EmergencyHauler]) {
                 for (let i = 0; i < creepIDs.length; i++) {
                     if (this.creeps[creepIDs[i]].aID == EmergencyHauler) {
@@ -131,10 +95,10 @@ export class BasicCreepScript extends BasicCreepGroup<CreepScript_Memory> {
                         this.assignments[NormalHauler].c = creepData.name;
                         //this.kernel.killProcess(this.assignments[NormalHauler].pid!, 'Reassigning Refill to Hauler');
                         this.HandleDeadJob(NormalHauler);
-                        this.EnsureAssignment(NormalHauler, CT_FastHauler, 1, Priority_Highest, CJ_Refiller);
+                        this.EnsureAssignment(NormalHauler, CT_FastHauler, 1, Priority_Highest, CJ_Refiller, TT_SpawnRefill);
                     }
                 }
-            }
+            }*/
         }
     }
     protected EnsureUpgraders() {
@@ -169,8 +133,7 @@ export class BasicCreepScript extends BasicCreepGroup<CreepScript_Memory> {
         }
 
         for (let i = 0; i < numberUpgraders; i++) {
-            this.EnsureAssignment('Upgrader_' + i, CT_Upgrader, upgraderSize, Priority_Low, CJ_Upgrade);
-            this.targetTypes['Upgrader_' + i] = 'Upgrade';
+            this.EnsureAssignment('Upgrader_' + i, CT_Upgrader, upgraderSize, Priority_Low, CJ_Upgrade, TT_Upgrader);
         }
     }
 }
