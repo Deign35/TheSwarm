@@ -90,9 +90,14 @@ class SpawnRegistry extends BasicProcess<SpawnRegistry_Memory> {
 
             let foundCreep = this.creepRegistry.tryFindCompatibleCreep(req.con.ct, req.con.l, req.loc, req.max);
             if (foundCreep) {
+                this.log.info(`Found a compatible creep instead of spawning`);
                 req.con.n = foundCreep;
                 req.spSta = SP_COMPLETE;
-                // (TODO): Handle default memory issues?
+                let creep = Game.creeps[foundCreep];
+                creep.memory = Object.assign(req.dm, {
+                    ct: req.con.ct,
+                    lvl: req.con.l
+                })
                 continue;
             }
             activeRequests[requests[i]] = req;

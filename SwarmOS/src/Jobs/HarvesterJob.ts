@@ -62,6 +62,7 @@ class HarvesterJob extends BasicJob<HarvesterJob_Memory> {
                 delete this.memory.cont;
             }
         }
+        // (TODO): Check that I can move to that position.
         if (target && !target.pos.isEqualTo(this.creep.pos)) {
             new MoveToPositionAction(this.creep, target.pos).Run();
             return ThreadState_Done;
@@ -98,8 +99,7 @@ class HarvesterJob extends BasicJob<HarvesterJob_Memory> {
         }
 
         this.memory.a = this.kernel.startProcess(PKG_CreepThread, startCreepMemory);
-        this.creepRegistry.releaseCreep(this.memory.c);
-        this.creepRegistry.tryReserveCreep(this.memory.c, this.memory.a);
+        this.creepRegistry.tryReleaseCreepToPID(this.creep.name, this.pid, this.memory.a);
         this.kernel.setParent(this.memory.a, this.pid);
         return ThreadState_Done;
     }

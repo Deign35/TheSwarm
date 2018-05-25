@@ -38,7 +38,8 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Basic
             if (!this.creeps[id].active && Game.time - delayTime >= (this.creeps[id].idle || 0)) {
                 let assignment = this.assignments[this.creeps[id].aID];
                 this.log.warn(`Creep(${id}) has been idle for ${delayTime} ticks`);
-                // Do something with this creep...
+                this.creepRegistry.releaseCreep(this.creeps[id].name);
+                delete this.creeps[id];
             }
         }
 
@@ -146,13 +147,14 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Basic
                     }
                     break;
                 case (TT_Harvest):
-                    this.log.warn(`Unset (TT_Harvest)`);
-                    break;
+                    return aID;
+                case (TT_SupportHarvest):
+                    // This will only work under the assumption that the assignment ID is -> `${sourcID}_1`
+                    return aID.slice(0, -2);
                 case (TT_Repair):
                     if (this.repairQueue.length > 0) {
                         return this.repairQueue.shift()!;
                     }
-
                     break;
                 case (TT_SpawnRefill):
                     if (!viewData.structures.extension || !viewData.structures.spawn) {

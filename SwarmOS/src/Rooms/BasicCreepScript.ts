@@ -67,12 +67,21 @@ export class BasicCreepScript extends BasicCreepGroup<CreepScript_Memory> {
         for (let i = 0; i < sourceIDs.length; i++) {
             this.EnsureAssignment(sourceIDs[i], CT_Harvester, extractionLevel, Priority_Medium, CJ_Harvester, TT_Harvest);
             this.SetAssignmentTarget(sourceIDs[i], sourceIDs[i]);
+
+            if (extractionLevel == 0) {
+                let newID1 = sourceIDs[i] + '_' + 1;
+                this.EnsureAssignment(newID1, CT_Harvester, extractionLevel, Priority_Medium, CJ_Harvester, TT_SupportHarvest);
+                this.SetAssignmentTarget(newID1, sourceIDs[i]);
+                let newID2 = sourceIDs[i] + '_' + 2;
+                this.EnsureAssignment(newID2, CT_Harvester, extractionLevel, Priority_Medium, CJ_Harvester, TT_SupportHarvest);
+                this.SetAssignmentTarget(newID2, sourceIDs[i]);
+            }
         }
     }
 
     protected EnsureRefiller(): void {
         let creepIDs = Object.keys(this.creeps);
-        if (creepIDs.length < 2 && !this.assignments[NormalHauler]) { // (TODO): Detect a room that cannot fill itself
+        if (creepIDs.length < 4 && !this.assignments[NormalHauler]) { // (TODO): Detect a room that cannot fill itself
             // Check for an existing hauler
             this.EnsureAssignment(EmergencyHauler, CT_Refiller, 0, Priority_EMERGENCY, CJ_Refiller, TT_SpawnRefill);
         } else {
@@ -85,20 +94,6 @@ export class BasicCreepScript extends BasicCreepGroup<CreepScript_Memory> {
                 delete this.assignments[NormalHauler].pid;
                 this.CreateProcessForAssignment(NormalHauler, Priority_Highest, CJ_Refiller);
             }
-            /*this.targetTypes[NormalHauler] = 'Refill';
-            if (this.assignments[EmergencyHauler]) {
-                for (let i = 0; i < creepIDs.length; i++) {
-                    if (this.creeps[creepIDs[i]].aID == EmergencyHauler) {
-                        this.HandleDeadJob(EmergencyHauler);
-                        let creepData = this.creeps[creepIDs[i]];
-                        creepData.aID = NormalHauler;
-                        this.assignments[NormalHauler].c = creepData.name;
-                        //this.kernel.killProcess(this.assignments[NormalHauler].pid!, 'Reassigning Refill to Hauler');
-                        this.HandleDeadJob(NormalHauler);
-                        this.EnsureAssignment(NormalHauler, CT_FastHauler, 1, Priority_Highest, CJ_Refiller, TT_SpawnRefill);
-                    }
-                }
-            }*/
         }
     }
     protected EnsureUpgraders() {

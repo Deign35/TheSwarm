@@ -88,7 +88,8 @@
                 "Harvest": 2,
                 "Repair": 3,
                 "Builder": 4,
-                "Upgrader": 5
+                "Upgrader": 5,
+                "SupportHarvest": 6
             }
         },
         "FT": {
