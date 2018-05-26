@@ -16,7 +16,7 @@ declare interface IPackageInterfaces {
     [EXT_SpawnRegistry]: ISpawnRegistryExtensions;
     [EXT_Flags]: undefined;
     [EXT_Interrupt]: IKernelNotificationsExtension;
-    [EXT_Kernel]: IKernelProcessExtensions;
+    [EXT_Kernel]: IKernelExtensions;
     [EXT_RoomView]: IRoomDataExtension;
     [EXT_Sleep]: IKernelSleepExtension;
     [EXT_Logger]: IKernelLoggerExtensions;
@@ -43,7 +43,7 @@ declare interface IExtensionRegistry extends IPackageExtension {
 /**
  * Extensions for processes to interface with the OS kernel
  */
-declare interface IKernelProcessExtensions extends IPackageExtension {
+declare interface IKernelExtensions extends IPackageExtension {
     installPackages(packages: IPackage<MemBase>[]): void;
     startProcess(packageName: string, startContext: MemBase): PID;
     killProcess(pid: PID, msg: string): void;

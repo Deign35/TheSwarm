@@ -1,6 +1,6 @@
 export abstract class BasicProcess<T extends MemBase> implements IProcess {
     @extensionInterface(EXT_Kernel)
-    protected kernel!: IKernelProcessExtensions;
+    protected kernel!: IKernelExtensions;
     @extensionInterface(EXT_Registry)
     protected extensions!: IExtensionRegistry;
     @extensionInterface(EXT_SpawnRegistry)

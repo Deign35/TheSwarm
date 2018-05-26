@@ -1,7 +1,7 @@
 declare interface IPackage<MemBase> {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry): void;
 }
-declare interface IKernel extends IKernelProcessExtensions, IKernelSleepExtension/*, IKernelNotificationsExtension*/ {
+declare interface IKernel extends IKernelExtensions, IKernelSleepExtension {
     loop(): void;
     log: IKernelLoggerExtensions;
 }
@@ -30,7 +30,6 @@ declare interface IProcessContext {
 }
 
 declare interface ProcInfo {
-    ex: boolean;// Executing -- If this process is currently executing
     PKG: string;// Package name to load
     pid: PID;   // process id
     st: number; // Started -- When the process started
