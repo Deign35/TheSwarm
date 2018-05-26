@@ -104,7 +104,6 @@ declare interface ISpawnRegistryExtensions extends IPackageExtension {
     getRequestStatus(id: SpawnRequestID): SpawnState;
     requestSpawn(context: CreepContext, location: RoomID, spawnPriority: Priority,
         maxSpawnDistance?: number, startMem?: any): SpawnRequestID;
-    //tryResetRequest(id: SpawnRequestID, newContext: CreepContext, priority?: Priority, defaultMemory?: any): boolean;
     getRequestContext(id: SpawnRequestID): CreepContext | undefined;
 }
 

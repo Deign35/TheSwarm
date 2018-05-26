@@ -69,10 +69,6 @@ class CreepRegistry extends BasicProcess<CreepRegistry_Memory> {
                 this.log.error(`Creep unregistered.  Creep is spawning - ${creep.spawning}`);
                 continue;
             }
-
-            if (context.o && !this.kernel.getProcessByPID(context.o)) {
-                context.o = undefined;
-            }
         }
     }
 

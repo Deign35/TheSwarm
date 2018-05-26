@@ -261,26 +261,6 @@ class SpawnRegistryExtensions extends ExtensionBase implements ISpawnRegistryExt
         return undefined;
     }
 
-    tryResetRequest(id: SpawnRequestID, newContext: CreepContext, priority?: Priority, defaultMemory?: any) {
-        if (this.memory[id]) {
-            this.memory[id].spSta = SP_QUEUED;
-        } else {
-            return false;
-        }
-        if (priority) {
-            this.memory[id].pri = priority;
-        }
-        if (newContext) {
-            this.memory[id].con = newContext;
-        } else {
-            this.memory[id].con.o = undefined;
-        }
-        if (defaultMemory) {
-            this.memory[id].dm = defaultMemory;
-        }
-
-        return true;
-    }
     cancelRequest(id: SpawnRequestID): boolean {
         if (this.memory[id]) {
             delete this.memory[id];
