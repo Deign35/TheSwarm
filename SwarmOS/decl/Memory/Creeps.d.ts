@@ -11,17 +11,11 @@ declare interface CreepJob_Memory extends MemBase {
     lvl: number;
     id: string;
 
-    a?: PID;         // (a)ction thread
+    co?: ObjectID;      // (c)urrent (o)bjective
+    ca?: ActionType;    // (c)urrent (a)ctionType
 }
 declare interface HarvesterJob_Memory extends CreepJob_Memory {
     cont?: string   //containerID
-}
-
-declare interface CreepThread_JobMemory extends MemBase {
-    a: ActionType;
-    c: CreepID;
-    l: RoomID;
-    t?: ObjectID;
 }
 
 declare interface CreepGroup_Assignment extends MemBase {

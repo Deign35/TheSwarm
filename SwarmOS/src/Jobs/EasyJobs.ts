@@ -38,18 +38,6 @@ class RefillerJob extends BasicJob<CreepJob_Memory> {
         return (!!obj && obj.energy < obj.energyCapacity);
     }
 
-    HandleMissingTarget() {
-        if (this.creep) {
-            this.creepRegistry.tryReleaseCreepToPID(this.creep.name, this.memory.a || this.pid, this.pid);
-        }
-        if (this.memory.a) {
-            this.kernel.killProcess(this.memory.a, `KillProcess (RefillerJob.HandleMissingTarget())`);
-            delete this.memory.a;
-        }
-        this.JobState = JobState_Inactive;
-        return ThreadState_Done as ThreadState;
-    }
-
     AssignNewTarget(targetID: string) {
         super.AssignNewTarget(targetID);
         let obj = Game.getObjectById(targetID) as StructureExtension | StructureSpawn;

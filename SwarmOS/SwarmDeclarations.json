@@ -22,8 +22,6 @@
                 "SwarmManager",
                 "SpawnRegistry",
                 "RoomManager",
-                "TempAgency",
-                "CreepThread",
                 "SimpleOwnedRoom",
                 "FlagBase"
             ]

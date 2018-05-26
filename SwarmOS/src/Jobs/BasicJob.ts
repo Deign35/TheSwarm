@@ -31,12 +31,12 @@ export abstract class BasicJob<T extends CreepJob_Memory> extends BasicProcess<T
         return this.memory.j;
     }
     set JobState(state: JobState) {
-        if (this.memory.a) {
-            this.kernel.killProcess(this.memory.a, `BasicJob.JobState()`);
-            if (this.memory.c && this.creepRegistry.tryGetCreep(this.memory.c, this.memory.a)) {
-                this.creepRegistry.tryReleaseCreepToPID(this.memory.c, this.memory.a, this.pid);
-            }
-            delete this.memory.a;
+        if (state == JobState_Running) {
+            this.memory.co = this.memory.t;
+            this.memory.ca = this.GetActionType();
+        } else {
+            this.memory.co = undefined;
+            this.memory.ca = undefined;
         }
         this.memory.j = state;
     }
@@ -58,13 +58,9 @@ export abstract class BasicJob<T extends CreepJob_Memory> extends BasicProcess<T
         if (!this.memory.c && this.JobState > JobState_Starting) {
             this.JobState = JobState_Inactive;
         }
-        if (this.memory.a && !this.kernel.getProcessByPID(this.memory.a)) {
-            this.creepRegistry.tryReleaseCreepToPID(this.memory.c, this.memory.a, this.pid);
-            delete this.memory.a;
-        }
 
         if (this.memory.c) {
-            this._creep = this.creepRegistry.tryGetCreep(this.memory.c, this.memory.a || this.pid);
+            this._creep = this.creepRegistry.tryGetCreep(this.memory.c, this.pid);
             if (this.creep) {
                 if (this.JobState < JobState_Preparing && this.JobState != JobState_Inactive) {
                     this.JobState = JobState_Preparing;
@@ -142,113 +138,63 @@ export abstract class BasicJob<T extends CreepJob_Memory> extends BasicProcess<T
     }
 
     protected RunState_Preparing(): ThreadState {
-        if (!this.creep) {
-            // if not, kill the child process and start over
-            if (this.memory.a) {
-                this.kernel.killProcess(this.memory.a, `KillProcess (BasicJob.RunState_Preparing_1())`);
-                delete this.memory.a;
-            }
-            delete this.memory.c;
-            this.JobState = JobState_Inactive;
-            return ThreadState_Done;
-        }
         // If the creep is full, move on to the next state
         if (this.creep.carry.energy == this.creep.carryCapacity) {
             this.JobState = JobState_Running;
-            this.creepRegistry.tryReleaseCreepToPID(this.creep.name, this.memory.a || this.pid, this.pid);
-            if (this.memory.a) {
-                this.kernel.killProcess(this.memory.a, `KillProcess (BasicJob.RunState_Preparing_2())`);
-                delete this.memory.a;
-                // (TODO): Change this to put the thread to sleep until its needed again
-            }
             return ThreadState_Active;
         } else {
-            if (this.memory.a) {
-                // Double check that the process still exists
-                if (this.kernel.getProcessByPID(this.memory.a)) {
-                    return ThreadState_Done;
-                } else {
-                    delete this.memory.a;
-                }
-            }
-
-            // Or make it
-            let target = this.FindNearestEnergyDispenser(this.creep.carryCapacity / 2);
+            let target = this.memory.co ? Game.getObjectById(this.memory.co) : undefined;
             if (!target) {
-                // nothing to retrieve
-                return ThreadState_Done;
-            }
-            let requiredAction: ActionType;
-            if ((target as Structure).structureType || (target as Tombstone).deathTime) {
-                requiredAction = AT_Withdraw;
-            } else if ((target as Resource).resourceType) {
-                requiredAction = AT_Pickup;
-            } else if ((target as Source).ticksToRegeneration !== undefined) {
-                requiredAction = AT_Harvest;
-            } else {
-                throw new Error(`Unexpected target for withdrawal`);
-            }
-            let startCreepMemory: CreepThread_JobMemory = {
-                c: this.memory.c,
-                a: requiredAction,
-                l: this.memory.l,
-                t: target.id
-            }
+                target = this.FindNearestEnergyDispenser(this.creep.carryCapacity / 2);
+                if (!target) {
+                    return ThreadState_Done;
+                }
+                let requiredAction: ActionType;
+                if ((target as Structure).structureType || (target as Tombstone).deathTime) {
+                    requiredAction = AT_Withdraw;
+                } else if ((target as Resource).resourceType) {
+                    requiredAction = AT_Pickup;
+                } else if ((target as Source).ticksToRegeneration !== undefined) {
+                    requiredAction = AT_Harvest;
+                } else {
+                    throw new Error(`Unexpected target for withdrawal`);
+                }
 
-            this.memory.a = this.kernel.startProcess(PKG_CreepThread, startCreepMemory);
-            this.creepRegistry.tryReleaseCreepToPID(this.memory.c, this.pid, this.memory.a);
-            this.kernel.setParent(this.memory.a, this.pid);
+                this.memory.ca = requiredAction;
+                this.memory.co = (target as Structure).id;
+            }
+            let action = GetBasicAction(this.creep, this.memory.ca!, target as RoomObject);
+
+            if (action) {
+                action.Run();
+            } else {
+                this.log.warn(`UNEXPECTED--Action not working1`);
+            }
             return ThreadState_Done;
         }
     }
 
     protected RunState_Running(): ThreadState {
-        if (!this.creep) {
-            // if not, kill the child process and start over
-            if (this.memory.a) {
-                this.kernel.killProcess(this.memory.a, `KillProcess (BasicJob.RunState_Running_1())`);
-                delete this.memory.a;
-            }
-            delete this.memory.c;
-            this.JobState = JobState_Inactive;
-            return ThreadState_Done;
-        }
         if (this.creep.carry.energy == 0) {
             this.JobState = JobState_Preparing;
-            this.creepRegistry.tryReleaseCreepToPID(this.creep.name, this.memory.a || this.pid, this.pid);
-            if (this.memory.a) {
-                this.kernel.killProcess(this.memory.a, `KillProcess (BasicJob.RunState_Running_2())`);
-                delete this.memory.a;
-            }
             return ThreadState_Active;
-        }
-        if (this.memory.a) {
-            // Double check that the process still exists
-            if (this.kernel.getProcessByPID(this.memory.a)) {
-                return ThreadState_Done;
-            } else {
-                delete this.memory.a;
-            }
         }
         if (!this.CheckIsTargetStillValid()) {
             this.JobState = JobState_Inactive;
-            if (this.memory.a) {
-                this.kernel.killProcess(this.memory.a, `KillProcess (BasicJob.RunState_Running_3())`);
-                delete this.memory.a;
-            }
             return ThreadState_Done;
         }
-        let startCreepMemory: CreepThread_JobMemory = {
-            c: this.memory.c,
-            a: this.GetActionType(),
-            l: this.memory.l,
-            t: this.memory.t
+        let target = Game.getObjectById(this.memory.co);
+        if (!target) {
+            this.kernel.killProcess(this.pid, `BasicJob's objective has disappeared, closing job`);
+            return ThreadState_Done;
         }
+        let action = GetBasicAction(this.creep, this.memory.ca!, target as RoomObject);
 
-        this.memory.a = this.kernel.startProcess(PKG_CreepThread, startCreepMemory);
-        this.creepRegistry.tryReleaseCreepToPID(this.memory.c, this.pid, this.memory.a);
-
-        this.kernel.setParent(this.memory.a, this.pid);
+        if (action) {
+            action.Run();
+        } else {
+            this.log.warn(`UNEXPECTED--Action not working2`);
+        }
         return ThreadState_Done;
     }
 
@@ -328,5 +274,39 @@ export abstract class BasicJob<T extends CreepJob_Memory> extends BasicProcess<T
         }
 
         return closestTarget;
+    }
+}
+
+
+import { MoveToPositionAction } from "Actions/MoveToPositionAction";
+import { ActionBase } from "Actions/ActionBase";
+import { UpgradeAction } from "Actions/UpgradeAction";
+import { BuildAction } from "Actions/BuildAction";
+import { PickupAction } from "Actions/PickupAction";
+import { RepairAction } from "Actions/RepairAction";
+import { TransferAction } from "Actions/TransferAction";
+import { WithdrawAction } from "Actions/WithdrawAction";
+import { HarvestAction } from "Actions/HarvestAction";
+import { RequestTransferAction } from "Actions/RequestTransfer";
+const GetBasicAction = function (creep: Creep, actionType: ActionType, target: RoomObject | Creep): ActionBase | undefined {
+    switch (actionType) {
+        case (AT_Build):
+            return new BuildAction(creep, target as ConstructionSite);
+        case (AT_Harvest):
+            return new HarvestAction(creep, target as Source);
+        case (AT_RequestTransfer):
+            return new RequestTransferAction(creep, target as Creep);
+        case (AT_Pickup):
+            return new PickupAction(creep, target as Resource);
+        case (AT_Repair):
+            return new RepairAction(creep, target as Structure);
+        case (AT_Transfer):
+            return new TransferAction(creep, target as Structure | Creep);
+        case (AT_Upgrade):
+            return new UpgradeAction(creep, target as StructureController);
+        case (AT_Withdraw):
+            return new WithdrawAction(creep, target as StructureContainer);
+        default:
+            return undefined;
     }
 }

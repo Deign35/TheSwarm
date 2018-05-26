@@ -6,6 +6,7 @@ export const OSPackage: IPackage<SpawnRegistry_Memory> = {
 
 import { BasicJob } from "./BasicJob";
 import { MoveToPositionAction } from "Actions/MoveToPositionAction";
+import { HarvestAction } from "Actions/HarvestAction";
 
 class HarvesterJob extends BasicJob<HarvesterJob_Memory> {
     protected GetActionType(): ActionType {
@@ -16,16 +17,6 @@ class HarvesterJob extends BasicJob<HarvesterJob_Memory> {
     }
 
     protected RunState_Preparing(): ThreadState {
-        if (!this.creep) {
-            // if not, kill the child process and start over
-            if (this.memory.a) {
-                this.kernel.killProcess(this.memory.a, `KillProcess (HarvesterJob.RunState_Preparing())`);
-                delete this.memory.a;
-            }
-            delete this.memory.c;
-            this.JobState = JobState_Inactive;
-            return ThreadState_Done;
-        }
         let target: Source | StructureContainer | ConstructionSite | undefined = Game.getObjectById(this.memory.t) as Source;
         if (!target) {
             this.JobState = JobState_Inactive;
@@ -71,36 +62,13 @@ class HarvesterJob extends BasicJob<HarvesterJob_Memory> {
         return ThreadState_Active;
     }
     protected RunState_Running(): ThreadState {
-        if (!this.creep) {
-            // if not, kill the child process and start over
-            if (this.memory.a) {
-                this.kernel.killProcess(this.memory.a, `KillProcess (HarvesterJob.RunState_Running())`);
-                delete this.memory.a;
-            }
-            delete this.memory.c;
-            this.JobState = JobState_Starting;
-            return ThreadState_Active;
-        }
+        let action = new HarvestAction(this.creep, Game.getObjectById(this.memory.t) as Source);
 
-        if (this.memory.a) {
-            // Double check that the process still exists
-            if (this.kernel.getProcessByPID(this.memory.a)) {
-                //this.sleeper.sleep(this.pid, this.creep.ticksToLive! - 3);
-                return ThreadState_Done;
-            } else {
-                delete this.memory.a;
-            }
+        if (action) {
+            action.Run();
+        } else {
+            this.log.warn(`UNEXPECTED--Action not working3`);
         }
-        let startCreepMemory: CreepThread_JobMemory = {
-            c: this.memory.c,
-            a: this.GetActionType(),
-            l: this.memory.l,
-            t: this.memory.t
-        }
-
-        this.memory.a = this.kernel.startProcess(PKG_CreepThread, startCreepMemory);
-        this.creepRegistry.tryReleaseCreepToPID(this.creep.name, this.pid, this.memory.a);
-        this.kernel.setParent(this.memory.a, this.pid);
         return ThreadState_Done;
     }
 }
