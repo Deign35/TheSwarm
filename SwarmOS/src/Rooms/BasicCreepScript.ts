@@ -4,7 +4,7 @@ export const OSPackage: IPackage<RoomStateMemory> = {
     }
 }
 
-import { BasicCreepGroup } from "CreepGroups/BasicCreepGroup";
+import { BasicCreepGroup } from "Jobs/BasicCreepGroup";
 
 const EmergencyHauler = 'E_Hauler';
 const NormalHauler = 'N_Hauler';
@@ -29,31 +29,8 @@ export class BasicCreepScript extends BasicCreepGroup<CreepScript_Memory> {
         this.EnsureHarvesters();
         this.EnsureRefiller();
         this.EnsureUpgraders();
-
-        if (!this.roomData.groups.CG_Maintenance) {
-            let maintenanceMem: MaintenanceGroup_Memory = {
-                homeRoom: this.roomName,
-                targetRoom: this.roomName,
-                assignments: {},
-                creeps: {},
-                repairQueue: []
-            }
-            let maintenancePID = this.kernel.startProcess(CG_Maintenance, maintenanceMem);
-            this.roomData.groups.CG_Maintenance = maintenancePID;
-            this.kernel.setParent(maintenancePID, this.pid);
-        }
-        if (!this.roomData.groups.CG_Infrastructure) {
-            let infraMem: InfrastructureGroup_Memory = {
-                homeRoom: this.roomName,
-                targetRoom: this.roomName,
-                assignments: {},
-                creeps: {},
-                repairQueue: []
-            }
-            let infraPID = this.kernel.startProcess(CG_Infrastructure, infraMem);
-            this.roomData.groups.CG_Infrastructure = infraPID;
-            this.kernel.setParent(infraPID, this.pid);
-        }
+        this.EnsureBuilders();
+        this.EnsureRepair();
     }
     protected EnsureHarvesters(): void {
         let extractionLevel = 0;
@@ -64,33 +41,27 @@ export class BasicCreepScript extends BasicCreepGroup<CreepScript_Memory> {
         }
 
         let sourceIDs = this.View.GetRoomData(this.roomName)!.sourceIDs;
-        for (let i = 0; i < sourceIDs.length; i++) {
-            this.EnsureAssignment(sourceIDs[i], CT_Harvester, extractionLevel, Priority_Medium, CJ_Harvester, TT_Harvest);
-            this.SetAssignmentTarget(sourceIDs[i], sourceIDs[i]);
-
+        if (sourceIDs.length > 0) {
+            this.EnsureAssignment(sourceIDs[0] + '_1', CT_Harvester, extractionLevel, Priority_High, CJ_Harvester, TT_Harvest);
             if (extractionLevel == 0) {
-                let newID1 = sourceIDs[i] + '_' + 1;
-                this.EnsureAssignment(newID1, CT_Harvester, extractionLevel, Priority_Medium, CJ_Harvester, TT_SupportHarvest);
-                this.SetAssignmentTarget(newID1, sourceIDs[i]);
-                let newID2 = sourceIDs[i] + '_' + 2;
-                this.EnsureAssignment(newID2, CT_Harvester, extractionLevel, Priority_Medium, CJ_Harvester, TT_SupportHarvest);
-                this.SetAssignmentTarget(newID2, sourceIDs[i]);
+                this.EnsureAssignment(sourceIDs[0] + '_2', CT_Harvester, extractionLevel, Priority_Medium, CJ_Harvester, TT_Harvest);
+                this.EnsureAssignment(sourceIDs[0] + '_3', CT_Harvester, extractionLevel, Priority_Medium, CJ_Harvester, TT_Harvest);
+            }
+        }
+        if (sourceIDs.length > 1) {
+            this.EnsureAssignment(sourceIDs[1] + '_1', CT_Harvester, extractionLevel, Priority_High, CJ_Harvester, TT_SupportHarvest);
+            if (extractionLevel == 0) {
+                this.EnsureAssignment(sourceIDs[1] + '_2', CT_Harvester, extractionLevel, Priority_Medium, CJ_Harvester, TT_SupportHarvest);
+                this.EnsureAssignment(sourceIDs[1] + '_3', CT_Harvester, extractionLevel, Priority_Medium, CJ_Harvester, TT_SupportHarvest);
             }
         }
     }
 
     protected EnsureRefiller(): void {
-        let creepIDs = Object.keys(this.creeps);
-        if (creepIDs.length < 4 && !this.assignments[NormalHauler]) { // (TODO): Detect a room that cannot fill itself
-            this.EnsureAssignment(EmergencyHauler, CT_Refiller, 0, Priority_EMERGENCY, CJ_Refiller, TT_SpawnRefill);
-        } else {
-            this.EnsureAssignment(NormalHauler, CT_FastHauler, 1, Priority_Highest, CJ_Refiller, TT_SpawnRefill);
-            if (this.assignments[EmergencyHauler] && this.assignments[EmergencyHauler].c) {
-                this.ChangeCreepAssignment(EmergencyHauler, NormalHauler);
-                this.CreateProcessForAssignment(NormalHauler, Priority_Highest, CJ_Refiller);
-            }
-        }
+        this.EnsureAssignment(EmergencyHauler, CT_Refiller, 0, Priority_EMERGENCY, CJ_Refiller, TT_SpawnRefill);
+        this.EnsureAssignment(NormalHauler, CT_FastHauler, 1, Priority_Medium, CJ_Refiller, TT_SpawnRefill);
     }
+    
     protected EnsureUpgraders() {
         let upgraderSize = 0;
         let numberUpgraders = 4;
@@ -123,7 +94,64 @@ export class BasicCreepScript extends BasicCreepGroup<CreepScript_Memory> {
         }
 
         for (let i = 0; i < numberUpgraders; i++) {
-            this.EnsureAssignment('Upgrader_' + i, CT_Upgrader, upgraderSize, Priority_Low, CJ_Upgrade, TT_Upgrader);
+            this.EnsureAssignment('Upgrader_' + i, CT_Upgrader, upgraderSize, Priority_Lowest, CJ_Upgrade, TT_Upgrader);
+        }
+    }
+
+    EnsureRepair(): void {
+        let viewData = this.View.GetRoomData(this.memory.targetRoom)!;
+
+        let spawnRoom = Game.rooms[this.memory.homeRoom];
+        if (viewData.owner && viewData.owner == MY_USERNAME) {
+            spawnRoom = Game.rooms[this.memory.targetRoom];
+        }
+
+        let repairLevel = 0;
+        if (spawnRoom.energyCapacityAvailable >= CreepBodies.Repair[1].cost) { // 1150
+            repairLevel = 1;
+        }
+        if (this.repairQueue.length == 0) {
+            let targetRoom = Game.rooms[this.memory.targetRoom];
+            if (targetRoom) {
+                let structs = targetRoom.find(FIND_STRUCTURES);
+                for (let i = 0; i < structs.length; i++) {
+                    if (structs[i].hits < structs[i].hitsMax) {
+                        this.repairQueue.push(structs[i].id);
+                    }
+                }
+            }
+
+            if (this.repairQueue.length == 0) {
+                // (TODO): Update this to a much longer sleep timer.
+                this.sleeper.sleep(this.pid, 20);
+            }
+        }
+        if (this.repairQueue.length > 0) {
+            this.EnsureAssignment('Repair', CT_Repair, repairLevel, Priority_Low, CJ_Repair, TT_Repair);
+        }
+    }
+
+    EnsureBuilders(): void {
+        let viewData = this.View.GetRoomData(this.memory.targetRoom)!;
+
+        let spawnRoom = Game.rooms[this.memory.homeRoom];
+        if (viewData.owner && viewData.owner == MY_USERNAME) {
+            spawnRoom = Game.rooms[this.memory.targetRoom];
+        }
+
+        let buildLevel = 0;
+        if (spawnRoom.energyCapacityAvailable >= 1700) {
+            buildLevel = 3;
+        } else if (spawnRoom.energyCapacityAvailable >= 1050) {
+            buildLevel = 2;
+        } else if (spawnRoom.energyCapacityAvailable >= 550) {
+            buildLevel = 1;
+        }
+        if (viewData.cSites.length > 0) {
+            this.EnsureAssignment('Builder1', CT_Builder, buildLevel, Priority_Medium, CJ_Build, TT_Builder);
+            this.EnsureAssignment('Builder2', CT_Builder, buildLevel, Priority_Low, CJ_Build, TT_Builder);
+            this.EnsureAssignment('Builder3', CT_Builder, buildLevel, Priority_Lowest, CJ_Build, TT_Builder);
+            this.EnsureAssignment('Builder4', CT_Builder, buildLevel, Priority_Lowest, CJ_Build, TT_Builder);
         }
     }
 }

@@ -1,20 +1,25 @@
 /** Jobs */
 declare interface CreepJob_Memory extends MemBase {
-    c: CreepID | SpawnRequestID
-    l: RoomID;
-    h: RoomID;
-    t: ObjectID;
-    j: JobState;
-    p: Priority;     // spawn (p)riority
+    cID: CreepID        //creep id
+    isSpawning?: boolean
+    loc: RoomID;        //location
+    home: RoomID;
+    obj: ObjectID;      //objective
+    pri: Priority;     // spawn (p)riority
+    tt: TargetType;
+    exp?: boolean;      // expires when the creep dies?
 
     ct: CT_ALL;
     lvl: number;
-    id: string;
-
-    co?: ObjectID;      // (c)urrent (o)bjective
-    ca?: ActionType;    // (c)urrent (a)ctionType
+    id: string;         // id for parent
 }
-declare interface HarvesterJob_Memory extends CreepJob_Memory {
+declare interface BasicJob_Memory extends CreepJob_Memory {
+    ac: ActionType;
+    ret?: boolean;       // (ret)reiving
+    tar: ObjectID;     //  current (tar)get
+}
+
+declare interface HarvesterJob_Memory extends BasicJob_Memory {
     cont?: string   //containerID
 }
 

@@ -4,7 +4,7 @@ export const OSPackage: IPackage<RoomStateMemory> = {
     }
 }
 
-import { BasicCreepGroup } from "CreepGroups/BasicCreepGroup";
+import { BasicCreepGroup } from "Jobs/BasicCreepGroup";
 
 class BasicRoom extends BasicCreepGroup<RoomThreadMemory> {
     protected GetNewTarget(assignmentID: string): string {
@@ -81,6 +81,5 @@ class BasicRoom extends BasicCreepGroup<RoomThreadMemory> {
                 this.kernel.setParent(maintenancePID, this.pid);
             }
         }
-
     }
 }

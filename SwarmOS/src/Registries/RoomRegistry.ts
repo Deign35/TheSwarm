@@ -11,7 +11,7 @@ export const OSPackage: IPackage<RoomStateMemory> = {
     }
 }
 
-class RoomRegistry extends BasicProcess<MemBase> {
+class RoomRegistry extends BasicProcess<RoomStateMemory> {
     get logID() { return 'RoomRegistry' };
     get logLevel() { return LOG_INFO as LogLevel; }
     @extensionInterface(EXT_RoomView)
@@ -77,6 +77,7 @@ class RoomExtension extends ExtensionBase {
             cSites: [],
             resources: [],
             tombstones: [],
+            needsRepair: [],
             mineralIDs: room.find(FIND_MINERALS)!.map((val: Mineral) => {
                 return val.id;
             }),

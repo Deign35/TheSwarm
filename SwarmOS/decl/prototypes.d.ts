@@ -1,11 +1,27 @@
-
-/**
- * Room - Tools/Prototypes.ts
- * Flag - Tools/Prototypes.ts
- */
 interface Room {
     id: RoomID;
+    SwarmOS: boolean;
 }
 interface Flag {
     id: FlagID;
+    SwarmOS: boolean;
+}
+interface StructureContainer {
+    energy: number;
+    SwarmOS: boolean;
+}
+
+interface StructureStorage {
+    energy: number;
+    SwarmOS: boolean;
+}
+
+interface StructureTerminal {
+    energy: number;
+    SwarmOS: boolean;
+}
+
+interface Tombstone {
+    energy: number;
+    SwarmOS: boolean;
 }

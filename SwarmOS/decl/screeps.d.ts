@@ -2389,6 +2389,8 @@ interface Resource<T extends ResourceConstant = ResourceConstant> extends RoomOb
      * One of the `RESOURCE_*` constants.
      */
     resourceType: T;
+
+    energy: number | undefined;
 }
 
 interface ResourceConstructor {

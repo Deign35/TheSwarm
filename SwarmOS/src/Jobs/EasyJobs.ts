@@ -9,62 +9,26 @@ export const OSPackage: IPackage<SpawnRegistry_Memory> = {
 
 import { BasicJob } from "./BasicJob";
 
-class RepairJob extends BasicJob<CreepJob_Memory> {
-    protected GetActionType(): ActionType {
-        return AT_Repair
-    }
-    CheckIsTargetStillValid(): boolean {
-        let obj = Game.getObjectById(this.memory.t) as Structure;
-        return (!!obj && obj.hits < obj.hitsMax);
+class RepairJob extends BasicJob<BasicJob_Memory> {
+    protected GetPrimaryActionType(): ActionType {
+        return AT_Repair;
     }
 }
 
-class BuildJob extends BasicJob<CreepJob_Memory> {
-    protected GetActionType(): ActionType {
+class BuildJob extends BasicJob<BasicJob_Memory> {
+    protected GetPrimaryActionType(): ActionType {
         return AT_Build;
     }
-    CheckIsTargetStillValid(): boolean {
-        return !!Game.getObjectById(this.memory.t);
-    }
 }
 
-class RefillerJob extends BasicJob<CreepJob_Memory> {
-    protected GetActionType(): ActionType {
+class RefillerJob extends BasicJob<BasicJob_Memory> {
+    protected GetPrimaryActionType(): ActionType {
         return AT_Transfer;
     }
-
-    CheckIsTargetStillValid() {
-        let obj = Game.getObjectById(this.memory.t) as StructureExtension | StructureSpawn;
-        return (!!obj && obj.energy < obj.energyCapacity);
-    }
-
-    AssignNewTarget(targetID: string) {
-        super.AssignNewTarget(targetID);
-        let obj = Game.getObjectById(targetID) as StructureExtension | StructureSpawn;
-        if (obj && obj.energyCapacity) {
-            if (this.creep && this.creep.carry.energy >= obj.energyCapacity - obj.energy) {
-                this.JobState = JobState_Running;
-            }
-        }
-    }
 }
 
-class UpgradeJob extends BasicJob<CreepJob_Memory> {
-    protected GetActionType(): ActionType {
+class UpgradeJob extends BasicJob<BasicJob_Memory> {
+    protected GetPrimaryActionType(): ActionType {
         return AT_Upgrade;
-    }
-
-    CheckIsTargetStillValid() {
-        let controller = Game.getObjectById(this.memory.t) as StructureController;
-        return (!!controller && controller.owner && controller.owner.username == MY_USERNAME);
-    }
-}
-
-class ScoutJob extends BasicJob<CreepJob_Memory> {
-    protected GetActionType(): ActionType {
-        throw new Error("Method not implemented.");
-    }
-    CheckIsTargetStillValid(): boolean {
-        throw new Error("Method not implemented.");
     }
 }

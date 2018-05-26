@@ -214,6 +214,7 @@
                 "Drop",
                 "Harvest",
                 "MoveToPosition",
+                "NoOp",
                 "Pickup",
                 "Repair",
                 "RequestTransfer",
