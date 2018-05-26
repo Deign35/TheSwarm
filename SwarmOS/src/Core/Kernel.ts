@@ -159,13 +159,12 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
                 services: {}
             }
             this.startProcess(PKG_SwarmManager, SwarmManagerMemory);
+            activeThreadIDs = Object.keys(this._curTickState);
         }
+
         while (activeThreadIDs.length > 0) {
             let protectionValue = activeThreadIDs.length;
             this.RunThreads(activeThreadIDs);
-            if (activeThreadIDs.length > 0) {
-                this.log.error(`Did not complete all threads...wth`);
-            }
             let allIDs = Object.keys(this._curTickState);
             for (let i = 0; i < allIDs.length; i++) {
                 let state = this._curTickState[allIDs[i]]
