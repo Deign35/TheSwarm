@@ -157,8 +157,10 @@ export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepEx
         let activeThreadIDs = Object.keys(this._curTickState);
         if (activeThreadIDs.length == 0) {
             // (TODO): dont move to next tick
-            this.startProcess(PKG_SwarmManager, {});
-            return;
+            let SwarmManagerMemory: PackageProviderMemory = {
+                services: {}
+            }
+            this.startProcess(PKG_SwarmManager, SwarmManagerMemory);
         }
         while (activeThreadIDs.length > 0) {
             let protectionValue = activeThreadIDs.length;

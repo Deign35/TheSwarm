@@ -27,6 +27,7 @@ export abstract class BasicJob<T extends CreepJob_Memory> extends BasicProcess<T
         // (TODO): Handle currently queued spawns
         this.memory.lvl = newLevel;
     }
+    
     get JobState() {
         return this.memory.j;
     }

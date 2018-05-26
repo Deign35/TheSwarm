@@ -13,8 +13,6 @@ declare interface IProcess {
     pkgName: string;
     pid: PID;
     parentPID: PID;
-    threadState: ThreadState
-    threadPriority: Priority
 
     PrepTick?(): void;
     EndTick?(): void;

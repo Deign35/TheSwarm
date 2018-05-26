@@ -10,9 +10,7 @@ export abstract class BasicProcess<T extends MemBase> implements IProcess {
 
     constructor(protected context: IProcessContext) {
         this._logger = context.getPackageInterface(EXT_Logger).CreateLogContext(this.logID, this.logLevel);
-        this.OnProcessInstantiation();
     }
-    protected OnProcessInstantiation(): void { }
 
     private _logger: ILogger;
     protected get log(): ILogger { return this._logger; }
@@ -24,8 +22,6 @@ export abstract class BasicProcess<T extends MemBase> implements IProcess {
     get pkgName(): string { return this.context.pkgName; }
     get pid(): PID { return this.context.pid; }
     get parentPID(): PID { return this.context.pPID; }
-    get threadState(): ThreadState { return ThreadState_Active; }// this.memory.sta || ThreadState_Inactive; }
-    get threadPriority(): Priority { return Priority_Hold; }//this.memory.pri || Priority_Hold; }
 
     GetParentProcess<T extends IProcess>(): T | undefined {
         return this.parentPID ? this.kernel.getProcessByPID(this.parentPID) as T : undefined;
@@ -38,12 +34,6 @@ export abstract class BasicProcess<T extends MemBase> implements IProcess {
 
 const SCAN_FREQUENCY = 15;
 export abstract class PackageProviderBase<T extends PackageProviderMemory> extends BasicProcess<T> {
-    protected OnProcessInstantiation() {
-        if (!this.memory.services) {
-            this.memory.services = {};
-        }
-    }
-
     protected abstract RequiredServices: SDictionary<ProviderService>;
     get ScanFrequency() { return SCAN_FREQUENCY; }
 
@@ -51,7 +41,7 @@ export abstract class PackageProviderBase<T extends PackageProviderMemory> exten
         this.log.info(() => `Adding service ${id}`);
         let pid = this.kernel.startProcess(id, Object.assign({}, startContext));
         this.kernel.setParent(pid, parentPID);
-        this.memory.services[serviceID] = { pid: pid, serviceID };
+        this.memory.services[serviceID] = { pid, serviceID };
     }
 
     RunThread(): ThreadState {
@@ -110,5 +100,4 @@ function extensionInterface(interfaceId: string): (target: any, propertyKey: str
         }
     }
 }
-
 global['extensionInterface'] = extensionInterface;
