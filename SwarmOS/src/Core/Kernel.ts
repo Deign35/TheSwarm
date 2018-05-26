@@ -6,15 +6,21 @@ declare var Memory: {
 
 declare type ProcessCache = {
     [id in PID]: {
-        state: TS_State;
         context: IProcessContext;
         process: IProcess;
     }
 }
 
+declare interface ProcessState {
+    state: TS_State;
+    context: IProcessContext;
+    process: IProcess;
+}
+
 const TS_Active = 1;
 const TS_Waiting = 2;
 const TS_Done = 3;
+
 declare type TS_Active = 1;
 declare type TS_Waiting = 2;
 declare type TS_Done = 3;
@@ -26,8 +32,7 @@ export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepEx
         this._processCache = {};
     }
     private _processCache: ProcessCache;
-    private _curTickIDs!: PID[];
-    private _curThreadData!: any;
+    private _curTickState!: IDictionary<PID, TS_State>;
 
     get log() {
         return this._logger;
@@ -62,17 +67,15 @@ export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepEx
     startProcess(packageName: ScreepsPackage, startMemory: MemBase): PID {
         let pid = 'p' + GetSUID() as PID;
         let pInfo: ProcInfo = {
+            ex: true,
             pid: pid,
             PKG: packageName,
-            ex: true,
             st: Game.time
         };
 
         this.processTable[pid] = pInfo;
         this.processMemory[pid] = startMemory || {};
 
-        let process = this.createProcess(pid);
-        this.log.debug(`CreateNewProcess: ${packageName}`);
         return pid;
     }
 
@@ -80,7 +83,7 @@ export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepEx
         this.log.debug(`ConstructProcess ${id}`);
         let pInfo = this.processTable[id];
         if (!pInfo) {
-            throw new Error(`Process ${id} does not exist`)
+            throw new Error(`Process ${id} does not exist`);
         }
 
         let kernelContext = this;
@@ -96,13 +99,14 @@ export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepEx
             get memory() {
                 return kernelContext.processMemory[pInfo.pid];
             },
-            // bind getExtension to getPackageInterface.
             getPackageInterface: kernelContext.extensionRegistry.get.bind(kernelContext.extensionRegistry)
         };
         Object.freeze(context);
         let process = this.processRegistry.createNewProcess(pInfo.PKG, context);
-        if (!process) throw new Error(`Could not create process ${pInfo.pid} ${pInfo.PKG}`);
-        this._processCache[id] = { context, process, state: TS_Done };
+        if (!process) {
+            throw new Error(`Could not create process ${pInfo.pid} ${pInfo.PKG}`);
+        }
+        this._processCache[id] = { context, process };
         return process;
     }
 
@@ -142,38 +146,77 @@ export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepEx
     }
 
     loop() {
+        this._curTickState = {};
         let processIDs = Object.keys(this.processTable);
-        this._curTickIDs = [];
-        this._curThreadData = {};
-
         for (let i = 0; i < processIDs.length; i++) {
-            this.PrepTick(processIDs[i]);
+            let pInfo = this.processTable[processIDs[i]];
+            if (pInfo.sl) {
+                if (pInfo.sl! <= Game.time) {
+                    this.wake(pInfo.pid);
+                }
+            }
+            if (!pInfo.sl) {
+                this.PrepTick(processIDs[i]);
+            }
         }
 
-        if (this._curTickIDs.length == 0) {
+        let activeThreadIDs = Object.keys(this._curTickState);
+        if (activeThreadIDs.length == 0) {
+            // (TODO): dont move to next tick
             this.startProcess(PKG_SwarmManager, {});
             return;
         }
-
-        let activeThreadIDs = CopyObject(this._curTickIDs);
         while (activeThreadIDs.length > 0) {
-            let pid = activeThreadIDs.shift()!;
+            let protectionValue = activeThreadIDs.length;
+            this.RunThreads(activeThreadIDs);
+            if (activeThreadIDs.length > 0) {
+                this.log.error(`Did not complete all threads...wth`);
+            }
+            let allIDs = Object.keys(this.processTable);
+            for (let i = 0; i < allIDs.length; i++) {
+                let state = this._curTickState[allIDs[i]]
+                if (state == TS_Waiting) {
+                    activeThreadIDs.push(allIDs[i]);
+                    this._curTickState[allIDs[i]] = TS_Active;
+                }
+            }
+
+            if (protectionValue == activeThreadIDs.length) {
+                this.log.alert(`A full cycle has occurred and no threads completed`);
+                break;
+            }
+        }
+
+        processIDs = Object.keys(this.processTable);
+        for (let i = 0; i < processIDs.length; i++) {
+            this.EndTick(processIDs[i]);
+        }
+    }
+
+    private RunThreads(ids: PID[]) {
+        while (ids.length > 0) {
+            let pid = ids.shift()!;
+            let pInfo = this.processTable[pid];
             try {
-                let curThread = this.getProcessByPID(pid)!;
-                if (!curThread) {
+                let process = this.getProcessByPID(pid);
+                if (!process) {
+                    this._curTickState[pid] = TS_Done;
                     continue;
                 }
-                let threadResult = curThread.RunThread();
-                switch (threadResult) {
+                let result = process.RunThread();
+                switch (result) {
                     case (ThreadState_Active):
-                        activeThreadIDs.push(pid);
-                        continue
+                        ids.push(pid);
+                        break;
                     case (ThreadState_Waiting):
+                        this._curTickState[pid] = TS_Waiting;
+                        break;
                     case (ThreadState_Inactive):
+                    case (ThreadState_Overrun):
                     case (ThreadState_Done):
-                    case (ThreadState_Overrun): // (TODO): Turn Overrun into a thread state that allows the thread to do extra work as cpu is available.
+                        this._curTickState[pid] = TS_Done;
                     default:
-                        continue;
+                        break;
                 }
             } catch (e) {
                 let pInfo = this.processTable[pid];
@@ -181,11 +224,6 @@ export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepEx
                 pInfo.err = e.stack || e.toString();
                 this.log.error(`[${pid}] ${pInfo.PKG} crashed\n${e.stack}`);
             }
-        }
-
-        processIDs = Object.keys(this.processTable);
-        for (let i = 0; i < processIDs.length; i++) {
-            this.EndTick(processIDs[i]);
         }
     }
 
@@ -196,15 +234,7 @@ export class Kernel implements IKernel, IKernelProcessExtensions, IKernelSleepEx
             if (proc.PrepTick) {
                 proc.PrepTick();
             }
-
-            if (pInfo.sl) {
-                if (pInfo.sl! <= Game.time) {
-                    this.wake(pid);
-                } else {
-                    return;
-                }
-            }
-            this._curTickIDs.push(pid);
+            this._curTickState[pid] = TS_Active;
         } catch (e) {
             this.killProcess(pid, `Kernel.PrepTick()`);
             pInfo.err = e.stack || e.toString();
