@@ -125,7 +125,6 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Basic
         switch (curState) {
             case (JobState_Inactive):
                 if (!this.AssignmentHasValidTarget(assignmentID)) {
-                    // (TODO): Fix this `!` issue!
                     let newTarget = this.GetNewTarget(assignmentID);
                     if (!newTarget) {
                         break;

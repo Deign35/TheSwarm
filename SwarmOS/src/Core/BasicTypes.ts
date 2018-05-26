@@ -35,9 +35,8 @@ export abstract class BasicProcess<T extends MemBase> implements IProcess {
 const SCAN_FREQUENCY = 15;
 export abstract class PackageProviderBase<T extends PackageProviderMemory> extends BasicProcess<T> {
     protected abstract RequiredServices: SDictionary<ProviderService>;
-    get ScanFrequency() { return SCAN_FREQUENCY; }
 
-    addPKGService(serviceID: string, id: string, parentPID?: PID, startContext: any = {}) {
+    private addPKGService(serviceID: string, id: string, parentPID?: PID, startContext: any = {}) {
         this.log.info(() => `Adding service ${id}`);
         let pid = this.kernel.startProcess(id, Object.assign({}, startContext));
         this.kernel.setParent(pid, parentPID);
@@ -65,7 +64,7 @@ export abstract class PackageProviderBase<T extends PackageProviderMemory> exten
             }
         }
 
-        this.sleeper.sleep(this.pid, this.ScanFrequency);
+        this.sleeper.sleep(this.pid, SCAN_FREQUENCY);
         return ThreadState_Done;
     }
 }

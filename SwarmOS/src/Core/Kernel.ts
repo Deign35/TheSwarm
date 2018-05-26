@@ -154,7 +154,6 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
 
         let activeThreadIDs = Object.keys(this._curTickState);
         if (activeThreadIDs.length == 0) {
-            // (TODO): dont move to next tick
             let SwarmManagerMemory: PackageProviderMemory = {
                 services: {}
             }

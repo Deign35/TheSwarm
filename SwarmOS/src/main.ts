@@ -37,11 +37,10 @@ import { kernel } from "Core/index";
 
 import { CreepJobsPackage } from "Jobs/index";
 import { CreepGroupsPackage } from "CreepGroups/index";
-import { bundle as SwarmManager } from "SwarmManagers/index";
-import { flagBundle } from "Flags/index";
-import { RegistriesPackage as Registries } from "Registries/index";
+import { FlagPackage } from "Flags/index";
+import { RegistriesPackage } from "Registries/index";
 
-kernel.installPackages([SwarmManager, Registries, CreepJobsPackage, flagBundle, CreepGroupsPackage]);
+kernel.installPackages([RegistriesPackage, CreepJobsPackage, FlagPackage, CreepGroupsPackage]);
 
 export function loop() {
     try {

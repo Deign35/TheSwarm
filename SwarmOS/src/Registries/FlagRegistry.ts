@@ -5,29 +5,29 @@ import { BasicProcess, ExtensionBase } from "Core/BasicTypes";
 
 export const OSPackage: IPackage<FlagExtensionsMemory> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
-        processRegistry.register(PKG_FlagManager, FlagManager);
-        extensionRegistry.register(EXT_Flags, FlagExtension);
+        processRegistry.register(PKG_FlagManager, FlagRegistry);
+        extensionRegistry.register(EXT_Flags, FlagRegistryExtensions);
     }
 }
-const PKG_FlagManager_LogContext: LogContext = {
+const PKG_FlagRegistry_LogContext: LogContext = {
     logID: PKG_FlagManager,
-    logLevel: LOG_DEBUG
+    logLevel: LOG_INFO
 }
 
 // (TODO): Convert to Flag Registry
-class FlagManager extends BasicProcess<FlagExtensionsMemory> {
+class FlagRegistry extends BasicProcess<FlagExtensionsMemory> {
     protected get memory(): FlagExtensionsMemory {
         if (!Memory.flagData) {
-            this.log.warn(`Initializing FlagManager memory`);
+            this.log.warn(`Initializing FlagRegistry memory`);
             Memory.flagData = {}
         }
         return Memory.flagData;
     }
     protected get logID() {
-        return PKG_FlagManager_LogContext.logID;
+        return PKG_FlagRegistry_LogContext.logID;
     }
     protected get logLevel(): LogLevel {
-        return PKG_FlagManager_LogContext.logLevel!;
+        return PKG_FlagRegistry_LogContext.logLevel!;
     }
 
     RunThread(): ThreadState {
@@ -56,7 +56,7 @@ class FlagManager extends BasicProcess<FlagExtensionsMemory> {
     }
 }
 
-class FlagExtension extends ExtensionBase {
+class FlagRegistryExtensions extends ExtensionBase {
     protected get memory(): FlagExtensionsMemory {
         if (!Memory.flagData) {
             this.log.warn(`Initializing FlagManager memory`);
