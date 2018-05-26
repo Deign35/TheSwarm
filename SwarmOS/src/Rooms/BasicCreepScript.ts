@@ -87,10 +87,6 @@ export class BasicCreepScript extends BasicCreepGroup<CreepScript_Memory> {
             this.EnsureAssignment(NormalHauler, CT_FastHauler, 1, Priority_Highest, CJ_Refiller, TT_SpawnRefill);
             if (this.assignments[EmergencyHauler] && this.assignments[EmergencyHauler].c) {
                 this.ChangeCreepAssignment(EmergencyHauler, NormalHauler);
-                this.kernel.killProcess(this.assignments[EmergencyHauler].pid!, 'Killing EmergencyHauler');
-                delete this.assignments[EmergencyHauler];
-                this.kernel.killProcess(this.assignments[NormalHauler].pid!, 'Replacing EmergencyHauler');
-                delete this.assignments[NormalHauler].pid;
                 this.CreateProcessForAssignment(NormalHauler, Priority_Highest, CJ_Refiller);
             }
         }

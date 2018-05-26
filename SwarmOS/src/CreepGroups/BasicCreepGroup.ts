@@ -88,6 +88,11 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Basic
                 if (this.assignments[newAssignmentID]) {
                     this.assignments[newAssignmentID].c = creep.name;
                 }
+
+                this.kernel.killProcess(this.assignments[oldAssignmentID].pid!, `Killing ${oldAssignmentID}`);
+                this.kernel.killProcess(this.assignments[newAssignmentID].pid!, `Replacing ${newAssignmentID}`);
+                delete this.assignments[newAssignmentID].pid;
+                delete this.assignments[oldAssignmentID];
                 return true;
             }
         }
