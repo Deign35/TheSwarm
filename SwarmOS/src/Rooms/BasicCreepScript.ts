@@ -82,7 +82,6 @@ export class BasicCreepScript extends BasicCreepGroup<CreepScript_Memory> {
     protected EnsureRefiller(): void {
         let creepIDs = Object.keys(this.creeps);
         if (creepIDs.length < 4 && !this.assignments[NormalHauler]) { // (TODO): Detect a room that cannot fill itself
-            // Check for an existing hauler
             this.EnsureAssignment(EmergencyHauler, CT_Refiller, 0, Priority_EMERGENCY, CJ_Refiller, TT_SpawnRefill);
         } else {
             this.EnsureAssignment(NormalHauler, CT_FastHauler, 1, Priority_Highest, CJ_Refiller, TT_SpawnRefill);

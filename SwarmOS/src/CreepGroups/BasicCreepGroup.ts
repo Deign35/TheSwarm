@@ -89,8 +89,6 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Basic
                     this.assignments[newAssignmentID].c = creep.name;
                 }
                 return true;
-            } else {
-                this.log.error(`ASSUMPTION: This should not be possible -- BCG.ChangeCreepAssignment`);
             }
         }
 

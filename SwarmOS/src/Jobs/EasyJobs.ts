@@ -18,6 +18,7 @@ class RepairJob extends BasicJob<CreepJob_Memory> {
         return (!!obj && obj.hits < obj.hitsMax);
     }
 }
+
 class BuildJob extends BasicJob<CreepJob_Memory> {
     protected GetActionType(): ActionType {
         return AT_Build;
@@ -59,6 +60,7 @@ class RefillerJob extends BasicJob<CreepJob_Memory> {
         }
     }
 }
+
 class UpgradeJob extends BasicJob<CreepJob_Memory> {
     protected GetActionType(): ActionType {
         return AT_Upgrade;
@@ -67,5 +69,14 @@ class UpgradeJob extends BasicJob<CreepJob_Memory> {
     CheckIsTargetStillValid() {
         let controller = Game.getObjectById(this.memory.t) as StructureController;
         return (!!controller && controller.owner && controller.owner.username == MY_USERNAME);
+    }
+}
+
+class ScoutJob extends BasicJob<CreepJob_Memory> {
+    protected GetActionType(): ActionType {
+        throw new Error("Method not implemented.");
+    }
+    CheckIsTargetStillValid(): boolean {
+        throw new Error("Method not implemented.");
     }
 }

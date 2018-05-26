@@ -62,8 +62,8 @@ class HarvesterJob extends BasicJob<HarvesterJob_Memory> {
                 delete this.memory.cont;
             }
         }
-        // (TODO): Check that I can move to that position.
-        if (target && !target.pos.isEqualTo(this.creep.pos)) {
+        // (TODO): If there happens to be a creep that ends up standing on the container, the harvester will not stand on it anymore.
+        if (target && !target.pos.isEqualTo(this.creep.pos) && target.pos.lookFor(LOOK_CREEPS).length == 0) {
             new MoveToPositionAction(this.creep, target.pos).Run();
             return ThreadState_Done;
         }
