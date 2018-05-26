@@ -81,10 +81,22 @@ export abstract class BasicJob<T extends CreepJob_Memory> extends BasicProcess<T
         }
         switch (this.JobState) {
             case (JobState_Complete):
+                if (!this.creep) {
+                    this.JobState = JobState_Inactive;
+                    return ThreadState_Done;
+                }
                 return this.RunState_Complete();
             case (JobState_Running):
+                if (!this.creep) {
+                    this.JobState = JobState_Inactive;
+                    return ThreadState_Done;
+                }
                 return this.RunState_Running();
             case (JobState_Preparing):
+                if (!this.creep) {
+                    this.JobState = JobState_Inactive;
+                    return ThreadState_Done;
+                }
                 return this.RunState_Preparing();
             case (JobState_Starting):
                 if (!this.memory.c) {
