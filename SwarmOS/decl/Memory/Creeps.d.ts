@@ -40,3 +40,7 @@ declare interface CreepGroup_Memory extends MemBase {
 declare interface BootSwarmOS_Memory extends CreepGroup_Memory {
     needsInfrastructureBoot?: boolean
 }
+
+declare interface SourceGroup_Memory extends BootSwarmOS_Memory {
+    sourceID: string;
+}

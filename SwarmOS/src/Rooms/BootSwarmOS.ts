@@ -73,7 +73,8 @@ class BootSwarmOS extends BasicCreepGroup<BootSwarmOS_Memory> {
             let spawn = Game.getObjectById(viewData.structures.spawn![0]) as StructureSpawn;
             let path = spawn.pos.findPathTo(source);
             let room = Game.rooms[this.memory.targetRoom];
-            for (let i = 0; i < path.length - 1; i++) {
+            room.createConstructionSite(path[path.length - 2].x, path[path.length - 2].y, STRUCTURE_CONTAINER);
+            for (let i = 0; i < path.length - 2; i++) {
                 if (i == path.length - 2) {
                     room.createConstructionSite(path[i].x, path[i].y, STRUCTURE_CONTAINER);
                 } else {
