@@ -29,12 +29,12 @@ class RoomRegistry extends BasicProcess<RoomStateMemory> {
         for (let roomID in Game.rooms) {
             let data = this.RoomView.GetRoomData(roomID);
             if (data && (!data.hostPID || !this.kernel.getProcessByPID(data.hostPID))) {
-                let newMem: CreepScript_Memory = {
+                let newMem: BootSwarmOS_Memory = {
                     assignments: {},
                     homeRoom: roomID,
                     targetRoom: roomID,
                     creeps: {},
-                    repairQueue: []
+                    needsInfrastructureBoot: true
                 }
                 let newPID = this.kernel.startProcess(PKG_SimpleOwnedRoom, newMem);
                 this.kernel.setParent(newPID);

@@ -37,7 +37,9 @@ declare interface CreepGroup_Memory extends MemBase {
     homeRoom: RoomID;
     targetRoom: RoomID;
     creeps: IDictionary<CreepID, CreepGroupCreepState>;
-    repairQueue: string[];
+}
+declare interface BootSwarmOS_Memory extends CreepGroup_Memory {
+    needsInfrastructureBoot?: boolean
 }
 
 declare interface ControlGroup_Memory extends CreepGroup_Memory {

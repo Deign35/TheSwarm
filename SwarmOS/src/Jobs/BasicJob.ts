@@ -112,6 +112,9 @@ export abstract class BasicJob<T extends BasicJob_Memory> extends BasicProcess<T
         if (!this.GetTarget()) {
             let newTarget = this.GetNewTarget();
             if (newTarget && !!Game.getObjectById(newTarget)) {
+                if (this.memory.obj == this.memory.tar) {
+                    this.memory.tar = newTarget;
+                }
                 this.memory.obj = newTarget;
             }
         }
@@ -139,7 +142,7 @@ export abstract class BasicJob<T extends BasicJob_Memory> extends BasicProcess<T
                 return ThreadState_Done;
             } else {
                 if (this.memory.tar) {
-                    // Make sure the target is still valid
+                    // Do something to ensure I can path to the location
                     let curTar = this.GetTarget() as Resource | StructureStorage | StructureContainer | StructureTerminal | Tombstone | Source | StructureLink;
                     if (curTar && curTar.energy! > 0) {
                         return ThreadState_Done;
@@ -185,7 +188,54 @@ export abstract class BasicJob<T extends BasicJob_Memory> extends BasicProcess<T
             case (TT_Builder):
                 // (TODO): Create a priority for constructionsites.
                 if (viewData.cSites.length > 0) {
-                    return viewData.cSites[0];
+                    let bestSite = undefined;
+                    let orderVal = 0;
+                    for (let i = 0; i < viewData.cSites.length; i++) {
+                        let cSite = Game.getObjectById(viewData.cSites[i]) as ConstructionSite;
+                        if (!cSite) {
+                            continue;
+                        }
+
+                        switch (cSite.structureType) {
+                            case (STRUCTURE_CONTAINER):
+                                if (orderVal < 3) {
+                                    bestSite = cSite;
+                                    orderVal = 3;
+                                }
+                                break;
+                            case (STRUCTURE_EXTENSION):
+                                if (orderVal < 6) {
+                                    bestSite = cSite;
+                                    orderVal = 6;
+                                }
+                                break;
+                            case (STRUCTURE_LAB):
+                                if (orderVal < 4) {
+                                    bestSite = cSite;
+                                    orderVal = 4;
+                                }
+                                break;
+                            case (STRUCTURE_ROAD):
+                                if (orderVal < 7) {
+                                    bestSite = cSite;
+                                    orderVal = 7;
+                                }
+                                break;
+                            case (STRUCTURE_SPAWN):
+                                if (orderVal < 5) {
+                                    bestSite = cSite;
+                                    orderVal = 5;
+                                }
+                                break;
+                            case (STRUCTURE_TOWER):
+                                if (orderVal < 8) {
+                                    bestSite = cSite;
+                                    orderVal = 8;
+                                }
+                                break;
+                        }
+                    }
+                    return bestSite ? bestSite.id : undefined;
                 }
                 break;
             case (TT_Repair):

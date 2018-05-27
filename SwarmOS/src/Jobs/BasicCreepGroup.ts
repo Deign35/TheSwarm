@@ -14,9 +14,6 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Basic
     protected get creeps() {
         return this.memory.creeps;
     }
-    protected get repairQueue() {
-        return this.memory.repairQueue;
-    }
 
     RunThread() {
         this.EnsureGroupFormation();
@@ -41,44 +38,37 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Basic
                 delete this.creeps[id];
             }
         }
+    }
 
-        // (TODO): Make this a thread that can be slept
-        if (this.repairQueue.length == 0) {
-            let targetRoom = Game.rooms[this.memory.targetRoom];
-            if (targetRoom) {
-                let structs = targetRoom.find(FIND_STRUCTURES);
-                for (let i = 0; i < structs.length; i++) {
-                    if (structs[i].hits < structs[i].hitsMax) {
-                        this.repairQueue.push(structs[i].id);
-                    }
+    protected EnsureAssignment(assignmentID: string, ctID: CT_ALL, level: number, priority: Priority,
+        jobType: CreepJobsPackage, targetType: TargetType, targetID?: string) {
+        try {
+            if (!this.assignments[assignmentID]) {
+                this.assignments[assignmentID] = {
+                    ct: ctID,
+                    lvl: level,
+                    tt: targetType
                 }
             }
-        }
-    }
-
-    protected EnsureAssignment(assignmentID: string, ctID: CT_ALL, level: number, priority: Priority, jobType: CreepJobsPackage, targetType: TargetType) {
-        if (!this.assignments[assignmentID]) {
-            this.assignments[assignmentID] = {
-                ct: ctID,
-                lvl: level,
-                tt: targetType
+            let assignment = this.assignments[assignmentID];
+            if (assignment.pid && (assignment.ct != ctID || assignment.lvl != level)) {
+                this.RemoveCreepFromAssignment(assignmentID);
+                this.kernel.killProcess(assignment.pid, 'Assignment needs to be upgraded');
+                assignment.ct = ctID;
+                assignment.lvl = level;
+                assignment.tt = targetType;
             }
-        }
-        let assignment = this.assignments[assignmentID];
-        if (assignment.pid && (assignment.ct != ctID || assignment.lvl != level)) {
-            this.RemoveCreepFromAssignment(assignmentID);
-            this.kernel.killProcess(assignment.pid, 'Assignment needs to be upgraded');
-            assignment.ct = ctID;
-            assignment.lvl = level;
-            assignment.tt = targetType;
-        }
 
-        if (!assignment.pid || !this.kernel.getProcessByPID(assignment.pid)) {
-            this.CreateProcessForAssignment(assignmentID, priority, jobType);
+            if (!assignment.pid || !this.kernel.getProcessByPID(assignment.pid)) {
+                this.CreateProcessForAssignment(assignmentID, priority, jobType, targetID);
+            }
+        } catch (ex) {
+            this.log.error(`${ex} error ensuring assignment`);
+            delete this.assignments[assignmentID];
         }
     }
 
-    protected CreateProcessForAssignment(aID: string, priority: Priority, jobType: CreepJobsPackage) {
+    protected CreateProcessForAssignment(aID: string, priority: Priority, jobType: CreepJobsPackage, targetID?: string) {
         let assignment = this.assignments[aID];
         let curCreep;
         if (assignment.pid) {
@@ -114,8 +104,8 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Basic
             loc: this.memory.targetRoom,
             pri: priority,
             cID: assignment.c || '',
-            obj: '',
-            tar: '',
+            obj: targetID || '',
+            tar: targetID || '',
             tt: assignment.tt,
             ac: AT_NoOp,
             id: aID,
