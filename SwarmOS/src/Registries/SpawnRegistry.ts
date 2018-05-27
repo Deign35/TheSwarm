@@ -237,8 +237,8 @@ class SpawnRegistryExtensions extends ExtensionBase implements ISpawnRegistryExt
         return Memory.spawnData;
     }
 
-    getRequestStatus(id: SpawnRequestID): SpawnState {
-        if (!this.memory[id]) {
+    getRequestStatus(id?: SpawnRequestID): SpawnState {
+        if (!id || !this.memory[id]) {
             return SP_ERROR;
         }
         let spawnRequest = this.memory[id];
@@ -253,16 +253,16 @@ class SpawnRegistryExtensions extends ExtensionBase implements ISpawnRegistryExt
 
         return spawnRequest.spSta;
     }
-    getRequestContext(id: SpawnRequestID): CreepContext | undefined {
-        if (this.memory[id]) {
+    getRequestContext(id?: SpawnRequestID): CreepContext | undefined {
+        if (id && this.memory[id]) {
             return this.memory[id].con;
         }
 
         return undefined;
     }
 
-    cancelRequest(id: SpawnRequestID): boolean {
-        if (this.memory[id]) {
+    cancelRequest(id?: SpawnRequestID): boolean {
+        if (id && this.memory[id]) {
             delete this.memory[id];
             return true;
         }

@@ -36,14 +36,10 @@ class CreepRegistry extends BasicProcess<CreepRegistry_Memory> {
         if (!Memory.creepData) {
             this.log.warn(`Initializing CreepRegistry memory`);
             Memory.creepData = {
-                inactiveCreeps: [],
                 registeredCreeps: {}
             }
         }
         return Memory.creepData;
-    }
-    protected get inactiveCreeps() {
-        return this.memory.inactiveCreeps;
     }
     protected get registeredCreeps() {
         return this.memory.registeredCreeps;
@@ -57,7 +53,7 @@ class CreepRegistry extends BasicProcess<CreepRegistry_Memory> {
     }
 
     PrepTick() {
-        let creepIDs = Object.keys(this.registeredCreeps);
+        let creepIDs = Object.keys(Game.creeps);
         for (let i = 0, length = creepIDs.length; i < length; i++) {
             let creep = Game.creeps[creepIDs[i]];
             if (!creep) {
@@ -66,8 +62,11 @@ class CreepRegistry extends BasicProcess<CreepRegistry_Memory> {
             }
             let context = this.registeredCreeps[creepIDs[i]];
             if (!context) {
-                this.log.error(`Creep unregistered.  Creep is spawning - ${creep.spawning}`);
-                continue;
+                this.Extensions.tryRegisterCreep({
+                    ct: (creep.memory as any).ct,
+                    l: (creep.memory as any).l,
+                    n: creep.name
+                })
             }
         }
     }
@@ -81,14 +80,10 @@ class CreepRegistryExtensions extends ExtensionBase implements ICreepRegistryExt
         if (!Memory.creepData) {
             this.log.warn(`Initializing CreepRegistry memory`);
             Memory.creepData = {
-                inactiveCreeps: [],
                 registeredCreeps: {}
             }
         }
         return Memory.creepData;
-    }
-    protected get inactiveCreeps() {
-        return this.memory.inactiveCreeps;
     }
     protected get registeredCreeps() {
         return this.memory.registeredCreeps;
@@ -98,10 +93,14 @@ class CreepRegistryExtensions extends ExtensionBase implements ICreepRegistryExt
         let bestMatch: CreepContext | undefined = undefined;
         let dist = maxDistance + 1;
         let desiredBody = CreepBodies[creepType][level];
-        for (let i = 0; i < this.inactiveCreeps.length; i++) {
-            let creep = this.registeredCreeps[this.inactiveCreeps[i]];
+        let creepIDs = Object.keys(this.registeredCreeps);
+        for (let i = 0; i < creepIDs.length; i++) {
+            let creep = this.registeredCreeps[creepIDs[i]];
+            if (creep.o) { continue; }
+
             let compareDist = Game.map.getRoomLinearDistance(Game.creeps[creep.n].room.name, targetRoom);
             let betterMatch = false;
+
             if (creep.ct == creepType) {
                 if (!bestMatch) {
                     betterMatch = true;
@@ -118,20 +117,6 @@ class CreepRegistryExtensions extends ExtensionBase implements ICreepRegistryExt
                         }
                     }
                 }
-            } else {
-                // do a comparison of the bodies
-                let compareBody = CreepBodies[creep.ct][creep.l];
-                let bodyIDs = Object.keys(BodyLegend);
-                let perfectMatch = true;
-                for (let i = 0; i < bodyIDs.length; i++) {
-                    if (compareBody[bodyIDs[i]] != desiredBody[bodyIDs[i]]) {
-                        perfectMatch = false;
-                    }
-                }
-
-                if (perfectMatch) {
-                    betterMatch = true;
-                }
             }
 
             if (betterMatch) {
@@ -146,14 +131,16 @@ class CreepRegistryExtensions extends ExtensionBase implements ICreepRegistryExt
     tryRegisterCreep(creepContext: CreepContext): boolean {
         if (!this.registeredCreeps[creepContext.n]) {
             this.registeredCreeps[creepContext.n] = creepContext;
-            this.inactiveCreeps.push(creepContext.n);
             return true;
         }
 
         return false;
     }
 
-    tryGetCreep(id: CreepID, requestingPID?: PID): Creep | undefined {
+    tryGetCreep(id?: CreepID, requestingPID?: PID): Creep | undefined {
+        if (!id || !requestingPID) {
+            return undefined;;
+        }
         let request = this.registeredCreeps[id];
         if (!request || !Game.creeps[request.n] || !request.o || request.o != requestingPID) {
             return undefined;
@@ -161,28 +148,24 @@ class CreepRegistryExtensions extends ExtensionBase implements ICreepRegistryExt
         return Game.creeps[request.n];
     }
 
-    tryReserveCreep(id: CreepID, requestingPID: PID): boolean {
+    tryReserveCreep(id?: CreepID, requestingPID?: PID): boolean {
+        if (!id || !requestingPID) {
+            return false;
+        }
         if (!this.registeredCreeps[id].o) {
             this.registeredCreeps[id].o = requestingPID;
-            this.inactiveCreeps.splice(this.inactiveCreeps.indexOf(id), 1);
-            return true;
         }
         return this.registeredCreeps[id].o == requestingPID;
     }
 
-    releaseCreep(id: CreepID): void {
+    releaseCreep(id?: CreepID, requestingPID?: PID): void {
+        if (!id || !requestingPID) {
+            return;
+        }
         if (this.registeredCreeps[id]) {
-            this.registeredCreeps[id].o = undefined;
-            this.inactiveCreeps.push(id);
+            if (!requestingPID || this.registeredCreeps[id].o == requestingPID) {
+                this.registeredCreeps[id].o = undefined;
+            }
         }
-    }
-
-    tryReleaseCreepToPID(id: CreepID, owner: PID, newOwner: PID) {
-        if (!this.registeredCreeps[id].o) {
-            this.tryReserveCreep(id, newOwner);
-        } else if (this.registeredCreeps[id].o == owner) {
-            this.registeredCreeps[id].o = newOwner;
-        }
-        return this.registeredCreeps[id].o == newOwner;
     }
 }

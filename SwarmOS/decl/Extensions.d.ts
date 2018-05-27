@@ -100,11 +100,11 @@ declare interface IRoomDataExtension extends IPackageExtension {
  * Extension for processes to be able to request creep spawning.
  */
 declare interface ISpawnRegistryExtensions extends IPackageExtension {
-    cancelRequest(id: SpawnRequestID): boolean;
-    getRequestStatus(id: SpawnRequestID): SpawnState;
+    cancelRequest(id?: SpawnRequestID): boolean;
+    getRequestStatus(id?: SpawnRequestID): SpawnState;
     requestSpawn(context: CreepContext, location: RoomID, spawnPriority: Priority,
         maxSpawnDistance?: number, startMem?: any): SpawnRequestID;
-    getRequestContext(id: SpawnRequestID): CreepContext | undefined;
+    getRequestContext(id?: SpawnRequestID): CreepContext | undefined;
 }
 
 /**
@@ -113,8 +113,7 @@ declare interface ISpawnRegistryExtensions extends IPackageExtension {
 declare interface ICreepRegistryExtensions extends IPackageExtension {
     tryFindCompatibleCreep(creepType: CT_ALL, level: number, targetRoom: RoomID, maxDistance?: number): string | undefined
     tryRegisterCreep(creepContext: CreepContext): boolean;
-    tryGetCreep(id: CreepID, requestingPID?: PID): Creep | undefined;
-    tryReserveCreep(id: CreepID, requestingPID: PID): boolean;
-    releaseCreep(id: CreepID): void;
-    tryReleaseCreepToPID(id: CreepID, owner: PID, newOwner: PID): boolean;
+    tryGetCreep(id?: CreepID, requestingPID?: PID): Creep | undefined;
+    tryReserveCreep(id?: CreepID, requestingPID?: PID): boolean;
+    releaseCreep(id?: CreepID, requestingPID?: PID): void;
 }

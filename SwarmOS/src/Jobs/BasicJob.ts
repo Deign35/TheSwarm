@@ -70,7 +70,6 @@ export abstract class BasicJob<T extends BasicJob_Memory> extends BasicProcess<T
                             this.creepRegistry.tryReserveCreep(newCreepName, this.pid);
                             let creep = this.creepRegistry.tryGetCreep(newCreepName, this.pid);
                             if (creep) {
-                                this.GetParentProcess<IProcess & { SetCreep(id: string, name: string): void }>()!.SetCreep(this.memory.id, newCreepName);
                                 this.spawnRegistry.cancelRequest(this.memory.cID);
                                 this.memory.cID = newCreepName;
                                 delete this.memory.isSpawning;
@@ -86,7 +85,7 @@ export abstract class BasicJob<T extends BasicJob_Memory> extends BasicProcess<T
                 } else {
                     // dead creep
                     delete this.memory.cID;
-                    if (this.memory.exp) {
+                    if (this.memory.expires) {
                         this.kernel.killProcess(this.pid, `Job complete`);
                     }
                 }

@@ -5,7 +5,6 @@ declare type SpawnRegistry_Memory = MemBase & {
 }
 declare interface CreepRegistry_Memory extends MemBase {
     registeredCreeps: { [id in CreepID]: CreepContext };
-    inactiveCreeps: CreepID[];
 }
 declare interface CreepContext extends MemBase {
     o?: PID;        // (o)wner process

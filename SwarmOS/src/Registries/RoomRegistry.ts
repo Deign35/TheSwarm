@@ -33,7 +33,6 @@ class RoomRegistry extends BasicProcess<RoomStateMemory> {
                     assignments: {},
                     homeRoom: roomID,
                     targetRoom: roomID,
-                    creeps: {},
                     needsInfrastructureBoot: true
                 }
                 let newPID = this.kernel.startProcess(PKG_SimpleOwnedRoom, newMem);

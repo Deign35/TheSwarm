@@ -7,7 +7,7 @@ declare interface CreepJob_Memory extends MemBase {
     obj: ObjectID;      //objective
     pri: Priority;     // spawn (p)riority
     tt: TargetType;
-    exp?: boolean;      // expires when the creep dies?
+    expires?: boolean;      // expires when the creep dies?
 
     ct: CT_ALL;
     lvl: number;
@@ -36,31 +36,7 @@ declare interface CreepGroup_Memory extends MemBase {
     assignments: IDictionary<GroupID, CreepGroup_Assignment>;
     homeRoom: RoomID;
     targetRoom: RoomID;
-    creeps: IDictionary<CreepID, CreepGroupCreepState>;
 }
 declare interface BootSwarmOS_Memory extends CreepGroup_Memory {
     needsInfrastructureBoot?: boolean
-}
-
-declare interface ControlGroup_Memory extends CreepGroup_Memory {
-
-}
-declare interface InfrastructureGroup_Memory extends CreepGroup_Memory {
-
-}
-declare interface ExtractionGroup_Memory extends CreepGroup_Memory {
-}
-declare interface MaintenanceGroup_Memory extends CreepGroup_Memory {
-    repairQueue: string[];
-}
-
-declare interface CreepGroupCreepState extends MemBase {
-    name: CreepID;
-    active: boolean;
-    aID: string;
-    idle?: number;
-}
-
-/** Creep Scripts */
-declare interface CreepScript_Memory extends CreepGroup_Memory {
 }
