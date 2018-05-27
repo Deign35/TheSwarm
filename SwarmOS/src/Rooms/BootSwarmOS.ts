@@ -9,14 +9,19 @@ import { FindNextTo } from "Tools/TheFinder";
 
 class BootSwarmOS extends BasicCreepGroup<BootSwarmOS_Memory> {
     protected EnsureGroupFormation(): void {
+        let room = Game.rooms[this.memory.targetRoom];
         this.EnsureAssignment('Bootstrapper', CT_Builder, 0, Priority_EMERGENCY, CJ_Refiller, TT_SpawnRefill);
         let viewData = this.View.GetRoomData(this.memory.targetRoom)!;
         for (let i = 0; i < viewData.sourceIDs.length; i++) {
             this.EnsureSourceGroupFormation(viewData.sourceIDs[i]);
+            if (viewData.structures.extension && viewData.structures.extension.length == 5) {
+                //nothing
+            } else {
+                this.EnsureAssignment(viewData.sourceIDs[i] + '_B1', CT_Builder, 0, Priority_Low, CJ_Build, TT_Builder);
+            }
         }
 
         if (this.memory.needsInfrastructureBoot && viewData.structures.spawn) {
-            let room = Game.rooms[this.memory.targetRoom];
             let spawn = Game.getObjectById(viewData.structures.spawn[0]) as StructureSpawn;
             let controller = Game.getObjectById(viewData.structures.controller!) as StructureController;
             let path = spawn.pos.findPathTo(controller);
@@ -33,6 +38,14 @@ class BootSwarmOS extends BasicCreepGroup<BootSwarmOS_Memory> {
             this.EnsureAssignment('Builder1', CT_Builder, 0, Priority_Low, CJ_Build, TT_Builder);
             this.EnsureAssignment('Builder2', CT_Builder, 0, Priority_Low, CJ_Build, TT_Builder);
         }
+
+        if (room.controller!.level == 2 && viewData.structures.extension && viewData.structures.extension.length == 5) {
+            this.EnsureAssignment('Upgrader2', CT_Upgrader, 1, Priority_Lowest, CJ_Upgrade, TT_Upgrader, viewData.structures.controller!);
+            this.EnsureAssignment('Upgrader3', CT_Upgrader, 1, Priority_Lowest, CJ_Upgrade, TT_Upgrader, viewData.structures.controller!);
+            this.EnsureAssignment('Upgrader4', CT_Upgrader, 1, Priority_Lowest, CJ_Upgrade, TT_Upgrader, viewData.structures.controller!);
+            this.EnsureAssignment('Upgrader5', CT_Upgrader, 1, Priority_Lowest, CJ_Upgrade, TT_Upgrader, viewData.structures.controller!);
+            this.EnsureAssignment('Upgrader6', CT_Upgrader, 1, Priority_Lowest, CJ_Upgrade, TT_Upgrader, viewData.structures.controller!);
+        }
     }
 
     protected EnsureSourceGroupFormation(sourceID: string) {
@@ -46,7 +59,6 @@ class BootSwarmOS extends BasicCreepGroup<BootSwarmOS_Memory> {
 
         if (openSpaceCount > 0) {
             this.EnsureAssignment(sourceID + '_1', CT_Harvester, 0, Priority_Highest, CJ_Harvester, TT_Harvest, sourceID);
-            this.EnsureAssignment(sourceID + '_B1', CT_Builder, 0, Priority_Low, CJ_Build, TT_Builder);
             if (openSpaceCount > 1) {
                 this.EnsureAssignment(sourceID + '_2', CT_Harvester, 0, Priority_High, CJ_Harvester, TT_SupportHarvest, sourceID);
                 if (openSpaceCount > 2) {

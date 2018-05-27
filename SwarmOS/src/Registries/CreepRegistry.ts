@@ -97,6 +97,7 @@ class CreepRegistryExtensions extends ExtensionBase implements ICreepRegistryExt
     tryFindCompatibleCreep(creepType: CT_ALL, level: number, targetRoom: RoomID, maxDistance: number = 3): string | undefined {
         let bestMatch: CreepContext | undefined = undefined;
         let dist = maxDistance + 1;
+        let desiredBody = CreepBodies[creepType][level];
         for (let i = 0; i < this.inactiveCreeps.length; i++) {
             let creep = this.registeredCreeps[this.inactiveCreeps[i]];
             let compareDist = Game.map.getRoomLinearDistance(Game.creeps[creep.n].room.name, targetRoom);
@@ -116,6 +117,20 @@ class CreepRegistryExtensions extends ExtensionBase implements ICreepRegistryExt
                             betterMatch = true;
                         }
                     }
+                }
+            } else {
+                // do a comparison of the bodies
+                let compareBody = CreepBodies[creep.ct][creep.l];
+                let bodyIDs = Object.keys(BodyLegend);
+                let perfectMatch = true;
+                for (let i = 0; i < bodyIDs.length; i++) {
+                    if (compareBody[bodyIDs[i]] != desiredBody[bodyIDs[i]]) {
+                        perfectMatch = false;
+                    }
+                }
+
+                if (perfectMatch) {
+                    betterMatch = true;
                 }
             }
 
