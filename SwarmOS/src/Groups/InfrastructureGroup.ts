@@ -21,11 +21,13 @@ class InfrastructureGroup extends BasicCreepGroup<SourceGroup_Memory> {
         if (viewData.cSites.length == 0) {
             if (this.assignments['Build']) {
                 this.CloseAssignment('Build');
+                delete this.assignments['Build'];
             }
             this.EnsureAssignment('Repair', CT_Repair, spawnCap >= CreepBodies.Repair[1].cost ? 1 : 0, Priority_Lowest, CJ_Repair, TT_Repair);
         } else {
             if (this.assignments['Repair']) {
                 this.CloseAssignment('Repair');
+                delete this.assignments['Repair'];
             }
             this.EnsureAssignment('Build', CT_Worker, spawnCap >= CreepBodies.Worker[1].cost ? 1 : 0, Priority_Low, CJ_Build, TT_Builder);
         }

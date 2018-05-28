@@ -5,10 +5,12 @@ export const OSPackage: IPackage<SpawnRegistry_Memory> = {
 }
 
 import { BasicCreepGroup } from "Jobs/BasicCreepGroup";
+import { FindNextTo } from "Tools/TheFinder";
 
 class SourceGroup extends BasicCreepGroup<SourceGroup_Memory> {
     protected EnsureGroupFormation(): void {
         let viewData = this.View.GetRoomData(this.memory.targetRoom)!;
+        let source = Game.getObjectById(this.memory.sourceID) as Source;
         let targetRoom = Game.rooms[this.memory.targetRoom];
         let extractionLevel = 0;
         let isMyRoom = viewData.owner && viewData.owner == MY_USERNAME;
@@ -27,6 +29,27 @@ class SourceGroup extends BasicCreepGroup<SourceGroup_Memory> {
         }
         this.EnsureAssignment('Harvester', CT_Harvester, extractionLevel,
             isMyRoom ? Priority_High : Priority_Medium, CJ_Harvester, TT_Harvest, this.memory.sourceID);
+        if (extractionLevel == 0) {
+            if (source) {
+                let spaces = FindNextTo(source.pos, LOOK_TERRAIN);
+                if (spaces.length > 1) {
+                    this.EnsureAssignment('Harvester2', CT_Harvester, 0, Priority_Medium, CJ_Harvester, TT_Harvest, this.memory.sourceID);
+                    if (spaces.length > 2) {
+                        this.EnsureAssignment('Harvester3', CT_Harvester, 0, Priority_Medium, CJ_Harvester, TT_Harvest, this.memory.sourceID);
+                    }
+                }
+            }
+        } else {
+            if (this.assignments['Harvester2']) {
+                this.CloseAssignment('Harvester2');
+                delete this.assignments['Harvester2'];
+            }
+            if (this.assignments['Harvester3']) {
+                this.CloseAssignment('Harvester3');
+                delete this.assignments['Harvester3'];
+            }
+        }
+
         if (this.memory.needsInfrastructureBoot) {
             this.CreateSites();
             delete this.memory.needsInfrastructureBoot;
