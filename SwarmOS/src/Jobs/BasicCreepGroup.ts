@@ -25,6 +25,15 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Basic
         }
     }
 
+    GetAssignmentTarget(aID: string): string | undefined {
+        let assignment = this.assignments[aID];
+        if (assignment) {
+            return assignment.tar;
+        }
+
+        return undefined;
+    }
+
     protected EnsureAssignment(aID: string, ctID: CT_ALL, level: number, priority: Priority,
         jobType: CreepJobsPackage, targetType: TargetType, targetID?: string) {
         try {
@@ -41,6 +50,7 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Basic
                 assignment.ct = ctID;
                 assignment.lvl = level;
                 assignment.tt = targetType;
+                assignment.tar = targetID;
             }
 
             if (!assignment.pid || !this.kernel.getProcessByPID(assignment.pid)) {
@@ -50,6 +60,7 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Basic
             // (TODO): Update the process if the targetID has changed.
         } catch (ex) {
             this.log.error(`${ex} error ensuring assignment`);
+            this.CloseAssignment(aID);
             delete this.assignments[aID];
         }
     }

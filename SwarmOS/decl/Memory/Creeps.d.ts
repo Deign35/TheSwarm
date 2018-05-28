@@ -29,6 +29,7 @@ declare interface CreepGroup_Assignment extends MemBase {
     ct: CT_ALL;
     lvl: number;
     tt: TargetType; // target type
+    tar?: string;
 }
 
 /** CreepGroups */
@@ -41,6 +42,13 @@ declare interface BootSwarmOS_Memory extends CreepGroup_Memory {
     needsInfrastructureBoot?: boolean
 }
 
+declare interface ControlGroup_Memory extends BootSwarmOS_Memory {
+    level: number;
+    EM?: boolean;
+}
+
 declare interface SourceGroup_Memory extends BootSwarmOS_Memory {
     sourceID: string;
+    savedPath?: PathStep[];
+    constructionIDs?: string[];
 }

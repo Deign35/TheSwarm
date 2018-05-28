@@ -51,10 +51,10 @@
             "usePrefix": true,
             "combinedType": "CreepGroupPackage",
             "entries": [
-                "Extraction",
+                "Source",
                 "Control",
                 "Infrastructure",
-                "Maintenance"
+                "Refill"
             ]
         },
         "EXT": {

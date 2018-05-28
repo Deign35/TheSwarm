@@ -83,7 +83,10 @@ interface RoomState_StructureData extends MemBase {
 }
 
 declare type RoomState_AttachedCreepGroups = {
-    [id in CreepGroupPackage]?: PID
+    [CG_Control]?: PID;
+    [CG_Infrastructure]?: PID;
+    [CG_Refill]?: PID[];
+    [CG_Source]?: PID[];
 }
 
 

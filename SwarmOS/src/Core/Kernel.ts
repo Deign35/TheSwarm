@@ -158,7 +158,8 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
                 services: {}
             }
             this.startProcess(PKG_SwarmManager, SwarmManagerMemory);
-            activeThreadIDs = Object.keys(this._curTickState);
+            // Initialization doesn't work on the first tick for some reason.  So skip the first tick.
+            return;
         }
 
         while (activeThreadIDs.length > 0) {

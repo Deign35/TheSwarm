@@ -14,6 +14,18 @@ export abstract class BasicJob<T extends BasicJob_Memory> extends BasicProcess<T
     protected GetTarget(): ObjectTypeWithID {
         return Game.getObjectById(this.memory.tar) as ObjectTypeWithID;
     }
+    protected UpdateTarget() {
+        let parent = this.kernel.getProcessByPID(this.parentPID)! as (IProcess & {
+            GetAssignmentTarget: (id: string) => string;
+        });
+        if (parent && parent.GetAssignmentTarget) {
+            let updTar = parent.GetAssignmentTarget(this.memory.id);
+            if (this.memory.tar && this.memory.tar == this.memory.obj) {
+                this.memory.tar = updTar;
+            }
+            this.memory.obj = updTar;
+        }
+    }
 
     GetBodyCT(): CT_ALL {
         return this.memory.ct;
@@ -109,12 +121,17 @@ export abstract class BasicJob<T extends BasicJob_Memory> extends BasicProcess<T
         }
 
         if (!this.GetTarget()) {
-            let newTarget = this.GetNewTarget();
-            if (newTarget && !!Game.getObjectById(newTarget)) {
-                if (this.memory.obj == this.memory.tar) {
-                    this.memory.tar = newTarget;
+            if (!this.memory.ret) {
+                this.UpdateTarget();
+            }
+            if (!this.GetTarget()) {
+                let newTarget = this.GetNewTarget();
+                if (newTarget && !!Game.getObjectById(newTarget)) {
+                    if (this.memory.obj == this.memory.tar) {
+                        this.memory.tar = newTarget;
+                    }
+                    this.memory.obj = newTarget;
                 }
-                this.memory.obj = newTarget;
             }
         }
 
@@ -127,7 +144,7 @@ export abstract class BasicJob<T extends BasicJob_Memory> extends BasicProcess<T
             if (action) {
                 action.Run();
             } else {
-                this.log.warn(`UNEXPECTED--Action not working2`);
+                this.log.warn(`UNEXPECTED--Action not working`);
             }
         }
     }

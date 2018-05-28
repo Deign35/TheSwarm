@@ -4,7 +4,7 @@ import { OSPackage as SpawnRegistry } from "Registries/SpawnRegistry";
 import { OSPackage as FlagRegistry } from "Registries/FlagRegistry";
 import { PackageProviderBase } from "Core/BasicTypes";
 
-import { OSPackage as RoomBase } from "Rooms/BootSwarmOS"
+import { OSPackage as RoomBase } from "Rooms/BasicRoom"
 
 export const RegistriesPackage: IPackage<{}> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
