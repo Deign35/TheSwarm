@@ -11,7 +11,7 @@ export abstract class BasicJob<T extends BasicJob_Memory> extends BasicProcess<T
     protected GetActionType(): ActionType {
         return this.memory.ac;
     }
-    protected GetTarget(): ObjectTypeWithID {
+    protected GetTarget(): ObjectTypeWithID | undefined {
         return Game.getObjectById(this.memory.tar) as ObjectTypeWithID;
     }
     protected UpdateTarget() {
@@ -65,6 +65,11 @@ export abstract class BasicJob<T extends BasicJob_Memory> extends BasicProcess<T
     }
     private _creep: Creep | undefined;
 
+    ReleaseCreep() {
+        this.spawnRegistry.cancelRequest(this.memory.cID);
+        this.creepRegistry.releaseCreep(this.memory.cID, this.pid);
+    }
+
     PrepTick() {
         if (this.memory.cID) {
             this._creep = this.creepRegistry.tryGetCreep(this.memory.cID, this.pid);
@@ -86,6 +91,10 @@ export abstract class BasicJob<T extends BasicJob_Memory> extends BasicProcess<T
                                 this.memory.cID = newCreepName;
                                 delete this.memory.isSpawning;
                                 this._creep = creep;
+                            } else if (spawnStatus == SP_COMPLETE) {
+                                this.spawnRegistry.cancelRequest(this.memory.cID);
+                                delete this.memory.isSpawning;
+                                delete this.memory.cID;
                             }
                             break;
                         case (SP_ERROR):
@@ -95,11 +104,12 @@ export abstract class BasicJob<T extends BasicJob_Memory> extends BasicProcess<T
                             break;
                     }
                 } else {
-                    // dead creep
-                    delete this.memory.cID;
+                    // dead creep?
                     if (this.memory.expires) {
+                        this.ReleaseCreep();
                         this.kernel.killProcess(this.pid, `Job complete`);
                     }
+                    delete this.memory.cID;
                 }
             }
         }
@@ -139,8 +149,9 @@ export abstract class BasicJob<T extends BasicJob_Memory> extends BasicProcess<T
     }
 
     EndTick() {
-        if (this.creep && !this.creep.spawning) {
-            let action = GetBasicAction(this.creep, this.GetActionType(), this.GetTarget());
+        let target = this.GetTarget();
+        if (this.creep && !this.creep.spawning && target) {
+            let action = GetBasicAction(this.creep, this.GetActionType(), target);
             if (action) {
                 action.Run();
             } else {
@@ -150,6 +161,11 @@ export abstract class BasicJob<T extends BasicJob_Memory> extends BasicProcess<T
     }
 
     protected SetupAction(): ThreadState {
+        if (this.memory.ac == AT_NoOp) {
+            this.memory.ret = true;
+            delete this.memory.tar;
+            delete this.memory.ac;
+        }
         if (this.memory.ret) {
             if (this.creep.carry.energy == this.creep.carryCapacity) {
                 delete this.memory.ret;
@@ -275,7 +291,7 @@ export abstract class BasicJob<T extends BasicJob_Memory> extends BasicProcess<T
                         return spawn.id;
                     }
                 }
-                return (Game.getObjectById(viewData.structures.spawn[0]) as StructureSpawn).id; // Guaranteed to exist
+                return undefined;
             case (TT_Upgrader):
                 return viewData.structures.controller;
             case (TT_SupportHarvest):

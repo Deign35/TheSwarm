@@ -87,6 +87,7 @@ declare type RoomState_AttachedCreepGroups = {
     [CG_Infrastructure]?: PID;
     [CG_Refill]?: PID[];
     [CG_Source]?: PID[];
+    [CG_SimpleSource]?: PID[];
 }
 
 

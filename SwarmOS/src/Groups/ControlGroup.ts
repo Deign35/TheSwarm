@@ -7,6 +7,7 @@ import { BasicCreepGroup } from "Jobs/BasicCreepGroup";
 
 class ControlGroup extends BasicCreepGroup<ControlGroup_Memory> {
     protected EnsureGroupFormation(): void {
+        // (TODO): Add a road from the spawn to the controller
         let viewData = this.View.GetRoomData(this.memory.targetRoom)!;
         let targetRoom = Game.rooms[this.memory.targetRoom];
         let isMyRoom = viewData.owner && viewData.owner == MY_USERNAME;

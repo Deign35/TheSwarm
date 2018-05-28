@@ -13,6 +13,14 @@ class RepairJob extends BasicJob<BasicJob_Memory> {
     protected GetPrimaryActionType(): ActionType {
         return AT_Repair;
     }
+
+    protected GetTarget(): ObjectTypeWithID | undefined {
+        let struct = Game.getObjectById(this.memory.tar) as StructureExtension | StructureSpawn;
+        if (struct && !this.memory.ret && struct.structureType) {
+            return struct.hits < struct.hitsMax ? struct : undefined;
+        }
+        return struct;
+    }
 }
 
 class BuildJob extends BasicJob<BasicJob_Memory> {
@@ -24,6 +32,14 @@ class BuildJob extends BasicJob<BasicJob_Memory> {
 class RefillerJob extends BasicJob<BasicJob_Memory> {
     protected GetPrimaryActionType(): ActionType {
         return AT_Transfer;
+    }
+
+    protected GetTarget(): ObjectTypeWithID | undefined {
+        let struct = Game.getObjectById(this.memory.tar) as StructureExtension | StructureSpawn;
+        if (struct && !this.memory.ret && struct.structureType && struct.energy) {
+            return struct.energy < struct.energyCapacity ? struct : undefined;
+        }
+        return struct;
     }
 }
 

@@ -30,21 +30,48 @@ class BasicRoom extends BasicCreepGroup<CreepGroup_Memory> {
                 let newPID = this.kernel.startProcess(CG_Control, newMem);
                 this.roomData.groups.CG_Control = newPID;
             }
+
+            // (TODO): Combine this with the other source one...this is just ugly
+            if (this.room.controller!.level > 3 && this.room.energyCapacityAvailable >= 800) {
+                if (this.roomData.groups.CG_Source) {
+                    for (let i = 0; i < this.roomData.groups.CG_Source.length; i++) {
+                        let creepGroup = this.kernel.getProcessByPID(this.roomData.groups.CG_Source[i]) as BasicCreepGroup<any>;
+                        creepGroup.CloseCreepGroupAssignments();
+                        this.kernel.killProcess(this.roomData.groups.CG_Source[i], `Room source group updated to simple source`);
+                    }
+                    delete this.roomData.groups.CG_Source;
+                }
+                if (!this.roomData.groups.CG_SimpleSource) {
+                    this.roomData.groups.CG_SimpleSource = [];
+                    for (let i = 0; i < this.roomData.sourceIDs.length; i++) {
+                        let sourceMem: SourceGroup_Memory = {
+                            assignments: {},
+                            homeRoom: this.roomName,
+                            targetRoom: this.roomName,
+                            sourceID: this.roomData.sourceIDs[i]
+                        }
+                        let sourcePID = this.kernel.startProcess(CG_SimpleSource, sourceMem);
+                        this.roomData.groups.CG_SimpleSource.push(sourcePID);
+                    }
+                }
+            }
         }
 
         if (!this.roomData.owner || this.roomData.owner == MY_USERNAME) {
-            if (!this.roomData.groups.CG_Source) {
-                this.roomData.groups.CG_Source = [];
-                for (let i = 0; i < this.roomData.sourceIDs.length; i++) {
-                    let sourceMem: SourceGroup_Memory = {
-                        assignments: {},
-                        homeRoom: this.roomName,
-                        targetRoom: this.roomName,
-                        sourceID: this.roomData.sourceIDs[i],
-                        needsInfrastructureBoot: true
+            if (!this.roomData.groups.CG_SimpleSource && this.room.controller && this.room.controller.level < 3) {
+                if (!this.roomData.groups.CG_Source) {
+                    this.roomData.groups.CG_Source = [];
+                    for (let i = 0; i < this.roomData.sourceIDs.length; i++) {
+                        let sourceMem: SourceGroup_Memory = {
+                            assignments: {},
+                            homeRoom: this.roomName,
+                            targetRoom: this.roomName,
+                            sourceID: this.roomData.sourceIDs[i],
+                            needsInfrastructureBoot: true
+                        }
+                        let sourcePID = this.kernel.startProcess(CG_Source, sourceMem);
+                        this.roomData.groups.CG_Source.push(sourcePID);
                     }
-                    let sourcePID = this.kernel.startProcess(CG_Source, sourceMem);
-                    this.roomData.groups.CG_Source.push(sourcePID);
                 }
             }
             if (!this.roomData.groups.CG_Infrastructure) {

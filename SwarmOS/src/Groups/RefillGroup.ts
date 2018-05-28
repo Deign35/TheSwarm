@@ -21,7 +21,7 @@ class RefillGroup extends BasicCreepGroup<SourceGroup_Memory> {
         }
 
         if (isMyRoom) {
-            if (targetRoom.controller!.level <= 2) {
+            if (targetRoom.controller!.level <= 3) {
                 this.EnsureAssignment('EMRefiller', CT_Worker, 0, Priority_Highest, CJ_Refiller, TT_SpawnRefill);
             } else if (this.assignments['EMRefiller']) {
                 this.CloseAssignment('EMRefiller');

@@ -98,12 +98,17 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Basic
     RemoveCreepFromAssignment(aID: GroupID): void {
         let assignment = this.assignments[aID];
         if (assignment) {
-            this.creepRegistry.releaseCreep(assignment.c, assignment.pid);
-            let spawnRequest = this.spawnRegistry.getRequestContext(assignment.c);
-            if (spawnRequest) {
-                this.spawnRegistry.cancelRequest(assignment.c);
+            let proc = this.kernel.getProcessByPID(assignment.pid!) as IProcess & { ReleaseCreep: () => void };
+            if (proc && proc.ReleaseCreep) {
+                proc.ReleaseCreep();
             }
-            assignment.c = undefined;
+        }
+    }
+
+    CloseCreepGroupAssignments() {
+        let assignmentIDs = Object.keys(this.assignments);
+        for (let i = 0; i < assignmentIDs.length; i++) {
+            this.CloseAssignment(assignmentIDs[i]);
         }
     }
 }

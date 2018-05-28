@@ -1,13 +1,24 @@
 export const OSPackage: IPackage<SpawnRegistry_Memory> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
         processRegistry.register(CG_Source, SourceGroup);
+        processRegistry.register(CG_SimpleSource, SimpleSourceGroup);
     }
 }
 
 import { BasicCreepGroup } from "Jobs/BasicCreepGroup";
 import { FindNextTo } from "Tools/TheFinder";
 
-class SourceGroup extends BasicCreepGroup<SourceGroup_Memory> {
+class SimpleSourceGroup extends BasicCreepGroup<SourceGroup_Memory> {
+    protected EnsureGroupFormation(): void {
+        let viewData = this.View.GetRoomData(this.memory.targetRoom)!;
+        let source = Game.getObjectById(this.memory.sourceID) as Source;
+        let isMyRoom = viewData.owner && viewData.owner == MY_USERNAME;
+        this.EnsureAssignment('Harvester', CT_Harvester, 2, isMyRoom ? Priority_High : Priority_Medium, CJ_Harvester, TT_Harvest, this.memory.sourceID);
+
+        this.sleeper.sleep(this.pid, 150);
+    }
+}
+export class SourceGroup extends BasicCreepGroup<SourceGroup_Memory> {
     protected EnsureGroupFormation(): void {
         let viewData = this.View.GetRoomData(this.memory.targetRoom)!;
         let source = Game.getObjectById(this.memory.sourceID) as Source;
@@ -38,15 +49,6 @@ class SourceGroup extends BasicCreepGroup<SourceGroup_Memory> {
                         this.EnsureAssignment('Harvester3', CT_Harvester, 0, Priority_Medium, CJ_Harvester, TT_Harvest, this.memory.sourceID);
                     }
                 }
-            }
-        } else {
-            if (this.assignments['Harvester2']) {
-                this.CloseAssignment('Harvester2');
-                delete this.assignments['Harvester2'];
-            }
-            if (this.assignments['Harvester3']) {
-                this.CloseAssignment('Harvester3');
-                delete this.assignments['Harvester3'];
             }
         }
 

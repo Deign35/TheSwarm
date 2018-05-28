@@ -21,6 +21,7 @@ declare interface BasicJob_Memory extends CreepJob_Memory {
 
 declare interface HarvesterJob_Memory extends BasicJob_Memory {
     cont?: string   //containerID
+    fm?: boolean   // finished moving?
 }
 
 declare interface CreepGroup_Assignment extends MemBase {

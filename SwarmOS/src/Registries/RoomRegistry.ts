@@ -127,6 +127,7 @@ class RoomExtension extends ExtensionBase {
             }
         }
 
+        roomData.needsRepair = [];
         let allStructures = room.find(FIND_STRUCTURES);
         for (let i = 0, length = allStructures.length; i < length; i++) {
             let structure = allStructures[i];
@@ -146,6 +147,9 @@ class RoomExtension extends ExtensionBase {
                     structure.structureType == STRUCTURE_RAMPART ||
                     structure.structureType == STRUCTURE_LAB) {
                     roomData.structures[structure.structureType]!.push(structure.id);
+                    if (structure.hits < structure.hitsMax && structure.structureType != STRUCTURE_WALL && structure.structureType != STRUCTURE_RAMPART) {
+                        roomData.needsRepair.push(structure.id);
+                    }
                 }
             }
         }

@@ -51,6 +51,7 @@
             "usePrefix": true,
             "combinedType": "CreepGroupPackage",
             "entries": [
+                "SimpleSource",
                 "Source",
                 "Control",
                 "Infrastructure",
