@@ -59,6 +59,20 @@ class ControlGroup extends BasicCreepGroup<ControlGroup_Memory> {
             }
         }
 
+        if (this.memory.needsInfrastructureBoot) {
+            let spawnID = viewData.structures.spawn && viewData.structures.spawn.length > 0 && viewData.structures.spawn[0];
+            if (spawnID) {
+                let spawn = Game.getObjectById(spawnID) as StructureSpawn;
+                if (spawn) {
+                    let path = spawn.pos.findPathTo(targetRoom.controller!);
+                    for (let i = 0; i < path.length - 1; i++) {
+                        targetRoom.createConstructionSite(path[i].x, path[i].y, STRUCTURE_ROAD);
+                    }
+                    delete this.memory.needsInfrastructureBoot;
+                }
+            }
+        }
+
         this.sleeper.sleep(this.pid, 20);
     }
 

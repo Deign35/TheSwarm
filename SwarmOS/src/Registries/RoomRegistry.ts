@@ -29,14 +29,19 @@ class RoomRegistry extends BasicProcess<RoomStateMemory> {
         for (let roomID in Game.rooms) {
             let data = this.RoomView.GetRoomData(roomID);
             if (data && (!data.hostPID || !this.kernel.getProcessByPID(data.hostPID))) {
-                let newMem: CreepGroup_Memory = {
-                    assignments: {},
-                    homeRoom: roomID,
-                    targetRoom: roomID,
+                let room = Game.rooms[roomID];
+                if (room.controller) {
+                    if (room.controller.my) {
+                        let newMem: CreepGroup_Memory = {
+                            assignments: {},
+                            homeRoom: roomID,
+                            targetRoom: roomID,
+                        }
+                        let newPID = this.kernel.startProcess(PKG_SimpleOwnedRoom, newMem);
+                        this.kernel.setParent(newPID);
+                        this.memory.roomStateData[roomID]!.hostPID = newPID;
+                    }
                 }
-                let newPID = this.kernel.startProcess(PKG_SimpleOwnedRoom, newMem);
-                this.kernel.setParent(newPID);
-                this.memory.roomStateData[roomID]!.hostPID = newPID;
             }
         }
 

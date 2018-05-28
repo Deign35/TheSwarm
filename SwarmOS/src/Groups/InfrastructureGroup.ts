@@ -20,12 +20,18 @@ class InfrastructureGroup extends BasicCreepGroup<SourceGroup_Memory> {
         }
         this.EnsureAssignment('Repair', CT_Repair, spawnCap >= CreepBodies.Repair[1].cost ? 1 : 0, Priority_Lowest, CJ_Repair, TT_Repair);
         if (viewData.cSites.length > 0) {
-            if (!targetRoom.controller || targetRoom.controller.level < 4) {
+            if (!targetRoom.controller) {
                 this.EnsureAssignment('Build', CT_Worker, spawnCap >= CreepBodies.Worker[1].cost ? 1 : 0, Priority_Low, CJ_Build, TT_Builder);
             } else {
-                this.EnsureAssignment('Build', CT_Worker, spawnCap >= CreepBodies.Worker[3].cost ? 3 : 2, Priority_Low, CJ_Build, TT_Builder);
-                if (viewData.sourceIDs.length > 1) {
-                    this.EnsureAssignment('Build2', CT_Worker, spawnCap >= CreepBodies.Worker[3].cost ? 3 : 2, Priority_Low, CJ_Build, TT_Builder);
+                if (targetRoom.controller.level < 4) {
+                    this.EnsureAssignment('Build', CT_Worker, spawnCap >= CreepBodies.Worker[1].cost ? 1 : 0, Priority_Low, CJ_Build, TT_Builder);
+                    this.EnsureAssignment('Build2', CT_Worker, spawnCap >= CreepBodies.Worker[1].cost ? 1 : 0, Priority_Low, CJ_Build, TT_Builder);
+                    this.EnsureAssignment('Build3', CT_Worker, spawnCap >= CreepBodies.Worker[1].cost ? 1 : 0, Priority_Low, CJ_Build, TT_Builder);
+                } else {
+                    this.EnsureAssignment('Build', CT_Worker, spawnCap >= CreepBodies.Worker[3].cost ? 3 : 2, Priority_Low, CJ_Build, TT_Builder);
+                    if (viewData.sourceIDs.length > 1) {
+                        this.EnsureAssignment('Build2', CT_Worker, spawnCap >= CreepBodies.Worker[3].cost ? 3 : 2, Priority_Low, CJ_Build, TT_Builder);
+                    }
                 }
             }
         } else {
@@ -35,6 +41,10 @@ class InfrastructureGroup extends BasicCreepGroup<SourceGroup_Memory> {
                 if (this.assignments['Build2']) {
                     this.CloseAssignment('Build2');
                     delete this.assignments['Build2'];
+                }
+                if (this.assignments['Build3']) {
+                    this.CloseAssignment('Build3');
+                    delete this.assignments['Build3'];
                 }
             }
         }

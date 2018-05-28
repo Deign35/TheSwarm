@@ -19,8 +19,8 @@ class HarvesterJob extends BasicJob<HarvesterJob_Memory> {
         this.memory.tar = this.memory.obj;
 
         if (!this.memory.fm) {
+            let source = Game.getObjectById(this.memory.tar) as Source;
             if (!this.memory.cont) {
-                let source = Game.getObjectById(this.memory.tar) as Source;
                 let containers = FindStructureNextTo(source.pos, STRUCTURE_CONTAINER);
                 if (containers && containers.length > 0) {
                     this.memory.cont = containers[0].structure.id;
@@ -47,6 +47,10 @@ class HarvesterJob extends BasicJob<HarvesterJob_Memory> {
                 } else if (!container) {
                     delete this.memory.cont;
                 }
+            }
+            if (this.creep.pos.isNearTo(source)) {
+                this.memory.fm = true;
+                delete this.memory.cont;
             }
         }
 

@@ -25,7 +25,8 @@ class BasicRoom extends BasicCreepGroup<CreepGroup_Memory> {
                     assignments: {},
                     homeRoom: this.roomName,
                     targetRoom: this.roomName,
-                    level: 0
+                    level: 0,
+                    needsInfrastructureBoot: true
                 }
                 let newPID = this.kernel.startProcess(CG_Control, newMem);
                 this.roomData.groups.CG_Control = newPID;

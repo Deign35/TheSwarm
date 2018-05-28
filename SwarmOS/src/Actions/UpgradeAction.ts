@@ -18,7 +18,14 @@ export class UpgradeAction extends ActionWithTarget<UpgradeTargetType> {
             //case(ERR_NO_BODYPART): No work body parts on this creep.
             default: console.log('FAILED ACTION[UpgradeAction] -- ' + result);
         }
-
+        if (!this.Target.sign || this.Target.sign.text != MY_SIGNATURE) {
+            if (!this.AssignedCreep.pos.isNearTo(this.Target)) {
+                this.Move(this.Target.pos);
+            }
+            else {
+                this.AssignedCreep.signController(this.Target, MY_SIGNATURE);
+            }
+        }
         return actionResponse;
     }
 
@@ -29,14 +36,6 @@ export class UpgradeAction extends ActionWithTarget<UpgradeTargetType> {
         }
         if (!this.AssignedCreep.pos.inRangeTo(this.Target, 3)) {
             result = SR_MOVE;
-        }
-        if (!this.Target.sign || this.Target.sign.text != MY_SIGNATURE) {
-            if (!this.AssignedCreep.pos.isNearTo(this.Target)) {
-                result = SR_MOVE;
-            }
-            else {
-                this.AssignedCreep.signController(this.Target, MY_SIGNATURE);
-            }
         }
         return result as SwarmlingResponse;
     }
