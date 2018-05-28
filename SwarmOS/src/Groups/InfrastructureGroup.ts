@@ -18,18 +18,25 @@ class InfrastructureGroup extends BasicCreepGroup<SourceGroup_Memory> {
         } else {
             spawnCap = targetRoom.energyCapacityAvailable;
         }
-        if (viewData.cSites.length == 0) {
+        this.EnsureAssignment('Repair', CT_Repair, spawnCap >= CreepBodies.Repair[1].cost ? 1 : 0, Priority_Lowest, CJ_Repair, TT_Repair);
+        if (viewData.cSites.length > 0) {
+            if (!targetRoom.controller || targetRoom.controller.level < 4) {
+                this.EnsureAssignment('Build', CT_Worker, spawnCap >= CreepBodies.Worker[1].cost ? 1 : 0, Priority_Low, CJ_Build, TT_Builder);
+            } else {
+                this.EnsureAssignment('Build', CT_Worker, spawnCap >= CreepBodies.Worker[3].cost ? 3 : 2, Priority_Low, CJ_Build, TT_Builder);
+                if (viewData.sourceIDs.length > 1) {
+                    this.EnsureAssignment('Build2', CT_Worker, spawnCap >= CreepBodies.Worker[3].cost ? 3 : 2, Priority_Low, CJ_Build, TT_Builder);
+                }
+            }
+        } else {
             if (this.assignments['Build']) {
                 this.CloseAssignment('Build');
                 delete this.assignments['Build'];
+                if (this.assignments['Build2']) {
+                    this.CloseAssignment('Build2');
+                    delete this.assignments['Build2'];
+                }
             }
-            this.EnsureAssignment('Repair', CT_Repair, spawnCap >= CreepBodies.Repair[1].cost ? 1 : 0, Priority_Lowest, CJ_Repair, TT_Repair);
-        } else {
-            if (this.assignments['Repair']) {
-                this.CloseAssignment('Repair');
-                delete this.assignments['Repair'];
-            }
-            this.EnsureAssignment('Build', CT_Worker, spawnCap >= CreepBodies.Worker[1].cost ? 1 : 0, Priority_Low, CJ_Build, TT_Builder);
         }
     }
 }

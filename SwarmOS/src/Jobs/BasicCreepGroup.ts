@@ -21,6 +21,7 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Basic
         for (let i = 0; i < childIDs.length; i++) {
             if (!this.assignments[childIDs[i]].pid || !this.kernel.getProcessByPID(this.assignments[childIDs[i]].pid!)) {
                 this.RemoveCreepFromAssignment(childIDs[i]);
+                delete this.assignments[childIDs[i]];
             }
         }
     }

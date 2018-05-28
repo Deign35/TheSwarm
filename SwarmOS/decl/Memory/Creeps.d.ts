@@ -45,7 +45,6 @@ declare interface BootSwarmOS_Memory extends CreepGroup_Memory {
 
 declare interface ControlGroup_Memory extends BootSwarmOS_Memory {
     level: number;
-    EM?: boolean;
 }
 
 declare interface SourceGroup_Memory extends BootSwarmOS_Memory {

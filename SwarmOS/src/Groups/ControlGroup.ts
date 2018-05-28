@@ -18,30 +18,13 @@ class ControlGroup extends BasicCreepGroup<ControlGroup_Memory> {
         } else {
             spawnCap = targetRoom.energyCapacityAvailable;
         }
-        if (viewData.cSites.length != 0 || targetRoom.controller.level != this.memory.level) {
-            let assignmentIDs = Object.keys(this.assignments);
-            for (let i = 0; i < assignmentIDs.length; i++) {
-                this.CloseAssignment(assignmentIDs[i]);
-                delete this.assignments[assignmentIDs[i]];
-            }
-            this.memory.level = targetRoom.controller.level;
-        }
 
         if (targetRoom.controller.ticksToDowngrade < 3000) {
-            this.memory.EM = true;
-        }
-
-        if (this.memory.EM) {
-            if (targetRoom.controller.ticksToDowngrade > 6000) {
-                this.memory.EM = false;
-                this.CloseAssignment('EMUpgrader');
-            } else {
-                this.EnsureAssignment('EMUpgrader', CT_Worker, 0, Priority_EMERGENCY, CJ_Upgrade, TT_Upgrader, targetRoom.controller.id);
-            }
+            this.EnsureAssignment('EMUpgrader', CT_Worker, 0, Priority_EMERGENCY, CJ_Upgrade, TT_Upgrader, targetRoom.controller.id);
         }
 
         if (viewData.cSites.length == 0) {
-            let numUpgraders = 4;
+            let numUpgraders = 0;
             let bodyLevel = 0;
 
             switch (targetRoom.controller.level) {
@@ -55,6 +38,7 @@ class ControlGroup extends BasicCreepGroup<ControlGroup_Memory> {
                 case (4):
                 case (3):
                 case (2):
+                    numUpgraders = 2 * viewData.sourceIDs.length;
                     for (let i = CreepBodies.Worker.length - 1; i >= 0; i--) {
                         if (spawnCap > CreepBodies.Worker[i].cost) {
                             bodyLevel = i;
@@ -74,6 +58,8 @@ class ControlGroup extends BasicCreepGroup<ControlGroup_Memory> {
                 this.EnsureUpgrader('Up' + i, bodyLevel);
             }
         }
+
+        this.sleeper.sleep(this.pid, 20);
     }
 
     protected EnsureUpgrader(id: string, level: number) {
