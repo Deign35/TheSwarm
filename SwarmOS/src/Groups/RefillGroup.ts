@@ -86,8 +86,10 @@ class RefillGroup extends BasicCreepGroup<RefillGroup_Memory> {
         if (isMyRoom) {
             if (targetRoom.controller!.level <= 3) {
                 this.EnsureAssignment('EMRefiller', CT_Worker, 0, Priority_EMERGENCY, CJ_Refiller, TT_SpawnRefill);
-                this.EnsureAssignment('SupportFiller3', CT_SlowHauler, spawnCap >= CreepBodies.SlowHauler[1].cost ? 1 : 0, Priority_Lowest, CJ_Refiller, TT_SupportFiller);
-                this.EnsureAssignment('SupportFiller4', CT_SlowHauler, spawnCap >= CreepBodies.SlowHauler[1].cost ? 1 : 0, Priority_Lowest, CJ_Refiller, TT_SupportFiller);
+                if (targetRoom.energyCapacityAvailable, 650) {
+                    this.EnsureAssignment('SupportFiller3', CT_SlowHauler, spawnCap >= CreepBodies.SlowHauler[1].cost ? 1 : 0, Priority_Lowest, CJ_Refiller, TT_SupportFiller);
+                    this.EnsureAssignment('SupportFiller4', CT_SlowHauler, spawnCap >= CreepBodies.SlowHauler[1].cost ? 1 : 0, Priority_Lowest, CJ_Refiller, TT_SupportFiller);
+                }
             }
             this.EnsureAssignment('SpawnFiller', CT_FastHauler, spawnCap >= CreepBodies.FastHauler[2].cost ? 2 : 1, Priority_High, CJ_Refiller, TT_SpawnRefill);
             this.EnsureAssignment('SupportFiller', CT_SlowHauler, spawnCap >= CreepBodies.SlowHauler[1].cost ? 1 : 0, Priority_Low, CJ_Refiller, TT_SupportFiller);

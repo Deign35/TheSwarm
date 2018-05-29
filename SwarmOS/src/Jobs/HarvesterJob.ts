@@ -14,7 +14,7 @@ class HarvesterJob extends BasicJob<HarvesterJob_Memory> {
         return AT_Harvest;
     }
     protected GetIcon() {
-        return '✴ ✴ ✴';
+        return '⛏ ⛏ ⛏';
     }
     protected GetTarget(): ObjectTypeWithID | undefined {
         return Game.getObjectById(this.memory.obj) as Source;

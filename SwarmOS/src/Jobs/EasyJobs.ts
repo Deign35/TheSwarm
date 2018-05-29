@@ -15,6 +15,23 @@
  * ♥
  * ♦
  * 🆓
+ * 👁️‍🗨️
+ * 💤
+ * ⛑
+ * 🌸
+ * 🚑
+ * 🚒
+ * 🛑
+ * 🚧
+ * ⌛
+ * ⏳
+ * 🎆
+ * 🔧
+ * 🗡
+ * ⚔
+ * 🏹
+ * 🛡
+ * 🔬
  */
 
 export const OSPackage: IPackage<SpawnRegistry_Memory> = {
@@ -33,7 +50,7 @@ class RepairJob extends BasicJob<BasicJob_Memory> {
         return AT_Repair;
     }
     protected GetIcon() {
-        return '🔧 🔧 🔧';
+        return '🛠 🛠 🛠';
     }
 
     protected GetTarget(): ObjectTypeWithID | undefined {
