@@ -56,6 +56,15 @@ if (!Memory.VERSION || Memory.VERSION != SWARM_VERSION_DATE) {
                 for (let i = 0; i < ids.length; i++) {
                     Memory.spawnData[ids[i]].OLD = SWARM_VERSION_DATE;
                 }
+            } else if (oldVersion == "2018-5-28 20:01:31") {
+                console.log('Fifth attempt to update the OS')
+                let ids = Object.keys(Memory.spawnData);
+                for (let i = 0; i < ids.length; i++) {
+                    if (Memory.spawnData[ids[i]].OLD == "2018-5-28 19:43:19" && Memory.spawnData[ids[i]].spSta == SP_COMPLETE) {
+                        console.log(`Deleting old spawnRequest${ids[i]}`);
+                        delete Memory.spawnData[ids[i]];
+                    }
+                }
             }
         }
     } catch (ex) {

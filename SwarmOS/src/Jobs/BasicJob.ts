@@ -133,10 +133,12 @@ export abstract class BasicJob<T extends BasicJob_Memory> extends BasicProcess<T
         }
 
         if (!this.GetTarget()) {
+            let doRecheck = false;
             if (!this.memory.ret) {
                 this.UpdateTarget();
+                doRecheck = true;
             }
-            if (!this.GetTarget()) {
+            if (!doRecheck || !this.GetTarget()) {
                 let newTarget = this.GetNewTarget();
                 if (newTarget && !!Game.getObjectById(newTarget)) {
                     if (this.memory.obj == this.memory.tar) {

@@ -81,6 +81,16 @@ class RefillerJob extends BasicJob<BasicJob_Memory> {
 
         return target;
     }
+
+    protected SetupAction() {
+        let check = (this.memory.ret && this.memory.ret == true) ? true : false;
+        let result = super.SetupAction();
+
+        if (!check && this.memory.ret) {
+            this.UpdateTarget();
+        }
+        return result;
+    }
 }
 
 class UpgradeJob extends BasicJob<BasicJob_Memory> {
