@@ -13,6 +13,7 @@ declare interface IProcess {
     pkgName: string;
     pid: PID;
     parentPID: PID;
+    rngSeed: number;
 
     PrepTick?(): void;
     EndTick?(): void;
@@ -27,6 +28,7 @@ declare interface IProcessContext {
     readonly pid: PID;
     readonly pPID: PID;
     readonly isActive: boolean;
+    readonly rngSeed: number;
 }
 
 declare interface ProcInfo {

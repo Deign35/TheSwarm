@@ -22,6 +22,7 @@ export abstract class BasicProcess<T extends MemBase> implements IProcess {
     get pkgName(): string { return this.context.pkgName; }
     get pid(): PID { return this.context.pid; }
     get parentPID(): PID { return this.context.pPID; }
+    get rngSeed(): number { return this.context.rngSeed; }
 
     GetParentProcess<T extends IProcess>(): T | undefined {
         return this.parentPID ? this.kernel.getProcessByPID(this.parentPID) as T : undefined;
