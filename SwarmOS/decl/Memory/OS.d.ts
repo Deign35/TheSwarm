@@ -1,4 +1,6 @@
-declare interface MemBase { }
+declare interface MemBase {
+    OLD?: string; // Denoting that a bit of memory is running on old code or other VERSIONING stuffs.
+}
 
 /** Core OS */
 declare interface KernelMemory extends MemBase {
