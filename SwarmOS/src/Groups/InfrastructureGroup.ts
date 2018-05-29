@@ -3,7 +3,7 @@ export const OSPackage: IPackage<SpawnRegistry_Memory> = {
         processRegistry.register(CG_Infrastructure, InfrastructureGroup);
     }
 }
-import { BasicCreepGroup } from "Jobs/BasicCreepGroup";
+import { BasicCreepGroup } from "Groups/BasicCreepGroup";
 
 class InfrastructureGroup extends BasicCreepGroup<SourceGroup_Memory> {
     protected EnsureGroupFormation(): void {

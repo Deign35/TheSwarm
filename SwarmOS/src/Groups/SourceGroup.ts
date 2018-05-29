@@ -5,7 +5,7 @@ export const OSPackage: IPackage<SpawnRegistry_Memory> = {
     }
 }
 
-import { BasicCreepGroup } from "Jobs/BasicCreepGroup";
+import { BasicCreepGroup } from "Groups/BasicCreepGroup";
 import { FindNextTo } from "Tools/TheFinder";
 
 class SimpleSourceGroup extends BasicCreepGroup<SourceGroup_Memory> {

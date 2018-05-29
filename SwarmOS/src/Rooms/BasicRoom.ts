@@ -4,7 +4,7 @@ export const OSPackage: IPackage<RoomStateMemory> = {
     }
 }
 
-import { BasicCreepGroup } from "Jobs/BasicCreepGroup";
+import { BasicCreepGroup } from "Groups/BasicCreepGroup";
 
 class BasicRoom extends BasicCreepGroup<CreepGroup_Memory> {
     protected roomData!: RoomState;
@@ -38,6 +38,17 @@ class BasicRoom extends BasicCreepGroup<CreepGroup_Memory> {
                 }
                 let newPID = this.kernel.startProcess(CG_Control, newMem);
                 this.roomData.groups.CG_Control = newPID;
+            }
+            if (!this.roomData.groups.CG_SelfDefense) {
+                let newMem: SelfDefenseGroup_Memory = {
+                    assignments: {},
+                    homeRoom: this.roomName,
+                    targetRoom: this.roomName,
+                    needsInfrastructureBoot: true
+                }
+
+                let newPID = this.kernel.startProcess(CG_SelfDefense, newMem);
+                this.roomData.groups.CG_SelfDefense = newPID;
             }
 
             // (TODO): Combine this with the other source one...this is just ugly

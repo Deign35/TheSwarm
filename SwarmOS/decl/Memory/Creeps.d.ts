@@ -50,6 +50,9 @@ declare interface RefillGroup_Memory extends CreepGroup_Memory {
     creeps: CreepID[];
     structs: ObjectID[];
 }
+declare interface SelfDefenseGroup_Memory extends BootSwarmOS_Memory {
+    
+}
 
 declare interface SourceGroup_Memory extends BootSwarmOS_Memory {
     sourceID: string;

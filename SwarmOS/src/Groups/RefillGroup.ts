@@ -4,7 +4,7 @@ export const OSPackage: IPackage<SpawnRegistry_Memory> = {
     }
 }
 
-import { BasicCreepGroup } from "Jobs/BasicCreepGroup";
+import { BasicCreepGroup } from "Groups/BasicCreepGroup";
 
 class RefillGroup extends BasicCreepGroup<RefillGroup_Memory> {
     protected get creepTargets() {
