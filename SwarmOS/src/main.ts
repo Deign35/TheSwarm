@@ -1,7 +1,8 @@
 ﻿declare var Memory: {
     VERSION: string,
     counter: number,
-    creeps: SDictionary<any>
+    creeps: SDictionary<any>,
+    kernel: KernelMemory
 }
 let startLoad = Game.cpu.getUsed(); // Will not use any prototype defined version of getUsed
 // Ensure all constants are initialized
@@ -29,6 +30,23 @@ if (!Memory.VERSION || Memory.VERSION != SWARM_VERSION_DATE) {
 
     console.log(`Updating OS to ${SWARM_VERSION_DATE}`);
     Memory.counter = Memory.counter || 1;
+    try {
+        if (Memory.VERSION && Memory.VERSION == "2018-5-28 15:10:15") {
+            console.log('First attempt to update the OS')
+            let pids = Object.keys(Memory.kernel.processMemory);
+            for (let i = 0; i < pids.length; i++) {
+                let mem = Memory.kernel.processMemory[pids[i]];
+                if ((mem as CreepGroup_Memory).assignments && (mem as CreepGroup_Memory).assignments['Spawnfiller']) {
+                    (mem as CreepGroup_Memory).assignments['SpawnFiller'] = (mem as CreepGroup_Memory).assignments['Spawnfiller'];
+                    delete (mem as CreepGroup_Memory).assignments['Spawnfiller'];
+                } else if ((mem as CreepJob_Memory).home && (mem as CreepJob_Memory).id && (mem as CreepJob_Memory).id == 'Spawnfiller') {
+                    (mem as CreepJob_Memory).id = 'SpawnFiller';
+                }
+            }
+        }
+    } catch (ex) {
+        console.log(`Failed to Update OS version ${ex}.`)
+    }
     Memory.VERSION = SWARM_VERSION_DATE;
     console.log(`Updating OS complete`)
 }
