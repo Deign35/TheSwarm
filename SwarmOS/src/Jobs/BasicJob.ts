@@ -153,7 +153,7 @@ export abstract class BasicJob<T extends BasicJob_Memory> extends BasicProcess<T
     EndTick() {
         let target = this.GetTarget();
         if (this.creep && !this.creep.spawning && target) {
-            if (Game.time % 5 == 0) {
+            if ((Game.time + this.rngSeed) % 13 == 0) {
                 this.creep.say(this.GetIcon());
             }
             let action = GetBasicAction(this.creep, this.GetActionType(), target);
