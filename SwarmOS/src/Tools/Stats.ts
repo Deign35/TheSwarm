@@ -47,23 +47,24 @@ put stuff like object ids in tags doing so ends up causing massive performance h
 as the tag indexes get too large too quickly. Good data for tags is more static stuff
 such as roomName, sectorName, etc, low overall spread.
 
-*
-declare var Memory: any;
-export default function setup(): void {
-    global.stats = new Statistics();
+*/
+declare var Memory: {
+    memory: StatsMemoryStructure
+}
+declare var global: {
+    stats: Statistics
+}
+export function setup(): void {
+    global['GStats'] = new Statistics();
 }
 
 export interface StatsConfig {
     driver: string;
-    format: string;
     types: string[];
     key: string;
     segment: number;
-    baseStats: boolean;
-    measureMemoryParse: boolean;
     divider: string;
-    usermap: { [id: string]: string };
-    outputMemoryParseResults: boolean;
+    baseStats: boolean;
 }
 
 interface Stat {
@@ -73,26 +74,19 @@ interface Stat {
 }
 
 const CONFIG: StatsConfig = {
-    driver: 'InfluxDB', // Graphite, InfluxDB
-    format: 'plain', // Or JSON, only applies to Graphite driver
-    types: ['console'], // memory, segment, console
+    driver: 'Graphite', // Graphite, InfluxDB
+    types: ['memory', 'console'], // memory, segment, console
     key: '__stats',
     segment: 30,
-    baseStats: true,
-    measureMemoryParse: true,
     divider: ';',  // "\n",
-    usermap: { // use module.user in console to get userID for mapping.
-        '4e241a77d2b82f7': 'Cashew'
-        // '577bc02e47c3ef7031adb268': 'ags131', // Useful for Private Servers
-    },
-    outputMemoryParseResults: false
+    baseStats: true,
 }
 
-export class Statistics {
+export class Statistics implements IStatistics {
     constructor(opts = {}) {
         this.opts = Object.assign(CONFIG, opts);
-        this.shard = (Game.shard && Game.shard.name) || 'shard0';
-        this.user = _.find(Game.spawns, v => v)!.owner.username;
+        this.shard = (Game.shard && Game.shard.name) || 'shard2';
+        //this.user = _.find(Game.spawns, v => v)!.owner.username;
         this.reset();
         this.startTick = Game.time;
     }
@@ -106,15 +100,12 @@ export class Statistics {
     private stats!: Stat[];
 
     private startTick: number;
-    private lastTime!: number;
-    private memoryParseTime!: number;
 
     private shard: string;
-    private user: string;
+    private user: string = MY_USERNAME;
     private prefix!: string;
 
     private cpuReset!: number;
-    private endReset!: number;
 
 
     public addSimpleStat(name: string, value: any = 0): void {
@@ -130,35 +121,9 @@ export class Statistics {
 
         this.stats = [];
         this.cpuReset = Game.cpu.getUsed();
-
-        if (!this.opts.measureMemoryParse) return;
-
-        let start = Game.cpu.getUsed();
-
-        if (this.lastTime && global.LastMemory && Game.time === (this.lastTime + 1)) {
-            delete global.Memory;
-            global.Memory = global.LastMemory;
-            RawMemory._parsed = global.LastMemory;
-            console.log('[1] Tick has same GID!');
-        } else {
-            Memory; // eslint-disable-line no-unused-expressions
-            global.LastMemory = RawMemory._parsed;
-        }
-
-        this.lastTime = Game.time;
-        let end = Game.cpu.getUsed();
-        let el = end - start;
-        this.memoryParseTime = el;
-
         this.addStat('memory', {}, {
-            parse: el,
             size: RawMemory.get().length
         });
-
-        this.endReset = Game.cpu.getUsed();
-
-        if (this.opts.outputMemoryParseResults)
-            console.log(`[1] [Stats] Entry: ${this.cpuReset.toFixed(3)} - Exit: ${(this.endReset - this.cpuReset).toFixed(3)} - Mem: ${this.memoryParseTime.toFixed(3)} (${(RawMemory.get().length / 1024).toFixed(2)}kb)`);
     }
 
     public commit(): void {
@@ -166,33 +131,35 @@ export class Statistics {
 
         if (this.opts.baseStats) this.addBaseStats();
 
-        let stats: string = `text/${this.opts.driver.toLowerCase()}\n`;
-        stats += `${Game.time}\n`;
-        stats += `${Date.now()}\n`;
+        let formattedStats: string = `text/${this.opts.driver.toLowerCase()}\n`;
+        formattedStats += `${Game.time}\n`;
+        formattedStats += `${Date.now()}\n`;
 
-        let format = this[`format${this.opts.driver}`].bind(this);
+        let format = this[`format${this.opts.driver}`].bind(this); // Binds formatGraphite or formatInfluxDB to this object.
         _.each(this.stats, (v, k) => {
-            stats += format(v)
+            formattedStats += format(v)
         });
 
         let end = Game.cpu.getUsed();
 
-        stats += format({ name: 'stats', tags: {}, values: { count: this.stats.length, size: stats.length, cpu: end - start } })
+        formattedStats += format({ name: 'stats', tags: {}, values: { count: this.stats.length, size: formattedStats.length, cpu: end - start } })
 
-        if (this.opts.types.indexOf('segment') >= 0)
-            RawMemory.segments[this.opts.segment] = stats;
-        if (this.opts.types.indexOf('memory') >= 0)
-            Memory[this.opts.key] = stats;
-        if (this.opts.types.indexOf('console') >= 0)
-            console.log('STATS;' + stats.replace(/\n/g, ';'));
+        if (this.opts.types.indexOf('segment') >= 0) {
+            RawMemory.segments[this.opts.segment] = formattedStats;
+        }
+        if (this.opts.types.indexOf('memory') >= 0) {
+            Memory[this.opts.key] = formattedStats;
+        }
+        if (this.opts.types.indexOf('console') >= 0) {
+            console.log('STATS' + this.opts.divider + formattedStats.replace(/\n/g, this.opts.divider));
+        }
     }
 
-    /** Adds some common stats. *
+    /** Adds some common stats. */
     private addBaseStats(): void {
         this.addStat('time', {}, {
             tick: Game.time,
             timestamp: Date.now(),
-            duration: Memory.lastDur
         });
 
         this.addStat('gcl', {}, {
@@ -278,4 +245,4 @@ export class Statistics {
     private kv(obj: any, sep = '='): string[] {
         return _.map(obj, (v, k) => `${k}${sep}${v}`)
     }
-}*/
+}

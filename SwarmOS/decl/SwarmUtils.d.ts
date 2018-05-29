@@ -66,3 +66,13 @@ declare function DoTest(testID: string, memObject: any, testFunction: () => void
 declare function GetSUID(): string;
 declare function GetRandomIndex(list: any[]): number;
 declare function GetRandomID<T>(dictionaryObject: SDictionary<T>): T | undefined;
+
+
+declare interface IStatistics {
+    addSimpleStat(name: string, value?: any): void;
+    commit(): void;
+    addStat(name: string, tags?: { [id: string]: any }, values?: { [id: string]: any }): void;
+    reset(): void
+}
+
+declare var GStats: IStatistics;
