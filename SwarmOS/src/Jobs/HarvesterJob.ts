@@ -54,6 +54,10 @@ class HarvesterJob extends BasicJob<HarvesterJob_Memory> {
         if (this.memory.cont) {
             let container = Game.getObjectById(this.memory.cont) as StructureContainer | ConstructionSite;
             if (container && !this.creep.pos.isEqualTo(container.pos)) {
+                if (container.pos.lookFor(LOOK_CREEPS).length > 0) {
+                    delete this.memory.cont;
+                    this.memory.fm = true;
+                }
                 new MoveToPositionAction(this.creep, container.pos).Run();
             } else if (container) {
                 this.memory.fm = true;
