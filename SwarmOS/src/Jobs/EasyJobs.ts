@@ -35,11 +35,17 @@ class RefillerJob extends BasicJob<BasicJob_Memory> {
     }
 
     protected GetTarget(): ObjectTypeWithID | undefined {
-        let struct = Game.getObjectById(this.memory.tar) as StructureExtension | StructureSpawn;
-        if (struct && !this.memory.ret && struct.structureType && struct.energy) {
-            return struct.energy < struct.energyCapacity ? struct : undefined;
+        let target = Game.getObjectById(this.memory.tar) as Structure | Creep;
+        if (target && !this.memory.ret) {
+            if ((target as Structure).structureType && (target as StructureExtension).energyCapacity) {
+                return (target as StructureExtension).energy < (target as StructureExtension).energyCapacity ? target : undefined;
+            }
+            if ((target as Creep).carryCapacity) {
+                return ((target as Creep).carry.energy + 25 < (target as Creep).carryCapacity) ? target : undefined;
+            }
         }
-        return struct;
+
+        return target;
     }
 }
 

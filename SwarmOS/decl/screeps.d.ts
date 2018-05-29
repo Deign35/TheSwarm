@@ -2089,7 +2089,10 @@ interface OrderFilter {
     price?: number;
 }
 
-interface ScreepsObject_CreepMemory { }
+interface ScreepsObject_CreepMemory {
+    ct: CT_ALL;
+    lvl: number;
+}
 interface ScreepsObject_FlagMemory { }
 interface ScreepsObject_RoomMemory { }
 interface ScreepsObject_SpawnMemory { }

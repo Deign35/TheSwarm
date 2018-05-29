@@ -98,6 +98,7 @@ export abstract class BasicJob<T extends BasicJob_Memory> extends BasicProcess<T
                             }
                             break;
                         case (SP_ERROR):
+                            this.spawnRegistry.cancelRequest(this.memory.cID);
                         default:
                             delete this.memory.cID;
                             delete this.memory.isSpawning;
@@ -275,6 +276,24 @@ export abstract class BasicJob<T extends BasicJob_Memory> extends BasicProcess<T
                     return viewData.needsRepair.shift()!;
                 }
                 break;
+            case (TT_SupportFiller):
+                if (viewData.structures.tower) {
+                    for (let i = 0; i < viewData.structures.tower.length; i++) {
+                        let tower = Game.getObjectById(viewData.structures.tower[i]) as StructureTower;
+                        if (tower && tower.energy < tower.energyCapacity) {
+                            return tower.id;
+                        }
+                    }
+                }
+
+                let ids = Object.keys(Game.creeps);
+                for (let i = 0; i < ids.length; i++) {
+                    let creep = Game.creeps[ids[i]];
+                    if (creep.memory.ct == CT_Worker && (creep.carry.energy * 4) < creep.carryCapacity) {
+                        return creep.id;
+                    }
+                }
+            // SupportFiller will help out with spawn filling if no other work is nearby
             case (TT_SpawnRefill):
                 if (!viewData.structures.extension || !viewData.structures.spawn) {
                     return;
@@ -291,14 +310,12 @@ export abstract class BasicJob<T extends BasicJob_Memory> extends BasicProcess<T
                         return spawn.id;
                     }
                 }
-                return undefined;
+                if (this.creep.getActiveBodyparts(WORK) == 0) {
+                    return undefined;
+                }
+            // If the creep has a work part, it will then dump its transfer into the controller (yay for creep.transfer working on the controller)
             case (TT_Upgrader):
                 return viewData.structures.controller;
-            case (TT_SupportHarvest):
-                // I'm cheating here..  (TODO): Make this not cheating!
-                if (viewData.sourceIDs.length > 1) {
-                    return viewData.sourceIDs[1];
-                }
             case (TT_Harvest):
                 return viewData.sourceIDs.length > 0 ? viewData.sourceIDs[0] : undefined;
             case (TT_None):

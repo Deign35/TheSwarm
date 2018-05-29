@@ -37,17 +37,6 @@ class HarvesterJob extends BasicJob<HarvesterJob_Memory> {
                     }
                 }
             }
-            if (this.memory.cont) {
-                let container = Game.getObjectById(this.memory.cont) as StructureContainer | ConstructionSite;
-                if (container && !this.creep.pos.isEqualTo(container.pos)) {
-                    new MoveToPositionAction(this.creep, container.pos).Run();
-                } else if (container) {
-                    this.memory.fm = true;
-                    delete this.memory.cont;
-                } else if (!container) {
-                    delete this.memory.cont;
-                }
-            }
             if (this.creep.pos.isNearTo(source)) {
                 this.memory.fm = true;
                 delete this.memory.cont;
@@ -55,5 +44,20 @@ class HarvesterJob extends BasicJob<HarvesterJob_Memory> {
         }
 
         return ThreadState_Done;
+    }
+
+    EndTick() {
+        super.EndTick();
+        if (this.memory.cont) {
+            let container = Game.getObjectById(this.memory.cont) as StructureContainer | ConstructionSite;
+            if (container && !this.creep.pos.isEqualTo(container.pos)) {
+                new MoveToPositionAction(this.creep, container.pos).Run();
+            } else if (container) {
+                this.memory.fm = true;
+                delete this.memory.cont;
+            } else if (!container) {
+                delete this.memory.cont;
+            }
+        }
     }
 }

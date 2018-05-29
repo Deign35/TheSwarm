@@ -72,8 +72,8 @@ class CreepRegistry extends BasicProcess<CreepRegistry_Memory> {
             let context = this.registeredCreeps[creepIDs[i]];
             if (!context) {
                 this.Extensions.tryRegisterCreep({
-                    ct: (creep.memory as any).ct,
-                    l: (creep.memory as any).l,
+                    ct: creep.memory.ct,
+                    l: creep.memory.lvl,
                     n: creep.name
                 })
             }

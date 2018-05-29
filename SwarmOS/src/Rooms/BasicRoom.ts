@@ -20,6 +20,14 @@ class BasicRoom extends BasicCreepGroup<CreepGroup_Memory> {
     }
     EnsureGroupFormation() {
         if (this.roomData.owner == MY_USERNAME) {
+            if (!this.room.controller!.safeMode && !this.room.controller!.safeModeCooldown && this.room.controller!.safeModeAvailable > 0) {
+                let hostiles = this.room.find(FIND_HOSTILE_CREEPS);
+                for (let i = 0; i < hostiles.length; i++) {
+                    if (hostiles[i].getActiveBodyparts(ATTACK) > 0) {
+                        this.room.controller!.activateSafeMode();
+                    }
+                }
+            }
             if (!this.roomData.groups.CG_Control) {
                 let newMem: ControlGroup_Memory = {
                     assignments: {},
@@ -59,7 +67,7 @@ class BasicRoom extends BasicCreepGroup<CreepGroup_Memory> {
         }
 
         if (!this.roomData.owner || this.roomData.owner == MY_USERNAME) {
-            if (!this.roomData.groups.CG_SimpleSource && this.room.controller && this.room.controller.level < 3) {
+            if (!this.roomData.groups.CG_SimpleSource && this.room.controller && this.room.controller.level <= 3) {
                 if (!this.roomData.groups.CG_Source) {
                     this.roomData.groups.CG_Source = [];
                     for (let i = 0; i < this.roomData.sourceIDs.length; i++) {

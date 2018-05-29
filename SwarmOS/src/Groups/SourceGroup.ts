@@ -88,7 +88,8 @@ export class SourceGroup extends BasicCreepGroup<SourceGroup_Memory> {
             }
         } else {
             let source = Game.getObjectById(this.memory.sourceID) as Source;
-            let spawn = source.pos.findClosestByPath(FIND_MY_SPAWNS);
+            let spawn = source.pos.findClosestByRange(FIND_MY_SPAWNS);
+
             path = spawn.pos.findPathTo(source);
         }
 
