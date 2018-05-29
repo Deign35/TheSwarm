@@ -24,31 +24,29 @@ class ControlGroup extends BasicCreepGroup<ControlGroup_Memory> {
         }
 
         if (viewData.cSites.length == 0) {
-            let numUpgraders = 2 * viewData.sourceIDs.length;
+            let numUpgraders = (2 * viewData.sourceIDs.length) + 1;
             let bodyLevel = 0;
 
             switch (targetRoom.controller.level) {
                 case (8):
+                case (1):
                     numUpgraders = 1;
                     bodyLevel = 0;
                     break;
-                case (3):
                 case (2):
                     numUpgraders += 1;
-                case (7):
-                case (6):
-                case (5):
+                case (3):
                 case (4):
-                    numUpgraders += 1; // Make sure we don't have 0
+                    numUpgraders += 1;
+                case (5):
+                case (6):
+                case (7):
                     for (let i = CreepBodies.Worker.length - 1; i >= 0; i--) {
                         if (spawnCap >= CreepBodies.Worker[i].cost) {
                             bodyLevel = i;
                             break;
                         }
                     }
-                    break;
-                case (1):
-                    numUpgraders = 1;
                     break;
                 case (0):
                 default:

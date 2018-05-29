@@ -33,27 +33,29 @@ if (!Memory.VERSION || Memory.VERSION != SWARM_VERSION_DATE) {
     Memory.counter = Memory.counter || 1;
     try {
         let oldVersion = Memory.VERSION;
-        if (oldVersion && oldVersion == "2018-5-28 15:10:15") {
-            console.log('First attempt to update the OS')
-            const oldName = 'Spawnfiller';
-            const newName = 'SpawnFiller';
-            let pids = Object.keys(Memory.kernel.processMemory);
-            for (let i = 0; i < pids.length; i++) {
-                let mem = Memory.kernel.processMemory[pids[i]];
-                if (mem) {
-                    if ((mem as CreepGroup_Memory).assignments && (mem as CreepGroup_Memory).assignments[oldName]) {
-                        (mem as CreepGroup_Memory).assignments[newName] = (mem as CreepGroup_Memory).assignments[oldName];
-                        delete (mem as CreepGroup_Memory).assignments[oldName];
-                    } else if ((mem as CreepJob_Memory).cID && (mem as CreepJob_Memory).id && (mem as CreepJob_Memory).id == oldName) {
-                        (mem as CreepJob_Memory).id = newName;
+        if (oldVersion) {
+            if (oldVersion == "2018-5-28 15:10:15") {
+                console.log('First attempt to update the OS')
+                const oldName = 'Spawnfiller';
+                const newName = 'SpawnFiller';
+                let pids = Object.keys(Memory.kernel.processMemory);
+                for (let i = 0; i < pids.length; i++) {
+                    let mem = Memory.kernel.processMemory[pids[i]];
+                    if (mem) {
+                        if ((mem as CreepGroup_Memory).assignments && (mem as CreepGroup_Memory).assignments[oldName]) {
+                            (mem as CreepGroup_Memory).assignments[newName] = (mem as CreepGroup_Memory).assignments[oldName];
+                            delete (mem as CreepGroup_Memory).assignments[oldName];
+                        } else if ((mem as CreepJob_Memory).cID && (mem as CreepJob_Memory).id && (mem as CreepJob_Memory).id == oldName) {
+                            (mem as CreepJob_Memory).id = newName;
+                        }
                     }
                 }
-            }
-        } else if (oldVersion == "2018-5-28 17:52:48") {
-            console.log('Second attempt to update the OS')
-            let ids = Object.keys(Memory.spawnData);
-            for (let i = 0; i < ids.length; i++) {
-                Memory.spawnData[ids[i]].OLD = SWARM_VERSION_DATE;
+            } else if (oldVersion == "2018-5-28 17:52:48") {
+                console.log('Second attempt to update the OS')
+                let ids = Object.keys(Memory.spawnData);
+                for (let i = 0; i < ids.length; i++) {
+                    Memory.spawnData[ids[i]].OLD = SWARM_VERSION_DATE;
+                }
             }
         }
     } catch (ex) {
