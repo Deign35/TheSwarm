@@ -12,6 +12,8 @@ var BODYPART_COST = {
     "t": 10,
     "cl": 600
 }
+
+const primeFunctionality = require('./grunt/primes');
 module.exports = function (grunt) {
     gObj = grunt;
     grunt.loadNpmTasks('grunt-contrib-clean');
@@ -431,49 +433,6 @@ var GenerateConstantsFile = function () {
         d_file.push(declareString(globalID, typeID, 'var', ': '));
     };
 
-    var primeLists = {
-        100: "",
-        300: "",
-        500: "",
-        1000: "",
-        1500: "",
-        2000: "",
-        2500: "",
-        3000: "",
-    };
-    var GeneratePrimes = function () {
-        g_file.push("// Primes");
-        d_file.push("");
-
-        var primes = [3, 5, 7, 11];
-        var curNum = 13;
-        while (primes.length < 3000) {
-            for (var primeIndex = 0, length = primes.length; primeIndex < length; primeIndex++) {
-                if (curNum % primes[primeIndex] == 0) {
-                    curNum += 2;
-                    continue;
-                }
-            }
-            primes.push(curNum);
-            curNum += 2;
-        }
-        primes = [2].concat(primes);
-
-        for (var primeListIndex = 0; primeListIndex < primes.length; primeListIndex++) {
-            for (var maxNumber in primeLists) {
-                if (maxNumber > primes[primeListIndex]) {
-                    primeLists[maxNumber] += primes[primeListIndex] + ', ';
-                }
-            }
-        }
-
-        for (var maxDigit in primeLists) {
-            primeLists[maxDigit] = '[' + primeLists[maxDigit].slice(0, -2) + ']';
-            g_file.push(setGlobal('primes_' + maxDigit, primeLists[maxDigit]));
-            d_file.push("declare const primes_" + maxDigit + ": " + primeLists[maxDigit] + '');
-        }
-    };
-
     var OutputToFile = function () {
         var declarationContents = "";
         for (var contentIndex = 0; contentIndex < d_file.length; contentIndex++) {
@@ -507,8 +466,14 @@ var GenerateConstantsFile = function () {
         d_file.push("");
 
         OutputAllCreepDefinitions();
-        g_file.push('');
-        GeneratePrimes();
+        g_file.push("\n// Primes");
+        d_file.push("");
+        var primesLists = primeFunctionality.GeneratePrimes();
+
+        for (var maxDigit in primesLists) {
+            g_file.push(setGlobal('primes_' + maxDigit, primesLists[maxDigit]));
+            d_file.push("declare const primes_" + maxDigit + ": " + primesLists[maxDigit] + '');
+        }
         OutputToFile();
     }
 
