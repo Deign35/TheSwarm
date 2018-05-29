@@ -24,7 +24,7 @@ class ControlGroup extends BasicCreepGroup<ControlGroup_Memory> {
         }
 
         if (viewData.cSites.length == 0) {
-            let numUpgraders = 0;
+            let numUpgraders = 2 * viewData.sourceIDs.length;
             let bodyLevel = 0;
 
             switch (targetRoom.controller.level) {
@@ -32,15 +32,16 @@ class ControlGroup extends BasicCreepGroup<ControlGroup_Memory> {
                     numUpgraders = 1;
                     bodyLevel = 0;
                     break;
+                case (3):
+                case (2):
+                    numUpgraders += 1;
                 case (7):
                 case (6):
                 case (5):
                 case (4):
-                case (3):
-                case (2):
-                    numUpgraders = 2 * viewData.sourceIDs.length;
+                    numUpgraders += 1; // Make sure we don't have 0
                     for (let i = CreepBodies.Worker.length - 1; i >= 0; i--) {
-                        if (spawnCap > CreepBodies.Worker[i].cost) {
+                        if (spawnCap >= CreepBodies.Worker[i].cost) {
                             bodyLevel = i;
                             break;
                         }
