@@ -15,7 +15,7 @@ class SimpleSourceGroup extends BasicCreepGroup<SourceGroup_Memory> {
         let isMyRoom = viewData.owner && viewData.owner == MY_USERNAME;
         this.EnsureAssignment('Harvester', CT_Harvester, 2, isMyRoom ? Priority_High : Priority_Medium, CJ_Harvester, TT_Harvest, this.memory.sourceID);
 
-        this.sleeper.sleep(this.pid, 150);
+        this.sleeper.sleep(this.pid, 10);
     }
 }
 export class SourceGroup extends BasicCreepGroup<SourceGroup_Memory> {
@@ -75,7 +75,7 @@ export class SourceGroup extends BasicCreepGroup<SourceGroup_Memory> {
             delete this.assignments['SupportBuilder'];
         }
 
-        this.sleeper.sleep(this.pid, 25);
+        this.sleeper.sleep(this.pid, 10);
     }
 
     CreateSites() {

@@ -132,7 +132,6 @@ export class Logger implements IKernelLoggerExtensions {
     }
 
     DumpLogToConsole(endTick: boolean = true): void {
-        let startLoggingTime = Game.cpu.getUsed();
 
         let logOutputs = [];
         let ids = Object.keys(this.logContexts);
@@ -145,18 +144,17 @@ export class Logger implements IKernelLoggerExtensions {
             }
         }
 
-        let headerStyle: TextStyle = { align: 'left', color: 'white', backgroundColor: 'black', opacity: 0.7 };
-        let vis = new RoomVisual();
-        vis.text(`[${Game.time}]`, 0, 0, headerStyle);
-        vis.text(`CPU: (${startLoggingTime}\/${Game.cpu.limit} -- [${Game.cpu.bucket}])`, 0, 1, headerStyle);
-
         for (let i = 0; i < logOutputs.length; i++) {
             console.log(logOutputs[i]);
         }
 
         // Reset the logger
         this.InitQueue();
-        vis.text(`End: (${Game.cpu.getUsed() - startLoggingTime})`, 0, 2, headerStyle);
+
+        let headerStyle: TextStyle = { align: 'left', color: 'white', backgroundColor: 'black', opacity: 0.7 };
+        let vis = new RoomVisual();
+        vis.text(`[${Game.time}]`, 0, 0, headerStyle);
+        vis.text(`CPU: (${Game.cpu.getUsed()}\/${Game.cpu.limit} -- [${Game.cpu.bucket}])`, 0, 1, headerStyle);
     }
 
     private ShouldLog(minLevel: LogLevel, messageLevel: LogLevel) {

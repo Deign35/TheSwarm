@@ -1,5 +1,6 @@
 declare var Memory: {
     creepData: CreepRegistry_Memory;
+    creeps: SDictionary<ScreepsObject_CreepMemory>;
 }
 
 import { BasicProcess, ExtensionBase } from "Core/BasicTypes";
@@ -60,15 +61,12 @@ class CreepRegistry extends BasicProcess<CreepRegistry_Memory> {
             }
             if (!Game.creeps[creepIDs[i]]) {
                 delete this.memory.registeredCreeps[creepIDs[i]];
+                delete Memory.creeps[creepIDs[i]];
             }
         }
         creepIDs = Object.keys(Game.creeps);
         for (let i = 0, length = creepIDs.length; i < length; i++) {
             let creep = Game.creeps[creepIDs[i]];
-            if (!creep) {
-                delete this.registeredCreeps[creepIDs[i]];
-                continue;
-            }
             let context = this.registeredCreeps[creepIDs[i]];
             if (!context) {
                 this.Extensions.tryRegisterCreep({

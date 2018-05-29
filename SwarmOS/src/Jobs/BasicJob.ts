@@ -80,7 +80,7 @@ export abstract class BasicJob<T extends BasicJob_Memory> extends BasicProcess<T
                 if (this.memory.isSpawning) {
                     let spawnStatus = this.spawnRegistry.getRequestStatus(this.memory.cID);
                     switch (spawnStatus) {
-                        case (SP_QUEUED): break;;
+                        case (SP_QUEUED): break;
                         case (SP_SPAWNING):
                         case (SP_COMPLETE):
                             let newCreepName = this.spawnRegistry.getRequestContext(this.memory.cID)!.n;
@@ -160,7 +160,9 @@ export abstract class BasicJob<T extends BasicJob_Memory> extends BasicProcess<T
             }
             let action = GetBasicAction(this.creep, this.GetActionType(), target);
             if (action) {
-                action.Run();
+                if (action.Run() == SR_TARGET_INELLIGIBLE) {
+                    delete this.memory.tar;
+                }
             } else {
                 this.log.warn(`UNEXPECTED--Action not working`);
             }

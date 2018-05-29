@@ -1,7 +1,6 @@
 ﻿declare var Memory: {
     VERSION: string;
     counter: number;
-    creeps: SDictionary<any>;
     kernel: KernelMemory;
     spawnData: SpawnRegistry_Memory;
 }
@@ -92,5 +91,7 @@ export function loop() {
 }
 
 let endLoad = Game.cpu.getUsed();
-//kernel.log.info(() => `SwarmOS reloaded - Begin: ${startLoad}cpu`);
-//kernel.log.info(() => `SwarmOS reloaded - Used: ${endLoad - startLoad}cpu`);
+if (!Game.rooms['sim']) {
+    kernel.log.info(() => `SwarmOS reloaded - Begin: ${startLoad}cpu`);
+    kernel.log.info(() => `SwarmOS reloaded - Used: ${endLoad - startLoad}cpu`);
+}
