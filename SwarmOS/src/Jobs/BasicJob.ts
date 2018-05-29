@@ -75,6 +75,51 @@ export abstract class BasicJob<T extends BasicJob_Memory> extends BasicProcess<T
         if (this.memory.cID) {
             this._creep = this.creepRegistry.tryGetCreep(this.memory.cID, this.pid);
         }
+    }
+
+    RunThread(): ThreadState {
+        if (!this.creep || this.creep.spawning) {
+            return ThreadState_Done;
+        }
+
+        if (!this.GetTarget()) {
+            let doRecheck = false;
+            if (!this.memory.ret) {
+                this.UpdateTarget();
+                doRecheck = true;
+            }
+            if (!doRecheck || !this.GetTarget()) {
+                let newTarget = this.GetNewTarget();
+                if (newTarget && !!Game.getObjectById(newTarget)) {
+                    if (this.memory.obj == this.memory.tar) {
+                        this.memory.tar = newTarget;
+                    }
+                    this.memory.obj = newTarget;
+                }
+            }
+        }
+
+        return this.SetupAction();
+    }
+
+    EndTick() {
+        if (this.creep) {
+            let target = this.GetTarget();
+            if (!this.creep.spawning && target) {
+                if ((Game.time + this.rngSeed) % 13 == 0) {
+                    this.creep.say(this.GetIcon());
+                }
+                let action = GetBasicAction(this.creep, this.GetActionType(), target);
+                if (action) {
+                    if (action.Run() == SR_TARGET_INELLIGIBLE) {
+                        delete this.memory.tar;
+                    }
+                } else {
+                    this.log.warn(`UNEXPECTED--Action not working`);
+                }
+            }
+        }
+
         if (!this.creep) {
             if (this.memory.cID) {
                 if (this.memory.isSpawning) {
@@ -124,48 +169,6 @@ export abstract class BasicJob<T extends BasicJob_Memory> extends BasicProcess<T
                 n: ct + GetSUID(),
             }, this.memory.loc, this.memory.pri);
             this.memory.isSpawning = true;
-        }
-    }
-
-    RunThread(): ThreadState {
-        if (!this.creep || this.creep.spawning) {
-            return ThreadState_Done;
-        }
-
-        if (!this.GetTarget()) {
-            let doRecheck = false;
-            if (!this.memory.ret) {
-                this.UpdateTarget();
-                doRecheck = true;
-            }
-            if (!doRecheck || !this.GetTarget()) {
-                let newTarget = this.GetNewTarget();
-                if (newTarget && !!Game.getObjectById(newTarget)) {
-                    if (this.memory.obj == this.memory.tar) {
-                        this.memory.tar = newTarget;
-                    }
-                    this.memory.obj = newTarget;
-                }
-            }
-        }
-
-        return this.SetupAction();
-    }
-
-    EndTick() {
-        let target = this.GetTarget();
-        if (this.creep && !this.creep.spawning && target) {
-            if ((Game.time + this.rngSeed) % 13 == 0) {
-                this.creep.say(this.GetIcon());
-            }
-            let action = GetBasicAction(this.creep, this.GetActionType(), target);
-            if (action) {
-                if (action.Run() == SR_TARGET_INELLIGIBLE) {
-                    delete this.memory.tar;
-                }
-            } else {
-                this.log.warn(`UNEXPECTED--Action not working`);
-            }
         }
     }
 
