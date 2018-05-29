@@ -16,12 +16,22 @@ class RefillGroup extends BasicCreepGroup<RefillGroup_Memory> {
         return this.memory.structs;
     }
     GetAssignmentTarget(aID: string) {
-        if (this.creepTargets.length == 0 && this.structTargets.length == 0) {
-            let viewData = this.View.GetRoomData(this.memory.targetRoom)!;
-            if (!viewData) {
-                return undefined;
-            }
+        let assignment = this.assignments[aID];
+        let viewData = this.View.GetRoomData(this.memory.targetRoom)!;
+        if (!assignment || !viewData) {
+            return undefined;
+        }
 
+        if (this.creepTargets.length == 0) {
+            let ids = Object.keys(Game.creeps);
+            for (let i = 0; i < ids.length; i++) {
+                let creep = Game.creeps[ids[i]];
+                if (creep.memory.ct == CT_Worker && creep.carry.energy * 2 < creep.carryCapacity) {
+                    this.creepTargets.push(creep.id);
+                }
+            }
+        }
+        if (this.structTargets.length == 0) {
             if (viewData.structures.tower) {
                 for (let i = 0; i < viewData.structures.tower.length; i++) {
                     let tower = Game.getObjectById(viewData.structures.tower[i]) as StructureTower;
@@ -30,16 +40,7 @@ class RefillGroup extends BasicCreepGroup<RefillGroup_Memory> {
                     }
                 }
             }
-
-            let ids = Object.keys(Game.creeps);
-            for (let i = 0; i < ids.length; i++) {
-                let creep = Game.creeps[ids[i]];
-                if (creep.memory.ct == CT_Worker && creep.carry.energy * 2 < creep.carryCapacity) {
-                    this.creepTargets.push(creep.id);
-                }
-            }
             if (viewData.structures.extension) {
-                // SupportFiller will help out with spawn filling if no other work is nearby
                 for (let i = 0; i < viewData.structures.extension.length; i++) {
                     let extension = Game.getObjectById(viewData.structures.extension[i]) as StructureExtension;
                     if (extension) {
@@ -58,18 +59,24 @@ class RefillGroup extends BasicCreepGroup<RefillGroup_Memory> {
             if (this.structTargets.length == 0 && viewData.structures.storage) {
                 this.structTargets.push(viewData.structures.storage);
             }
-
         }
 
+        // (TODO): Sort these?
         let retVal = undefined;
-        if (this.structTargets.length > 0) {
-            retVal = this.structTargets.shift();
-        } else if (this.creepTargets.length > 0) {
-            retVal = this.creepTargets.shift();
+        if (assignment.tt == TT_SupportFiller) {
+            if (this.creepTargets.length > 0) {
+                retVal = this.creepTargets.shift();
+            }
+        }
+        if (!retVal) {
+            if (this.structTargets.length > 0) {
+                retVal = this.structTargets.shift();
+            }
         }
 
         return retVal;
     }
+
     protected EnsureGroupFormation(): void {
         let viewData = this.View.GetRoomData(this.memory.targetRoom)!;
         let targetRoom = Game.rooms[this.memory.targetRoom];
@@ -86,14 +93,16 @@ class RefillGroup extends BasicCreepGroup<RefillGroup_Memory> {
         if (isMyRoom) {
             if (targetRoom.controller!.level <= 3) {
                 this.EnsureAssignment('EMRefiller', CT_Worker, 0, Priority_EMERGENCY, CJ_Refiller, TT_SpawnRefill);
-                if (targetRoom.energyCapacityAvailable, 650) {
-                    this.EnsureAssignment('SupportFiller3', CT_SlowHauler, spawnCap >= CreepBodies.SlowHauler[1].cost ? 1 : 0, Priority_Lowest, CJ_Refiller, TT_SupportFiller);
-                    this.EnsureAssignment('SupportFiller4', CT_SlowHauler, spawnCap >= CreepBodies.SlowHauler[1].cost ? 1 : 0, Priority_Lowest, CJ_Refiller, TT_SupportFiller);
-                }
+                this.EnsureAssignment('SupportFiller3', CT_SlowHauler, spawnCap >= CreepBodies.SlowHauler[1].cost ? 1 : 0, Priority_Lowest, CJ_Refiller, TT_SupportFiller);
+                this.EnsureAssignment('SupportFiller4', CT_SlowHauler, spawnCap >= CreepBodies.SlowHauler[1].cost ? 1 : 0, Priority_Lowest, CJ_Refiller, TT_SupportFiller);
+
+                this.EnsureAssignment('SpawnFiller', CT_FastHauler, spawnCap >= CreepBodies.FastHauler[2].cost ? 2 : 1, Priority_High, CJ_Refiller, TT_SpawnRefill);
+                this.EnsureAssignment('SupportFiller', CT_SlowHauler, spawnCap >= CreepBodies.SlowHauler[1].cost ? 1 : 0, Priority_Low, CJ_Refiller, TT_SupportFiller);
+                this.EnsureAssignment('SupportFiller2', CT_FastHauler, spawnCap >= CreepBodies.FastHauler[2].cost ? 2 : 1, Priority_Low, CJ_Refiller, TT_SupportFiller);
+            } else {
+                this.EnsureAssignment('SpawnRefiller', CT_SuperHauler, spawnCap >= CreepBodies.SuperHauler[1].cost ? 1 : 0, Priority_High, CJ_Refiller, TT_SpawnRefill);
+                this.EnsureAssignment('SupportRefiller', CT_FastHauler, spawnCap >= CreepBodies.FastHauler[4].cost ? 4 : 3, Priority_Medium, CJ_Refiller, TT_SupportFiller);
             }
-            this.EnsureAssignment('SpawnFiller', CT_FastHauler, spawnCap >= CreepBodies.FastHauler[2].cost ? 2 : 1, Priority_High, CJ_Refiller, TT_SpawnRefill);
-            this.EnsureAssignment('SupportFiller', CT_SlowHauler, spawnCap >= CreepBodies.SlowHauler[1].cost ? 1 : 0, Priority_Low, CJ_Refiller, TT_SupportFiller);
-            this.EnsureAssignment('SupportFiller2', CT_FastHauler, spawnCap >= CreepBodies.FastHauler[2].cost ? 2 : 1, Priority_Low, CJ_Refiller, TT_SupportFiller);
         }
     }
 }
