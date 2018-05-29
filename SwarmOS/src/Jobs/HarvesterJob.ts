@@ -13,6 +13,9 @@ class HarvesterJob extends BasicJob<HarvesterJob_Memory> {
     protected GetPrimaryActionType(): ActionType {
         return AT_Harvest;
     }
+    protected GetIcon() {
+        return '✴ ✴ ✴';
+    }
 
     protected SetupAction(): ThreadState {
         this.memory.ac = AT_Harvest;
