@@ -39,7 +39,7 @@ export class SourceGroup extends BasicCreepGroup<SourceGroup_Memory> {
             }
         }
         this.EnsureAssignment('Harvester', CT_Harvester, extractionLevel,
-            isMyRoom ? Priority_High : Priority_Medium, CJ_Harvester, TT_Harvest, this.memory.sourceID);
+            isMyRoom ? Priority_High : Priority_Highest, CJ_Harvester, TT_Harvest, this.memory.sourceID);
         if (extractionLevel == 0) {
             if (source) {
                 let spaces = FindNextTo(source.pos, LOOK_TERRAIN);
@@ -112,5 +112,6 @@ export class SourceGroup extends BasicCreepGroup<SourceGroup_Memory> {
                 this.memory.constructionIDs.push(site[0].id);
             }
         }
+        this.memory.constructionIDs = this.memory.constructionIDs.reverse();
     }
 }

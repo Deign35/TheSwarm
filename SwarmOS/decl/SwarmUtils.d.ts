@@ -74,5 +74,3 @@ declare interface IStatistics {
     addStat(name: string, tags?: { [id: string]: any }, values?: { [id: string]: any }): void;
     reset(): void
 }
-
-declare var GStats: IStatistics;

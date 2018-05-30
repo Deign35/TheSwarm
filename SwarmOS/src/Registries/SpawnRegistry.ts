@@ -97,11 +97,11 @@ class SpawnRegistry extends BasicProcess<SpawnRegistry_Memory> {
                 if (this.creepRegistry.tryReserveCreep(foundCreep, this.pid)) {
                     reservedCreeps.push(foundCreep);
                 }
-
                 continue;
+            } else {
+                activeRequests[requests[i]] = req;
+                minSpawnCost = Math.min(minSpawnCost, CreepBodies.get(req.con.ct)[req.con.l].cost);
             }
-            activeRequests[requests[i]] = req;
-            minSpawnCost = Math.min(minSpawnCost, CreepBodies.get(req.con.ct)[req.con.l].cost);
         }
 
         for (let i = 0; i < reservedCreeps.length; i++) {

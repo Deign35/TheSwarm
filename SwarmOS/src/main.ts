@@ -10,8 +10,8 @@ require('globalConstants');
 
 import * as Profiler from "Tools/Profiler";
 global['Profiler'] = Profiler.init();
-import * as Stats from "Tools/Stats";
-Stats.setup();
+//import * as Stats from "Tools/Stats";
+//Stats.setup();
 
 import "Tools/GlobalTools";
 import "Tools_Prototypes";
@@ -86,11 +86,11 @@ kernel.installPackages([CreepGroupsPackage, CreepJobsPackage, FlagPackage, Regis
 
 export function loop() {
     try {
-        GStats.reset();
+        //GStats.reset();
         kernel.loop();
     } finally {
         kernel.log.DumpLogToConsole();
-        GStats.commit();
+        //GStats.commit();
     }
 }
 
