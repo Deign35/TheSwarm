@@ -154,7 +154,8 @@ export class Logger implements IKernelLoggerExtensions {
         let headerStyle: TextStyle = { align: 'left', color: 'white', backgroundColor: 'black', opacity: 0.7 };
         let vis = new RoomVisual();
         vis.text(`[${Game.time}]`, 0, 0, headerStyle);
-        vis.text(`CPU: (${Game.cpu.getUsed()}\/${Game.cpu.limit} -- [${Game.cpu.bucket}])`, 0, 1, headerStyle);
+
+        vis.text(`CPU: (${Game.cpu.getUsed().toFixed(3)}\/${Game.cpu.limit} -- [${Game.cpu.bucket}])`, 0, 1, headerStyle);
     }
 
     private ShouldLog(minLevel: LogLevel, messageLevel: LogLevel) {
