@@ -171,7 +171,7 @@ export abstract class BasicJob<T extends BasicJob_Memory> extends BasicProcess<T
     }
 
     protected SetupAction(): ThreadState {
-        if (!this.memory.ac || this.memory.ac == AT_NoOp) {
+        if (!this.memory.ac || this.memory.ac == AT_NoOp as ActionType) {
             this.memory.ret = true;
             delete this.memory.tar;
             delete this.memory.ac;

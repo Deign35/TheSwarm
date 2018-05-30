@@ -12,7 +12,8 @@ declare interface IProcessRegistry {
 declare interface IProcess {
     pkgName: string;
     pid: PID;
-    parentPID: PID;
+    parentPID?: PID;
+    rngSeed?: number;
 
     PrepTick?(): void;
     EndTick?(): void;

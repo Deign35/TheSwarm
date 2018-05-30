@@ -1,20 +1,20 @@
 export abstract class SlimProcess<T extends MemBase> implements IProcess {
+    constructor(protected context: IProcessContext) { }
+
     @extensionInterface(EXT_Kernel)
     protected kernel!: IKernelExtensions;
 
-    constructor(protected context: IProcessContext) { }
     protected get memory(): T { return this.context.memory as T; }
     get pkgName(): string { return this.context.pkgName; }
     get pid(): PID { return this.context.pid; }
     get parentPID(): PID { return this.context.pPID; }
-
-    GetParentProcess<T extends IProcess>(): T | undefined {
-        return this.parentPID ? this.kernel.getProcessByPID(this.parentPID) as T : undefined;
+    GetParentProcess<K extends IProcess>(): K | undefined {
+        return this.parentPID ? this.kernel.getProcessByPID(this.parentPID) as K : undefined;
     }
 
     PrepTick?(): void;
-    EndTick?(): void;
     abstract RunThread(): ThreadState;
+    EndTick?(): void;
 }
 export abstract class BasicProcess<T extends MemBase> extends SlimProcess<T> {
     constructor(protected context: IProcessContext) {
@@ -33,7 +33,7 @@ export abstract class BasicProcess<T extends MemBase> extends SlimProcess<T> {
     protected get log() { return this._logger; }
     protected get logID() { return DEFAULT_LOG_ID; }
     protected get logLevel(): LogLevel { return DEFAULT_LOG_LEVEL; }
-    protected get rngSeed(): number { return this.context.rngSeed; }
+    get rngSeed(): number { return this.context.rngSeed; }
 }
 
 const SCAN_FREQUENCY = 15;

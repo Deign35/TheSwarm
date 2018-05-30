@@ -1114,7 +1114,7 @@ interface Game {
      * @param id The unique identifier.
      * @returns an object instance or null if it cannot be found.
      */
-    getObjectById<T>(id: string | undefined): T | null;
+    getObjectById<T>(id: string | undefined): T | undefined; // POTENTIAL ISSUE INTRODUCED BECAUSE THIS ACTUALLY RETURNS NULL
     /**
      * Send a custom message at your profile email.
      *

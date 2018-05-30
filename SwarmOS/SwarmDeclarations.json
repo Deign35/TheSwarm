@@ -208,24 +208,33 @@
             "comment": "Action type",
             "enabled": true,
             "combinedType": "ActionType",
-            "string": true,
-            "isArray": true,
             "type": true,
-            "entries": [
-                "Attack",
-                "Build",
-                "Drop",
-                "Harvest",
-                "MoveToPosition",
-                "NoOp",
-                "Pickup",
-                "Repair",
-                "RequestTransfer",
-                "Say",
-                "Transfer",
-                "Upgrade",
-                "Withdraw"
-            ]
+            "entries": {
+                "NoOp": 0,
+                "Attack": 1,
+                "AttackController": 2,
+                "Build": 3,
+                "Drop": 4,
+                "Harvest": 5,
+                "MoveToPosition": 6,
+                "Pickup": 7,
+                "Repair": 8,
+                "RequestTransfer": 9,
+                "Transfer": 10,
+                "Upgrade": 11,
+                "Withdraw": 12,
+                "ClaimController": 13,
+                "Dismantle": 14,
+                "GenerateSafeMode": 15,
+                "Heal": 16,
+                "MoveByPath": 17,
+                "RangedAttack": 18,
+                "RangedHeal": 19,
+                "RangedMassAttack": 20,
+                "ReserveController": 21,
+                "SignController": 22,
+                "Suicide": 23
+            }
         }
     }
 }
