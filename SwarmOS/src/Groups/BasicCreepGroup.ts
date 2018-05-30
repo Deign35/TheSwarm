@@ -42,7 +42,8 @@ export abstract class BasicCreepGroup<T extends CreepGroup_Memory> extends Basic
                 this.assignments[aID] = {
                     ct: ctID,
                     lvl: level,
-                    tt: targetType
+                    tt: targetType,
+                    tar: targetID
                 }
             }
             let assignment = this.assignments[aID];

@@ -16,9 +16,7 @@ export abstract class BasicJob<T extends BasicJob_Memory> extends BasicProcess<T
         return Game.getObjectById(this.memory.tar) as ObjectTypeWithID;
     }
     protected UpdateTarget() {
-        let parent = this.kernel.getProcessByPID(this.parentPID)! as (IProcess & {
-            GetAssignmentTarget: (id: string) => string;
-        });
+        let parent = this.kernel.getProcessByPID(this.parentPID)! as (IProcess & { GetAssignmentTarget: (id: string) => string; });
         if (parent && parent.GetAssignmentTarget) {
             let updTar = parent.GetAssignmentTarget(this.memory.id);
             if (!this.memory.ret) {
@@ -91,7 +89,7 @@ export abstract class BasicJob<T extends BasicJob_Memory> extends BasicProcess<T
             if (!doRecheck || !this.GetTarget()) {
                 let newTarget = this.GetNewTarget();
                 if (newTarget && !!Game.getObjectById(newTarget)) {
-                    if (this.memory.obj == this.memory.tar) {
+                    if (!this.memory.ret) {
                         this.memory.tar = newTarget;
                     }
                     this.memory.obj = newTarget;
