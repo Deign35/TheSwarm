@@ -96,7 +96,7 @@ class RefillerJob extends BasicJob<BasicJob_Memory> {
             }
         }
 
-        return target;
+        return super.GetTarget();
     }
 
     protected SetupAction() {

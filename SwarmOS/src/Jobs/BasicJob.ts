@@ -21,7 +21,7 @@ export abstract class BasicJob<T extends BasicJob_Memory> extends BasicProcess<T
         });
         if (parent && parent.GetAssignmentTarget) {
             let updTar = parent.GetAssignmentTarget(this.memory.id);
-            if (this.memory.tar && this.memory.tar == this.memory.obj) {
+            if (!this.memory.ret) {
                 this.memory.tar = updTar;
             }
             this.memory.obj = updTar;
