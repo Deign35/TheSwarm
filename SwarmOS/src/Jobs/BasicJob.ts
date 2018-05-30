@@ -277,6 +277,11 @@ export abstract class BasicJob<T extends BasicJob_Memory> extends BasicProcess<T
                                     orderVal = 8;
                                 }
                                 break;
+                            default:
+                                // (TODO): Get this less weird...    
+                                if (orderVal < 2) {
+                                    bestSite = cSite;
+                                }
                         }
                     }
                     return bestSite ? bestSite.id : undefined;
@@ -324,7 +329,8 @@ export abstract class BasicJob<T extends BasicJob_Memory> extends BasicProcess<T
                 if (this.creep.getActiveBodyparts(WORK) == 0) {
                     return undefined;
                 }
-            // If the creep has a work part, it will then dump its transfer into the controller (yay for creep.transfer working on the controller)
+                break;
+            // (disabled) If the creep has a work part, it will then dump its transfer into the controller (yay for creep.transfer working on the controller)
             case (TT_Upgrader):
                 return viewData.structures.controller;
             case (TT_Harvest):
