@@ -59,8 +59,7 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
         let pid = 'p' + GetSUID() as PID;
         let pInfo: ProcInfo = {
             pid: pid,
-            PKG: packageName,
-            st: Game.time
+            PKG: packageName
         };
 
         this.processTable[pid] = pInfo;

@@ -13,7 +13,6 @@ declare interface IProcess {
     pkgName: string;
     pid: PID;
     parentPID: PID;
-    rngSeed: number;
 
     PrepTick?(): void;
     EndTick?(): void;
@@ -34,7 +33,6 @@ declare interface IProcessContext {
 declare interface ProcInfo {
     PKG: string;// Package name to load
     pid: PID;   // process id
-    st: number; // Started -- When the process started
     pP?: PID;   // parent pid
     end?: number; // Ended -- When the process ended
     err?: string; // Error

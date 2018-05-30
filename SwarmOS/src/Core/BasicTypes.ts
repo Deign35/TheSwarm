@@ -1,28 +1,12 @@
-export abstract class BasicProcess<T extends MemBase> implements IProcess {
+export abstract class SlimProcess<T extends MemBase> implements IProcess {
     @extensionInterface(EXT_Kernel)
     protected kernel!: IKernelExtensions;
-    @extensionInterface(EXT_Registry)
-    protected extensions!: IExtensionRegistry;
-    @extensionInterface(EXT_SpawnRegistry)
-    protected spawnRegistry!: ISpawnRegistryExtensions;
-    @extensionInterface(EXT_Sleep)
-    protected sleeper!: IKernelSleepExtension;
 
-    constructor(protected context: IProcessContext) {
-        this._logger = context.getPackageInterface(EXT_Logger).CreateLogContext(this.logID, this.logLevel);
-    }
-
-    private _logger: ILogger;
-    protected get log(): ILogger { return this._logger; }
-    protected get logID() { return DEFAULT_LOG_ID; }
-    protected get logLevel(): LogLevel { return DEFAULT_LOG_LEVEL; }
-
+    constructor(protected context: IProcessContext) { }
     protected get memory(): T { return this.context.memory as T; }
-
     get pkgName(): string { return this.context.pkgName; }
     get pid(): PID { return this.context.pid; }
     get parentPID(): PID { return this.context.pPID; }
-    get rngSeed(): number { return this.context.rngSeed; }
 
     GetParentProcess<T extends IProcess>(): T | undefined {
         return this.parentPID ? this.kernel.getProcessByPID(this.parentPID) as T : undefined;
@@ -31,6 +15,25 @@ export abstract class BasicProcess<T extends MemBase> implements IProcess {
     PrepTick?(): void;
     EndTick?(): void;
     abstract RunThread(): ThreadState;
+}
+export abstract class BasicProcess<T extends MemBase> extends SlimProcess<T> {
+    constructor(protected context: IProcessContext) {
+        super(context);
+        this._logger = context.getPackageInterface(EXT_Logger).CreateLogContext(this.logID, this.logLevel);
+    }
+
+    @extensionInterface(EXT_Registry)
+    protected extensions!: IExtensionRegistry;
+    @extensionInterface(EXT_SpawnRegistry)
+    protected spawnRegistry!: ISpawnRegistryExtensions;
+    @extensionInterface(EXT_Sleep)
+    protected sleeper!: IKernelSleepExtension;
+
+    private _logger!: ILogger;
+    protected get log() { return this._logger; }
+    protected get logID() { return DEFAULT_LOG_ID; }
+    protected get logLevel(): LogLevel { return DEFAULT_LOG_LEVEL; }
+    protected get rngSeed(): number { return this.context.rngSeed; }
 }
 
 const SCAN_FREQUENCY = 15;
