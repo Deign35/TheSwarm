@@ -12,6 +12,9 @@ declare interface ActionMemory extends MemBase {
 declare interface SpawnActivity_Memory extends MemBase {
     sID: string;
 }
+declare interface RoomActivity_Memory extends MemBase {
+    rID: RoomID;
+}
 
 
 

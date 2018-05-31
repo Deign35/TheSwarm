@@ -24,7 +24,8 @@
                 "RoomManager",
                 "SimpleOwnedRoom",
                 "FlagBase",
-                "SwarmCLI"
+                "SwarmCLI",
+                "EmptyProcess"
             ]
         },
         "CJ": {
@@ -215,6 +216,18 @@
                 "Launch": "launch",
                 "ChangeFlag": "flagColor"
             }
+        },
+        "SPKG": {
+            "comment": "Activity packages",
+            "enabled": true,
+            "combinedType": "SlimOSPackage",
+            "type": true,
+            "string": true,
+            "isArray": true,
+            "entries": [
+                "CreepActivity",
+                "SpawnActivity"
+            ]
         },
         "AT": {
             "comment": "Action type",

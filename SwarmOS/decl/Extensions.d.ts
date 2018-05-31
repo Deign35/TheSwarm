@@ -46,7 +46,7 @@ declare interface IExtensionRegistry extends IPackageExtension {
 declare interface IKernelExtensions extends IPackageExtension {
     installPackages(packages: IPackage<MemBase>[]): void;
     startProcess(packageName: string, startContext: MemBase): PID;
-    killProcess(pid: PID, msg: string): void;
+    killProcess(pid: PID, msg?: string): void;
     getProcessByPID(pid: PID): IProcess | undefined;
     setParent(pid: PID, parentId?: PID): boolean;
 }

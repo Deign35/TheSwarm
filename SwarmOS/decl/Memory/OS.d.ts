@@ -1,5 +1,6 @@
 declare interface MemBase {
     OLD?: string; // Denoting that a bit of memory is running on old code or other VERSIONING stuffs.
+    HC?: string; // (H)andle of the (C)allback function for informing the parent process that this process has died.
 }
 
 /** Core OS */

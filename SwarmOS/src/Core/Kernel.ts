@@ -101,10 +101,12 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
         return process;
     }
 
-    killProcess(id: PID, msg: string): void {
+    killProcess(id: PID, msg: string = ''): void {
         let pinfo = this.processTable[id];
         if (!pinfo) return;
-        this.log.info(`${id} killed - ${msg}`);
+        if (msg) {
+            this.log.info(`${id} killed - ${msg}`);
+        }
         pinfo.end = Game.time;
         let ids = Object.keys(this.processTable);
         for (let i = 0; i < ids.length; i++) {

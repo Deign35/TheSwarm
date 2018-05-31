@@ -159,6 +159,13 @@ class CreepRegistryExtensions extends ExtensionBase implements ICreepRegistryExt
         if (!id || !requestingPID) {
             return false;
         }
+        if (!this.registeredCreeps[id]) {
+            let creep = Game.creeps[id];
+            if (!creep) {
+                return false;
+            }
+            this.tryRegisterCreep({ ct: creep.memory.ct, l: creep.memory.lvl, n: creep.name, o: requestingPID });
+        }
         if (!this.registeredCreeps[id].o) {
             this.registeredCreeps[id].o = requestingPID;
         }

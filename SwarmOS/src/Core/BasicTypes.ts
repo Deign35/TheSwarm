@@ -3,6 +3,10 @@ export abstract class SlimProcess<T extends MemBase> implements IProcess {
 
     @extensionInterface(EXT_Kernel)
     protected kernel!: IKernelExtensions;
+    @extensionInterface(EXT_Registry)
+    protected extensions!: IExtensionRegistry;
+    @extensionInterface(EXT_Sleep)
+    protected sleeper!: IKernelSleepExtension;
 
     protected get memory(): T { return this.context.memory as T; }
     get pkgName(): string { return this.context.pkgName; }
@@ -15,19 +19,27 @@ export abstract class SlimProcess<T extends MemBase> implements IProcess {
     PrepTick?(): void;
     abstract RunThread(): ThreadState;
     EndTick?(): void;
+
+    protected EndProcess(cbVal?: string) {
+        let proc = this.GetParentProcess();
+        if (proc) {
+            if (cbVal && this.memory.HC) {
+                proc[this.memory.HC](cbVal); // Notify the parent using the given callback function.
+            }
+            this.sleeper.wake(this.parentPID);
+        }
+        this.kernel.killProcess(this.pid);
+    }
 }
+
 export abstract class BasicProcess<T extends MemBase> extends SlimProcess<T> {
     constructor(protected context: IProcessContext) {
         super(context);
         this._logger = context.getPackageInterface(EXT_Logger).CreateLogContext(this.logID, this.logLevel);
     }
 
-    @extensionInterface(EXT_Registry)
-    protected extensions!: IExtensionRegistry;
     @extensionInterface(EXT_SpawnRegistry)
     protected spawnRegistry!: ISpawnRegistryExtensions;
-    @extensionInterface(EXT_Sleep)
-    protected sleeper!: IKernelSleepExtension;
 
     private _logger!: ILogger;
     protected get log() { return this._logger; }
