@@ -330,7 +330,7 @@ export abstract class BasicJob<T extends BasicJob_Memory> extends BasicProcess<T
                 break;
             // (disabled) If the creep has a work part, it will then dump its transfer into the controller (yay for creep.transfer working on the controller)
             case (TT_Upgrader):
-                return viewData.structures.controller;
+                return Game.rooms[this.memory.loc].controller!.id;
             case (TT_Harvest):
                 return viewData.sourceIDs.length > 0 ? viewData.sourceIDs[0] : undefined;
             case (TT_None):
@@ -384,8 +384,8 @@ export abstract class BasicJob<T extends BasicJob_Memory> extends BasicProcess<T
                 closestTarget = storage;
             }
         }
-        for (let i = 0; i < view.structures.container.length; i++) {
-            let container = Game.getObjectById(view.structures.container[i]) as StructureContainer;
+        for (let i = 0; i < view.structures.container!.length; i++) {
+            let container = Game.getObjectById(view.structures.container![i]) as StructureContainer;
             if (!container) { continue; }
             if (container.store.energy >= minEnergy) {
                 let containerDist = this.creep.pos.getRangeTo(container);

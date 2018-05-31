@@ -92,8 +92,7 @@ declare interface IKernelSleepExtension extends IPackageExtension {
  * Is updated on a regular schedule by the RoomManager.
  */
 declare interface IRoomDataExtension extends IPackageExtension {
-    ForceResetRVDMemory(roomID: string): void;
-    GetRoomData(roomID: string, forceUpdate?: boolean): RoomState | undefined;
+    GetRoomData(roomID: string): RoomState | undefined;
 }
 
 /**

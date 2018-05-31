@@ -16,6 +16,10 @@ declare interface RoomActivity_Memory extends MemBase {
     rID: RoomID;
 }
 
+declare interface RoomGroup_Memory extends MemBase {
+    rID: RoomID;
+    creeps: CreepID[];
+}
 
 
 

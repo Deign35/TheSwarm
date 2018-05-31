@@ -226,7 +226,8 @@
             "isArray": true,
             "entries": [
                 "CreepActivity",
-                "SpawnActivity"
+                "SpawnActivity",
+                "RoomActivity"
             ]
         },
         "AT": {
