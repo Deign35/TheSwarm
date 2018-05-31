@@ -56,6 +56,15 @@ class RoomActivity extends SlimProcess<RoomActivity_Memory> {
             if (this.shouldRefresh(31, this.roomData!.minUpdateOffset)) {
                 this.RefreshRoomStructures(this.roomName);
             }
+
+            if (!this.roomData.hostPID || !this.kernel.getProcessByPID(this.roomData.hostPID)) {
+                let newMem: CreepGroup_Memory = {
+                    assignments: {},
+                    homeRoom: this.memory.rID,
+                    targetRoom: this.memory.rID
+                }
+                this.roomData.hostPID = this.kernel.startProcess(PKG_SimpleOwnedRoom, newMem);
+            }
             this.roomData.lastUpdated = Game.time;
         }
 

@@ -27,7 +27,7 @@ class RoomRegistry extends SlimProcess<RoomStateMemory> {
     RunThread(): ThreadState {
         for (let roomID in Game.rooms) {
             let data = this.RoomView.GetRoomData(roomID);
-            if (!data || !data.hostPID || !this.kernel.getProcessByPID(data.hostPID)) {
+            if (!data || !data.activityPID || !this.kernel.getProcessByPID(data.activityPID)) {
                 let newMem: RoomActivity_Memory = {
                     rID: roomID
                 }
@@ -55,7 +55,7 @@ class RoomRegistry extends SlimProcess<RoomStateMemory> {
                         activityPID: ''
                     }
                 }
-                this.memory.roomStateData[roomID]!.hostPID = this.kernel.startProcess(SPKG_RoomActivity, newMem);
+                this.memory.roomStateData[roomID]!.activityPID = this.kernel.startProcess(SPKG_RoomActivity, newMem);
             }
         }
 
