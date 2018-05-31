@@ -51,7 +51,6 @@ such as roomName, sectorName, etc, low overall spread.
 declare var Memory: {
     memory: StatsMemoryStructure
 }
-declare var GStats: IStatistics;
 export function setup(): void {
     global['GStats'] = new Statistics();
 }
