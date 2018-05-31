@@ -26,6 +26,10 @@ declare interface PackageProviderMemory extends MemBase {
         }
     }
 }
+
+declare interface SwarmCLIMemory extends MemBase {
+    commands: any[]
+}
 /** Stats */
 declare type RoomStats = {}
 declare type MarketStats = {}

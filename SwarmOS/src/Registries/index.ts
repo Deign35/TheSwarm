@@ -2,6 +2,7 @@ import { OSPackage as CreepRegistry } from "Registries/CreepRegistry";
 import { OSPackage as RoomRegistry } from "Registries/RoomRegistry";
 import { OSPackage as SpawnRegistry } from "Registries/SpawnRegistry";
 import { OSPackage as FlagRegistry } from "Registries/FlagRegistry";
+import { OSPackage as SwarmCLI } from "ColonyManagement/SwarmCLI";
 import { PackageProviderBase } from "Core/BasicTypes";
 
 import { OSPackage as RoomBase } from "Rooms/BasicRoom"
@@ -12,6 +13,7 @@ export const RegistriesPackage: IPackage<{}> = {
         RoomRegistry.install(processRegistry, extensionRegistry);
         SpawnRegistry.install(processRegistry, extensionRegistry);
         FlagRegistry.install(processRegistry, extensionRegistry);
+        SwarmCLI.install(processRegistry, extensionRegistry);
 
         RoomBase.install(processRegistry, extensionRegistry);
 
@@ -37,6 +39,9 @@ class SwarmManager extends PackageProviderBase<PackageProviderMemory> {
         },
         creepManager: {
             processName: PKG_CreepRegistry
+        },
+        cli: {
+            processName: PKG_SwarmCLI
         }
     }
 }

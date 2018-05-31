@@ -23,7 +23,8 @@
                 "SpawnRegistry",
                 "RoomManager",
                 "SimpleOwnedRoom",
-                "FlagBase"
+                "FlagBase",
+                "SwarmCLI"
             ]
         },
         "CJ": {
@@ -202,6 +203,17 @@
                 "Preparing": 3,
                 "Running": 4,
                 "Complete": 5
+            }
+        },
+        "CLI": {
+            "comment": "Command line actions",
+            "enabled": true,
+            "combinedType": "CLI_Command",
+            "type": true,
+            "string": true,
+            "entries": {
+                "Launch": "launch",
+                "ChangeFlag": "flagColor"
             }
         },
         "AT": {
