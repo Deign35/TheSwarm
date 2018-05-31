@@ -1,7 +1,7 @@
 import { SlimProcess } from "Core/BasicTypes";
 import { ActivityRunner, RunArgs } from "./ActivityRunner";
 
-export abstract class CreepActivity extends SlimProcess<ActionMemory> {
+export class CreepActivity extends SlimProcess<ActionMemory> {
     @extensionInterface(EXT_CreepRegistry)
     protected creepRegistry!: ICreepRegistryExtensions;
     @extensionInterface(EXT_RoomView)
@@ -13,19 +13,16 @@ export abstract class CreepActivity extends SlimProcess<ActionMemory> {
     Target?: ObjectTypeWithID;
     TargetPos?: RoomPosition;
 
-    PreTick() {
-        this.LoadActionMemory();
-    }    // (TODO): Change throw new error to wake parent process blah blah?
     RunThread(): ThreadState {
+        this.LoadActionMemory();
         if (!this.AssignedCreep || (!this.Target && !this.TargetPos)) {
             this.EndActivity(`Creep(${this.memory.c} -- [${this.AssignedCreep}]) or Target(${this.memory.t} -- [${this.Target}]) was not found`);
             return ThreadState_Done;
         }
-        if (!ActivityRunner.ValidateActionTarget(this.memory.at, this.Target)) {
-            this.EndActivity(`Target(${this.memory.t} -- [${this.Target}]) couldn't be targeted by AT(${this.memory.at})`);
-        }
+
+        // (TODO): Change this to be more predictive using the path (e.g. if(this.memory.p.length <= 3))
         if (!ActivityRunner.CreepIsInRange(this.memory.at, this.AssignedCreep.pos, this.TargetPos || this.Target!.pos)) {
-            ActivityRunner.MoveCreep(this.AssignedCreep, this.TargetPos || this.Target!.pos);
+            ActivityRunner.MoveCreep(this.AssignedCreep, this.TargetPos || this.Target!.pos, this.memory.p);
         } else {
             let result = ActivityRunner.RunActivity(this.CreateActivityArgs());
             switch (result) {
@@ -55,7 +52,7 @@ export abstract class CreepActivity extends SlimProcess<ActionMemory> {
         return {
             actionType: this.memory.at,
             creep: this.AssignedCreep!,
-            target: this.Target || this.TargetPos,
+            target: this.Target || this.TargetPos || this.AssignedCreep!.pos,
             amount: this.memory.a,
             message: this.memory.m,
             path: this.memory.p,
@@ -72,9 +69,6 @@ export abstract class CreepActivity extends SlimProcess<ActionMemory> {
     }
 
     protected EndActivity(killMessage: string) {
-        let parentProcess = this.GetParentProcess(); // this.GetParentProcess<SomeProcessType>();
-        // parentProcess.dosomething();
-
         this.sleeper.wake(this.parentPID);
         this.kernel.killProcess(this.pid, killMessage);
     }

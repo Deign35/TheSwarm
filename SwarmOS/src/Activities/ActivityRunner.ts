@@ -1,28 +1,67 @@
 export interface RunArgs {
     creep: Creep;
     actionType: ActionType;
+    path: PathStep[];
+
     target?: any;
-    
     amount?: number;
     message?: string;
     resourceType?: ResourceConstant;
-    path?: PathStep[];
 }
 
 export const ActivityRunner = {
+    CreateNewCreepActivity: (actionMem: ActionMemory, parentPID: PID, extensions: IExtensionRegistry) => {
+        if (!actionMem || !parentPID || !extensions || !actionMem.c || !actionMem.at) {
+            return undefined;
+        }
+        let creep = (extensions.get(EXT_CreepRegistry) as ICreepRegistryExtensions).tryGetCreep(actionMem.c, parentPID);
+        if (!creep) {
+            return undefined;
+        }
+        let target = actionMem.t ? Game.getObjectById(actionMem.t) : undefined;
+        if (!target && actionMem.tp) {
+            target = new RoomPosition(actionMem.tp.x || 25, actionMem.tp.y || 25, actionMem.tp.roomName);
+        } else if (!target) {
+            target = creep.pos;
+        }
+
+        if (!target || !ActivityRunner.ValidateActionTarget(actionMem.at, target)) {
+            return undefined;
+        }
+        if (!actionMem.p) {
+            actionMem.p = ActivityRunner.CreateMovePath(creep, target);
+        }
+
+        let newPID = extensions.getKernel().startProcess('pkg_creepaction', actionMem);
+        extensions.getKernel().setParent(newPID, parentPID);
+        return newPID;
+    },
+
     GetSquareDistance: (pos1: { x: number, y: number }, pos2: { x: number, y: number }) => {
         let xDiff = pos1.x - pos2.x;
         let yDiff = pos1.y - pos2.y;
         return xDiff > yDiff ? xDiff : yDiff;
     },
-    MoveCreep: (creep: Creep, pos: RoomPosition) => {
+
+    MoveCreep: (creep: Creep, pos: RoomPosition, path?: PathStep[]) => {
+        if (path && path.length > 0) {
+            creep.moveByPath(path);
+        }
         creep.moveTo(pos);
+    },
+
+    CreateMovePath: (creep: Creep, target: any): PathStep[] => {
+        let path: PathStep[] = [];
+
+        return path;
     },
 
     CreepIsInRange: (actionType: ActionType, pos1: RoomPosition, pos2: RoomPosition) => {
         let distance = ActivityRunner.GetSquareDistance(pos1, pos2);
         if (actionType == AT_Build || actionType == AT_RangedAttack || actionType == AT_RangedHeal || actionType == AT_Repair || actionType == AT_Upgrade) {
             return distance <= 3;
+        } else if (actionType == AT_Drop || actionType == AT_Suicide) {
+            return distance == 0;
         } else {
             return distance <= 1;
         }
@@ -102,7 +141,7 @@ export const ActivityRunner = {
             case (AT_Suicide):
             case (AT_NoOp):
             default:
-                return true;
+                return target && !!(target as RoomPosition).isNearTo;
         }
     }
 }
