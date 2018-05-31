@@ -1,12 +1,12 @@
 declare interface ActionMemory extends MemBase {
     c: CreepID;     //Creep
     at: ActionType; //ActionType
-    p: PathStep[]; //Path
     t?: ObjectID;   //Target
     tp?: { x?: number, y?: number, roomName: string }; //TargetPosition
     a?: number;     //Amount
     m?: string;     //Message
     rt?: ResourceConstant; //ResourceType
+    p?: PathStep[]; //Path
 }
 
 declare interface SpawnActivity_Memory extends MemBase {
@@ -18,7 +18,22 @@ declare interface RoomActivity_Memory extends MemBase {
 
 declare interface RoomGroup_Memory extends MemBase {
     rID: RoomID;
-    creeps: CreepID[];
+    creeps: {
+        [id in CreepID]: {
+            act: PID
+        }
+    }
+    workTasks: {
+        tar: string,
+        act: ActionType
+    }[];
+    transferTasks: {
+        tar: string
+    }[];
+    pendingTasks: {
+        tar: string,
+        act: ActionType
+    }[];
 }
 
 

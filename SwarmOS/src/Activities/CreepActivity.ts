@@ -60,7 +60,7 @@ class CreepActivity extends SlimProcess<ActionMemory> {
             target: this.Target || this.TargetPos || this.AssignedCreep!.pos,
             amount: this.memory.a,
             message: this.memory.m,
-            path: this.memory.p,
+            path: this.memory.p || [],
             resourceType: this.memory.rt,
         }
     }
@@ -71,6 +71,10 @@ class CreepActivity extends SlimProcess<ActionMemory> {
         if (this.memory.tp) {
             this.TargetPos = new RoomPosition(this.memory.tp.x || 25, this.memory.tp.y || 25, this.memory.tp.roomName);
         }
+    }
+
+    EndProcess() {
+        super.EndProcess(this.memory.c);
     }
 }
 interface RunArgs {

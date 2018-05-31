@@ -11,33 +11,6 @@ class RoomActivity extends SlimProcess<RoomActivity_Memory> {
     protected View!: IRoomDataExtension;
 
     protected get roomData(): RoomState {
-        if (!Memory.roomData.roomStateData[this.roomName]) {
-            if (!this.room) {
-                throw new Error(`Attempting to initialize room data memory for a room that is out of view`);
-            }
-
-            Memory.roomData.roomStateData[this.roomName] = {
-                owner: '',
-                lastUpdated: 0,
-                cSites: [],
-                resources: [],
-                tombstones: [],
-                needsRepair: [],
-                mineralIDs: this.room.find(FIND_MINERALS)!.map((val: Mineral) => {
-                    return val.id;
-                }),
-                minUpdateOffset: GetRandomIndex(primes_3000) || 73,
-                sourceIDs: this.room.find(FIND_SOURCES)!.map((val: Source) => {
-                    return val.id;
-                }),
-                structures: {
-                    container: [],
-                    road: []
-                },
-                groups: {},
-                activityPID: this.pid
-            }
-        }
         return Memory.roomData.roomStateData[this.roomName];
     }
 

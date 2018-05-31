@@ -56,8 +56,8 @@ class RefillGroup extends BasicCreepGroup<RefillGroup_Memory> {
                     }
                 }
             }
-            if (this.structTargets.length == 0 && viewData.structures.storage) {
-                this.structTargets.push(viewData.structures.storage);
+            if (this.structTargets.length == 0 && Game.rooms[this.memory.homeRoom].storage) {
+                this.structTargets.push(Game.rooms[this.memory.homeRoom].storage!.id);
             }
         }
 
