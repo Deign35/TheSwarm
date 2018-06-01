@@ -5,6 +5,7 @@ export const OSPackage: IPackage<SpawnRegistry_Memory> = {
 }
 import { BasicProcess } from "Core/BasicTypes";
 
+// (TODO): Search for buildings
 class HarvestJob extends BasicProcess<HarvestJob_Memory> {
     @extensionInterface(EXT_CreepRegistry)
     creepRegistry!: ICreepRegistryExtensions;
@@ -23,6 +24,7 @@ class HarvestJob extends BasicProcess<HarvestJob_Memory> {
             if (!this.memory.a || !this.kernel.getProcessByPID(this.memory.a)) {
                 this.CreateHarvestActivity(this.memory.h!);
             }
+
             if (inLink) {
                 if (creep.carry.energy * 1.5 >= creep.carryCapacity) {
                     creep.transfer(inLink, RESOURCE_ENERGY);
@@ -32,8 +34,8 @@ class HarvestJob extends BasicProcess<HarvestJob_Memory> {
                     delete this.memory.c;
                 }
             }
+
             if ((target as Source).energy == 0) {
-                creep.cancelOrder('harvest');
                 this.sleeper.sleep(this.memory.a!, (target as Source).ticksToRegeneration);
                 if (container && container.hits < container.hitsMax) {
                     if (creep.carry.energy > 0) {
@@ -45,8 +47,8 @@ class HarvestJob extends BasicProcess<HarvestJob_Memory> {
                     }
                 }
             }
+
             if (container && !creep.pos.isEqualTo(container.pos)) {
-                creep.cancelOrder('move');
                 this.creepActivity.MoveCreep(creep, container.pos);
             }
 
@@ -100,8 +102,8 @@ class HarvestJob extends BasicProcess<HarvestJob_Memory> {
         let sID = this.spawnRegistry.requestSpawn({
             l: spawnLevel,
             ct: CT_Harvester,
-            n: this.memory.l + '_HJ' + this.memory.t.slice(-1)
-        }, this.memory.l, Priority_High, 3, {
+            n: this.memory.r + '_HJ' + this.memory.t.slice(-1)
+        }, this.memory.r, Priority_High, 3, {
                 ct: CT_Harvester,
                 lvl: spawnLevel
             });
@@ -132,7 +134,7 @@ class HarvestJob extends BasicProcess<HarvestJob_Memory> {
         }
     }
     HarvestComplete(creepID: string) {
-        let creep = Game.creeps[creepID];
+        let creep = this.creepRegistry.tryGetCreep(creepID);
         if (creep) {
             this.CreateHarvestActivity(creepID);
         } else {

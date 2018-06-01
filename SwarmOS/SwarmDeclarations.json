@@ -58,7 +58,8 @@
                 "Control",
                 "Infrastructure",
                 "Refill",
-                "SelfDefense"
+                "SelfDefense",
+                "Worker"
             ]
         },
         "EXT": {

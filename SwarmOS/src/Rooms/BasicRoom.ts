@@ -29,7 +29,7 @@ class BasicRoom extends BasicCreepGroup<CreepGroup_Memory> {
             for (let i = 0; i < this.roomData.sourceIDs.length; i++) {
                 let newMem: HarvestJob_Memory = {
                     t: this.roomData.sourceIDs[i],
-                    l: this.memory.targetRoom
+                    r: this.memory.targetRoom
                 }
                 this.roomData.groups.CG_SimpleSource.push(this.kernel.startProcess(CJ_Harvester, newMem));
             }

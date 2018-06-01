@@ -42,9 +42,31 @@ declare interface HarvestJob_Memory extends MemBase {
     o?: ObjectID;    // (o)ut link
     c?: ObjectID;    // (c)ontainer
     h?: CreepID;    // (h)arvester
-    l: RoomID;      // (l)ocation
+    r: RoomID;      // (r)oom
+}
+declare interface WorkerJob_Memory extends MemBase {
+    a?: PID;        // (a)ctivity
+    c: CreepID;     // (c)reep
+    r: RoomID;      // (r)oom
 }
 
+declare interface WorkerGroup_Memory extends MemBase {
+    creeps: {
+        [id in CreepID]: {
+            a?: PID;        // (a)ctivity
+        }
+    }
+
+    targets: {
+        [id: string]: {
+            a: ActionType;  // (a)ctionType
+            p: Priority;    // (p)riority
+        }
+    }
+
+    energy: ObjectID[];     // energy withdrawal targets
+    allocatedEnergy: number;// energy allowed to be used by this group.
+}
 
 
 
