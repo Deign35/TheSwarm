@@ -54,11 +54,36 @@ class HarvestJob extends BasicProcess<HarvestJob_Memory> {
                 // Let the activity burn itself out while this job begins the next one.
                 creep = undefined;
                 delete this.memory.h;
+                delete this.memory.a;
+                return ThreadState_Active;
             }
         }
 
         if (!creep) {
             if (!this.memory.a || !this.kernel.getProcessByPID(this.memory.a)) {
+                if ((target as Mineral).mineralType && (target as Mineral).mineralAmount > 0) {
+                    let extractor = target.pos.lookFor(LOOK_STRUCTURES) as StructureExtractor[];
+                    for (let i = 0; i < extractor.length; i++) {
+                        if (extractor[i].structureType == STRUCTURE_EXTRACTOR && (!extractor[i].cooldown || extractor[i].cooldown <= 100)) {
+                            this.CreateSpawnActivity(3);
+                            break;
+                        }
+                    }
+                }
+                if ((target as Source).energyCapacity) {
+                    let spawnLevel = 0;
+                    if (target.room!.controller && target.room!.controller!.my) {
+                        if (target.room!.energyCapacityAvailable >= 800) {
+                            spawnLevel = 2;
+                        } else if (target.room!.energyCapacityAvailable >= 550) {
+                            spawnLevel = 1;
+                        }
+                    } else {
+                        spawnLevel = 2;
+                    }
+
+                    this.CreateSpawnActivity(spawnLevel);
+                }
             }
         }
 
@@ -72,7 +97,7 @@ class HarvestJob extends BasicProcess<HarvestJob_Memory> {
     }
 
     CreateSpawnActivity(spawnLevel: number) {
-        this.memory.a = this.spawnRegistry.requestSpawn({
+        let sID = this.spawnRegistry.requestSpawn({
             l: spawnLevel,
             ct: CT_Harvester,
             n: this.memory.l + '_HJ' + this.memory.t.slice(-1)
@@ -81,10 +106,13 @@ class HarvestJob extends BasicProcess<HarvestJob_Memory> {
                 lvl: spawnLevel
             });
         let spawnMem: SpawnActivity_Memory = {
-            sID: this.memory.a,
+            sID: sID,
             HC: 'SpawnComplete'
         }
+        this.memory.a = this.kernel.startProcess(SPKG_SpawnActivity, spawnMem);
+        this.kernel.setParent(this.memory.a, this.pid);
     }
+
     SpawnComplete(creepID: string) {
         if (this.memory.h) {
             let oldCreep = this.creepRegistry.tryGetCreep(this.memory.h, this.pid);
@@ -98,7 +126,8 @@ class HarvestJob extends BasicProcess<HarvestJob_Memory> {
             this.memory.a = this.creepActivity.CreateNewCreepActivity({
                 at: AT_Harvest,
                 c: this.memory.h!,
-                HC: 'HarvestComplete'
+                HC: 'HarvestComplete',
+                t: this.memory.t
             }, this.pid, this.extensions);
         }
     }

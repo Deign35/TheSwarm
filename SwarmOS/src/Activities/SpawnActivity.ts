@@ -16,7 +16,6 @@ class SpawnActivity extends SlimProcess<SpawnActivity_Memory> {
         switch (status) {
             case (SP_QUEUED):
                 let context = this.spawnRegistry.getRequestContext(this.memory.sID)!;
-                this.sleeper.sleep(this.pid, 7);
                 break;
             case (SP_COMPLETE):
             case (SP_SPAWNING):

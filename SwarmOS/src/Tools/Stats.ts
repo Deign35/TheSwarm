@@ -72,7 +72,7 @@ interface Stat {
 
 const CONFIG: StatsConfig = {
     driver: 'Graphite', // Graphite, InfluxDB
-    types: ['memory', 'console'], // memory, segment, console
+    types: ['memory'], // memory, segment, console
     key: '__stats',
     segment: 30,
     divider: ';',  // "\n",
