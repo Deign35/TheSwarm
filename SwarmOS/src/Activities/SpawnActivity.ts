@@ -9,8 +9,6 @@ import { SlimProcess } from "Core/BasicTypes";
 class SpawnActivity extends SlimProcess<SpawnActivity_Memory> {
     @extensionInterface(EXT_SpawnRegistry)
     protected spawnRegistry!: ISpawnRegistryExtensions;
-    @extensionInterface(EXT_CreepRegistry)
-    protected creepRegistry!: ICreepRegistryExtensions;
 
     RunThread(): ThreadState {
         let status = this.spawnRegistry.getRequestStatus(this.memory.sID);
@@ -23,7 +21,6 @@ class SpawnActivity extends SlimProcess<SpawnActivity_Memory> {
             case (SP_COMPLETE):
             case (SP_SPAWNING):
                 newCreepName = this.spawnRegistry.getRequestContext(this.memory.sID)!.n;
-                this.creepRegistry.tryReserveCreep(newCreepName, this.parentPID);
             case (SP_ERROR):
             default:
                 this.EndProcess(newCreepName);

@@ -23,7 +23,7 @@ class BasicRoom extends BasicCreepGroup<CreepGroup_Memory> {
             if (!this.room.controller!.safeMode && !this.room.controller!.safeModeCooldown && this.room.controller!.safeModeAvailable > 0) {
                 let hostiles = this.room.find(FIND_HOSTILE_CREEPS);
                 for (let i = 0; i < hostiles.length; i++) {
-                    if (hostiles[i].getActiveBodyparts(ATTACK) > 0) {
+                    if (hostiles[i].getActiveBodyparts(ATTACK) > 0 || hostiles.length >= 3) {
                         this.room.controller!.activateSafeMode();
                     }
                 }
@@ -52,7 +52,7 @@ class BasicRoom extends BasicCreepGroup<CreepGroup_Memory> {
             }
 
             // (TODO): Combine this with the other source one...this is just ugly
-            if (this.room.controller!.level > 3 && this.room.energyCapacityAvailable >= 800) {
+            /*if (this.room.controller!.level > 3 && this.room.energyCapacityAvailable >= 800) {
                 if (this.roomData.groups.CG_Source) {
                     for (let i = 0; i < this.roomData.groups.CG_Source.length; i++) {
                         let creepGroup = this.kernel.getProcessByPID(this.roomData.groups.CG_Source[i]) as BasicCreepGroup<any>;
@@ -74,11 +74,11 @@ class BasicRoom extends BasicCreepGroup<CreepGroup_Memory> {
                         this.roomData.groups.CG_SimpleSource.push(sourcePID);
                     }
                 }
-            }
+            }*/
         }
 
         if (!this.roomData.owner || this.roomData.owner == MY_USERNAME) {
-            if (!this.roomData.groups.CG_SimpleSource && this.room.controller && this.room.controller.level <= 3) {
+            /*if (!this.roomData.groups.CG_SimpleSource && this.room.controller && this.room.controller.level <= 3) {
                 if (!this.roomData.groups.CG_Source) {
                     this.roomData.groups.CG_Source = [];
                     for (let i = 0; i < this.roomData.sourceIDs.length; i++) {
@@ -93,7 +93,7 @@ class BasicRoom extends BasicCreepGroup<CreepGroup_Memory> {
                         this.roomData.groups.CG_Source.push(sourcePID);
                     }
                 }
-            }
+            }*/
             if (!this.roomData.groups.CG_Infrastructure) {
                 let infrMem: CreepGroup_Memory = {
                     homeRoom: this.roomName,
@@ -117,5 +117,21 @@ class BasicRoom extends BasicCreepGroup<CreepGroup_Memory> {
             }
         }
 
+        if (!this.roomData.groups.CG_SimpleSource) {
+            this.roomData.groups.CG_SimpleSource = [];
+        }
+
+        if (this.roomData.groups.CG_SimpleSource.length < this.roomData.sourceIDs.length) {
+            if (this.roomData.groups.CG_SimpleSource.length > 0) {
+                this.log.alert(`ASSUMPTION FAILURE -- BasicRoom.EnsureGroupFormation()`);
+            }
+            for (let i = 0; i < this.roomData.sourceIDs.length; i++) {
+                let newMem: HarvestJob_Memory = {
+                    t: this.roomData.sourceIDs[i],
+                    l: this.memory.targetRoom
+                }
+                this.roomData.groups.CG_SimpleSource.push(this.kernel.startProcess(CJ_Harvester, newMem));
+            }
+        }
     }
 }

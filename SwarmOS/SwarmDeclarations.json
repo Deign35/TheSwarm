@@ -69,6 +69,7 @@
             "combinedType": "OSExtension",
             "entries": {
                 "CreepRegistry": "creeps",
+                "CreepActivity": "c_activity",
                 "Registry": "extRegistry",
                 "SpawnRegistry": "spawner",
                 "RoomView": "roomView",

@@ -307,7 +307,6 @@ export abstract class BasicJob<T extends BasicJob_Memory> extends BasicProcess<T
                         return creep.id;
                     }
                 }
-            // SupportFiller will help out with spawn filling if no other work is nearby
             case (TT_SpawnRefill):
                 if (!viewData.structures.extension || !viewData.structures.spawn) {
                     return;

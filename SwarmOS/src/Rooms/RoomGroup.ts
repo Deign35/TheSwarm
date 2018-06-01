@@ -1,11 +1,12 @@
 import { BasicProcess, SlimProcess } from "Core/BasicTypes";
-import { CreepActivityExtensions } from "Activities/CreepActivity";
 
 export class RoomGroup<T extends RoomGroup_Memory> extends BasicProcess<T> {
     @extensionInterface(EXT_CreepRegistry)
     protected creepRegistry!: ICreepRegistryExtensions;
     @extensionInterface(EXT_RoomView)
     protected View!: IRoomDataExtension;
+    @extensionInterface(EXT_CreepActivity)
+    protected creepActivity!: ICreepActivityExtensions;
 
     private _room?: Room;
     protected get room(): Room | undefined {
@@ -38,7 +39,7 @@ export class RoomGroup<T extends RoomGroup_Memory> extends BasicProcess<T> {
             this.kernel.killProcess(this.memory.creeps[creepID].act);
         }
 
-        CreepActivityExtensions.CreateNewCreepActivity({
+        this.creepActivity.CreateNewCreepActivity({
             c: creepID,
             at: AT_Build,
             t: '',

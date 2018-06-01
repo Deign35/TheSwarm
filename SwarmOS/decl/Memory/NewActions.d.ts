@@ -35,7 +35,15 @@ declare interface RoomGroup_Memory extends MemBase {
         act: ActionType
     }[];
 }
-
+declare interface HarvestJob_Memory extends MemBase {
+    a?: PID;        // (a)ctivity
+    t: ObjectID;    // (t)arget
+    i?: ObjectID;    // (i)n link
+    o?: ObjectID;    // (o)ut link
+    c?: ObjectID;    // (c)ontainer
+    h?: CreepID;    // (h)arvester
+    l: RoomID;      // (l)ocation
+}
 
 
 

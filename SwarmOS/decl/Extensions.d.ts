@@ -102,7 +102,7 @@ declare interface ISpawnRegistryExtensions extends IPackageExtension {
     cancelRequest(id?: SpawnRequestID): boolean;
     getRequestStatus(id?: SpawnRequestID): SpawnState;
     requestSpawn(context: CreepContext, location: RoomID, spawnPriority: Priority,
-        maxSpawnDistance?: number, startMem?: any): SpawnRequestID;
+        maxSpawnDistance?: number, startMem?: ScreepsObject_CreepMemory): SpawnRequestID;
     getRequestContext(id?: SpawnRequestID): CreepContext | undefined;
 }
 
@@ -115,4 +115,23 @@ declare interface ICreepRegistryExtensions extends IPackageExtension {
     tryGetCreep(id?: CreepID, requestingPID?: PID): Creep | undefined;
     tryReserveCreep(id?: CreepID, requestingPID?: PID): boolean;
     releaseCreep(id?: CreepID, requestingPID?: PID): void;
+}
+
+declare interface ICreepActivityExtensions extends IPackageExtension {
+    CreateNewCreepActivity(actionMem: ActionMemory, parentPID: PID, extensions: IExtensionRegistry): PID | undefined;
+    RunActivity(args: RunArgs): ScreepsReturnCode;
+    ValidateActionTarget(actionType: ActionType, target: any): boolean;
+    CreepIsInRange(actionType: ActionType, pos1: RoomPosition, pos2: RoomPosition): boolean;
+    MoveCreep(creep: Creep, pos: RoomPosition, path?: PathStep[]): ScreepsReturnCode;
+}
+
+interface RunArgs {
+    creep: Creep;
+    actionType: ActionType;
+
+    path?: PathStep[];
+    target?: any;
+    amount?: number;
+    message?: string;
+    resourceType?: ResourceConstant;
 }

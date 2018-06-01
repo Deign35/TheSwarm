@@ -1,4 +1,4 @@
-import { OSPackage as HarvesterJob } from "Jobs/HarvesterJob";
+import { OSPackage as HarvesterJob } from "Jobs/HarvestJob";
 import { OSPackage as EasyJobs } from "Jobs/EasyJobs";
 
 export const CreepJobsPackage: IPackage<{}> = {
