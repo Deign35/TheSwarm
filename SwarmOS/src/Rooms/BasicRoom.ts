@@ -4,9 +4,13 @@ export const OSPackage: IPackage<RoomStateMemory> = {
     }
 }
 
-import { BasicCreepGroup } from "Groups/BasicCreepGroup";
+import { BasicProcess } from "Core/BasicTypes";
 
-class BasicRoom extends BasicCreepGroup<CreepGroup_Memory> {
+class BasicRoom extends BasicProcess<CreepGroup_Memory> {
+    @extensionInterface(EXT_CreepRegistry)
+    protected creepRegistry!: ICreepRegistryExtensions;
+    @extensionInterface(EXT_RoomView)
+    protected View!: IRoomDataExtension;
     protected roomData!: RoomState;
     get roomName() {
         return this.memory.homeRoom;
@@ -15,10 +19,9 @@ class BasicRoom extends BasicCreepGroup<CreepGroup_Memory> {
         return Game.rooms[this.roomName];
     }
     PrepTick() {
-        super.PrepTick();
         this.roomData = this.View.GetRoomData(this.roomName)!;
     }
-    EnsureGroupFormation() {
+    RunThread(): ThreadState {
         if (!this.roomData.groups.CG_SimpleSource) {
             this.roomData.groups.CG_SimpleSource = [];
         }
@@ -34,6 +37,7 @@ class BasicRoom extends BasicCreepGroup<CreepGroup_Memory> {
                 this.roomData.groups.CG_SimpleSource.push(this.kernel.startProcess(CJ_Harvester, newMem));
             }
         }
+        return ThreadState_Done;
         /*if (this.roomData.owner == MY_USERNAME) {
             if (!this.room.controller!.safeMode && !this.room.controller!.safeModeCooldown && this.room.controller!.safeModeAvailable > 0) {
                 let hostiles = this.room.find(FIND_HOSTILE_CREEPS);

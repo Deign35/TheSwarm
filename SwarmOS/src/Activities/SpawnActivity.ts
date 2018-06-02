@@ -4,9 +4,9 @@ export const OSPackage: IPackage<SpawnRegistry_Memory> = {
     }
 }
 
-import { SlimProcess } from "Core/BasicTypes";
+import { BasicProcess } from "Core/BasicTypes";
 
-class SpawnActivity extends SlimProcess<SpawnActivity_Memory> {
+class SpawnActivity extends BasicProcess<SpawnActivity_Memory> {
     @extensionInterface(EXT_SpawnRegistry)
     protected spawnRegistry!: ISpawnRegistryExtensions;
 

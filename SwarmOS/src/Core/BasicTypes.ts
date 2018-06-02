@@ -1,5 +1,7 @@
-export abstract class SlimProcess<T extends MemBase> implements IProcess {
-    constructor(protected context: IProcessContext) { }
+export abstract class BasicProcess<T extends MemBase> implements IProcess {
+    constructor(protected context: IProcessContext) {
+        this._logger = context.getPackageInterface(EXT_Logger).CreateLogContext(this.logID, this.logLevel);
+    }
 
     @extensionInterface(EXT_Kernel)
     protected kernel!: IKernelExtensions;
@@ -7,6 +9,8 @@ export abstract class SlimProcess<T extends MemBase> implements IProcess {
     protected extensions!: IExtensionRegistry;
     @extensionInterface(EXT_Sleep)
     protected sleeper!: IKernelSleepExtension;
+    @extensionInterface(EXT_SpawnRegistry)
+    protected spawnRegistry!: ISpawnRegistryExtensions;
 
     protected get memory(): T { return this.context.memory as T; }
     get pkgName(): string { return this.context.pkgName; }
@@ -15,6 +19,12 @@ export abstract class SlimProcess<T extends MemBase> implements IProcess {
     GetParentProcess<K extends IProcess>(): K | undefined {
         return this.parentPID ? this.kernel.getProcessByPID(this.parentPID) as K : undefined;
     }
+
+    private _logger!: ILogger;
+    protected get log() { return this._logger; }
+    protected get logID() { return DEFAULT_LOG_ID; }
+    protected get logLevel(): LogLevel { return DEFAULT_LOG_LEVEL; }
+    get rngSeed(): number { return this.context.rngSeed; }
 
     PrepTick?(): void;
     abstract RunThread(): ThreadState;
@@ -30,22 +40,6 @@ export abstract class SlimProcess<T extends MemBase> implements IProcess {
         }
         this.kernel.killProcess(this.pid);
     }
-}
-
-export abstract class BasicProcess<T extends MemBase> extends SlimProcess<T> {
-    constructor(protected context: IProcessContext) {
-        super(context);
-        this._logger = context.getPackageInterface(EXT_Logger).CreateLogContext(this.logID, this.logLevel);
-    }
-
-    @extensionInterface(EXT_SpawnRegistry)
-    protected spawnRegistry!: ISpawnRegistryExtensions;
-
-    private _logger!: ILogger;
-    protected get log() { return this._logger; }
-    protected get logID() { return DEFAULT_LOG_ID; }
-    protected get logLevel(): LogLevel { return DEFAULT_LOG_LEVEL; }
-    get rngSeed(): number { return this.context.rngSeed; }
 }
 
 const SCAN_FREQUENCY = 15;

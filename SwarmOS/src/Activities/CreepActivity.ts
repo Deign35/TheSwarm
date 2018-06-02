@@ -4,9 +4,9 @@ export const OSPackage: IPackage<SpawnRegistry_Memory> = {
     }
 }
 
-import { SlimProcess } from "Core/BasicTypes";
+import { BasicProcess } from "Core/BasicTypes";
 
-class CreepActivity extends SlimProcess<ActionMemory> {
+class CreepActivity extends BasicProcess<ActionMemory> {
     @extensionInterface(EXT_CreepActivity)
     protected creepActivity!: ICreepActivityExtensions;
     @extensionInterface(EXT_CreepRegistry)

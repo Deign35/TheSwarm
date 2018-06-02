@@ -2,7 +2,7 @@ declare var Memory: {
     roomData: RoomStateMemory
 }
 
-import { ExtensionBase, SlimProcess } from "Core/BasicTypes";
+import { ExtensionBase, BasicProcess } from "Core/BasicTypes";
 
 export const OSPackage: IPackage<RoomStateMemory> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
@@ -11,7 +11,7 @@ export const OSPackage: IPackage<RoomStateMemory> = {
     }
 }
 
-class RoomRegistry extends SlimProcess<RoomStateMemory> {
+class RoomRegistry extends BasicProcess<RoomStateMemory> {
     get logID() { return 'RoomRegistry' };
     get logLevel() { return LOG_INFO as LogLevel; }
     @extensionInterface(EXT_RoomView)

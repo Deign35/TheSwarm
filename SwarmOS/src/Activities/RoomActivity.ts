@@ -4,9 +4,9 @@ export const OSPackage: IPackage<SpawnRegistry_Memory> = {
     }
 }
 
-import { SlimProcess } from "Core/BasicTypes";
+import { BasicProcess } from "Core/BasicTypes";
 
-class RoomActivity extends SlimProcess<RoomActivity_Memory> {
+class RoomActivity extends BasicProcess<RoomActivity_Memory> {
     @extensionInterface(EXT_RoomView)
     protected View!: IRoomDataExtension;
 
