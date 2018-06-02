@@ -94,6 +94,7 @@
                 "Lab": 4,
                 "Controller": 5,
                 "Source": 6,
+                "Creep": 7,
                 "AnyStructure": 10
             }
         },

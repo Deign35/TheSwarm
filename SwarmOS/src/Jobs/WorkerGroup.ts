@@ -129,7 +129,7 @@ class WorkerGroup extends BasicProcess<WorkerGroup_Memory> {
         }
         return {
             t: bestTarget,
-            a: this.targets[bestTarget].a
+            a: actionType
         }
     }
 
@@ -142,7 +142,9 @@ class WorkerGroup extends BasicProcess<WorkerGroup_Memory> {
         let score = creepEnergy * creepRatio * 2;
         let energyNeeded = 0;
 
-        if (targetMemory.a == AT_Build && targetMemory.t == TT_ConstructionSite) {
+        let distance = creep.pos.getRangeTo(target);
+
+        if (targetMemory.t == TT_ConstructionSite && targetMemory.a == AT_Build) {
             energyNeeded = (target as ConstructionSite).progressTotal - (target as ConstructionSite).progress;
         } else if (targetMemory.t == TT_StorageContainer) {
             if (targetMemory.a == AT_Withdraw) {
@@ -151,9 +153,24 @@ class WorkerGroup extends BasicProcess<WorkerGroup_Memory> {
                 energyNeeded = (target as StructureStorage).energyCapacity - (target as StructureLink).energy;
             }
         } else if (targetMemory.t == TT_AnyStructure && targetMemory.a == AT_Repair) {
-            energyNeeded = ((target as Structure).hitsMax - (target as Structure).hits) / 100;
+            energyNeeded = ((target as Structure).hitsMax - (target as Structure).hits) * REPAIR_COST;
         } else if (targetMemory.t == TT_Controller) {
             energyNeeded = 1;
+        } else if (targetMemory.t == TT_Resource && targetMemory.a == AT_Pickup && (target as Resource).resourceType == RESOURCE_ENERGY) {
+            score = (target as Resource).amount;
+            score -= distance * Math.ceil((target as Resource).amount / ENERGY_DECAY);
+            if (score > energyNeeded) {
+                score *= 4;
+            }
+        } else if (targetMemory.t == TT_Creep) {
+            if (targetMemory.a == AT_RequestTransfer) {
+                score = (target as Creep).carry.energy;
+                if (score > energyNeeded) {
+                    score *= 2;
+                }
+            } else if (targetMemory.a == AT_Transfer) {
+                score = (target as Creep).carryCapacity - (target as Creep).carry.energy;
+            }
         }
 
         if (creepEnergy >= energyNeeded) {
@@ -161,10 +178,9 @@ class WorkerGroup extends BasicProcess<WorkerGroup_Memory> {
         } else if (creep.carryCapacity >= energyNeeded) {
             score = 0;
         }
-        let distance = creep.pos.getRangeTo(target);
 
-        score = (Math.pow(0.9, creep.pos.getRangeTo(target)) * score);
-        score = (Math.pow(1.2, targetMemory.p) * score);
+        score = (Math.pow(0.9, creep.pos.getRangeTo(target)) * score); // Further away = lower score by 10% per distance
+        score = (Math.pow(1.2, targetMemory.p) * score); // Higher priority = higher score by 20% per priority level
 
         return score;
     }
