@@ -34,22 +34,23 @@ class CreepActivity extends SlimProcess<ActionMemory> {
             let result = this.creepActivity.RunActivity(this.CreateActivityArgs());
             switch (result) {
                 case (OK):
+                case (ERR_BUSY):
+                case (ERR_TIRED):
+                case (ERR_NOT_IN_RANGE):
                     break;
                 case (ERR_NOT_OWNER):
                 case (ERR_NO_PATH):
                 case (ERR_NAME_EXISTS):
-                case (ERR_BUSY):
                 case (ERR_NOT_FOUND):
                 case (ERR_NOT_ENOUGH_RESOURCES):
                 case (ERR_INVALID_TARGET):
                 case (ERR_FULL):
-                case (ERR_NOT_IN_RANGE):
                 case (ERR_INVALID_ARGS):
-                case (ERR_TIRED):
                 case (ERR_NO_BODYPART):
                 case (ERR_RCL_NOT_ENOUGH):
                 case (ERR_GCL_NOT_ENOUGH):
                     console.log(`ActionMemory(${result}) -- ${JSON.stringify(result)}`);
+                    this.EndProcess();
             }
         }
 

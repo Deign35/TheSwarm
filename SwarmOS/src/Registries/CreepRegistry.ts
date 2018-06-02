@@ -214,7 +214,9 @@ class CreepActivityExtensions extends ExtensionBase implements ICreepActivityExt
     }
     protected GetSquareDistance(pos1: { x: number, y: number }, pos2: { x: number, y: number }) {
         let xDiff = pos1.x - pos2.x;
+        xDiff *= xDiff < 0 ? -1 : 1;
         let yDiff = pos1.y - pos2.y;
+        yDiff *= yDiff < 0 ? -1 : 1;
         return xDiff > yDiff ? xDiff : yDiff;
     }
 
