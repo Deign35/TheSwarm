@@ -16,7 +16,6 @@ class HarvestJob extends BasicProcess<HarvestJob_Memory> {
     RunThread(): ThreadState {
         let target = Game.getObjectById(this.memory.t) as Source | Mineral;
         let inLink = Game.getObjectById(this.memory.i) as StructureLink | undefined;
-        let outLink = Game.getObjectById(this.memory.o) as StructureLink | undefined;
         let container = Game.getObjectById(this.memory.c) as StructureContainer | undefined;
         let creep = this.creepRegistry.tryGetCreep(this.memory.h, this.pid) as Creep | undefined;
 
@@ -86,12 +85,6 @@ class HarvestJob extends BasicProcess<HarvestJob_Memory> {
 
                     this.CreateSpawnActivity(spawnLevel);
                 }
-            }
-        }
-
-        if (inLink && outLink && !inLink.cooldown && inLink.energy * 4 >= inLink.energyCapacity) {
-            if (outLink.energyCapacity - outLink.energy >= inLink.energy / 2) {
-                inLink.transferEnergy(outLink);
             }
         }
 
