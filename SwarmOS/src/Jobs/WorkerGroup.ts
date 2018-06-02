@@ -142,17 +142,17 @@ class WorkerGroup extends BasicProcess<WorkerGroup_Memory> {
         let score = creepEnergy * creepRatio * 2;
         let energyNeeded = 0;
 
-        if (targetMemory.a == AT_Build && targetMemory.o == TAR_ConstructionSite) {
+        if (targetMemory.a == AT_Build && targetMemory.t == TT_ConstructionSite) {
             energyNeeded = (target as ConstructionSite).progressTotal - (target as ConstructionSite).progress;
-        } else if (targetMemory.o == TAR_StorageContainer) {
+        } else if (targetMemory.t == TT_StorageContainer) {
             if (targetMemory.a == AT_Withdraw) {
                 score = Math.min((target as StructureContainer).energy || 0, creep.carryCapacity);
             } else if (targetMemory.a == AT_Transfer) {
                 energyNeeded = (target as StructureStorage).energyCapacity - (target as StructureLink).energy;
             }
-        } else if (targetMemory.o == TAR_AnyStructure && targetMemory.a == AT_Repair) {
+        } else if (targetMemory.t == TT_AnyStructure && targetMemory.a == AT_Repair) {
             energyNeeded = ((target as Structure).hitsMax - (target as Structure).hits) / 100;
-        } else if (targetMemory.o == TAR_Controller) {
+        } else if (targetMemory.t == TT_Controller) {
             energyNeeded = 1;
         }
 

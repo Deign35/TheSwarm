@@ -82,26 +82,10 @@
             }
         },
         "TT": {
-            "comment": "Type of targetting (e.g. how to find new targets)",
-            "enabled": true,
-            "type": true,
-            "combinedType": "TargetType",
-            "entries": {
-                "None": 0,
-                "SpawnRefill": 1,
-                "Harvest": 2,
-                "Repair": 3,
-                "Builder": 4,
-                "Upgrader": 5,
-                "SupportHarvest": 6,
-                "SupportFiller": 7
-            }
-        },
-        "TAR": {
             "comment": "Type of target for quickly determining how to interact with the object",
             "enabled": true,
             "type": true,
-            "combinedType": "ObjectType",
+            "combinedType": "TargetType",
             "entries": {
                 "None": 0,
                 "ConstructionSite": 1,
@@ -111,15 +95,6 @@
                 "Controller": 5,
                 "Source": 6,
                 "AnyStructure": 10
-            }
-        },
-        "FT": {
-            "comment": "Functional Tests",
-            "enabled": true,
-            "string": true,
-            "entries": {
-                "InterruptListener": "interrupt_listener",
-                "InterruptNotifier": "interrupt_notifier"
             }
         },
         "LOG": {
@@ -147,23 +122,6 @@
                 "QUEUED": 1,
                 "SPAWNING": 2,
                 "COMPLETE": 3
-            }
-        },
-        "SR": {
-            "comment": "Swarm Result -- Unique return results from SwarmOS services",
-            "enabled": true,
-            "type": true,
-            "combinedType": "SwarmlingResponse",
-            "entries": {
-                "NONE": 0,
-                "INVALID": -1,
-                "MISSING_TARGET": -2,
-                "REQUIRES_ENERGY": -3,
-                "TARGET_INELLIGIBLE": -4,
-                "ACTION_UNNECESSARY": -5,
-                "NOT_IMPLEMENTED": -6,
-                "REQ_REJECTED": -7,
-                "MOVE": -8
             }
         },
         "E2C": {
@@ -208,20 +166,6 @@
                 "Waiting": 2,
                 "Done": 3,
                 "Overrun": 4
-            }
-        },
-        "JobState": {
-            "comment": "The state of a creep's job assignment",
-            "enabled": true,
-            "combinedType": "JobState",
-            "type": true,
-            "entries": {
-                "Inactive": 0,
-                "Starting": 1,
-                "Spawning": 2,
-                "Preparing": 3,
-                "Running": 4,
-                "Complete": 5
             }
         },
         "CLI": {

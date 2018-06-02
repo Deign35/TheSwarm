@@ -1,3 +1,4 @@
+// CLI('launch', PKG_EmptyProcess, {})
 export const OSPackage: IPackage<SpawnRegistry_Memory> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
         processRegistry.register(PKG_EmptyProcess, EmptyProcess);

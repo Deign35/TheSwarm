@@ -65,7 +65,7 @@ declare interface WorkerGroup_Memory extends MemBase {
 }
 declare interface WorkerTarget_Memory extends MemBase {
     a: ActionType;  // (a)ctionType
-    o: ObjectType;  // (o)bject type
+    t: TargetType;  // (o)bject type
     p: Priority;    // (p)riority
 }
 
