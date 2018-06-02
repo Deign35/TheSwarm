@@ -33,6 +33,3 @@ declare type RoomState_AttachedCreepGroups = {
     [CG_SimpleSource]?: PID[];
     [CG_SelfDefense]?: PID;
 }
-
-declare interface RoomThreadMemory extends CreepGroup_Memory {
-}

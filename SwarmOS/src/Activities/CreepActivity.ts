@@ -6,7 +6,7 @@ export const OSPackage: IPackage<SpawnRegistry_Memory> = {
 
 import { BasicProcess } from "Core/BasicTypes";
 
-class CreepActivity extends BasicProcess<ActionMemory> {
+class CreepActivity extends BasicProcess<CreepActivity_Memory> {
     @extensionInterface(EXT_CreepActivity)
     protected creepActivity!: ICreepActivityExtensions;
     @extensionInterface(EXT_CreepRegistry)
@@ -49,7 +49,7 @@ class CreepActivity extends BasicProcess<ActionMemory> {
                 case (ERR_NO_BODYPART):
                 case (ERR_RCL_NOT_ENOUGH):
                 case (ERR_GCL_NOT_ENOUGH):
-                    console.log(`ActionMemory(${result}) -- ${JSON.stringify(result)}`);
+                    console.log(`CreepAction(${result}) -- ${JSON.stringify(result)}`);
                     this.EndProcess();
             }
         }

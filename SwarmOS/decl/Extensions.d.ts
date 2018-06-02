@@ -118,7 +118,7 @@ declare interface ICreepRegistryExtensions extends IPackageExtension {
 }
 
 declare interface ICreepActivityExtensions extends IPackageExtension {
-    CreateNewCreepActivity(actionMem: ActionMemory, parentPID: PID, extensions: IExtensionRegistry): PID | undefined;
+    CreateNewCreepActivity(actionMem: CreepActivity_Memory, parentPID: PID, extensions: IExtensionRegistry): PID | undefined;
     RunActivity(args: RunArgs): ScreepsReturnCode;
     ValidateActionTarget(actionType: ActionType, target: any): boolean;
     CreepIsInRange(actionType: ActionType, pos1: RoomPosition, pos2: RoomPosition): boolean;

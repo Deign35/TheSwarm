@@ -58,8 +58,7 @@ class RoomActivity extends BasicProcess<RoomActivity_Memory> {
             }
 
             if (!this.roomData.hostPID || !this.kernel.getProcessByPID(this.roomData.hostPID)) {
-                let newMem: CreepGroup_Memory = {
-                    assignments: {},
+                let newMem: BasicRoom_Memory = {
                     homeRoom: this.memory.rID,
                     targetRoom: this.memory.rID
                 }

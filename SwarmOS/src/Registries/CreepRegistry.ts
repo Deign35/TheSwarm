@@ -186,7 +186,7 @@ class CreepRegistryExtensions extends ExtensionBase implements ICreepRegistryExt
 }
 
 class CreepActivityExtensions extends ExtensionBase implements ICreepActivityExtensions {
-    CreateNewCreepActivity(actionMem: ActionMemory, parentPID: PID, extensions: IExtensionRegistry): PID | undefined {
+    CreateNewCreepActivity(actionMem: CreepActivity_Memory, parentPID: PID, extensions: IExtensionRegistry): PID | undefined {
         if (!actionMem || !parentPID || !extensions || !actionMem.c || !actionMem.at) {
             return undefined;
         }

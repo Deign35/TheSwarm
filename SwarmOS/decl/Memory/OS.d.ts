@@ -3,7 +3,6 @@ declare var Memory: {
 }
 
 declare interface MemBase {
-    OLD?: string; // Denoting that a bit of memory is running on old code or other VERSIONING stuffs.
     HC?: string; // (H)andle of the (C)allback function for informing the parent process that this process has died.
 }
 
@@ -18,11 +17,6 @@ declare type ProcessMemory = {
     [id in PID]: MemBase;
 }
 
-declare interface ChildThreadState {
-    priority: Priority;
-    pid: PID;
-    tid: ThreadID
-}
 declare interface PackageProviderMemory extends MemBase {
     services: {
         [id: string]: {
