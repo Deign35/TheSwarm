@@ -163,6 +163,25 @@ class WorkerGroup extends BasicProcess<WorkerGroup_Memory> {
         }
         let distance = creep.pos.getRangeTo(target);
 
-        return score + Math.pow(0.1, distance) * score + Math.pow(0.2, targetMemory.p) * score;
+        score = (Math.pow(0.9, creep.pos.getRangeTo(target)) * score);
+        score = (Math.pow(1.2, targetMemory.p) * score);
+
+        return score;
+    }
+
+    AddCreep(creepID: CreepID) {
+        if (this.creepRegistry.tryReserveCreep(creepID, this.pid)) {
+            this.creeps[creepID] = {};
+            this.CreateActivityForCreep(creepID);
+        }
+    }
+
+    RemoveCreep(creepID: CreepID) {
+        if (this.creeps[creepID]) {
+            if (this.creeps[creepID].a) {
+                this.kernel.killProcess(this.creeps[creepID].a!);
+            }
+            delete this.creeps[creepID];
+        }
     }
 }
