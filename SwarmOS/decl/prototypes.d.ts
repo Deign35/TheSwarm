@@ -8,11 +8,13 @@ interface Flag {
 }
 interface StructureContainer {
     energy: number;
+    energyCapacity: number;
     SwarmOS: boolean;
 }
 
 interface StructureStorage {
     energy: number;
+    energyCapacity: number;
     SwarmOS: boolean;
 }
 

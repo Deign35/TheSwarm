@@ -51,23 +51,23 @@ declare interface WorkerJob_Memory extends MemBase {
 }
 
 declare interface WorkerGroup_Memory extends MemBase {
+    rID: RoomID;
     creeps: {
         [id in CreepID]: {
             a?: PID;        // (a)ctivity
         }
     }
 
-    targets: {
-        [id: string]: {
-            a: ActionType;  // (a)ctionType
-            p: Priority;    // (p)riority
-        }
-    }
+    targets: IDictionary<ObjectID, WorkerTarget_Memory>;
 
-    energy: ObjectID[];     // energy withdrawal targets
+    energy: IDictionary<ObjectID, WorkerTarget_Memory>;     // energy withdrawal targets
     allocatedEnergy: number;// energy allowed to be used by this group.
 }
-
+declare interface WorkerTarget_Memory extends MemBase {
+    a: ActionType;  // (a)ctionType
+    o: ObjectType;  // (o)bject type
+    p: Priority;    // (p)riority
+}
 
 
 

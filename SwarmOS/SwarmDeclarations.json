@@ -97,6 +97,22 @@
                 "SupportFiller": 7
             }
         },
+        "TAR": {
+            "comment": "Type of target for quickly determining how to interact with the object",
+            "enabled": true,
+            "type": true,
+            "combinedType": "ObjectType",
+            "entries": {
+                "None": 0,
+                "ConstructionSite": 1,
+                "Resource": 2,
+                "StorageContainer": 3,
+                "Lab": 4,
+                "Controller": 5,
+                "Source": 6,
+                "AnyStructure": 10
+            }
+        },
         "FT": {
             "comment": "Functional Tests",
             "enabled": true,
