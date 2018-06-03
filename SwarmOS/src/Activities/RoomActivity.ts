@@ -58,11 +58,11 @@ class RoomActivity extends BasicProcess<RoomActivity_Memory> {
             }
 
             if (!this.roomData.hostPID || !this.kernel.getProcessByPID(this.roomData.hostPID)) {
-                let newMem: BasicRoom_Memory = {
-                    homeRoom: this.memory.rID,
-                    targetRoom: this.memory.rID
+                let newMem: Bootstrap_Memory = {
+                    containers: [],
+                    rID: this.memory.rID
                 }
-                this.roomData.hostPID = this.kernel.startProcess(PKG_SimpleOwnedRoom, newMem);
+                this.roomData.hostPID = this.kernel.startProcess(PKG_BootRoom, newMem);
             }
             this.roomData.lastUpdated = Game.time;
         }

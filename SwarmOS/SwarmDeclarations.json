@@ -23,6 +23,7 @@
                 "SpawnRegistry",
                 "RoomManager",
                 "SimpleOwnedRoom",
+                "BootRoom",
                 "FlagBase",
                 "SwarmCLI",
                 "EmptyProcess"

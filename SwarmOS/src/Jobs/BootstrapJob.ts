@@ -1,6 +1,6 @@
 export const OSPackage: IPackage<SpawnRegistry_Memory> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
-        processRegistry.register(CJ_Boot, BootstrapJob);
+        processRegistry.register(PKG_BootRoom, BootstrapJob);
     }
 }
 import { BasicProcess } from "Core/BasicTypes";
@@ -14,8 +14,6 @@ class BootstrapJob extends BasicProcess<Bootstrap_Memory> {
     @extensionInterface(EXT_CreepActivity)
     protected creepActivity!: ICreepActivityExtensions;
 
-
-    get creeps() { return this.memory.creeps; }
     get containers() { return this.memory.containers; }
     get room(): Room | undefined { return Game.rooms[this.memory.rID] };
     get roomData() { return this.View.GetRoomData(this.memory.rID); }
@@ -37,11 +35,26 @@ class BootstrapJob extends BasicProcess<Bootstrap_Memory> {
 
             let sites = this.room.find(FIND_CONSTRUCTION_SITES);
             if (sites && sites.length > 0) {
+                let targetMem: IDictionary<string, WorkerTarget_PriorityMemory> = {}
                 for (let i = 0; i < sites.length; i++) {
                     if (sites[i].structureType == STRUCTURE_CONTAINER) {
                         this.containers.push(sites[i].id);
+                        targetMem[sites[i].id] = {
+                            a: AT_Build,
+                            p: Priority_Low,
+                            t: TT_ConstructionSite
+                        }
                     }
                 }
+
+                let workMem: GenericWorkerGroup_Memory<WorkerTarget_PriorityMemory, WorkerTarget_Memory> = {
+                    creeps: {},
+                    energy: {},
+                    rID: this.memory.rID,
+                    targets: targetMem
+                }
+                this.roomData!.groups[CJ_Work] = this.kernel.startProcess(CJ_Work, workMem);
+                return ThreadState_Active;
             } else {
                 let spawns = this.room.find(FIND_MY_SPAWNS);
                 if (spawns.length == 0) {
@@ -55,11 +68,28 @@ class BootstrapJob extends BasicProcess<Bootstrap_Memory> {
                     this.CreatePathAndContainerSites(spawn, controller);
                 }
 
+                this.roomData!.groups[CJ_Boot] = [];
+                this.roomData!.groups[CJ_Harvest] = [];
                 let sources = this.room.find(FIND_SOURCES);
                 for (let i = 0; i < sources.length; i++) {
                     this.CreatePathAndContainerSites(spawn, sources[i]);
+                    let startMem: BootstrapRefiller_Memory = {
+                        creeps: {
+                            refill: {}
+                        },
+                        hb: false,
+                        rID: this.memory.rID,
+                        s: sources[i].id
+                    }
+                    this.roomData!.groups[CJ_Boot]!.push(this.kernel.startProcess(CJ_Boot, startMem));
+
+                    let harvMem: HarvestJob_Memory = {
+                        r: this.memory.rID,
+                        t: sources[i].id
+                    }
+                    this.roomData!.groups[CJ_Harvest]!.push(this.kernel.startProcess(CJ_Harvest, harvMem));
                 }
-                // (TODO): Find a nearby spot to put another container.
+                return ThreadState_Done;
             }
         }
 

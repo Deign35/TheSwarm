@@ -28,6 +28,10 @@ declare interface BootstrapRefiller_Memory extends MemBase {
             a?: PID;        // (a)ctivity
             c?: CreepID;    // (c)reep
         }
+        'refill': {
+            a?: PID;        // (a)ctivity
+            c?: CreepID;    // (c)reep
+        }
     }
     rID: RoomID;
     s: ObjectID;    // (s)ource ID
@@ -45,19 +49,5 @@ declare interface WorkerTarget_PriorityMemory extends WorkerTarget_Memory {
 
 declare interface Bootstrap_Memory extends MemBase {
     rID: RoomID;
-    refiller?: PID;
     containers: ObjectID[];
-
-    creeps: {
-        [id in CreepID]: {
-            a?: PID;        // (a)ctivity
-            t: ObjectID;    // (t)arget
-        }
-    }
-    harvesters: {
-        [id in CreepID]: {
-            a?: PID;
-            t: ObjectID;    // (t)arget
-        }
-    }
 }

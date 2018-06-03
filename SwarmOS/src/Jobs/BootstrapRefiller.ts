@@ -56,6 +56,9 @@ class BootstrapJob extends BasicProcess<BootstrapRefiller_Memory> {
         }
         let newPID = this.kernel.startProcess(SPKG_SpawnActivity, spawnMem);
         this.kernel.setParent(newPID, this.pid);
+        if (!this.creeps[spawnID]) {
+            this.creeps[spawnID] = {};
+        }
         this.creeps[spawnID].a = newPID;
     }
 
@@ -147,6 +150,7 @@ class BootstrapJob extends BasicProcess<BootstrapRefiller_Memory> {
                         this.creeps['refill'].a = this.creepActivity.CreateNewCreepActivity({
                             at: AT_Pickup,
                             c: creepID,
+                            HC: 'CreateRefillActivity',
                             t: (resources[i].resource as Resource).id
                         }, this.pid, this.extensions);
                         return;
@@ -159,6 +163,7 @@ class BootstrapJob extends BasicProcess<BootstrapRefiller_Memory> {
                     this.creeps['refill'].a = this.creepActivity.CreateNewCreepActivity({
                         at: AT_Transfer,
                         c: creepID,
+                        HC: 'CreateRefillActivity',
                         t: spawn[0].id
                     }, this.pid, this.extensions);
                     return;
@@ -172,6 +177,7 @@ class BootstrapJob extends BasicProcess<BootstrapRefiller_Memory> {
                         this.creeps['refill'].a = this.creepActivity.CreateNewCreepActivity({
                             at: AT_Transfer,
                             c: creepID,
+                            HC: 'CreateRefillActivity',
                             t: container.id
                         }, this.pid, this.extensions);
                         return;
@@ -186,6 +192,7 @@ class BootstrapJob extends BasicProcess<BootstrapRefiller_Memory> {
                         this.creeps['refill'].a = this.creepActivity.CreateNewCreepActivity({
                             at: AT_Transfer,
                             c: creepID,
+                            HC: 'CreateRefillActivity',
                             t: container.id
                         }, this.pid, this.extensions);
                         return;
@@ -198,6 +205,7 @@ class BootstrapJob extends BasicProcess<BootstrapRefiller_Memory> {
                         this.creeps['refill'].a = this.creepActivity.CreateNewCreepActivity({
                             at: AT_Transfer,
                             c: creepID,
+                            HC: 'CreateRefillActivity',
                             t: creep.id
                         }, this.pid, this.extensions);
                         return;

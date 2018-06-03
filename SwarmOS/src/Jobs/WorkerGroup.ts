@@ -33,7 +33,6 @@ export abstract class WorkerGroup<T extends WorkerGroup_Memory> extends BasicPro
     CreateActivityForCreep(cID: CreepID) {
         let creep = this.creepRegistry.tryGetCreep(cID, this.pid);
         if (!creep) {
-            // (TODO): This needs to be changed for sure!  Either do a respawn or somethign...
             delete this.creeps[cID];
             return;
         }
