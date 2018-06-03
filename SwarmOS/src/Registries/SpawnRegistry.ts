@@ -56,7 +56,7 @@ class SpawnRegistry extends BasicProcess<SpawnRegistry_Memory> {
     @extensionInterface(EXT_CreepRegistry)
     protected creepRegistry!: ICreepRegistryExtensions;
 
-    protected get memory() {
+    get memory() {
         if (!Memory.spawnData) {
             this.log.warn(`Initializing RoomManager memory`);
             Memory.spawnData = {}
@@ -233,7 +233,7 @@ class SpawnRegistry extends BasicProcess<SpawnRegistry_Memory> {
 const UNSPAWNABLE_COST = -1;
 
 class SpawnRegistryExtensions extends ExtensionBase implements ISpawnRegistryExtensions {
-    protected get memory(): SpawnRegistry_Memory {
+    get memory(): SpawnRegistry_Memory {
         if (!Memory.spawnData) {
             this.log.warn(`Initializing RoomManager memory`);
             Memory.spawnData = {}

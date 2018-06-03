@@ -11,7 +11,7 @@ export const OSPackage: IPackage<CreepRegistry_Memory> = {
 import { BasicProcess } from "Core/BasicTypes";
 
 class SwarmCLI extends BasicProcess<SwarmCLIMemory> {
-    protected get memory(): SwarmCLIMemory {
+    get memory(): SwarmCLIMemory {
         if (!Memory.CLI) {
             this.log.warn(`Initializing Command Line Interface memory`);
             Memory.CLI = {

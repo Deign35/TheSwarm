@@ -16,7 +16,7 @@ const PKG_FlagRegistry_LogContext: LogContext = {
 
 // (TODO): Convert to Flag Registry
 class FlagRegistry extends BasicProcess<FlagExtensionsMemory> {
-    protected get memory(): FlagExtensionsMemory {
+    get memory(): FlagExtensionsMemory {
         if (!Memory.flagData) {
             this.log.warn(`Initializing FlagRegistry memory`);
             Memory.flagData = {}
@@ -57,7 +57,7 @@ class FlagRegistry extends BasicProcess<FlagExtensionsMemory> {
 }
 
 class FlagRegistryExtensions extends ExtensionBase {
-    protected get memory(): FlagExtensionsMemory {
+    get memory(): FlagExtensionsMemory {
         if (!Memory.flagData) {
             this.log.warn(`Initializing FlagManager memory`);
             Memory.flagData = {}

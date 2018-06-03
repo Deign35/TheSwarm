@@ -12,7 +12,7 @@ export abstract class BasicProcess<T extends MemBase> implements IProcess {
     @extensionInterface(EXT_SpawnRegistry)
     protected spawnRegistry!: ISpawnRegistryExtensions;
 
-    protected get memory(): T { return this.context.memory as T; }
+    get memory(): T { return this.context.memory as T; }
     get pkgName(): string { return this.context.pkgName; }
     get pid(): PID { return this.context.pid; }
     get parentPID(): PID { return this.context.pPID; }

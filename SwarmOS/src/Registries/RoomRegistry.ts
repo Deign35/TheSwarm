@@ -16,7 +16,7 @@ class RoomRegistry extends BasicProcess<RoomStateMemory> {
     get logLevel() { return LOG_INFO as LogLevel; }
     @extensionInterface(EXT_RoomView)
     RoomView!: RoomExtension;
-    protected get memory(): RoomStateMemory {
+    get memory(): RoomStateMemory {
         if (!Memory.roomData) {
             Memory.roomData = {
                 roomStateData: {}
@@ -64,7 +64,7 @@ class RoomRegistry extends BasicProcess<RoomStateMemory> {
 }
 
 class RoomExtension extends ExtensionBase implements IRoomDataExtension {
-    protected get memory(): IDictionary<RoomID, RoomState> {
+    get memory(): IDictionary<RoomID, RoomState> {
         if (!Memory.roomData) {
             this.log.warn(`Initializing RoomManager memory`);
             Memory.roomData = {

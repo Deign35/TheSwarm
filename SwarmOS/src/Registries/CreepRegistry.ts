@@ -34,7 +34,7 @@ const BodyLegend = {
 class CreepRegistry extends BasicProcess<CreepRegistry_Memory> {
     @extensionInterface(EXT_CreepRegistry)
     Extensions!: ICreepRegistryExtensions;
-    protected get memory(): CreepRegistry_Memory {
+    get memory(): CreepRegistry_Memory {
         if (!Memory.creepData) {
             this.log.warn(`Initializing CreepRegistry memory`);
             Memory.creepData = {
@@ -84,7 +84,7 @@ class CreepRegistry extends BasicProcess<CreepRegistry_Memory> {
     }
 }
 class CreepRegistryExtensions extends ExtensionBase implements ICreepRegistryExtensions {
-    protected get memory(): CreepRegistry_Memory {
+    get memory(): CreepRegistry_Memory {
         if (!Memory.creepData) {
             this.log.warn(`Initializing CreepRegistry memory`);
             Memory.creepData = {
