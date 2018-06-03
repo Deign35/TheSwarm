@@ -1,6 +1,6 @@
 export const OSPackage: IPackage<SpawnRegistry_Memory> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
-        processRegistry.register(CJ_Harvester, HarvestJob);
+        processRegistry.register(CJ_Harvest, HarvestJob);
     }
 }
 import { BasicProcess } from "Core/BasicTypes";
@@ -120,7 +120,7 @@ class HarvestJob extends BasicProcess<HarvestJob_Memory> {
         if (this.creepRegistry.tryReserveCreep(creepID, this.pid)) {
             this.memory.a = this.creepActivity.CreateNewCreepActivity({
                 at: AT_Harvest,
-                c: this.memory.h!,
+                c: creepID,
                 HC: 'HarvestComplete',
                 t: this.memory.t
             }, this.pid, this.extensions);

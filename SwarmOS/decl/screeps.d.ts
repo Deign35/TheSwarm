@@ -1406,6 +1406,9 @@ interface FindPathOpts {
      * Path to within (range) tiles of target tile. The default is to path to the tile that the target is on (0).
      */
     range?: number;
+
+    swampCost?: number;
+    plainCost?: number;
 }
 
 interface MoveToOpts extends FindPathOpts {

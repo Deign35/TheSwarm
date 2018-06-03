@@ -26,10 +26,9 @@ type RoomState_StructureData = {
 }
 
 declare type RoomState_AttachedCreepGroups = {
-    [CG_Control]?: PID;
-    [CG_Infrastructure]?: PID;
-    [CG_Refill]?: PID[];
-    [CG_Source]?: PID[];
-    [CG_SimpleSource]?: PID[];
-    [CG_SelfDefense]?: PID;
+    [CJ_Fortify]?: PID;
+    [CJ_Harvest]?: PID[];
+    [CJ_Refill]?: PID;
+    [CJ_Science]?: PID;
+    [CJ_Work]?: PID;
 }

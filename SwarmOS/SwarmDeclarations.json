@@ -37,29 +37,12 @@
             "usePrefix": true,
             "combinedType": "CreepJobsPackage",
             "entries": [
-                "Harvester",
-                "Refiller",
-                "Upgrade",
-                "Build",
-                "Repair"
-            ]
-        },
-        "CG": {
-            "comment": "Creep group packages",
-            "enabled": true,
-            "string": true,
-            "isArray": true,
-            "type": true,
-            "usePrefix": true,
-            "combinedType": "CreepGroupPackage",
-            "entries": [
-                "SimpleSource",
-                "Source",
-                "Control",
-                "Infrastructure",
+                "Harvest",
                 "Refill",
-                "SelfDefense",
-                "Worker"
+                "Work",
+                "Science",
+                "Fortify",
+                "Boot"
             ]
         },
         "EXT": {

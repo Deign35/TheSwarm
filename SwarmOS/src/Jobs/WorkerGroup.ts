@@ -1,6 +1,6 @@
 export const OSPackage: IPackage<SpawnRegistry_Memory> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
-        processRegistry.register(CG_Worker, WorkerGroup);
+        processRegistry.register(CJ_Work, WorkerGroup);
     }
 }
 import { BasicProcess } from "Core/BasicTypes";

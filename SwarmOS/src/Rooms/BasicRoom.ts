@@ -22,11 +22,11 @@ class BasicRoom extends BasicProcess<BasicRoom_Memory> {
         this.roomData = this.View.GetRoomData(this.roomName)!;
     }
     RunThread(): ThreadState {
-        if (!this.roomData.groups.CG_SimpleSource) {
-            this.roomData.groups.CG_SimpleSource = [];
+        if (!this.roomData.groups.CJ_Harvest) {
+            this.roomData.groups.CJ_Harvest = [];
         }
-        if (this.roomData.groups.CG_SimpleSource.length < this.roomData.sourceIDs.length) {
-            if (this.roomData.groups.CG_SimpleSource.length > 0) {
+        if (this.roomData.groups.CJ_Harvest.length < this.roomData.sourceIDs.length) {
+            if (this.roomData.groups.CJ_Harvest.length > 0) {
                 this.log.alert(`ASSUMPTION FAILURE -- BasicRoom.EnsureGroupFormation()`);
             }
             for (let i = 0; i < this.roomData.sourceIDs.length; i++) {
@@ -34,9 +34,10 @@ class BasicRoom extends BasicProcess<BasicRoom_Memory> {
                     t: this.roomData.sourceIDs[i],
                     r: this.memory.targetRoom
                 }
-                this.roomData.groups.CG_SimpleSource.push(this.kernel.startProcess(CJ_Harvester, newMem));
+                this.roomData.groups.CJ_Harvest.push(this.kernel.startProcess(CJ_Harvest, newMem));
             }
         }
+
         return ThreadState_Done;
     }
 }

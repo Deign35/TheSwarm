@@ -20,7 +20,7 @@ declare type GroupID = string;
 declare type TempAgencyID = string;
 declare type SpawnRequestID = string;
 
-declare type ScreepsPackage = OSPackage | CreepGroupPackage | CreepJobsPackage
+declare type ScreepsPackage = OSPackage | SlimOSPackage | CreepJobsPackage
 
 declare type ObjectTypeWithID = Structure | Creep | Source | ConstructionSite | Mineral | Nuke | Resource | Tombstone;
 
