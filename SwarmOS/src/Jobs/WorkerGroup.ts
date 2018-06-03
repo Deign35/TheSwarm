@@ -46,6 +46,7 @@ export abstract class WorkerGroup<T extends WorkerGroup_Memory> extends BasicPro
             t: nextTask.t,
             at: nextTask.a,
             c: cID,
+            f: []
         }, this.pid, this.extensions);
     }
 

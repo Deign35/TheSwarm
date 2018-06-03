@@ -32,26 +32,16 @@ class CreepActivity extends BasicProcess<CreepActivity_Memory> {
             this.creepActivity.MoveCreep(this.AssignedCreep, this.TargetPos || this.Target!.pos, this.memory.p);
         } else {
             let result = this.creepActivity.RunActivity(this.CreateActivityArgs());
-            switch (result) {
-                case (OK):
-                case (ERR_BUSY):
-                case (ERR_TIRED):
-                case (ERR_NOT_IN_RANGE):
-                    break;
-                case (ERR_NOT_OWNER):
-                case (ERR_NO_PATH):
-                case (ERR_NAME_EXISTS):
-                case (ERR_NOT_FOUND):
-                case (ERR_NOT_ENOUGH_RESOURCES):
-                case (ERR_INVALID_TARGET):
-                case (ERR_FULL):
-                case (ERR_INVALID_ARGS):
-                case (ERR_NO_BODYPART):
-                case (ERR_RCL_NOT_ENOUGH):
-                case (ERR_GCL_NOT_ENOUGH):
-                    console.log(`CreepAction(${result}) -- ${JSON.stringify(result)}`);
-                    this.EndProcess();
+            if (result == OK || result == ERR_BUSY || result == ERR_TIRED || result == ERR_NOT_IN_RANGE) {
+                return ThreadState_Done;
             }
+            for (let i = 0; i < this.memory.f.length; i++) {
+                if (result == this.memory.f[i]) {
+                    return ThreadState_Done;
+                }
+            }
+            // If we get here, then the action result is not accessible.
+            this.EndProcess();
         }
 
         return ThreadState_Done;

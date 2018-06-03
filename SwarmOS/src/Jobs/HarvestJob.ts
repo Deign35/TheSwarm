@@ -125,7 +125,8 @@ class HarvestJob extends BasicProcess<HarvestJob_Memory> {
                 at: AT_Harvest,
                 c: creepID,
                 HC: 'HarvestComplete',
-                t: this.memory.t
+                t: this.memory.t,
+                f: [ERR_FULL]
             }, this.pid, this.extensions);
         }
     }

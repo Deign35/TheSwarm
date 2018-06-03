@@ -37,6 +37,9 @@ class BootstrapJob extends BasicProcess<BootstrapRefiller_Memory> {
             return ThreadState_Done;
         }
 
+        if (this.creeps.refill.c && (!this.creeps.refill.a || !this.kernel.getProcessByPID(this.creeps.refill.a))) {
+            this.CreateRefillActivity(this.creeps.refill.c);
+        }
 
         return ThreadState_Done;
     }
@@ -82,7 +85,8 @@ class BootstrapJob extends BasicProcess<BootstrapRefiller_Memory> {
                 at: AT_Harvest,
                 c: creepID,
                 HC: 'HarvestComplete',
-                t: this.memory.s
+                t: this.memory.s,
+                f: [ERR_FULL]
             }, this.pid, this.extensions);
             let keys = Object.keys(this.creeps);
             for (let i = 0; i < keys.length; i++) {
@@ -130,6 +134,7 @@ class BootstrapJob extends BasicProcess<BootstrapRefiller_Memory> {
         if (this.creepRegistry.tryReserveCreep(creepID, this.pid)) {
             let creep = this.creepRegistry.tryGetCreep(creepID, this.pid);
             this.creeps['refill'].c = creepID;
+            this.CreateRefillActivity(creepID);
         }
     }
 
@@ -142,31 +147,32 @@ class BootstrapJob extends BasicProcess<BootstrapRefiller_Memory> {
                 return;
             }
 
+            let newActivity = {
+                at: AT_NoOp as ActionType,
+                c: creepID,
+                HC: 'CreateRefillActivity',
+                t: '',
+                f: []
+            }
             if (creep.carry.energy == 0) {
                 // get energy
                 let resources = FindNextTo((Game.getObjectById(this.memory.s) as Source).pos, LOOK_RESOURCES);
                 for (let i = 0; i < resources.length; i++) {
                     if (resources[i].resource && (resources[i].resource as Resource).amount > creep.carryCapacity) {
-                        this.creeps['refill'].a = this.creepActivity.CreateNewCreepActivity({
-                            at: AT_Pickup,
-                            c: creepID,
-                            HC: 'CreateRefillActivity',
-                            t: (resources[i].resource as Resource).id
-                        }, this.pid, this.extensions);
-                        return;
+                        newActivity.at = AT_Pickup;
+                        newActivity.t = (resources[i].resource as Resource).id;
                     }
                 }
+                if (newActivity.at == AT_NoOp) {
+                    newActivity.at = AT_Harvest;
+                    newActivity.t = this.memory.s;
+                }
             } else {
+                newActivity.at = AT_Transfer;
                 // find a delivery target
                 let spawn = creep.room.find(FIND_MY_SPAWNS);
                 if (spawn.length > 0 && spawn[0].energy < spawn[0].energyCapacity) {
-                    this.creeps['refill'].a = this.creepActivity.CreateNewCreepActivity({
-                        at: AT_Transfer,
-                        c: creepID,
-                        HC: 'CreateRefillActivity',
-                        t: spawn[0].id
-                    }, this.pid, this.extensions);
-                    return;
+                    newActivity.t = spawn[0].id;
                 }
                 let spawnTainer = FindStructureNextTo(spawn[0].pos, STRUCTURE_CONTAINER, {
                     distance: 3
@@ -174,13 +180,7 @@ class BootstrapJob extends BasicProcess<BootstrapRefiller_Memory> {
                 if (spawnTainer && spawnTainer.length > 0) {
                     let container = spawnTainer[0].structure as StructureContainer;
                     if (container.energy < container.energyCapacity) {
-                        this.creeps['refill'].a = this.creepActivity.CreateNewCreepActivity({
-                            at: AT_Transfer,
-                            c: creepID,
-                            HC: 'CreateRefillActivity',
-                            t: container.id
-                        }, this.pid, this.extensions);
-                        return;
+                        newActivity.t = container.id;
                     }
                 }
                 let controlTainer = FindStructureNextTo(creep.room.controller!.pos, STRUCTURE_CONTAINER, {
@@ -189,29 +189,18 @@ class BootstrapJob extends BasicProcess<BootstrapRefiller_Memory> {
                 if (controlTainer && controlTainer.length > 0) {
                     let container = controlTainer[0].structure as StructureContainer;
                     if (container.energy < container.energyCapacity) {
-                        this.creeps['refill'].a = this.creepActivity.CreateNewCreepActivity({
-                            at: AT_Transfer,
-                            c: creepID,
-                            HC: 'CreateRefillActivity',
-                            t: container.id
-                        }, this.pid, this.extensions);
-                        return;
+                        newActivity.t = container.id;
                     }
                 }
                 let creeps = creep.room.find(FIND_MY_CREEPS);
                 for (let i = 0; i < creeps.length; i++) {
                     let creep = creeps[i];
                     if (creep.memory.ct == CT_Worker && creep.carry.energy == 0) {
-                        this.creeps['refill'].a = this.creepActivity.CreateNewCreepActivity({
-                            at: AT_Transfer,
-                            c: creepID,
-                            HC: 'CreateRefillActivity',
-                            t: creep.id
-                        }, this.pid, this.extensions);
-                        return;
+                        newActivity.t = creep.id;
                     }
                 }
             }
+            this.creeps['refill'].a = this.creepActivity.CreateNewCreepActivity(newActivity, this.pid, this.extensions);
         }
     }
 }

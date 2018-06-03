@@ -254,7 +254,12 @@ class CreepActivityExtensions extends ExtensionBase implements ICreepActivityExt
             case (AT_ClaimController): return creep.claimController(target);
             case (AT_Dismantle): return creep.dismantle(target);
             case (AT_GenerateSafeMode): return creep.generateSafeMode(target);
-            case (AT_Harvest): return creep.harvest(target);
+            case (AT_Harvest):
+                let res = creep.harvest(target);
+                if (res == OK && creep.carry.energy == creep.carryCapacity) {
+                    return ERR_FULL;
+                }
+                return res;
             case (AT_Heal): return creep.heal(target);
             case (AT_Pickup): return creep.pickup(target);
             case (AT_RangedAttack): return creep.rangedAttack(target);

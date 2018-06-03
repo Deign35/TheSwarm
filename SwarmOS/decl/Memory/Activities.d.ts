@@ -13,4 +13,5 @@ declare interface CreepActivity_Memory extends MemBase {
     m?: string;     //Message
     rt?: ResourceConstant; //ResourceType
     p?: PathStep[]; //Path
+    f: ScreepsReturnCode[]; // Failure codes that should be ignored
 }
