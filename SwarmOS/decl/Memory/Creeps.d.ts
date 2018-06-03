@@ -8,31 +8,6 @@ declare interface HarvestJob_Memory extends MemBase {
     h?: CreepID;    // (h)arvester
     r: RoomID;      // (r)oom
 }
-declare interface BootstrapRefiller_Memory extends MemBase {
-    creeps: {
-        h1: {           // (h)arvester 1
-            a?: PID;    // (a)ctivity
-            c?: CreepID;// (c)reep
-        },
-        h2: {           // (h)arvester 2
-            a?: PID;    // (a)ctivity
-            c?: CreepID;// (c)reep
-        }
-        r: {            // (r)efiller
-            a?: PID;    // (a)ctivity
-            c?: CreepID;// (c)reep
-        }
-    }
-
-    rID: RoomID;    // (r)oom (ID)
-    s: ObjectID;    // (s)ource ID
-}
-
-declare interface WorkerJob_Memory extends MemBase {
-    a?: PID;        // (a)ctivity
-    c: CreepID;     // (c)reep
-    r: RoomID;      // (r)oom
-}
 
 declare interface WorkerGroup_Memory extends MemBase {
     rID: RoomID;
@@ -41,14 +16,30 @@ declare interface WorkerGroup_Memory extends MemBase {
             a?: PID;        // (a)ctivity
         }
     }
+}
+declare interface GenericWorkerGroup_Memory<TarType extends WorkerTarget_Memory, EnType extends WorkerTarget_Memory> extends WorkerGroup_Memory {
+    targets: IDictionary<ObjectID, TarType>;
+    energy: IDictionary<ObjectID, EnType>;     // energy withdrawal targets
+}
 
-    targets: IDictionary<ObjectID, WorkerTarget_Memory>;
-    energy: IDictionary<ObjectID, WorkerTarget_Memory>;     // energy withdrawal targets
+declare interface BootstrapRefiller_Memory extends MemBase {
+    creeps: {
+        [id: string]: {
+            a?: PID;        // (a)ctivity
+            c?: CreepID;    // (c)reep
+        }
+    }
+    rID: RoomID;
+    s: ObjectID;    // (s)ource ID
+    hb: boolean;        // (h)as (b)oot
 }
 
 declare interface WorkerTarget_Memory extends MemBase {
     a: ActionType;  // (a)ctionType
     t: TargetType;  // (o)bject type
+}
+
+declare interface WorkerTarget_PriorityMemory extends WorkerTarget_Memory {
     p: Priority;    // (p)riority
 }
 

@@ -110,7 +110,10 @@ class HarvestJob extends BasicProcess<HarvestJob_Memory> {
 
     SpawnComplete(creepID: string) {
         if (this.memory.h) {
+            // (TODO): Orphaned creep, what to do with it?!??!?!
             let oldCreep = this.creepRegistry.tryGetCreep(this.memory.h, this.pid);
+            this.creepRegistry.releaseCreep(this.memory.h, this.pid);
+            this.log.warn(`SpawnComplete, but harvester already exists.  Not working functionality`);
         }
         this.memory.h = creepID;
         this.CreateHarvestActivity(creepID);

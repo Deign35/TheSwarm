@@ -48,6 +48,7 @@ class BootstrapJob extends BasicProcess<Bootstrap_Memory> {
                     return ThreadState_Done;
                 }
                 let spawn = spawns[0];
+                spawn.room.createConstructionSite(spawn.pos.x - 1, spawn.pos.y, STRUCTURE_CONTAINER);
 
                 let controller = this.room.controller;
                 if (controller) {
@@ -61,10 +62,6 @@ class BootstrapJob extends BasicProcess<Bootstrap_Memory> {
                 // (TODO): Find a nearby spot to put another container.
             }
         }
-
-        if (!this.memory.refiller || !this.kernel.getProcessByPID(this.memory.refiller)) {
-        }
-
 
         return ThreadState_Done;
     }
@@ -86,53 +83,5 @@ class BootstrapJob extends BasicProcess<Bootstrap_Memory> {
         this.room.createConstructionSite(path[path.length - 1].x, path[path.length - 1].y, STRUCTURE_CONTAINER);
 
         return true;
-    }
-
-    CreateRefillerSpawnActivity() {
-        let sID = this.spawnRegistry.requestSpawn({
-            ct: CT_Worker,
-            l: 0,
-            n: this.memory.rID + '_BS',
-        }, this.memory.rID, Priority_Highest, 1, {
-                ct: CT_Worker,
-                lvl: 0
-            });
-        this.memory.refiller = this.kernel.startProcess(SPKG_SpawnActivity, {
-            sID: sID,
-            HC: 'RefillSpawnComplete'
-        });
-        this.kernel.setParent(this.memory.refiller, this.pid);
-    }
-
-    RefillSpawnComplete(creepID: string) {
-        if (this.creepRegistry.tryReserveCreep(creepID, this.pid)) {
-            this.memory.refiller = this.creepActivity.CreateNewCreepActivity({
-            })
-        }
-    }
-
-    SpawnComplete(creepID: string) {
-        this.memory.hasSpawnRequest = false;
-        this.creeps[creepID] = {};
-        this.CreateActivity(creepID);
-    }
-
-    CreateActivity(creepID: string) {
-        if (this.creepRegistry.tryReserveCreep(creepID, this.pid)) {
-            this.creeps[creepID].a = this.creepActivity.CreateNewCreepActivity({
-                at: AT_Harvest,
-                c: creepID,
-                HC: 'ActivityComplete',
-                t: this.memory.t
-            }, this.pid, this.extensions);
-        }
-    }
-    ActivityComplete(creepID: string) {
-        let creep = this.creepRegistry.tryGetCreep(creepID);
-        if (creep) {
-            this.CreateActivity(creepID);
-        } else {
-            delete this.memory.h;
-        }
     }
 }
