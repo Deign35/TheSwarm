@@ -20,6 +20,7 @@ interface StructureStorage {
 
 interface StructureTerminal {
     energy: number;
+    energyCapacity: number;
     SwarmOS: boolean;
 }
 

@@ -1,6 +1,6 @@
 export const OSPackage: IPackage<SpawnRegistry_Memory> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
-        processRegistry.register(CJ_Boot, BootstrapJob);
+        processRegistry.register(CJ_BootRefill, BootstrapJob);
     }
 }
 
@@ -16,17 +16,14 @@ class BootstrapJob extends BasicProcess<BootstrapRefiller_Memory> {
     @extensionInterface(EXT_RoomView)
     protected View!: IRoomDataExtension;
 
-    get creeps() { return this.memory.creeps; }
     RunThread(): ThreadState {
         if (!this.memory.hb) {
-            this.CreateRefillerSpawnActivity();
-
             let terrain = FindNextTo((Game.getObjectById(this.memory.s) as Source).pos, LOOK_TERRAIN);
             let count = 0;
             for (let i = 0; i < terrain.length; i++) {
                 if (terrain[i].terrain != 'wall') {
                     count++;
-                    this.CreateHarvestSpawnActivity('S' + i);
+                    this.CreateTempHarvestJob();
                     if (count >= 2) {
                         break;
                     }
@@ -34,173 +31,120 @@ class BootstrapJob extends BasicProcess<BootstrapRefiller_Memory> {
             }
 
             this.memory.hb = true;
-            return ThreadState_Done;
         }
 
-        if (this.creeps.refill.c && (!this.creeps.refill.a || !this.kernel.getProcessByPID(this.creeps.refill.a))) {
-            this.CreateRefillActivity(this.creeps.refill.c);
+        if (!this.memory.ref.a || !this.kernel.getProcessByPID(this.memory.ref.a)) {
+            if (this.memory.ref.c) {
+                this.CreateRefillActivity(this.memory.ref.c);
+            } else {
+                this.CreateRefillerSpawnActivity();
+            }
         }
 
         return ThreadState_Done;
     }
 
-    CreateHarvestSpawnActivity(spawnID: string) {
-        let sID = this.spawnRegistry.requestSpawn({
-            l: 0,
-            ct: CT_Harvester,
-            n: spawnID
-        }, this.memory.rID, Priority_High, 1, {
-                ct: CT_Harvester,
-                lvl: 0
-            });
-        let spawnMem: SpawnActivity_Memory = {
-            sID: sID,
-            HC: 'HarvestSpawnComplete'
+    CreateTempHarvestJob() {
+        let harvestMem: HarvestJob_Memory = {
+            r: this.memory.rID,
+            SUPPORT: true,
+            t: this.memory.s
         }
-        let newPID = this.kernel.startProcess(SPKG_SpawnActivity, spawnMem);
+        let newPID = this.kernel.startProcess(CJ_Harvest, harvestMem);
         this.kernel.setParent(newPID, this.pid);
-        if (!this.creeps[spawnID]) {
-            this.creeps[spawnID] = {};
-        }
-        this.creeps[spawnID].a = newPID;
+        // Will be killed when this process is closed
     }
-
-    HarvestSpawnComplete(creepID: string, activityPID: PID) {
-        if (this.creepRegistry.tryReserveCreep(creepID, this.pid)) {
-            let creep = this.creepRegistry.tryGetCreep(creepID, this.pid);
-            let keys = Object.keys(this.creeps);
-            for (let i = 0; i < keys.length; i++) {
-                if (this.creeps[keys[i]].a == activityPID) {
-                    this.creeps[keys[i]].c = creepID;
-                    delete this.creeps[keys[i]].a;
-                }
-            }
+    CreateTempBuilderJob() {
+        let builderMem: BootstrapBuilder_Memory = {
+            rID: this.memory.rID,
+            bui: {},
+            s: this.memory.s,
+            sites: []
         }
-        this.CreateHarvestActivity(creepID);
-    }
-
-    CreateHarvestActivity(creepID: string) {
-        if (this.creepRegistry.tryReserveCreep(creepID, this.pid)) {
-            let newPID = this.creepActivity.CreateNewCreepActivity({
-                at: AT_Harvest,
-                c: creepID,
-                HC: 'HarvestComplete',
-                t: this.memory.s,
-                f: [ERR_FULL]
-            }, this.pid, this.extensions);
-            let keys = Object.keys(this.creeps);
-            for (let i = 0; i < keys.length; i++) {
-                if (this.creeps[keys[i]].c == creepID) {
-                    this.creeps[keys[i]].a = newPID;
-                }
-            }
-        }
-    }
-
-    HarvestComplete(creepID: string) {
-        let creep = this.creepRegistry.tryGetCreep(creepID);
-        if (creep) {
-            this.CreateHarvestActivity(creepID);
-        } else {
-            let keys = Object.keys(this.creeps);
-            for (let i = 0; i < keys.length; i++) {
-                if (this.creeps[keys[i]].c == creepID) {
-                    this.CreateHarvestSpawnActivity(keys[i]);
-                    break;
-                }
-            }
-        }
+        let newPID = this.kernel.startProcess(CJ_BootBuild, builderMem);
+        this.kernel.setParent(newPID, this.pid);
+        // Will be killed when this process is closed
     }
 
     CreateRefillerSpawnActivity() {
         let sID = this.spawnRegistry.requestSpawn({
             l: 0,
-            ct: CT_Harvester,
-            n: this.memory.s.slice(-5) + 'ref'
+            ct: CT_Worker,
+            n: this.memory.s.slice(-5) + 'r'
         }, this.memory.rID, Priority_EMERGENCY, 1, {
-                ct: CT_Harvester,
+                ct: CT_Worker,
                 lvl: 0
             });
         let spawnMem: SpawnActivity_Memory = {
             sID: sID,
-            HC: 'RefillerSpawnComplete'
+            HC: 'CreateRefillActivity'
         }
-        let newPID = this.kernel.startProcess(SPKG_SpawnActivity, spawnMem);
-        this.kernel.setParent(newPID, this.pid);
-        this.creeps['refill'].a = newPID;
-    }
-
-    RefillerSpawnComplete(creepID: CreepID) {
-        if (this.creepRegistry.tryReserveCreep(creepID, this.pid)) {
-            let creep = this.creepRegistry.tryGetCreep(creepID, this.pid);
-            this.creeps['refill'].c = creepID;
-            this.CreateRefillActivity(creepID);
-        }
+        this.memory.ref.a = this.kernel.startProcess(SPKG_SpawnActivity, spawnMem);
+        this.kernel.setParent(this.memory.ref.a, this.pid);
     }
 
     CreateRefillActivity(creepID: CreepID) {
-        if (this.creepRegistry.tryReserveCreep(creepID, this.pid)) {
-            let creep = this.creepRegistry.tryGetCreep(creepID, this.pid);
-            if (!creep) {
-                delete this.memory.creeps['refill'].c;
-                this.CreateRefillerSpawnActivity();
-                return;
-            }
-
-            let newActivity = {
-                at: AT_NoOp as ActionType,
-                c: creepID,
-                HC: 'CreateRefillActivity',
-                t: '',
-                f: []
-            }
-            if (creep.carry.energy == 0) {
-                // get energy
-                let resources = FindNextTo((Game.getObjectById(this.memory.s) as Source).pos, LOOK_RESOURCES);
-                for (let i = 0; i < resources.length; i++) {
-                    if (resources[i].resource && (resources[i].resource as Resource).amount > creep.carryCapacity) {
-                        newActivity.at = AT_Pickup;
-                        newActivity.t = (resources[i].resource as Resource).id;
-                    }
-                }
-                if (newActivity.at == AT_NoOp) {
-                    newActivity.at = AT_Harvest;
-                    newActivity.t = this.memory.s;
-                }
-            } else {
-                newActivity.at = AT_Transfer;
-                // find a delivery target
-                let spawn = creep.room.find(FIND_MY_SPAWNS);
-                if (spawn.length > 0 && spawn[0].energy < spawn[0].energyCapacity) {
-                    newActivity.t = spawn[0].id;
-                }
-                let spawnTainer = FindStructureNextTo(spawn[0].pos, STRUCTURE_CONTAINER, {
-                    distance: 3
-                });
-                if (spawnTainer && spawnTainer.length > 0) {
-                    let container = spawnTainer[0].structure as StructureContainer;
-                    if (container.energy < container.energyCapacity) {
-                        newActivity.t = container.id;
-                    }
-                }
-                let controlTainer = FindStructureNextTo(creep.room.controller!.pos, STRUCTURE_CONTAINER, {
-                    distance: 3
-                });
-                if (controlTainer && controlTainer.length > 0) {
-                    let container = controlTainer[0].structure as StructureContainer;
-                    if (container.energy < container.energyCapacity) {
-                        newActivity.t = container.id;
-                    }
-                }
-                let creeps = creep.room.find(FIND_MY_CREEPS);
-                for (let i = 0; i < creeps.length; i++) {
-                    let creep = creeps[i];
-                    if (creep.memory.ct == CT_Worker && creep.carry.energy == 0) {
-                        newActivity.t = creep.id;
-                    }
-                }
-            }
-            this.creeps['refill'].a = this.creepActivity.CreateNewCreepActivity(newActivity, this.pid, this.extensions);
+        this.creepRegistry.tryReserveCreep(creepID, this.pid);
+        let creep = this.creepRegistry.tryGetCreep(creepID, this.pid);
+        if (!creep) {
+            this.CreateRefillerSpawnActivity();
+            return;
         }
+
+        this.memory.ref.c = creepID;
+        let newActivity = {
+            at: AT_NoOp as ActionType,
+            c: creepID,
+            HC: 'CreateRefillActivity',
+            t: '',
+            f: []
+        }
+        if (creep.carry.energy == 0) {
+            // get energy
+            let resources = FindNextTo((Game.getObjectById(this.memory.s) as Source).pos, LOOK_RESOURCES);
+            for (let i = 0; i < resources.length; i++) {
+                if (resources[i].resource && (resources[i].resource as Resource).amount > creep.carryCapacity) {
+                    newActivity.at = AT_Pickup;
+                    newActivity.t = (resources[i].resource as Resource).id;
+                }
+            }
+            if (newActivity.at == AT_NoOp) {
+                newActivity.at = AT_Harvest;
+                newActivity.t = this.memory.s;
+            }
+        } else {
+            newActivity.at = AT_Transfer;
+            // find a delivery target
+            let spawn = creep.room.find(FIND_MY_SPAWNS);
+            if (spawn.length > 0 && spawn[0].energy < spawn[0].energyCapacity) {
+                newActivity.t = spawn[0].id;
+            }
+            let spawnTainer = FindStructureNextTo(spawn[0].pos, STRUCTURE_CONTAINER, {
+                distance: 3
+            });
+            if (spawnTainer && spawnTainer.length > 0) {
+                let container = spawnTainer[0].structure as StructureContainer;
+                if (container.energy < container.energyCapacity) {
+                    newActivity.t = container.id;
+                }
+            }
+            let controlTainer = FindStructureNextTo(creep.room.controller!.pos, STRUCTURE_CONTAINER, {
+                distance: 3
+            });
+            if (controlTainer && controlTainer.length > 0) {
+                let container = controlTainer[0].structure as StructureContainer;
+                if (container.energy < container.energyCapacity) {
+                    newActivity.t = container.id;
+                }
+            }
+            let creeps = creep.room.find(FIND_MY_CREEPS);
+            for (let i = 0; i < creeps.length; i++) {
+                let creep = creeps[i];
+                if (creep.memory.ct == CT_Worker && creep.carry.energy * 5 <= creep.carryCapacity) {
+                    newActivity.t = creep.id;
+                }
+            }
+        }
+        this.memory.ref.a = this.creepActivity.CreateNewCreepActivity(newActivity, this.pid, this.extensions);
     }
 }

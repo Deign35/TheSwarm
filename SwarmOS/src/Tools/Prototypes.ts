@@ -75,6 +75,11 @@ if (!StructureTerminal.prototype.SwarmOS) {
                 return this.store.energy || 0;
             }
         },
+        energyCapacity: {
+            get() {
+                return this.storeCapacity - _.sum(this.store) + this.energy;
+            }
+        },
         SwarmOS: {
             get() {
                 return true;

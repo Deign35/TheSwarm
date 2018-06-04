@@ -30,7 +30,7 @@ class BootstrapJob extends BasicProcess<Bootstrap_Memory> {
             });
             if (containers.length > 0) {
                 // Replace this job with a standard room worker group
-                this.kernel.killProcess(this.pid, `Bootstrapping ${this.memory.rID} complete`);
+                //this.kernel.killProcess(this.pid, `Bootstrapping ${this.memory.rID} complete`);
             }
 
             let sites = this.room.find(FIND_CONSTRUCTION_SITES);
@@ -47,13 +47,14 @@ class BootstrapJob extends BasicProcess<Bootstrap_Memory> {
                     }
                 }
 
-                let workMem: GenericWorkerGroup_Memory<WorkerTarget_PriorityMemory, WorkerTarget_Memory> = {
-                    creeps: {},
-                    energy: {},
+                let workMem: BootstrapBuilder_Memory = {
+                    bui: {},
                     rID: this.memory.rID,
-                    targets: targetMem
+                    sites: this.containers
                 }
-                this.roomData!.groups[CJ_Work] = this.kernel.startProcess(CJ_Work, workMem);
+                let newPID = this.kernel.startProcess(CJ_BootBuild, workMem);
+                this.roomData!.groups[CJ_BootBuild]!.push(newPID);
+                this.kernel.setParent(newPID, this.pid);
                 return ThreadState_Active;
             } else {
                 let spawns = this.room.find(FIND_MY_SPAWNS);
@@ -68,26 +69,38 @@ class BootstrapJob extends BasicProcess<Bootstrap_Memory> {
                     this.CreatePathAndContainerSites(spawn, controller);
                 }
 
-                this.roomData!.groups[CJ_Boot] = [];
+                this.roomData!.groups[CJ_BootRefill] = [];
                 this.roomData!.groups[CJ_Harvest] = [];
+                this.roomData!.groups[CJ_BootBuild] = [];
                 let sources = this.room.find(FIND_SOURCES);
                 for (let i = 0; i < sources.length; i++) {
                     this.CreatePathAndContainerSites(spawn, sources[i]);
                     let startMem: BootstrapRefiller_Memory = {
-                        creeps: {
-                            refill: {}
-                        },
                         hb: false,
                         rID: this.memory.rID,
-                        s: sources[i].id
+                        s: sources[i].id,
+                        ref: {},
                     }
-                    this.roomData!.groups[CJ_Boot]!.push(this.kernel.startProcess(CJ_Boot, startMem));
+                    let newPID = this.kernel.startProcess(CJ_BootRefill, startMem);
+                    this.roomData!.groups[CJ_BootRefill]!.push(newPID);
+                    this.kernel.setParent(newPID, this.pid);
 
                     let harvMem: HarvestJob_Memory = {
                         r: this.memory.rID,
                         t: sources[i].id
                     }
-                    this.roomData!.groups[CJ_Harvest]!.push(this.kernel.startProcess(CJ_Harvest, harvMem));
+                    newPID = this.kernel.startProcess(CJ_Harvest, harvMem);
+                    this.roomData!.groups[CJ_Harvest]!.push(newPID);
+
+                    let buildMem: BootstrapBuilder_Memory = {
+                        bui: {},
+                        rID: this.memory.rID,
+                        s: sources[i].id,
+                        sites: []
+                    }
+                    newPID = this.kernel.startProcess(CJ_BootBuild, buildMem);
+                    this.roomData!.groups[CJ_BootBuild]!.push(newPID);
+                    this.kernel.setParent(newPID, this.pid);
                 }
                 return ThreadState_Done;
             }

@@ -313,7 +313,21 @@ class CreepActivityExtensions extends ExtensionBase implements ICreepActivityExt
             case (AT_ReserveController): return (target as Structure).structureType == STRUCTURE_CONTROLLER;
             case (AT_Upgrade): return (target as Structure).structureType == STRUCTURE_CONTROLLER;
             case (AT_SignController): return (target as Structure).structureType == STRUCTURE_CONTROLLER;
-            case (AT_Transfer): return !!(target as Creep | Structure).hitsMax
+            case (AT_Transfer):
+                if (!(target as Creep | Structure).hitsMax) {
+                    return false;
+                }
+
+                if ((target as Structure).structureType) {
+                    if ((target as StructureStorage).energy < (target as StructureTerminal).energyCapacity) {
+                        return true;
+                    }
+                } else {
+                    if ((target as Creep).carry.energy < (target as Creep).carryCapacity * 0.8) {
+                        return true;
+                    }
+                }
+                return false;
             case (AT_Withdraw): return (target as Structure).structureType && (!!(target as StructureContainer).storeCapacity || !!(target as StructureLink).energyCapacity);
 
             case (AT_Drop):

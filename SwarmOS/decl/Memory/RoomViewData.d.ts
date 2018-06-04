@@ -26,7 +26,8 @@ type RoomState_StructureData = {
 }
 
 declare type RoomState_AttachedCreepGroups = {
-    [CJ_Boot]?: PID[];
+    [CJ_BootRefill]?: PID[];
+    [CJ_BootBuild]?: PID[];
     [CJ_Fortify]?: PID;
     [CJ_Harvest]?: PID[];
     [CJ_Refill]?: PID;

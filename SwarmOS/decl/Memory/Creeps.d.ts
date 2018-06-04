@@ -7,6 +7,7 @@ declare interface HarvestJob_Memory extends MemBase {
     c?: ObjectID;   // (c)ontainer
     h?: CreepID;    // (h)arvester
     r: RoomID;      // (r)oom
+    SUPPORT?: boolean;
 }
 
 declare interface WorkerGroup_Memory extends MemBase {
@@ -23,19 +24,22 @@ declare interface GenericWorkerGroup_Memory<TarType extends WorkerTarget_Memory,
 }
 
 declare interface BootstrapRefiller_Memory extends MemBase {
-    creeps: {
-        [id: string]: {
-            a?: PID;        // (a)ctivity
-            c?: CreepID;    // (c)reep
-        }
-        'refill': {
-            a?: PID;        // (a)ctivity
-            c?: CreepID;    // (c)reep
-        }
+    ref: {              // (ref)iller
+        a?: PID;        // (a)ctivity
+        c?: CreepID;    // (creep)
     }
-    rID: RoomID;
-    s: ObjectID;    // (s)ource ID
-    hb: boolean;        // (h)as (b)oot
+    rID: RoomID;            // (r)oom(ID)
+    s: ObjectID;            // (s)ource ID
+    hb: boolean;            // (h)as (b)oot
+}
+declare interface BootstrapBuilder_Memory extends MemBase {
+    bui: {              // (bui)lder
+        a?: PID;        // (a)ctivity
+        c?: CreepID;    // (creep)
+    }
+    rID: RoomID;            // (r)oom(ID)
+    s?: ObjectID;            // (s)ource ID
+    sites: ObjectID[];
 }
 
 declare interface WorkerTarget_Memory extends MemBase {

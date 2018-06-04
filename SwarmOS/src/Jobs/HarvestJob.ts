@@ -47,7 +47,7 @@ class HarvestJob extends BasicProcess<HarvestJob_Memory> {
                 }
             }
 
-            if (container && !creep.pos.isEqualTo(container.pos)) {
+            if (!this.memory.SUPPORT && container && !creep.pos.isEqualTo(container.pos)) {
                 this.creepActivity.MoveCreep(creep, container.pos);
             }
 
@@ -126,7 +126,7 @@ class HarvestJob extends BasicProcess<HarvestJob_Memory> {
                 c: creepID,
                 HC: 'HarvestComplete',
                 t: this.memory.t,
-                f: [ERR_FULL]
+                f: [ERR_FULL, ERR_NOT_ENOUGH_RESOURCES]
             }, this.pid, this.extensions);
         }
     }
