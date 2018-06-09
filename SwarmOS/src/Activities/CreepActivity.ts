@@ -32,6 +32,21 @@ class CreepActivity extends BasicProcess<CreepActivity_Memory> {
             this.creepActivity.MoveCreep(this.AssignedCreep, this.TargetPos || this.Target!.pos, this.memory.p);
         } else {
             let result = this.creepActivity.RunActivity(this.CreateActivityArgs());
+            switch (this.memory.at) {
+                //case (AT_ClaimController):
+                case (AT_Drop):
+                //case (AT_GenerateSafeMode):
+                case (AT_Pickup):
+                case (AT_RequestTransfer):
+                case (AT_SignController):
+                case (AT_Suicide):
+                case (AT_Transfer):
+                case (AT_Withdraw):
+                    this.EndProcess();
+                    return ThreadState_Done;
+                default:
+                    break;
+            }
             if (result == OK || result == ERR_BUSY || result == ERR_TIRED || result == ERR_NOT_IN_RANGE) {
                 return ThreadState_Done;
             }
