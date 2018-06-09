@@ -30,7 +30,10 @@ class BootstrapJob extends BasicProcess<Bootstrap_Memory> {
             });
             if (containers.length > 0) {
                 // Replace this job with a standard room worker group
-                //this.kernel.killProcess(this.pid, `Bootstrapping ${this.memory.rID} complete`);
+                if (this.room.energyCapacityAvailable >= 550) { // Big enough to support a 5 work harvester
+                    this.kernel.killProcess(this.pid, `Bootstrapping ${this.memory.rID} complete`); // This will kill all the child processes.
+                    // (TODO): Mark each container for its purpose and prep the room to continue along mostly on auto pilot.
+                }
             }
 
             let sites = this.room.find(FIND_CONSTRUCTION_SITES);
@@ -98,6 +101,7 @@ class BootstrapJob extends BasicProcess<Bootstrap_Memory> {
                     }
                     newPID = this.kernel.startProcess(CJ_Harvest, harvMem);
                     this.roomData!.groups[CJ_Harvest]!.push(newPID);
+                    // Don't set as parent so that the harvester job will continue even once bootstrapping is complete.
 
                     let buildMem: BootstrapBuilder_Memory = {
                         bui: {},
