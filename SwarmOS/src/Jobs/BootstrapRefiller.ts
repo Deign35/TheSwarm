@@ -67,14 +67,26 @@ class BootstrapJob extends BasicProcess<BootstrapRefiller_Memory> {
     }
 
     CreateRefillerSpawnActivity() {
-        let sID = this.spawnRegistry.requestSpawn({
-            l: 0,
-            ct: CT_Worker,
-            n: this.memory.s.slice(-5) + 'r'
-        }, this.memory.rID, Priority_EMERGENCY, 1, {
+        let sID = undefined;
+        if (Object.keys(Game.creeps).length == 0) {
+            sID = this.spawnRegistry.requestSpawn({
+                l: 0,
                 ct: CT_Worker,
-                lvl: 0
-            });
+                n: this.memory.s.slice(-5) + 'r'
+            }, this.memory.rID, Priority_EMERGENCY, 1, {
+                    ct: CT_Worker,
+                    lvl: 0
+                });
+        } else {
+            sID = this.spawnRegistry.requestSpawn({
+                l: 1,
+                ct: CT_FastHauler,
+                n: this.memory.s.slice(-5) + 'r'
+            }, this.memory.rID, Priority_EMERGENCY, 1, {
+                    ct: CT_FastHauler,
+                    lvl: 1
+                })
+        }
         let spawnMem: SpawnActivity_Memory = {
             sID: sID,
             HC: 'CreateRefillActivity'
@@ -92,11 +104,10 @@ class BootstrapJob extends BasicProcess<BootstrapRefiller_Memory> {
         }
 
         this.memory.ref.c = creepID;
-        let newActivity = {
+        let newActivity: CreepActivity_Memory = {
             at: AT_NoOp as ActionType,
             c: creepID,
             HC: 'CreateRefillActivity',
-            t: '',
             f: []
         }
         if (creep.carry.energy == 0) {
@@ -106,6 +117,17 @@ class BootstrapJob extends BasicProcess<BootstrapRefiller_Memory> {
                 if (resources[i].resource && (resources[i].resource as Resource).amount > creep.carryCapacity) {
                     newActivity.at = AT_Pickup;
                     newActivity.t = (resources[i].resource as Resource).id;
+                }
+            }
+
+            if (!newActivity.t) {
+                let resourceContainer = FindStructureNextTo((Game.getObjectById(this.memory.s) as Source).pos, STRUCTURE_CONTAINER)
+                if (resourceContainer && resourceContainer.length > 0) {
+                    let container = resourceContainer[0].structure as StructureContainer;
+                    if (container.energy >= creep.carryCapacity) {
+                        newActivity.at = AT_Withdraw;
+                        newActivity.t = container.id;
+                    }
                 }
             }
             if (newActivity.at == AT_NoOp) {
@@ -118,30 +140,48 @@ class BootstrapJob extends BasicProcess<BootstrapRefiller_Memory> {
             let spawn = creep.room.find(FIND_MY_SPAWNS);
             if (spawn.length > 0 && spawn[0].energy < spawn[0].energyCapacity) {
                 newActivity.t = spawn[0].id;
-            }
-            let spawnTainer = FindStructureNextTo(spawn[0].pos, STRUCTURE_CONTAINER, {
-                distance: 3
-            });
-            if (spawnTainer && spawnTainer.length > 0) {
-                let container = spawnTainer[0].structure as StructureContainer;
-                if (container.energy < container.energyCapacity) {
-                    newActivity.t = container.id;
+            } else {
+                let spawnTainer = FindStructureNextTo(spawn[0].pos, STRUCTURE_CONTAINER, {
+                    distance: 3
+                });
+                if (spawnTainer && spawnTainer.length > 0) {
+                    let container = spawnTainer[0].structure as StructureContainer;
+                    if (container.energy < container.energyCapacity) {
+                        newActivity.t = container.id;
+                    }
                 }
-            }
-            let controlTainer = FindStructureNextTo(creep.room.controller!.pos, STRUCTURE_CONTAINER, {
-                distance: 3
-            });
-            if (controlTainer && controlTainer.length > 0) {
-                let container = controlTainer[0].structure as StructureContainer;
-                if (container.energy < container.energyCapacity) {
-                    newActivity.t = container.id;
-                }
-            }
-            let creeps = creep.room.find(FIND_MY_CREEPS);
-            for (let i = 0; i < creeps.length; i++) {
-                let creep = creeps[i];
-                if (creep.memory.ct == CT_Worker && creep.carry.energy * 5 <= creep.carryCapacity) {
-                    newActivity.t = creep.id;
+                if (!newActivity.t) {
+                    let controlTainer = FindStructureNextTo(creep.room.controller!.pos, STRUCTURE_CONTAINER, {
+                        distance: 3
+                    });
+                    if (controlTainer && controlTainer.length > 0) {
+                        let container = controlTainer[0].structure as StructureContainer;
+                        if (container.energy < container.energyCapacity) {
+                            newActivity.t = container.id;
+                        }
+                    }
+                    if (!newActivity.t) {
+                        let creeps = creep.room.find(FIND_MY_CREEPS);
+                        for (let i = 0; i < creeps.length; i++) {
+                            let creep = creeps[i];
+                            if (creep.memory.ct == CT_Worker && creep.carry.energy * 5 <= creep.carryCapacity) {
+                                newActivity.t = creep.id;
+                                break;
+                            }
+                        }
+                        if (!newActivity.t) {
+                            let extensions = this.View.GetRoomData(this.memory.rID)!.structures.extension;
+                            if (extensions && extensions.length > 0) {
+                                for (let i = 0; i < extensions.length; i++) {
+                                    let extension = Game.getObjectById(extensions[i]) as StructureExtension;
+                                    if (extension && extension.energy < extension.energyCapacity) {
+                                        newActivity.t = extension.id;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
