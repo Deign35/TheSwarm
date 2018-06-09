@@ -47,14 +47,21 @@ class BootstrapJob extends BasicProcess<Bootstrap_Memory> {
                     }
                 }
 
-                let workMem: BootstrapBuilder_Memory = {
+                let bootMem: BootstrapBuilder_Memory = {
                     bui: {},
                     rID: this.memory.rID,
                     sites: this.containers
                 }
-                let newPID = this.kernel.startProcess(CJ_BootBuild, workMem);
+                let newPID = this.kernel.startProcess(CJ_BootBuild, bootMem);
                 this.roomData!.groups[CJ_BootBuild]!.push(newPID);
                 this.kernel.setParent(newPID, this.pid);
+
+                let workMem: WorkerGroup_Memory = {
+                    creeps: {},
+                    rID: this.memory.rID
+                }
+                newPID = this.kernel.startProcess(CJ_Work, workMem);
+                this.roomData!.groups[CJ_Work] = newPID;
                 return ThreadState_Active;
             } else {
                 let spawns = this.room.find(FIND_MY_SPAWNS);

@@ -200,12 +200,6 @@ let InitStringReplaceConfig = function () {
         src: './build/compiled/main.js',
         dest: './build/compiled2/main.js',
     };
-    stringReplaceConfig['options'] = {
-        replacements: [{
-            pattern: /((?:require\(")[.|/]*([^"]*))"\);/,
-            replacement: '$1',
-        }]
-    };
 
     return stringReplaceConfig;
 }
