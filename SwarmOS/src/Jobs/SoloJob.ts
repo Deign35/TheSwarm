@@ -1,18 +1,29 @@
 import { BasicProcess } from "Core/BasicTypes";
 
-export abstract class SoloJob extends BasicProcess<SoloJob_Memory> {
+export abstract class SoloJob<T extends SoloJob_Memory> extends BasicProcess<T> {
     @extensionInterface(EXT_CreepRegistry)
     creepRegistry!: ICreepRegistryExtensions;
 
+    protected get energyTargets() {
+        return this.memory.et;
+    }
+    protected get homeRoom(): Room {
+        return Game.rooms[this.memory.rID];
+    }
+    protected get targets() {
+        return this.memory.wt;
+    }
+    protected creep: Creep | undefined;
+
     RunThread(): ThreadState {
-        let creep = this.creepRegistry.tryGetCreep(this.memory.c, this.pid) as Creep | undefined;
-        if (creep && !creep.spawning) {
+        this.creep = this.creepRegistry.tryGetCreep(this.memory.c, this.pid) as Creep | undefined;
+        if (this.creep && !this.creep.spawning) {
             if (!this.memory.a || !this.kernel.getProcessByPID(this.memory.a)) {
                 this.CreateCreepActivity(this.memory.c!);
             }
         }
 
-        if (!creep) {
+        if (!this.creep) {
             if (!this.memory.a) {
                 this.CreateSpawnActivity();
             } else if (!this.kernel.getProcessByPID(this.memory.a)) {
@@ -44,11 +55,21 @@ export abstract class SoloJob extends BasicProcess<SoloJob_Memory> {
 
     CreateCreepActivity(creepID: CreepID) {
         this.creepRegistry.tryReserveCreep(creepID, this.pid);
-        let creep = this.creepRegistry.tryGetCreep(creepID, this.pid);
-        if (!creep) {
+        this.creep = this.creepRegistry.tryGetCreep(creepID, this.pid);
+        if (!this.creep) {
+            if (this.memory.exp) {
+                this.EndProcess();
+            } else {
+                this.CreateSpawnActivity();
+            }
             return;
         }
-        this.memory.a = this.CreateCustomCreepActivity(creep);
+        this.memory.a = this.CreateCustomCreepActivity(this.creep);
+        if (!this.memory.a) {
+            this.EndProcess();
+        } else {
+            this.kernel.setParent(this.memory.a, this.pid);
+        }
     }
     protected abstract CreateCustomCreepActivity(creep: Creep): PID | undefined;
 

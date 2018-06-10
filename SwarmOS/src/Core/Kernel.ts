@@ -131,11 +131,12 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
         return this._processCache[pid];
     }
 
-    setParent(pid: PID, parentPId?: PID): boolean {
+    // (TODO): Update startprocess to take a parentpid as a parameter
+    setParent(pid: PID, parentPID?: PID): boolean {
         if (!this.processTable[pid]) {
             return false;
         }
-        this.processTable[pid].pP = parentPId;
+        this.processTable[pid].pP = parentPID;
         return true;
     }
 

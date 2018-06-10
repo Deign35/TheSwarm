@@ -5,22 +5,28 @@ declare interface HarvestJob_Memory extends MemBase {
     l?: ObjectID;   // (l)ink
     c?: ObjectID;   // (c)ontainer
     h?: CreepID;    // (h)arvester
-    rID: RoomID;      // (r)oom
+    rID: RoomID;    // (r)oom
     SUPPORT?: boolean;
 }
 
 declare interface ScoutJob_Memory extends MemBase {
     a?: PID;        // (a)ctivity
     c?: CreepID;    // (c)reep
-    rID: RoomID;      // (r)oom
+    rID: RoomID;    // (r)oom
     n: RoomID[];    // (n)earby Rooms to scout
 }
 declare interface SoloJob_Memory extends MemBase {
     a?: PID;        // (a)ctivity
     c?: CreepID;    // (c)reep
-    exp?: boolean;  // (exp)pires -- Dies when the creep dies or when the list of actions are complete
-    rID: RoomID;      // (h)ome room
+    exp?: boolean;  // (exp)pires -- Kill the process when the creep dies
+    rID: RoomID;    // (h)ome room
     tr: RoomID;     // (t)arget (r)oom
+
+    wt: IDictionary<ObjectID, WorkerTarget_Memory>;     // (w)ork (t)argets for this job
+    et: IDictionary<ObjectID, WorkerTarget_Memory>;     // (e)nergy withdrawal (t)argets
+}
+declare interface ControlledRoomRefiller_Memory extends SoloJob_Memory {
+
 }
 
 declare interface WorkerGroup_Memory extends MemBase {
