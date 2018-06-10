@@ -18,8 +18,13 @@ class RoomRegistry extends BasicProcess<RoomStateMemory> {
     RoomView!: RoomExtension;
     get memory(): RoomStateMemory {
         if (!Memory.roomData) {
+            this.log.warn(`Initializing RoomManager memory`);
             Memory.roomData = {
-                roomStateData: {}
+                roomStateData: {},
+                cartographicMemory: {
+                    creeps: {},
+                    homeRooms: {}
+                }
             }
         }
         return Memory.roomData;
@@ -33,7 +38,7 @@ class RoomRegistry extends BasicProcess<RoomStateMemory> {
                 }
                 if (!data) {
                     let room = Game.rooms[roomID];
-                    Memory.roomData.roomStateData[roomID] = {
+                    this.memory.roomStateData[roomID] = {
                         owner: '',
                         lastUpdated: 0,
                         cSites: [],
@@ -64,17 +69,28 @@ class RoomRegistry extends BasicProcess<RoomStateMemory> {
 }
 
 class RoomExtension extends ExtensionBase implements IRoomDataExtension {
-    get memory(): IDictionary<RoomID, RoomState> {
+    get memory(): RoomStateMemory {
         if (!Memory.roomData) {
             this.log.warn(`Initializing RoomManager memory`);
             Memory.roomData = {
-                roomStateData: {}
+                roomStateData: {},
+                cartographicMemory: {
+                    creeps: {},
+                    homeRooms: {}
+                }
             }
         }
-        return Memory.roomData.roomStateData;
+
+        return Memory.roomData;
     }
 
     GetRoomData(roomID: string): RoomState | undefined {
-        return this.memory[roomID];
+        return this.memory.roomStateData[roomID];
+    }
+
+    SetScoutNexus(roomID: RoomID) {
+        if (!this.memory.cartographicMemory.homeRooms[roomID]) {
+            this.memory.cartographicMemory.homeRooms[roomID] = { nearbyRooms: [] }
+        }
     }
 }

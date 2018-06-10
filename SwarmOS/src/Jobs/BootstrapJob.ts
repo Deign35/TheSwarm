@@ -85,23 +85,24 @@ class BootstrapJob extends BasicProcess<Bootstrap_Memory> {
                 let sources = this.room.find(FIND_SOURCES);
                 for (let i = 0; i < sources.length; i++) {
                     this.CreatePathAndContainerSites(spawn, sources[i]);
+
+                    let harvMem: HarvestJob_Memory = {
+                        r: this.memory.rID,
+                        t: sources[i].id
+                    }
+                    let newPID = this.kernel.startProcess(CJ_Harvest, harvMem);
+                    this.roomData!.groups[CJ_Harvest]!.push(newPID);
+                    // Don't set as parent so that the harvester job will continue even once bootstrapping is complete.
+
                     let startMem: BootstrapRefiller_Memory = {
                         hb: false,
                         rID: this.memory.rID,
                         s: sources[i].id,
                         ref: {},
                     }
-                    let newPID = this.kernel.startProcess(CJ_BootRefill, startMem);
+                    newPID = this.kernel.startProcess(CJ_BootRefill, startMem);
                     this.roomData!.groups[CJ_BootRefill]!.push(newPID);
                     this.kernel.setParent(newPID, this.pid);
-
-                    let harvMem: HarvestJob_Memory = {
-                        r: this.memory.rID,
-                        t: sources[i].id
-                    }
-                    newPID = this.kernel.startProcess(CJ_Harvest, harvMem);
-                    this.roomData!.groups[CJ_Harvest]!.push(newPID);
-                    // Don't set as parent so that the harvester job will continue even once bootstrapping is complete.
 
                     let buildMem: BootstrapBuilder_Memory = {
                         bui: {},

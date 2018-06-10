@@ -32,6 +32,9 @@ class RoomActivity extends BasicProcess<RoomActivity_Memory> {
                 (this.room.controller.owner && this.room.controller.owner.username) ||
                 (this.room.controller.reservation && this.room.controller.reservation.username)
             )) || undefined;
+            if (this.room.controller && this.room.controller.my) {
+                this.View.SetScoutNexus(this.memory.rID);
+            }
 
             if (this.shouldRefresh(11, this.roomData!.minUpdateOffset)) {
                 this.roomData.resources = this.room.find(FIND_DROPPED_RESOURCES).map((value: Resource) => {

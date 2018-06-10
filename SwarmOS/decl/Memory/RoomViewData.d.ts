@@ -3,6 +3,7 @@ declare interface RoomStateMemory extends MemBase {
     roomStateData: {
         [id in RoomID]: RoomState
     }
+    cartographicMemory: CartographerMemory;
 }
 
 interface RoomState extends MemBase {
@@ -33,4 +34,19 @@ declare type RoomState_AttachedCreepGroups = {
     [CJ_Refill]?: PID;
     [CJ_Science]?: PID;
     [CJ_Work]?: PID;
+}
+
+declare interface CartographerMemory extends MemBase {
+    creeps: {
+        [id in CreepID]: {
+            a?: PID;        // (a)ctivity
+            home: RoomID;   // (c)reep
+        }
+    }
+    homeRooms: {
+        [id in RoomID]: {
+            creepID?: CreepID;
+            nearbyRooms: RoomID[];
+        }
+    }
 }
