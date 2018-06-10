@@ -2,7 +2,18 @@ declare var Memory: {
     roomData: RoomStateMemory;
 }
 
+export const OSPackage: IPackage<CreepRegistry_Memory> = {
+    install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
+        processRegistry.register(PKG_Cartography, SwarmCartographer);
+    }
+}
+
 import { BasicProcess } from "Core/BasicTypes";
+
+const PKG_Cartography_LogContext: LogContext = {
+    logID: PKG_Cartography,
+    logLevel: LOG_INFO
+}
 
 class SwarmCartographer extends BasicProcess<CartographerMemory> {
     @extensionInterface(EXT_CreepActivity)
@@ -10,6 +21,14 @@ class SwarmCartographer extends BasicProcess<CartographerMemory> {
     @extensionInterface(EXT_CreepRegistry)
     protected creepRegistry!: ICreepRegistryExtensions;
     @extensionInterface(EXT_RoomView)
+
+
+    protected get logID(): string {
+        return PKG_Cartography_LogContext.logID;
+    }
+    protected get logLevel(): LogLevel {
+        return PKG_Cartography_LogContext.logLevel!;
+    }
 
     get memory(): CartographerMemory {
         if (!Memory.roomData) {
@@ -86,7 +105,7 @@ class SwarmCartographer extends BasicProcess<CartographerMemory> {
             l: 0,
             ct: CT_Scout,
             n: creepID
-        }, roomID, Priority_Low, 1, {
+        }, roomID, Priority_Lowest, 1, {
                 ct: CT_Scout,
                 lvl: 0
             });

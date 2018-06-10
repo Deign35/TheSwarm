@@ -55,9 +55,9 @@ class CreepRegistry extends BasicProcess<CreepRegistry_Memory> {
     }
 
     PrepTick() {
-        let creepIDs = Object.keys(this.memory.registeredCreeps);
+        let creepIDs = Object.keys(this.registeredCreeps);
         for (let i = 0; i < creepIDs.length; i++) {
-            if (!this.kernel.getProcessByPID(this.memory.registeredCreeps[creepIDs[i]].o!)) {
+            if (!this.kernel.getProcessByPID(this.registeredCreeps[creepIDs[i]].o!)) {
                 delete this.memory.registeredCreeps[creepIDs[i]].o;
             }
             if (!Game.creeps[creepIDs[i]]) {

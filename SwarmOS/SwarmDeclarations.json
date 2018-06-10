@@ -26,7 +26,8 @@
                 "BootRoom",
                 "FlagBase",
                 "SwarmCLI",
-                "EmptyProcess"
+                "EmptyProcess",
+                "Cartography"
             ]
         },
         "CJ": {
