@@ -27,6 +27,22 @@ class CreepActivity extends BasicProcess<CreepActivity_Memory> {
             return ThreadState_Done;
         }
 
+        if (this.memory.at == AT_MoveToPosition) {
+            let result = this.creepActivity.RunActivity(this.CreateActivityArgs());
+            if (result == ERR_NOT_IN_RANGE || result == ERR_BUSY || result == ERR_TIRED) {
+                // Not yet there
+            } else if (result == OK) {
+                this.EndProcess();
+            } else if (result == ERR_NO_PATH) {
+                let hasCreep = this.TargetPos!.lookFor(LOOK_CREEPS);
+                if (hasCreep && hasCreep.length > 0) {
+                    let otherCreep = hasCreep[0];
+                    this.creepActivity.MoveCreep(otherCreep, this.AssignedCreep.pos);
+                }
+            }
+            return ThreadState_Done;
+        }
+
         // (TODO): Change this to be more predictive using the path (e.g. if(this.memory.p.length <= 3))
         if (!this.creepActivity.CreepIsInRange(this.memory.at, this.AssignedCreep.pos, this.TargetPos || this.Target!.pos)) {
             this.creepActivity.MoveCreep(this.AssignedCreep, this.TargetPos || this.Target!.pos);

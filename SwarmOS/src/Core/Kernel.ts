@@ -177,7 +177,8 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
             }
 
             if (protectionValue == activeThreadIDs.length) {
-                this.log.alert(`A full cycle has occurred and no threads completed`);
+                // (TODO): Find out how to fix this, essentially this means threading isn't working.
+                //this.log.alert(`A full cycle has occurred and no threads completed`);
                 break;
             }
         }

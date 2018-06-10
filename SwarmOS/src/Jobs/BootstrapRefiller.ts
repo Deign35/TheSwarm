@@ -30,14 +30,16 @@ class BootstrapJob extends BasicProcess<BootstrapRefiller_Memory> {
                 }
             }
 
+            this.CreateRefillerSpawnActivity(0);
             this.memory.hb = true;
+            return ThreadState_Done;
         }
 
         if (!this.memory.ref.a || !this.kernel.getProcessByPID(this.memory.ref.a)) {
             if (this.memory.ref.c) {
                 this.CreateRefillActivity(this.memory.ref.c);
             } else {
-                this.CreateRefillerSpawnActivity();
+                this.CreateRefillerSpawnActivity(1);
             }
         }
 
@@ -46,7 +48,7 @@ class BootstrapJob extends BasicProcess<BootstrapRefiller_Memory> {
 
     CreateTempHarvestJob() {
         let harvestMem: HarvestJob_Memory = {
-            r: this.memory.rID,
+            rID: this.memory.rID,
             SUPPORT: true,
             t: this.memory.s
         }
@@ -66,27 +68,15 @@ class BootstrapJob extends BasicProcess<BootstrapRefiller_Memory> {
         // Will be killed when this process is closed
     }
 
-    CreateRefillerSpawnActivity() {
-        let sID = undefined;
-        if (Object.keys(Game.creeps).length == 0) {
-            sID = this.spawnRegistry.requestSpawn({
-                l: 0,
+    CreateRefillerSpawnActivity(spawnLevel: number) {
+        let sID = this.spawnRegistry.requestSpawn({
+            l: spawnLevel,
+            ct: CT_Refiller,
+            n: this.memory.s.slice(-5) + 'r'
+        }, this.memory.rID, Priority_EMERGENCY, 1, {
                 ct: CT_Refiller,
-                n: this.memory.s.slice(-5) + 'r'
-            }, this.memory.rID, Priority_EMERGENCY, 1, {
-                    ct: CT_Refiller,
-                    lvl: 0
-                });
-        } else {
-            sID = this.spawnRegistry.requestSpawn({
-                l: 1,
-                ct: CT_FastHauler,
-                n: this.memory.s.slice(-5) + 'r'
-            }, this.memory.rID, Priority_EMERGENCY, 1, {
-                    ct: CT_FastHauler,
-                    lvl: 1
-                })
-        }
+                lvl: spawnLevel
+            });
         let spawnMem: SpawnActivity_Memory = {
             sID: sID,
             HC: 'CreateRefillActivity'
@@ -99,7 +89,7 @@ class BootstrapJob extends BasicProcess<BootstrapRefiller_Memory> {
         this.creepRegistry.tryReserveCreep(creepID, this.pid);
         let creep = this.creepRegistry.tryGetCreep(creepID, this.pid);
         if (!creep) {
-            this.CreateRefillerSpawnActivity();
+            this.CreateRefillerSpawnActivity(1);
             return;
         }
 

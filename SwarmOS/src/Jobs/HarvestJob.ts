@@ -15,54 +15,37 @@ class HarvestJob extends BasicProcess<HarvestJob_Memory> {
     protected creepActivity!: ICreepActivityExtensions;
     RunThread(): ThreadState {
         let target = Game.getObjectById(this.memory.t) as Source | Mineral;
-        let inLink = Game.getObjectById(this.memory.i) as StructureLink | undefined;
+        let inLink = Game.getObjectById(this.memory.l) as StructureLink | undefined;
         let container = Game.getObjectById(this.memory.c) as StructureContainer | undefined;
         let creep = this.creepRegistry.tryGetCreep(this.memory.h, this.pid) as Creep | undefined;
 
         if (creep && !creep.spawning) {
-            if (!this.memory.a || !this.kernel.getProcessByPID(this.memory.a)) {
-                this.CreateHarvestActivity(this.memory.h!);
-            }
-
             if (inLink) {
                 if (creep.carry.energy * 1.5 >= creep.carryCapacity) {
                     creep.transfer(inLink, RESOURCE_ENERGY);
                 }
                 if (container) {
                     container.destroy();
+                    this.kernel.killProcess(this.memory.a);
                     delete this.memory.c;
+                    delete this.memory.a;
                 }
             }
 
-            if ((target as Source).energy == 0) {
-                this.sleeper.sleep(this.memory.a!, (target as Source).ticksToRegeneration);
-                if (container && container.hits < container.hitsMax) {
-                    if (creep.carry.energy > 0) {
-                        creep.repair(container);
-                    } else if (container.energy > 0) {
-                        creep.withdraw(container, RESOURCE_ENERGY);
-                    } else {
-                        this.sleeper.sleep(this.pid, (target as Source).ticksToRegeneration);
-                    }
-                }
+            if (!this.memory.a || !this.kernel.getProcessByPID(this.memory.a)) {
+                this.CreateHarvestActivity(this.memory.h!);
             }
-
-            if (!this.memory.SUPPORT && container && !creep.pos.isEqualTo(container.pos)) {
-                this.creepActivity.MoveCreep(creep, container.pos);
-            }
-
             if (creep.ticksToLive! < 80) {
                 // Let the activity burn itself out while this job begins the next one.
                 creep = undefined;
                 delete this.memory.h;
                 delete this.memory.a;
-                return ThreadState_Active;
             }
         }
 
         if (!creep) {
             if (!this.memory.a || !this.kernel.getProcessByPID(this.memory.a)) {
-                if ((target as Mineral).mineralType && (target as Mineral).mineralAmount > 0) {
+                /*if ((target as Mineral).mineralType && (target as Mineral).mineralAmount > 0) {
                     let extractor = target.pos.lookFor(LOOK_STRUCTURES) as StructureExtractor[];
                     for (let i = 0; i < extractor.length; i++) {
                         if (extractor[i].structureType == STRUCTURE_EXTRACTOR && (!extractor[i].cooldown || extractor[i].cooldown <= 100)) {
@@ -70,7 +53,7 @@ class HarvestJob extends BasicProcess<HarvestJob_Memory> {
                             break;
                         }
                     }
-                }
+                }*/
                 if ((target as Source).energyCapacity) {
                     let spawnLevel = 0;
                     if (target.room!.controller && target.room!.controller!.my) {
@@ -95,8 +78,8 @@ class HarvestJob extends BasicProcess<HarvestJob_Memory> {
         let sID = this.spawnRegistry.requestSpawn({
             l: spawnLevel,
             ct: CT_Harvester,
-            n: this.memory.r + '_HJ' + this.memory.t.slice(-1)
-        }, this.memory.r, Priority_High, 3, {
+            n: this.memory.rID + '_HJ' + this.memory.t.slice(-1),
+        }, this.memory.rID, Priority_High, 3, {
                 ct: CT_Harvester,
                 lvl: spawnLevel
             });
@@ -106,6 +89,10 @@ class HarvestJob extends BasicProcess<HarvestJob_Memory> {
         }
         this.memory.a = this.kernel.startProcess(SPKG_SpawnActivity, spawnMem);
         this.kernel.setParent(this.memory.a, this.pid);
+
+        if (!this.memory.l) {
+            let possibleLinks
+        }
     }
 
     SpawnComplete(creepID: string) {
@@ -121,15 +108,53 @@ class HarvestJob extends BasicProcess<HarvestJob_Memory> {
 
     CreateHarvestActivity(creepID: string) {
         if (this.creepRegistry.tryReserveCreep(creepID, this.pid)) {
-            this.memory.a = this.creepActivity.CreateNewCreepActivity({
-                at: AT_Harvest,
-                c: creepID,
-                HC: 'HarvestComplete',
-                t: this.memory.t,
-                e: [ERR_FULL, ERR_NOT_ENOUGH_RESOURCES]
-            }, this.pid);
+            let container = Game.getObjectById(this.memory.c) as StructureContainer | undefined;
+            let link = Game.getObjectById(this.memory.l) as StructureLink | undefined;
+            if (this.memory.SUPPORT || (!container && !link)) {
+                this.memory.a = this.creepActivity.CreateNewCreepActivity({
+                    at: AT_Harvest,
+                    c: creepID,
+                    HC: 'HarvestComplete',
+                    t: this.memory.t,
+                    e: [ERR_FULL, ERR_NOT_ENOUGH_RESOURCES]
+                }, this.pid);
+            } else if (container) {
+                let actions: SingleCreepActivity_Memory[] = [];
+                actions.push({
+                    at: AT_MoveToPosition,
+                    n: 1,
+                    p: container.pos
+                });
+                actions.push({
+                    at: AT_Harvest,
+                    e: [ERR_FULL],
+                    t: this.memory.t
+                });
+                actions.push({
+                    at: AT_Withdraw,
+                    t: this.memory.c
+                });
+                actions.push({
+                    at: AT_Repair,
+                    t: this.memory.c
+                });
+                actions.push({
+                    at: AT_Drop,
+                    p: container.pos
+                });
+                this.memory.a = this.kernel.startProcess(SPKG_RepetitiveCreepActivity, {
+                    a: actions,
+                    c: creepID,
+                    HC: 'HarvestComplete'
+                } as RepetitiveCreepActivity_Memory);
+            } else if (link) {
+                // (TODO): Set up refilling and using the link
+            }
+
+            this.kernel.setParent(this.memory.a!, this.pid);
         }
     }
+
     HarvestComplete(creepID: string) {
         let creep = this.creepRegistry.tryGetCreep(creepID);
         if (creep) {

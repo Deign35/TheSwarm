@@ -32,12 +32,12 @@ class ScoutJob extends BasicProcess<ScoutJob_Memory> {
     }
 
     CreateSpawnActivity() {
-        let creepID = this.memory.r + (Game.time + '_s').slice(-5);
+        let creepID = this.memory.rID + (Game.time + '_s').slice(-5);
         let sID = this.spawnRegistry.requestSpawn({
             l: 0,
             ct: CT_Scout,
             n: creepID
-        }, this.memory.r, Priority_Lowest, 1, {
+        }, this.memory.rID, Priority_Lowest, 1, {
                 ct: CT_Scout,
                 lvl: 0
             });
@@ -58,7 +58,7 @@ class ScoutJob extends BasicProcess<ScoutJob_Memory> {
         }
 
         let allRooms = this.memory.n;
-        let nextRoom = this.memory.r;
+        let nextRoom = this.memory.rID;
         let bestRoom: RoomState | undefined = undefined;
         for (let i = 0; i < allRooms.length; i++) {
             let data = this.View.GetRoomData(allRooms[i]);

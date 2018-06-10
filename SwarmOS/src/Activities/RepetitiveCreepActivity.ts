@@ -1,6 +1,6 @@
 export const OSPackage: IPackage<SpawnRegistry_Memory> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
-        processRegistry.register(SPKG_CreepActivity, RepetitiveCreepActivity);
+        processRegistry.register(SPKG_RepetitiveCreepActivity, RepetitiveCreepActivity);
     }
 }
 
@@ -21,8 +21,8 @@ class RepetitiveCreepActivity extends BasicProcess<RepetitiveCreepActivity_Memor
     }
 
     protected CreateActivityArgs(creepID: CreepID) {
-        this.creepRegistry.tryReserveCreep(creepID, this.pid);
-        let creep = this.creepRegistry.tryGetCreep(creepID, this.pid);
+        this.creepRegistry.tryReserveCreep(creepID, this.parentPID);
+        let creep = this.creepRegistry.tryGetCreep(creepID, this.parentPID);
 
         if (!creep || this.memory.a.length == 0) {
             this.EndProcess();
@@ -35,10 +35,10 @@ class RepetitiveCreepActivity extends BasicProcess<RepetitiveCreepActivity_Memor
             activityMemory.c = this.memory.c;
             this.memory.p = this.creepActivity.CreateNewCreepActivity(activityMemory, this.parentPID);
             if (this.memory.p) {
-                if (!nextActivity.n || nextActivity.n-- > 0) {
+                if (nextActivity.n === undefined || nextActivity.n-- > 1) {
                     this.memory.a.push(nextActivity); // Put it back in the queue
                 }
-                this.kernel.setParent(this.memory.p, this.pid);
+                this.kernel.setParent(this.memory.p, this.parentPID);
                 this.sleeper.sleep(this.pid, 5);
                 return;
             }

@@ -32,7 +32,7 @@ class BasicRoom extends BasicProcess<BasicRoom_Memory> {
             for (let i = 0; i < this.roomData.sourceIDs.length; i++) {
                 let newMem: HarvestJob_Memory = {
                     t: this.roomData.sourceIDs[i],
-                    r: this.memory.targetRoom
+                    rID: this.memory.targetRoom
                 }
                 this.roomData.groups.CJ_Harvest.push(this.kernel.startProcess(CJ_Harvest, newMem));
             }

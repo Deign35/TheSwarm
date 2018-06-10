@@ -2,17 +2,17 @@
 declare interface HarvestJob_Memory extends MemBase {
     a?: PID;        // (a)ctivity
     t: ObjectID;    // (t)arget
-    i?: ObjectID;   // (i)n link
+    l?: ObjectID;   // (l)ink
     c?: ObjectID;   // (c)ontainer
     h?: CreepID;    // (h)arvester
-    r: RoomID;      // (r)oom
+    rID: RoomID;      // (r)oom
     SUPPORT?: boolean;
 }
 
 declare interface ScoutJob_Memory extends MemBase {
     a?: PID;        // (a)ctivity
     c?: CreepID;    // (c)reep
-    r: RoomID;      // (r)oom
+    rID: RoomID;      // (r)oom
     n: RoomID[];    // (n)earby Rooms to scout
 }
 

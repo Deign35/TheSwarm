@@ -272,7 +272,16 @@ class CreepActivityExtensions extends ExtensionBase implements ICreepActivityExt
                 if ((target as Structure).pos) {
                     target = (target as Structure).pos;
                 }
-                return creep.moveTo(target);
+                let result = creep.moveTo(target);
+                if (creep.pos.isNearTo(target)) {
+                    let creeps = (target as RoomPosition).lookFor(LOOK_CREEPS);
+                    if (creeps.length > 0 && creeps[0].name != creep.name) {
+                        return ERR_NO_PATH;
+                    }
+                    return result;
+                } else {
+                    return ERR_NOT_IN_RANGE;
+                }
             case (AT_RangedMassAttack): return creep.rangedMassAttack();
             case (AT_Suicide): return creep.suicide();
             case (AT_NoOp): return OK;

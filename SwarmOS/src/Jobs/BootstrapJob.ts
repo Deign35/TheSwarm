@@ -85,7 +85,7 @@ class BootstrapJob extends BasicProcess<Bootstrap_Memory> {
                     this.CreatePathAndContainerSites(spawn, sources[i]);
 
                     let harvMem: HarvestJob_Memory = {
-                        r: this.memory.rID,
+                        rID: this.memory.rID,
                         t: sources[i].id
                     }
                     let newPID = this.kernel.startProcess(CJ_Harvest, harvMem);
@@ -240,7 +240,7 @@ class BootstrapJob extends BasicProcess<Bootstrap_Memory> {
 
         let scoutMem: ScoutJob_Memory = {
             n: _.without(this.GatherRoomIDs(this.memory.rID, 3), this.memory.rID),
-            r: this.memory.rID
+            rID: this.memory.rID
         }
         this.roomData!.groups.CJ_Scout = this.kernel.startProcess(CJ_Scout, scoutMem);
     }

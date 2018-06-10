@@ -11,7 +11,6 @@ declare interface CreepActivity_Memory extends SingleCreepActivity_Memory {
 declare interface RepetitiveCreepActivity_Memory extends MemBase {
     a: SingleCreepActivity_Memory[];    // (a)ctions
     c: CreepID;
-    i: number;      // (i)ndex
     p?: PID;
 }
 
