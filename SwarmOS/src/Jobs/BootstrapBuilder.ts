@@ -54,16 +54,16 @@ class BootstrapJob extends BasicProcess<BootstrapBuilder_Memory> {
         }
 
         this.memory.bui.c = creepID;
-        let newActivity = {
+        let newActivity: CreepActivity_Memory = {
             at: AT_NoOp as ActionType,
             c: creepID,
             HC: 'CreateBuilderActivity',
             t: '',
-            f: [] as ScreepsReturnCode[]
+            e: [] as ScreepsReturnCode[]
         }
 
         if (!this.memory.s) {
-            newActivity.f.push(ERR_NOT_ENOUGH_RESOURCES);
+            newActivity.e = [ERR_NOT_ENOUGH_RESOURCES];
         }
         if (creep.carry.energy == 0 && this.memory.s) {
             // get energy
@@ -105,6 +105,6 @@ class BootstrapJob extends BasicProcess<BootstrapBuilder_Memory> {
                 newActivity.t = creep.room.controller!.id
             }
         }
-        this.memory.bui.a = this.creepActivity.CreateNewCreepActivity(newActivity, this.pid, this.extensions);
+        this.memory.bui.a = this.creepActivity.CreateNewCreepActivity(newActivity, this.pid);
     }
 }

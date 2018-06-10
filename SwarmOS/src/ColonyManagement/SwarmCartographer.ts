@@ -21,7 +21,7 @@ class SwarmCartographer extends BasicProcess<CartographerMemory> {
     @extensionInterface(EXT_CreepRegistry)
     protected creepRegistry!: ICreepRegistryExtensions;
     @extensionInterface(EXT_RoomView)
-
+    protected View!: IRoomDataExtension;
 
     protected get logID(): string {
         return PKG_Cartography_LogContext.logID;
@@ -43,15 +43,13 @@ class SwarmCartographer extends BasicProcess<CartographerMemory> {
         }
         return Memory.roomData.cartographicMemory;
     }
-    protected View!: IRoomDataExtension;
-    protected scoutCreeps!: Creep[];
-    protected scoutIndex!: number;
     protected get homeRooms() {
         return this.memory.homeRooms;
     }
     protected get creeps() {
         return this.memory.creeps;
     }
+
     RunThread(): ThreadState {
         let roomIDs = Object.keys(this.homeRooms);
         for (let i = 0; i < roomIDs.length; i++) {
@@ -59,7 +57,6 @@ class SwarmCartographer extends BasicProcess<CartographerMemory> {
             let roomProcData = this.homeRooms[roomID];
             if (roomProcData.nearbyRooms.length == 0) {
                 this.homeRooms[roomID].nearbyRooms = _.without(this.GatherRoomIDs(roomID, 3), roomID);
-
             }
 
             if (roomProcData.creepID) {
@@ -74,7 +71,7 @@ class SwarmCartographer extends BasicProcess<CartographerMemory> {
             }
 
             if (!roomProcData.creepID) {
-                this.CreateScoutSpawnActivity(roomID);
+                continue;
             }
 
             let creepID = roomProcData.creepID!;
@@ -87,7 +84,7 @@ class SwarmCartographer extends BasicProcess<CartographerMemory> {
                     }
                     delete this.creeps[creepID];
                     delete this.homeRooms[roomID].creepID;
-                    i--;
+                    this.CreateScoutSpawnActivity(roomID);
                     continue;
                 } else {
                     this.CreateNewScoutActivity(creep.name);
@@ -155,15 +152,15 @@ class SwarmCartographer extends BasicProcess<CartographerMemory> {
 
         this.creepActivity.CreateNewCreepActivity({
             at: AT_MoveToPosition,
-            tp: {
+            p: {
                 x: 25,
                 y: 25,
                 roomName: nextRoom
             },
             c: creep.name,
-            f: [],
+            e: [],
             HC: 'CreateNewScoutActivity'
-        }, this.pid, this.extensions);
+        }, this.pid);
     }
 
     protected GatherRoomIDs(centerRoom: RoomID, distance: number): RoomID[] {

@@ -108,7 +108,7 @@ class BootstrapJob extends BasicProcess<BootstrapRefiller_Memory> {
             at: AT_NoOp as ActionType,
             c: creepID,
             HC: 'CreateRefillActivity',
-            f: []
+            e: []
         }
         if (creep.carry.energy == 0) {
             // get energy
@@ -186,6 +186,6 @@ class BootstrapJob extends BasicProcess<BootstrapRefiller_Memory> {
                 }
             }
         }
-        this.memory.ref.a = this.creepActivity.CreateNewCreepActivity(newActivity, this.pid, this.extensions);
+        this.memory.ref.a = this.creepActivity.CreateNewCreepActivity(newActivity, this.pid);
     }
 }

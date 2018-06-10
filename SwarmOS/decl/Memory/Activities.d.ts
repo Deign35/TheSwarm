@@ -4,14 +4,24 @@ declare interface SpawnActivity_Memory extends MemBase {
 declare interface RoomActivity_Memory extends MemBase {
     rID: RoomID;
 }
-declare interface CreepActivity_Memory extends MemBase {
+declare interface CreepActivity_Memory extends SingleCreepActivity_Memory {
     c: CreepID;     //Creep
-    at: ActionType; //ActionType
-    t?: ObjectID;   //Target
-    tp?: { x?: number, y?: number, roomName: string }; //TargetPosition
-    a?: number;     //Amount
-    m?: string;     //Message
-    rt?: ResourceConstant; //ResourceType
-    p?: PathStep[]; //Path
-    f: ScreepsReturnCode[]; // Failure codes that should be ignored
+}
+
+declare interface RepetitiveCreepActivity_Memory extends MemBase {
+    a: SingleCreepActivity_Memory[];    // (a)ctions
+    c: CreepID;
+    i: number;      // (i)ndex
+    p?: PID;
+}
+
+declare interface SingleCreepActivity_Memory extends MemBase {
+    at: ActionType;
+    a?: number;     // (a)mount for resource transfers
+    n?: number;     // (n)umber of times to run this action
+    e?: ScreepsReturnCode[];    // (e)xempted failures
+    m?: string;     // (m)essage to write to a say or signcontroller
+    p?: { x?: number, y?: number, roomName: string };  // (p)osition to move to
+    r?: ResourceConstant // (r)esource type to withdraw or transfer
+    t?: ObjectID;   // (t)arget
 }

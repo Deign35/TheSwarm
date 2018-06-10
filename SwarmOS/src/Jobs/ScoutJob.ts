@@ -16,7 +16,6 @@ class ScoutJob extends BasicProcess<ScoutJob_Memory> {
 
     RunThread(): ThreadState {
         let creep = this.creepRegistry.tryGetCreep(this.memory.c, this.pid) as Creep | undefined;
-
         if (creep && !creep.spawning) {
             if (!this.memory.a || !this.kernel.getProcessByPID(this.memory.a)) {
                 this.CreateNewScoutActivity(this.memory.c!);
@@ -80,14 +79,14 @@ class ScoutJob extends BasicProcess<ScoutJob_Memory> {
 
         this.creepActivity.CreateNewCreepActivity({
             at: AT_MoveToPosition,
-            tp: {
+            p: {
                 x: 25,
                 y: 25,
                 roomName: nextRoom
             },
             c: creep.name,
-            f: [],
+            e: [],
             HC: 'CreateNewScoutActivity'
-        }, this.pid, this.extensions);
+        }, this.pid);
     }
 }

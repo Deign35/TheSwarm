@@ -29,7 +29,7 @@ class CreepActivity extends BasicProcess<CreepActivity_Memory> {
 
         // (TODO): Change this to be more predictive using the path (e.g. if(this.memory.p.length <= 3))
         if (!this.creepActivity.CreepIsInRange(this.memory.at, this.AssignedCreep.pos, this.TargetPos || this.Target!.pos)) {
-            this.creepActivity.MoveCreep(this.AssignedCreep, this.TargetPos || this.Target!.pos, this.memory.p);
+            this.creepActivity.MoveCreep(this.AssignedCreep, this.TargetPos || this.Target!.pos);
         } else {
             let result = this.creepActivity.RunActivity(this.CreateActivityArgs());
             switch (this.memory.at) {
@@ -50,9 +50,11 @@ class CreepActivity extends BasicProcess<CreepActivity_Memory> {
             if (result == OK || result == ERR_BUSY || result == ERR_TIRED || result == ERR_NOT_IN_RANGE) {
                 return ThreadState_Done;
             }
-            for (let i = 0; i < this.memory.f.length; i++) {
-                if (result == this.memory.f[i]) {
-                    return ThreadState_Done;
+            if (this.memory.e) {
+                for (let i = 0; i < this.memory.e.length; i++) {
+                    if (result == this.memory.e[i]) {
+                        return ThreadState_Done;
+                    }
                 }
             }
             // If we get here, then the action result is not accessible.
@@ -69,16 +71,15 @@ class CreepActivity extends BasicProcess<CreepActivity_Memory> {
             target: this.Target || this.TargetPos || this.AssignedCreep!.pos,
             amount: this.memory.a,
             message: this.memory.m,
-            path: this.memory.p || [],
-            resourceType: this.memory.rt,
+            resourceType: this.memory.r,
         }
     }
 
     protected LoadActionMemory() {
         this.AssignedCreep = this.creepRegistry.tryGetCreep(this.memory.c, this.parentPID);
         this.Target = Game.getObjectById(this.memory.t);
-        if (this.memory.tp) {
-            this.TargetPos = new RoomPosition(this.memory.tp.x || 25, this.memory.tp.y || 25, this.memory.tp.roomName);
+        if (this.memory.p) {
+            this.TargetPos = new RoomPosition(this.memory.p.x || 25, this.memory.p.y || 25, this.memory.p.roomName);
         }
     }
 

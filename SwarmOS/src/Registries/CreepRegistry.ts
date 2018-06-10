@@ -186,17 +186,17 @@ class CreepRegistryExtensions extends ExtensionBase implements ICreepRegistryExt
 }
 
 class CreepActivityExtensions extends ExtensionBase implements ICreepActivityExtensions {
-    CreateNewCreepActivity(actionMem: CreepActivity_Memory, parentPID: PID, extensions: IExtensionRegistry): PID | undefined {
-        if (!actionMem || !parentPID || !extensions || !actionMem.c || !actionMem.at) {
+    CreateNewCreepActivity(actionMem: CreepActivity_Memory, parentPID: PID): PID | undefined {
+        if (!actionMem || !parentPID || !actionMem.c || !actionMem.at) {
             return undefined;
         }
-        let creep = (extensions.get(EXT_CreepRegistry) as ICreepRegistryExtensions).tryGetCreep(actionMem.c, parentPID);
+        let creep = (this.extensionRegistry.get(EXT_CreepRegistry) as ICreepRegistryExtensions).tryGetCreep(actionMem.c, parentPID);
         if (!creep) {
             return undefined;
         }
         let target = actionMem.t ? Game.getObjectById(actionMem.t) : undefined;
-        if (!target && actionMem.tp) {
-            target = new RoomPosition(actionMem.tp.x || 25, actionMem.tp.y || 25, actionMem.tp.roomName);
+        if (!target && actionMem.p) {
+            target = new RoomPosition(actionMem.p.x || 25, actionMem.p.y || 25, actionMem.p.roomName);
         } else if (!target) {
             target = creep.pos;
         }
@@ -204,12 +204,9 @@ class CreepActivityExtensions extends ExtensionBase implements ICreepActivityExt
         if (!target || !this.ValidateActionTarget(actionMem.at, target)) {
             return undefined;
         }
-        if (!actionMem.p) {
-            actionMem.p = this.CreateMovePath(creep, target);
-        }
 
-        let newPID = extensions.getKernel().startProcess(SPKG_CreepActivity, actionMem);
-        extensions.getKernel().setParent(newPID, parentPID);
+        let newPID = this.extensionRegistry.getKernel().startProcess(SPKG_CreepActivity, actionMem);
+        this.extensionRegistry.getKernel().setParent(newPID, parentPID);
         return newPID;
     }
     protected GetSquareDistance(pos1: { x: number, y: number }, pos2: { x: number, y: number }) {
@@ -220,17 +217,8 @@ class CreepActivityExtensions extends ExtensionBase implements ICreepActivityExt
         return xDiff > yDiff ? xDiff : yDiff;
     }
 
-    MoveCreep(creep: Creep, pos: RoomPosition, path?: PathStep[]) {
-        /*if (path && path.length > 0) {
-            creep.moveByPath(path);
-        }*/
+    MoveCreep(creep: Creep, pos: RoomPosition) {
         return creep.moveTo(pos);
-    }
-
-    CreateMovePath(creep: Creep, target: any): PathStep[] {
-        let path: PathStep[] = [];
-
-        return path;
     }
 
     CreepIsInRange(actionType: ActionType, pos1: RoomPosition, pos2: RoomPosition) {
@@ -279,9 +267,6 @@ class CreepActivityExtensions extends ExtensionBase implements ICreepActivityExt
 
             case (AT_Drop): return creep.drop(args.resourceType || RESOURCE_ENERGY, args.amount || 0);
             case (AT_MoveByPath):
-                if (args.path) {
-                    return creep.moveByPath(args.path);
-                }
                 break;
             case (AT_MoveToPosition):
                 if ((target as Structure).pos) {

@@ -45,9 +45,8 @@ export abstract class WorkerGroup<T extends WorkerGroup_Memory> extends BasicPro
         this.creeps[cID].a = this.creepActivity.CreateNewCreepActivity({
             t: nextTask.t,
             at: nextTask.a,
-            c: cID,
-            f: []
-        }, this.pid, this.extensions);
+            c: cID
+        }, this.pid);
     }
 
     ActivityComplete(cID: CreepID) {
