@@ -45,7 +45,8 @@
                 "Science",
                 "Fortify",
                 "BootRefill",
-                "BootBuild"
+                "BootBuild",
+                "Scout"
             ]
         },
         "EXT": {

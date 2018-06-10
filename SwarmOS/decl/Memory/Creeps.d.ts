@@ -1,5 +1,4 @@
 /** CreepActions */
-
 declare interface HarvestJob_Memory extends MemBase {
     a?: PID;        // (a)ctivity
     t: ObjectID;    // (t)arget
@@ -10,6 +9,13 @@ declare interface HarvestJob_Memory extends MemBase {
     SUPPORT?: boolean;
 }
 
+declare interface ScoutJob_Memory extends MemBase {
+    a?: PID;        // (a)ctivity
+    c?: CreepID;    // (c)reep
+    r: RoomID;      // (r)oom
+    n: RoomID[];    // (n)earby Rooms to scout
+}
+
 declare interface WorkerGroup_Memory extends MemBase {
     rID: RoomID;
     creeps: {
@@ -18,9 +24,9 @@ declare interface WorkerGroup_Memory extends MemBase {
         }
     }
 }
-declare interface GenericWorkerGroup_Memory<TarType extends WorkerTarget_Memory, EnType extends WorkerTarget_Memory> extends WorkerGroup_Memory {
-    targets: IDictionary<ObjectID, TarType>;
-    energy: IDictionary<ObjectID, EnType>;     // energy withdrawal targets
+declare interface GenericWorkerGroup_Memory extends WorkerGroup_Memory {
+    targets: IDictionary<ObjectID, WorkerTarget_Memory>;
+    energy: IDictionary<ObjectID, WorkerTarget_Memory>;     // energy withdrawal targets
 }
 
 declare interface BootstrapRefiller_Memory extends MemBase {
@@ -45,10 +51,7 @@ declare interface BootstrapBuilder_Memory extends MemBase {
 declare interface WorkerTarget_Memory extends MemBase {
     a: ActionType;  // (a)ctionType
     t: TargetType;  // (o)bject type
-}
-
-declare interface WorkerTarget_PriorityMemory extends WorkerTarget_Memory {
-    p: Priority;    // (p)riority
+    p?: Priority;    // (p)riority
 }
 
 declare interface Bootstrap_Memory extends MemBase {

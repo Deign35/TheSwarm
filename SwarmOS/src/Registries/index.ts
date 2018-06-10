@@ -27,9 +27,6 @@ class SwarmManager extends PackageProviderBase<PackageProviderMemory> {
         cli: {
             processName: PKG_SwarmCLI
         },
-        cartographer: {
-            processName: PKG_Cartography,
-        }
     }
 }
 

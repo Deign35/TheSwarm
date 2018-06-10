@@ -31,20 +31,18 @@ class BootstrapJob extends BasicProcess<Bootstrap_Memory> {
             if (containers.length > 0) {
                 // Replace this job with a standard room worker group
                 if (this.room.energyCapacityAvailable >= 550) { // Big enough to support a 5 work harvester
-                    this.kernel.killProcess(this.pid, `Bootstrapping ${this.memory.rID} complete`); // This will kill all the child processes.
-                    // (TODO): Mark each container for its purpose and prep the room to continue along mostly on auto pilot.
+                    this.CompleteBootstrapping();
                 }
             }
 
             let sites = this.room.find(FIND_CONSTRUCTION_SITES);
             if (sites && sites.length > 0) {
-                let targetMem: IDictionary<string, WorkerTarget_PriorityMemory> = {}
+                let targetMem: IDictionary<string, WorkerTarget_Memory> = {}
                 for (let i = 0; i < sites.length; i++) {
                     if (sites[i].structureType == STRUCTURE_CONTAINER) {
                         this.containers.push(sites[i].id);
                         targetMem[sites[i].id] = {
                             a: AT_Build,
-                            p: Priority_Low,
                             t: TT_ConstructionSite
                         }
                     }
@@ -138,5 +136,148 @@ class BootstrapJob extends BasicProcess<Bootstrap_Memory> {
         this.room.createConstructionSite(path[path.length - 1].x, path[path.length - 1].y, STRUCTURE_CONTAINER);
 
         return true;
+    }
+
+    protected CompleteBootstrapping() {
+        this.kernel.killProcess(this.pid, `Bootstrapping ${this.memory.rID} complete`); // This will kill all the child processes.
+        let containers = this.room!.find(FIND_STRUCTURES, {
+            filter: (struct) => {
+                return struct.structureType == STRUCTURE_CONTAINER;
+            }
+        });
+
+        let harvestContainers = [];
+        let refillerEnergyTargets = {};
+        let workerWorkTargets = {};
+
+        let sources = this.room!.find(FIND_SOURCES);
+        for (let i = 0; i < sources.length; i++) {
+            let container = sources[i].pos.findInRange(containers, 1);
+            if (container && container.length > 0) {
+                harvestContainers.push(container[0].id);
+                refillerEnergyTargets[container[0].id] = {
+                    a: AT_Withdraw,
+                    t: TT_StorageContainer,
+                };
+            }
+        }
+
+        let refillContainers = [];
+        let refillerFillTargets = {};
+        let workerEnergyTargets = {};
+
+        workerWorkTargets[this.room!.controller!.id] = {
+            a: AT_Upgrade,
+            p: Priority_Lowest,
+            t: TT_Controller,
+        }
+        let controlTainer = this.room!.controller!.pos.findInRange(containers, 1);
+        if (controlTainer && controlTainer.length > 0) {
+            refillContainers.push(controlTainer[0].id);
+            refillerFillTargets[controlTainer[0].id] = {
+                a: AT_Transfer,
+                t: TT_StorageContainer,
+            };
+            workerEnergyTargets[controlTainer[0].id] = {
+                a: AT_Withdraw,
+                t: TT_StorageContainer
+            };
+        }
+
+        let spawn = this.room!.find(FIND_MY_SPAWNS)[0];
+        refillerFillTargets[spawn.id] = {
+            a: AT_Transfer,
+            t: TT_StorageContainer
+        }
+        let spawnTainer = spawn.pos.findInRange(containers, 1);
+        if (spawnTainer && spawnTainer.length > 0) {
+            refillContainers.push(spawnTainer[0].id);
+            refillerFillTargets[spawnTainer[0].id] = {
+                a: AT_Transfer,
+                t: TT_StorageContainer,
+            };
+            workerEnergyTargets[spawnTainer[0].id] = {
+                a: AT_Withdraw,
+                t: TT_StorageContainer
+            };
+        }
+
+        let extensions = this.room!.find(FIND_STRUCTURES, {
+            filter: (struct) => {
+                return struct.structureType == STRUCTURE_EXTENSION;
+            }
+        });
+        for (let i = 0; i < extensions.length; i++) {
+            refillerFillTargets[extensions[i].id] = {
+                a: AT_Transfer,
+                t: TT_StorageContainer
+            }
+        }
+
+        let sites = this.room!.find(FIND_CONSTRUCTION_SITES);
+        for (let i = 0; i < sites.length; i++) {
+            workerWorkTargets[sites[i].id] = {
+                a: AT_Build,
+                t: TT_ConstructionSite
+            }
+        }
+
+        let workMem: GenericWorkerGroup_Memory = {
+            creeps: {},
+            rID: this.memory.rID,
+            energy: refillerEnergyTargets,
+            targets: refillerFillTargets
+        }
+        this.roomData!.groups.CJ_Refill = this.kernel.startProcess(CJ_Work, workMem);
+
+        let builderMem: GenericWorkerGroup_Memory = {
+            creeps: {},
+            rID: this.memory.rID,
+            energy: workerEnergyTargets,
+            targets: workerWorkTargets
+        }
+        this.roomData!.groups.CJ_Work = this.kernel.startProcess(CJ_Work, builderMem);
+
+        let scoutMem: ScoutJob_Memory = {
+            n: _.without(this.GatherRoomIDs(this.memory.rID, 3), this.memory.rID),
+            r: this.memory.rID
+        }
+        this.roomData!.groups.CJ_Scout = this.kernel.startProcess(CJ_Scout, scoutMem);
+    }
+
+    protected GatherRoomIDs(centerRoom: RoomID, distance: number): RoomID[] {
+        let nearbyRooms: RoomID[] = [];
+        let nearby = Game.map.describeExits(centerRoom);
+        if (nearby) {
+            if (nearby["1"]) {
+                nearbyRooms.push(nearby["1"]!);
+                if (distance > 1) {
+                    let furtherRooms = this.GatherRoomIDs(nearby["1"]!, distance - 1);
+                    nearbyRooms.concat(furtherRooms)
+                }
+            }
+            if (nearby["3"]) {
+                nearbyRooms.push(nearby["3"]!);
+                if (distance > 1) {
+                    let furtherRooms = this.GatherRoomIDs(nearby["3"]!, distance - 1);
+                    nearbyRooms.concat(furtherRooms)
+                }
+            }
+            if (nearby["5"]) {
+                nearbyRooms.push(nearby["5"]!);
+                if (distance > 1) {
+                    let furtherRooms = this.GatherRoomIDs(nearby["5"]!, distance - 1);
+                    nearbyRooms.concat(furtherRooms)
+                }
+            }
+            if (nearby["7"]) {
+                nearbyRooms.push(nearby["7"]!);
+                if (distance > 1) {
+                    let furtherRooms = this.GatherRoomIDs(nearby["7"]!, distance - 1);
+                    nearbyRooms.concat(furtherRooms)
+                }
+            }
+        }
+        return _.unique(nearbyRooms);
     }
 }

@@ -5,12 +5,12 @@ export const OSPackage: IPackage<SpawnRegistry_Memory> = {
 }
 import { WorkerGroup } from "./WorkerGroup";
 
-export class GenericWorkerGroup extends WorkerGroup<GenericWorkerGroup_Memory<WorkerTarget_PriorityMemory, WorkerTarget_Memory>> {
+export class GenericWorkerGroup extends WorkerGroup<GenericWorkerGroup_Memory> {
     GetSpawnNeeds(): CreepContext | undefined {
         if (Object.keys(this.creeps).length >= 2) {
             return undefined;
         }
-        
+
         let level = 0;
         if (!this.room || this.room.energyCapacityAvailable == 0) {
             level = 2;
@@ -155,8 +155,8 @@ export class GenericWorkerGroup extends WorkerGroup<GenericWorkerGroup_Memory<Wo
             score *= Math.pow(1.1, distance); // Closer withdraw targets get higher score
         }
 
-        if ((targetMemory as WorkerTarget_PriorityMemory).p) {
-            score = (Math.pow(1.2, (targetMemory as WorkerTarget_PriorityMemory).p) * score); // Higher priority = higher score by 20% per priority level
+        if (targetMemory.p) {
+            score = (Math.pow(1.2, targetMemory.p) * score); // Higher priority = higher score by 20% per priority level
         }
         return score;
     }

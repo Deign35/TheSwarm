@@ -33,6 +33,7 @@ declare type RoomState_AttachedCreepGroups = {
     [CJ_Harvest]?: PID[];
     [CJ_Refill]?: PID;
     [CJ_Science]?: PID;
+    [CJ_Scout]?: PID;
     [CJ_Work]?: PID;
 }
 

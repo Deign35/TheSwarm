@@ -71,10 +71,10 @@ class BootstrapJob extends BasicProcess<BootstrapRefiller_Memory> {
         if (Object.keys(Game.creeps).length == 0) {
             sID = this.spawnRegistry.requestSpawn({
                 l: 0,
-                ct: CT_Worker,
+                ct: CT_Refiller,
                 n: this.memory.s.slice(-5) + 'r'
             }, this.memory.rID, Priority_EMERGENCY, 1, {
-                    ct: CT_Worker,
+                    ct: CT_Refiller,
                     lvl: 0
                 });
         } else {
@@ -151,13 +151,14 @@ class BootstrapJob extends BasicProcess<BootstrapRefiller_Memory> {
                     }
                 }
                 if (!newActivity.t) {
-                    let controlTainer = FindStructureNextTo(creep.room.controller!.pos, STRUCTURE_CONTAINER, {
-                        distance: 3
-                    });
-                    if (controlTainer && controlTainer.length > 0) {
-                        let container = controlTainer[0].structure as StructureContainer;
-                        if (container.energy < container.energyCapacity) {
-                            newActivity.t = container.id;
+                    let extensions = this.View.GetRoomData(this.memory.rID)!.structures.extension;
+                    if (extensions && extensions.length > 0) {
+                        for (let i = 0; i < extensions.length; i++) {
+                            let extension = Game.getObjectById(extensions[i]) as StructureExtension;
+                            if (extension && extension.energy < extension.energyCapacity) {
+                                newActivity.t = extension.id;
+                                break;
+                            }
                         }
                     }
                     if (!newActivity.t) {
@@ -169,15 +170,15 @@ class BootstrapJob extends BasicProcess<BootstrapRefiller_Memory> {
                                 break;
                             }
                         }
+
                         if (!newActivity.t) {
-                            let extensions = this.View.GetRoomData(this.memory.rID)!.structures.extension;
-                            if (extensions && extensions.length > 0) {
-                                for (let i = 0; i < extensions.length; i++) {
-                                    let extension = Game.getObjectById(extensions[i]) as StructureExtension;
-                                    if (extension && extension.energy < extension.energyCapacity) {
-                                        newActivity.t = extension.id;
-                                        break;
-                                    }
+                            let controlTainer = FindStructureNextTo(creep.room.controller!.pos, STRUCTURE_CONTAINER, {
+                                distance: 3
+                            });
+                            if (controlTainer && controlTainer.length > 0) {
+                                let container = controlTainer[0].structure as StructureContainer;
+                                if (container.energy < container.energyCapacity) {
+                                    newActivity.t = container.id;
                                 }
                             }
                         }
