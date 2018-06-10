@@ -147,7 +147,6 @@ class BootstrapJob extends BasicProcess<Bootstrap_Memory> {
     }
 
     protected CompleteBootstrapping() {
-        debugger;
         this.kernel.killProcess(this.pid, `Bootstrapping ${this.memory.rID} complete`); // This will kill all the child processes.
         let containers = this.room!.find(FIND_STRUCTURES, {
             filter: (struct) => {
@@ -155,7 +154,7 @@ class BootstrapJob extends BasicProcess<Bootstrap_Memory> {
             }
         });
 
-        let refillerEnergyTargets = {};
+        let refillerEnergyTargets: WorkerTargetDictionary = {};
 
         let sources = this.room!.find(FIND_SOURCES);
         for (let i = 0; i < sources.length; i++) {
@@ -163,13 +162,14 @@ class BootstrapJob extends BasicProcess<Bootstrap_Memory> {
             if (container && container.length > 0) {
                 refillerEnergyTargets[container[0].id] = {
                     a: AT_Withdraw,
+                    p: Priority_Medium,
                     t: TT_StorageContainer,
                 };
             }
         }
 
-        let refillerFillTargets = {};
-        let workerEnergyTargets = {};
+        let refillerFillTargets: WorkerTargetDictionary = {};
+        let workerEnergyTargets: WorkerTargetDictionary = {};
 
         let spawn = this.room!.find(FIND_MY_SPAWNS)[0];
         refillerFillTargets[spawn.id] = {
@@ -191,7 +191,7 @@ class BootstrapJob extends BasicProcess<Bootstrap_Memory> {
             };
         }
 
-        let workerWorkTargets = {};
+        let workerWorkTargets: WorkerTargetDictionary = {};
         workerWorkTargets[this.room!.controller!.id] = {
             a: AT_Upgrade,
             p: Priority_Lowest,

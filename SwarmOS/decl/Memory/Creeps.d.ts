@@ -22,9 +22,10 @@ declare interface SoloJob_Memory extends MemBase {
     rID: RoomID;    // (h)ome room
     tr: RoomID;     // (t)arget (r)oom
 
-    wt: IDictionary<ObjectID, WorkerTarget_Memory>;     // (w)ork (t)argets for this job
-    et: IDictionary<ObjectID, WorkerTarget_Memory>;     // (e)nergy withdrawal (t)argets
+    wt: WorkerTargetDictionary;     // (w)ork (t)argets for this job
+    et: WorkerTargetDictionary;     // (e)nergy withdrawal (t)argets
 }
+declare type WorkerTargetDictionary = IDictionary<ObjectID, WorkerTarget_Memory>;
 declare interface ControlledRoomRefiller_Memory extends SoloJob_Memory {
 
 }
@@ -38,8 +39,8 @@ declare interface WorkerGroup_Memory extends MemBase {
     }
 }
 declare interface GenericWorkerGroup_Memory extends WorkerGroup_Memory {
-    targets: IDictionary<ObjectID, WorkerTarget_Memory>;
-    energy: IDictionary<ObjectID, WorkerTarget_Memory>;     // energy withdrawal targets
+    targets: WorkerTargetDictionary;
+    energy: WorkerTargetDictionary;     // energy withdrawal targets
 }
 
 declare interface BootstrapRefiller_Memory extends MemBase {

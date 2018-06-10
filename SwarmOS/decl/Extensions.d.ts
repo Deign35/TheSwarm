@@ -114,7 +114,7 @@ declare interface ICreepRegistryExtensions extends IPackageExtension {
     tryFindCompatibleCreep(creepType: CT_ALL, level: number, targetRoom: RoomID, maxDistance?: number): string | undefined
     tryRegisterCreep(creepContext: CreepContext): boolean;
     tryGetCreep(id?: CreepID, requestingPID?: PID): Creep | undefined;
-    tryReserveCreep(id?: CreepID, requestingPID?: PID): boolean;
+    tryReserveCreep(id?: CreepID, requestingPID?: PID, priority?: Priority): boolean;
     releaseCreep(id?: CreepID, requestingPID?: PID): void;
 }
 

@@ -63,11 +63,11 @@ export class GenericWorkerGroup extends WorkerGroup<GenericWorkerGroup_Memory> {
         let scores = {};
         for (let i = 0; i < possibleTargets.length; i++) {
             let id = possibleTargets[i];
-            let score = this.ScoreTarget(creep, baseScore, Game.getObjectById(id), this.targets[id]);
+            let score = this.ScoreTarget(creep, baseScore, Game.getObjectById(id), list[id]);
             if (score < 0) {
                 delete this.targets[id];
             }
-            if (scores > 0) {
+            if (score > 0) {
                 scores[id] = score;
             }
         }
@@ -123,10 +123,15 @@ export class GenericWorkerGroup extends WorkerGroup<GenericWorkerGroup_Memory> {
                 }
                 break;
             case (AT_Transfer):
+                score = baseScore;
                 if (targetMemory.t == TT_StorageContainer) {
                     energyNeeded = (target as StructureStorage).energyCapacity - (target as StructureLink).energy;
                 } else if (targetMemory.t == TT_Creep) {
                     energyNeeded = (target as Creep).carryCapacity - (target as Creep).carry.energy;
+                }
+
+                if (energyNeeded == 0) {
+                    return 0;
                 }
                 break;
             case (AT_Upgrade):
@@ -141,6 +146,7 @@ export class GenericWorkerGroup extends WorkerGroup<GenericWorkerGroup_Memory> {
                 }
                 break;
             default:
+                score = 0;
                 break;
         }
 
@@ -155,9 +161,6 @@ export class GenericWorkerGroup extends WorkerGroup<GenericWorkerGroup_Memory> {
             score *= Math.pow(1.1, distance); // Closer withdraw targets get higher score
         }
 
-        if (targetMemory.p) {
-            score = (Math.pow(1.2, targetMemory.p) * score); // Higher priority = higher score by 20% per priority level
-        }
-        return score;
+        return (Math.pow(1.2, targetMemory.p) * score);// Higher priority = higher score by 20% per priority level
     }
 }

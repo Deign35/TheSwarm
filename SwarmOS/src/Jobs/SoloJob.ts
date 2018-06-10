@@ -56,21 +56,26 @@ export abstract class SoloJob<T extends SoloJob_Memory> extends BasicProcess<T> 
     CreateCreepActivity(creepID: CreepID) {
         this.creepRegistry.tryReserveCreep(creepID, this.pid);
         this.creep = this.creepRegistry.tryGetCreep(creepID, this.pid);
+        this.memory.c = creepID;
         if (!this.creep) {
             if (this.memory.exp) {
                 this.EndProcess();
-            } else {
-                this.CreateSpawnActivity();
             }
             return;
         }
         this.memory.a = this.CreateCustomCreepActivity(this.creep);
         if (!this.memory.a) {
-            this.EndProcess();
+            this.HandleNoActivity();
         } else {
             this.kernel.setParent(this.memory.a, this.pid);
         }
     }
     protected abstract CreateCustomCreepActivity(creep: Creep): PID | undefined;
+    protected HandleNoActivity() {
+        this.EndProcess();
+    }
 
+    EndProcess() {
+        super.EndProcess(this.memory.c);
+    }
 }
