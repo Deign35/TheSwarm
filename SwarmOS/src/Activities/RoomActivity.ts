@@ -60,13 +60,14 @@ class RoomActivity extends BasicProcess<RoomActivity_Memory> {
                 this.RefreshRoomStructures(this.roomName);
             }
 
-            if (!this.roomData.hostPID || !this.kernel.getProcessByPID(this.roomData.hostPID)) {
+            if (!this.roomData.hostPID) {
                 let newMem: Bootstrap_Memory = {
                     containers: [],
                     rID: this.memory.rID
                 }
                 this.roomData.hostPID = this.kernel.startProcess(PKG_BootRoom, newMem);
             }
+            // (TODO): What to do when the hostPID is dead?  What should it change to?
             this.roomData.lastUpdated = Game.time;
         }
 

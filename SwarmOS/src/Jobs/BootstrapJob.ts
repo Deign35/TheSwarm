@@ -32,6 +32,7 @@ class BootstrapJob extends BasicProcess<Bootstrap_Memory> {
                 // Replace this job with a standard room worker group
                 if (this.room.energyCapacityAvailable >= 550) { // Big enough to support a 5 work harvester
                     this.CompleteBootstrapping();
+                    return ThreadState_Done;
                 }
             }
 
@@ -43,6 +44,7 @@ class BootstrapJob extends BasicProcess<Bootstrap_Memory> {
                         this.containers.push(sites[i].id);
                         targetMem[sites[i].id] = {
                             a: AT_Build,
+                            p: Priority_Medium,
                             t: TT_ConstructionSite
                         }
                     }
@@ -114,6 +116,12 @@ class BootstrapJob extends BasicProcess<Bootstrap_Memory> {
                 }
                 return ThreadState_Done;
             }
+        } else {
+            for (let i = 0; i < this.containers.length; i++) {
+                if (!Game.getObjectById(this.containers[i])) {
+                    this.containers.splice(i--, 1);
+                }
+            }
         }
 
         return ThreadState_Done;
@@ -139,6 +147,7 @@ class BootstrapJob extends BasicProcess<Bootstrap_Memory> {
     }
 
     protected CompleteBootstrapping() {
+        debugger;
         this.kernel.killProcess(this.pid, `Bootstrapping ${this.memory.rID} complete`); // This will kill all the child processes.
         let containers = this.room!.find(FIND_STRUCTURES, {
             filter: (struct) => {
@@ -146,15 +155,12 @@ class BootstrapJob extends BasicProcess<Bootstrap_Memory> {
             }
         });
 
-        let harvestContainers = [];
         let refillerEnergyTargets = {};
-        let workerWorkTargets = {};
 
         let sources = this.room!.find(FIND_SOURCES);
         for (let i = 0; i < sources.length; i++) {
             let container = sources[i].pos.findInRange(containers, 1);
             if (container && container.length > 0) {
-                harvestContainers.push(container[0].id);
                 refillerEnergyTargets[container[0].id] = {
                     a: AT_Withdraw,
                     t: TT_StorageContainer,
@@ -162,10 +168,30 @@ class BootstrapJob extends BasicProcess<Bootstrap_Memory> {
             }
         }
 
-        let refillContainers = [];
         let refillerFillTargets = {};
         let workerEnergyTargets = {};
 
+        let spawn = this.room!.find(FIND_MY_SPAWNS)[0];
+        refillerFillTargets[spawn.id] = {
+            a: AT_Transfer,
+            p: Priority_Medium,
+            t: TT_StorageContainer
+        }
+        let spawnTainer = spawn.pos.findInRange(containers, 1);
+        if (spawnTainer && spawnTainer.length > 0) {
+            refillerFillTargets[spawnTainer[0].id] = {
+                a: AT_Transfer,
+                p: Priority_Low,
+                t: TT_StorageContainer,
+            };
+            workerEnergyTargets[spawnTainer[0].id] = {
+                a: AT_Withdraw,
+                p: Priority_Low,
+                t: TT_StorageContainer
+            };
+        }
+
+        let workerWorkTargets = {};
         workerWorkTargets[this.room!.controller!.id] = {
             a: AT_Upgrade,
             p: Priority_Lowest,
@@ -173,31 +199,14 @@ class BootstrapJob extends BasicProcess<Bootstrap_Memory> {
         }
         let controlTainer = this.room!.controller!.pos.findInRange(containers, 1);
         if (controlTainer && controlTainer.length > 0) {
-            refillContainers.push(controlTainer[0].id);
             refillerFillTargets[controlTainer[0].id] = {
                 a: AT_Transfer,
+                p: Priority_Low,
                 t: TT_StorageContainer,
             };
             workerEnergyTargets[controlTainer[0].id] = {
                 a: AT_Withdraw,
-                t: TT_StorageContainer
-            };
-        }
-
-        let spawn = this.room!.find(FIND_MY_SPAWNS)[0];
-        refillerFillTargets[spawn.id] = {
-            a: AT_Transfer,
-            t: TT_StorageContainer
-        }
-        let spawnTainer = spawn.pos.findInRange(containers, 1);
-        if (spawnTainer && spawnTainer.length > 0) {
-            refillContainers.push(spawnTainer[0].id);
-            refillerFillTargets[spawnTainer[0].id] = {
-                a: AT_Transfer,
-                t: TT_StorageContainer,
-            };
-            workerEnergyTargets[spawnTainer[0].id] = {
-                a: AT_Withdraw,
+                p: Priority_Medium,
                 t: TT_StorageContainer
             };
         }
@@ -210,6 +219,7 @@ class BootstrapJob extends BasicProcess<Bootstrap_Memory> {
         for (let i = 0; i < extensions.length; i++) {
             refillerFillTargets[extensions[i].id] = {
                 a: AT_Transfer,
+                p: Priority_High,
                 t: TT_StorageContainer
             }
         }
@@ -218,6 +228,7 @@ class BootstrapJob extends BasicProcess<Bootstrap_Memory> {
         for (let i = 0; i < sites.length; i++) {
             workerWorkTargets[sites[i].id] = {
                 a: AT_Build,
+                p: Priority_Low,
                 t: TT_ConstructionSite
             }
         }
@@ -229,6 +240,7 @@ class BootstrapJob extends BasicProcess<Bootstrap_Memory> {
             targets: refillerFillTargets
         }
         this.roomData!.groups.CJ_Refill = this.kernel.startProcess(CJ_Work, workMem);
+        // (TODO): This refiller will not do his job
 
         let builderMem: GenericWorkerGroup_Memory = {
             creeps: {},
@@ -237,6 +249,7 @@ class BootstrapJob extends BasicProcess<Bootstrap_Memory> {
             targets: workerWorkTargets
         }
         this.roomData!.groups.CJ_Work = this.kernel.startProcess(CJ_Work, builderMem);
+        // (TODO): Look for workers when CJ_Work needs em
 
         let scoutMem: ScoutJob_Memory = {
             n: _.without(this.GatherRoomIDs(this.memory.rID, 3), this.memory.rID),

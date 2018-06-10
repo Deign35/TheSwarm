@@ -51,7 +51,7 @@ declare interface BootstrapBuilder_Memory extends MemBase {
 declare interface WorkerTarget_Memory extends MemBase {
     a: ActionType;  // (a)ctionType
     t: TargetType;  // (o)bject type
-    p?: Priority;    // (p)riority
+    p: Priority;    // (p)riority
 }
 
 declare interface Bootstrap_Memory extends MemBase {
