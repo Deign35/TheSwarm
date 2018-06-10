@@ -77,7 +77,7 @@ class ScoutJob extends BasicProcess<ScoutJob_Memory> {
             nextRoom = allRooms[i];
         }
 
-        this.creepActivity.CreateNewCreepActivity({
+        this.memory.a = this.creepActivity.CreateNewCreepActivity({
             at: AT_MoveToPosition,
             p: {
                 x: 25,
