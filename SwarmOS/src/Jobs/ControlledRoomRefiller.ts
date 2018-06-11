@@ -8,7 +8,7 @@ import { SoloJob } from "./SoloJob";
 class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory> {
     @extensionInterface(EXT_CreepActivity)
     creepActivity!: ICreepActivityExtensions;
-    protected GetSpawnData(): { ct: CT_ALL; l: number; n: string; } {
+    protected GetSpawnData(): SpawnContext {
         let newName = this.memory.rID + '_Ref';
         let level = 1;
         if (this.homeRoom.energyCapacityAvailable >= CreepBodies.Refiller[3].cost) {
@@ -18,7 +18,7 @@ class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory> {
         }
 
         return {
-            ct: CT_Refiller,
+            c: CT_Refiller,
             l: level,
             n: newName
         }

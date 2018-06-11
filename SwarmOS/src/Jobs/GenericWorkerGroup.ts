@@ -6,7 +6,7 @@ export const OSPackage: IPackage<SpawnRegistry_Memory> = {
 import { WorkerGroup } from "./WorkerGroup";
 
 export class GenericWorkerGroup extends WorkerGroup<GenericWorkerGroup_Memory> {
-    GetSpawnNeeds(): CreepContext | undefined {
+    GetSpawnNeeds(): SpawnContext | undefined {
         if (Object.keys(this.creeps).length >= 2) {
             return undefined;
         }
@@ -26,7 +26,7 @@ export class GenericWorkerGroup extends WorkerGroup<GenericWorkerGroup_Memory> {
             }
         }
         return {
-            ct: CT_Worker,
+            c: CT_Worker,
             l: level,
             n: 'gw' + GetSUID()
         }

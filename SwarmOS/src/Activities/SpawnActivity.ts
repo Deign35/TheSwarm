@@ -19,7 +19,7 @@ class SpawnActivity extends BasicProcess<SpawnActivity_Memory> {
                 break;
             case (SP_COMPLETE):
             case (SP_SPAWNING):
-                newCreepName = this.spawnRegistry.getRequestContext(this.memory.sID)!.n;
+                newCreepName = this.spawnRegistry.getRequestContext(this.memory.sID)!.c;
             case (SP_ERROR):
             default:
                 this.EndProcess(newCreepName);

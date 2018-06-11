@@ -102,9 +102,9 @@ declare interface IRoomDataExtension extends IPackageExtension {
 declare interface ISpawnRegistryExtensions extends IPackageExtension {
     cancelRequest(id?: SpawnRequestID): boolean;
     getRequestStatus(id?: SpawnRequestID): SpawnState;
-    requestSpawn(context: CreepContext, location: RoomID, spawnPriority: Priority,
+    requestSpawn(context: SpawnContext, location: RoomID, spawnPriority: Priority,
         maxSpawnDistance?: number, startMem?: ScreepsObject_CreepMemory): SpawnRequestID;
-    getRequestContext(id?: SpawnRequestID): CreepContext | undefined;
+    getRequestContext(id?: SpawnRequestID): SpawnContext | undefined;
 }
 
 /**
@@ -112,7 +112,7 @@ declare interface ISpawnRegistryExtensions extends IPackageExtension {
  */
 declare interface ICreepRegistryExtensions extends IPackageExtension {
     tryFindCompatibleCreep(creepType: CT_ALL, level: number, targetRoom: RoomID, maxDistance?: number): string | undefined
-    tryRegisterCreep(creepContext: CreepContext): boolean;
+    tryRegisterCreep(creepID: CreepID): boolean;
     tryGetCreep(id?: CreepID, requestingPID?: PID): Creep | undefined;
     tryReserveCreep(id?: CreepID, requestingPID?: PID, priority?: Priority): boolean;
     releaseCreep(id?: CreepID, requestingPID?: PID): void;

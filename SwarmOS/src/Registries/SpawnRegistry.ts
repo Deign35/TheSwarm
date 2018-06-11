@@ -28,9 +28,9 @@ const BodyLegend = {
 }
 
 // (TODO) -- Convert this to auto generated -- maybe also optional ordering??
-const ConvertContextToSpawnBody = function (context: CreepContext) {
+const ConvertContextToSpawnBody = function (context: SpawnContext) {
     let body = [];
-    let bodyDef = CreepBodies.get(context.ct)[context.l];
+    let bodyDef = CreepBodies.get(context.c)[context.l];
     for (let bodyID in BodyLegend) {
         if (bodyDef[bodyID]) {
             for (let i = 0; i < bodyDef[bodyID]; i++) {
@@ -80,16 +80,16 @@ class SpawnRegistry extends BasicProcess<SpawnRegistry_Memory> {
             let req = this.memory[requests[i]];
             if (req.spSta != SP_QUEUED) {
                 if (req.spSta == SP_SPAWNING) {
-                    if (!Game.creeps[req.con.n]) {
+                    if (!Game.creeps[req.con.c]) {
                         req.spSta = SP_ERROR;
-                    } else if (!Game.creeps[req.con.n].spawning) {
+                    } else if (!Game.creeps[req.con.c].spawning) {
                         req.spSta = SP_COMPLETE;
                     }
                 }
                 continue;
             }
 
-            let foundCreep = this.creepRegistry.tryFindCompatibleCreep(req.con.ct, req.con.l, req.loc, req.max);
+            let foundCreep = this.creepRegistry.tryFindCompatibleCreep(req.con.c, req.con.l, req.loc, req.max);
             if (foundCreep) {
                 this.log.info(`Found a compatible creep instead of spawning`);
                 req.con.n = foundCreep;
@@ -100,7 +100,7 @@ class SpawnRegistry extends BasicProcess<SpawnRegistry_Memory> {
                 continue;
             } else {
                 activeRequests[requests[i]] = req;
-                minSpawnCost = Math.min(minSpawnCost, CreepBodies.get(req.con.ct)[req.con.l].cost);
+                minSpawnCost = Math.min(minSpawnCost, CreepBodies.get(req.con.c)[req.con.l].cost);
             }
         }
 
@@ -152,7 +152,7 @@ class SpawnRegistry extends BasicProcess<SpawnRegistry_Memory> {
                 if (usedRequestIDs.includes(req.id)) {
                     continue;
                 }
-                let body = CreepBodies[req.con.ct][req.con.l];
+                let body = CreepBodies[req.con.c][req.con.l];
                 if (spawn.room.energyCapacityAvailable < body.cost) {
                     continue;
                 }
@@ -187,17 +187,17 @@ class SpawnRegistry extends BasicProcess<SpawnRegistry_Memory> {
         while (spawnResult != OK && req.spSta == SP_QUEUED) {
             // construct the body here somehow
             let spawnMem = Object.assign(req.dm || {}, {
-                ct: req.con.ct,
+                ct: req.con.c,
                 lvl: req.con.l
             })
             spawnResult = spawn.spawnCreep(ConvertContextToSpawnBody(req.con),
-                req.con.n,
+                req.con.c,
                 { memory: spawnMem });
             switch (spawnResult) {
                 case (ERR_NOT_ENOUGH_ENERGY):
                     return false;
                 case (ERR_NAME_EXISTS):
-                    req.con.n += `_` + (Game.time % GetRandomIndex(primes_100));
+                    req.con.c += `_` + (Game.time % GetRandomIndex(primes_100));
                 case (OK):
                     break;
                 default:
@@ -219,7 +219,7 @@ class SpawnRegistry extends BasicProcess<SpawnRegistry_Memory> {
         if (req.spSta != SP_QUEUED) {
             return UNSPAWNABLE_COST;
         }
-        let diff = CreepBodies.get(req.con.ct)[req.con.l].cost;
+        let diff = CreepBodies.get(req.con.c)[req.con.l].cost;
         let dist = Game.map.getRoomLinearDistance(spawn.room.name, req.loc) || 0
         if (req.max && dist > req.max) {
             return UNSPAWNABLE_COST;
@@ -248,7 +248,7 @@ class SpawnRegistryExtensions extends ExtensionBase implements ISpawnRegistryExt
         let spawnRequest = this.memory[id];
 
         if (spawnRequest.spSta == SP_SPAWNING) {
-            let creep = Game.creeps[spawnRequest.con.n];
+            let creep = Game.creeps[spawnRequest.con.c];
             if (creep && !creep.spawning) {
                 this.memory[id].spSta = SP_COMPLETE;
                 spawnRequest.spSta = SP_COMPLETE;
@@ -257,7 +257,7 @@ class SpawnRegistryExtensions extends ExtensionBase implements ISpawnRegistryExt
 
         return spawnRequest.spSta;
     }
-    getRequestContext(id?: SpawnRequestID): CreepContext | undefined {
+    getRequestContext(id?: SpawnRequestID): SpawnContext | undefined {
         if (id && this.memory[id]) {
             return this.memory[id].con;
         }
@@ -274,7 +274,7 @@ class SpawnRegistryExtensions extends ExtensionBase implements ISpawnRegistryExt
         return false;
     }
 
-    requestSpawn(context: CreepContext, location: RoomID, spawnPriority: Priority,
+    requestSpawn(context: SpawnContext, location: RoomID, spawnPriority: Priority,
         maxSpawnDistance: number = 3, startMem?: any): SpawnRequestID {
         let newRequest: SpawnRequest = {
             con: context,

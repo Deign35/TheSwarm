@@ -77,7 +77,7 @@ class HarvestJob extends BasicProcess<HarvestJob_Memory> {
     CreateSpawnActivity(spawnLevel: number) {
         let sID = this.spawnRegistry.requestSpawn({
             l: spawnLevel,
-            ct: CT_Harvester,
+            c: CT_Harvester,
             n: this.memory.rID + '_HJ' + this.memory.t.slice(-1),
         }, this.memory.rID, Priority_High, 3, {
                 ct: CT_Harvester,

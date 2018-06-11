@@ -41,7 +41,7 @@ export abstract class SoloJob<T extends SoloJob_Memory> extends BasicProcess<T> 
     CreateSpawnActivity() {
         let spawnData = this.GetSpawnData();
         let sID = this.spawnRegistry.requestSpawn(spawnData, this.memory.rID, Priority_Lowest, 1, {
-            ct: spawnData.ct,
+            ct: spawnData.c,
             lvl: spawnData.l
         });
         let spawnMem: SpawnActivity_Memory = {
@@ -51,7 +51,7 @@ export abstract class SoloJob<T extends SoloJob_Memory> extends BasicProcess<T> 
         this.memory.a = this.kernel.startProcess(SPKG_SpawnActivity, spawnMem)
         this.kernel.setParent(this.memory.a, this.pid);
     }
-    protected abstract GetSpawnData(): { ct: CT_ALL, l: number, n: CreepID };
+    protected abstract GetSpawnData(): SpawnContext;
 
     CreateCreepActivity(creepID: CreepID) {
         this.creepRegistry.tryReserveCreep(creepID, this.pid);

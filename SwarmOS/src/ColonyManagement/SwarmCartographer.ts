@@ -100,7 +100,7 @@ class SwarmCartographer extends BasicProcess<CartographerMemory> {
         let creepID = roomID + (Game.time + '_s').slice(-5);
         let sID = this.spawnRegistry.requestSpawn({
             l: 0,
-            ct: CT_Scout,
+            c: CT_Scout,
             n: creepID
         }, roomID, Priority_Lowest, 1, {
                 ct: CT_Scout,

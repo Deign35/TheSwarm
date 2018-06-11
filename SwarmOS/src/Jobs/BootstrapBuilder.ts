@@ -31,7 +31,7 @@ class BootstrapJob extends BasicProcess<BootstrapBuilder_Memory> {
     CreateBuilderSpawnActivity() {
         let sID = this.spawnRegistry.requestSpawn({
             l: 0,
-            ct: CT_Worker,
+            c: CT_Worker,
             n: this.memory.rID + '_b'
         }, this.memory.rID, Priority_Low, 1, {
                 ct: CT_Worker,

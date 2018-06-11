@@ -59,7 +59,7 @@ export abstract class WorkerGroup<T extends WorkerGroup_Memory> extends BasicPro
         }
     }
 
-    abstract GetSpawnNeeds(): CreepContext | undefined;
+    abstract GetSpawnNeeds(): SpawnContext | undefined;
 
     AddCreep(creepID: CreepID) {
         if (this.creepRegistry.tryReserveCreep(creepID, this.pid)) {

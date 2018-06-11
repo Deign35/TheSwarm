@@ -8,14 +8,17 @@ declare interface CreepRegistry_Memory extends MemBase {
 }
 declare interface CreepContext extends MemBase {
     o?: PID;        // (o)wner process
-
-    n: CreepID;     // (n)ame
-    ct: CT_ALL;     // (b)ody definition
-    l: number;      // body (l)evel
+    c: CreepID;     // (n)ame
+    rID: RoomID;    // spawn room
 }
 
+declare interface SpawnContext extends MemBase {
+    n: CreepID; // (n)ame
+    c: CT_ALL;  // (c)reep type
+    l: number;  // (l)evel
+}
 declare interface SpawnRequest extends MemBase {
-    con: CreepContext;  // Context
+    con: SpawnContext;  // Context
     id: SpawnRequestID; // requestID
     loc: RoomID;        // Where the spawn request originates
     pri: Priority;      // How much of a priority is this spawn??
