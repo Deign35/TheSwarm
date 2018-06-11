@@ -14,7 +14,6 @@ const PKG_FlagRegistry_LogContext: LogContext = {
     logLevel: LOG_INFO
 }
 
-// (TODO): Convert to Flag Registry
 class FlagRegistry extends BasicProcess<FlagExtensionsMemory> {
     get memory(): FlagExtensionsMemory {
         if (!Memory.flagData) {

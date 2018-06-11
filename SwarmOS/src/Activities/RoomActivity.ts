@@ -160,6 +160,7 @@ class RoomActivity extends BasicProcess<RoomActivity_Memory> {
             roomData.lastUpdated = Game.time;
         }
 
+        // (TODO): Create workers as needed
         return ThreadState_Done;
     }
 

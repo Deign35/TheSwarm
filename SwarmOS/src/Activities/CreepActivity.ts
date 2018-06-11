@@ -43,15 +43,14 @@ class CreepActivity extends BasicProcess<CreepActivity_Memory> {
             return ThreadState_Done;
         }
 
-        // (TODO): Change this to be more predictive using the path (e.g. if(this.memory.p.length <= 3))
         if (!this.creepActivity.CreepIsInRange(this.memory.at, this.AssignedCreep.pos, this.TargetPos || this.Target!.pos)) {
             this.creepActivity.MoveCreep(this.AssignedCreep, this.TargetPos || this.Target!.pos);
         } else {
             let result = this.creepActivity.RunActivity(this.CreateActivityArgs());
             switch (this.memory.at) {
-                //case (AT_ClaimController):
+                case (AT_ClaimController):
                 case (AT_Drop):
-                //case (AT_GenerateSafeMode):
+                case (AT_GenerateSafeMode):
                 case (AT_Pickup):
                 case (AT_RequestTransfer):
                 case (AT_SignController):

@@ -7,7 +7,6 @@ export const OSPackage: IPackage<SpawnRegistry_Memory> = {
 import { FindNextTo, FindStructureNextTo } from "Tools/TheFinder";
 import { BasicProcess } from "Core/BasicTypes";
 
-// (TODO): Search for buildings
 class BootstrapRefiller extends BasicProcess<BootstrapRefiller_Memory> {
     @extensionInterface(EXT_CreepActivity)
     protected creepActivity!: ICreepActivityExtensions;

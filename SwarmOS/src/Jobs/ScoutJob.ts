@@ -5,7 +5,6 @@ export const OSPackage: IPackage<SpawnRegistry_Memory> = {
 }
 import { BasicProcess } from "Core/BasicTypes";
 
-// (TODO): Search for buildings
 class ScoutJob extends BasicProcess<ScoutJob_Memory> {
     @extensionInterface(EXT_CreepRegistry)
     creepRegistry!: ICreepRegistryExtensions;

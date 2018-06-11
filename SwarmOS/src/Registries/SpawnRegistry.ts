@@ -28,6 +28,7 @@ const BodyLegend = {
 }
 
 // (TODO) -- Convert this to auto generated -- maybe also optional ordering??
+// additionally, presize the array.
 const ConvertContextToSpawnBody = function (context: SpawnContext) {
     let body = [];
     let bodyDef = CreepBodies.get(context.c)[context.l];

@@ -5,7 +5,6 @@ export const OSPackage: IPackage<SpawnRegistry_Memory> = {
 }
 import { BasicProcess } from "Core/BasicTypes";
 
-// (TODO): Search for buildings
 class HarvestJob extends BasicProcess<HarvestJob_Memory> {
     @extensionInterface(EXT_CreepRegistry)
     creepRegistry!: ICreepRegistryExtensions;
@@ -99,7 +98,6 @@ class HarvestJob extends BasicProcess<HarvestJob_Memory> {
 
     SpawnComplete(creepID: string) {
         if (this.memory.h) {
-            // (TODO): Orphaned creep, what to do with it?!??!?!
             let oldCreep = this.creepRegistry.tryGetCreep(this.memory.h, this.pid);
             this.creepRegistry.releaseCreep(this.memory.h, this.pid);
             this.log.warn(`SpawnComplete, but harvester already exists.  Not working functionality`);
