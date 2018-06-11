@@ -118,7 +118,7 @@ class CreepRegistryExtensions extends ExtensionBase implements ICreepRegistryExt
             let creepData = this.registeredCreeps[creepIDs[i]];
             let creep = Game.creeps[creepData.c];
 
-            if (creepData.o && creep.memory.ct != CT_Worker) {
+            if (creepData.o) {
                 let parentProcess = this.extensionRegistry.getKernel().getProcessByPID(creepData.o);
                 if (parentProcess && parentProcess.pkgName != CJ_Work) {
                     continue;
@@ -198,7 +198,7 @@ class CreepRegistryExtensions extends ExtensionBase implements ICreepRegistryExt
     }
 
     releaseCreep(id?: CreepID, requestingPID?: PID): void {
-        if (!id || !requestingPID) {
+        if (!id) {
             return;
         }
         if (this.registeredCreeps[id]) {

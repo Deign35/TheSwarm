@@ -76,7 +76,7 @@ class BootstrapJob extends BasicProcess<Bootstrap_Memory> {
                         bui: {},
                         rID: this.memory.rID,
                         s: sources[i].id,
-                        sites: []
+                        sites: this.containers
                     }
                     newPID = this.kernel.startProcess(CJ_BootBuild, buildMem);
                     this.roomData!.groups[CJ_BootBuild]!.push(newPID);
