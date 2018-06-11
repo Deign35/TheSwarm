@@ -35,7 +35,8 @@ class RoomRegistry extends BasicProcess<RoomStateMemory> {
             if (!data || !data.activityPID || !this.kernel.getProcessByPID(data.activityPID)) {
                 let newMem: RoomActivity_Memory = {
                     rID: roomID,
-                    energyTargets: {}
+                    energyTargets: {},
+                    hb: false
                 }
                 if (!data) {
                     let room = Game.rooms[roomID];

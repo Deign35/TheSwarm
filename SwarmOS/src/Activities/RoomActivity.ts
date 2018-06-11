@@ -32,6 +32,22 @@ class RoomActivity extends BasicProcess<RoomActivity_Memory> {
 
             this.EnsureRoomGroups();
 
+            if (!this.memory.hb) {
+                let spawn = this.room.find(FIND_MY_SPAWNS);
+                if (spawn && spawn.length > 0) {
+                    this.room.createConstructionSite(spawn[0].pos.x - 1, spawn[0].pos.y, STRUCTURE_CONTAINER);
+                    let sources = this.room.find(FIND_SOURCES);
+                    for (let i = 0; i < sources.length; i++) {
+                        this.CreatePath(spawn[0].pos, sources[i].pos, true);
+                    }
+                    if (sources.length < 4) { // limit of 5 containers
+                        this.CreatePath(spawn[0].pos, this.room.controller!.pos, true);
+                    }
+                }
+
+                delete this.memory.hb;
+            }
+
             if (this.shouldRefresh(11, roomData!.minUpdateOffset, roomData.lastUpdated)) {
                 roomData.resources = this.room.find(FIND_DROPPED_RESOURCES).map((value: Resource) => {
                     return value.id;

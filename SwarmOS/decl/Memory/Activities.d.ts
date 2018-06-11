@@ -6,6 +6,7 @@ declare interface RoomActivity_Memory extends MemBase {
     energyTargets: {
         [id: string]: boolean;
     };
+    hb?: boolean;
 }
 declare interface CreepActivity_Memory extends SingleCreepActivity_Memory {
     c: CreepID;     //Creep
