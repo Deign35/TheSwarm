@@ -1,6 +1,6 @@
 export const OSPackage: IPackage<SpawnRegistry_Memory> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
-        processRegistry.register(CJ_BootRefill, BootstrapJob);
+        processRegistry.register(CJ_BootRefill, BootstrapRefiller);
     }
 }
 
@@ -8,7 +8,7 @@ import { FindNextTo, FindStructureNextTo } from "Tools/TheFinder";
 import { BasicProcess } from "Core/BasicTypes";
 
 // (TODO): Search for buildings
-class BootstrapJob extends BasicProcess<BootstrapRefiller_Memory> {
+class BootstrapRefiller extends BasicProcess<BootstrapRefiller_Memory> {
     @extensionInterface(EXT_CreepActivity)
     protected creepActivity!: ICreepActivityExtensions;
     @extensionInterface(EXT_CreepRegistry)
@@ -65,7 +65,8 @@ class BootstrapJob extends BasicProcess<BootstrapRefiller_Memory> {
             p: this.pid
         }, this.memory.rID, Priority_EMERGENCY, 1, {
                 ct: CT_Refiller,
-                lvl: spawnLevel
+                lvl: spawnLevel,
+                p: this.pid
             });
         let spawnMem: SpawnActivity_Memory = {
             sID: sID,

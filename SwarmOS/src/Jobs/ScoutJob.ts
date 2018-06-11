@@ -40,7 +40,8 @@ class ScoutJob extends BasicProcess<ScoutJob_Memory> {
             p: this.pid
         }, this.memory.rID, Priority_Lowest, 1, {
                 ct: CT_Scout,
-                lvl: 0
+                lvl: 0,
+                p: this.pid
             });
         let spawnMem: SpawnActivity_Memory = {
             sID: sID,

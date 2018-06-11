@@ -79,8 +79,8 @@ export class WorkerGroup extends BasicProcess<WorkerGroup_Memory> implements IWo
         }
     }
 
-    get targets() { return this.View.GetRoomData(this.memory.rID)!.groups.CR_Work!.targets; }
-    get energyTargets() { return this.View.GetRoomData(this.memory.rID)!.groups.CR_Work!.energy; }
+    get targets() { return this.View.GetRoomData(this.memory.rID)!.targets.CR_Work!.targets; }
+    get energyTargets() { return this.View.GetRoomData(this.memory.rID)!.targets.CR_Work!.energy; }
 
     GetNextTarget(creep: Creep): { t: ObjectID, a: ActionType } | undefined {
         let actionType: ActionType = AT_NoOp;
@@ -88,9 +88,36 @@ export class WorkerGroup extends BasicProcess<WorkerGroup_Memory> implements IWo
         if (bestTarget) {
             actionType = this.targets[bestTarget].a;
         } else {
-            bestTarget = this.GetBestOfList(creep, this.energyTargets);
+            let pickupTargets = this.View.GetRoomData(this.memory.rID)!.resources.concat(this.View.GetRoomData(this.memory.rID)!.tombstones);
+            let eligibleTargets: WorkerTargetDictionary = {};
+            for (let i = 0; i < pickupTargets.length; i++) {
+                let res = Game.getObjectById(pickupTargets[i]) as Resource | Tombstone;
+                if (res && (res as Resource).resourceType == RESOURCE_ENERGY) {
+                    if ((res as Resource).amount >= creep.carryCapacity) {
+                        eligibleTargets[res.id] = {
+                            a: AT_Pickup,
+                            p: Priority_Medium,
+                            t: TT_Resource
+                        };
+                    }
+                } else if (res && (res as Tombstone).deathTime) {
+                    if ((res as Tombstone).energy >= creep.carryCapacity) {
+                        eligibleTargets[res.id] = {
+                            a: AT_Withdraw,
+                            p: Priority_Medium,
+                            t: TT_StorageContainer
+                        };
+                    }
+                }
+            }
+            bestTarget = this.GetBestOfList(creep, eligibleTargets);
             if (bestTarget) {
                 actionType = this.energyTargets[bestTarget].a;
+            } else {
+                bestTarget = this.GetBestOfList(creep, this.energyTargets);
+                if (bestTarget) {
+                    actionType = this.energyTargets[bestTarget].a;
+                }
             }
         }
 

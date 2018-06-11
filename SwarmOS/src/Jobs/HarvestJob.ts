@@ -82,7 +82,8 @@ class HarvestJob extends BasicProcess<HarvestJob_Memory> {
             p: this.pid
         }, this.memory.rID, Priority_High, 3, {
                 ct: CT_Harvester,
-                lvl: spawnLevel
+                lvl: spawnLevel,
+                p: this.pid
             });
         let spawnMem: SpawnActivity_Memory = {
             sID: sID,

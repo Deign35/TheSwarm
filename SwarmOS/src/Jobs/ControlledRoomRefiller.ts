@@ -13,10 +13,10 @@ class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory> {
 
 
     protected get energyTargets() {
-        return this.View.GetRoomData(this.memory.rID)!.groups.CR_SpawnFill!.energy;
+        return this.View.GetRoomData(this.memory.rID)!.targets.CR_SpawnFill!.energy;
     }
     protected get targets() {
-        return this.View.GetRoomData(this.memory.rID)!.groups.CR_SpawnFill!.targets;
+        return this.View.GetRoomData(this.memory.rID)!.targets.CR_SpawnFill!.targets;
     }
     protected GetSpawnData(): SpawnContext {
         let newName = this.memory.rID + '_Ref';
@@ -61,9 +61,35 @@ class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory> {
             bestTarget = this.GetBestOfList(creep, this.energyTargets);
             if (bestTarget) {
                 actionType = this.energyTargets[bestTarget].a;
+            } else {
+                let pickupTargets = this.View.GetRoomData(this.memory.rID)!.resources.concat(this.View.GetRoomData(this.memory.rID)!.tombstones);
+                let eligibleTargets: WorkerTargetDictionary = {};
+                for (let i = 0; i < pickupTargets.length; i++) {
+                    let res = Game.getObjectById(pickupTargets[i]) as Resource | Tombstone;
+                    if (res && (res as Resource).resourceType == RESOURCE_ENERGY) {
+                        if ((res as Resource).amount >= creep.carryCapacity) {
+                            eligibleTargets[res.id] = {
+                                a: AT_Pickup,
+                                p: Priority_Medium,
+                                t: TT_Resource
+                            };
+                        }
+                    } else if (res && (res as Tombstone).deathTime) {
+                        if ((res as Tombstone).energy >= creep.carryCapacity) {
+                            eligibleTargets[res.id] = {
+                                a: AT_Withdraw,
+                                p: Priority_Medium,
+                                t: TT_StorageContainer
+                            };
+                        }
+                    }
+                }
+                bestTarget = this.GetBestOfList(creep, eligibleTargets);
+                if (bestTarget) {
+                    actionType = this.energyTargets[bestTarget].a;
+                }
             }
         }
-
         if (!bestTarget) {
             return undefined;
         }

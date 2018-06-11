@@ -34,7 +34,8 @@ class RoomRegistry extends BasicProcess<RoomStateMemory> {
             let data = this.RoomView.GetRoomData(roomID);
             if (!data || !data.activityPID || !this.kernel.getProcessByPID(data.activityPID)) {
                 let newMem: RoomActivity_Memory = {
-                    rID: roomID
+                    rID: roomID,
+                    energyTargets: {}
                 }
                 if (!data) {
                     let room = Game.rooms[roomID];
@@ -57,6 +58,16 @@ class RoomRegistry extends BasicProcess<RoomStateMemory> {
                             road: []
                         },
                         groups: {},
+                        targets: {
+                            CR_SpawnFill: {
+                                energy: {},
+                                targets: {}
+                            },
+                            CR_Work: {
+                                energy: {},
+                                targets: {}
+                            }
+                        },
                         activityPID: '',
                     }
                 }

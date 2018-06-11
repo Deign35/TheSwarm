@@ -17,30 +17,48 @@ interface RoomState extends MemBase {
     minUpdateOffset: number;
     structures: RoomState_StructureData;
     groups: RoomState_AttachedCreepGroups;
+    targets: {
+        CR_SpawnFill: AttachedCreepGroup_Memory
+        CR_Work: AttachedCreepGroup_Memory
+    }
     activityPID: PID;
     owner?: PlayerID;
 }
-type RoomState_StructureData = {
-    [id in StructureConstant]?: ObjectID[];
+interface RoomState_StructureData {
+    [STRUCTURE_CONTAINER]: ObjectID[];
+    [STRUCTURE_ROAD]: ObjectID[]
+
+    [STRUCTURE_EXTENSION]?: ObjectID[];
+    [STRUCTURE_LAB]?: ObjectID[];
+    [STRUCTURE_LINK]?: ObjectID[];
+    [STRUCTURE_RAMPART]?: ObjectID[];
+    [STRUCTURE_SPAWN]?: ObjectID[];
+    [STRUCTURE_TOWER]?: ObjectID[];
+    [STRUCTURE_WALL]?: ObjectID[];
+    [id: string]: ObjectID[] | undefined;
 }
 
+
+declare interface WorkerTarget_Memory extends MemBase {
+    a: ActionType;  // (a)ctionType
+    t: TargetType;  // (o)bject type
+    p: Priority;    // (p)riority
+}
 declare type WorkerTargetDictionary = IDictionary<ObjectID, WorkerTarget_Memory>;
 declare interface AttachedCreepGroup_Memory {
-    pid: PID;
-
     energy: WorkerTargetDictionary;
     targets: WorkerTargetDictionary;
 }
 
 declare interface RoomState_AttachedCreepGroups {
-    [CR_BootFill]?: AttachedCreepGroup_Memory;
+    [CR_BootFill]?: PID;
     [CR_Harvester]?: IDictionary<ObjectID, PID>;
     [CR_Scout]?: PID;
-    [CR_SpawnFill]?: AttachedCreepGroup_Memory;
-    [CR_Work]?: AttachedCreepGroup_Memory;
+    [CR_SpawnFill]?: PID;
+    [CR_Work]?: PID;
 
 
-    [CR_Fortify]?: AttachedCreepGroup_Memory;
+    [CR_Fortify]?: PID;
     [CR_Science]?: PID;
 }
 

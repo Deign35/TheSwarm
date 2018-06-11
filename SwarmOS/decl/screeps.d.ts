@@ -2095,6 +2095,7 @@ interface OrderFilter {
 interface ScreepsObject_CreepMemory {
     ct: CT_ALL;
     lvl: number;
+    p: PID;     // Spawning PID
 }
 interface ScreepsObject_FlagMemory { }
 interface ScreepsObject_RoomMemory { }
@@ -2508,7 +2509,7 @@ interface RoomPosition {
      * @param range The range distance.
      * @param opts See Room.find.
      */
-    findInRange<K extends FindConstant>(type: K, range: number, opts?: { filter: any | string }): Array<FindTypes[K]>;
+    findInRange<K extends FindConstant>(type: K, range: number, opts?: { filter: FilterFunction<K> }): Array<FindTypes[K]>;
     findInRange<T extends Structure>(type: FIND_STRUCTURES | FIND_MY_STRUCTURES | FIND_HOSTILE_STRUCTURES, range: number, opts?: { filter: FilterFunction<FIND_STRUCTURES> }): T[];
     /**
      * Find all objects in the specified linear range.

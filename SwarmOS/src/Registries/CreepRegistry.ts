@@ -79,13 +79,15 @@ class CreepRegistry extends BasicProcess<CreepRegistry_Memory> {
                     this.log.error(`Creep context doesnt exist and couldnt register the creep(${creep.name}).`);
                     return ThreadState_Done;
                 }
+                this.registeredCreeps[creep.name].o = creep.memory.p;
+                delete creep.memory.p;
                 context = this.registeredCreeps[creep.name];
             }
 
             if (!context.o) {
                 let roomData = this.View.GetRoomData(creep.room.name)!;
                 if (roomData.groups.CR_Work) {
-                    let proc = this.kernel.getProcessByPID(roomData.groups.CR_Work.pid);
+                    let proc = this.kernel.getProcessByPID(roomData.groups.CR_Work);
                     if (proc && (proc as IWorkerGroupProcess).AddCreep) {
                         (proc as IWorkerGroupProcess).AddCreep(creep.name);
                     }

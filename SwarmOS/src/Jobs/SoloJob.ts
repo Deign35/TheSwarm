@@ -35,7 +35,8 @@ export abstract class SoloJob<T extends SoloJob_Memory> extends BasicProcess<T> 
         let spawnData = this.GetSpawnData();
         let sID = this.spawnRegistry.requestSpawn(spawnData, this.memory.rID, Priority_Lowest, 1, {
             ct: spawnData.c,
-            lvl: spawnData.l
+            lvl: spawnData.l,
+            p: this.pid
         });
         let spawnMem: SpawnActivity_Memory = {
             sID: sID,

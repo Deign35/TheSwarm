@@ -183,7 +183,8 @@ class SpawnRegistry extends BasicProcess<SpawnRegistry_Memory> {
             // construct the body here somehow
             let spawnMem = Object.assign(req.dm || {}, {
                 ct: req.con.c,
-                lvl: req.con.l
+                lvl: req.con.l,
+                p: req.con.p
             })
             spawnResult = spawn.spawnCreep(ConvertContextToSpawnBody(req.con),
                 req.con.n,

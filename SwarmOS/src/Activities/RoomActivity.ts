@@ -30,96 +30,8 @@ class RoomActivity extends BasicProcess<RoomActivity_Memory> {
                 (this.room.controller.reservation && this.room.controller.reservation.username)
             )) || undefined;
 
-            if (!roomData.groups.CR_Work) {
-                let workMem: WorkerGroup_Memory = {
-                    rID: this.memory.rID,
-                    creeps: {}
-                }
-                roomData.groups.CR_Work = {
-                    pid: this.kernel.startProcess(CJ_Work, workMem),
-                    energy: {},
-                    targets: {}
-                }
-            }
+            this.EnsureRoomGroups();
 
-            // I control this room
-            if (this.room.controller && this.room.controller.my) {
-                this.View.SetScoutNexus(this.memory.rID);
-                if (!roomData.groups.CR_Scout || !this.kernel.getProcessByPID(roomData.groups.CR_Scout)) {
-                    let scoutMem: ScoutJob_Memory = {
-                        n: _.without(this.GatherNearbyRoomIDs(this.memory.rID, 3), this.memory.rID),
-                        rID: this.memory.rID
-                    }
-                    roomData.groups.CR_Scout = this.kernel.startProcess(CJ_Scout, scoutMem);
-                }
-                if (!roomData.groups.CR_Harvester) {
-                    roomData.groups.CR_Harvester = {};
-                }
-                let sources = this.room.find(FIND_SOURCES);
-                for (let i = 0; i < sources.length; i++) {
-                    if (!roomData.groups.CR_Harvester[sources[i].id] || !this.kernel.getProcessByPID(roomData.groups.CR_Harvester[sources[i].id])) {
-                        let harvMem: HarvestJob_Memory = {
-                            rID: this.memory.rID,
-                            t: sources[i].id
-                        }
-                        roomData.groups.CR_Harvester[sources[i].id] = (this.kernel.startProcess(CJ_Harvest, harvMem));
-                    }
-                    if (this.room.energyCapacityAvailable < 550) {
-                        if (!roomData.groups.CR_BootFill) {
-                            let bootMem: BootstrapRefiller_Memory = {
-                                hb: false,
-                                s: sources[i].id,
-                                rID: this.memory.rID,
-                                ref: {}
-                            }
-                            roomData.groups.CR_BootFill = {
-                                pid: this.kernel.startProcess(CJ_BootRefill, bootMem),
-                                energy: {},
-                                targets: {}
-                            }
-                        }
-                    } else {
-                        if (roomData.groups.CR_BootFill) {
-
-                        }
-                    }
-                }
-
-                if (!roomData.groups.CR_SpawnFill) {
-                    let refillMem: ControlledRoomRefiller_Memory = {
-                        rID: this.memory.rID,
-                        tr: this.memory.rID,
-
-                    }
-                    roomData.groups.CR_SpawnFill = {
-                        pid: this.kernel.startProcess(CJ_Refill, refillMem),
-                        energy: {},
-                        targets: {}
-                    }
-                }
-
-            } else {
-                // I do not own this room
-                if (roomData.groups.CR_Scout) {
-                    this.kernel.killProcess(roomData.groups.CR_Scout);
-                    delete roomData.groups.CR_Scout;
-                }
-                if (roomData.groups.CR_Harvester) {
-                    let ids = Object.keys(roomData.groups.CR_Harvester);
-                    for (let i = 0; i < ids.length; i++) {
-                        this.kernel.killProcess(roomData.groups.CR_Harvester[i]);
-                    }
-                    delete roomData.groups.CR_Harvester;
-                }
-                if (roomData.groups.CR_BootFill) {
-                    this.kernel.killProcess(roomData.groups.CR_BootFill.pid);
-                    delete roomData.groups.CR_BootFill;
-                }
-                if (roomData.groups.CR_SpawnFill) {
-                    this.kernel.killProcess(roomData.groups.CR_SpawnFill.pid);
-                    delete roomData.groups.CR_SpawnFill;
-                }
-            }
             if (this.shouldRefresh(11, roomData!.minUpdateOffset, roomData.lastUpdated)) {
                 roomData.resources = this.room.find(FIND_DROPPED_RESOURCES).map((value: Resource) => {
                     return value.id;
@@ -134,16 +46,117 @@ class RoomActivity extends BasicProcess<RoomActivity_Memory> {
 
             // (TODO): Change this to plan out the layout
             if (this.shouldRefresh(29, roomData!.minUpdateOffset, roomData.lastUpdated)) {
+                this.RefreshRoomStructures(roomData);
                 roomData.cSites = this.room.find(FIND_CONSTRUCTION_SITES).map((value: ConstructionSite) => {
                     return value.id;
                 });
-            }
+                let targets: WorkerTargetDictionary = {};
+                let keys = Object.keys(roomData.cSites);
+                // (TODO): Organize cSites by some priority based on structure type
+                for (let i = 0; i < keys.length; i++) {
+                    targets[keys[i]] = {
+                        a: AT_Build,
+                        t: TT_ConstructionSite,
+                        p: Priority_Medium
+                    }
+                }
 
-            // Update path stuff somehow.
-            if (this.shouldRefresh(31, roomData!.minUpdateOffset, roomData.lastUpdated)) {
-                this.RefreshRoomStructures(roomData);
+                keys = Object.keys(roomData.needsRepair);
+                for (let i = 0; i < keys.length; i++) {
+                    targets[keys[i]] = {
+                        a: AT_Repair,
+                        t: TT_AnyStructure,
+                        p: Priority_Low,
+                    }
+                }
+                if (roomData.owner == MY_USERNAME) {
+                    targets[this.room!.controller!.id] = {
+                        a: AT_Upgrade,
+                        t: TT_Controller,
+                        p: Priority_Lowest
+                    }
+                }
+
+                roomData.targets.CR_Work.targets = targets;
+
+                for (let i = 0; i < roomData.structures.container.length; i++) {
+                    let containerID = roomData.structures.container[i];
+                    if (!this.memory.energyTargets[containerID]) {
+                        let container = Game.getObjectById(containerID) as StructureContainer;
+                        let sources = container.pos.findInRange(FIND_SOURCES, 1);
+                        if (sources && sources.length > 0) {
+                            if (!roomData.targets.CR_SpawnFill.energy[containerID]) {
+                                roomData.targets.CR_SpawnFill.energy[containerID] = {
+                                    a: AT_Withdraw,
+                                    p: Priority_Medium,
+                                    t: TT_StorageContainer
+                                }
+                            }
+                        } else {
+                            if (!roomData.targets.CR_SpawnFill.targets[containerID]) {
+                                roomData.targets.CR_SpawnFill.targets[containerID] = {
+                                    a: AT_Transfer,
+                                    p: Priority_Low,
+                                    t: TT_StorageContainer
+                                }
+                            }
+                            if (!roomData.targets.CR_Work.energy[containerID]) {
+                                roomData.targets.CR_Work.energy[containerID] = {
+                                    a: AT_Withdraw,
+                                    p: Priority_Low,
+                                    t: TT_StorageContainer
+                                }
+                            }
+                        }
+
+                        this.memory.energyTargets[containerID] = true;
+                    }
+                }
+
+                if (roomData.structures.spawn) {
+                    for (let i = 0; i < roomData.structures.spawn.length; i++) {
+                        let spawnID = roomData.structures.spawn[i];
+                        if (!roomData.targets.CR_SpawnFill.targets[spawnID]) {
+                            roomData.targets.CR_SpawnFill.targets[spawnID] = {
+                                a: AT_Transfer,
+                                p: Priority_Medium,
+                                t: TT_StorageContainer
+                            }
+                        }
+                    }
+                }
+
+                if (roomData.structures.extension) {
+                    for (let i = 0; i < roomData.structures.extension.length; i++) {
+                        let extensionID = roomData.structures.extension[i];
+                        if (!roomData.targets.CR_SpawnFill.targets[extensionID]) {
+                            roomData.targets.CR_SpawnFill.targets[extensionID] = {
+                                a: AT_Transfer,
+                                p: Priority_High,
+                                t: TT_StorageContainer
+                            }
+                        }
+                    }
+                }
+
+                if (this.room && this.room.storage) {
+                    if (!roomData.targets.CR_SpawnFill.targets[this.room.storage.id]) {
+                        roomData.targets.CR_SpawnFill.targets[this.room.storage.id] = {
+                            a: AT_Transfer,
+                            p: Priority_Lowest,
+                            t: TT_StorageContainer
+                        }
+                    }
+                    if (!roomData.targets.CR_Work.energy[this.room.storage.id]) {
+                        roomData.targets.CR_Work.energy[this.room.storage.id] = {
+                            a: AT_Withdraw,
+                            p: Priority_Lowest,
+                            t: TT_StorageContainer
+                        }
+                    }
+                }
             }
-            // (TODO): What to do when the hostPID is dead?  What should it change to?
+            // (TODO): Update path stuff somehow.
             roomData.lastUpdated = Game.time;
         }
 
@@ -198,8 +211,6 @@ class RoomActivity extends BasicProcess<RoomActivity_Memory> {
         }
     }
 
-
-
     protected GatherNearbyRoomIDs(centerRoom: RoomID, distance: number): RoomID[] {
         let nearbyRooms: RoomID[] = [];
         let nearby = Game.map.describeExits(centerRoom);
@@ -234,5 +245,125 @@ class RoomActivity extends BasicProcess<RoomActivity_Memory> {
             }
         }
         return _.unique(nearbyRooms);
+    }
+
+    protected CreatePath(from: RoomPosition, to: RoomPosition, buildContainer: boolean) {
+        if (!this.room) {
+            return false;
+        }
+        if (buildContainer) {
+            let nearby = to.findInRange(FIND_STRUCTURES, 1, {
+                filter: (struct) => {
+                    return struct.structureType == STRUCTURE_CONTAINER;
+                }
+            });
+
+            if (nearby && nearby.length > 0) {
+                to = nearby[0].pos;
+                buildContainer = false;
+            }
+        }
+        let path = from.findPathTo(to, {
+            ignoreCreeps: true,
+            ignoreDestructibleStructures: true,
+            ignoreRoads: true,
+            range: 1,
+            swampCost: 1
+        });
+        for (let i = 0; i < path.length - 1; i++) {
+            this.room.createConstructionSite(path[i].x, path[i].y, STRUCTURE_ROAD);
+        }
+        this.room.createConstructionSite(path[path.length - 1].x, path[path.length - 1].y, buildContainer ? STRUCTURE_CONTAINER : STRUCTURE_ROAD);
+
+        return true;
+    }
+    protected EnsureRoomGroups() {
+        let roomData = this.View.GetRoomData(this.memory.rID)!;
+        if (!roomData.groups.CR_Work) {
+            let workMem: WorkerGroup_Memory = {
+                rID: this.memory.rID,
+                creeps: {}
+            }
+            roomData.groups.CR_Work = this.kernel.startProcess(CJ_Work, workMem);
+            roomData.targets.CR_Work = {
+                energy: {},
+                targets: {}
+            }
+        }
+
+        // I control this room
+        if (this.room!.controller && this.room!.controller!.my) {
+            this.View.SetScoutNexus(this.memory.rID);
+            if (!roomData.groups.CR_Scout || !this.kernel.getProcessByPID(roomData.groups.CR_Scout)) {
+                let scoutMem: ScoutJob_Memory = {
+                    n: _.without(this.GatherNearbyRoomIDs(this.memory.rID, 3), this.memory.rID),
+                    rID: this.memory.rID
+                }
+                roomData.groups.CR_Scout = this.kernel.startProcess(CJ_Scout, scoutMem);
+            }
+            if (!roomData.groups.CR_Harvester) {
+                roomData.groups.CR_Harvester = {};
+            }
+            let sources = this.room!.find(FIND_SOURCES);
+            for (let i = 0; i < sources.length; i++) {
+                if (!roomData.groups.CR_Harvester[sources[i].id] || !this.kernel.getProcessByPID(roomData.groups.CR_Harvester[sources[i].id])) {
+                    let harvMem: HarvestJob_Memory = {
+                        rID: this.memory.rID,
+                        t: sources[i].id
+                    }
+                    roomData.groups.CR_Harvester[sources[i].id] = (this.kernel.startProcess(CJ_Harvest, harvMem));
+                }
+                if (this.room!.energyCapacityAvailable < 550) {
+                    if (!roomData.groups.CR_BootFill) {
+                        let bootMem: BootstrapRefiller_Memory = {
+                            hb: false,
+                            s: sources[i].id,
+                            rID: this.memory.rID,
+                            ref: {}
+                        }
+                        roomData.groups.CR_BootFill = this.kernel.startProcess(CJ_BootRefill, bootMem);
+                    }
+                } else {
+                    if (roomData.groups.CR_BootFill) {
+                        this.kernel.killProcess(roomData.groups.CR_BootFill);
+                        delete roomData.groups.CR_BootFill;
+                    }
+                }
+            }
+
+            if (!roomData.groups.CR_SpawnFill) {
+                let refillMem: ControlledRoomRefiller_Memory = {
+                    rID: this.memory.rID,
+                    tr: this.memory.rID,
+
+                }
+                roomData.groups.CR_SpawnFill = this.kernel.startProcess(CJ_Refill, refillMem);
+                roomData.targets.CR_SpawnFill = {
+                    energy: {},
+                    targets: {}
+                }
+            }
+        } else {
+            // I do not own this room
+            if (roomData.groups.CR_Scout) {
+                this.kernel.killProcess(roomData.groups.CR_Scout);
+                delete roomData.groups.CR_Scout;
+            }
+            if (roomData.groups.CR_Harvester) {
+                let ids = Object.keys(roomData.groups.CR_Harvester);
+                for (let i = 0; i < ids.length; i++) {
+                    this.kernel.killProcess(roomData.groups.CR_Harvester[i]);
+                }
+                delete roomData.groups.CR_Harvester;
+            }
+            if (roomData.groups.CR_BootFill) {
+                this.kernel.killProcess(roomData.groups.CR_BootFill);
+                delete roomData.groups.CR_BootFill;
+            }
+            if (roomData.groups.CR_SpawnFill) {
+                this.kernel.killProcess(roomData.groups.CR_SpawnFill);
+                delete roomData.groups.CR_SpawnFill;
+            }
+        }
     }
 }
