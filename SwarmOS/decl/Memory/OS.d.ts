@@ -1,7 +1,3 @@
-declare var Memory: {
-    roomData: RoomStateMemory;
-}
-
 declare interface MemBase {
     HC?: string; // (H)andle of the (C)allback function for informing the parent process that this process has died.
 }

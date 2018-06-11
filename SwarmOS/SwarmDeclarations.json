@@ -30,6 +30,24 @@
                 "Cartography"
             ]
         },
+        "CR": {
+            "comment": "Creep roles",
+            "enabled": true,
+            "string": true,
+            "isArray": true,
+            "usePrefix": true,
+            "type": true,
+            "combinedType": "CreepRoles",
+            "entries": [
+                "BootFill",
+                "Fortify",
+                "Harvester",
+                "Science",
+                "Scout",
+                "SpawnFill",
+                "Work"
+            ]
+        },
         "CJ": {
             "comment": "Creep job packages",
             "enabled": true,
@@ -39,13 +57,12 @@
             "usePrefix": true,
             "combinedType": "CreepJobsPackage",
             "entries": [
+                "BootRefill",
                 "Harvest",
                 "Refill",
                 "Work",
                 "Science",
                 "Fortify",
-                "BootRefill",
-                "BootBuild",
                 "Scout"
             ]
         },

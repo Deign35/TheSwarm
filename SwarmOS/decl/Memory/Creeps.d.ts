@@ -21,11 +21,7 @@ declare interface SoloJob_Memory extends MemBase {
     exp?: boolean;  // (exp)pires -- Kill the process when the creep dies
     rID: RoomID;    // (h)ome room
     tr: RoomID;     // (t)arget (r)oom
-
-    wt: WorkerTargetDictionary;     // (w)ork (t)argets for this job
-    et: WorkerTargetDictionary;     // (e)nergy withdrawal (t)argets
 }
-declare type WorkerTargetDictionary = IDictionary<ObjectID, WorkerTarget_Memory>;
 declare interface ControlledRoomRefiller_Memory extends SoloJob_Memory {
 
 }
@@ -37,10 +33,6 @@ declare interface WorkerGroup_Memory extends MemBase {
             a?: PID;        // (a)ctivity
         }
     }
-}
-declare interface GenericWorkerGroup_Memory extends WorkerGroup_Memory {
-    targets: WorkerTargetDictionary;
-    energy: WorkerTargetDictionary;     // energy withdrawal targets
 }
 
 declare interface BootstrapRefiller_Memory extends MemBase {

@@ -1,4 +1,4 @@
-export const OSPackage: IPackage<SpawnRegistry_Memory> = {
+/*export const OSPackage: IPackage<SpawnRegistry_Memory> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
         processRegistry.register(PKG_BootRoom, BootstrapJob);
     }
@@ -249,40 +249,4 @@ class BootstrapJob extends BasicProcess<Bootstrap_Memory> {
         }
         this.roomData!.groups.CJ_Scout = this.kernel.startProcess(CJ_Scout, scoutMem);
     }
-
-    protected GatherRoomIDs(centerRoom: RoomID, distance: number): RoomID[] {
-        let nearbyRooms: RoomID[] = [];
-        let nearby = Game.map.describeExits(centerRoom);
-        if (nearby) {
-            if (nearby["1"]) {
-                nearbyRooms.push(nearby["1"]!);
-                if (distance > 1) {
-                    let furtherRooms = this.GatherRoomIDs(nearby["1"]!, distance - 1);
-                    nearbyRooms.concat(furtherRooms)
-                }
-            }
-            if (nearby["3"]) {
-                nearbyRooms.push(nearby["3"]!);
-                if (distance > 1) {
-                    let furtherRooms = this.GatherRoomIDs(nearby["3"]!, distance - 1);
-                    nearbyRooms.concat(furtherRooms)
-                }
-            }
-            if (nearby["5"]) {
-                nearbyRooms.push(nearby["5"]!);
-                if (distance > 1) {
-                    let furtherRooms = this.GatherRoomIDs(nearby["5"]!, distance - 1);
-                    nearbyRooms.concat(furtherRooms)
-                }
-            }
-            if (nearby["7"]) {
-                nearbyRooms.push(nearby["7"]!);
-                if (distance > 1) {
-                    let furtherRooms = this.GatherRoomIDs(nearby["7"]!, distance - 1);
-                    nearbyRooms.concat(furtherRooms)
-                }
-            }
-        }
-        return _.unique(nearbyRooms);
-    }
-}
+}*/

@@ -8,6 +8,16 @@ import { SoloJob } from "./SoloJob";
 class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory> {
     @extensionInterface(EXT_CreepActivity)
     creepActivity!: ICreepActivityExtensions;
+    @extensionInterface(EXT_RoomView)
+    protected View!: IRoomDataExtension;
+
+
+    protected get energyTargets() {
+        return this.View.GetRoomData(this.memory.rID)!.groups.CR_SpawnFill!.energy;
+    }
+    protected get targets() {
+        return this.View.GetRoomData(this.memory.rID)!.groups.CR_SpawnFill!.targets;
+    }
     protected GetSpawnData(): SpawnContext {
         let newName = this.memory.rID + '_Ref';
         let level = 1;

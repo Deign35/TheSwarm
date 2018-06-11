@@ -18,23 +18,30 @@ interface RoomState extends MemBase {
     structures: RoomState_StructureData;
     groups: RoomState_AttachedCreepGroups;
     activityPID: PID;
-
     owner?: PlayerID;
-    hostPID?: PID;
 }
 type RoomState_StructureData = {
     [id in StructureConstant]?: ObjectID[];
 }
 
-declare type RoomState_AttachedCreepGroups = {
-    [CJ_BootRefill]?: PID[];
-    [CJ_BootBuild]?: PID[];
-    [CJ_Fortify]?: PID;
-    [CJ_Harvest]?: PID[];
-    [CJ_Refill]?: PID;
-    [CJ_Science]?: PID;
-    [CJ_Scout]?: PID;
-    [CJ_Work]?: PID;
+declare type WorkerTargetDictionary = IDictionary<ObjectID, WorkerTarget_Memory>;
+declare interface AttachedCreepGroup_Memory {
+    pid: PID;
+
+    energy: WorkerTargetDictionary;
+    targets: WorkerTargetDictionary;
+}
+
+declare interface RoomState_AttachedCreepGroups {
+    [CR_BootFill]?: AttachedCreepGroup_Memory;
+    [CR_Harvester]?: IDictionary<ObjectID, PID>;
+    [CR_Scout]?: PID;
+    [CR_SpawnFill]?: AttachedCreepGroup_Memory;
+    [CR_Work]?: AttachedCreepGroup_Memory;
+
+
+    [CR_Fortify]?: AttachedCreepGroup_Memory;
+    [CR_Science]?: PID;
 }
 
 declare interface CartographerMemory extends MemBase {
