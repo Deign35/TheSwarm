@@ -1,6 +1,6 @@
 import { BasicProcess } from "Core/BasicTypes";
 
-export abstract class WorkerGroup<T extends WorkerGroup_Memory> extends BasicProcess<T> {
+export abstract class WorkerGroup<T extends WorkerGroup_Memory> extends BasicProcess<T> implements IWorkerGroupProcess {
     @extensionInterface(EXT_CreepActivity)
     creepActivity!: ICreepActivityExtensions;
     @extensionInterface(EXT_CreepRegistry)

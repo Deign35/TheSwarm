@@ -80,9 +80,9 @@ class SpawnRegistry extends BasicProcess<SpawnRegistry_Memory> {
             let req = this.memory[requests[i]];
             if (req.spSta != SP_QUEUED) {
                 if (req.spSta == SP_SPAWNING) {
-                    if (!Game.creeps[req.con.c]) {
+                    if (!Game.creeps[req.con.n]) {
                         req.spSta = SP_ERROR;
-                    } else if (!Game.creeps[req.con.c].spawning) {
+                    } else if (!Game.creeps[req.con.n].spawning) {
                         req.spSta = SP_COMPLETE;
                     }
                 }
@@ -191,13 +191,13 @@ class SpawnRegistry extends BasicProcess<SpawnRegistry_Memory> {
                 lvl: req.con.l
             })
             spawnResult = spawn.spawnCreep(ConvertContextToSpawnBody(req.con),
-                req.con.c,
+                req.con.n,
                 { memory: spawnMem });
             switch (spawnResult) {
                 case (ERR_NOT_ENOUGH_ENERGY):
                     return false;
                 case (ERR_NAME_EXISTS):
-                    req.con.c += `_` + (Game.time % GetRandomIndex(primes_100));
+                    req.con.n += `_` + (Game.time % GetRandomIndex(primes_100));
                 case (OK):
                     break;
                 default:
@@ -248,7 +248,7 @@ class SpawnRegistryExtensions extends ExtensionBase implements ISpawnRegistryExt
         let spawnRequest = this.memory[id];
 
         if (spawnRequest.spSta == SP_SPAWNING) {
-            let creep = Game.creeps[spawnRequest.con.c];
+            let creep = Game.creeps[spawnRequest.con.n];
             if (creep && !creep.spawning) {
                 this.memory[id].spSta = SP_COMPLETE;
                 spawnRequest.spSta = SP_COMPLETE;

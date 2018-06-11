@@ -34,6 +34,8 @@ const BodyLegend = {
 class CreepRegistry extends BasicProcess<CreepRegistry_Memory> {
     @extensionInterface(EXT_CreepRegistry)
     Extensions!: ICreepRegistryExtensions;
+    @extensionInterface(EXT_RoomView)
+    View!: IRoomDataExtension;
     get memory(): CreepRegistry_Memory {
         if (!Memory.creepData) {
             this.log.warn(`Initializing CreepRegistry memory`);
@@ -65,21 +67,31 @@ class CreepRegistry extends BasicProcess<CreepRegistry_Memory> {
                 delete Memory.creeps[creepIDs[i]];
             }
         }
-        creepIDs = Object.keys(Game.creeps);
-        for (let i = 0, length = creepIDs.length; i < length; i++) {
-            let creep = Game.creeps[creepIDs[i]];
-            let context = this.registeredCreeps[creepIDs[i]];
-            if (!context) {
-                this.Extensions.tryRegisterCreep({
-                    ct: creep.memory.ct,
-                    l: creep.memory.lvl,
-                    n: creep.name
-                })
-            }
-        }
     }
 
     RunThread(): ThreadState {
+        let creepIDs = Object.keys(Game.creeps);
+        for (let i = 0, length = creepIDs.length; i < length; i++) {
+            let creep = Game.creeps[creepIDs[i]];
+            let context = this.registeredCreeps[creep.name];
+            if (!context) {
+                if (!this.Extensions.tryRegisterCreep(creep.name)) {
+                    this.log.error(`Creep context doesnt exist and couldnt register the creep(${creep.name}).`);
+                    return ThreadState_Done;
+                }
+                context = this.registeredCreeps[creep.name];
+            }
+
+            if (!context.o) {
+                let roomData = this.View.GetRoomData(creep.room.name)!;
+                if (roomData.groups.CJ_Work) {
+                    let proc = this.kernel.getProcessByPID(roomData.groups.CJ_Work);
+                    if (proc && (proc as IWorkerGroupProcess).AddCreep) {
+                        (proc as IWorkerGroupProcess).AddCreep(creep.name);
+                    }
+                }
+            }
+        }
         return ThreadState_Done;
     }
 }
@@ -98,29 +110,37 @@ class CreepRegistryExtensions extends ExtensionBase implements ICreepRegistryExt
     }
 
     tryFindCompatibleCreep(creepType: CT_ALL, level: number, targetRoom: RoomID, maxDistance: number = 3): string | undefined {
-        let bestMatch: CreepContext | undefined = undefined;
+        let bestMatch: { con: CreepContext, creep: Creep } | undefined = undefined;
         let dist = maxDistance + 1;
         let desiredBody = CreepBodies[creepType][level];
         let creepIDs = Object.keys(this.registeredCreeps);
         for (let i = 0; i < creepIDs.length; i++) {
-            let creep = this.registeredCreeps[creepIDs[i]];
-            if (creep.o) { continue; }
+            let creepData = this.registeredCreeps[creepIDs[i]];
+            let creep = Game.creeps[creepData.c];
 
-            let compareDist = Game.map.getRoomLinearDistance(Game.creeps[creep.n].room.name, targetRoom);
+            if (creepData.o && creep.memory.ct != CT_Worker) {
+                let parentProcess = this.extensionRegistry.getKernel().getProcessByPID(creepData.o);
+                if (parentProcess && parentProcess.pkgName != CJ_Work) {
+                    continue;
+                }
+                creepData.o = undefined;
+            }
+
+            let compareDist = Game.map.getRoomLinearDistance(Game.creeps[creepData.c].room.name, targetRoom);
             let betterMatch = false;
 
-            if (creep.ct == creepType) {
+            if (creep.memory.ct == creepType || creepType == CT_Worker) {
                 if (!bestMatch) {
                     betterMatch = true;
                 } else {
-                    if (bestMatch.l != level || bestMatch.l == creep.l) {
+                    if (creep.memory.ct == creepType && bestMatch.creep.memory.ct != creepType) {
+                        betterMatch = true;
+                    } else if (bestMatch.creep.memory.lvl != level || bestMatch.creep.memory.lvl == creep.memory.lvl) {
                         if (compareDist < dist) {
                             betterMatch = true;
-                        }
-                    } else {
-                        if (bestMatch.l < level && creep.l > bestMatch.l) {
+                        } else if (bestMatch.creep.memory.lvl < level && creep.memory.lvl > bestMatch.creep.memory.lvl) {
                             betterMatch = true;
-                        } else if (bestMatch.l > level && creep.l < bestMatch.l) {
+                        } else if (bestMatch.creep.memory.lvl > level && creep.memory.lvl < bestMatch.creep.memory.lvl) {
                             betterMatch = true;
                         }
                     }
@@ -128,17 +148,23 @@ class CreepRegistryExtensions extends ExtensionBase implements ICreepRegistryExt
             }
 
             if (betterMatch) {
-                bestMatch = creep;
+                bestMatch = {
+                    con: creepData,
+                    creep: creep
+                }
                 dist = compareDist;
             }
         }
 
-        return bestMatch ? bestMatch.n : undefined;
+        return bestMatch ? bestMatch.con.c : undefined;
     }
 
-    tryRegisterCreep(creepContext: CreepContext): boolean {
-        if (!this.registeredCreeps[creepContext.n]) {
-            this.registeredCreeps[creepContext.n] = creepContext;
+    tryRegisterCreep(creepID: CreepID): boolean {
+        if (!this.registeredCreeps[creepID] && Game.creeps[creepID]) {
+            this.registeredCreeps[creepID] = {
+                c: creepID,
+                rID: Game.creeps[creepID].room.name
+            }
             return true;
         }
 
@@ -150,10 +176,10 @@ class CreepRegistryExtensions extends ExtensionBase implements ICreepRegistryExt
             return undefined;;
         }
         let request = this.registeredCreeps[id];
-        if (!request || !Game.creeps[request.n] || !request.o || request.o != requestingPID) {
+        if (!request || !Game.creeps[request.c] || !request.o || request.o != requestingPID) {
             return undefined;
         }
-        return Game.creeps[request.n];
+        return Game.creeps[request.c];
     }
 
     tryReserveCreep(id?: CreepID, requestingPID?: PID): boolean {
@@ -161,11 +187,9 @@ class CreepRegistryExtensions extends ExtensionBase implements ICreepRegistryExt
             return false;
         }
         if (!this.registeredCreeps[id]) {
-            let creep = Game.creeps[id];
-            if (!creep) {
+            if (!this.tryRegisterCreep(id)) {
                 return false;
             }
-            this.tryRegisterCreep({ ct: creep.memory.ct, l: creep.memory.lvl, n: creep.name, o: requestingPID });
         }
         if (!this.registeredCreeps[id].o) {
             this.registeredCreeps[id].o = requestingPID;

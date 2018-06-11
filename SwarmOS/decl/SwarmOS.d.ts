@@ -69,3 +69,8 @@ declare interface ProviderService extends IProcess {
     processName: string,
     startContext?: any
 }
+
+declare interface IWorkerGroupProcess extends IProcess {
+    AddCreep(creepID: CreepID): void;
+    RemoveCreep(creepID: CreepID): void;
+}
