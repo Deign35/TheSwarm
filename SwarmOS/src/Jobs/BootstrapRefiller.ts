@@ -56,17 +56,6 @@ class BootstrapJob extends BasicProcess<BootstrapRefiller_Memory> {
         this.kernel.setParent(newPID, this.pid);
         // Will be killed when this process is closed
     }
-    CreateTempBuilderJob() {
-        let builderMem: BootstrapBuilder_Memory = {
-            rID: this.memory.rID,
-            bui: {},
-            s: this.memory.s,
-            sites: []
-        }
-        let newPID = this.kernel.startProcess(CJ_BootBuild, builderMem);
-        this.kernel.setParent(newPID, this.pid);
-        // Will be killed when this process is closed
-    }
 
     CreateRefillerSpawnActivity(spawnLevel: number) {
         let sID = this.spawnRegistry.requestSpawn({
