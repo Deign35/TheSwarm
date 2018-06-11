@@ -70,16 +70,44 @@ class RoomActivity extends BasicProcess<RoomActivity_Memory> {
                 let keys = Object.keys(roomData.cSites);
                 // (TODO): Organize cSites by some priority based on structure type
                 for (let i = 0; i < keys.length; i++) {
-                    targets[keys[i]] = {
+                    let priority: Priority = Priority_Low;
+                    let cSite = Game.getObjectById(roomData.cSites[keys[i]]) as ConstructionSite;
+                    switch (cSite.structureType) {
+                        case (STRUCTURE_SPAWN):
+                            priority = Priority_Highest
+                            break;
+                        case (STRUCTURE_CONTAINER):
+                        case (STRUCTURE_EXTENSION):
+                            priority = Priority_High;
+                            break;
+                        case (STRUCTURE_EXTRACTOR):
+                        case (STRUCTURE_LAB):
+                        case (STRUCTURE_LINK):
+                        case (STRUCTURE_STORAGE):
+                        case (STRUCTURE_TERMINAL):
+                        case (STRUCTURE_TOWER):
+                            priority = Priority_Medium;
+                            break;
+                        case (STRUCTURE_OBSERVER):
+                        case (STRUCTURE_RAMPART):
+                        case (STRUCTURE_ROAD):
+                        case (STRUCTURE_WALL):
+                            priority = Priority_Low;
+                            break;
+                        default:
+                            priority = Priority_Lowest;
+                    }
+                    targets[roomData.cSites[keys[i]]] = {
                         a: AT_Build,
                         t: TT_ConstructionSite,
-                        p: Priority_Medium
+                        p: priority
                     }
                 }
 
+                // (TODO): Prioritize repairs
                 keys = Object.keys(roomData.needsRepair);
                 for (let i = 0; i < keys.length; i++) {
-                    targets[keys[i]] = {
+                    targets[roomData.needsRepair[keys[i]]] = {
                         a: AT_Repair,
                         t: TT_AnyStructure,
                         p: Priority_Low,
@@ -89,7 +117,7 @@ class RoomActivity extends BasicProcess<RoomActivity_Memory> {
                     targets[this.room!.controller!.id] = {
                         a: AT_Upgrade,
                         t: TT_Controller,
-                        p: Priority_Lowest
+                        p: Priority_Hold
                     }
                 }
 
@@ -199,8 +227,9 @@ class RoomActivity extends BasicProcess<RoomActivity_Memory> {
                             sID: spawnReq,
                             HC: 'AddCreep'
                         }
-                        this.kernel.startProcess(SPKG_SpawnActivity, spawnMem);
+                        let newPID = this.kernel.startProcess(SPKG_SpawnActivity, spawnMem);
                         this.memory.sID = spawnReq;
+                        this.kernel.setParent(newPID, roomData.groups.CR_Work)
                     }
                 }
             }

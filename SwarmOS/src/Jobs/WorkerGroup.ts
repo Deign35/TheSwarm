@@ -135,32 +135,21 @@ export class WorkerGroup extends BasicProcess<WorkerGroup_Memory> implements IWo
         let carryRatio = creep.carry.energy / (creep.carryCapacity) || 1;
         let baseScore = creep.carry.energy * carryRatio * 2;
 
-        let scores = {};
+        let bestScore = 0;
+        let bestID: ObjectID | undefined = undefined;
         for (let i = 0; i < possibleTargets.length; i++) {
             let id = possibleTargets[i];
             let score = this.ScoreTarget(creep, baseScore, Game.getObjectById(id), list[id]);
             if (score < 0) {
                 delete this.targets[id];
             }
-            if (score > 0) {
-                scores[id] = score;
+            if (score > bestScore) {
+                bestScore = score;
+                bestID = id;
             }
         }
 
-        let bestTarget: ObjectID | undefined = undefined;
-        possibleTargets = Object.keys(scores);
-        for (let i = 0; i < possibleTargets.length; i++) {
-            let score = scores[possibleTargets[i]] || 0;
-            if (score > 0) {
-                if (!bestTarget) {
-                    bestTarget = possibleTargets[i];
-                } else if (score > scores[bestTarget]) {
-                    bestTarget = possibleTargets[i];
-                }
-            }
-        }
-
-        return bestTarget;
+        return bestID;
     }
 
     ScoreTarget(creep: Creep, baseScore: number, target: ObjectTypeWithID | undefined, targetMemory: WorkerTarget_Memory): number {
@@ -210,7 +199,7 @@ export class WorkerGroup extends BasicProcess<WorkerGroup_Memory> implements IWo
                 }
                 break;
             case (AT_Upgrade):
-                energyNeeded = 1;
+                energyNeeded = creep.carryCapacity + 1;
                 break;
             case (AT_Withdraw):
                 if (targetMemory.t == TT_StorageContainer) {

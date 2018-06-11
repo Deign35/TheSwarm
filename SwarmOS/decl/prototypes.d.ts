@@ -26,5 +26,6 @@ interface StructureTerminal {
 
 interface Tombstone {
     energy: number;
+    energyCapacity: number;
     SwarmOS: boolean;
 }

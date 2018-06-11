@@ -95,6 +95,11 @@ if (!Tombstone.prototype.SwarmOS) {
                 return this.store.energy || 0;
             }
         },
+        energyCapacity: {
+            get() {
+                return this.store.energy || 0;
+            }
+        },
         SwarmOS: {
             get() {
                 return true;
