@@ -3,6 +3,7 @@ declare interface SpawnActivity_Memory extends MemBase {
 }
 declare interface RoomActivity_Memory extends MemBase {
     rID: RoomID;
+    sID: string;
     energyTargets: {
         [id: string]: boolean;
     };

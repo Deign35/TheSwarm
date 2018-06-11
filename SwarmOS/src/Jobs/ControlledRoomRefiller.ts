@@ -18,7 +18,7 @@ class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory> {
     protected get targets() {
         return this.View.GetRoomData(this.memory.rID)!.targets.CR_SpawnFill!.targets;
     }
-    protected GetSpawnData(): SpawnContext {
+    protected GetNewSpawnID(): string {
         let newName = this.memory.rID + '_Ref';
         let level = 1;
         if (this.homeRoom.energyCapacityAvailable >= CreepBodies.Refiller[3].cost) {
@@ -27,12 +27,18 @@ class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory> {
             level = 2;
         }
 
-        return {
+        let priority: Priority = this.View.GetRoomData(this.memory.rID)!.groups.CR_BootFill ? Priority_Low : Priority_High;
+        let sID = this.spawnRegistry.requestSpawn({
             c: CT_Refiller,
             l: level,
             n: newName,
             p: this.pid
-        }
+        }, this.memory.rID, priority, 1, {
+                ct: CT_Refiller,
+                lvl: level,
+                p: this.pid
+            });
+        return sID;
     }
 
     protected CreateCustomCreepActivity(creep: Creep): string | undefined {
@@ -86,7 +92,7 @@ class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory> {
                 }
                 bestTarget = this.GetBestOfList(creep, eligibleTargets);
                 if (bestTarget) {
-                    actionType = this.energyTargets[bestTarget].a;
+                    actionType = eligibleTargets[bestTarget].a;
                 }
             }
         }

@@ -112,7 +112,7 @@ export class WorkerGroup extends BasicProcess<WorkerGroup_Memory> implements IWo
             }
             bestTarget = this.GetBestOfList(creep, eligibleTargets);
             if (bestTarget) {
-                actionType = this.energyTargets[bestTarget].a;
+                actionType = eligibleTargets[bestTarget].a;
             } else {
                 bestTarget = this.GetBestOfList(creep, this.energyTargets);
                 if (bestTarget) {

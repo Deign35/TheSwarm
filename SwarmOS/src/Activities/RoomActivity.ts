@@ -23,8 +23,8 @@ class RoomActivity extends BasicProcess<RoomActivity_Memory> {
     }
 
     RunThread(): ThreadState {
+        let roomData = this.View.GetRoomData(this.memory.rID)!;
         if (this.room) {
-            let roomData = this.View.GetRoomData(this.memory.rID)!;
             roomData.owner = (this.room.controller && (
                 (this.room.controller.owner && this.room.controller.owner.username) ||
                 (this.room.controller.reservation && this.room.controller.reservation.username)
@@ -176,7 +176,35 @@ class RoomActivity extends BasicProcess<RoomActivity_Memory> {
             roomData.lastUpdated = Game.time;
         }
 
-        // (TODO): Create workers as needed
+        if (roomData && roomData.groups.CR_Work) {
+            let workProcess = this.kernel.getProcessByPID(roomData.groups.CR_Work);
+            if (workProcess) {
+                let workMem = workProcess.memory as WorkerGroup_Memory;
+                let creepCount = Object.keys(workMem.creeps).length;
+                let neededCreepCount = roomData.owner == MY_USERNAME ? 2 : 0;
+                if (creepCount < neededCreepCount) {
+                    let curReq = this.spawnRegistry.getRequestContext(this.memory.sID);
+                    if (!curReq) {
+                        let spawnReq = this.spawnRegistry.requestSpawn({
+                            c: CT_Worker,
+                            l: 0,
+                            n: GetSUID() + (Game.time + '_w').slice(-5),
+                            p: roomData.groups.CR_Work
+                        }, this.memory.rID, Priority_Lowest, 3, {
+                                ct: CT_Worker,
+                                lvl: 0,
+                                p: roomData.groups.CR_Work
+                            })
+                        let spawnMem: SpawnActivity_Memory = {
+                            sID: spawnReq,
+                            HC: 'AddCreep'
+                        }
+                        this.kernel.startProcess(SPKG_SpawnActivity, spawnMem);
+                        this.memory.sID = spawnReq;
+                    }
+                }
+            }
+        }
         return ThreadState_Done;
     }
 
@@ -321,6 +349,7 @@ class RoomActivity extends BasicProcess<RoomActivity_Memory> {
             if (!roomData.groups.CR_Harvester) {
                 roomData.groups.CR_Harvester = {};
             }
+
             let sources = this.room!.find(FIND_SOURCES);
             for (let i = 0; i < sources.length; i++) {
                 if (!roomData.groups.CR_Harvester[sources[i].id] || !this.kernel.getProcessByPID(roomData.groups.CR_Harvester[sources[i].id])) {
@@ -332,17 +361,23 @@ class RoomActivity extends BasicProcess<RoomActivity_Memory> {
                 }
                 if (this.room!.energyCapacityAvailable < 550) {
                     if (!roomData.groups.CR_BootFill) {
+                        roomData.groups.CR_BootFill = {};
+                    }
+                    if (!roomData.groups.CR_BootFill[sources[i].id]) {
                         let bootMem: BootstrapRefiller_Memory = {
                             hb: false,
                             s: sources[i].id,
                             rID: this.memory.rID,
                             ref: {}
                         }
-                        roomData.groups.CR_BootFill = this.kernel.startProcess(CJ_BootRefill, bootMem);
+                        roomData.groups.CR_BootFill[sources[i].id] = this.kernel.startProcess(CJ_BootRefill, bootMem);
                     }
                 } else {
                     if (roomData.groups.CR_BootFill) {
-                        this.kernel.killProcess(roomData.groups.CR_BootFill);
+                        let keys = Object.keys(roomData.groups.CR_BootFill);
+                        for (let i = 0; i < keys.length; i++) {
+                            this.kernel.killProcess(roomData.groups.CR_BootFill[keys[i]]);
+                        }
                         delete roomData.groups.CR_BootFill;
                     }
                 }
@@ -374,7 +409,10 @@ class RoomActivity extends BasicProcess<RoomActivity_Memory> {
                 delete roomData.groups.CR_Harvester;
             }
             if (roomData.groups.CR_BootFill) {
-                this.kernel.killProcess(roomData.groups.CR_BootFill);
+                let keys = Object.keys(roomData.groups.CR_BootFill);
+                for (let i = 0; i < keys.length; i++) {
+                    this.kernel.killProcess(roomData.groups.CR_BootFill[keys[i]]);
+                }
                 delete roomData.groups.CR_BootFill;
             }
             if (roomData.groups.CR_SpawnFill) {

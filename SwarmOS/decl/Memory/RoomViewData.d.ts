@@ -51,7 +51,7 @@ declare interface AttachedCreepGroup_Memory {
 }
 
 declare interface RoomState_AttachedCreepGroups {
-    [CR_BootFill]?: PID;
+    [CR_BootFill]?: IDictionary<ObjectID, PID>;
     [CR_Harvester]?: IDictionary<ObjectID, PID>;
     [CR_Scout]?: PID;
     [CR_SpawnFill]?: PID;
