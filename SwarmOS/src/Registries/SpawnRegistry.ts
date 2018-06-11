@@ -75,7 +75,7 @@ class SpawnRegistry extends BasicProcess<SpawnRegistry_Memory> {
         let requests = Object.keys(this.memory);
         let minSpawnCost = 36000;
         let activeRequests = {};
-        let reservedCreeps = [];
+
         for (let i = 0; i < requests.length; i++) {
             let req = this.memory[requests[i]];
             if (req.spSta != SP_QUEUED) {
@@ -94,18 +94,13 @@ class SpawnRegistry extends BasicProcess<SpawnRegistry_Memory> {
                 this.log.info(`Found a compatible creep instead of spawning`);
                 req.con.n = foundCreep;
                 req.spSta = SP_COMPLETE;
-                if (this.creepRegistry.tryReserveCreep(foundCreep, this.pid)) {
-                    reservedCreeps.push(foundCreep);
-                }
+                this.creepRegistry.releaseCreep(foundCreep);
+                this.creepRegistry.tryReserveCreep(foundCreep, req.con.p);
                 continue;
             } else {
                 activeRequests[requests[i]] = req;
                 minSpawnCost = Math.min(minSpawnCost, CreepBodies.get(req.con.c)[req.con.l].cost);
             }
-        }
-
-        for (let i = 0; i < reservedCreeps.length; i++) {
-            this.creepRegistry.releaseCreep(reservedCreeps[i], this.pid);
         }
 
         let spawnIDs = Object.keys(Game.spawns);

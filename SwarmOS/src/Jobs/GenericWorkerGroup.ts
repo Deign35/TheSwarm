@@ -28,7 +28,8 @@ export class GenericWorkerGroup extends WorkerGroup<GenericWorkerGroup_Memory> {
         return {
             c: CT_Worker,
             l: level,
-            n: 'gw' + GetSUID()
+            n: 'gw' + GetSUID(),
+            p: this.pid
         }
     }
     get targets() { return this.memory.targets; }

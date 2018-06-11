@@ -16,6 +16,7 @@ declare interface SpawnContext extends MemBase {
     n: CreepID; // (n)ame
     c: CT_ALL;  // (c)reep type
     l: number;  // (l)evel
+    p: PID;     // creep parent (p)id
 }
 declare interface SpawnRequest extends MemBase {
     con: SpawnContext;  // Context

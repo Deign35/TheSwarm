@@ -61,7 +61,8 @@ class BootstrapJob extends BasicProcess<BootstrapRefiller_Memory> {
         let sID = this.spawnRegistry.requestSpawn({
             l: spawnLevel,
             c: CT_Refiller,
-            n: this.memory.s.slice(-5) + 'r'
+            n: this.memory.s.slice(-5) + 'r',
+            p: this.pid
         }, this.memory.rID, Priority_EMERGENCY, 1, {
                 ct: CT_Refiller,
                 lvl: spawnLevel

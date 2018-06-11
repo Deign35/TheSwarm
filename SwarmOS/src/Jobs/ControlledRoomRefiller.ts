@@ -20,7 +20,8 @@ class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory> {
         return {
             c: CT_Refiller,
             l: level,
-            n: newName
+            n: newName,
+            p: this.pid
         }
     }
 

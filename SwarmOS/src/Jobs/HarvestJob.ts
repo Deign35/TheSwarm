@@ -79,6 +79,7 @@ class HarvestJob extends BasicProcess<HarvestJob_Memory> {
             l: spawnLevel,
             c: CT_Harvester,
             n: this.memory.rID + '_HJ' + this.memory.t.slice(-1),
+            p: this.pid
         }, this.memory.rID, Priority_High, 3, {
                 ct: CT_Harvester,
                 lvl: spawnLevel
@@ -109,6 +110,7 @@ class HarvestJob extends BasicProcess<HarvestJob_Memory> {
     CreateHarvestActivity(creepID: string) {
         if (this.creepRegistry.tryReserveCreep(creepID, this.pid)) {
             let container = Game.getObjectById(this.memory.c) as StructureContainer | undefined;
+            let creep = this.creepRegistry.tryGetCreep(creepID, this.pid);
             let link = Game.getObjectById(this.memory.l) as StructureLink | undefined;
             if (this.memory.SUPPORT || (!container && !link)) {
                 this.memory.a = this.creepActivity.CreateNewCreepActivity({
@@ -122,7 +124,7 @@ class HarvestJob extends BasicProcess<HarvestJob_Memory> {
                 let actions: SingleCreepActivity_Memory[] = [];
                 actions.push({
                     at: AT_MoveToPosition,
-                    n: 1,
+                    n: 2,
                     p: container.pos
                 });
                 actions.push({
@@ -130,18 +132,20 @@ class HarvestJob extends BasicProcess<HarvestJob_Memory> {
                     e: [ERR_FULL],
                     t: this.memory.t
                 });
-                actions.push({
-                    at: AT_Withdraw,
-                    t: this.memory.c
-                });
-                actions.push({
-                    at: AT_Repair,
-                    t: this.memory.c
-                });
-                actions.push({
-                    at: AT_Drop,
-                    p: container.pos
-                });
+                if (creep!.getActiveBodyparts(CARRY) > 0) {
+                    actions.push({
+                        at: AT_Withdraw,
+                        t: this.memory.c
+                    });
+                    actions.push({
+                        at: AT_Repair,
+                        t: this.memory.c
+                    });
+                    actions.push({
+                        at: AT_Drop,
+                        p: container.pos
+                    });
+                }
                 this.memory.a = this.kernel.startProcess(SPKG_RepetitiveCreepActivity, {
                     a: actions,
                     c: creepID,

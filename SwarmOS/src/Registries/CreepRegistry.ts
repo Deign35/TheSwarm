@@ -123,7 +123,6 @@ class CreepRegistryExtensions extends ExtensionBase implements ICreepRegistryExt
                 if (parentProcess && parentProcess.pkgName != CJ_Work) {
                     continue;
                 }
-                creepData.o = undefined;
             }
 
             let compareDist = Game.map.getRoomLinearDistance(Game.creeps[creepData.c].room.name, targetRoom);
@@ -133,7 +132,9 @@ class CreepRegistryExtensions extends ExtensionBase implements ICreepRegistryExt
                 if (!bestMatch) {
                     betterMatch = true;
                 } else {
-                    if (creep.memory.ct == creepType && bestMatch.creep.memory.ct != creepType) {
+                    if (bestMatch.con.o && !creepData.o) {
+                        betterMatch = true;
+                    } else if (creep.memory.ct == creepType && bestMatch.creep.memory.ct != creepType) {
                         betterMatch = true;
                     } else if (bestMatch.creep.memory.lvl != level || bestMatch.creep.memory.lvl == creep.memory.lvl) {
                         if (compareDist < dist) {

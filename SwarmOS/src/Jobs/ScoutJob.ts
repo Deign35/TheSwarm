@@ -36,7 +36,8 @@ class ScoutJob extends BasicProcess<ScoutJob_Memory> {
         let sID = this.spawnRegistry.requestSpawn({
             l: 0,
             c: CT_Scout,
-            n: creepID
+            n: creepID,
+            p: this.pid
         }, this.memory.rID, Priority_Lowest, 1, {
                 ct: CT_Scout,
                 lvl: 0
