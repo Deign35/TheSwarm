@@ -192,7 +192,8 @@
             "string": true,
             "entries": {
                 "Launch": "launch",
-                "ChangeFlag": "flagColor"
+                "ChangeFlag": "flagColor",
+                "Assimilate": "addRoom"
             }
         },
         "SET": {

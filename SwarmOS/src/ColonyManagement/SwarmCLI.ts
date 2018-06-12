@@ -11,6 +11,13 @@ export const OSPackage: IPackage<CreepRegistry_Memory> = {
 import { BasicProcess } from "Core/BasicTypes";
 
 class SwarmCLI extends BasicProcess<SwarmCLIMemory> {
+    @extensionInterface(EXT_CreepActivity)
+    protected creepActivity!: ICreepActivityExtensions;
+    @extensionInterface(EXT_CreepRegistry)
+    protected creepRegistry!: ICreepRegistryExtensions;
+    @extensionInterface(EXT_RoomView)
+    protected View!: IRoomDataExtension;
+
     get memory(): SwarmCLIMemory {
         if (!Memory.CLI) {
             this.log.warn(`Initializing Command Line Interface memory`);
@@ -44,6 +51,10 @@ class SwarmCLI extends BasicProcess<SwarmCLIMemory> {
                             }
                             this.ChangeFlagColors(cmd.args[0], cmd.args[1], cmd.args[2], cmd.args[3]);
                         }
+                        break;
+                    case (CLI_Assimilate):
+                        this.Assimilate(cmd.args);
+                        break;
                     default:
                         break;
                 }
@@ -76,6 +87,35 @@ class SwarmCLI extends BasicProcess<SwarmCLIMemory> {
                     }
                 }
             }
+        }
+    }
+
+    Assimilate(args: any[]) {
+        if (args.length < 2) {
+            this.log.warn(`Invalid number of arguments`);
+            return;
+        }
+        let roomData = this.View.GetRoomData(args[0]);
+        if (!roomData) {
+            this.log.warn(`Cannot assimilate a room that has yet to be seen`);
+            return;
+        }
+        switch (args[1]) {
+            case (1):
+                // Add home room    
+                break;
+            case (2):
+                if (args.length != 3) {
+                    this.log.warn(`Invalid number of arguments`);
+                    return;
+                }
+                let homeRoom = this.View.GetRoomData(args[2]);
+                if (!homeRoom) { // || homeRoom.IsHomeRoom
+                    this.log.warn(`Cannot make ${args[0]} into a harvest room for ${args[2]}`);
+                    return;
+                }
+                // Add as remote harvest room to homeRoom
+                break;
         }
     }
 }
