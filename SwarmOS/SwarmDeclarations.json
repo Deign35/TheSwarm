@@ -48,6 +48,17 @@
                 "Work"
             ]
         },
+        "RJ": {
+            "enabled": true,
+            "string": true,
+            "isArray": true,
+            "usePrefix": true,
+            "type": true,
+            "combinedType": "RoomJobs",
+            "entries": [
+                "Tower"
+            ]
+        },
         "CJ": {
             "comment": "Creep job packages",
             "enabled": true,

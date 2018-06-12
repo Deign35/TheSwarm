@@ -4,9 +4,14 @@
 
 
 (WANT, but not needed right now!!!)
-RoomActivity is way too big, it needs to be broken down some how.
-Creep memory should be broken down similar to how rooms are.
-Convert old jobs to solo jobs
-Pre cached pathing
+Convert old jobs to SoloJobs
 Add logging (both visual and console)
 hook stats into RoomActivity updates
+
+Split bootfiller off to be part of the harvester and the roomrefiller
+the refill part will be played by a single job that gets kicked off but is not a room group
+the harvest part will be done the same way.
+
+RoomActivity is way too big, it needs to be broken down some how -- Into each of the jobs?  // OH MY GOD... what is wrong with me???
+Creep memory should be broken down similar to how rooms are.
+Pre cached pathing

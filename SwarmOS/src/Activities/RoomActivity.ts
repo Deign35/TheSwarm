@@ -223,6 +223,24 @@ class RoomActivity extends BasicProcess<RoomActivity_Memory> {
                     }
                 }
 
+                if (roomData.structures.tower && roomData.structures.tower.length > 0) {
+                    if (!roomData.groups.RJ_Tower || !this.kernel.getProcessByPID(roomData.groups.RJ_Tower)) {
+                        let towerProcessMemroy: Tower_Memory = {
+                            rID: this.memory.rID
+                        }
+                        roomData.groups.RJ_Tower = this.kernel.startProcess(RJ_Tower, towerProcessMemroy);
+                    }
+                    for (let i = 0; i < roomData.structures.tower.length; i++) {
+                        if (!roomData.targets.CR_SpawnFill.targets[roomData.structures.tower[i]]) {
+                            roomData.targets.CR_SpawnFill.targets[roomData.structures.tower[i]] = {
+                                a: AT_Transfer,
+                                p: Priority_Medium,
+                                t: TT_StorageContainer
+                            }
+                        }
+                    }
+                }
+
                 if (roomData && roomData.groups.CR_Work) {
                     let workProcess = this.kernel.getProcessByPID(roomData.groups.CR_Work);
                     if (workProcess) {

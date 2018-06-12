@@ -50,8 +50,9 @@ import { ActivitiesPackage } from "Activities/index";
 import { CreepJobsPackage } from "Jobs/index";
 import { FlagPackage } from "Flags/index";
 import { RegistriesPackage } from "Registries/index";
+import { RoomJobs } from "RoomJobs/index";
 
-kernel.installPackages([ActivitiesPackage, CreepJobsPackage, FlagPackage, RegistriesPackage]);
+kernel.installPackages([ActivitiesPackage, CreepJobsPackage, FlagPackage, RegistriesPackage, RoomJobs]);
 
 export function loop() {
     try {
