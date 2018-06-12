@@ -8,6 +8,10 @@ declare interface HarvestJob_Memory extends MemBase {
     rID: RoomID;    // (r)oom
     SUPPORT?: boolean;
 }
+declare interface RemoteHarvester_Memory extends SoloJob_Memory {
+    t: ObjectID;        // (t)arget
+    s?: ObjectID;       // (s)upport (site or container)
+}
 
 declare interface ScoutJob_Memory extends MemBase {
     a?: PID;        // (a)ctivity

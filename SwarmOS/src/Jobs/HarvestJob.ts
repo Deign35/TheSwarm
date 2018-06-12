@@ -90,10 +90,6 @@ class HarvestJob extends BasicProcess<HarvestJob_Memory> {
         }
         this.memory.a = this.kernel.startProcess(SPKG_SpawnActivity, spawnMem);
         this.kernel.setParent(this.memory.a, this.pid);
-
-        if (!this.memory.l) {
-            let possibleLinks
-        }
     }
 
     SpawnComplete(creepID: string) {

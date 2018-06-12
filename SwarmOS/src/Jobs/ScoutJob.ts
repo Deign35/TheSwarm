@@ -112,7 +112,6 @@ class ScoutJob extends BasicProcess<ScoutJob_Memory> {
                 roomName: this.memory.t
             },
             c: creep.name,
-            e: [],
             HC: 'CreateNewScoutActivity'
         }, this.pid);
     }

@@ -4,6 +4,8 @@ import { OSPackage as WorkerGroup } from "Jobs/WorkerGroup";
 import { OSPackage as BootstrapRefiller } from "Jobs/BootstrapRefiller";
 import { OSPackage as ScoutJob } from "Jobs/ScoutJob";
 
+import { OSPackage as RemoteHarvester } from "Jobs/RemoteHarvester";
+
 export const CreepJobsPackage: IPackage<{}> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
         BootstrapRefiller.install(processRegistry, extensionRegistry);
@@ -11,5 +13,6 @@ export const CreepJobsPackage: IPackage<{}> = {
         HarvesterJob.install(processRegistry, extensionRegistry);
         ScoutJob.install(processRegistry, extensionRegistry);
         WorkerGroup.install(processRegistry, extensionRegistry);
+        RemoteHarvester.install(processRegistry, extensionRegistry);
     }
 }
