@@ -66,6 +66,8 @@ class RoomActivity extends BasicProcess<RoomActivity_Memory> {
                 roomData.cSites = this.room.find(FIND_CONSTRUCTION_SITES).map((value: ConstructionSite) => {
                     return value.id;
                 });
+                // (TODO): THE KEY IS HERE.  ORGANIZE THE WORK I NEED DONE....HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                // IT AUTO REFRESHES EVERY 29 TICKS
                 let targets: WorkerTargetDictionary = {};
                 let keys = Object.keys(roomData.cSites);
                 // (TODO): Organize cSites by some priority based on structure type
@@ -118,13 +120,6 @@ class RoomActivity extends BasicProcess<RoomActivity_Memory> {
                         a: AT_Upgrade,
                         t: TT_Controller,
                         p: Priority_Hold
-                    }
-                    if (!this.room.controller!.sign || this.room.controller!.sign!.text != MY_SIGNATURE) {
-                        targets[this.room!.controller!.id] = {
-                            a: AT_SignController,
-                            p: Priority_High,
-                            t: TT_Controller
-                        }
                     }
                 }
 
@@ -206,40 +201,43 @@ class RoomActivity extends BasicProcess<RoomActivity_Memory> {
                         }
                     }
                 }
-            }
-            // (TODO): Update path stuff somehow.
-            roomData.lastUpdated = Game.time;
-        }
 
-        if (roomData && roomData.groups.CR_Work) {
-            let workProcess = this.kernel.getProcessByPID(roomData.groups.CR_Work);
-            if (workProcess) {
-                let workMem = workProcess.memory as WorkerGroup_Memory;
-                let creepCount = Object.keys(workMem.creeps).length;
-                let neededCreepCount = roomData.owner == MY_USERNAME ? 2 : 0;
-                if (creepCount < neededCreepCount) {
-                    let curReq = this.spawnRegistry.getRequestContext(this.memory.sID);
-                    if (!curReq) {
-                        let spawnReq = this.spawnRegistry.requestSpawn({
-                            c: CT_Worker,
-                            l: 0,
-                            n: GetSUID() + (Game.time + '_w').slice(-5),
-                            p: roomData.groups.CR_Work
-                        }, this.memory.rID, Priority_Lowest, 3, {
-                                ct: CT_Worker,
-                                lvl: 0,
+                // (TODO): Add CR_Workers to the list of transfer targets.
+            }
+
+            // (TODO): Collect information on amount of energy in the room, and determine if a worker aught to be created based on the needs above.
+            if (roomData && roomData.groups.CR_Work) {
+                let workProcess = this.kernel.getProcessByPID(roomData.groups.CR_Work);
+                if (workProcess) {
+                    let workMem = workProcess.memory as WorkerGroup_Memory;
+                    let creepCount = Object.keys(workMem.creeps).length;
+                    let neededCreepCount = roomData.owner == MY_USERNAME ? 2 : 0;
+                    if (creepCount < neededCreepCount) {
+                        let curReq = this.spawnRegistry.getRequestContext(this.memory.sID);
+                        if (!curReq) {
+                            let spawnReq = this.spawnRegistry.requestSpawn({
+                                c: CT_Worker,
+                                l: 0,
+                                n: GetSUID() + (Game.time + '_w').slice(-5),
                                 p: roomData.groups.CR_Work
-                            })
-                        let spawnMem: SpawnActivity_Memory = {
-                            sID: spawnReq,
-                            HC: 'AddCreep'
+                            }, this.memory.rID, Priority_Lowest, 3, {
+                                    ct: CT_Worker,
+                                    lvl: 0,
+                                    p: roomData.groups.CR_Work
+                                })
+                            let spawnMem: SpawnActivity_Memory = {
+                                sID: spawnReq,
+                                HC: 'AddCreep'
+                            }
+                            let newPID = this.kernel.startProcess(SPKG_SpawnActivity, spawnMem);
+                            this.memory.sID = spawnReq;
+                            this.kernel.setParent(newPID, roomData.groups.CR_Work)
                         }
-                        let newPID = this.kernel.startProcess(SPKG_SpawnActivity, spawnMem);
-                        this.memory.sID = spawnReq;
-                        this.kernel.setParent(newPID, roomData.groups.CR_Work)
                     }
                 }
             }
+            // (TODO): Update path stuff somehow.
+            roomData.lastUpdated = Game.time;
         }
         return ThreadState_Done;
     }

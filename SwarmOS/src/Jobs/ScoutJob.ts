@@ -19,6 +19,12 @@ class ScoutJob extends BasicProcess<ScoutJob_Memory> {
             if (!this.memory.a || !this.kernel.getProcessByPID(this.memory.a)) {
                 this.CreateNewScoutActivity(this.memory.c!);
             }
+            if (creep.room.name == this.memory.t) {
+                this.kernel.killProcess(this.memory.a);
+                this.memory.t = undefined;
+                this.memory.a = undefined;
+                this.CreateNewScoutActivity(creep.name);
+            }
         }
 
         if (!creep) {
@@ -31,6 +37,10 @@ class ScoutJob extends BasicProcess<ScoutJob_Memory> {
     }
 
     CreateSpawnActivity() {
+        if (this.memory.a) {
+            this.kernel.killProcess(this.memory.a);
+            delete this.memory.a;
+        }
         let creepID = this.memory.rID + (Game.time + '_s').slice(-5);
         let sID = this.spawnRegistry.requestSpawn({
             l: 0,
@@ -51,6 +61,10 @@ class ScoutJob extends BasicProcess<ScoutJob_Memory> {
     }
 
     CreateNewScoutActivity(creepID: CreepID) {
+        if (this.memory.a) {
+            this.kernel.killProcess(this.memory.a);
+            delete this.memory.a;
+        }
         this.creepRegistry.tryReserveCreep(creepID, this.pid);
         let creep = this.creepRegistry.tryGetCreep(creepID, this.pid);
         if (!creep) {
@@ -58,6 +72,17 @@ class ScoutJob extends BasicProcess<ScoutJob_Memory> {
             return;
         }
 
+        if (creep.room.controller && (!creep.room.controller.sign || creep.room.controller.sign.text != MY_SIGNATURE)) {
+            this.memory.a = this.creepActivity.CreateNewCreepActivity({
+                t: creep.room.controller.id,
+                at: AT_SignController,
+                c: creepID,
+                m: MY_SIGNATURE,
+                HC: 'CreateNewScoutActivity'
+            }, this.pid);
+            delete this.memory.t;
+            return;
+        }
         let allRooms = this.memory.n;
         let nextRoom = this.memory.rID;
         let bestRoom: RoomState | undefined = undefined;
@@ -78,12 +103,13 @@ class ScoutJob extends BasicProcess<ScoutJob_Memory> {
             nextRoom = allRooms[i];
         }
 
+        this.memory.t = nextRoom;
         this.memory.a = this.creepActivity.CreateNewCreepActivity({
             at: AT_MoveToPosition,
             p: {
                 x: 25,
                 y: 25,
-                roomName: nextRoom
+                roomName: this.memory.t
             },
             c: creep.name,
             e: [],

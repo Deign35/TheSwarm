@@ -42,7 +42,6 @@ export class WorkerGroup extends BasicProcess<WorkerGroup_Memory> implements IWo
         }
         let nextTask = this.GetNextTarget(creep);
         if (!nextTask) {
-            //this.kernel.killProcess(`WorkerGroup tasks complete`);
             return;
         }
 

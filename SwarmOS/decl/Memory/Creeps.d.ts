@@ -13,6 +13,7 @@ declare interface ScoutJob_Memory extends MemBase {
     a?: PID;        // (a)ctivity
     c?: CreepID;    // (c)reep
     rID: RoomID;    // (r)oom
+    t?: RoomID;     // (t)arget room
     n: RoomID[];    // (n)earby Rooms to scout
 }
 declare interface SoloJob_Memory extends MemBase {

@@ -279,7 +279,11 @@ class CreepActivityExtensions extends ExtensionBase implements ICreepActivityExt
             case (AT_Pickup): return creep.pickup(target);
             case (AT_RangedAttack): return creep.rangedAttack(target);
             case (AT_RangedHeal): return creep.rangedHeal(target);
-            case (AT_Repair): return creep.repair(target);
+            case (AT_Repair):
+                if ((target as Structure).hits == (target as Structure).hitsMax) {
+                    return ERR_INVALID_TARGET;
+                }
+                return creep.repair(target);
             case (AT_ReserveController): return creep.reserveController(target);
             case (AT_Upgrade): return creep.upgradeController(target);
 
@@ -329,7 +333,7 @@ class CreepActivityExtensions extends ExtensionBase implements ICreepActivityExt
             case (AT_Pickup): return !!(target as Resource).resourceType;
             case (AT_RangedAttack): return !!(target as Creep | Structure).hitsMax
             case (AT_RangedHeal): return !!(target as Creep | Structure).hitsMax
-            case (AT_Repair): return (target as Structure).structureType && !!(target as Structure).hitsMax;
+            case (AT_Repair): return (target as Structure).structureType && !!(target as Structure).hitsMax && (target as Structure).hits < (target as Structure).hitsMax;
             case (AT_RequestTransfer): return !!(target as Creep).ticksToLive;
             case (AT_ReserveController): return (target as Structure).structureType == STRUCTURE_CONTROLLER;
             case (AT_Upgrade): return (target as Structure).structureType == STRUCTURE_CONTROLLER;
