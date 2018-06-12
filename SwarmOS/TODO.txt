@@ -1,9 +1,6 @@
-1. Targeting needs to be updated now that it is part of the auto refresh per 29 ticks.
-2. Defenses are still missing
-3. Remote harvesting, my holy grail.
-4. Room Claimer & Reserver
-5. hook stats into RoomActivity updates
-6. Additional room build support
+1. Defenses are still missing
+2. Remote harvesting, my holy grail.
+3. Room Claimer & Reserver
 
 
 (WANT, but not needed right now!!!)
@@ -11,3 +8,5 @@ RoomActivity is way too big, it needs to be broken down some how.
 Creep memory should be broken down similar to how rooms are.
 Convert old jobs to solo jobs
 Pre cached pathing
+Add logging (both visual and console)
+hook stats into RoomActivity updates

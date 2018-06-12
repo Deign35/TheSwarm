@@ -44,6 +44,7 @@ class RoomRegistry extends BasicProcess<RoomStateMemory> {
                     this.memory.roomStateData[roomID] = {
                         owner: '',
                         lastUpdated: 0,
+                        lastEnergy: 0,
                         cSites: [],
                         resources: [],
                         tombstones: [],

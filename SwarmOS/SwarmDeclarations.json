@@ -184,6 +184,16 @@
                 "ChangeFlag": "flagColor"
             }
         },
+        "SET": {
+            "comment": "Settings",
+            "enabled": true,
+            "entries": {
+                "MaxSites": 5,
+                "SiteToWorkRatio": 10000,
+                "TriggerNewWorker": 500,
+                "GroundWorkerRatio": 1200
+            }
+        },
         "SPKG": {
             "comment": "Activity packages",
             "enabled": true,

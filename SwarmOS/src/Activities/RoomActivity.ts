@@ -40,12 +40,13 @@ class RoomActivity extends BasicProcess<RoomActivity_Memory> {
                     for (let i = 0; i < sources.length; i++) {
                         this.CreatePath(spawn[0].pos, sources[i].pos, true);
                     }
-                    if (sources.length < 4) { // limit of 5 containers
-                        this.CreatePath(spawn[0].pos, this.room.controller!.pos, true);
+                    this.CreatePath(spawn[0].pos, this.room.controller!.pos, sources.length < 4);// limit of 5 containers
+                    for (let i = 0; i < sources.length; i++) {
+                        this.CreatePath(sources[i].pos, this.room.controller!.pos, false);
                     }
                 }
 
-                delete this.memory.hb;
+                this.memory.hb = true;
             }
 
             if (this.shouldRefresh(11, roomData!.minUpdateOffset, roomData.lastUpdated)) {
@@ -62,18 +63,21 @@ class RoomActivity extends BasicProcess<RoomActivity_Memory> {
 
             // (TODO): Change this to plan out the layout
             if (this.shouldRefresh(29, roomData!.minUpdateOffset, roomData.lastUpdated)) {
+                let curEnergyLevel = 0;
+                let targets: WorkerTargetDictionary = {};
+
                 this.RefreshRoomStructures(roomData);
                 roomData.cSites = this.room.find(FIND_CONSTRUCTION_SITES).map((value: ConstructionSite) => {
                     return value.id;
                 });
-                // (TODO): THE KEY IS HERE.  ORGANIZE THE WORK I NEED DONE....HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                // IT AUTO REFRESHES EVERY 29 TICKS
-                let targets: WorkerTargetDictionary = {};
-                let keys = Object.keys(roomData.cSites);
-                // (TODO): Organize cSites by some priority based on structure type
-                for (let i = 0; i < keys.length; i++) {
+                let siteKeys = Object.keys(roomData.cSites);
+                let siteInfo: WorkerTargetDictionary = {};
+                let leftToBuild = 0;
+
+                for (let i = 0; i < siteKeys.length; i++) {
                     let priority: Priority = Priority_Low;
-                    let cSite = Game.getObjectById(roomData.cSites[keys[i]]) as ConstructionSite;
+                    let cSite = Game.getObjectById(roomData.cSites[siteKeys[i]]) as ConstructionSite;
+                    leftToBuild += cSite.progressTotal - cSite.progress;
                     switch (cSite.structureType) {
                         case (STRUCTURE_SPAWN):
                             priority = Priority_Highest
@@ -96,18 +100,31 @@ class RoomActivity extends BasicProcess<RoomActivity_Memory> {
                         case (STRUCTURE_WALL):
                             priority = Priority_Low;
                             break;
+                        case (STRUCTURE_NUKER):
+                        case (STRUCTURE_POWER_SPAWN):
                         default:
                             priority = Priority_Lowest;
                     }
-                    targets[roomData.cSites[keys[i]]] = {
+                    siteInfo[roomData.cSites[siteKeys[i]]] = {
                         a: AT_Build,
                         t: TT_ConstructionSite,
                         p: priority
                     }
                 }
+                let sortedKeys = Object.keys(siteInfo).sort((a, b) => {
+                    let siteA = siteInfo[a];
+                    let siteB = siteInfo[b];
+                    if (siteA.p != siteB.p) {
+                        return siteA.p < siteB.p ? 1 : -1;
+                    }
+                    return 0;
+                });
+                for (let i = 0; i < sortedKeys.length && i < SET_MaxSites; i++) {
+                    targets[sortedKeys[i]] = siteInfo[sortedKeys[i]];
+                }
 
                 // (TODO): Prioritize repairs
-                keys = Object.keys(roomData.needsRepair);
+                let keys = Object.keys(roomData.needsRepair);
                 for (let i = 0; i < keys.length; i++) {
                     targets[roomData.needsRepair[keys[i]]] = {
                         a: AT_Repair,
@@ -127,8 +144,11 @@ class RoomActivity extends BasicProcess<RoomActivity_Memory> {
 
                 for (let i = 0; i < roomData.structures.container.length; i++) {
                     let containerID = roomData.structures.container[i];
+                    let container = Game.getObjectById(containerID) as StructureContainer;
+                    if (!container) { continue; }
+                    curEnergyLevel += container.energy || 0;
+
                     if (!this.memory.energyTargets[containerID]) {
-                        let container = Game.getObjectById(containerID) as StructureContainer;
                         let sources = container.pos.findInRange(FIND_SOURCES, 1);
                         if (sources && sources.length > 0) {
                             if (!roomData.targets.CR_SpawnFill.energy[containerID]) {
@@ -186,6 +206,7 @@ class RoomActivity extends BasicProcess<RoomActivity_Memory> {
                 }
 
                 if (this.room && this.room.storage) {
+                    curEnergyLevel += this.room.storage.energy;
                     if (!roomData.targets.CR_SpawnFill.targets[this.room.storage.id]) {
                         roomData.targets.CR_SpawnFill.targets[this.room.storage.id] = {
                             a: AT_Transfer,
@@ -202,38 +223,73 @@ class RoomActivity extends BasicProcess<RoomActivity_Memory> {
                     }
                 }
 
-                // (TODO): Add CR_Workers to the list of transfer targets.
-            }
-
-            // (TODO): Collect information on amount of energy in the room, and determine if a worker aught to be created based on the needs above.
-            if (roomData && roomData.groups.CR_Work) {
-                let workProcess = this.kernel.getProcessByPID(roomData.groups.CR_Work);
-                if (workProcess) {
-                    let workMem = workProcess.memory as WorkerGroup_Memory;
-                    let creepCount = Object.keys(workMem.creeps).length;
-                    let neededCreepCount = roomData.owner == MY_USERNAME ? 2 : 0;
-                    if (creepCount < neededCreepCount) {
-                        let curReq = this.spawnRegistry.getRequestContext(this.memory.sID);
-                        if (!curReq) {
-                            let spawnReq = this.spawnRegistry.requestSpawn({
-                                c: CT_Worker,
-                                l: 0,
-                                n: GetSUID() + (Game.time + '_w').slice(-5),
-                                p: roomData.groups.CR_Work
-                            }, this.memory.rID, Priority_Lowest, 3, {
-                                    ct: CT_Worker,
-                                    lvl: 0,
-                                    p: roomData.groups.CR_Work
-                                })
-                            let spawnMem: SpawnActivity_Memory = {
-                                sID: spawnReq,
-                                HC: 'AddCreep'
+                if (roomData && roomData.groups.CR_Work) {
+                    let workProcess = this.kernel.getProcessByPID(roomData.groups.CR_Work);
+                    if (workProcess) {
+                        let workMem = workProcess.memory as WorkerGroup_Memory;
+                        let creepIDs = Object.keys(workMem.creeps);
+                        for (let i = 0; i < creepIDs.length; i++) {
+                            let creep = Game.creeps[creepIDs[i]];
+                            if (!creep || creep.memory.ct != CT_Worker) {
+                                continue;
                             }
-                            let newPID = this.kernel.startProcess(SPKG_SpawnActivity, spawnMem);
-                            this.memory.sID = spawnReq;
-                            this.kernel.setParent(newPID, roomData.groups.CR_Work)
+                            if (!roomData.targets.CR_SpawnFill.targets[creep.id]) {
+                                roomData.targets.CR_SpawnFill.targets[creep.id] = {
+                                    a: AT_Transfer,
+                                    p: Priority_Lowest,
+                                    t: TT_Creep
+                                }
+                            }
+                        }
+
+                        let neededCreepCount = roomData.owner == MY_USERNAME ? 2 : 0;
+                        if (this.room.storage) { } else { } // (TODO): <-- this .. Set up storage energy gating
+                        if (leftToBuild == 0) {
+                            if (curEnergyLevel - SET_TriggerNewWorker > roomData.lastEnergy) {
+                                neededCreepCount += 1;
+                            }
+                        } else {
+                            neededCreepCount = leftToBuild / SET_SiteToWorkRatio + 1;
+                        }
+
+
+                        let resourcesIDs = roomData.resources;
+                        let groundResources = 0;
+                        for (let i = 0; i < resourcesIDs.length; i++) {
+                            let resource = Game.getObjectById(resourcesIDs[i]) as Resource;
+                            if (resource && resource.energy && resource.energy > 50) {
+                                groundResources += resource.energy - 50; // Decay (?)
+                            }
+                        }
+
+                        if (this.room.energyAvailable == this.room.energyCapacityAvailable && groundResources >= SET_GroundWorkerRatio) {
+                            neededCreepCount += 1;
+                        }
+
+                        if (creepIDs.length < neededCreepCount) {
+                            let curReq = this.spawnRegistry.getRequestContext(this.memory.sID);
+                            if (!curReq) {
+                                let spawnReq = this.spawnRegistry.requestSpawn({
+                                    c: CT_Worker,
+                                    l: 0,
+                                    n: GetSUID() + (Game.time + '_w').slice(-5),
+                                    p: roomData.groups.CR_Work
+                                }, this.memory.rID, Priority_Lowest, 3, {
+                                        ct: CT_Worker,
+                                        lvl: 0,
+                                        p: roomData.groups.CR_Work
+                                    })
+                                let spawnMem: SpawnActivity_Memory = {
+                                    sID: spawnReq,
+                                    HC: 'AddCreep'
+                                }
+                                let newPID = this.kernel.startProcess(SPKG_SpawnActivity, spawnMem);
+                                this.memory.sID = spawnReq;
+                                this.kernel.setParent(newPID, roomData.groups.CR_Work)
+                            }
                         }
                     }
+                    roomData.lastEnergy = curEnergyLevel;
                 }
             }
             // (TODO): Update path stuff somehow.
@@ -243,7 +299,7 @@ class RoomActivity extends BasicProcess<RoomActivity_Memory> {
     }
 
     protected shouldRefresh(frequency: number, offset: number, lastUpdated: number): boolean {
-        if (Game.time - lastUpdated < frequency) {
+        if (Game.time - lastUpdated >= frequency) {
             return true;
         }
         return (Game.time + offset) % frequency == 0;

@@ -8,6 +8,7 @@ declare interface RoomStateMemory extends MemBase {
 
 interface RoomState extends MemBase {
     lastUpdated: number;
+    lastEnergy: number;
     cSites: ObjectID[];
     mineralIDs: ObjectID[];
     resources: ObjectID[];
