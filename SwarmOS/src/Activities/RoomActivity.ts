@@ -119,6 +119,13 @@ class RoomActivity extends BasicProcess<RoomActivity_Memory> {
                         t: TT_Controller,
                         p: Priority_Hold
                     }
+                    if (!this.room.controller!.sign || this.room.controller!.sign!.text != MY_SIGNATURE) {
+                        targets[this.room!.controller!.id] = {
+                            a: AT_SignController,
+                            p: Priority_High,
+                            t: TT_Controller
+                        }
+                    }
                 }
 
                 roomData.targets.CR_Work.targets = targets;

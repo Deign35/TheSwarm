@@ -11,13 +11,6 @@ class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory> {
     @extensionInterface(EXT_RoomView)
     protected View!: IRoomDataExtension;
 
-
-    protected get energyTargets() {
-        return this.View.GetRoomData(this.memory.rID)!.targets.CR_SpawnFill!.energy;
-    }
-    protected get targets() {
-        return this.View.GetRoomData(this.memory.rID)!.targets.CR_SpawnFill!.targets;
-    }
     protected GetNewSpawnID(): string {
         let newName = this.memory.rID + '_Ref';
         let level = 1;
@@ -58,6 +51,12 @@ class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory> {
         this.sleeper.sleep(this.pid, 3);
     }
 
+    protected get energyTargets() {
+        return this.View.GetRoomData(this.memory.rID)!.targets.CR_SpawnFill!.energy;
+    }
+    protected get targets() {
+        return this.View.GetRoomData(this.memory.rID)!.targets.CR_SpawnFill!.targets;
+    }
     protected GetNextTarget(creep: Creep): { t: ObjectID, a: ActionType } | undefined {
         let actionType: ActionType = AT_NoOp;
         let bestTarget = this.GetBestOfList(creep, this.targets);

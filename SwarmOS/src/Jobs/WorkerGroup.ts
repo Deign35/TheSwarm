@@ -152,6 +152,7 @@ export class WorkerGroup extends BasicProcess<WorkerGroup_Memory> implements IWo
         return bestID;
     }
 
+    // (TODO): Scoring needs to be more dynamic, especially for construction.  Use energyNeeded as the primary means of driving that.
     ScoreTarget(creep: Creep, baseScore: number, target: ObjectTypeWithID | undefined, targetMemory: WorkerTarget_Memory): number {
         if (!target) {
             return -1;
