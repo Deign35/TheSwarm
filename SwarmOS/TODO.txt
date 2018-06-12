@@ -1,12 +1,14 @@
-1. Defenses are still missing
-2. Remote harvesting, my holy grail.
-3. Room Claimer & Reserver
+1. Remote harvesting, my holy grail.
+2. Room Claimer & Reserver
 
 
 (WANT, but not needed right now!!!)
 Convert old jobs to SoloJobs
 Add logging (both visual and console)
 hook stats into RoomActivity updates
+Science workers
+Defenders
+Clean up RoomViewData
 
 Split bootfiller off to be part of the harvester and the roomrefiller
 the refill part will be played by a single job that gets kicked off but is not a room group

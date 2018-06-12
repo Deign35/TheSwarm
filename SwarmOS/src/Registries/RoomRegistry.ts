@@ -72,6 +72,10 @@ class RoomRegistry extends BasicProcess<RoomStateMemory> {
                             }
                         },
                         activityPID: '',
+                        RoomType: {
+                            other: {},
+                            type: RT_None
+                        }
                     }
                 }
                 this.memory.roomStateData[roomID]!.activityPID = this.kernel.startProcess(SPKG_RoomActivity, newMem);

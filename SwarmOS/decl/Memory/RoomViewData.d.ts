@@ -24,6 +24,13 @@ interface RoomState extends MemBase {
     }
     activityPID: PID;
     owner?: PlayerID;
+
+    RoomType: {
+        type: RoomType;
+        other: {
+            sources?: IDictionary<ObjectID, PID>
+        }
+    }
 }
 interface RoomState_StructureData {
     [STRUCTURE_CONTAINER]: ObjectID[];

@@ -8,3 +8,7 @@ declare interface BasicRoom_Memory extends MemBase {
 declare interface Tower_Memory extends MemBase {
     rID: RoomID;
 }
+
+declare interface RoomProvider_Memory extends MemBase {
+    rID: RoomID;
+}

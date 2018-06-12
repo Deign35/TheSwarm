@@ -27,7 +27,8 @@
                 "FlagBase",
                 "SwarmCLI",
                 "EmptyProcess",
-                "Cartography"
+                "Cartography",
+                "RoomProvider"
             ]
         },
         "CR": {
@@ -45,7 +46,8 @@
                 "Science",
                 "Scout",
                 "SpawnFill",
-                "Work"
+                "Work",
+                "RemoteHarvest"
             ]
         },
         "RJ": {
@@ -74,7 +76,8 @@
                 "Work",
                 "Science",
                 "Fortify",
-                "Scout"
+                "Scout",
+                "RemoteHarvest"
             ]
         },
         "EXT": {
@@ -111,6 +114,18 @@
                 "Source": 6,
                 "Creep": 7,
                 "AnyStructure": 10
+            }
+        },
+        "RT": {
+            "comment": "Type of room for quickly determining how to interact with the room",
+            "enabled": true,
+            "type": true,
+            "combinedType": "RoomType",
+            "entries": {
+                "None": 0,
+                "Home": 1,
+                "RemoteHarvest": 2,
+                "Other": 3
             }
         },
         "LOG": {
