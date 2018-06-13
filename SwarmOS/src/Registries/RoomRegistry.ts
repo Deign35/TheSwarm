@@ -87,7 +87,9 @@ class RoomRegistry extends BasicProcess<RoomStateMemory> {
                         },
                         activityPID: '',
                         RoomType: {
-                            other: {},
+                            other: {
+                                tr: roomID
+                            },
                             type: RT_None
                         }
                     }

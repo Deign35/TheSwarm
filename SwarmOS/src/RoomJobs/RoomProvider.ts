@@ -16,12 +16,17 @@ class RoomProvider extends BasicProcess<RoomProvider_Memory> {
     protected View!: IRoomDataExtension;
 
     private _reqJobs!: IDictionary<string, number>;
+
+    private _roomData!: RoomState;
+    protected get roomData() {
+        return this._roomData;
+    }
     PrepTick() {
         this._reqJobs = {};
         let room = Game.rooms[this.memory.rID];
-        let data = this.View.GetRoomData(this.memory.rID);
+        this._roomData = this.View.GetRoomData(this.memory.rID)!;
 
-        if (!data) {
+        if (!this.roomData) {
             this.kernel.killProcess(this.pid, `RoomProvider couldn't find any data`);
             return;
         }
@@ -29,28 +34,28 @@ class RoomProvider extends BasicProcess<RoomProvider_Memory> {
             return;
         }
         for (let i = 0; i < RequiredJobs.length; i++) {
-            if (!data.groups[RequiredJobs[i]] || !this.kernel.getProcessByPID(data.groups[RequiredJobs[i]])) {
-                data.groups[RequiredJobs[i]] = this.CreateRoomJob(RequiredJobs[i]);
+            if (!this.roomData.groups[RequiredJobs[i]] || !this.kernel.getProcessByPID(this.roomData.groups[RequiredJobs[i]])) {
+                this.roomData.groups[RequiredJobs[i]] = this.CreateRoomJob(RequiredJobs[i]);
             }
         }
 
-        switch (data.RoomType.type) {
+        switch (this.roomData.RoomType.type) {
             case (RT_Home):
                 this._reqJobs[CJ_Work] = 1;
                 this._reqJobs[CJ_Refill] = 1;
-                this._reqJobs[CJ_Harvest] = data.sourceIDs.length;
+                this._reqJobs[CJ_Harvest] = this.roomData.sourceIDs.length;
                 this._reqJobs[CJ_Scout] = 2;
-                if (data.structures.tower && data.structures.tower.length > 0) {
+                if (this.roomData.structures.tower && this.roomData.structures.tower.length > 0) {
                     this._reqJobs[RJ_Tower] = 1;
                 }
 
-                /*if (data.structures.lab && data.structures.lab.length > 0) {
+                /*if (this.roomData.structures.lab && this.roomData.structures.lab.length > 0) {
                     this._reqJobs[CJ_Science] = 1;
                 }*/
                 break;
             case (RT_RemoteHarvest):
                 this._reqJobs[CJ_Work] = 1;
-                this._reqJobs[CJ_RemoteHarvest] = data.sourceIDs.length;
+                this._reqJobs[CJ_RemoteHarvest] = this.roomData.sourceIDs.length;
                 break;
             case (RT_Other):
             case (RT_None):
@@ -85,17 +90,16 @@ class RoomProvider extends BasicProcess<RoomProvider_Memory> {
             case (CJ_Fortify):
                 break;
             case (CJ_Harvest):
-                let data = this.View.GetRoomData(this.memory.rID)!;
-                if (!data.RoomType.other.sources) {
-                    data.RoomType.other.sources = {};
+                if (!this.roomData.RoomType.other.sources) {
+                    this.roomData.RoomType.other.sources = {};
                 }
 
-                for (let i = 0; i < data.sourceIDs.length; i++) {
-                    let pid = data.RoomType.other.sources[data.sourceIDs[i]];
+                for (let i = 0; i < this.roomData.sourceIDs.length; i++) {
+                    let pid = this.roomData.RoomType.other.sources[this.roomData.sourceIDs[i]];
                     if (!pid || !this.kernel.getProcessByPID(pid)) {
-                        (newJobMemory as HarvestJob_Memory).t = data.sourceIDs[i];
+                        (newJobMemory as HarvestJob_Memory).t = this.roomData.sourceIDs[i];
                         let newPID = this.kernel.startProcess(jobID, newJobMemory);
-                        data.RoomType.other.sources[data.sourceIDs[i]] = newPID;
+                        this.roomData.RoomType.other.sources[this.roomData.sourceIDs[i]] = newPID;
                         return newPID;
                     }
                 }
@@ -116,7 +120,8 @@ class RoomProvider extends BasicProcess<RoomProvider_Memory> {
                     at: AT_NoOp,
                     t: '',
                     tt: TT_None
-                }
+                };
+                (newJobMemory as Worker_Memory).tr = this.roomData.RoomType.other.tr;
                 break;
             case (RJ_Misc):
             case (RJ_Structures):

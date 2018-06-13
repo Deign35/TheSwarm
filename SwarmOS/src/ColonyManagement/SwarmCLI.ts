@@ -117,7 +117,9 @@ class SwarmCLI extends BasicProcess<SwarmCLIMemory> {
                 // Add home room
                 roomData.RoomType = {
                     type: RT_Home,
-                    other: {}
+                    other: {
+                        tr: args[0]
+                    }
                 }
                 break;
             case (2):

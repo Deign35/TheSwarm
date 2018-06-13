@@ -100,4 +100,17 @@ class BootstrapRefiller extends SoloJob<BootstrapRefiller_Memory> {
         }
         return this.creepActivity.CreateNewCreepActivity(newActivity, this.pid);
     }
+
+    HandleNoActivity() {
+        let creeps = Game.rooms[this.memory.rID].find(FIND_MY_CREEPS);
+        if (creeps.length > 3) {
+            return super.HandleNoActivity();
+        }
+
+        for (let i = 0; i < creeps.length; i++) {
+            if (creeps[i].memory.ct == CT_Refiller) {
+                return super.HandleNoActivity();
+            }
+        }
+    }
 }

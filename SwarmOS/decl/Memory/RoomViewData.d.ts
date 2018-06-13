@@ -41,7 +41,8 @@ interface RoomState extends MemBase {
     RoomType: {
         type: RoomType;
         other: {
-            sources?: IDictionary<ObjectID, PID>
+            sources?: IDictionary<ObjectID, PID>;
+            tr: RoomID;
         }
     }
 }

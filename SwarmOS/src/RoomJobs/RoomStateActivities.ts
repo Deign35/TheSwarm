@@ -113,7 +113,108 @@ class RoomStateStructureActivity extends RoomStateActivity<RoomStateActivity_Mem
                     this.roomData.needsRepair.push(structure.id);
                 }
             }
+
+            let curEnergyLevel = 0;
+            for (let i = 0; i < this.roomData.structures.container.length; i++) {
+                let containerID = this.roomData.structures.container[i];
+                let container = Game.getObjectById(containerID) as StructureContainer;
+                if (!container) { continue; }
+                curEnergyLevel += container.energy || 0;
+                let sources = container.pos.findInRange(FIND_SOURCES, 1);
+                if (sources && sources.length > 0) {
+                    if (!this.roomData.targets.CR_SpawnFill.energy[containerID]) {
+                        this.roomData.targets.CR_SpawnFill.energy[containerID] = {
+                            a: AT_Withdraw,
+                            p: Priority_Medium,
+                            t: TT_StorageContainer
+                        }
+                    }
+                } else {
+                    if (!this.roomData.targets.CR_SpawnFill.targets[containerID]) {
+                        this.roomData.targets.CR_SpawnFill.targets[containerID] = {
+                            a: AT_Transfer,
+                            p: Priority_Low,
+                            t: TT_StorageContainer
+                        }
+                    }
+                    if (!this.roomData.targets.CR_Work.energy[containerID]) {
+                        this.roomData.targets.CR_Work.energy[containerID] = {
+                            a: AT_Withdraw,
+                            p: Priority_Low,
+                            t: TT_StorageContainer
+                        }
+                    }
+                }
+            }
+
+            if (this.roomData.structures.spawn) {
+                for (let i = 0; i < this.roomData.structures.spawn.length; i++) {
+                    let spawnID = this.roomData.structures.spawn[i];
+                    if (!this.roomData.targets.CR_SpawnFill.targets[spawnID]) {
+                        this.roomData.targets.CR_SpawnFill.targets[spawnID] = {
+                            a: AT_Transfer,
+                            p: Priority_Medium,
+                            t: TT_StorageContainer
+                        }
+                    }
+                }
+            }
+
+            if (this.roomData.structures.extension) {
+                for (let i = 0; i < this.roomData.structures.extension.length; i++) {
+                    let extensionID = this.roomData.structures.extension[i];
+                    if (!this.roomData.targets.CR_SpawnFill.targets[extensionID]) {
+                        this.roomData.targets.CR_SpawnFill.targets[extensionID] = {
+                            a: AT_Transfer,
+                            p: Priority_High,
+                            t: TT_StorageContainer
+                        }
+                    }
+                }
+            }
+
+            if (this.room && this.room.storage) {
+                curEnergyLevel += this.room.storage.energy;
+                if (!this.roomData.targets.CR_SpawnFill.targets[this.room.storage.id]) {
+                    this.roomData.targets.CR_SpawnFill.targets[this.room.storage.id] = {
+                        a: AT_Transfer,
+                        p: Priority_Lowest,
+                        t: TT_StorageContainer
+                    }
+                }
+                if (!this.roomData.targets.CR_Work.energy[this.room.storage.id]) {
+                    this.roomData.targets.CR_Work.energy[this.room.storage.id] = {
+                        a: AT_Withdraw,
+                        p: Priority_Lowest,
+                        t: TT_StorageContainer
+                    }
+                }
+            }
+
+            if (this.roomData.structures.tower && this.roomData.structures.tower.length > 0) {
+                for (let i = 0; i < this.roomData.structures.tower.length; i++) {
+                    if (!this.roomData.targets.CR_SpawnFill.targets[this.roomData.structures.tower[i]]) {
+                        this.roomData.targets.CR_SpawnFill.targets[this.roomData.structures.tower[i]] = {
+                            a: AT_Transfer,
+                            p: Priority_Medium,
+                            t: TT_StorageContainer
+                        }
+                    }
+                }
+            }
+
+            let creeps = this.room.find(FIND_MY_CREEPS);
+            for (let i = 0; i < creeps.length; i++) {
+                if (creeps[i].memory.ct == CT_Worker) {
+                    this.roomData.targets.CR_SpawnFill.targets[creeps[i].id] = {
+                        a: AT_Transfer,
+                        p: Priority_Lowest,
+                        t: TT_Creep
+                    }
+                }
+            }
         }
+
         this.memory.lu = Game.time;
         return ThreadState_Done;
     }
