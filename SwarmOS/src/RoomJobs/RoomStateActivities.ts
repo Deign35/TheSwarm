@@ -38,7 +38,7 @@ export abstract class RoomStateActivity<T extends RoomStateActivity_Memory> exte
     }
 }
 
-class RoomStateMiscActivity extends RoomStateActivity<RoomStateActivity_Memory> {
+class RoomStateMiscActivity extends RoomStateActivity<RoomStateMisc_Memory> {
     RunThread(): ThreadState {
         if (!this.room) {
             return ThreadState_Done;
@@ -55,9 +55,31 @@ class RoomStateMiscActivity extends RoomStateActivity<RoomStateActivity_Memory> 
 
         this.roomData.owner = (this.room.controller && this.room.controller.owner && this.room.controller.owner.username) || undefined;
         if (this.shouldRefresh(11, this.roomData.minUpdateOffset, this.memory.lu)) {
+            let newCount = 0;
             this.roomData.resources = this.room.find(FIND_DROPPED_RESOURCES).map((value: Resource) => {
+                newCount += value.energy || 0;
                 return value.id;
             });
+
+            if (this.roomData.RoomType.type == RT_Home) {
+                if (this.memory.lr + 300 <= newCount) { // Should this scale?
+                    // Spawn a worker
+                    let newMem: Worker_Memory = {
+                        rID: this.memory.hr,
+                        tr: this.memory.rID,
+                        target: {
+                            at: AT_NoOp,
+                            t: '',
+                            tt: TT_None
+                        },
+                        exp: true
+                    }
+
+                    this.kernel.startProcess(CJ_Work, newMem);
+                }
+            }
+
+            this.memory.lr = newCount;
         }
 
         if (this.shouldRefresh(17, this.roomData.minUpdateOffset, this.memory.lu)) {
