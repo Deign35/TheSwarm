@@ -9,6 +9,7 @@ export const OSPackage: IPackage<CreepRegistry_Memory> = {
 }
 
 import { BasicProcess } from "Core/BasicTypes";
+import { RoomActivityUtils } from "ColonyManagement/RoomUtils";
 
 class SwarmCLI extends BasicProcess<SwarmCLIMemory> {
     @extensionInterface(EXT_CreepActivity)
@@ -121,6 +122,7 @@ class SwarmCLI extends BasicProcess<SwarmCLIMemory> {
                         tr: args[0]
                     }
                 }
+                RoomActivityUtils.BootRoom(args[0]);
                 break;
             case (2):
                 if (args.length != 3) {

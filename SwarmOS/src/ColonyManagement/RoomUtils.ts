@@ -1,4 +1,4 @@
-export class RoomActivityUtils {
+export const RoomActivityUtils = {
     BootRoom(room: Room) {
         let spawn = room.find(FIND_MY_SPAWNS);
         if (spawn && spawn.length > 0) {
@@ -12,7 +12,7 @@ export class RoomActivityUtils {
                 this.CreatePath(room, sources[i].pos, room.controller!.pos, false);
             }
         }
-    }
+    },
 
     CreatePath(room: Room, from: RoomPosition, to: RoomPosition, buildContainer: boolean) {
         if (buildContainer) {
