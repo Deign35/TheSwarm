@@ -221,7 +221,7 @@ class CreepActivityExtensions extends ExtensionBase implements ICreepActivityExt
         if (!creep) {
             return undefined;
         }
-        let target = actionMem.t ? Game.getObjectById(actionMem.t) : undefined;
+        let target: ObjectTypeWithID | RoomPosition | undefined = actionMem.t ? Game.getObjectById(actionMem.t) : undefined;
         if (!target && actionMem.p) {
             target = new RoomPosition(actionMem.p.x || 25, actionMem.p.y || 25, actionMem.p.roomName);
         } else if (!target) {

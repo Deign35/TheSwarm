@@ -56,6 +56,13 @@
             }
         ]
     },
+    "BootFiller": {
+        "entries": [{
+            "w": 1,
+            "c": 1,
+            "m": 2
+        }]
+    },
     "Scout": {
         "entries": [{
                 "t": 2,

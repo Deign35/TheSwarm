@@ -23,11 +23,11 @@ class BootstrapRefiller extends SoloJob<BootstrapRefiller_Memory> {
     GetNewSpawnID() {
         return this.spawnRegistry.requestSpawn({
             l: 0,
-            c: CT_Worker,
+            c: CT_BootFiller,
             n: this.memory.rID + '_boot',
             p: this.pid
         }, this.memory.rID, Priority_EMERGENCY, 5, {
-                ct: CT_Worker,
+                ct: CT_BootFiller,
                 lvl: 0,
                 p: this.pid
             });
@@ -39,6 +39,7 @@ class BootstrapRefiller extends SoloJob<BootstrapRefiller_Memory> {
             c: creep.name,
             e: []
         }
+        creep.memory.ct = CT_Worker;
         if (creep.carry.energy == 0) {
             // get energy
             let roomData = this.View.GetRoomData(this.memory.rID)!;

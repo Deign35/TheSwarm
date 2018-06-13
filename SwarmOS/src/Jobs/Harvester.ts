@@ -4,6 +4,7 @@ export const OSPackage: IPackage<SpawnRegistry_Memory> = {
     }
 }
 import { SoloJob } from "./SoloJob";
+import { FindNextTo } from "Tools/TheFinder";
 
 class Harvester extends SoloJob<HarvesterMemory> {
     @extensionInterface(EXT_RoomView)
@@ -30,8 +31,23 @@ class Harvester extends SoloJob<HarvesterMemory> {
         } else if (targetRoom.energyCapacityAvailable >= CreepBodies.Harvester[1].cost) {
             spawnLevel = 1;
         } else {
-            this.SpawnSupportHarvester();
-            this.SpawnSupportHarvester();
+            let source = Game.getObjectById<ObjectTypeWithID>(this.memory.src)!;
+            let nearby = FindNextTo(source.pos, LOOK_TERRAIN);
+            let hasSpawnedSupport = false;
+            let hasSpawnedHarvester = false;
+            for (let i = 0; i < nearby.length; i++) {
+                if (nearby[i].terrain !== 'wall') {
+                    if (!hasSpawnedHarvester) {
+                        hasSpawnedHarvester = true;
+                        continue;
+                    }
+                    this.SpawnSupportHarvester();
+                    if (hasSpawnedSupport) {
+                        break;
+                    }
+                    hasSpawnedSupport = true;
+                }
+            }
         }
         return this.spawnRegistry.requestSpawn({
             l: spawnLevel,
