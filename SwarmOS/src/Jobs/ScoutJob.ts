@@ -14,6 +14,7 @@ class ScoutJob extends BasicProcess<ScoutJob_Memory> {
     protected creepActivity!: ICreepActivityExtensions;
 
     RunThread(): ThreadState {
+        this.GatherNearbyRoomIDs(this.memory.rID, 3);
         let homeRoomData = this.View.GetRoomData(this.memory.rID)!;
         let provider = this.kernel.getProcessByPID(homeRoomData.activityPID);
         if (provider && provider['RoomJobCheckin']) {
@@ -110,6 +111,30 @@ class ScoutJob extends BasicProcess<ScoutJob_Memory> {
             nextRoom = allRooms[i];
         }
 
+        if (nextRoom == creep.room.name) {
+            this.memory.n = this.GatherNearbyRoomIDs(this.memory.rID, 3);
+            allRooms = this.memory.n;
+            nextRoom = this.memory.rID;
+            bestRoom = undefined;
+
+            for (let i = 0; i < allRooms.length; i++) {
+                let data = this.View.GetRoomData(allRooms[i]);
+                if (!data) {
+                    nextRoom = allRooms[i];
+                    break;
+                }
+
+                if (bestRoom) {
+                    if (bestRoom.lastUpdated <= data.lastUpdated) {
+                        continue;
+                    }
+                }
+
+                bestRoom = data;
+                nextRoom = allRooms[i];
+            }
+        }
+
         this.memory.t = nextRoom;
         this.memory.a = this.creepActivity.CreateNewCreepActivity({
             at: AT_MoveToPosition,
@@ -121,5 +146,41 @@ class ScoutJob extends BasicProcess<ScoutJob_Memory> {
             c: creep.name,
             HC: 'CreateNewScoutActivity'
         }, this.pid);
+    }
+
+    protected GatherNearbyRoomIDs(centerRoom: RoomID, distance: number): RoomID[] {
+        let nearbyRooms: RoomID[] = [];
+        let nearby = Game.map.describeExits(centerRoom);
+        if (nearby) {
+            if (nearby["1"]) {
+                nearbyRooms.push(nearby["1"]!);
+                if (distance > 1) {
+                    let furtherRooms = this.GatherNearbyRoomIDs(nearby["1"]!, distance - 1);
+                    nearbyRooms = nearbyRooms.concat(furtherRooms)
+                }
+            }
+            if (nearby["3"]) {
+                nearbyRooms.push(nearby["3"]!);
+                if (distance > 1) {
+                    let furtherRooms = this.GatherNearbyRoomIDs(nearby["3"]!, distance - 1);
+                    nearbyRooms = nearbyRooms.concat(furtherRooms)
+                }
+            }
+            if (nearby["5"]) {
+                nearbyRooms.push(nearby["5"]!);
+                if (distance > 1) {
+                    let furtherRooms = this.GatherNearbyRoomIDs(nearby["5"]!, distance - 1);
+                    nearbyRooms = nearbyRooms.concat(furtherRooms)
+                }
+            }
+            if (nearby["7"]) {
+                nearbyRooms.push(nearby["7"]!);
+                if (distance > 1) {
+                    let furtherRooms = this.GatherNearbyRoomIDs(nearby["7"]!, distance - 1);
+                    nearbyRooms = nearbyRooms.concat(furtherRooms)
+                }
+            }
+        }
+        return _.unique(nearbyRooms);
     }
 }

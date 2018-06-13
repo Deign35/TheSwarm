@@ -320,6 +320,7 @@ class CreepActivityExtensions extends ExtensionBase implements ICreepActivityExt
                         opacity: .25
                     }
                 });
+
                 let dist = creep.pos.getRangeTo(target);
                 if (dist <= (args.amount || 0)) {
                     if (creep.pos.isNearTo(target)) {
@@ -330,7 +331,15 @@ class CreepActivityExtensions extends ExtensionBase implements ICreepActivityExt
                         return result;
                     }
                 } else {
-                    return ERR_NOT_IN_RANGE;
+                    if ((target as RoomPosition).roomName == creep.name) {
+                        let objsAtPos = (target as RoomPosition).look();
+                        for (let i = 0; i < objsAtPos.length; i++) {
+                            if (OBSTACLE_OBJECT_TYPES[objsAtPos[i].type] || ((objsAtPos[i].terrain || '') == 'wall')) {
+                                return ERR_NO_PATH;
+                            }
+                        }
+                    }
+                    return result == OK ? ERR_NOT_IN_RANGE : result;
                 }
             case (AT_RangedMassAttack): return creep.rangedMassAttack();
             case (AT_Suicide): return creep.suicide();

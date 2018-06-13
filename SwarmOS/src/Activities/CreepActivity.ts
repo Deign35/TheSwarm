@@ -36,6 +36,8 @@ class CreepActivity extends BasicProcess<CreepActivity_Memory> {
                 if (hasCreep && hasCreep.length > 0) {
                     let otherCreep = hasCreep[0];
                     this.creepActivity.MoveCreep(otherCreep, this.AssignedCreep.pos);
+                } else {
+                    this.EndProcess();
                 }
             }
             return ThreadState_Done;
