@@ -44,7 +44,7 @@ class RoomProvider extends BasicProcess<RoomProvider_Memory> {
                 this._reqJobs[CJ_Work] = 1;
                 this._reqJobs[CJ_Refill] = 1;
                 this._reqJobs[CJ_Harvest] = this.roomData.sourceIDs.length;
-                this._reqJobs[CJ_Scout] = 2;
+                this._reqJobs[CJ_Scout] = 1;
                 if (this.roomData.structures.tower && this.roomData.structures.tower.length > 0) {
                     this._reqJobs[RJ_Tower] = 1;
                 }

@@ -98,40 +98,45 @@ class SwarmCLI extends BasicProcess<SwarmCLIMemory> {
             this.log.warn(`Invalid number of arguments`);
             return;
         }
-        let roomData = this.View.GetRoomData(args[0]);
+        let roomID: RoomID = args[0];
+        let roomData = this.View.GetRoomData(roomID);
         if (!roomData) {
             this.log.warn(`Cannot assimilate a room that has yet to be seen`);
             return;
         }
-        if (roomData.RoomType == args[1]) {
-            this.log.info(`Room already assimilated as ${args[1]}`);
+
+        let roomType: RoomType = args[1];
+        if (roomData.RoomType.type == roomType) {
+            this.log.info(`Room already assimilated as ${roomType}`);
             return;
         }
-        switch (args[1]) {
+        switch (roomType) {
             case (1):
                 let bootMem: BootstrapRefiller_Memory = {
                     exp: true,
-                    rID: args[0],
-                    tr: args[0],
+                    rID: roomID,
+                    tr: roomID,
                 }
                 this.kernel.startProcess(CJ_BootRefill, bootMem);
                 // Add home room
                 roomData.RoomType = {
                     type: RT_Home,
                     other: {
-                        tr: args[0]
+                        tr: roomID
                     }
                 }
-                RoomActivityUtils.BootRoom(args[0]);
+                // (TODO): Doesn't work if i can't see the room.  Should make this an activity to be launched.
+                RoomActivityUtils.BootRoom(Game.rooms[roomID]);
                 break;
             case (2):
                 if (args.length != 3) {
                     this.log.warn(`Invalid number of arguments`);
                     return;
                 }
-                let homeRoom = this.View.GetRoomData(args[2]);
+                let homeID: RoomID = args[2];
+                let homeRoom = this.View.GetRoomData(homeID);
                 if (!homeRoom) { // || homeRoom.IsHomeRoom
-                    this.log.warn(`Cannot make ${args[0]} into a harvest room for ${args[2]}`);
+                    this.log.warn(`Cannot make ${roomID} into a harvest room for ${homeID}`);
                     return;
                 }
                 // Add as remote harvest room to homeRoom
@@ -143,4 +148,8 @@ class SwarmCLI extends BasicProcess<SwarmCLIMemory> {
 global['CLI'] = function (command: CLI_Command, ...args: any[]) {
     Memory.CLI.commands.push({ command, args });
     return OK;
+}
+
+global['qb'] = function () {
+    CLI(CLI_Assimilate, 'sim', RT_Home);
 }
