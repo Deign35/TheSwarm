@@ -80,8 +80,6 @@ declare var GStats: IStatistics;
 // SwarmCLI
 
 //declare function CLI(command: CLI_Command, ...args: any[]): ScreepsReturnCode;
-
-declare function qb(): void; // Quick boot -- Shortcut for CLI_Assimilate sim.
 declare function CLI(command: CLI_Assimilate, roomID: RoomID, roomType: RoomType, homeRoom?: RoomID): ScreepsReturnCode;
 
 declare function CLI(command: CLI_Launch, pkg: ScreepsPackage, startMem: MemBase): ScreepsReturnCode;
