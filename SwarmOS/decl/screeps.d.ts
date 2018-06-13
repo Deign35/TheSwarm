@@ -1257,7 +1257,8 @@ interface SignDefinition {
     time: number;
     datetime: Date;
 }
-
+declare const SIGN_NOVICE_AREA: 'A new Novice Area is being planned somewhere in this sector. Please make sure all important rooms are reserved.';
+declare const SIGN_RESPAWN_AREA: 'A new Respawn Area is being planned somewhere in this sector. Please make sure all important rooms are reserved.';
 interface CPUShardLimits {
     [shard: string]: number;
 }

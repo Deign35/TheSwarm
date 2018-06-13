@@ -114,7 +114,7 @@ class RoomProvider extends BasicProcess<RoomProvider_Memory> {
             case (CJ_Science):
                 break;
             case (CJ_Scout):
-                (newJobMemory as ScoutJob_Memory).n = []
+                (newJobMemory as ScoutJob_Memory).n = this.GatherNearbyRoomIDs(this.memory.rID, 3);
                 break;
             case (CJ_Work):
                 (newJobMemory as Worker_Memory).target = {
@@ -136,5 +136,41 @@ class RoomProvider extends BasicProcess<RoomProvider_Memory> {
         }
 
         return this.kernel.startProcess(jobID, newJobMemory);
+    }
+
+    protected GatherNearbyRoomIDs(centerRoom: RoomID, distance: number): RoomID[] {
+        let nearbyRooms: RoomID[] = [];
+        let nearby = Game.map.describeExits(centerRoom);
+        if (nearby) {
+            if (nearby["1"]) {
+                nearbyRooms.push(nearby["1"]!);
+                if (distance > 1) {
+                    let furtherRooms = this.GatherNearbyRoomIDs(nearby["1"]!, distance - 1);
+                    nearbyRooms.concat(furtherRooms)
+                }
+            }
+            if (nearby["3"]) {
+                nearbyRooms.push(nearby["3"]!);
+                if (distance > 1) {
+                    let furtherRooms = this.GatherNearbyRoomIDs(nearby["3"]!, distance - 1);
+                    nearbyRooms.concat(furtherRooms)
+                }
+            }
+            if (nearby["5"]) {
+                nearbyRooms.push(nearby["5"]!);
+                if (distance > 1) {
+                    let furtherRooms = this.GatherNearbyRoomIDs(nearby["5"]!, distance - 1);
+                    nearbyRooms.concat(furtherRooms)
+                }
+            }
+            if (nearby["7"]) {
+                nearbyRooms.push(nearby["7"]!);
+                if (distance > 1) {
+                    let furtherRooms = this.GatherNearbyRoomIDs(nearby["7"]!, distance - 1);
+                    nearbyRooms.concat(furtherRooms)
+                }
+            }
+        }
+        return _.unique(nearbyRooms);
     }
 }

@@ -4,7 +4,7 @@ export const OSPackage: IPackage<SpawnRegistry_Memory> = {
     }
 }
 import { SoloJob } from "./SoloJob";
-import { FindNextTo } from "Tools/TheFinder";
+import { FindNextTo, FindStructureNextTo } from "Tools/TheFinder";
 
 class Harvester extends SoloJob<HarvesterMemory> {
     @extensionInterface(EXT_RoomView)
@@ -88,8 +88,35 @@ class Harvester extends SoloJob<HarvesterMemory> {
                 at: AT_MoveToPosition,
                 c: creep.name,
                 p: container ? container.pos : source.pos,
-                a: 1
+                a: container ? 0 : 1
             }, this.pid);
+        }
+        else if (!container) {
+            let structures = FindStructureNextTo(source.pos, STRUCTURE_CONTAINER);
+            if (structures && structures.length > 0) {
+                container = structures[0].structure as StructureContainer;
+            } else {
+                let sites = creep.pos.lookFor(LOOK_CONSTRUCTION_SITES);
+                if (sites && sites.length > 0) {
+                    for (let i = 0; i < sites.length; i++) {
+                        if (sites[i].structureType == STRUCTURE_CONTAINER) {
+                            container = sites[i];
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (!container) {
+                creep.room.createConstructionSite(creep.pos, STRUCTURE_CONTAINER);
+                return this.creepActivity.CreateNewCreepActivity({
+                    at: AT_Harvest,
+                    c: creep.name,
+                    t: source.id
+                }, this.pid);
+            } else {
+                this.memory.sup = container.id;
+            }
         }
 
         if (source.energy > 0) {
@@ -119,18 +146,6 @@ class Harvester extends SoloJob<HarvesterMemory> {
                     }, this.pid);
                 } else {
                     delete this.memory.sup;
-                }
-            } else {
-                let sites = creep.pos.lookFor(LOOK_CONSTRUCTION_SITES);
-                if (sites && sites.length > 0) {
-
-                } else {
-                    creep.room.createConstructionSite(creep.pos, STRUCTURE_CONTAINER);
-                    return this.creepActivity.CreateNewCreepActivity({
-                        at: AT_Harvest,
-                        c: creep.name,
-                        t: source.id
-                    }, this.pid);
                 }
             }
         }

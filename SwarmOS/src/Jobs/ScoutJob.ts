@@ -78,7 +78,8 @@ class ScoutJob extends BasicProcess<ScoutJob_Memory> {
             return;
         }
 
-        if (creep.room.controller && (!creep.room.controller.sign || creep.room.controller.sign.text != MY_SIGNATURE)) {
+        if (creep.room.controller && creep.room.controller.my && (!creep.room.controller.sign ||
+            (creep.room.controller.sign.text != MY_SIGNATURE && creep.room.controller.sign.text != SIGN_NOVICE_AREA && creep.room.controller.sign.text != SIGN_RESPAWN_AREA))) {
             this.memory.a = this.creepActivity.CreateNewCreepActivity({
                 t: creep.room.controller.id,
                 at: AT_SignController,

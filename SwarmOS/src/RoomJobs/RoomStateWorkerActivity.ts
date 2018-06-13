@@ -8,7 +8,7 @@ import { RoomStateActivity } from "RoomJobs/RoomStateActivities";
 class RoomStateWorkerTargetActivity extends RoomStateActivity<RoomStateActivity_Memory> {
     PrepTick() {
         super.PrepTick();
-        if (this.roomData.targets.Other.t == TT_Controller) {
+        if (this.roomData.targets.Other.t == TT_Controller || this.roomData.targets.Other.at == AT_Repair) {
             this.roomData.targets.Other.en = 0;
         }
 

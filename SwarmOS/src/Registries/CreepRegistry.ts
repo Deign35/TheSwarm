@@ -245,7 +245,15 @@ class CreepActivityExtensions extends ExtensionBase implements ICreepActivityExt
     }
 
     MoveCreep(creep: Creep, pos: RoomPosition) {
-        return creep.moveTo(pos);
+        return creep.moveTo(pos, {
+            visualizePathStyle: {
+                fill: 'transparent',
+                stroke: '#fff',
+                lineStyle: 'dashed',
+                strokeWidth: .15,
+                opacity: .25
+            }
+        });
     }
 
     CreepIsInRange(actionType: ActionType, pos1: RoomPosition, pos2: RoomPosition) {
@@ -303,7 +311,15 @@ class CreepActivityExtensions extends ExtensionBase implements ICreepActivityExt
                 if ((target as Structure).pos) {
                     target = (target as Structure).pos;
                 }
-                let result = creep.moveTo(target);
+                let result = creep.moveTo(target, {
+                    visualizePathStyle: {
+                        fill: 'transparent',
+                        stroke: '#fff',
+                        lineStyle: 'dashed',
+                        strokeWidth: .15,
+                        opacity: .25
+                    }
+                });
                 let dist = creep.pos.getRangeTo(target);
                 if (dist <= (args.amount || 0)) {
                     if (creep.pos.isNearTo(target)) {
