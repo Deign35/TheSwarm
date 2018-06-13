@@ -8,6 +8,25 @@ declare interface HarvestJob_Memory extends MemBase {
     rID: RoomID;    // (r)oom
     SUPPORT?: boolean;
 }
+
+declare interface SoloJob_Memory extends MemBase {
+    a?: PID;        // (a)ctivity
+    c?: CreepID;    // (c)reep
+    exp?: boolean;  // (exp)pires -- Kill the process when the creep dies
+    rID: RoomID;    // (h)ome room
+    tr: RoomID;     // (t)arget (r)oom
+}
+declare interface ScoutJob_Memory extends MemBase {
+    a?: PID;        // (a)ctivity
+    c?: CreepID;    // (c)reep
+    rID: RoomID;    // (r)oom
+    t?: RoomID;     // (t)arget room
+    n: RoomID[];    // (n)earby Rooms to scout
+}
+declare interface HarvesterMemory extends SoloJob_Memory {
+    src: ObjectID;
+    sup: ObjectID;
+}
 declare interface RemoteHarvester_Memory extends SoloJob_Memory {
     t: ObjectID;        // (t)arget
     s?: ObjectID;       // (s)upport (site or container)
@@ -18,21 +37,6 @@ declare interface Worker_Memory extends SoloJob_Memory {
         at: ActionType;
         tt: TargetType;
     }
-}
-
-declare interface ScoutJob_Memory extends MemBase {
-    a?: PID;        // (a)ctivity
-    c?: CreepID;    // (c)reep
-    rID: RoomID;    // (r)oom
-    t?: RoomID;     // (t)arget room
-    n: RoomID[];    // (n)earby Rooms to scout
-}
-declare interface SoloJob_Memory extends MemBase {
-    a?: PID;        // (a)ctivity
-    c?: CreepID;    // (c)reep
-    exp?: boolean;  // (exp)pires -- Kill the process when the creep dies
-    rID: RoomID;    // (h)ome room
-    tr: RoomID;     // (t)arget (r)oom
 }
 declare interface ControlledRoomRefiller_Memory extends SoloJob_Memory {
 

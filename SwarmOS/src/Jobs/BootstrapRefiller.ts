@@ -103,7 +103,7 @@ class BootstrapRefiller extends SoloJob<BootstrapRefiller_Memory> {
 
     HandleNoActivity() {
         let creeps = Game.rooms[this.memory.rID].find(FIND_MY_CREEPS);
-        if (creeps.length > 3) {
+        if (creeps.length > 7) {
             return super.HandleNoActivity();
         }
 

@@ -1,5 +1,5 @@
 import { OSPackage as ControlledRoomRefiller } from "Jobs/ControlledRoomRefiller";
-import { OSPackage as HarvesterJob } from "Jobs/HarvestJob";
+import { OSPackage as HarvesterJob } from "Jobs/Harvester";
 import { OSPackage as WorkerGroup } from "Jobs/Worker";
 import { OSPackage as BootstrapRefiller } from "Jobs/BootstrapRefiller";
 import { OSPackage as ScoutJob } from "Jobs/ScoutJob";

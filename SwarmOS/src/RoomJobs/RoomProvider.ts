@@ -97,7 +97,7 @@ class RoomProvider extends BasicProcess<RoomProvider_Memory> {
                 for (let i = 0; i < this.roomData.sourceIDs.length; i++) {
                     let pid = this.roomData.RoomType.other.sources[this.roomData.sourceIDs[i]];
                     if (!pid || !this.kernel.getProcessByPID(pid)) {
-                        (newJobMemory as HarvestJob_Memory).t = this.roomData.sourceIDs[i];
+                        (newJobMemory as HarvesterMemory).src = this.roomData.sourceIDs[i];
                         let newPID = this.kernel.startProcess(jobID, newJobMemory);
                         this.roomData.RoomType.other.sources[this.roomData.sourceIDs[i]] = newPID;
                         return newPID;

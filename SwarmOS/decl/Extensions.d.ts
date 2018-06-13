@@ -94,6 +94,7 @@ declare interface IKernelSleepExtension extends IPackageExtension {
 declare interface IRoomDataExtension extends IPackageExtension {
     GetRoomData(roomID: string): RoomState | undefined;
     SetScoutNexus(roomID: string): void;
+    BootRoom(roomID: string, force: boolean): void;
 }
 
 /**

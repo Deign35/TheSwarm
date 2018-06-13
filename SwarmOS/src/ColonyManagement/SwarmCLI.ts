@@ -111,7 +111,12 @@ class SwarmCLI extends BasicProcess<SwarmCLIMemory> {
             return;
         }
         switch (roomType) {
-            case (1):
+            case (RT_None):
+                if (roomID == 'sim') {
+                    this.View.BootRoom('sim', true);
+                }
+                break;
+            case (RT_Home):
                 let bootMem: BootstrapRefiller_Memory = {
                     exp: true,
                     rID: roomID,
@@ -128,7 +133,7 @@ class SwarmCLI extends BasicProcess<SwarmCLIMemory> {
                 // (TODO): Doesn't work if i can't see the room.  Should make this an activity to be launched.
                 RoomActivityUtils.BootRoom(Game.rooms[roomID]);
                 break;
-            case (2):
+            case (RT_RemoteHarvest):
                 if (args.length != 3) {
                     this.log.warn(`Invalid number of arguments`);
                     return;
@@ -152,4 +157,9 @@ global['CLI'] = function (command: CLI_Command, ...args: any[]) {
 
 global['qb'] = function () {
     CLI(CLI_Assimilate, 'sim', RT_Home);
+}
+
+global['rb'] = function () {
+    CLI(CLI_Assimilate, 'sim', RT_None);
+
 }
