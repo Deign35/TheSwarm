@@ -50,7 +50,6 @@ class RoomStateMiscActivity extends RoomStateActivity<RoomStateActivity_Memory> 
             this.roomData.sourceIDs = this.room.find(FIND_SOURCES).map((value: Source) => {
                 return value.id;
             })
-
             delete this.memory.nb;
         }
 
@@ -115,6 +114,7 @@ class RoomStateStructureActivity extends RoomStateActivity<RoomStateActivity_Mem
             }
 
             let curEnergyLevel = 0;
+            this.roomData.targets.CR_Work.energy = {};
             for (let i = 0; i < this.roomData.structures.container.length; i++) {
                 let containerID = this.roomData.structures.container[i];
                 let container = Game.getObjectById(containerID) as StructureContainer;
@@ -188,6 +188,14 @@ class RoomStateStructureActivity extends RoomStateActivity<RoomStateActivity_Mem
                         p: Priority_Lowest,
                         t: TT_StorageContainer
                     }
+                }
+            }
+
+            for (let i = 0; i < this.roomData.sourceIDs.length; i++) {
+                this.roomData.targets.CR_Work.energy[this.roomData.sourceIDs[i]] = {
+                    a: AT_Harvest,
+                    p: Priority_Hold,
+                    t: TT_Source
                 }
             }
 

@@ -106,7 +106,7 @@ class SwarmCLI extends BasicProcess<SwarmCLIMemory> {
         }
 
         let roomType: RoomType = args[1];
-        if (roomData.RoomType.type == roomType) {
+        if (roomType != 0 && roomData.RoomType.type == roomType) {
             this.log.info(`Room already assimilated as ${roomType}`);
             return;
         }

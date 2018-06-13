@@ -13,7 +13,6 @@ class RepetitiveCreepActivity extends BasicProcess<RepetitiveCreepActivity_Memor
     protected creepRegistry!: ICreepRegistryExtensions;
 
     RunThread(): ThreadState {
-        debugger;
         if (!this.memory.p || !this.kernel.getProcessByPID(this.memory.p)) {
             this.CreateActivityArgs(this.memory.c);
         }

@@ -116,8 +116,62 @@ class WorkerActivity extends SoloJob<Worker_Memory> {
         // (TODO): Fix this. ^^^
         if (creep.carry.energy < creep.carryCapacity) {
             let targetIDs = Object.keys(roomData.targets.CR_Work.energy);
+            let bestTarget: ObjectTypeWithID | undefined = undefined;
+            let bestData: WorkerTarget_Memory | undefined = undefined;
+            let bestDist = 1000;
             for (let i = 0; i < targetIDs.length; i++) {
-                roomData.targets.CR_Work.energy[targetIDs[i]];
+                let target = Game.getObjectById<Source | Resource | Structure | Creep>(targetIDs[i]);
+                if (!target) { continue; }
+                let tarData = roomData.targets.CR_Work.energy[targetIDs[i]];
+
+                if (bestTarget && bestData) {
+                    if (bestData.p > tarData.p) {
+                        continue;
+                    }
+                }
+
+                let enAvailable = 0;
+                if (tarData.a == AT_Withdraw) {
+                    enAvailable = (target as StructureContainer).energy;
+                } else if (tarData.a == AT_Pickup) {
+                    enAvailable = (target as Resource).energy || 0;
+                } else if (tarData.a == AT_Harvest) {
+                    enAvailable = (target as Source).energy;
+                } else if (tarData.a == AT_RequestTransfer) {
+                    enAvailable = (target as Creep).carry.energy;
+                }
+
+                if (enAvailable < creep.carryCapacity) {
+                    continue;
+                }
+
+                let dist = creep.pos.getRangeTo(target);
+                if (!bestData) {
+                    bestData = tarData;
+                    bestTarget = target;
+                    bestDist = dist;
+                    continue
+                }
+                if (bestData.p < tarData.p) {
+                    bestData = tarData;
+                    bestTarget = target;
+                    bestDist = dist;
+                    continue;
+                }
+                if (dist < bestDist) {
+                    bestData = tarData;
+                    bestTarget = target;
+                    bestDist = dist;
+                    continue;
+                }
+            }
+
+            if (bestTarget && bestData) {
+                return this.creepActivity.CreateNewCreepActivity({
+                    at: bestData.a,
+                    c: creep.name,
+                    t: bestTarget.id
+                }, this.pid);
             }
         }
 
