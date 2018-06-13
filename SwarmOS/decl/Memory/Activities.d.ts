@@ -1,14 +1,6 @@
 declare interface SpawnActivity_Memory extends MemBase {
     sID: string;
 }
-declare interface RoomActivity_Memory extends MemBase {
-    rID: RoomID;
-    sID: string;
-    energyTargets: {
-        [id: string]: boolean;
-    };
-    hb?: boolean;
-}
 declare interface CreepActivity_Memory extends SingleCreepActivity_Memory {
     c: CreepID;     //Creep
 }

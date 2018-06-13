@@ -12,8 +12,8 @@ const PKG_EmptyProcess_LogContext: LogContext = {
     logLevel: LOG_TRACE
 }
 
-const ENABLE_PROFILING = false;
-class EmptyProcess extends BasicProcess<RoomActivity_Memory> {
+const ENABLE_PROFILING = true;
+class EmptyProcess extends BasicProcess<MemBase> {
     @extensionInterface(EXT_RoomView)
     protected View!: IRoomDataExtension;
     @extensionInterface(EXT_SpawnRegistry)

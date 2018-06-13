@@ -1,4 +1,4 @@
-export const OSPackage: IPackage<SpawnRegistry_Memory> = {
+/*export const OSPackage: IPackage<SpawnRegistry_Memory> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
         processRegistry.register(SPKG_RoomActivity, RoomActivity);
     }
@@ -529,4 +529,4 @@ class RoomActivity extends BasicProcess<RoomActivity_Memory> {
             }
         }
     }
-}
+}*/

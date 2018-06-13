@@ -72,6 +72,7 @@ export abstract class SoloJob<T extends SoloJob_Memory> extends BasicProcess<T> 
     }
 
     EndProcess() {
+        this.creepRegistry.releaseCreep(this.memory.c, this.pid);
         super.EndProcess(this.memory.c);
     }
 }

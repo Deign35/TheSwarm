@@ -33,11 +33,8 @@ class RoomRegistry extends BasicProcess<RoomStateMemory> {
         for (let roomID in Game.rooms) {
             let data = this.RoomView.GetRoomData(roomID);
             if (!data || !data.activityPID || !this.kernel.getProcessByPID(data.activityPID)) {
-                let newMem: RoomActivity_Memory = {
-                    rID: roomID,
-                    sID: '',
-                    energyTargets: {},
-                    hb: false
+                let newMem: RoomProvider_Memory = {
+                    rID: roomID
                 }
                 if (!data) {
                     let room = Game.rooms[roomID];

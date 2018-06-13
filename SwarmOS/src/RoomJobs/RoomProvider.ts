@@ -1,13 +1,12 @@
 export const OSPackage: IPackage<RoomStateMemory> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
-        processRegistry.register(PKG_RoomProvider, RoomProvider);
+        processRegistry.register(SPKG_RoomActivity, RoomProvider);
     }
 }
 
 import { PackageProviderBase, BasicProcess } from "Core/BasicTypes";
 
 const RequiredJobs = [
-    CR_Work,
     RJ_Misc,
     RJ_Structures,
     RJ_WorkTarget
@@ -31,12 +30,13 @@ class RoomProvider extends BasicProcess<RoomProvider_Memory> {
         }
         for (let i = 0; i < RequiredJobs.length; i++) {
             if (!data.groups[RequiredJobs[i]] || !this.kernel.getProcessByPID(data.groups[RequiredJobs[i]])) {
-                this.CreateRoomJob(RequiredJobs[i]);
+                data.groups[RequiredJobs[i]] = this.CreateRoomJob(RequiredJobs[i]);
             }
         }
 
         switch (data.RoomType.type) {
             case (RT_Home):
+                this._reqJobs[CJ_Work] = 1;
                 this._reqJobs[CJ_Refill] = 1;
                 this._reqJobs[CJ_Harvest] = data.sourceIDs.length;
                 this._reqJobs[CJ_Scout] = 2;
@@ -49,6 +49,7 @@ class RoomProvider extends BasicProcess<RoomProvider_Memory> {
                 }*/
                 break;
             case (RT_RemoteHarvest):
+                this._reqJobs[CJ_Work] = 1;
                 this._reqJobs[CJ_RemoteHarvest] = data.sourceIDs.length;
                 break;
             case (RT_Other):
@@ -75,7 +76,7 @@ class RoomProvider extends BasicProcess<RoomProvider_Memory> {
         this._reqJobs[jobID]--;
     }
 
-    CreateRoomJob(jobID: string) {
+    CreateRoomJob(jobID: string): PID | undefined {
         let newJobMemory: MemBase & { rID: RoomID } = {
             rID: this.memory.rID
         };
@@ -109,7 +110,11 @@ class RoomProvider extends BasicProcess<RoomProvider_Memory> {
                 (newJobMemory as ScoutJob_Memory).n = []
                 break;
             case (CJ_Work):
-                (newJobMemory as WorkerGroup_Memory).creeps = {}
+                (newJobMemory as Worker_Memory).target = {
+                    at: AT_NoOp,
+                    t: '',
+                    tt: TT_None
+                }
                 break;
             case (RJ_Misc):
             case (RJ_Structures):
@@ -120,6 +125,6 @@ class RoomProvider extends BasicProcess<RoomProvider_Memory> {
                 break;
         }
 
-        this.kernel.startProcess(jobID, newJobMemory);
+        return this.kernel.startProcess(jobID, newJobMemory);
     }
 }

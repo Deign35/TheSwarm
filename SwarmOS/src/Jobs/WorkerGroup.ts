@@ -1,4 +1,4 @@
-export const OSPackage: IPackage<SpawnRegistry_Memory> = {
+/*export const OSPackage: IPackage<SpawnRegistry_Memory> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
         processRegistry.register(CJ_Work, WorkerGroup);
     }
@@ -227,4 +227,4 @@ export class WorkerGroup extends BasicProcess<WorkerGroup_Memory> implements IWo
 
         return (Math.pow(1.2, targetMemory.p) * score);// Higher priority = higher score by 20% per priority level
     }
-}
+}*/

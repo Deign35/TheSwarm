@@ -30,6 +30,8 @@ class SwarmCLI extends BasicProcess<SwarmCLIMemory> {
     protected get commands() {
         return this.memory.commands;
     }
+
+    // (TODO): Reset room.
     RunThread(): ThreadState {
         let cmd = this.commands.shift();
         if (cmd) {
@@ -102,7 +104,11 @@ class SwarmCLI extends BasicProcess<SwarmCLIMemory> {
         }
         switch (args[1]) {
             case (1):
-                // Add home room    
+                // Add home room
+                roomData.RoomType = {
+                    type: RT_Home,
+                    other: {}
+                }
                 break;
             case (2):
                 if (args.length != 3) {
