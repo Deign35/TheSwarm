@@ -1,9 +1,7 @@
 {
-    "folders": [
-        {
-            "path": "."
-        }
-    ],
+    "folders": [{
+        "path": "."
+    }],
     "settings": {
         "files.exclude": {
             "**/.git": true,
@@ -20,7 +18,7 @@
             "**/dist/": true,
             "**/package*.json": true,
             "**/tsconfig.json": true,
-            "**/Gruntfile.js": true,
+            "**/Gruntfile.js": false,
             "**/README.md": true
         },
         "mocha.enabled": false,

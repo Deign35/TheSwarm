@@ -30,26 +30,8 @@ class Harvester extends SoloJob<HarvesterMemory> {
         } else if (targetRoom.energyCapacityAvailable >= CreepBodies.Harvester[1].cost) {
             spawnLevel = 1;
         } else {
-            // Create spawn activities
-            for (let i = 0; i < 2; i++) {
-                let sID = this.spawnRegistry.requestSpawn({
-                    c: CT_Harvester,
-                    l: 0,
-                    n: this.memory.src.slice(-3) + '_SH' + i,
-                    p: this.pid
-                }, this.memory.rID, Priority_High, 1, {
-                        ct: CT_Harvester,
-                        lvl: 0,
-                        p: this.pid
-                    });
-
-                let newSpawnActivityMem: SpawnActivity_Memory = {
-                    sID: sID,
-                    HC: 'SupportHarvesterSpawn'
-                }
-                let newPID = this.kernel.startProcess(SPKG_SpawnActivity, newSpawnActivityMem);
-                this.kernel.setParent(newPID, this.pid);
-            }
+            this.SpawnSupportHarvester();
+            this.SpawnSupportHarvester();
         }
         return this.spawnRegistry.requestSpawn({
             l: spawnLevel,
@@ -140,12 +122,34 @@ class Harvester extends SoloJob<HarvesterMemory> {
         // Do Nothing;
     }
 
-    SupportHarvesterSpawn(creepID: CreepID) {
+    SpawnSupportHarvester() {
+        let sID = this.spawnRegistry.requestSpawn({
+            c: CT_Harvester,
+            l: 0,
+            n: 'SH' + GetRandomIndex(primes_100),
+            p: this.pid
+        }, this.memory.rID, Priority_High, 1, {
+                ct: CT_Harvester,
+                lvl: 0,
+                p: this.pid
+            });
+
+        let newSpawnActivityMem: SpawnActivity_Memory = {
+            sID: sID,
+            HC: 'SupportHarvesterHC'
+        }
+        let newPID = this.kernel.startProcess(SPKG_SpawnActivity, newSpawnActivityMem);
+        this.kernel.setParent(newPID, this.pid);
+    }
+
+    // (TODO): Set this up to auto refresh itself by checking energyCapacity
+    // Problem right now with this is not spawning them over and over (use the RoomBooter?)
+    SupportHarvesterHC(creepID: CreepID) {
         let newMem: RepetitiveCreepActivity_Memory = {
             a: [{
                 at: AT_Harvest,
                 e: [ERR_FULL, ERR_NOT_ENOUGH_ENERGY],
-                t: this.memory.src
+                t: this.memory.src,
             }],
             c: creepID,
         }
