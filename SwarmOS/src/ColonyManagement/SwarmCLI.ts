@@ -61,7 +61,7 @@ class SwarmCLI extends BasicProcess<SwarmCLIMemory> {
                     case (CLI_Kill):
                         if (cmd.args.length == 1 && this.kernel.getProcessByPID(cmd.args[0])) {
                             this.log.info(`Killing process ${cmd.args[0]}`)
-                            this.kernel.killProcess(cmd[0]);
+                            this.kernel.killProcess(cmd.args[0]);
                         }
                         break;
                     default:
