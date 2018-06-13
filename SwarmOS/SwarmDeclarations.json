@@ -211,7 +211,8 @@
             "entries": {
                 "Launch": "launch",
                 "ChangeFlag": "flagColor",
-                "Assimilate": "addRoom"
+                "Assimilate": "addRoom",
+                "Kill": "kill"
             }
         },
         "SET": {

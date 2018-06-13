@@ -58,12 +58,19 @@ class SwarmCLI extends BasicProcess<SwarmCLIMemory> {
                     case (CLI_Assimilate):
                         this.Assimilate(cmd.args);
                         break;
+                    case (CLI_Kill):
+                        if (cmd.args.length == 1 && this.kernel.getProcessByPID(cmd.args[0])) {
+                            this.log.info(`Killing process ${cmd.args[0]}`)
+                            this.kernel.killProcess(cmd[0]);
+                        }
+                        break;
                     default:
+                        this.log.info(`CLI Command(${cmd.command}) with args {${JSON.stringify(cmd.args)}}`);
                         break;
                 }
 
             } catch (ex) {
-                this.log.warn(`CLI Command(${cmd.command}) failed with args {${JSON.stringify(cmd.args)}} `);
+                this.log.warn(`CLI Command(${cmd.command}) failed with args {${JSON.stringify(cmd.args)}}`);
             }
         }
         return this.commands.length > 0 ? ThreadState_Active : ThreadState_Done;
