@@ -76,12 +76,16 @@ declare interface RoomState_AttachedCreepGroups {
     [CR_Harvester]?: IDictionary<ObjectID, PID>;
     [CR_Scout]?: PID;
     [CR_SpawnFill]?: PID;
-    [CR_Work]?: PID;
-
-    [RJ_Tower]?: PID;
 
     [CR_Fortify]?: PID;
     [CR_Science]?: PID;
+
+    [RJ_Tower]?: PID;
+
+    [CR_Work]: PID;
+    [RJ_Misc]: PID;
+    [RJ_Structures]: PID;
+    [RJ_WorkTarget]: PID;
 }
 
 declare interface CartographerMemory extends MemBase {

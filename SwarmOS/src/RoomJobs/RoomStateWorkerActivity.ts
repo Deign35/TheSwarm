@@ -68,18 +68,26 @@ class RoomStateWorkerTargetActivity extends RoomStateActivity<RoomStateActivity_
                     en: Math.ceil((siteToBuild.progressTotal - siteToBuild.progress) / BUILD_POWER)
                 }
                 nextTarget = siteToBuild;
+                return ThreadState_Waiting;
             }
         }
 
-        if (!nextTarget) {
+        if (this.roomData.owner == MY_USERNAME) {
             this.roomData.targets.Other = {
                 target: this.room.controller!.id,
                 at: AT_Upgrade,
                 t: TT_Controller,
                 en: 200
             }
+            return ThreadState_Waiting;
         }
 
-        return ThreadState_Waiting;
+        this.roomData.targets.Other = {
+            target: '',
+            at: AT_NoOp,
+            t: TT_None,
+            en: 0
+        }
+        return ThreadState_Done;
     }
 }

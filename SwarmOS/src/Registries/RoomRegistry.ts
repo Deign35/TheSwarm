@@ -60,7 +60,12 @@ class RoomRegistry extends BasicProcess<RoomStateMemory> {
                             container: [],
                             road: []
                         },
-                        groups: {},
+                        groups: {
+                            CR_Work: '',
+                            RJ_Misc: '',
+                            RJ_Structures: '',
+                            RJ_WorkTarget: ''
+                        },
                         targets: {
                             CR_SpawnFill: {
                                 energy: {},

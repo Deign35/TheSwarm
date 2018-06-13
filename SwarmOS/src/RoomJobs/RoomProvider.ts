@@ -6,6 +6,12 @@ export const OSPackage: IPackage<RoomStateMemory> = {
 
 import { PackageProviderBase, BasicProcess } from "Core/BasicTypes";
 
+const RequiredJobs = [
+    CR_Work,
+    RJ_Misc,
+    RJ_Structures,
+    RJ_WorkTarget
+]
 class RoomProvider extends BasicProcess<RoomProvider_Memory> {
     @extensionInterface(EXT_RoomView)
     protected View!: IRoomDataExtension;
@@ -23,10 +29,14 @@ class RoomProvider extends BasicProcess<RoomProvider_Memory> {
         if (!room) {
             return;
         }
+        for (let i = 0; i < RequiredJobs.length; i++) {
+            if (!data.groups[RequiredJobs[i]] || !this.kernel.getProcessByPID(data.groups[RequiredJobs[i]])) {
+                this.CreateRoomJob(RequiredJobs[i]);
+            }
+        }
 
         switch (data.RoomType.type) {
             case (RT_Home):
-                this._reqJobs[CJ_Work] = 1;
                 this._reqJobs[CJ_Refill] = 1;
                 this._reqJobs[CJ_Harvest] = data.sourceIDs.length;
                 this._reqJobs[CJ_Scout] = 2;
@@ -39,7 +49,6 @@ class RoomProvider extends BasicProcess<RoomProvider_Memory> {
                 }*/
                 break;
             case (RT_RemoteHarvest):
-                this._reqJobs[CJ_Work] = 1;
                 this._reqJobs[CJ_RemoteHarvest] = data.sourceIDs.length;
                 break;
             case (RT_Other):
@@ -68,9 +77,9 @@ class RoomProvider extends BasicProcess<RoomProvider_Memory> {
 
     CreateRoomJob(jobID: string) {
         let newJobMemory: MemBase & { rID: RoomID } = {
-            rID: this.memory.rID,
-            HC: 'RoomJobCheckin'
+            rID: this.memory.rID
         };
+
         switch (jobID) {
             case (CJ_Fortify):
                 break;
@@ -102,12 +111,15 @@ class RoomProvider extends BasicProcess<RoomProvider_Memory> {
             case (CJ_Work):
                 (newJobMemory as WorkerGroup_Memory).creeps = {}
                 break;
+            case (RJ_Misc):
+            case (RJ_Structures):
+            case (RJ_WorkTarget):
+                (newJobMemory as RoomStateActivity_Memory).lu = 0;
             case (RJ_Tower): // nothing atm
             default:
                 break;
         }
 
-        let newPID = this.kernel.startProcess(jobID, newJobMemory);
-        this.kernel.setParent(newPID, this.pid);
+        this.kernel.startProcess(jobID, newJobMemory);
     }
 }
