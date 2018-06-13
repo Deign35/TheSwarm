@@ -129,8 +129,6 @@ export class Statistics implements IStatistics {
         if (this.opts.baseStats) this.addBaseStats();
 
         let formattedStats: string = `text/${this.opts.driver.toLowerCase()}\n`;
-        formattedStats += `${Game.time}\n`;
-        formattedStats += `${Date.now()}\n`;
 
         let format = this[`format${this.opts.driver}`].bind(this); // Binds formatGraphite or formatInfluxDB to this object.
         _.each(this.stats, (v, k) => {
