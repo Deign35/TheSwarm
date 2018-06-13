@@ -9,6 +9,7 @@ declare interface RoomStateMemory extends MemBase {
 interface RoomState extends MemBase {
     lastUpdated: number;
     lastEnergy: number;
+
     cSites: ObjectID[];
     mineralIDs: ObjectID[];
     resources: ObjectID[];
@@ -21,6 +22,18 @@ interface RoomState extends MemBase {
     targets: {
         CR_SpawnFill: AttachedCreepGroup_Memory
         CR_Work: AttachedCreepGroup_Memory
+        Other: {
+            target: ObjectID;
+            at: ActionType;
+            t: TargetType;
+            en: number;     // Energy required to complete the job
+        };
+        Fill: {
+            target: ObjectID;
+            at: ActionType;
+            t: TargetType;
+            c: number; // (c)ount,
+        };
     }
     activityPID: PID;
     owner?: PlayerID;

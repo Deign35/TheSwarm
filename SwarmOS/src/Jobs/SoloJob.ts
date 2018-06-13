@@ -3,6 +3,9 @@ import { BasicProcess } from "Core/BasicTypes";
 export abstract class SoloJob<T extends SoloJob_Memory> extends BasicProcess<T> {
     @extensionInterface(EXT_CreepRegistry)
     creepRegistry!: ICreepRegistryExtensions;
+    @extensionInterface(EXT_CreepActivity)
+    protected creepActivity!: ICreepActivityExtensions;
+
     protected get homeRoom(): Room {
         return Game.rooms[this.memory.rID];
     }

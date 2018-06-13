@@ -6,12 +6,6 @@ export const OSPackage: IPackage<SpawnRegistry_Memory> = {
 import { SoloJob } from "./SoloJob";
 
 class RemoteHarvester extends SoloJob<RemoteHarvester_Memory> {
-    @extensionInterface(EXT_CreepRegistry)
-    creepRegistry!: ICreepRegistryExtensions;
-    @extensionInterface(EXT_RoomView)
-    protected View!: IRoomDataExtension;
-    @extensionInterface(EXT_CreepActivity)
-    protected creepActivity!: ICreepActivityExtensions;
     RunThread(): ThreadState {
         let creep = Game.creeps[this.memory.c!];
         if (!creep || (!creep.spawning && creep.ticksToLive! < 80)) {

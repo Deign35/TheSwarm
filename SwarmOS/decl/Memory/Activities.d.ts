@@ -29,3 +29,10 @@ declare interface SingleCreepActivity_Memory extends MemBase {
     r?: ResourceConstant // (r)esource type to withdraw or transfer
     t?: ObjectID;   // (t)arget
 }
+
+declare interface RoomStateActivity_Memory extends MemBase {
+    rID: RoomID;    // room
+    lu: number;     // (l)ast (u)pdated
+    nb?: boolean;   // (n)eeds re(b)oot
+    // (TODO): Change hb to nb all over.
+}

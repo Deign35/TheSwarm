@@ -58,7 +58,10 @@
             "type": true,
             "combinedType": "RoomJobs",
             "entries": [
-                "Tower"
+                "Tower",
+                "Misc",
+                "WorkTarget",
+                "Structures"
             ]
         },
         "CJ": {

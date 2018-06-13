@@ -69,6 +69,18 @@ class RoomRegistry extends BasicProcess<RoomStateMemory> {
                             CR_Work: {
                                 energy: {},
                                 targets: {}
+                            },
+                            Other: {
+                                at: AT_NoOp,
+                                t: TT_None,
+                                en: 0,
+                                target: ''
+                            },
+                            Fill: {
+                                at: AT_NoOp,
+                                t: TT_None,
+                                c: 0,
+                                target: ''
                             }
                         },
                         activityPID: '',

@@ -1,6 +1,3 @@
-1. Remote harvesting, my holy grail.
-2. Room Claimer & Reserver
-
 
 (WANT, but not needed right now!!!)
 Convert old jobs to SoloJobs
@@ -17,3 +14,5 @@ the harvest part will be done the same way.
 RoomActivity is way too big, it needs to be broken down some how -- Into each of the jobs?  // OH MY GOD... what is wrong with me???
 Creep memory should be broken down similar to how rooms are.
 Pre cached pathing
+
+room reserving and claiming
