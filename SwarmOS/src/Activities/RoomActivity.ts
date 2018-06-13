@@ -25,41 +25,12 @@ class RoomActivity extends BasicProcess<RoomActivity_Memory> {
     RunThread(): ThreadState {
         let roomData = this.View.GetRoomData(this.memory.rID)!;
         if (this.room) {
-            roomData.owner = (this.room.controller && (
-                (this.room.controller.owner && this.room.controller.owner.username) ||
-                (this.room.controller.reservation && this.room.controller.reservation.username)
-            )) || undefined;
+
 
             this.EnsureRoomGroups();
 
-            if (!this.memory.hb) {
-                let spawn = this.room.find(FIND_MY_SPAWNS);
-                if (spawn && spawn.length > 0) {
-                    this.room.createConstructionSite(spawn[0].pos.x - 1, spawn[0].pos.y, STRUCTURE_CONTAINER);
-                    let sources = this.room.find(FIND_SOURCES);
-                    for (let i = 0; i < sources.length; i++) {
-                        this.CreatePath(spawn[0].pos, sources[i].pos, true);
-                    }
-                    this.CreatePath(spawn[0].pos, this.room.controller!.pos, sources.length < 4);// limit of 5 containers
-                    for (let i = 0; i < sources.length; i++) {
-                        this.CreatePath(sources[i].pos, this.room.controller!.pos, false);
-                    }
-                }
 
-                this.memory.hb = true;
-            }
 
-            if (this.shouldRefresh(11, roomData!.minUpdateOffset, roomData.lastUpdated)) {
-                roomData.resources = this.room.find(FIND_DROPPED_RESOURCES).map((value: Resource) => {
-                    return value.id;
-                });
-            }
-
-            if (this.shouldRefresh(27, roomData!.minUpdateOffset, roomData.lastUpdated)) {
-                roomData.tombstones = this.room.find(FIND_TOMBSTONES).map((value: Tombstone) => {
-                    return value.id;
-                });
-            }
 
             // (TODO): Change this to plan out the layout
             if (this.shouldRefresh(29, roomData!.minUpdateOffset, roomData.lastUpdated)) {
@@ -400,36 +371,7 @@ class RoomActivity extends BasicProcess<RoomActivity_Memory> {
         return _.unique(nearbyRooms);
     }
 
-    protected CreatePath(from: RoomPosition, to: RoomPosition, buildContainer: boolean) {
-        if (!this.room) {
-            return false;
-        }
-        if (buildContainer) {
-            let nearby = to.findInRange(FIND_STRUCTURES, 1, {
-                filter: (struct) => {
-                    return struct.structureType == STRUCTURE_CONTAINER;
-                }
-            });
 
-            if (nearby && nearby.length > 0) {
-                to = nearby[0].pos;
-                buildContainer = false;
-            }
-        }
-        let path = from.findPathTo(to, {
-            ignoreCreeps: true,
-            ignoreDestructibleStructures: true,
-            ignoreRoads: true,
-            range: 1,
-            swampCost: 1
-        });
-        for (let i = 0; i < path.length - 1; i++) {
-            this.room.createConstructionSite(path[i].x, path[i].y, STRUCTURE_ROAD);
-        }
-        this.room.createConstructionSite(path[path.length - 1].x, path[path.length - 1].y, buildContainer ? STRUCTURE_CONTAINER : STRUCTURE_ROAD);
-
-        return true;
-    }
     protected EnsureRoomGroups() {
         let roomData = this.View.GetRoomData(this.memory.rID)!;
         if (!roomData.groups.CR_Work) {

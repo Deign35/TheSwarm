@@ -67,12 +67,6 @@ class RoomStateMiscActivity extends RoomStateActivity<RoomStateActivity_Memory> 
             });
         }
 
-        if (this.shouldRefresh(27, this.roomData.minUpdateOffset, this.memory.lu)) {
-            this.roomData.cSites = this.room.find(FIND_CONSTRUCTION_SITES).map((value: ConstructionSite) => {
-                return value.id;
-            });
-        }
-
         this.memory.lu = Game.time;
         return ThreadState_Done;
     }

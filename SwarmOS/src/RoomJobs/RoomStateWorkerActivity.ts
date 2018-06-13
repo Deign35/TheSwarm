@@ -22,6 +22,13 @@ class RoomStateWorkerTargetActivity extends RoomStateActivity<RoomStateActivity_
                 }
             }
         }
+        if (this.room) {
+            if (this.shouldRefresh(27, this.roomData.minUpdateOffset, this.memory.lu)) {
+                this.roomData.cSites = this.room.find(FIND_CONSTRUCTION_SITES).map((value: ConstructionSite) => {
+                    return value.id;
+                });
+            }
+        }
     }
 
     RunThread(): ThreadState {
@@ -33,12 +40,20 @@ class RoomStateWorkerTargetActivity extends RoomStateActivity<RoomStateActivity_
             this.roomData.targets.Other.at != AT_NoOp) {
             return ThreadState_Waiting;
         }
+        if (!curTarget) {
+            this.roomData.targets.Other = {
+                target: '',
+                at: AT_NoOp,
+                t: TT_None,
+                en: 0
+            }
+        }
 
         let nextTarget;
         if (this.roomData.targets.Other.t != TT_AnyStructure) {
             while (this.roomData.needsRepair.length > 0) {
                 nextTarget = Game.getObjectById<Structure>(this.roomData.needsRepair.splice(0, 1)![0]);
-                if (nextTarget) {
+                if (nextTarget && nextTarget != curTarget) {
                     this.roomData.targets.Other = {
                         t: TT_AnyStructure,
                         at: AT_Repair,
@@ -51,9 +66,10 @@ class RoomStateWorkerTargetActivity extends RoomStateActivity<RoomStateActivity_
 
         if (!nextTarget && this.roomData.targets.Other.t != TT_ConstructionSite && this.roomData.cSites.length > 0) {
             let siteToBuild: ConstructionSite | undefined = undefined;
+            // (TODO): Prioritize here.
             for (let i = 0; i < this.roomData.cSites.length; i++) {
                 let site = Game.getObjectById<ConstructionSite>(this.roomData.cSites[i]);
-                if (site) {
+                if (site && site != curTarget) {
                     if (!siteToBuild) {
                         siteToBuild = site;
                     }

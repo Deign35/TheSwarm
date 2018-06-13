@@ -54,9 +54,7 @@ class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory> {
         }, this.pid);
     }
 
-    protected HandleNoActivity() {
-        this.sleeper.sleep(this.pid, 3);
-    }
+    protected HandleNoActivity() {    }
 
     protected get energyTargets() {
         return this.View.GetRoomData(this.memory.rID)!.targets.CR_SpawnFill!.energy;
