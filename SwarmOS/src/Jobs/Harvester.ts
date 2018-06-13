@@ -41,6 +41,7 @@ class Harvester extends SoloJob<HarvesterMemory> {
                         hasSpawnedHarvester = true;
                         continue;
                     }
+                    this.log.info(`Spawning a harvester for ${this.memory.src}.`);
                     this.SpawnSupportHarvester();
                     if (hasSpawnedSupport) {
                         break;
@@ -49,6 +50,7 @@ class Harvester extends SoloJob<HarvesterMemory> {
                 }
             }
         }
+        this.log.info(`Spawning a harvester for ${this.memory.src}.`);
         return this.spawnRegistry.requestSpawn({
             l: spawnLevel,
             c: CT_Harvester,
@@ -78,13 +80,14 @@ class Harvester extends SoloJob<HarvesterMemory> {
                 p: { x: lastPosition.x, y: lastPosition.y, roomName: creep.room.name }
             }, this.pid);
         }
+        let container = Game.getObjectById<StructureContainer | ConstructionSite>(this.memory.sup);
 
         let source = Game.getObjectById<Source>(this.memory.src)!;
         if (source.pos.getRangeTo(creep.pos) > 1) {
             return this.creepActivity.CreateNewCreepActivity({
                 at: AT_MoveToPosition,
                 c: creep.name,
-                p: source.pos,
+                p: container ? container.pos : source.pos,
                 a: 1
             }, this.pid);
         }
@@ -97,7 +100,7 @@ class Harvester extends SoloJob<HarvesterMemory> {
                 e: [ERR_FULL]
             }, this.pid);
         }
-        let container = Game.getObjectById<StructureContainer | ConstructionSite>(this.memory.sup);
+
         if (creep.carry.energy > 0) {
             if (container) {
                 if ((container as StructureContainer).hitsMax) {

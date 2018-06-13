@@ -61,7 +61,7 @@ class RoomStateMiscActivity extends RoomStateActivity<RoomStateMisc_Memory> {
                 return value.id;
             });
 
-            if (this.roomData.RoomType.type == RT_Home) {
+            if (this.roomData.RoomType.type == RT_Home && this.room.energyAvailable == this.room.energyCapacityAvailable) {
                 if (this.memory.lr + 300 <= newCount || (this.memory.lr < newCount && newCount > 1000)) { // Should this scale?
                     // Spawn a worker
                     this.log.info(`Spawning a worker for ${this.memory.rID}.  Ground resources are growing quite quickly`);
@@ -153,14 +153,15 @@ class RoomStateStructureActivity extends RoomStateActivity<RoomStateActivity_Mem
                 if (!container) { continue; }
                 curEnergyLevel += container.energy || 0;
                 let sources = container.pos.findInRange(FIND_SOURCES, 1);
-                if (sources && sources.length > 0) {
-                    if (!this.roomData.targets.CR_SpawnFill.energy[containerID]) {
-                        this.roomData.targets.CR_SpawnFill.energy[containerID] = {
-                            a: AT_Withdraw,
-                            p: Priority_Medium,
-                            t: TT_StorageContainer
-                        }
+                if (!this.roomData.targets.CR_SpawnFill.energy[containerID]) {
+                    this.roomData.targets.CR_SpawnFill.energy[containerID] = {
+                        a: AT_Withdraw,
+                        p: Priority_Lowest,
+                        t: TT_StorageContainer
                     }
+                }
+                if (sources && sources.length > 0) {
+                    this.roomData.targets.CR_SpawnFill.energy[containerID].p = Priority_Medium
                 } else {
                     if (!this.roomData.targets.CR_SpawnFill.targets[containerID]) {
                         this.roomData.targets.CR_SpawnFill.targets[containerID] = {

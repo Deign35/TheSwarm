@@ -60,6 +60,7 @@ class RoomStateWorkerTargetActivity extends RoomStateActivity<RoomStateActivity_
                         target: nextTarget.id,
                         en: Math.ceil((nextTarget.hitsMax - nextTarget.hits) * REPAIR_COST)
                     }
+                    return ThreadState_Waiting;
                 }
             }
         }

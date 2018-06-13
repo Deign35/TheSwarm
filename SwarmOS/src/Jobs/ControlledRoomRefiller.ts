@@ -106,7 +106,7 @@ class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory> {
             let targetIDs = Object.keys(targets);
             for (let i = 0; i < targetIDs.length; i++) {
                 if (bestTarget) {
-                    if (this.targets[targetIDs[i]].p < this.targets[bestTarget].p) {
+                    if (targets[targetIDs[i]].p < targets[bestTarget].p) {
                         continue;
                     }
                 }
@@ -125,9 +125,10 @@ class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory> {
                 if (targetWants == 0) {
                     continue;
                 }
+
                 if (targetWants > creep.carryCapacity || targetWants <= creep.carry.energy) {
                     let dist = nextTarget.pos.getRangeTo(creep.pos);
-                    if (dist < closestDist) {
+                    if (bestTarget && targets[targetIDs[i]].p > targets[bestTarget].p || dist < closestDist) {
                         closestDist = dist;
                         bestTarget = nextTarget.id;
                         actionType = AT_Transfer;
@@ -141,8 +142,44 @@ class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory> {
             let targets = this.energyTargets;
             let targetIDs = Object.keys(targets);
             for (let i = 0; i < targetIDs.length; i++) {
-                let nexttarget = Game.getObjectById<ObjectTypeWithID>(targetIDs[i]);
-                if (!nexttarget) { continue; }
+                let nextTarget = Game.getObjectById<ObjectTypeWithID>(targetIDs[i]);
+                if (!nextTarget) { continue; }
+
+                if (bestTarget) {
+                    if (targets[targetIDs[i]].p < targets[bestTarget].p) {
+                        continue;
+                    }
+                }
+                let targetHas = 0;
+                switch (targets[targetIDs[i]].t) {
+                    case (TT_StorageContainer):
+                        targetHas = (nextTarget as StructureContainer).energy;
+                        break;
+                    case (TT_Creep):
+                        targetHas = (nextTarget as Creep).carry.energy;
+                        break;
+                }
+                if (bestTarget && targets[targetIDs[i]].p > targets[bestTarget].p) {
+                    closestDist = nextTarget.pos.getRangeTo(creep.pos);
+                    bestTarget = nextTarget.id;
+                    if (targets[targetIDs[i]].t == TT_Creep) {
+                        actionType = AT_RequestTransfer;
+                    } else {
+                        actionType = AT_Withdraw;
+                    }
+                }
+                if (targetHas > creep.carryCapacity - creep.carry.energy) {
+                    let dist = nextTarget.pos.getRangeTo(creep.pos);
+                    if (dist < closestDist) {
+                        closestDist = dist;
+                        bestTarget = nextTarget.id;
+                        if (targets[targetIDs[i]].t == TT_Creep) {
+                            actionType = AT_RequestTransfer;
+                        } else {
+                            actionType = AT_Withdraw;
+                        }
+                    }
+                }
             }
         }
 
