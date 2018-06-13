@@ -47,15 +47,7 @@ declare interface WorkerGroup_Memory extends MemBase {
     }
 }
 
-declare interface BootstrapRefiller_Memory extends MemBase {
-    ref: {              // (ref)iller
-        a?: PID;        // (a)ctivity
-        c?: CreepID;    // (creep)
-    }
-    rID: RoomID;            // (r)oom(ID)
-    s: ObjectID;            // (s)ource ID
-    hb: boolean;            // (h)as (b)oot
-}
+declare interface BootstrapRefiller_Memory extends SoloJob_Memory { }
 declare interface BootstrapBuilder_Memory extends MemBase {
     bui: {              // (bui)lder
         a?: PID;        // (a)ctivity

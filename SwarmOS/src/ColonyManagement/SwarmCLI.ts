@@ -102,8 +102,18 @@ class SwarmCLI extends BasicProcess<SwarmCLIMemory> {
             this.log.warn(`Cannot assimilate a room that has yet to be seen`);
             return;
         }
+        if (roomData.RoomType == args[1]) {
+            this.log.info(`Room already assimilated as ${args[1]}`);
+            return;
+        }
         switch (args[1]) {
             case (1):
+                let bootMem: BootstrapRefiller_Memory = {
+                    exp: true,
+                    rID: args[0],
+                    tr: args[0],
+                }
+                this.kernel.startProcess(CJ_BootRefill, bootMem);
                 // Add home room
                 roomData.RoomType = {
                     type: RT_Home,

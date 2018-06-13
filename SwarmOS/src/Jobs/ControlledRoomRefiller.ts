@@ -10,6 +10,14 @@ class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory> {
     creepActivity!: ICreepActivityExtensions;
     @extensionInterface(EXT_RoomView)
     protected View!: IRoomDataExtension;
+    RunThread() {
+        let homeRoomData = this.View.GetRoomData(this.memory.rID)!;
+        let provider = this.kernel.getProcessByPID(homeRoomData.activityPID);
+        if (provider && provider['RoomJobCheckin']) {
+            provider['RoomJobCheckin'](this.pkgName);
+        }
+        return super.RunThread();
+    }
 
     protected GetNewSpawnID(): string {
         let newName = this.memory.rID + '_Ref';
@@ -20,13 +28,12 @@ class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory> {
             level = 2;
         }
 
-        let priority: Priority = this.View.GetRoomData(this.memory.rID)!.groups.CR_BootFill ? Priority_Low : Priority_High;
         let sID = this.spawnRegistry.requestSpawn({
             c: CT_Refiller,
             l: level,
             n: newName,
             p: this.pid
-        }, this.memory.rID, priority, 1, {
+        }, this.memory.rID, Priority_Medium, 1, {
                 ct: CT_Refiller,
                 lvl: level,
                 p: this.pid

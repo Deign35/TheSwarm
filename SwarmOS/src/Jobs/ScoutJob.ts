@@ -14,6 +14,12 @@ class ScoutJob extends BasicProcess<ScoutJob_Memory> {
     protected creepActivity!: ICreepActivityExtensions;
 
     RunThread(): ThreadState {
+        let homeRoomData = this.View.GetRoomData(this.memory.rID)!;
+        let provider = this.kernel.getProcessByPID(homeRoomData.activityPID);
+        if (provider && provider['RoomJobCheckin']) {
+            provider['RoomJobCheckin'](this.pkgName);
+        }
+
         let creep = this.creepRegistry.tryGetCreep(this.memory.c, this.pid) as Creep | undefined;
         if (creep && !creep.spawning) {
             if (!this.memory.a || !this.kernel.getProcessByPID(this.memory.a)) {

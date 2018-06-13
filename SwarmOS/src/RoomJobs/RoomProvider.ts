@@ -94,7 +94,9 @@ class RoomProvider extends BasicProcess<RoomProvider_Memory> {
                     let pid = data.RoomType.other.sources[data.sourceIDs[i]];
                     if (!pid || !this.kernel.getProcessByPID(pid)) {
                         (newJobMemory as HarvestJob_Memory).t = data.sourceIDs[i];
-                        break;
+                        let newPID = this.kernel.startProcess(jobID, newJobMemory);
+                        data.RoomType.other.sources[data.sourceIDs[i]] = newPID;
+                        return newPID;
                     }
                 }
                 this.log.info(`Trying to add a harvesterjob to a room that is already full.  Disallowed`);

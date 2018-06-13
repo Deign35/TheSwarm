@@ -13,6 +13,12 @@ class HarvestJob extends BasicProcess<HarvestJob_Memory> {
     @extensionInterface(EXT_CreepActivity)
     protected creepActivity!: ICreepActivityExtensions;
     RunThread(): ThreadState {
+        let homeRoomData = this.View.GetRoomData(this.memory.rID)!;
+        let provider = this.kernel.getProcessByPID(homeRoomData.activityPID);
+        if (provider && provider['RoomJobCheckin']) {
+            provider['RoomJobCheckin'](this.pkgName);
+        }
+
         let target = Game.getObjectById(this.memory.t) as Source | Mineral;
         let inLink = Game.getObjectById(this.memory.l) as StructureLink | undefined;
         let container = Game.getObjectById(this.memory.c) as StructureContainer | undefined;
