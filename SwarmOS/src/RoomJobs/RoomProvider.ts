@@ -89,6 +89,9 @@ class RoomProvider extends BasicProcess<RoomProvider_Memory> {
         switch (jobID) {
             case (CJ_Fortify):
                 break;
+            case (CJ_RemoteHarvest):
+                newJobMemory.rID = this.roomData.RoomType.other.tr;
+                (newJobMemory as RemoteHarvester_Memory).tr = this.memory.rID;
             case (CJ_Harvest):
                 if (!this.roomData.RoomType.other.sources) {
                     this.roomData.RoomType.other.sources = {};
@@ -108,8 +111,6 @@ class RoomProvider extends BasicProcess<RoomProvider_Memory> {
             case (CJ_Refill):
                 (newJobMemory as ControlledRoomRefiller_Memory).tr = this.memory.rID;
                 break;
-            case (CJ_RemoteHarvest):
-                break;
             case (CJ_Science):
                 break;
             case (CJ_Scout):
@@ -124,6 +125,8 @@ class RoomProvider extends BasicProcess<RoomProvider_Memory> {
                 (newJobMemory as Worker_Memory).tr = this.roomData.RoomType.other.tr;
                 break;
             case (RJ_Misc):
+                (newJobMemory as RoomStateMisc_Memory).hr = this.roomData.RoomType.other.tr;
+                (newJobMemory as RoomStateMisc_Memory).lr = 0;
             case (RJ_Structures):
             case (RJ_WorkTarget):
                 (newJobMemory as RoomStateActivity_Memory).lu = 0;

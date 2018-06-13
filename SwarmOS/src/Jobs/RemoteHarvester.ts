@@ -22,7 +22,7 @@ class RemoteHarvester extends SoloJob<RemoteHarvester_Memory> {
         return this.spawnRegistry.requestSpawn({
             l: spawnLevel,
             c: CT_Harvester,
-            n: this.memory.rID + '_RH' + this.memory.t.slice(-1),
+            n: this.memory.rID + '_RH' + this.memory.src.slice(-1),
             p: this.pid
         }, this.memory.rID, Priority_Low, 3, {
                 ct: CT_Harvester,
@@ -49,8 +49,8 @@ class RemoteHarvester extends SoloJob<RemoteHarvester_Memory> {
             }, this.pid);
         }
 
-        let source = Game.getObjectById<Source>(this.memory.t)!;
-        let container = Game.getObjectById<StructureContainer | ConstructionSite>(this.memory.s);
+        let source = Game.getObjectById<Source>(this.memory.src)!;
+        let container = Game.getObjectById<StructureContainer | ConstructionSite>(this.memory.sup);
 
         if (source.pos.getRangeTo(creep.pos) > 1) {
             if (container) {
@@ -84,7 +84,7 @@ class RemoteHarvester extends SoloJob<RemoteHarvester_Memory> {
             if (containers && containers.length > 0) {
                 for (let i = 0; i < containers.length; i++) {
                     if (containers[i].structureType == STRUCTURE_CONTAINER) {
-                        this.memory.s = containers[i].id;
+                        this.memory.sup = containers[i].id;
                         container = containers[i] as StructureContainer;
                     }
                 }
@@ -92,7 +92,7 @@ class RemoteHarvester extends SoloJob<RemoteHarvester_Memory> {
             if (!container) {
                 let sites = creep.pos.lookFor(LOOK_CONSTRUCTION_SITES);
                 if (sites && sites.length > 0) {
-                    this.memory.s = sites[0].id;
+                    this.memory.sup = sites[0].id;
                     container = sites[0];
                 } else {
                     creep.room.createConstructionSite(creep.pos, STRUCTURE_CONTAINER);

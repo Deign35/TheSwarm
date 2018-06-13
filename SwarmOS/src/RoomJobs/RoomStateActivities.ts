@@ -62,8 +62,9 @@ class RoomStateMiscActivity extends RoomStateActivity<RoomStateMisc_Memory> {
             });
 
             if (this.roomData.RoomType.type == RT_Home) {
-                if (this.memory.lr + 300 <= newCount) { // Should this scale?
+                if (this.memory.lr + 300 <= newCount || (this.memory.lr < newCount && newCount > 1000)) { // Should this scale?
                     // Spawn a worker
+                    this.log.info(`Spawning a worker for ${this.memory.rID}.  Ground resources are growing quite quickly`);
                     let newMem: Worker_Memory = {
                         rID: this.memory.hr,
                         tr: this.memory.rID,
@@ -76,6 +77,8 @@ class RoomStateMiscActivity extends RoomStateActivity<RoomStateMisc_Memory> {
                     }
 
                     this.kernel.startProcess(CJ_Work, newMem);
+                } else {
+                    this.log.debug(`Resources On the ground diff: ${newCount - this.memory.lr}`);
                 }
             }
 
@@ -137,6 +140,13 @@ class RoomStateStructureActivity extends RoomStateActivity<RoomStateActivity_Mem
 
             let curEnergyLevel = 0;
             this.roomData.targets.CR_Work.energy = {};
+            for (let i = 0; i < this.roomData.resources.length; i++) {
+                this.roomData.targets.CR_Work.energy[this.roomData.resources[i]] = {
+                    a: AT_Pickup,
+                    p: Priority_Highest,
+                    t: TT_Resource
+                }
+            }
             for (let i = 0; i < this.roomData.structures.container.length; i++) {
                 let containerID = this.roomData.structures.container[i];
                 let container = Game.getObjectById(containerID) as StructureContainer;

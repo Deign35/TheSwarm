@@ -27,9 +27,7 @@ declare interface HarvesterMemory extends SoloJob_Memory {
     src: ObjectID;
     sup: ObjectID;
 }
-declare interface RemoteHarvester_Memory extends SoloJob_Memory {
-    t: ObjectID;        // (t)arget
-    s?: ObjectID;       // (s)upport (site or container)
+declare interface RemoteHarvester_Memory extends HarvesterMemory {
 }
 declare interface Worker_Memory extends SoloJob_Memory {
     target: {

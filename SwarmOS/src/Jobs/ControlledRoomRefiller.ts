@@ -105,43 +105,32 @@ class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory> {
             let targets = this.targets;
             let targetIDs = Object.keys(targets);
             for (let i = 0; i < targetIDs.length; i++) {
+                if (bestTarget) {
+                    if (this.targets[targetIDs[i]].p < this.targets[bestTarget].p) {
+                        continue;
+                    }
+                }
                 let nextTarget = Game.getObjectById<ObjectTypeWithID>(targetIDs[i]);
                 if (!nextTarget) { continue; }
-                let energyNeeded = 0;
+                let targetWants = 0;
                 switch (targets[targetIDs[i]].t) {
                     case (TT_StorageContainer):
-                        energyNeeded = (nextTarget as StructureTerminal).energyCapacity - (nextTarget as StructureContainer).energy;
+                        targetWants = (nextTarget as StructureTerminal).energyCapacity - (nextTarget as StructureContainer).energy;
                         break;
                     case (TT_Creep):
-                        energyNeeded = (nextTarget as Creep).carryCapacity - (nextTarget as Creep).carry.energy;
+                        targetWants = (nextTarget as Creep).carryCapacity - (nextTarget as Creep).carry.energy;
                         break;
                 }
 
-                if (energyNeeded == 0) {
+                if (targetWants == 0) {
                     continue;
                 }
-                if (energyNeeded > creep.carryCapacity || energyNeeded <= creep.carry.energy) {
+                if (targetWants > creep.carryCapacity || targetWants <= creep.carry.energy) {
                     let dist = nextTarget.pos.getRangeTo(creep.pos);
                     if (dist < closestDist) {
                         closestDist = dist;
                         bestTarget = nextTarget.id;
                         actionType = AT_Transfer;
-                    }
-                }
-            }
-
-            if (actionType == AT_NoOp) {
-                let creeps = this.homeRoom.find(FIND_MY_CREEPS);
-                for (let i = 0; i < creeps.length; i++) {
-                    if (creeps[i].memory.ct == CT_Worker) {
-                        if (creeps[i].carry.energy * 2 <= creeps[i].carryCapacity) {
-                            let dist = creeps[i].pos.getRangeTo(creep);
-                            if (dist < closestDist) {
-                                closestDist = dist;
-                                bestTarget = creep.id;
-                                actionType = AT_Transfer;
-                            }
-                        }
                     }
                 }
             }
@@ -154,7 +143,6 @@ class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory> {
             for (let i = 0; i < targetIDs.length; i++) {
                 let nexttarget = Game.getObjectById<ObjectTypeWithID>(targetIDs[i]);
                 if (!nexttarget) { continue; }
-
             }
         }
 

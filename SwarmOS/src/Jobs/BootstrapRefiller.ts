@@ -12,18 +12,9 @@ class BootstrapRefiller extends SoloJob<BootstrapRefiller_Memory> {
     protected View!: IRoomDataExtension;
 
     RunThread() {
-
-        let creeps = Game.rooms[this.memory.rID].find(FIND_MY_CREEPS);
-        if (creeps.length > 7) {
-            this.kernel.killProcess(this.pid);
+        if (this.CheckIfBootIsStillValid() == ThreadState_Done) {
+            this.EndProcess();
             return ThreadState_Done;
-        }
-
-        for (let i = 0; i < creeps.length; i++) {
-            if (creeps[i].memory.ct == CT_Refiller) {
-                this.kernel.killProcess(this.pid);
-                return ThreadState_Done;
-            }
         }
 
         return super.RunThread();
@@ -32,11 +23,11 @@ class BootstrapRefiller extends SoloJob<BootstrapRefiller_Memory> {
     GetNewSpawnID() {
         return this.spawnRegistry.requestSpawn({
             l: 0,
-            c: CT_Harvester,
+            c: CT_Worker,
             n: this.memory.rID + '_boot',
             p: this.pid
         }, this.memory.rID, Priority_EMERGENCY, 5, {
-                ct: CT_Harvester,
+                ct: CT_Worker,
                 lvl: 0,
                 p: this.pid
             });
@@ -117,5 +108,26 @@ class BootstrapRefiller extends SoloJob<BootstrapRefiller_Memory> {
             }
         }
         return this.creepActivity.CreateNewCreepActivity(newActivity, this.pid);
+    }
+
+    HandleNoActivity() {
+        if (!this.CheckIfBootIsStillValid()) {
+            super.HandleNoActivity();
+        }
+    }
+
+    CheckIfBootIsStillValid() {
+        let creeps = Game.rooms[this.memory.rID].find(FIND_MY_CREEPS);
+        if (creeps.length > 7) {
+            return ThreadState_Done;
+        }
+
+        for (let i = 0; i < creeps.length; i++) {
+            if (creeps[i].memory.ct == CT_Refiller) {
+                return ThreadState_Done;
+            }
+        }
+
+        return ThreadState_Active;
     }
 }

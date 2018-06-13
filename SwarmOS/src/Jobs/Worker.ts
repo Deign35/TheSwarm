@@ -15,6 +15,12 @@ class WorkerActivity extends SoloJob<Worker_Memory> {
     protected get roomData() {
         return this._roomData;
     }
+
+    PrepTick() {
+        this.hasRun = false;
+        this.hasNotified = false;
+        this._roomData = this.View.GetRoomData(this.memory.tr)!;
+    }
     RunThread(): ThreadState {
         if (!this.hasNotified) {
             let provider = this.kernel.getProcessByPID(this.roomData.activityPID);
@@ -31,12 +37,6 @@ class WorkerActivity extends SoloJob<Worker_Memory> {
 
         this.hasRun = false;
         return ThreadState_Waiting;
-    }
-
-    PrepTick() {
-        this.hasRun = false;
-        this.hasNotified = false;
-        this._roomData = this.View.GetRoomData(this.memory.rID)!;
     }
 
     protected GetNewSpawnID(): string {
