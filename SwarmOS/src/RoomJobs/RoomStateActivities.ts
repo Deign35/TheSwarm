@@ -62,7 +62,7 @@ class RoomStateMiscActivity extends RoomStateActivity<RoomStateMisc_Memory> {
             });
 
             if (this.roomData.RoomType.type == RT_Home && this.room.energyAvailable == this.room.energyCapacityAvailable) {
-                if (this.memory.lr + 300 <= newCount || (this.memory.lr < newCount && newCount > 1000)) { // Should this scale?
+                if (this.memory.lr + 300 <= newCount || (this.memory.lr < newCount && newCount > 2000)) { // Should this scale?
                     // Spawn a worker
                     this.log.info(`Spawning a worker for ${this.memory.rID}.  Ground resources are growing quite quickly`);
                     let newMem: Worker_Memory = {

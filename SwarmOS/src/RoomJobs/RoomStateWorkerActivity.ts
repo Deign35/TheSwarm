@@ -10,6 +10,8 @@ class RoomStateWorkerTargetActivity extends RoomStateActivity<RoomStateActivity_
         super.PrepTick();
         if (this.roomData.targets.Other.t == TT_Controller || this.roomData.targets.Other.at == AT_Repair) {
             this.roomData.targets.Other.en = 0;
+            this.roomData.targets.Other.at = AT_NoOp;
+            this.roomData.targets.Other.t = TT_None;
         }
 
         if (this.room && this.roomData.owner == MY_USERNAME) {
