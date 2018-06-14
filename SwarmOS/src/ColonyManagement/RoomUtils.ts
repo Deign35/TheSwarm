@@ -39,11 +39,11 @@ export const RoomActivityUtils = {
         }
         room.createConstructionSite(path[path.length - 1].x, path[path.length - 1].y, buildContainer ? STRUCTURE_CONTAINER : STRUCTURE_ROAD);
     },
-    CreateRoomJob(jobID: string, room: Room, roomData: RoomState, jobMem: SoloJob_Memory): SoloJob_Memory {
+    CreateRoomJob(jobID: string, roomID: RoomID, roomData: RoomState, jobMem: SoloJob_Memory): SoloJob_Memory {
         jobMem = Object.assign(jobMem, {
-            rID: room.name,
+            rID: roomID,
             exp: true,
-            tr: room.name
+            tr: roomID
         });
 
         switch (jobID) {

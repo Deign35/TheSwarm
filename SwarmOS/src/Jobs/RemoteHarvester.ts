@@ -4,11 +4,19 @@ export const OSPackage: IPackage<SpawnRegistry_Memory> = {
     }
 }
 import { SoloJob } from "./SoloJob";
+import { FindStructureNextTo } from "Tools/TheFinder";
 
 class RemoteHarvester extends SoloJob<RemoteHarvester_Memory> {
+    @extensionInterface(EXT_RoomView)
+    protected View!: IRoomDataExtension;
     RunThread(): ThreadState {
+        let homeRoomData = this.View.GetRoomData(this.memory.rID)!;
+        let provider = this.kernel.getProcessByPID(homeRoomData.activityPID);
+        if (provider && provider['RoomJobCheckin']) {
+            provider['RoomJobCheckin'](this.pkgName);
+        }
         let creep = Game.creeps[this.memory.c!];
-        if (!creep || (!creep.spawning && creep.ticksToLive! < 80)) {
+        if (creep && !creep.spawning && creep.ticksToLive! < 80) {
             delete this.memory.c;
             delete this.memory.a;
         }
@@ -17,7 +25,7 @@ class RemoteHarvester extends SoloJob<RemoteHarvester_Memory> {
 
     protected GetNewSpawnID(): string {
         let targetRoom = Game.rooms[this.memory.tr];
-        let spawnLevel = 2; // (TODO): Update this value based on if targetRoom is reserved
+        let spawnLevel = 2;
         let homeRoom = Game.rooms[this.memory.rID];
         return this.spawnRegistry.requestSpawn({
             l: spawnLevel,
@@ -53,60 +61,42 @@ class RemoteHarvester extends SoloJob<RemoteHarvester_Memory> {
         let container = Game.getObjectById<StructureContainer | ConstructionSite>(this.memory.sup);
 
         if (source.pos.getRangeTo(creep.pos) > 1) {
-            if (container) {
-                return this.creepActivity.CreateNewCreepActivity({
-                    at: AT_MoveToPosition,
-                    c: creep.name,
-                    p: { x: container.pos.x, y: container.pos.y, roomName: this.memory.tr }
-                }, this.pid);
+            return this.creepActivity.CreateNewCreepActivity({
+                at: AT_MoveToPosition,
+                c: creep.name,
+                p: container ? container.pos : source.pos,
+                a: container ? 0 : 1
+            }, this.pid);
+        } else if (!container) {
+            let structures = FindStructureNextTo(source.pos, STRUCTURE_CONTAINER);
+            if (structures && structures.length > 0) {
+                container = structures[0].structure as StructureContainer;
             } else {
-                // (TODO): Test perf for find path options
-                let path = creep.pos.findPathTo(source.pos, {
-                    range: 1,
-                    ignoreCreeps: true,
-                    ignoreDestructibleStructures: true,
-                    ignoreRoads: true
-                });
-                let lastPosition = path[path.length - 1];
-                if (!lastPosition) {
-                    throw new Error(`Remote Harvester attempted to find a path to the next room, but failed`);
-                }
-
-                return this.creepActivity.CreateNewCreepActivity({
-                    at: AT_MoveToPosition,
-                    c: creep.name,
-                    p: { x: lastPosition.x, y: lastPosition.y, roomName: creep.room.name }
-                }, this.pid);
-            }
-        }
-        if (!container) {
-            let containers = creep.pos.lookFor(LOOK_STRUCTURES);
-            if (containers && containers.length > 0) {
-                for (let i = 0; i < containers.length; i++) {
-                    if (containers[i].structureType == STRUCTURE_CONTAINER) {
-                        this.memory.sup = containers[i].id;
-                        container = containers[i] as StructureContainer;
+                let sites = creep.pos.lookFor(LOOK_CONSTRUCTION_SITES);
+                if (sites && sites.length > 0) {
+                    for (let i = 0; i < sites.length; i++) {
+                        if (sites[i].structureType == STRUCTURE_CONTAINER) {
+                            container = sites[i];
+                            break;
+                        }
                     }
                 }
             }
+
             if (!container) {
-                let sites = creep.pos.lookFor(LOOK_CONSTRUCTION_SITES);
-                if (sites && sites.length > 0) {
-                    this.memory.sup = sites[0].id;
-                    container = sites[0];
-                } else {
-                    creep.room.createConstructionSite(creep.pos, STRUCTURE_CONTAINER);
-                    return this.creepActivity.CreateNewCreepActivity({
-                        at: AT_Harvest,
-                        c: creep.name,
-                        t: source.id
-                    }, this.pid);
-                }
+                creep.room.createConstructionSite(creep.pos, STRUCTURE_CONTAINER);
+                return this.creepActivity.CreateNewCreepActivity({
+                    at: AT_Harvest,
+                    c: creep.name,
+                    t: source.id
+                }, this.pid);
+            } else {
+                this.memory.sup = container.id;
             }
         }
 
         if ((container as ConstructionSite).progressTotal) {
-            if (creep.carry.energy == creep.carryCapacity) {
+            if (creep.carry.energy > 0) {
                 return this.creepActivity.CreateNewCreepActivity({
                     at: AT_Build,
                     c: creep.name,

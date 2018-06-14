@@ -111,7 +111,7 @@ class SwarmCLI extends BasicProcess<SwarmCLIMemory> {
         let roomID: RoomID = args[0];
         let pkg: ScreepsPackage = args[1];
 
-        let jobMem = RoomActivityUtils.CreateRoomJob(pkg, Game.rooms[roomID], this.View.GetRoomData(roomID)!, args.length >= 3 ? args[2] : {});
+        let jobMem = RoomActivityUtils.CreateRoomJob(pkg, roomID, this.View.GetRoomData(roomID)!, args.length >= 3 ? args[2] : {});
         this.kernel.startProcess(pkg, jobMem);
     }
 
