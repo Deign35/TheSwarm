@@ -64,6 +64,9 @@ class RoomProvider extends BasicProcess<RoomProvider_Memory> {
         }
     }
     RunThread(): ThreadState {
+        if (Game.rooms[this.memory.rID]) {
+            this.roomData.lastUpdated = Game.time;
+        }
         return ThreadState_Done;
     }
 

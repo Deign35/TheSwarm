@@ -161,7 +161,7 @@ class RoomStateStructureActivity extends RoomStateActivity<RoomStateActivity_Mem
                     }
                 }
                 if (sources && sources.length > 0) {
-                    this.roomData.targets.CR_SpawnFill.energy[containerID].p = Priority_Medium
+                    this.roomData.targets.CR_SpawnFill.energy[containerID].p = Priority_Low
                 } else {
                     if (!this.roomData.targets.CR_SpawnFill.targets[containerID]) {
                         this.roomData.targets.CR_SpawnFill.targets[containerID] = {
@@ -186,7 +186,7 @@ class RoomStateStructureActivity extends RoomStateActivity<RoomStateActivity_Mem
                     if (!this.roomData.targets.CR_SpawnFill.targets[spawnID]) {
                         this.roomData.targets.CR_SpawnFill.targets[spawnID] = {
                             a: AT_Transfer,
-                            p: Priority_Medium,
+                            p: Priority_High,
                             t: TT_StorageContainer
                         }
                     }
@@ -199,7 +199,7 @@ class RoomStateStructureActivity extends RoomStateActivity<RoomStateActivity_Mem
                     if (!this.roomData.targets.CR_SpawnFill.targets[extensionID]) {
                         this.roomData.targets.CR_SpawnFill.targets[extensionID] = {
                             a: AT_Transfer,
-                            p: Priority_High,
+                            p: Priority_Highest,
                             t: TT_StorageContainer
                         }
                     }
