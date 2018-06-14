@@ -212,7 +212,8 @@
                 "Launch": "launch",
                 "ChangeFlag": "flagColor",
                 "Assimilate": "addRoom",
-                "Kill": "kill"
+                "Kill": "kill",
+                "Spawn": "spawn"
             }
         },
         "SET": {

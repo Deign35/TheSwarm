@@ -16,11 +16,7 @@ declare interface SoloJob_Memory extends MemBase {
     rID: RoomID;    // (h)ome room
     tr: RoomID;     // (t)arget (r)oom
 }
-declare interface ScoutJob_Memory extends MemBase {
-    a?: PID;        // (a)ctivity
-    c?: CreepID;    // (c)reep
-    rID: RoomID;    // (r)oom
-    t?: RoomID;     // (t)arget room
+declare interface ScoutJob_Memory extends SoloJob_Memory {
     n: RoomID[];    // (n)earby Rooms to scout
 }
 declare interface HarvesterMemory extends SoloJob_Memory {

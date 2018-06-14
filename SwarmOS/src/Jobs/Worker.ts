@@ -94,9 +94,10 @@ class WorkerActivity extends SoloJob<Worker_Memory> {
             if (roomData.targets.Other.en <= creep.carryCapacity) {
                 isValidTarget = creep.carry.energy >= roomData.targets.Other.en;
             }
+
             if (isValidTarget) {
                 let nextTarget = Game.getObjectById<ObjectTypeWithID>(roomData.targets.Other.target);
-                if (nextTarget) {
+                if (nextTarget && this.creepActivity.ValidateActionTarget(roomData.targets.Other.at, nextTarget)) {
                     let newActivity = this.creepActivity.CreateNewCreepActivity({
                         at: roomData.targets.Other.at,
                         c: creep.name,

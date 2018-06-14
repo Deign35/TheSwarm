@@ -143,7 +143,7 @@ class RoomStateStructureActivity extends RoomStateActivity<RoomStateActivity_Mem
             for (let i = 0; i < this.roomData.resources.length; i++) {
                 this.roomData.targets.CR_Work.energy[this.roomData.resources[i]] = {
                     a: AT_Pickup,
-                    p: Priority_Highest,
+                    p: Priority_Low,
                     t: TT_Resource
                 }
             }
@@ -173,7 +173,7 @@ class RoomStateStructureActivity extends RoomStateActivity<RoomStateActivity_Mem
                     if (!this.roomData.targets.CR_Work.energy[containerID]) {
                         this.roomData.targets.CR_Work.energy[containerID] = {
                             a: AT_Withdraw,
-                            p: Priority_Low,
+                            p: Priority_High,
                             t: TT_StorageContainer
                         }
                     }

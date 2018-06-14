@@ -64,6 +64,8 @@ class SwarmCLI extends BasicProcess<SwarmCLIMemory> {
                             this.kernel.killProcess(cmd.args[0]);
                         }
                         break;
+                    case (CLI_Spawn):
+                        this.SpawnCreep(cmd.args);
                     default:
                         this.log.info(`CLI Command(${cmd.command}) with args {${JSON.stringify(cmd.args)}}`);
                         break;
@@ -98,6 +100,19 @@ class SwarmCLI extends BasicProcess<SwarmCLIMemory> {
                 }
             }
         }
+    }
+
+    SpawnCreep(args: any[]) {
+        if (args.length < 2) {
+            this.log.warn(`Invalid number of arguments`);
+            return;
+        }
+
+        let roomID: RoomID = args[0];
+        let pkg: ScreepsPackage = args[1];
+
+        let jobMem = RoomActivityUtils.CreateRoomJob(pkg, Game.rooms[roomID], this.View.GetRoomData(roomID)!, args.length >= 3 ? args[2] : {});
+        this.kernel.startProcess(pkg, jobMem);
     }
 
     Assimilate(args: any[]) {
@@ -164,9 +179,4 @@ global['CLI'] = function (command: CLI_Command, ...args: any[]) {
 
 global['qb'] = function () {
     CLI(CLI_Assimilate, 'sim', RT_Home);
-}
-
-global['rb'] = function () {
-    CLI(CLI_Assimilate, 'sim', RT_None);
-
 }

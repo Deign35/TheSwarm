@@ -25,10 +25,9 @@ class ScoutJob extends BasicProcess<ScoutJob_Memory> {
             if (!this.memory.a || !this.kernel.getProcessByPID(this.memory.a)) {
                 this.CreateNewScoutActivity(this.memory.c!);
             }
-            if (creep.room.name == this.memory.t) {
-                this.memory.n = this.GatherNearbyRoomIDs(creep.room.name, 3);
+            if (creep.room.name == this.memory.tr) {
                 this.kernel.killProcess(this.memory.a);
-                this.memory.t = undefined;
+                delete this.memory.tr;
                 this.memory.a = undefined;
                 this.CreateNewScoutActivity(creep.name);
             }
@@ -78,6 +77,7 @@ class ScoutJob extends BasicProcess<ScoutJob_Memory> {
             this.CreateSpawnActivity();
             return;
         }
+        this.memory.n = this.GatherNearbyRoomIDs(creep.room.name, 2);
 
         if (creep.room.controller && creep.room.controller.my && (!creep.room.controller.sign ||
             (creep.room.controller.sign.text != MY_SIGNATURE && creep.room.controller.sign.text != SIGN_NOVICE_AREA && creep.room.controller.sign.text != SIGN_RESPAWN_AREA))) {
@@ -88,7 +88,7 @@ class ScoutJob extends BasicProcess<ScoutJob_Memory> {
                 m: MY_SIGNATURE,
                 HC: 'CreateNewScoutActivity'
             }, this.pid);
-            delete this.memory.t;
+            delete this.memory.tr;
             return;
         }
         let allRooms = this.memory.n;
@@ -135,13 +135,13 @@ class ScoutJob extends BasicProcess<ScoutJob_Memory> {
             }
         }
 
-        this.memory.t = nextRoom;
+        this.memory.tr = nextRoom;
         this.memory.a = this.creepActivity.CreateNewCreepActivity({
             at: AT_MoveToPosition,
             p: {
                 x: 25,
                 y: 25,
-                roomName: this.memory.t
+                roomName: this.memory.tr
             },
             c: creep.name,
             HC: 'CreateNewScoutActivity'
