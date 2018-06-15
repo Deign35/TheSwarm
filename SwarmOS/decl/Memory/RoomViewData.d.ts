@@ -37,7 +37,7 @@ interface RoomState extends MemBase {
     }
     activityPID: PID;
     owner?: PlayerID;
-
+    exits: { "1"?: string, "3"?: string, "5"?: string, "7"?: string };
     RoomType: {
         type: RoomType;
         other: {

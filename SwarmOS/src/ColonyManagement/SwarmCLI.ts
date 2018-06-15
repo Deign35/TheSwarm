@@ -66,6 +66,7 @@ class SwarmCLI extends BasicProcess<SwarmCLIMemory> {
                         break;
                     case (CLI_Spawn):
                         this.SpawnCreep(cmd.args);
+                        break;
                     default:
                         this.log.info(`CLI Command(${cmd.command}) with args {${JSON.stringify(cmd.args)}}`);
                         break;
@@ -110,9 +111,13 @@ class SwarmCLI extends BasicProcess<SwarmCLIMemory> {
 
         let roomID: RoomID = args[0];
         let pkg: ScreepsPackage = args[1];
+        let memory: any = args[2];
+        let count = args[3] || 1;
 
-        let jobMem = RoomActivityUtils.CreateRoomJob(pkg, roomID, this.View.GetRoomData(roomID)!, args.length >= 3 ? args[2] : {});
-        this.kernel.startProcess(pkg, jobMem);
+        for (let i = 0; i < count; i++) {
+            let jobMem = RoomActivityUtils.CreateRoomJob(pkg, roomID, this.View.GetRoomData(roomID)!, CopyObject(memory));
+            this.kernel.startProcess(pkg, jobMem);
+        }
     }
 
     Assimilate(args: any[]) {
@@ -173,7 +178,16 @@ class SwarmCLI extends BasicProcess<SwarmCLIMemory> {
 }
 
 global['CLI'] = function (command: CLI_Command, ...args: any[]) {
-    Memory.CLI.commands.push({ command, args });
+    if (command == CLI_ResetMemory) {
+        for (let name in Memory) {
+            if (name == 'creeps') {
+                continue;
+            }
+            delete Memory[name];
+        }
+    } else {
+        Memory.CLI.commands.push({ command, args });
+    }
     return OK;
 }
 

@@ -41,7 +41,20 @@ class RemoteHarvester extends SoloJob<RemoteHarvester_Memory> {
     protected CreateCustomCreepActivity(creep: Creep): string | undefined {
         let targetRoom = Game.rooms[this.memory.tr];
         if (!targetRoom) {
-            let path = creep.pos.findPathTo(new RoomPosition(25, 25, this.memory.tr), {
+            let map = Game.map.findRoute(creep.room.name, this.memory.tr);
+            let nextRoom = this.memory.tr;
+            if (map == ERR_NO_PATH) {
+                delete this.memory.tr
+                return this.creepActivity.CreateNewCreepActivity({
+                    at: AT_MoveToPosition,
+                    p: creep.pos,
+                    c: creep.name
+                }, this.pid)
+            }
+            if (map && map.length > 0) {
+                nextRoom = map[0].room;
+            }
+            let path = creep.pos.findPathTo(new RoomPosition(25, 25, nextRoom), {
                 ignoreCreeps: true,
                 ignoreRoads: true
             });
@@ -49,11 +62,21 @@ class RemoteHarvester extends SoloJob<RemoteHarvester_Memory> {
             if (!lastPosition) {
                 throw new Error(`Remote Harvester attempted to find a path to the next room, but failed`);
             }
+            if (lastPosition.x == 0) {
+                lastPosition.x = 49;
+            } else if (lastPosition.x == 49) {
+                lastPosition.x = 0;
+            }
+            if (lastPosition.y == 0) {
+                lastPosition.y = 49;
+            } else if (lastPosition.y == 49) {
+                lastPosition.y = 0;
+            }
 
             return this.creepActivity.CreateNewCreepActivity({
                 at: AT_MoveToPosition,
                 c: creep.name,
-                p: { x: lastPosition.x, y: lastPosition.y, roomName: creep.room.name }
+                p: { x: lastPosition.x, y: lastPosition.y, roomName: nextRoom }
             }, this.pid);
         }
 

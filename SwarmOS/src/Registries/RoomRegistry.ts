@@ -128,7 +128,8 @@ class RoomExtension extends ExtensionBase implements IRoomDataExtension {
                         tr: roomID
                     },
                     type: RT_None
-                }
+                },
+                exits: Game.map.describeExits(roomID)
             }
         }
 

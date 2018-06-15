@@ -168,7 +168,7 @@ class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory> {
                         actionType = AT_Withdraw;
                     }
                 }
-                if (targetHas > creep.carryCapacity - creep.carry.energy) {
+                if (targetHas >= creep.carryCapacity - creep.carry.energy) {
                     let dist = nextTarget.pos.getRangeTo(creep.pos);
                     if (dist < closestDist) {
                         closestDist = dist;

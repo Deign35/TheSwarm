@@ -213,7 +213,8 @@
                 "ChangeFlag": "flagColor",
                 "Assimilate": "addRoom",
                 "Kill": "kill",
-                "Spawn": "spawn"
+                "Spawn": "spawn",
+                "ResetMemory": "reset"
             }
         },
         "SET": {

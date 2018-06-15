@@ -15,16 +15,21 @@ class TowerJob extends BasicProcess<Tower_Memory> {
         return this.View.GetRoomData(this.memory.rID)!;
     }
     RunThread(): ThreadState {
+        let homeRoomData = this.View.GetRoomData(this.memory.rID)!;
+        let provider = this.kernel.getProcessByPID(homeRoomData.activityPID);
+        if (provider && provider['RoomJobCheckin']) {
+            provider['RoomJobCheckin'](this.pkgName);
+        }
         let otherCreeps = this.room.find(FIND_HOSTILE_CREEPS);
         if (otherCreeps.length == 0) {
-            this.sleeper.sleep(this.pid, 6);
+            //this.sleeper.sleep(this.pid, 6);
             return ThreadState_Done;
         }
 
         // (TODO): Add in heal targets if there are hostiles.
         let hostiles = this.GetHostileTargets(otherCreeps);
         if (hostiles.length == 0) {
-            this.sleeper.sleep(this.pid, 6);
+            //this.sleeper.sleep(this.pid, 6);
             return ThreadState_Done;
         }
 
