@@ -29,9 +29,9 @@ class RoomRegistry extends BasicProcess<RoomStateMemory> {
     }
     RunThread(): ThreadState {
         for (let roomID in Game.rooms) {
-            let data = this.RoomView.GetRoomData(roomID);
+            let data = this.View.GetRoomData(roomID);
             if (!data || !data.activityPID || !this.kernel.getProcessByPID(data.activityPID)) {
-                this.RoomView.BootRoom(roomID, false);
+                this.View.BootRoom(roomID, false);
             }
         }
 
