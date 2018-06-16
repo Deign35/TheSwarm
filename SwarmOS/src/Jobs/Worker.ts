@@ -6,9 +6,6 @@ export const OSPackage: IPackage<SpawnRegistry_Memory> = {
 import { SoloJob } from "./SoloJob";
 
 class WorkerActivity extends SoloJob<Worker_Memory> {
-    @extensionInterface(EXT_RoomView)
-    protected View!: IRoomDataExtension;
-
     private hasRun!: boolean;
     private hasNotified!: boolean;
     private _roomData!: RoomState;

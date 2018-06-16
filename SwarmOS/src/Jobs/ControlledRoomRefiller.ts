@@ -8,8 +8,6 @@ import { SoloJob } from "./SoloJob";
 class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory> {
     @extensionInterface(EXT_CreepActivity)
     creepActivity!: ICreepActivityExtensions;
-    @extensionInterface(EXT_RoomView)
-    protected View!: IRoomDataExtension;
     RunThread() {
         let homeRoomData = this.View.GetRoomData(this.memory.rID)!;
         let provider = this.kernel.getProcessByPID(homeRoomData.activityPID);

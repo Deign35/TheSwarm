@@ -7,8 +7,6 @@ import { SoloJob } from "./SoloJob";
 import { FindStructureNextTo } from "Tools/TheFinder";
 
 class RemoteHarvester extends SoloJob<RemoteHarvester_Memory> {
-    @extensionInterface(EXT_RoomView)
-    protected View!: IRoomDataExtension;
     RunThread(): ThreadState {
         let homeRoomData = this.View.GetRoomData(this.memory.rID)!;
         let provider = this.kernel.getProcessByPID(homeRoomData.activityPID);

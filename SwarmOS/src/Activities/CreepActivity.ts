@@ -11,8 +11,6 @@ class CreepActivity extends BasicProcess<CreepActivity_Memory> {
     protected creepActivity!: ICreepActivityExtensions;
     @extensionInterface(EXT_CreepRegistry)
     protected creepRegistry!: ICreepRegistryExtensions;
-    @extensionInterface(EXT_RoomView)
-    protected View!: IRoomDataExtension;
 
     AssignedCreep?: Creep;
     Target?: ObjectTypeWithID;

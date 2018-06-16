@@ -14,8 +14,6 @@ export const OSPackage: IPackage<RoomStateMemory> = {
 class RoomRegistry extends BasicProcess<RoomStateMemory> {
     get logID() { return 'RoomRegistry' };
     get logLevel() { return LOG_INFO as LogLevel; }
-    @extensionInterface(EXT_RoomView)
-    RoomView!: RoomExtension;
     get memory(): RoomStateMemory {
         if (!Memory.roomData) {
             this.log.warn(`Initializing RoomManager memory`);

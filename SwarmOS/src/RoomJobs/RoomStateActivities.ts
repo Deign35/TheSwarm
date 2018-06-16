@@ -8,9 +8,6 @@ export const OSPackage: IPackage<SpawnRegistry_Memory> = {
 import { BasicProcess } from "Core/BasicTypes";
 
 export abstract class RoomStateActivity<T extends RoomStateActivity_Memory> extends BasicProcess<T> {
-    @extensionInterface(EXT_RoomView)
-    protected View!: IRoomDataExtension;
-
     private _room?: Room;
     protected get room(): Room | undefined {
         return this._room;

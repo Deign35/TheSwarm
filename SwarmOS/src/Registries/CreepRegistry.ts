@@ -34,8 +34,6 @@ const BodyLegend = {
 class CreepRegistry extends BasicProcess<CreepRegistry_Memory> {
     @extensionInterface(EXT_CreepRegistry)
     Extensions!: ICreepRegistryExtensions;
-    @extensionInterface(EXT_RoomView)
-    View!: IRoomDataExtension;
     get memory(): CreepRegistry_Memory {
         if (!Memory.creepData) {
             this.log.warn(`Initializing CreepRegistry memory`);

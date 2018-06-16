@@ -8,9 +8,6 @@ import { FindNextTo, FindStructureNextTo } from "Tools/TheFinder";
 import { SoloJob } from "./SoloJob";
 
 class BootstrapRefiller extends SoloJob<BootstrapRefiller_Memory> {
-    @extensionInterface(EXT_RoomView)
-    protected View!: IRoomDataExtension;
-
     RunThread() {
         if (this.CheckIfBootIsStillValid() == ThreadState_Done) {
             this.EndProcess();

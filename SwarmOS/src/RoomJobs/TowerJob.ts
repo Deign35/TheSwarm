@@ -6,8 +6,6 @@ export const OSPackage: IPackage<SpawnRegistry_Memory> = {
 import { BasicProcess } from "Core/BasicTypes";
 
 class TowerJob extends BasicProcess<Tower_Memory> {
-    @extensionInterface(EXT_RoomView)
-    protected View!: IRoomDataExtension;
     get room() {
         return Game.rooms[this.memory.rID];
     }
@@ -20,6 +18,21 @@ class TowerJob extends BasicProcess<Tower_Memory> {
         if (provider && provider['RoomJobCheckin']) {
             provider['RoomJobCheckin'](this.pkgName);
         }
+
+        let towerIDs = this.roomData.structures.tower!;
+        if (!towerIDs || towerIDs.length == 0) {
+            this.EndProcess();
+            return ThreadState_Done;
+        }
+        for (let i = 0; i < towerIDs.length; i++) {
+            if (!homeRoomData.targets.CR_SpawnFill.targets[towerIDs[i]]) {
+                homeRoomData.targets.CR_SpawnFill.targets[towerIDs[i]] = {
+                    a: AT_Transfer,
+                    p: Priority_High,
+                    t: TT_StorageContainer
+                }
+            }
+        }
         let otherCreeps = this.room.find(FIND_HOSTILE_CREEPS);
         if (otherCreeps.length == 0) {
             //this.sleeper.sleep(this.pid, 6);
@@ -30,12 +43,6 @@ class TowerJob extends BasicProcess<Tower_Memory> {
         let hostiles = this.GetHostileTargets(otherCreeps);
         if (hostiles.length == 0) {
             //this.sleeper.sleep(this.pid, 6);
-            return ThreadState_Done;
-        }
-
-        let towerIDs = this.roomData.structures.tower!;
-        if (!towerIDs || towerIDs.length == 0) {
-            this.EndProcess();
             return ThreadState_Done;
         }
         for (let i = 0; i < towerIDs.length; i++) {

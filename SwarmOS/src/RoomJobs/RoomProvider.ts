@@ -12,8 +12,6 @@ const RequiredJobs = [
     RJ_WorkTarget
 ]
 class RoomProvider extends BasicProcess<RoomProvider_Memory> {
-    @extensionInterface(EXT_RoomView)
-    protected View!: IRoomDataExtension;
 
     private _reqJobs!: IDictionary<string, number>;
 

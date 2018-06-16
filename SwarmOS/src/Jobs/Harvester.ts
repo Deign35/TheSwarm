@@ -7,8 +7,6 @@ import { SoloJob } from "./SoloJob";
 import { FindNextTo, FindStructureNextTo } from "Tools/TheFinder";
 
 class Harvester extends SoloJob<HarvesterMemory> {
-    @extensionInterface(EXT_RoomView)
-    protected View!: IRoomDataExtension;
     RunThread(): ThreadState {
         let homeRoomData = this.View.GetRoomData(this.memory.rID)!;
         let provider = this.kernel.getProcessByPID(homeRoomData.activityPID);
@@ -84,7 +82,7 @@ class Harvester extends SoloJob<HarvesterMemory> {
             });
             let lastPosition = path[path.length - 1];
             if (!lastPosition) {
-                throw new Error(`Remote Harvester attempted to find a path to the next room, but failed`);
+                throw new Error(`Harvester attempted to find a path to the next room, but failed`);
             }
             if (lastPosition.x == 0) {
                 lastPosition.x = 49;

@@ -16,8 +16,6 @@ class SwarmCLI extends BasicProcess<SwarmCLIMemory> {
     protected creepActivity!: ICreepActivityExtensions;
     @extensionInterface(EXT_CreepRegistry)
     protected creepRegistry!: ICreepRegistryExtensions;
-    @extensionInterface(EXT_RoomView)
-    protected View!: IRoomDataExtension;
 
     get memory(): SwarmCLIMemory {
         if (!Memory.CLI) {

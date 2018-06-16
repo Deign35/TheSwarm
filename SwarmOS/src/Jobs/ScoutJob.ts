@@ -6,8 +6,6 @@ export const OSPackage: IPackage<SpawnRegistry_Memory> = {
 import { SoloJob } from "./SoloJob";
 
 class ScoutJob extends SoloJob<ScoutJob_Memory> {
-    @extensionInterface(EXT_RoomView)
-    protected View!: IRoomDataExtension;
     protected GetNewSpawnID(): string {
         let spawnLevel = 0;
         return this.spawnRegistry.requestSpawn({
@@ -79,7 +77,7 @@ class ScoutJob extends SoloJob<ScoutJob_Memory> {
             });
             let lastPosition = path[path.length - 1];
             if (!lastPosition) {
-                throw new Error(`Remote Harvester attempted to find a path to the next room, but failed`);
+                throw new Error(`Scout attempted to find a path to the next room, but failed`);
             }
             if (lastPosition.x == 0) {
                 lastPosition.x = 49;
