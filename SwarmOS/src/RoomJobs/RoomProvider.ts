@@ -37,10 +37,18 @@ class RoomProvider extends BasicProcess<RoomProvider_Memory> {
             }
         }
 
+        // Set minimum number of jobs.
+        let energyCap = room.energyCapacityAvailable;
+        let cSites = room.find(FIND_MY_CONSTRUCTION_SITES);
         switch (this.roomData.RoomType.type) {
             case (RT_Home):
-                this._reqJobs[CJ_Work] = 1;
-                this._reqJobs[CJ_Refill] = this.roomData.sourceIDs.length;
+                this._reqJobs[CJ_Work] = 1 + (cSites.length > 0 ? 1 : 0);
+                this._reqJobs[CJ_Refill] = 1;
+                if (room.controller!.level < 4) {
+                    this._reqJobs[CJ_Refill] = 2 * this.roomData.sourceIDs.length;
+                } else if (energyCap < CreepBodies.Refiller[4].cost) {
+                    this._reqJobs[CJ_Refill] *= 2;
+                }
                 this._reqJobs[CJ_Harvest] = this.roomData.sourceIDs.length;
                 this._reqJobs[CJ_Scout] = 0;
                 if (this.roomData.structures.tower && this.roomData.structures.tower.length > 0) {
