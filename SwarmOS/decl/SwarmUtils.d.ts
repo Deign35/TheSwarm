@@ -84,3 +84,4 @@ declare function CLI(command: CLI_Assimilate, roomID: RoomID, roomType: RoomType
 
 declare function CLI(command: CLI_Launch, pkg: ScreepsPackage, startMem: MemBase): ScreepsReturnCode;
 declare function CLI(command: CLI_ChangeFlag, priA: ColorConstant, priB: ColorConstant, secA?: ColorConstant, secB?: ColorConstant): ScreepsReturnCode;
+declare function CLI(command: CLI_Spawn, roomID: RoomID, jobType: CreepJobsPackage, num?: number, mem?: MemBase): ScreepsReturnCode;

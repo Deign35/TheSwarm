@@ -37,7 +37,7 @@ class SwarmCLI extends BasicProcess<SwarmCLIMemory> {
         let cmd = this.commands.shift();
         if (cmd) {
             try {
-                this.log.info(`Processing CLI_${cmd.command}(${JSON.stringify(cmd.args)})`)
+                this.log.info(`Processing ${cmd.command}(${JSON.stringify(cmd.args)})`)
                 switch (cmd.command) {
                     case (CLI_Launch):
                         if (cmd.args && cmd.args.length == 2) {
@@ -111,8 +111,8 @@ class SwarmCLI extends BasicProcess<SwarmCLIMemory> {
 
         let roomID: RoomID = args[0];
         let pkg: ScreepsPackage = args[1];
-        let memory: any = args[2];
-        let count = args[3] || 1;
+        let memory: any = args[3] || {};
+        let count = args[2] || 1;
 
         for (let i = 0; i < count; i++) {
             let jobMem = RoomActivityUtils.CreateRoomJob(pkg, roomID, this.View.GetRoomData(roomID)!, CopyObject(memory));
