@@ -1,4 +1,5 @@
 declare interface MemBase {
+    CV?: string; // Default (C)allback (V)alue to the HC.
     HC?: string; // (H)andle of the (C)allback function for informing the parent process that this process has died.
 }
 

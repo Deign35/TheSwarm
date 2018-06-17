@@ -2094,9 +2094,13 @@ interface OrderFilter {
 }
 
 interface ScreepsObject_CreepMemory {
+    [id: string]: any;
     ct: CT_ALL;
     lvl: number;
     p: PID;     // Spawning PID
+
+    s?: ObjectID; // Harvester: sourceID
+    sup?: boolean; // Is a support creep (not the leader)
 }
 interface ScreepsObject_FlagMemory { }
 interface ScreepsObject_RoomMemory { }

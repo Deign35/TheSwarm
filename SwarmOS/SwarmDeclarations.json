@@ -61,7 +61,8 @@
                 "Tower",
                 "Misc",
                 "WorkTarget",
-                "Structures"
+                "Structures",
+                "Harvest"
             ]
         },
         "CJ": {
@@ -270,7 +271,8 @@
                 "RangedMassAttack": 20,
                 "ReserveController": 21,
                 "SignController": 22,
-                "Suicide": 23
+                "Suicide": 23,
+                "MoveToRoom": 24
             }
         }
     }

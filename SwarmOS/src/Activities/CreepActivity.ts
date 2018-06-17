@@ -23,6 +23,10 @@ class CreepActivity extends BasicProcess<CreepActivity_Memory> {
             return ThreadState_Done;
         }
 
+        if (this.memory.at == AT_MoveToRoom) {
+            
+        }
+
         if (this.memory.at == AT_MoveToPosition) {
             let result = this.creepActivity.RunActivity(this.CreateActivityArgs());
             if (result == ERR_NOT_IN_RANGE || result == ERR_BUSY || result == ERR_TIRED) {

@@ -21,6 +21,15 @@ declare interface RoomStateActivity_Memory extends MemBase {
     // (TODO): Change hb to nb all over.
 }
 
+declare interface RoomStateHarvest_Memory extends RoomStateActivity_Memory {
+    harvesters: {
+        [id: string]: {
+            sup?: ObjectID;  //support structure
+            pid?: PID;
+        }
+    }
+}
+
 declare interface RoomStateMisc_Memory extends RoomStateActivity_Memory {
     lr: number;     // (l)ast (r)esources
 }

@@ -28,9 +28,9 @@ class RemoteHarvester extends SoloJob<RemoteHarvester_Memory> {
         return this.spawnRegistry.requestSpawn({
             l: spawnLevel,
             c: CT_Harvester,
-            n: this.memory.rID + '_RH' + this.memory.src.slice(-1),
+            n: this.memory.tr + '_RH' + this.memory.src.slice(-1),
             p: this.pid
-        }, this.memory.rID, Priority_Low, 3, {
+        }, this.memory.tr, Priority_Low, 3, {
                 ct: CT_Harvester,
                 lvl: spawnLevel,
                 p: this.pid
