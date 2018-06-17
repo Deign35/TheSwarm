@@ -157,6 +157,9 @@ class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory> {
                         targetHas = (nextTarget as Creep).carry.energy;
                         break;
                 }
+                if (targetHas < creep.carryCapacity) {
+                    continue;
+                }
                 if (bestTarget && targets[targetIDs[i]].p > targets[bestTarget].p) {
                     closestDist = nextTarget.pos.getRangeTo(creep.pos);
                     bestTarget = nextTarget.id;
