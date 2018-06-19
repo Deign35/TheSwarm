@@ -13,7 +13,7 @@ class ScoutJob extends SoloJob<ScoutJob_Memory> {
             c: CT_Scout,
             n: (Game.time + '_Sc').slice(-6),
             p: this.pid
-        }, this.memory.rID, Priority_Lowest, 1, {
+        }, this.memory.home, Priority_Lowest, 1, {
                 ct: CT_Scout,
                 lvl: spawnLevel,
                 p: this.pid
@@ -34,9 +34,9 @@ class ScoutJob extends SoloJob<ScoutJob_Memory> {
             }
         }
 
-        if (!this.memory.tr || creep.room.name == this.memory.tr) {
-            let nearby = this.GatherNearbyRoomIDs(this.memory.rID, 3);
-            let nextRoom = this.memory.rID;
+        if (!this.memory.rID || creep.room.name == this.memory.rID) {
+            let nearby = this.GatherNearbyRoomIDs(creep.room.name, 2);
+            let nextRoom = this.memory.home;
             let bestRoom: RoomState | undefined = undefined;
             for (let i = 0; i < nearby.length; i++) {
                 let data = this.View.GetRoomData(nearby[i]);
@@ -54,14 +54,14 @@ class ScoutJob extends SoloJob<ScoutJob_Memory> {
                 bestRoom = data;
                 nextRoom = nearby[i];
             }
-            this.memory.tr = nextRoom;
+            this.memory.rID = nextRoom;
         }
 
-        if (creep.room.name != this.memory.tr) {
-            let map = Game.map.findRoute(creep.room.name, this.memory.tr);
-            let nextRoom = this.memory.tr;
+        if (creep.room.name != this.memory.rID) {
+            let map = Game.map.findRoute(creep.room.name, this.memory.rID);
+            let nextRoom = this.memory.rID;
             if (map == ERR_NO_PATH) {
-                delete this.memory.tr
+                delete this.memory.rID
                 return this.creepActivity.CreateNewCreepActivity({
                     at: AT_MoveToPosition,
                     p: creep.pos,
@@ -72,8 +72,7 @@ class ScoutJob extends SoloJob<ScoutJob_Memory> {
                 nextRoom = map[0].room;
             }
             let path = creep.pos.findPathTo(new RoomPosition(25, 25, nextRoom), {
-                ignoreCreeps: true,
-                ignoreRoads: true
+                ignoreCreeps: true
             });
             let lastPosition = path[path.length - 1];
             if (!lastPosition) {
@@ -90,6 +89,7 @@ class ScoutJob extends SoloJob<ScoutJob_Memory> {
         return undefined;
     }
 
+    // (TODO): Cache these results for future use (between OS loads)
     protected GatherNearbyRoomIDs(centerRoom: RoomID, distance: number): RoomID[] {
         let nearbyRooms: RoomID[] = [];
         let roomData = this.View.GetRoomData(centerRoom);

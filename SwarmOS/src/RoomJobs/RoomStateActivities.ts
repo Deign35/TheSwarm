@@ -1,7 +1,6 @@
 export const OSPackage: IPackage<SpawnRegistry_Memory> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
         processRegistry.register(RJ_Misc, RoomStateMiscActivity);
-        processRegistry.register(RJ_Structures, RoomStateStructureActivity);
     }
 }
 
@@ -60,8 +59,8 @@ class RoomStateMiscActivity extends RoomStateActivity<RoomStateMisc_Memory> {
                     // Spawn a worker
                     this.log.info(`Spawning a worker for ${this.memory.rID}.  Ground resources are growing quite quickly`);
                     let newMem: Worker_Memory = {
-                        rID: this.memory.hr,
-                        tr: this.memory.rID,
+                        home: this.memory.hr,
+                        rID: this.memory.rID,
                         target: {
                             at: AT_NoOp,
                             t: '',
@@ -77,17 +76,6 @@ class RoomStateMiscActivity extends RoomStateActivity<RoomStateMisc_Memory> {
             }
 
             this.memory.lr = newCount;
-        }
-
-        this.memory.lu = Game.time;
-        return ThreadState_Done;
-    }
-}
-
-class RoomStateStructureActivity extends RoomStateActivity<RoomStateActivity_Memory> {
-    RunThread(): ThreadState {
-        if (!this.room) {
-            return ThreadState_Done;
         }
 
         this.memory.lu = Game.time;

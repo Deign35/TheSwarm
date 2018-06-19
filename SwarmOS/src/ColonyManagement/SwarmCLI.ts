@@ -144,8 +144,8 @@ class SwarmCLI extends BasicProcess<SwarmCLIMemory> {
             case (RT_Home):
                 let bootMem: BootstrapRefiller_Memory = {
                     exp: true,
+                    home: roomID,
                     rID: roomID,
-                    tr: roomID,
                 }
                 this.kernel.startProcess(CJ_BootRefill, bootMem);
                 // Add home room

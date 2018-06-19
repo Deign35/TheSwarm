@@ -7,7 +7,7 @@ export abstract class SoloJob<T extends SoloJob_Memory> extends BasicProcess<T> 
     protected creepActivity!: ICreepActivityExtensions;
 
     protected get homeRoom(): Room {
-        return Game.rooms[this.memory.rID];
+        return Game.rooms[this.memory.home];
     }
     protected creep: Creep | undefined;
 

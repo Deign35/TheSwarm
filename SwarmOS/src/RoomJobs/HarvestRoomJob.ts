@@ -200,7 +200,6 @@ class RoomStateHarvestActivity extends RoomStateActivity<RoomStateHarvest_Memory
             return;
         }
 
-        let actions: SingleCreepActivity_Memory[] = [];
         let moveTarget = Game.getObjectById<ConstructionSite | StructureContainer>(this.memory.harvesters[creep.memory.s].sup);
         if (!creep.memory.sup && (!moveTarget || (moveTarget as ConstructionSite).progressTotal)) {
             this.memory.harvesters[creep.memory.s].pid = this.creepActivity.CreateNewCreepActivity({

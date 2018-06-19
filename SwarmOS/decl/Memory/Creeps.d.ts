@@ -13,17 +13,17 @@ declare interface SoloJob_Memory extends MemBase {
     a?: PID;        // (a)ctivity
     c?: CreepID;    // (c)reep
     exp?: boolean;  // (exp)pires -- Kill the process when the creep dies
-    rID: RoomID;    // (h)ome room
-    tr: RoomID;     // (t)arget (r)oom
+    home: RoomID;    // (h)ome room
+    rID: RoomID;     // (t)arget (r)oom
 }
 declare interface ScoutJob_Memory extends SoloJob_Memory {
     n: RoomID[];    // (n)earby Rooms to scout
 }
 declare interface HarvesterMemory extends SoloJob_Memory {
     src: ObjectID;
-    sup: ObjectID;
-}
-declare interface RemoteHarvester_Memory extends HarvesterMemory {
+    helper: boolean;
+    supStr: ObjectID;
+    spLvl: number;
 }
 declare interface Worker_Memory extends SoloJob_Memory {
     target: {

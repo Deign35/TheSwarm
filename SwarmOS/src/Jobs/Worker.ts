@@ -16,7 +16,7 @@ class WorkerActivity extends SoloJob<Worker_Memory> {
     PrepTick() {
         this.hasRun = false;
         this.hasNotified = false;
-        this._roomData = this.View.GetRoomData(this.memory.tr)!;
+        this._roomData = this.View.GetRoomData(this.memory.rID)!;
     }
     RunThread(): ThreadState {
         if (!this.hasNotified) {
@@ -37,8 +37,8 @@ class WorkerActivity extends SoloJob<Worker_Memory> {
     }
 
     protected GetNewSpawnID(): string {
-        let targetRoom = Game.rooms[this.memory.tr];
-        let homeRoom = Game.rooms[this.memory.rID];
+        let targetRoom = Game.rooms[this.memory.rID];
+        let homeRoom = Game.rooms[this.memory.home];
 
         let spawnLevel = 0;
         let energyCapacity = homeRoom.energyCapacityAvailable;
@@ -60,9 +60,9 @@ class WorkerActivity extends SoloJob<Worker_Memory> {
             });
     }
     protected CreateCustomCreepActivity(creep: Creep): string | undefined {
-        let targetRoom = Game.rooms[this.memory.tr];
+        let targetRoom = Game.rooms[this.memory.rID];
         if (!targetRoom) {
-            let path = creep.pos.findPathTo(new RoomPosition(25, 25, this.memory.tr), {
+            let path = creep.pos.findPathTo(new RoomPosition(25, 25, this.memory.rID), {
                 ignoreCreeps: true,
                 ignoreRoads: true
             });

@@ -39,7 +39,7 @@ export const RoomActivityUtils = {
         jobMem = Object.assign(jobMem, {
             rID: roomID,
             exp: true,
-            tr: roomID
+            home: roomID
         });
 
         switch (jobID) {
@@ -49,7 +49,7 @@ export const RoomActivityUtils = {
                 console.log(`Command ${jobID} is not configured`);
                 break;
             case (CJ_RemoteHarvest):
-                jobMem.rID = roomData.RoomType.other.tr;
+                jobMem.home = roomData.RoomType.other.tr;
                 break;
             case (CJ_Harvest):
             case (CJ_Refill):
@@ -59,7 +59,7 @@ export const RoomActivityUtils = {
                     t: '',
                     tt: TT_None
                 };
-                (jobMem as Worker_Memory).tr = roomData.RoomType.other.tr;
+                (jobMem as Worker_Memory).home = roomData.RoomType.other.tr;
                 break;
             default:
                 break;

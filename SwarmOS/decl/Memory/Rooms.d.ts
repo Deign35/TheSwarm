@@ -11,6 +11,7 @@ declare interface Tower_Memory extends MemBase {
 
 declare interface RoomProvider_Memory extends MemBase {
     rID: RoomID;
+    home: RoomID;
 }
 
 declare interface RoomStateActivity_Memory extends MemBase {

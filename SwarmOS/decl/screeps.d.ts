@@ -2098,9 +2098,6 @@ interface ScreepsObject_CreepMemory {
     ct: CT_ALL;
     lvl: number;
     p: PID;     // Spawning PID
-
-    s?: ObjectID; // Harvester: sourceID
-    sup?: boolean; // Is a support creep (not the leader)
 }
 interface ScreepsObject_FlagMemory { }
 interface ScreepsObject_RoomMemory { }
