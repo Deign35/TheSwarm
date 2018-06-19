@@ -274,6 +274,18 @@
                 "Suicide": 23,
                 "MoveToRoom": 24
             }
+        },
+        "Terrain": {
+            "comment": "Terrain type",
+            "enabled": true,
+            "combinedType": "TerrainType",
+            "string": true,
+            "type": true,
+            "entries": {
+                "Plain": "plain",
+                "Swamp": "swamp",
+                "Wall": "wall"
+            }
         }
     }
 }
