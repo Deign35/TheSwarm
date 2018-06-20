@@ -1,4 +1,4 @@
-// CLI('launch', PKG_EmptyProcess, {})
+// CLI(CLI_Launch, PKG_EmptyProcess, {})
 export const OSPackage: IPackage<SpawnRegistry_Memory> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
         processRegistry.register(PKG_EmptyProcess, EmptyProcess);
@@ -14,8 +14,6 @@ const PKG_EmptyProcess_LogContext: LogContext = {
 
 const ENABLE_PROFILING = true;
 class EmptyProcess extends BasicProcess<MemBase> {
-    @extensionInterface(EXT_SpawnRegistry)
-    protected spawnRegistry!: ISpawnRegistryExtensions;
     @extensionInterface(EXT_CreepRegistry)
     protected creepRegistry!: ICreepRegistryExtensions;
 

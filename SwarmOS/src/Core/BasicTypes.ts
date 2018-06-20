@@ -35,10 +35,12 @@ export abstract class BasicProcess<T extends MemBase> implements IProcess {
     protected EndProcess(cbVal?: string) {
         let proc = this.GetParentProcess();
         if (proc) {
-            this.sleeper.wake(this.parentPID);
-            cbVal = cbVal || this.memory.CV;
-            if (cbVal && this.memory.HC && proc[this.memory.HC]) {
-                proc[this.memory.HC](cbVal, this.pid); // Notify the parent using the given callback function.
+            if (this.memory.HC && proc[this.memory.HC]) {
+                this.sleeper.wake(this.parentPID);
+                cbVal = cbVal || this.memory.CV;
+                if (cbVal) {
+                    proc[this.memory.HC](cbVal, this.pid); // Notify the parent using the given callback function.
+                }
             }
         }
         this.kernel.killProcess(this.pid);
