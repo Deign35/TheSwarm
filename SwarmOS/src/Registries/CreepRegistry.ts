@@ -242,16 +242,25 @@ class CreepActivityExtensions extends ExtensionBase implements ICreepActivityExt
         return xDiff > yDiff ? xDiff : yDiff;
     }
 
-    MoveCreep(creep: Creep, pos: RoomPosition) {
-        return creep.moveTo(pos, {
-            visualizePathStyle: {
+    MoveCreep(creep: Creep, pos: RoomPosition, moveToOpts: MoveToOpts = {}) {
+        if (!moveToOpts.visualizePathStyle) {
+            moveToOpts.visualizePathStyle = {
                 fill: 'transparent',
                 stroke: '#fff',
                 lineStyle: 'dashed',
                 strokeWidth: .15,
                 opacity: .25
             }
-        });
+        }
+
+        // (TODO): Verify this does anything...
+        moveToOpts.noPathFinding = true;
+        let err = creep.moveTo(pos, moveToOpts);
+        if (err = ERR_NO_PATH) {
+            moveToOpts.noPathFinding = false;
+            err = creep.moveTo(pos, moveToOpts);
+        }
+        return err;
     }
 
     CreepIsInRange(actionType: ActionType, pos1: RoomPosition, pos2: RoomPosition) {

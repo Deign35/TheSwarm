@@ -18,7 +18,7 @@ class CreepActivity extends BasicProcess<CreepActivity_Memory> {
 
     RunThread(): ThreadState {
         this.LoadActionMemory();
-        if (!this.AssignedCreep || (!this.Target && !this.TargetPos)) {
+        if (!this.AssignedCreep || (!this.Target && !this.TargetPos) || !this.creepActivity.ValidateActionTarget(this.memory.at, this.Target || this.TargetPos)) {
             this.EndProcess();
             return ThreadState_Done;
         }
@@ -31,7 +31,7 @@ class CreepActivity extends BasicProcess<CreepActivity_Memory> {
                 this.EndProcess();
             } else if (result == ERR_NO_PATH) {
                 let hasCreep = this.TargetPos!.lookFor(LOOK_CREEPS);
-                if (hasCreep && hasCreep.length > 0) {
+                if (hasCreep && hasCreep.length > 0 && hasCreep[0].name != this.AssignedCreep.name) {
                     let otherCreep = hasCreep[0];
                     this.creepActivity.MoveCreep(otherCreep, this.AssignedCreep.pos);
                 } else {

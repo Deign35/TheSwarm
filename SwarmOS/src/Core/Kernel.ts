@@ -110,7 +110,7 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
         if (msg) {
             this.log.info(`${id} killed - ${msg}`);
         }
-        pInfo.end = Game.time + 1;
+        pInfo.end = Game.time;
         let ids = Object.keys(this.processTable);
         for (let i = 0; i < ids.length; i++) {
             let otherPI = this.processTable[ids[i]]
@@ -147,6 +147,7 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
         let processIDs = Object.keys(this.processTable);
         for (let i = 0; i < processIDs.length; i++) {
             let pInfo = this.processTable[processIDs[i]];
+            if (pInfo.end) continue;
             if (pInfo.sl) {
                 if (pInfo.sl! <= Game.time) {
                     this.wake(pInfo.pid);
@@ -236,11 +237,13 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
         }
         let pInfo = this.processTable[pid];
         try {
-            let proc = this.getProcessByPID(pid)!;
-            if (proc.PrepTick) {
-                proc.PrepTick();
+            let proc = this.getProcessByPID(pid);
+            if (proc) {
+                if (proc.PrepTick) {
+                    proc.PrepTick();
+                }
+                this._curTickState[pid] = TS_Active;
             }
-            this._curTickState[pid] = TS_Active;
         } catch (e) {
             this.killProcess(pid, `Kernel.PrepTick()`);
             pInfo.err = e.stack || e.toString();
@@ -264,7 +267,7 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
             delete this._curTickState[pid];
         }
 
-        if (pInfo.end) {
+        if (pInfo.end && pInfo.end + 100 <= Game.time) {
             if (pInfo.err) {
                 this.memory.ErrorLog.push(`[${pid}] - ${pInfo.err}`);
             }
