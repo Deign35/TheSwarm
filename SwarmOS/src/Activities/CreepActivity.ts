@@ -98,4 +98,8 @@ class CreepActivity extends BasicProcess<CreepActivity_Memory> {
             this.TargetPos = new RoomPosition(this.memory.p.x || 25, this.memory.p.y || 25, this.memory.p.roomName);
         }
     }
+
+    EndProcess() {
+        super.EndProcess(this.memory.c);
+    }
 }

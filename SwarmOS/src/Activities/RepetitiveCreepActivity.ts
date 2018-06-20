@@ -41,6 +41,7 @@ class RepetitiveCreepActivity extends BasicProcess<RepetitiveCreepActivity_Memor
             }
             let activityMemory: CreepActivity_Memory = CopyObject(nextActivity) as CreepActivity_Memory;
             activityMemory.c = this.memory.c;
+            activityMemory.HC = 'CreateActivityArgs';
             this.memory.p = this.creepActivity.CreateNewCreepActivity(activityMemory, this.parentPID);
             if (this.memory.p) {
                 if (nextActivity.n === undefined || nextActivity.n-- > 1) {

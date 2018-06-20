@@ -60,10 +60,6 @@ export abstract class SoloJob<T extends SoloJob_Memory> extends BasicProcess<T> 
             this.HandleNoActivity();
         } else {
             this.kernel.setParent(this.memory.a, this.pid);
-            let childActivity = this.kernel.getProcessByPID(this.memory.a)!;
-            if (!childActivity.memory.HC) {
-                childActivity.memory.HC = 'CreateCreepActivity';
-            }
         }
     }
     protected abstract CreateCustomCreepActivity(creep: Creep): PID | undefined;
@@ -71,7 +67,7 @@ export abstract class SoloJob<T extends SoloJob_Memory> extends BasicProcess<T> 
         this.EndProcess();
     }
 
-    EndProcess() {
+    protected EndProcess() {
         this.creepRegistry.releaseCreep(this.memory.c, this.pid);
         super.EndProcess(this.memory.c);
     }
