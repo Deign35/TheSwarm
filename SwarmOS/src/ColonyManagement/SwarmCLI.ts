@@ -109,8 +109,8 @@ class SwarmCLI extends BasicProcess<SwarmCLIMemory> {
 
         let roomID: RoomID = args[0];
         let pkg: ScreepsPackage = args[1];
-        let memory: any = args[3] || {};
         let count = args[2] || 1;
+        let memory: any = args[3] || {};
 
         for (let i = 0; i < count; i++) {
             let jobMem = RoomActivityUtils.CreateRoomJob(pkg, roomID, this.View.GetRoomData(roomID)!, CopyObject(memory));

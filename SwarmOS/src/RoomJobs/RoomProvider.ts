@@ -7,6 +7,7 @@ export const OSPackage: IPackage<RoomStateMemory> = {
 import { PackageProviderBase, BasicProcess } from "Core/BasicTypes";
 
 const RequiredJobs = [
+    RJ_Harvest,
     RJ_Misc,
     RJ_Structures,
     RJ_WorkTarget
@@ -35,38 +36,6 @@ class RoomProvider extends BasicProcess<RoomProvider_Memory> {
             if (!this.roomData.groups[RequiredJobs[i]] || !this.kernel.getProcessByPID(this.roomData.groups[RequiredJobs[i]])) {
                 this.roomData.groups[RequiredJobs[i]] = this.CreateRoomJob(RequiredJobs[i]);
             }
-        }
-
-        // Set minimum number of jobs.
-        let energyCap = room.energyCapacityAvailable;
-        let cSites = room.find(FIND_MY_CONSTRUCTION_SITES);
-        switch (this.roomData.RoomType.type) {
-            case (RT_Home):
-                this._reqJobs[CJ_Work] = 1 + (cSites.length > 0 ? 1 : 0);
-                this._reqJobs[CJ_Refill] = 1;
-                if (room.controller!.level < 4) {
-                    this._reqJobs[CJ_Refill] = 2 * this.roomData.sourceIDs.length;
-                } else if (energyCap < CreepBodies.Refiller[4].cost) {
-                    this._reqJobs[CJ_Refill] *= 2;
-                }
-                this._reqJobs[CJ_Harvest] = this.roomData.sourceIDs.length;
-                this._reqJobs[CJ_Scout] = 0;
-                if (this.roomData.structures.tower && this.roomData.structures.tower.length > 0) {
-                    this._reqJobs[RJ_Tower] = 1;
-                }
-
-                /*if (this.roomData.structures.lab && this.roomData.structures.lab.length > 0) {
-                    this._reqJobs[CJ_Science] = 1;
-                }*/
-                break;
-            case (RT_RemoteHarvest):
-                this._reqJobs[CJ_Work] = 1;
-                this._reqJobs[CJ_RemoteHarvest] = this.roomData.sourceIDs.length;
-                break;
-            case (RT_Other):
-            case (RT_None):
-            default:
-                break;
         }
     }
     RunThread(): ThreadState {
@@ -132,6 +101,12 @@ class RoomProvider extends BasicProcess<RoomProvider_Memory> {
                     tt: TT_None
                 };
                 (newJobMemory as Worker_Memory).tr = this.roomData.RoomType.other.tr;
+                break;
+            case (RJ_Harvest):
+                (newJobMemory as RoomStateHarvest_Memory).harvesters = {};
+                (newJobMemory as RoomStateMisc_Memory).hr = this.roomData.RoomType.other.tr;
+                (newJobMemory as RoomStateActivity_Memory).lu = 0;
+                (newJobMemory as RoomStateActivity_Memory).nb = true;
                 break;
             case (RJ_Misc):
                 (newJobMemory as RoomStateMisc_Memory).hr = this.roomData.RoomType.other.tr;

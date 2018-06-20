@@ -86,6 +86,7 @@ declare interface RoomState_AttachedCreepGroups {
     [RJ_Misc]: PID;
     [RJ_Structures]: PID;
     [RJ_WorkTarget]: PID;
+    [RJ_Harvest]?: PID;
 }
 
 declare interface CartographerMemory extends MemBase {

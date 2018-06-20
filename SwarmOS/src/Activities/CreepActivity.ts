@@ -23,10 +23,6 @@ class CreepActivity extends BasicProcess<CreepActivity_Memory> {
             return ThreadState_Done;
         }
 
-        if (this.memory.at == AT_MoveToRoom) {
-            
-        }
-
         if (this.memory.at == AT_MoveToPosition) {
             let result = this.creepActivity.RunActivity(this.CreateActivityArgs());
             if (result == ERR_NOT_IN_RANGE || result == ERR_BUSY || result == ERR_TIRED) {
@@ -46,7 +42,9 @@ class CreepActivity extends BasicProcess<CreepActivity_Memory> {
         }
 
         if (!this.creepActivity.CreepIsInRange(this.memory.at, this.AssignedCreep.pos, this.TargetPos || this.Target!.pos)) {
-            this.creepActivity.MoveCreep(this.AssignedCreep, this.TargetPos || this.Target!.pos);
+            if (this.creepActivity.MoveCreep(this.AssignedCreep, this.TargetPos || this.Target!.pos) == ERR_NO_PATH) {
+                this.EndProcess();
+            }
         } else {
             let result = this.creepActivity.RunActivity(this.CreateActivityArgs());
             switch (this.memory.at) {
