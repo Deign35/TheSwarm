@@ -18,7 +18,6 @@ class RoomStateHarvestActivity extends RoomStateActivity<RoomStateHarvest_Memory
         }
         if (this.memory.nb) {
             this.BootHarvest();
-            delete this.memory.nb;
         }
         let keys = Object.keys(this.memory.harvesters);
         for (let i = 0; i < keys.length; i++) {
@@ -63,14 +62,17 @@ class RoomStateHarvestActivity extends RoomStateActivity<RoomStateHarvest_Memory
             this.kernel.killProcess(this.memory.harvesters[keys[i]].pid);
         }
         this.memory.harvesters = {};
-        if (this.room) {
-            this.roomData.sourceIDs = this.room.find(FIND_SOURCES)!.map((val: Source) => {
-                return val.id;
-            });
+
+        if (!this.room) {
+            return;
         }
-        for (let i = 0; i < this.roomData.sourceIDs.length; i++) {
-            this.memory.harvesters[this.roomData.sourceIDs[i]] = {};
+        let sources = this.room.find(FIND_SOURCES);
+        this.roomData.EnergyIncomeRate = 0;
+        for (let i = 0; i < sources.length; i++) {
+            this.roomData.EnergyIncomeRate += sources[i].energyCapacity / ENERGY_REGEN_TIME;
+            this.memory.harvesters[sources[i].id] = {};
         }
+        delete this.memory.nb;
     }
 
     SpawnHarvester(sourceID: ObjectID) {
@@ -131,6 +133,27 @@ class RoomStateHarvestActivity extends RoomStateActivity<RoomStateHarvest_Memory
         this.kernel.setParent(this.memory.harvesters[sourceID].pid!, this.pid);
     }
 
+    SpawnSupport(sourceID: ObjectID) {
+        let spawnID = this.spawnRegistry.requestSpawn({
+            l: 0,
+            c: CT_Harvester,
+            n: GetSUID() + '_HS',
+            p: this.pid
+        }, this.memory.rID, Priority_Low, 3, {
+                ct: CT_Harvester,
+                lvl: 0,
+                p: this.pid,
+                s: sourceID,
+                sup: true
+            });
+        let spawnMem: SpawnActivity_Memory = {
+            sID: spawnID,
+            HC: "HarvestSourceActivity"
+        }
+        let newPID = this.kernel.startProcess(SPKG_SpawnActivity, spawnMem);
+        this.kernel.setParent(newPID, this.pid);
+    }
+
     HarvestSourceActivity(creepID: CreepID) {
         if (!this.creepRegistry.tryReserveCreep(creepID, this.pid)) {
             return;
@@ -185,8 +208,9 @@ class RoomStateHarvestActivity extends RoomStateActivity<RoomStateHarvest_Memory
                 p: moveTarget ? moveTarget.pos : source.pos,
                 a: moveTarget ? 0 : 1,
                 c: creep.name,
-                HC: 'ConstructContainer'
+                HC: 'ConstructContainerActivity'
             }, this.pid)
+            return;
         }
 
         if (!creep.memory.sup && moveTarget && !creep.pos.isEqualTo(moveTarget.pos)) {
@@ -211,28 +235,7 @@ class RoomStateHarvestActivity extends RoomStateActivity<RoomStateHarvest_Memory
         }
     }
 
-    SpawnSupport(sourceID: ObjectID) {
-        let spawnID = this.spawnRegistry.requestSpawn({
-            l: 0,
-            c: CT_Harvester,
-            n: GetSUID() + '_HS',
-            p: this.pid
-        }, this.memory.rID, Priority_Low, 3, {
-                ct: CT_Harvester,
-                lvl: 0,
-                p: this.pid,
-                s: sourceID,
-                sup: true
-            });
-        let spawnMem: SpawnActivity_Memory = {
-            sID: spawnID,
-            HC: "HarvestSourceActivity"
-        }
-        let newPID = this.kernel.startProcess(SPKG_SpawnActivity, spawnMem);
-        this.kernel.setParent(newPID, this.pid);
-    }
-
-    ConstructContainer(creepID: CreepID) {
+    ConstructContainerActivity(creepID: CreepID) {
         if (!this.creepRegistry.tryReserveCreep(creepID, this.pid)) {
             return;
         }
@@ -264,7 +267,7 @@ class RoomStateHarvestActivity extends RoomStateActivity<RoomStateHarvest_Memory
                         p: source.pos,
                         a: 1,
                         c: creep.name,
-                        HC: 'ConstructContainer'
+                        HC: 'ConstructContainerActivity'
                     }, this.pid)
                     return;
                 }
@@ -294,7 +297,7 @@ class RoomStateHarvestActivity extends RoomStateActivity<RoomStateHarvest_Memory
                 at: AT_Harvest,
                 t: creep.memory.s,
                 c: creep.name,
-                HC: 'ConstructContainer'
+                HC: 'ConstructContainerActivity'
             }, this.pid)
             return;
         }
@@ -312,7 +315,7 @@ class RoomStateHarvestActivity extends RoomStateActivity<RoomStateHarvest_Memory
         let newMem: RepetitiveCreepActivity_Memory = {
             a: actions,
             c: creep.name,
-            HC: 'ConstructContainer'
+            HC: 'ConstructContainerActivity'
         }
 
         this.log.info(`Container construction ${constructionSite.id} in ${creep.room.name} continues.`);

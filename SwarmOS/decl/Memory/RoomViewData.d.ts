@@ -10,12 +10,9 @@ interface RoomState extends MemBase {
     lastUpdated: number;
     lastEnergy: number;
 
-    cSites: ObjectID[];
+    EnergyIncomeRate: number;
+
     mineralIDs: ObjectID[];
-    resources: ObjectID[];
-    sourceIDs: ObjectID[];
-    tombstones: ObjectID[];
-    needsRepair: ObjectID[];
     minUpdateOffset: number;
     structures: RoomState_StructureData;
     groups: RoomState_AttachedCreepGroups;

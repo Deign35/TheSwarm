@@ -71,20 +71,7 @@ class RoomProvider extends BasicProcess<RoomProvider_Memory> {
                 newJobMemory.rID = this.roomData.RoomType.other.tr;
                 (newJobMemory as RemoteHarvester_Memory).tr = this.memory.rID;
             case (CJ_Harvest):
-                if (!this.roomData.RoomType.other.sources) {
-                    this.roomData.RoomType.other.sources = {};
-                }
-
-                for (let i = 0; i < this.roomData.sourceIDs.length; i++) {
-                    let pid = this.roomData.RoomType.other.sources[this.roomData.sourceIDs[i]];
-                    if (!pid || !this.kernel.getProcessByPID(pid)) {
-                        (newJobMemory as HarvesterMemory).src = this.roomData.sourceIDs[i];
-                        let newPID = this.kernel.startProcess(jobID, newJobMemory);
-                        this.roomData.RoomType.other.sources[this.roomData.sourceIDs[i]] = newPID;
-                        return newPID;
-                    }
-                }
-                this.log.info(`Trying to add a harvesterjob to a room that is already full.  Disallowed`);
+                this.log.info(`CJ_Harvest is no longer valid.  Please use RJ_Harvest instead.  Disallowed`);
                 return;
             case (CJ_Refill):
                 (newJobMemory as ControlledRoomRefiller_Memory).tr = this.memory.rID;
@@ -112,8 +99,13 @@ class RoomProvider extends BasicProcess<RoomProvider_Memory> {
                 (newJobMemory as RoomStateMisc_Memory).hr = this.roomData.RoomType.other.tr;
                 (newJobMemory as RoomStateMisc_Memory).lr = 0;
             case (RJ_Structures):
-            case (RJ_WorkTarget):
                 (newJobMemory as RoomStateActivity_Memory).lu = 0;
+                break;
+            case (RJ_WorkTarget):
+                (newJobMemory as RoomStateWorkTarget_Memory).lu = 0;
+                (newJobMemory as RoomStateWorkTarget_Memory).needsRepair = [];
+                (newJobMemory as RoomStateWorkTarget_Memory).cSites = [];
+                break;
             case (RJ_Tower): // nothing atm
             default:
                 break;

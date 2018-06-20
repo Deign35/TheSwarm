@@ -70,30 +70,23 @@ class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory> {
 
         let closestDist = 1000;
         if (carryRatio < 0.25) {
-            if (roomData.resources.length > 0) {
-                for (let i = 0; i < roomData.resources.length; i++) {
-                    let resource = Game.getObjectById<Resource>(roomData.resources[i]);
-                    if (resource && (resource.energy || -1) >= energyNeeded) {
-                        let dist = resource.pos.getRangeTo(creep.pos);
-                        if (dist < closestDist) {
-                            closestDist = dist;
-                            bestTarget = resource.id;
-                            actionType = AT_Pickup;
-                        }
-                    }
+            let resources = creep.room.find(FIND_DROPPED_RESOURCES, {
+                filter: (resource) => {
+                    return resource.resourceType == RESOURCE_ENERGY && resource.amount >= energyNeeded;
                 }
-            }
-            if (actionType == AT_NoOp && roomData.tombstones.length > 0) {
-                for (let i = 0; i < roomData.tombstones.length; i++) {
-                    let tombstone = Game.getObjectById<Tombstone>(roomData.tombstones[i]);
-                    if (tombstone && (tombstone.energy || -1) >= energyNeeded) {
-                        let dist = tombstone.pos.getRangeTo(creep.pos);
-                        if (dist < closestDist) {
-                            closestDist = dist;
-                            bestTarget = tombstone.id;
-                            actionType = AT_Withdraw;
-                        }
+            });
+            if (resources.length > 0) {
+                actionType = AT_Pickup;
+                bestTarget = creep.pos.findClosestByRange(resources).id;
+            } else {
+                let tombstones = creep.room.find(FIND_TOMBSTONES, {
+                    filter: (tombstone) => {
+                        return tombstone.energy >= energyNeeded;
                     }
+                });
+                if (tombstones.length > 0) {
+                    actionType = AT_Withdraw;
+                    bestTarget = creep.pos.findClosestByRange(tombstones).id;
                 }
             }
         }

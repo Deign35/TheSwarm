@@ -33,3 +33,8 @@ declare interface RoomStateHarvest_Memory extends RoomStateActivity_Memory {
 declare interface RoomStateMisc_Memory extends RoomStateActivity_Memory {
     lr: number;     // (l)ast (r)esources
 }
+
+declare interface RoomStateWorkTarget_Memory extends RoomStateActivity_Memory {
+    needsRepair: ObjectID[];
+    cSites: ObjectID[];
+}

@@ -163,13 +163,23 @@ class SwarmCLI extends BasicProcess<SwarmCLIMemory> {
                     this.log.warn(`Invalid number of arguments`);
                     return;
                 }
+                if (roomData.RoomType.type == RT_Home) {
+                    this.log.warn(`Cannot make ${roomID} into a harvest room, it is already a home room.`);
+                    return;
+                }
                 let homeID: RoomID = args[2];
                 let homeRoom = this.View.GetRoomData(homeID);
-                if (!homeRoom) { // || homeRoom.IsHomeRoom
+                if (!homeRoom || homeRoom.RoomType.type != RT_Home) { // || homeRoom.IsHomeRoom
                     this.log.warn(`Cannot make ${roomID} into a harvest room for ${homeID}`);
                     return;
                 }
                 // Add as remote harvest room to homeRoom
+                roomData.RoomType = {
+                    type: RT_RemoteHarvest,
+                    other: {
+                        tr: homeID
+                    }
+                }
                 break;
         }
     }
@@ -190,5 +200,5 @@ global['CLI'] = function (command: CLI_Command, ...args: any[]) {
 }
 
 global['qb'] = function () {
-    CLI(CLI_Assimilate, 'sim', RT_Home);
+    return CLI(CLI_Assimilate, 'sim', RT_Home);
 }

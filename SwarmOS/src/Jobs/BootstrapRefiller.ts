@@ -39,16 +39,15 @@ class BootstrapRefiller extends SoloJob<BootstrapRefiller_Memory> {
         creep.memory.ct = CT_Worker;
         if (creep.carry.energy == 0) {
             // get energy
-            let roomData = this.View.GetRoomData(this.memory.rID)!;
-            for (let i = 0; i < roomData.resources.length; i++) {
-                let resource = Game.getObjectById<Resource>(roomData.resources[i]);
-                if (resource && (resource.energy || 0) >= creep.carryCapacity) {
-                    newActivity.at = AT_Pickup;
-                    newActivity.t = resource.id;
-                    break;
+            let resources = creep.room.find(FIND_DROPPED_RESOURCES, {
+                filter: (resource) => {
+                    return resource.resourceType == RESOURCE_ENERGY && resource.amount >= creep.carryCapacity;
                 }
-            }
-            if (newActivity.at == AT_NoOp) {
+            });
+            if (resources && resources.length > 0) {
+                newActivity.at = AT_Pickup;
+                newActivity.t = creep.pos.findClosestByRange(resources).id;
+            } else {
                 newActivity.at = AT_Harvest;
                 let source = creep.pos.findClosestByRange(FIND_SOURCES);
                 newActivity.t = source.id;

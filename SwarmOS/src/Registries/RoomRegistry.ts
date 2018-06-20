@@ -77,17 +77,11 @@ class RoomExtension extends ExtensionBase implements IRoomDataExtension {
                 owner: '',
                 lastUpdated: 0,
                 lastEnergy: 0,
-                cSites: [],
-                resources: [],
-                tombstones: [],
-                needsRepair: [],
+                EnergyIncomeRate: 0,
                 mineralIDs: room.find(FIND_MINERALS)!.map((val: Mineral) => {
                     return val.id;
                 }),
                 minUpdateOffset: GetRandomIndex(primes_3000) || 73,
-                sourceIDs: room.find(FIND_SOURCES)!.map((val: Source) => {
-                    return val.id;
-                }),
                 structures: {
                     container: [],
                     road: []

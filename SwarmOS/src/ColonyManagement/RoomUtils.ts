@@ -5,41 +5,34 @@ export const RoomActivityUtils = {
             room.createConstructionSite(spawn[0].pos.x - 1, spawn[0].pos.y, STRUCTURE_CONTAINER);
             let sources = room.find(FIND_SOURCES);
             for (let i = 0; i < sources.length; i++) {
-                this.CreatePath(room, spawn[0].pos, sources[i].pos, 1);
+                this.BuildContainerAlongPath(room, spawn[0].pos, sources[i].pos, 1);
             }
-            this.CreatePath(room, spawn[0].pos, room.controller!.pos, 3);// limit of 5 containers
-            for (let i = 0; i < sources.length; i++) {
-                this.CreatePath(room, sources[i].pos, room.controller!.pos, 0);
-            }
+            this.BuildContainerAlongPath(room, spawn[0].pos, room.controller!.pos, 3);// limit of 5 containers
         }
     },
 
-    CreatePath(room: Room, from: RoomPosition, to: RoomPosition, buildContainer: number) {
-        if (buildContainer > 0) {
-            let nearby = to.findInRange(FIND_STRUCTURES, buildContainer, {
+    BuildContainerAlongPath(room: Room, from: RoomPosition, to: RoomPosition, buildContainerDistance: number) {
+        if (buildContainerDistance > 0) {
+            let nearby = to.findInRange(FIND_STRUCTURES, buildContainerDistance, {
                 filter: (struct) => {
                     return struct.structureType == STRUCTURE_CONTAINER;
                 }
             });
 
             if (nearby && nearby.length > 0) {
-                to = nearby[0].pos;
-                buildContainer = 0;
+                return;
             }
         }
         let path = from.findPathTo(to, {
             ignoreCreeps: true,
             ignoreDestructibleStructures: true,
             ignoreRoads: true,
-            range: 1,
+            range: buildContainerDistance,
             swampCost: 1
         });
-        for (let i = 0; i < path.length; i++) {
-            if (i + buildContainer == path.length) {
-                room.createConstructionSite(path[i].x, path[i].y, STRUCTURE_CONTAINER);
-            } else {
-                room.createConstructionSite(path[i].x, path[i].y, STRUCTURE_ROAD);
-            }
+        if (path.length > 0) {
+            let siteLoc = path[(path.length - 1)];
+            room.createConstructionSite(siteLoc.x, siteLoc.y, STRUCTURE_CONTAINER);
         }
     },
     CreateRoomJob(jobID: string, roomID: RoomID, roomData: RoomState, jobMem: SoloJob_Memory): SoloJob_Memory {
