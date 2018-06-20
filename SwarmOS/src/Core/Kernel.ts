@@ -98,23 +98,25 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
             throw new Error(`Could not create process ${pInfo.pid} ${pInfo.PKG}`);
         }
         this._processCache[id] = process;
+        if (process.PrepTick) {
+            process.PrepTick();
+        }
         return process;
     }
 
     killProcess(id: PID, msg: string = ''): void {
-        let pinfo = this.processTable[id];
-        if (!pinfo) return;
+        let pInfo = this.processTable[id];
+        if (!pInfo) return;
         if (msg) {
             this.log.info(`${id} killed - ${msg}`);
         }
-        pinfo.end = Game.time;
+        pInfo.end = Game.time + 1;
         let ids = Object.keys(this.processTable);
         for (let i = 0; i < ids.length; i++) {
-            let id = ids[i];
-            let pi = this.processTable[id]
-            if (pi.pP === pinfo.pid) {
-                if (!pi.end) {
-                    this.killProcess(id, msg);
+            let otherPI = this.processTable[ids[i]]
+            if (otherPI.pP === pInfo.pid) {
+                if (!otherPI.end) {
+                    this.killProcess(ids[i], msg);
                 }
             }
         }
@@ -165,9 +167,11 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
             return;
         }
 
+        let loopStates = {};
         while (activeThreadIDs.length > 0) {
             let protectionValue = activeThreadIDs.length;
             this.RunThreads(activeThreadIDs);
+            activeThreadIDs = [];
             let allIDs = Object.keys(this._curTickState);
             for (let i = 0; i < allIDs.length; i++) {
                 let state = this._curTickState[allIDs[i]]
@@ -177,9 +181,11 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
                 }
             }
 
-            if (protectionValue == activeThreadIDs.length) {
-                // (TODO): Find out how to fix this, essentially this means threading isn't working.
-                //this.log.alert(`A full cycle has occurred and no threads completed`);
+            let stringified = JSON.stringify(activeThreadIDs);
+            if (!loopStates[stringified]) {
+                loopStates[stringified] = true;
+            } else {
+                this.log.alert(`A cycle has repeated a previous position.`);
                 break;
             }
         }
@@ -255,6 +261,7 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
                     this.log.error(`[${pid}] ${pInfo.PKG} crashed\n${e.stack}`);
                 }
             }
+            delete this._curTickState[pid];
         }
 
         if (pInfo.end) {
