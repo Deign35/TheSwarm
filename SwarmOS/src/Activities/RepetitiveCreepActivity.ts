@@ -31,6 +31,14 @@ class RepetitiveCreepActivity extends BasicProcess<RepetitiveCreepActivity_Memor
 
         while (this.memory.a.length > 0) {
             let nextActivity = this.memory.a.shift()!;
+            if (nextActivity.HC) {
+                this.log.error(`UNEXPECTED: Repetitive creep activity has preassigned HC`);
+                continue;
+            }
+            if (nextActivity.CV) {
+                this.log.error(`UNEXPECTED: Repetitive creep activity has preassigned CV`);
+                continue;
+            }
             let activityMemory: CreepActivity_Memory = CopyObject(nextActivity) as CreepActivity_Memory;
             activityMemory.c = this.memory.c;
             this.memory.p = this.creepActivity.CreateNewCreepActivity(activityMemory, this.parentPID);
@@ -38,7 +46,6 @@ class RepetitiveCreepActivity extends BasicProcess<RepetitiveCreepActivity_Memor
                 if (nextActivity.n === undefined || nextActivity.n-- > 1) {
                     this.memory.a.push(nextActivity); // Put it back in the queue
                 }
-                this.kernel.setParent(this.memory.p, this.parentPID);
                 this.sleeper.sleep(this.pid, 5);
                 return;
             }
@@ -46,7 +53,7 @@ class RepetitiveCreepActivity extends BasicProcess<RepetitiveCreepActivity_Memor
         this.EndProcess();
     }
 
-    EndProcess() {
+    protected EndProcess() {
         super.EndProcess(this.memory.c);
     }
 }

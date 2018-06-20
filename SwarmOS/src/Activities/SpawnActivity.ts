@@ -15,7 +15,6 @@ class SpawnActivity extends BasicProcess<SpawnActivity_Memory> {
         let newCreepName = undefined;
         switch (status) {
             case (SP_QUEUED):
-                let context = this.spawnRegistry.getRequestContext(this.memory.sID)!;
                 break;
             case (SP_COMPLETE):
             case (SP_SPAWNING):

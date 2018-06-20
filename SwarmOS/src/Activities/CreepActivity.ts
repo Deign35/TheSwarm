@@ -57,12 +57,13 @@ class CreepActivity extends BasicProcess<CreepActivity_Memory> {
                 case (AT_Suicide):
                 case (AT_Transfer):
                 case (AT_Withdraw):
+                case (AT_NoOp):
                     this.EndProcess();
                     return ThreadState_Done;
                 default:
                     break;
             }
-            if (result == OK || result == ERR_BUSY || result == ERR_TIRED || result == ERR_NOT_IN_RANGE) {
+            if (result == OK || result == ERR_BUSY || result == ERR_TIRED) {
                 return ThreadState_Done;
             }
             if (this.memory.e) {
@@ -96,9 +97,5 @@ class CreepActivity extends BasicProcess<CreepActivity_Memory> {
         if (this.memory.p) {
             this.TargetPos = new RoomPosition(this.memory.p.x || 25, this.memory.p.y || 25, this.memory.p.roomName);
         }
-    }
-
-    EndProcess() {
-        super.EndProcess(this.memory.c);
     }
 }

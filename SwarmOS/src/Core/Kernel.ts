@@ -186,7 +186,7 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
             if (!loopStates[stringified]) {
                 loopStates[stringified] = true;
             } else {
-                this.log.alert(`A cycle has repeated a previous position.`);
+                this.log.alert(`A cycle has repeated a previous position. -- ${stringified}`);
                 break;
             }
         }
