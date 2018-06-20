@@ -22,14 +22,14 @@ class ScoutJob extends SoloJob<ScoutJob_Memory> {
     protected CreateCustomCreepActivity(creep: Creep): string | undefined {
         if (creep.room.controller) {
             let sign = creep.room.controller.sign && creep.room.controller.sign.text || '';
+            // (TODO): Change when shouldSign is true.  Shouldn't just be my rooms, but this will do for now.
             let shouldSign = sign != MY_SIGNATURE && sign != SIGN_NOVICE_AREA && sign != SIGN_RESPAWN_AREA;
-            if (shouldSign) {
+            if (shouldSign && creep.room.controller.my) {
                 return this.creepActivity.CreateNewCreepActivity({
                     t: creep.room.controller.id,
                     at: AT_SignController,
                     c: creep.name,
                     m: MY_SIGNATURE,
-                    HC: 'CreateNewScoutActivity'
                 }, this.pid);
             }
         }
@@ -79,21 +79,11 @@ class ScoutJob extends SoloJob<ScoutJob_Memory> {
             if (!lastPosition) {
                 throw new Error(`Scout attempted to find a path to the next room, but failed`);
             }
-            if (lastPosition.x == 0) {
-                lastPosition.x = 49;
-            } else if (lastPosition.x == 49) {
-                lastPosition.x = 0;
-            }
-            if (lastPosition.y == 0) {
-                lastPosition.y = 49;
-            } else if (lastPosition.y == 49) {
-                lastPosition.y = 0;
-            }
 
             return this.creepActivity.CreateNewCreepActivity({
                 at: AT_MoveToPosition,
                 c: creep.name,
-                p: { x: lastPosition.x, y: lastPosition.y, roomName: nextRoom }
+                p: { x: lastPosition.x, y: lastPosition.y, roomName: creep.room.name }
             }, this.pid);
         }
 

@@ -2,7 +2,7 @@ import { BasicProcess } from "Core/BasicTypes";
 
 export abstract class SoloJob<T extends SoloJob_Memory> extends BasicProcess<T> {
     @extensionInterface(EXT_CreepRegistry)
-    creepRegistry!: ICreepRegistryExtensions;
+    protected creepRegistry!: ICreepRegistryExtensions;
     @extensionInterface(EXT_CreepActivity)
     protected creepActivity!: ICreepActivityExtensions;
 
@@ -50,9 +50,6 @@ export abstract class SoloJob<T extends SoloJob_Memory> extends BasicProcess<T> 
         this.creep = this.creepRegistry.tryGetCreep(creepID, this.pid);
         this.memory.c = creepID;
         if (!this.creep) {
-            if (this.memory.exp) {
-                this.EndProcess();
-            }
             return;
         }
         this.memory.a = this.CreateCustomCreepActivity(this.creep);
