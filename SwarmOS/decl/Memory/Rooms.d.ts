@@ -22,6 +22,21 @@ declare interface RoomStateActivity_Memory extends MemBase {
     // (TODO): Change hb to nb all over.
 }
 
+declare interface RoomMonitor_Memory extends MemBase {
+    lu: number;     // (l)ast (u)pdated
+    nb?: boolean;   // (n)eeds re(b)oot
+    hr: RoomID;     // (h)ome (r)oom
+    rID: RoomID;    // (t)arget (r)oom
+    fr: number;     // (fr)equency
+}
+declare interface RoomMonitorWorkCapacity_Memory extends RoomMonitor_Memory {
+    lr: number;     // (l)ast (r)esources
+}
+
+declare interface RoomMonitorWorkTarget_Memory extends RoomMonitor_Memory {
+    needsRepair: ObjectID[];
+    cSites: ObjectID[];
+}
 declare interface RoomStateHarvest_Memory extends RoomStateActivity_Memory {
     harvesters: {
         [id: string]: {
