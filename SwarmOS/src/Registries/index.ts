@@ -23,7 +23,6 @@ class SwarmManager extends PackageProviderBase<PackageProviderMemory> {
         creepManager: {
             processName: PKG_CreepRegistry
         },
-
         cli: {
             processName: PKG_SwarmCLI
         },

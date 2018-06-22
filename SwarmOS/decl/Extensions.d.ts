@@ -27,7 +27,7 @@ declare interface IPackageInterfaces {
  * A process can access the registry via this function.
  */
 declare interface IProcessContext {
-    getPackageInterface<T extends keyof IPackageInterfaces>(interfaceId: T): IPackageInterfaces[T];
+    getExtensionInterface<T extends keyof IPackageInterfaces>(interfaceId: T): IPackageInterfaces[T];
 }
 
 /**
@@ -35,7 +35,6 @@ declare interface IProcessContext {
  */
 declare interface IExtensionRegistry extends IPackageExtension {
     get(interfaceId: string): IPackageExtension | undefined;
-    getKernel(): IKernel;
     register(interfaceId: string, extension: IPackageExtension): boolean;
     unregister(interfaceId: string): boolean;
 }
@@ -93,7 +92,6 @@ declare interface IKernelSleepExtension extends IPackageExtension {
  */
 declare interface IRoomDataExtension extends IPackageExtension {
     GetRoomData(roomID: string): RoomState | undefined;
-    SetScoutNexus(roomID: string): void;
     BootRoom(roomID: string, force: boolean): void;
 }
 

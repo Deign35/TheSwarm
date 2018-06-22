@@ -77,6 +77,7 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
         }
 
         let kernelContext = this;
+        let loggerContext = kernelContext.log.CreateLogContext(pInfo.PKG, DEFAULT_LOG_LEVEL)
         let context: IProcessContext = {
             pid: pInfo.pid,
             pkgName: pInfo.PKG,
@@ -90,7 +91,10 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
             get memory() {
                 return kernelContext.processMemory[pInfo.pid];
             },
-            getPackageInterface: kernelContext.extensionRegistry.get.bind(kernelContext.extensionRegistry)
+            get log() {
+                return loggerContext;
+            },
+            getExtensionInterface: kernelContext.extensionRegistry.get.bind(kernelContext.extensionRegistry)
         };
         Object.freeze(context);
         let process = this.processRegistry.createNewProcess(pInfo.PKG, context);

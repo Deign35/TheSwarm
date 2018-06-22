@@ -1,14 +1,17 @@
 declare interface IPackage<MemBase> {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry): void;
 }
+
 declare interface IKernel extends IKernelExtensions, IKernelSleepExtension {
     loop(): void;
     log: IKernelLoggerExtensions;
 }
+
 declare interface IProcessRegistry {
     register(pkgName: string, constructor: _ProcessConstructor): boolean;
     createNewProcess(name: string, context: IProcessContext): IProcess | undefined;
 }
+
 declare interface IProcess {
     pkgName: string;
     pid: PID;
@@ -20,10 +23,13 @@ declare interface IProcess {
     EndTick?(): void;
     RunThread(): ThreadState;
 }
+
 declare interface _ProcessConstructor {
     new(context: IProcessContext): IProcess;
 }
+
 declare interface IProcessContext {
+    readonly log: ILogger;
     readonly memory: MemBase;
     readonly pkgName: string;
     readonly pid: PID;

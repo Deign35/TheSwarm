@@ -12,21 +12,16 @@ export const OSPackage: IPackage<RoomStateMemory> = {
 }
 
 class RoomRegistry extends BasicProcess<RoomStateMemory> {
-    get logID() { return 'RoomRegistry' };
-    get logLevel() { return LOG_INFO as LogLevel; }
     get memory(): RoomStateMemory {
         if (!Memory.roomData) {
             this.log.warn(`Initializing RoomManager memory`);
             Memory.roomData = {
-                roomStateData: {},
-                cartographicMemory: {
-                    creeps: {},
-                    homeRooms: {}
-                }
+                roomStateData: {}
             }
         }
         return Memory.roomData;
     }
+
     RunThread(): ThreadState {
         for (let roomID in Game.rooms) {
             let data = this.View.GetRoomData(roomID);
@@ -44,11 +39,7 @@ class RoomExtension extends ExtensionBase implements IRoomDataExtension {
         if (!Memory.roomData) {
             this.log.warn(`Initializing RoomManager memory`);
             Memory.roomData = {
-                roomStateData: {},
-                cartographicMemory: {
-                    creeps: {},
-                    homeRooms: {}
-                }
+                roomStateData: {}
             }
         }
 
@@ -59,17 +50,11 @@ class RoomExtension extends ExtensionBase implements IRoomDataExtension {
         return this.memory.roomStateData[roomID];
     }
 
-    SetScoutNexus(roomID: RoomID) {
-        if (!this.memory.cartographicMemory.homeRooms[roomID]) {
-            this.memory.cartographicMemory.homeRooms[roomID] = { nearbyRooms: [] }
-        }
-    }
-
     BootRoom(roomID: string, force: boolean) {
         let data = this.GetRoomData(roomID);
         if (force || !data) {
             if (data && data.activityPID) {
-                this.extensionRegistry.getKernel().killProcess(data.activityPID, 'Rebooting room');
+                this.kernel.killProcess(data.activityPID, 'Rebooting room');
                 delete data.activityPID;
             }
             let room = Game.rooms[roomID];
@@ -125,14 +110,13 @@ class RoomExtension extends ExtensionBase implements IRoomDataExtension {
             }
         }
 
-
         data = this.GetRoomData(roomID)!;
-        if (!data.activityPID || !this.extensionRegistry.getKernel().getProcessByPID(data.activityPID)) {
+        if (!data.activityPID || !this.kernel.getProcessByPID(data.activityPID)) {
             let newMem: RoomProvider_Memory = {
                 rID: roomID,
                 home: roomID
             }
-            this.memory.roomStateData[roomID]!.activityPID = this.extensionRegistry.getKernel().startProcess(SPKG_RoomActivity, newMem);
+            this.memory.roomStateData[roomID]!.activityPID = this.kernel.startProcess(SPKG_RoomActivity, newMem);
         }
     }
 }

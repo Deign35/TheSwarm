@@ -1,7 +1,5 @@
 export abstract class BasicProcess<T extends MemBase> implements IProcess {
-    constructor(protected context: IProcessContext) {
-        this._logger = context.getPackageInterface(EXT_Logger).CreateLogContext(this.logID, this.logLevel);
-    }
+    constructor(protected context: IProcessContext) { }
 
     @extensionInterface(EXT_Kernel)
     protected kernel!: IKernelExtensions;
@@ -22,10 +20,7 @@ export abstract class BasicProcess<T extends MemBase> implements IProcess {
         return this.parentPID ? this.kernel.getProcessByPID(this.parentPID) as K : undefined;
     }
 
-    private _logger!: ILogger;
-    protected get log() { return this._logger; }
-    protected get logID() { return DEFAULT_LOG_ID; }
-    protected get logLevel(): LogLevel { return DEFAULT_LOG_LEVEL; }
+    get log() { return this.context.log; }
     get rngSeed(): number { return this.context.rngSeed; }
 
     PrepTick?(): void;
@@ -88,6 +83,8 @@ export abstract class ExtensionBase implements IPackageExtension {
     constructor(protected extensionRegistry: IExtensionRegistry) {
         this._logger = (extensionRegistry.get(EXT_Logger) as IKernelLoggerExtensions)!.CreateLogContext(this.logID, this.logLevel);
     }
+    @extensionExposure(EXT_Kernel)
+    kernel!: IKernelExtensions;
 
     private _logger: ILogger;
     protected get log(): ILogger {
@@ -101,13 +98,29 @@ export abstract class ExtensionBase implements IPackageExtension {
     }
 }
 
-function extensionInterface(interfaceId: string): (target: any, propertyKey: string) => any {
+function extensionExposure(interfaceID: string): (target: any, propertyKey: string) => any {
+    return function (target: any, propertyKey: string): any {
+        let value: IPackageExtension;
+        return {
+            get() {
+                if (!value) {
+                    value = this.extensionRegistry.get(interfaceID) as any
+                }
+
+                return value;
+            }
+        }
+    }
+}
+global['extensionExposure'] = extensionExposure;
+
+function extensionInterface(interfaceID: string): (target: any, propertyKey: string) => any {
     return function (target: any, propertyKey: string): any {
         let value: IPackageExtension
         return {
             get() {
                 if (!value) {
-                    value = this.context.getPackageInterface(interfaceId);
+                    value = this.context.getExtensionInterface(interfaceID);
                 }
                 return value;
             }

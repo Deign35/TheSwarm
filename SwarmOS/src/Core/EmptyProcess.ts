@@ -7,11 +7,6 @@ export const OSPackage: IPackage<SpawnRegistry_Memory> = {
 
 import { BasicProcess } from "Core/BasicTypes";
 
-const PKG_EmptyProcess_LogContext: LogContext = {
-    logID: PKG_EmptyProcess,
-    logLevel: LOG_TRACE
-}
-
 const ENABLE_PROFILING = true;
 class EmptyProcess extends BasicProcess<MemBase> {
     @extensionInterface(EXT_CreepRegistry)

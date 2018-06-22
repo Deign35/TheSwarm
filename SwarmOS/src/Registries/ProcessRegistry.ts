@@ -1,21 +1,11 @@
-const ProcessRegistry_LogContext: LogContext = {
-    logID: "ProcessRegistry",
-    logLevel: LOG_INFO
-}
 export class ProcessRegistry implements IProcessRegistry {
     constructor(logger: IKernelLoggerExtensions) {
-        this._logger = logger.CreateLogContext(this.logID, this.logLevel);
+        this._logger = logger.CreateLogContext("ProcessRegistry", LOG_INFO);
     }
 
     private _logger: ILogger;
     protected get log() {
         return this._logger;
-    }
-    protected get logID() {
-        return ProcessRegistry_LogContext.logID;
-    }
-    protected get logLevel(): LogLevel {
-        return ProcessRegistry_LogContext.logLevel!;
     }
 
     private registry: { [name: string]: _ProcessConstructor } = {};
@@ -24,13 +14,13 @@ export class ProcessRegistry implements IProcessRegistry {
             this.log.error(`Name already registered: ${name}`);
             return false;
         }
-        this.log.debug(() => `Registered Process: ${name}`);
+        this.log.info(() => `Registered Process: ${name}`);
         this.registry[name] = constructor;
         return true;
     }
     createNewProcess(name: string, context: IProcessContext): IProcess | undefined {
         if (!this.registry[name]) return;
-        this.log.debug(() => `Created ${name}`);
+        this.log.info(() => `Created ${name}`);
         return new this.registry[name](context);
     }
 }

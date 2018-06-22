@@ -1,11 +1,6 @@
-const ExtensionRegistry_LogContext: LogContext = {
-    logID: "ExtensionRegistry",
-    logLevel: LOG_INFO
-}
-
 export class ExtensionRegistry implements IExtensionRegistry {
     constructor(logger: IKernelLoggerExtensions) {
-        this._logger = logger.CreateLogContext(this.logID, this.logLevel);
+        this._logger = logger.CreateLogContext(EXT_Registry, LOG_INFO);
         this.registry = {};
         this.register(EXT_Registry, this);
     }
@@ -13,12 +8,6 @@ export class ExtensionRegistry implements IExtensionRegistry {
         return this._logger;
     }
     private _logger: ILogger;
-    protected get logID() {
-        return ExtensionRegistry_LogContext.logID;
-    }
-    protected get logLevel(): LogLevel {
-        return ExtensionRegistry_LogContext.logLevel!;
-    }
 
     private registry: { [interfaceId: string]: IPackageExtension };
     register(interfaceId: string, extension: IPackageExtension): boolean {
@@ -42,8 +31,5 @@ export class ExtensionRegistry implements IExtensionRegistry {
     get(interfaceId: string): IPackageExtension | undefined {
         if (!this.registry[interfaceId]) return;
         return this.registry[interfaceId];
-    }
-    getKernel(): IKernel {
-        return this.get(EXT_Kernel) as IKernel;
     }
 }

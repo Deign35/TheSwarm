@@ -9,10 +9,6 @@ export const OSPackage: IPackage<FlagExtensionsMemory> = {
         extensionRegistry.register(EXT_Flags, FlagRegistryExtensions);
     }
 }
-const PKG_FlagRegistry_LogContext: LogContext = {
-    logID: PKG_FlagManager,
-    logLevel: LOG_INFO
-}
 
 class FlagRegistry extends BasicProcess<FlagExtensionsMemory> {
     get memory(): FlagExtensionsMemory {
@@ -21,12 +17,6 @@ class FlagRegistry extends BasicProcess<FlagExtensionsMemory> {
             Memory.flagData = {}
         }
         return Memory.flagData;
-    }
-    protected get logID() {
-        return PKG_FlagRegistry_LogContext.logID;
-    }
-    protected get logLevel(): LogLevel {
-        return PKG_FlagRegistry_LogContext.logLevel!;
     }
 
     RunThread(): ThreadState {

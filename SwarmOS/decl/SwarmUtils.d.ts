@@ -33,6 +33,7 @@ declare interface Profiler {
     toString(): string;
 }
 declare function extensionInterface(interfaceId: string): (target: any, propertyKey: string) => any
+declare function extensionExposure(interfaceId: string): (target: any, propertyKey: string) => any
 
 declare class Stopwatch {
     Start(): void;
@@ -42,10 +43,6 @@ declare class Stopwatch {
     ToString(): string;
 }
 
-declare interface LogContext {
-    logID: string,
-    logLevel?: LogLevel,
-}
 /*declare class SwarmLogger {*/
 declare interface ILogger {
     trace(message: (string | (() => string))): void;

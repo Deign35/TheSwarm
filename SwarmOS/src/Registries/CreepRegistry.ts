@@ -13,11 +13,6 @@ export const OSPackage: IPackage<CreepRegistry_Memory> = {
     }
 }
 
-const PKG_CreepRegistry_LogContext: LogContext = {
-    logID: PKG_CreepRegistry,
-    logLevel: LOG_INFO
-}
-
 // This order determines the default order of body parts
 const BodyLegend = {
     t: TOUGH,
@@ -45,13 +40,6 @@ class CreepRegistry extends BasicProcess<CreepRegistry_Memory> {
     }
     protected get registeredCreeps() {
         return this.memory.registeredCreeps;
-    }
-
-    protected get logID(): string {
-        return PKG_CreepRegistry_LogContext.logID;
-    }
-    protected get logLevel(): LogLevel {
-        return PKG_CreepRegistry_LogContext.logLevel!;
     }
 
     PrepTick() {
@@ -119,7 +107,7 @@ class CreepRegistryExtensions extends ExtensionBase implements ICreepRegistryExt
             let creep = Game.creeps[creepData.c];
 
             if (creepData.o) {
-                let parentProcess = this.extensionRegistry.getKernel().getProcessByPID(creepData.o);
+                let parentProcess = this.kernel.getProcessByPID(creepData.o);
                 if (parentProcess && (parentProcess.pkgName != CJ_Work || creepType == CT_Worker)) {
                     continue;
                 }
@@ -230,8 +218,8 @@ class CreepActivityExtensions extends ExtensionBase implements ICreepActivityExt
             return undefined;
         }
 
-        let newPID = this.extensionRegistry.getKernel().startProcess(SPKG_CreepActivity, actionMem);
-        this.extensionRegistry.getKernel().setParent(newPID, parentPID);
+        let newPID = this.kernel.startProcess(SPKG_CreepActivity, actionMem);
+        this.kernel.setParent(newPID, parentPID);
         return newPID;
     }
     protected GetSquareDistance(pos1: { x: number, y: number }, pos2: { x: number, y: number }) {

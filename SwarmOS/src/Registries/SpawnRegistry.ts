@@ -10,11 +10,6 @@ export const OSPackage: IPackage<SpawnRegistry_Memory> = {
     }
 }
 
-const PKG_SpawnRegistry_LogContext: LogContext = {
-    logID: PKG_SpawnRegistry,
-    logLevel: LOG_INFO
-}
-
 // This order determines the default order of body parts
 const BodyLegend = {
     t: TOUGH,
@@ -64,14 +59,6 @@ class SpawnRegistry extends BasicProcess<SpawnRegistry_Memory> {
         }
         return Memory.spawnData;
     }
-
-    protected get logID(): string {
-        return PKG_SpawnRegistry_LogContext.logID;
-    }
-    protected get logLevel(): LogLevel {
-        return PKG_SpawnRegistry_LogContext.logLevel!;
-    }
-
     protected AnalyzeSpawnRequests(): SpawnRegistry_FlashMemory {
         let requests = Object.keys(this.memory);
         let minSpawnCost = 36000;
