@@ -22,7 +22,7 @@ declare interface ScoutJob_Memory extends SoloJob_Memory {
 declare interface HarvesterMemory extends SoloJob_Memory {
     src: ObjectID;
     helper: boolean;
-    supStr: ObjectID;
+    supStr?: ObjectID;
     spLvl: number;
 }
 declare interface Worker_Memory extends SoloJob_Memory {

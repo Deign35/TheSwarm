@@ -8,6 +8,7 @@ import { PackageProviderBase, BasicProcess } from "Core/BasicTypes";
 
 class RoomProvider extends BasicProcess<RoomProvider_Memory> {
     EnsureRoomJobs() {
+        let room = Game.rooms[this.memory.rID];
         let roomData = this.View.GetRoomData(this.memory.rID)!;
         if (!roomData) {
             this.kernel.killProcess(this.pid, `RoomProvider couldn't find any data`);
@@ -36,10 +37,16 @@ class RoomProvider extends BasicProcess<RoomProvider_Memory> {
 
         if (roomData.RoomType.type == RT_Home) {
             if (!roomData.groups.RJ_Tower || !this.kernel.getProcessByPID(roomData.groups.RJ_Tower)) {
-                let newMem: Tower_Memory = {
-                    rID: this.memory.rID
+                if (room.controller!.level >= 3 && room.find(FIND_STRUCTURES, {
+                    filter: (struct) => {
+                        return struct.structureType == STRUCTURE_TOWER;
+                    }
+                }).length > 0) {
+                    let newMem: Tower_Memory = {
+                        rID: this.memory.rID
+                    }
+                    roomData.groups.RJ_Tower = this.kernel.startProcess(RJ_Tower, newMem);
                 }
-                roomData.groups.RJ_Tower = this.kernel.startProcess(RJ_Tower, newMem);
             }
         }
 
@@ -49,7 +56,8 @@ class RoomProvider extends BasicProcess<RoomProvider_Memory> {
                     hr: this.memory.home,
                     lu: 0,
                     rID: this.memory.rID,
-                    harvesters: {}
+                    harvesters: {},
+                    nb: true
                 }
                 roomData.groups.RJ_Harvest = this.kernel.startProcess(RJ_Harvest, newMem);
             }

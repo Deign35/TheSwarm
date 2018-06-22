@@ -22,10 +22,6 @@ class RoomStateHarvestActivity extends RoomStateActivity<RoomStateHarvest_Memory
         let keys = Object.keys(this.memory.harvesters);
         for (let i = 0; i < keys.length; i++) {
             let mem = this.memory.harvesters[keys[i]];
-            if (!mem.pid || !this.kernel.getProcessByPID(mem.pid!)) {
-                this.SpawnHarvester(keys[i]);
-            }
-
             if (mem.sup) {
                 let obj = Game.getObjectById(mem.sup);
                 if (!obj) {
@@ -50,7 +46,15 @@ class RoomStateHarvestActivity extends RoomStateActivity<RoomStateHarvest_Memory
                             }
                         }
                     }
+
+                    if (mem.sup) {
+                        // (TODO): inform the harvester
+                    }
                 }
+            }
+
+            if (!mem.pid || !this.kernel.getProcessByPID(mem.pid!)) {
+                this.SpawnHarvester(keys[i], mem.sup);
             }
         }
         return ThreadState_Done;
@@ -75,13 +79,11 @@ class RoomStateHarvestActivity extends RoomStateActivity<RoomStateHarvest_Memory
         delete this.memory.nb;
     }
 
-    SpawnHarvester(sourceID: ObjectID) {
-        this.memory.lu = Game.time;
+    SpawnHarvester(sourceID: ObjectID, supportStructure?: ObjectID) {
+        this.log.info(`Spawning a harvester for ${sourceID}.`);
         let spawnLevel = 0;
-        let priority: Priority = Priority_Medium;
-        if (this.memory.hr != this.memory.rID) {
+        if (this.memory.hr != this.memory.rID) { // Remote harvester
             spawnLevel = 2;
-            priority = Priority_Low;
         } else {
             let homeRoom = Game.rooms[this.memory.hr];
             if (homeRoom.energyCapacityAvailable >= CreepBodies.Harvester[2].cost) {
@@ -111,214 +113,28 @@ class RoomStateHarvestActivity extends RoomStateActivity<RoomStateHarvest_Memory
                 }
             }
         }
-
-        this.log.info(`Spawning a harvester for ${sourceID}.`);
-        let spawnID = this.spawnRegistry.requestSpawn({
-            l: spawnLevel,
-            c: CT_Harvester,
-            n: this.memory.rID + '_' + (Game.time + '_Ha').slice(-5),
-            p: this.pid,
-        }, this.memory.rID, priority, 3, {
-                ct: CT_Harvester,
-                lvl: spawnLevel,
-                p: this.pid,
-                s: sourceID
-            });
-        let spawnMem: SpawnActivity_Memory = {
-            sID: spawnID,
-            HC: "HarvestSourceActivity"
+        let harvMem: HarvesterMemory = {
+            src: sourceID,
+            supStr: supportStructure,
+            helper: false,
+            home: this.memory.hr,
+            rID: this.memory.rID,
+            spLvl: spawnLevel,
         }
 
-        this.memory.harvesters[sourceID].pid = this.kernel.startProcess(SPKG_SpawnActivity, spawnMem);
+        this.memory.harvesters[sourceID].pid = this.kernel.startProcess(CJ_Harvest, harvMem);
         this.kernel.setParent(this.memory.harvesters[sourceID].pid!, this.pid);
     }
 
     SpawnSupport(sourceID: ObjectID) {
-        let spawnID = this.spawnRegistry.requestSpawn({
-            l: 0,
-            c: CT_Harvester,
-            n: GetSUID() + '_HS',
-            p: this.pid
-        }, this.memory.rID, Priority_Low, 3, {
-                ct: CT_Harvester,
-                lvl: 0,
-                p: this.pid,
-                s: sourceID,
-                sup: true
-            });
-        let spawnMem: SpawnActivity_Memory = {
-            sID: spawnID,
-            HC: "HarvestSourceActivity"
+        let harvMem: HarvesterMemory = {
+            src: sourceID,
+            helper: true,
+            home: this.memory.hr,
+            rID: this.memory.rID,
+            spLvl: 0,
         }
-        let newPID = this.kernel.startProcess(SPKG_SpawnActivity, spawnMem);
+        let newPID = this.kernel.startProcess(CJ_Harvest, harvMem);
         this.kernel.setParent(newPID, this.pid);
-    }
-
-    HarvestSourceActivity(creepID: CreepID) {
-        if (!this.creepRegistry.tryReserveCreep(creepID, this.pid)) {
-            return;
-        }
-
-        let creep = this.creepRegistry.tryGetCreep(creepID, this.pid);
-        if (!creep || !creep.memory.s) {
-            this.creepRegistry.releaseCreep(creepID, this.pid);
-            return;
-        }
-
-        let source = Game.getObjectById(creep.memory.s) as Source;
-        if (creep.room.name != this.memory.rID) {
-            let map = Game.map.findRoute(creep.room.name, this.memory.rID);
-            let nextRoom = this.memory.rID;
-            if (map == ERR_NO_PATH) {
-                this.log.error(`Could not find a route between two rooms`);
-                return;
-            }
-
-            if (map && map.length > 0) {
-                nextRoom = map[0].room;
-            }
-            let path = creep.pos.findPathTo(new RoomPosition(25, 25, nextRoom), {
-                ignoreCreeps: true,
-                ignoreRoads: true
-            });
-
-            let lastPosition = path[path.length - 1];
-            if (!lastPosition) {
-                this.log.error('Attempted to find a path to the next room, but failed');
-                return;
-            }
-
-            let newPID = this.creepActivity.CreateNewCreepActivity({
-                at: AT_MoveToPosition,
-                c: creep.name,
-                HC: 'HarvestSourceActivity',
-                p: { x: lastPosition.x, y: lastPosition.y, roomName: creep.room.name }
-            }, this.pid);
-            if (!creep.memory.sup) {
-                this.memory.harvesters[creep.memory.s].pid = newPID;
-            }
-            return;
-        }
-
-        let moveTarget = Game.getObjectById<ConstructionSite | StructureContainer>(this.memory.harvesters[creep.memory.s].sup);
-        if (!creep.memory.sup && (!moveTarget || (moveTarget as ConstructionSite).progressTotal)) {
-            this.memory.harvesters[creep.memory.s].pid = this.creepActivity.CreateNewCreepActivity({
-                at: AT_MoveToPosition,
-                p: moveTarget ? moveTarget.pos : source.pos,
-                a: moveTarget ? 0 : 1,
-                c: creep.name,
-                HC: 'ConstructContainerActivity'
-            }, this.pid)
-            return;
-        }
-
-        if (!creep.memory.sup && moveTarget && !creep.pos.isEqualTo(moveTarget.pos)) {
-            this.memory.harvesters[creep.memory.s].pid = this.creepActivity.CreateNewCreepActivity({
-                at: AT_MoveToPosition,
-                p: moveTarget.pos,
-                c: creep.name,
-                HC: 'HarvestSourceActivity'
-            }, this.pid);
-            return;
-        }
-
-        let newPID = this.creepActivity.CreateNewCreepActivity({
-            at: AT_Harvest,
-            c: creep.name,
-            HC: 'HarvestSourceActivity',
-            t: creep.memory.s,
-            e: [ERR_FULL, ERR_NOT_ENOUGH_RESOURCES],
-        }, this.pid);
-        if (!creep.memory.sup) {
-            this.memory.harvesters[creep.memory.s].pid = newPID;
-        }
-    }
-
-    ConstructContainerActivity(creepID: CreepID) {
-        if (!this.creepRegistry.tryReserveCreep(creepID, this.pid)) {
-            return;
-        }
-
-        let creep = this.creepRegistry.tryGetCreep(creepID, this.pid);
-        if (!creep || !creep.memory.s) {
-            this.creepRegistry.releaseCreep(creepID, this.pid);
-            return;
-        }
-
-        let source = Game.getObjectById(creep.memory.s) as Source;
-        let constructionSite = Game.getObjectById<ConstructionSite>(this.memory.harvesters[creep.memory.s].sup);
-        if (!constructionSite) {
-            let structures = FindStructureNextTo(source.pos, STRUCTURE_CONTAINER);
-            if (structures && structures.length > 0) {
-                let container = structures[0].structure as StructureContainer;
-                this.memory.harvesters[creep.memory.s].sup = container.id;
-                this.memory.harvesters[creep.memory.s].pid = this.creepActivity.CreateNewCreepActivity({
-                    at: AT_Harvest,
-                    c: creep.name,
-                    HC: 'HarvestSourceActivity',
-                    t: creep.memory.s,
-                }, this.pid);
-                return;
-            } else {
-                if (!creep.pos.isNearTo(source.pos)) {
-                    this.memory.harvesters[creep.memory.s].pid = this.creepActivity.CreateNewCreepActivity({
-                        at: AT_MoveToPosition,
-                        p: source.pos,
-                        a: 1,
-                        c: creep.name,
-                        HC: 'ConstructContainerActivity'
-                    }, this.pid)
-                    return;
-                }
-
-                let foundSite: ConstructionSite | undefined = undefined;
-                let sites = creep.pos.lookFor(LOOK_CONSTRUCTION_SITES);
-                if (sites && sites.length > 0) {
-                    for (let i = 0; i < sites.length; i++) {
-                        if (sites[i].structureType == STRUCTURE_CONTAINER) {
-                            foundSite = sites[i];
-                            break;
-                        }
-                    }
-                }
-
-                if (!foundSite) {
-                    creep.room.createConstructionSite(creep.pos, STRUCTURE_CONTAINER);
-                } else {
-                    constructionSite = foundSite;
-                    this.memory.harvesters[creep.memory.s].sup = foundSite.id;
-                }
-            }
-        }
-
-        if (!constructionSite) {
-            this.memory.harvesters[creep.memory.s].pid = this.creepActivity.CreateNewCreepActivity({
-                at: AT_Harvest,
-                t: creep.memory.s,
-                c: creep.name,
-                HC: 'ConstructContainerActivity'
-            }, this.pid)
-            return;
-        }
-        let actions: SingleCreepActivity_Memory[] = [];
-        actions.push({
-            at: AT_Harvest,
-            t: source.id,
-            n: 10
-        });
-        actions.push({
-            at: AT_Build,
-            t: constructionSite.id,
-            n: 10
-        })
-        let newMem: RepetitiveCreepActivity_Memory = {
-            a: actions,
-            c: creep.name,
-            HC: 'ConstructContainerActivity'
-        }
-
-        this.log.info(`Container construction ${constructionSite.id} in ${creep.room.name} continues.`);
-        this.memory.harvesters[creep.memory.s].pid = this.kernel.startProcess(SPKG_RepetitiveCreepActivity, newMem);
-        this.kernel.setParent(this.memory.harvesters[creep.memory.s].pid!, this.pid);
     }
 }

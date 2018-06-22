@@ -73,7 +73,6 @@ class Harvester extends SoloJob<HarvesterMemory> {
         return this.creepActivity.CreateNewCreepActivity({
             at: AT_Harvest,
             c: creep.name,
-            HC: 'HarvestSourceActivity',
             t: this.memory.src,
             e: [ERR_FULL, ERR_NOT_ENOUGH_RESOURCES],
         }, this.pid);
