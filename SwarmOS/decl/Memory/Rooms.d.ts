@@ -54,3 +54,7 @@ declare interface RoomStateWorkTarget_Memory extends RoomStateActivity_Memory {
     needsRepair: ObjectID[];
     cSites: ObjectID[];
 }
+
+declare interface RoomEnergyMonitor_Memory extends RoomStateActivity_Memory {
+    
+}

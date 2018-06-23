@@ -15,11 +15,8 @@ export abstract class RoomStateActivity<T extends RoomStateActivity_Memory> exte
     protected get roomData() {
         return this._roomData;
     }
-    protected get roomName(): RoomID {
-        return this.memory.rID;
-    }
     PrepTick() {
-        this._room = Game.rooms[this.roomName];
+        this._room = Game.rooms[this.memory.rID];
         this._roomData = this.View.GetRoomData(this.memory.rID)!;
         if (!this._roomData) {
             throw new Error(`Roomstate activity is missing roomdata ${this.memory.rID}`);
