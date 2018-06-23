@@ -5,14 +5,9 @@ class EnergyTransferActivity extends BasicProcess<EnergyJob_Memory> {
     protected creepRegistry!: ICreepRegistryExtensions;
 
     protected creep: Creep | undefined;
-    protected roomData!: RoomState;
-
-    PrepTick() {
-        this.creep = this.creepRegistry.tryGetCreep(this.memory.c, this.pid);
-        this.roomData = this.View.GetRoomData(this.memory.rID)!;
-    }
 
     RunThread(): ThreadState {
+        this.creep = this.creepRegistry.tryGetCreep(this.memory.c, this.parentPID);
         if (!this.creep) {
             this.CurrentJobComplete();
             return ThreadState_Done;
