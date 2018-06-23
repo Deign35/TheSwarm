@@ -1,14 +1,17 @@
 /** CreepActions */
-declare interface HarvestJob_Memory extends MemBase {
-    a?: PID;        // (a)ctivity
-    t: ObjectID;    // (t)arget
-    l?: ObjectID;   // (l)ink
-    c?: ObjectID;   // (c)ontainer
-    h?: CreepID;    // (h)arvester
-    rID: RoomID;    // (r)oom
-    SUPPORT?: boolean;
-}
+declare interface EnergyJob_Memory extends MemBase {
+    rID: RoomID;     // (t)arget (r)oom
+    c: CreepID;
 
+    aTo: number;
+    pTo: PathStep[];
+    tTo: ObjectID;
+
+    aGet?: number;
+    pGet?: PathStep[];
+    tGet?: ObjectID;
+
+}
 declare interface SoloJob_Memory extends MemBase {
     a?: PID;        // (a)ctivity
     c?: CreepID;    // (c)reep
