@@ -69,7 +69,7 @@ class BootstrapRefiller extends SoloJob<BootstrapRefiller_Memory> {
                     }
                 }
                 if (!newActivity.t) {
-                    let extensions = this.View.GetRoomData(this.memory.rID)!.structures.extension;
+                    let extensions = this.roomView.GetRoomData(this.memory.rID)!.structures.extension;
                     if (extensions && extensions.length > 0) {
                         for (let i = 0; i < extensions.length; i++) {
                             let extension = Game.getObjectById(extensions[i]) as StructureExtension;

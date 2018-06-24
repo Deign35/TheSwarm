@@ -28,9 +28,9 @@ class RoomRegistry extends BasicProcess<RoomStateMemory> {
 
     RunThread(): ThreadState {
         for (let roomID in Game.rooms) {
-            let data = this.View.GetRoomData(roomID);
+            let data = this.roomView.GetRoomData(roomID);
             if (!data || !data.activityPID || !this.kernel.getProcessByPID(data.activityPID)) {
-                this.View.BootRoom(roomID, false);
+                this.roomView.BootRoom(roomID, false);
             }
         }
 
@@ -139,6 +139,7 @@ class RoomExtension extends ExtensionBase implements IRoomDataExtension {
 
         return arr;
     }
+
     AverageDistanceMaps(roomID: RoomID, ids: string[]) {
         let roomData = this.GetRoomData(roomID)!;
         let arr = new Array(ROOM_ARRAY_SIZE).fill(0);
@@ -154,14 +155,8 @@ class RoomExtension extends ExtensionBase implements IRoomDataExtension {
         return arr;
     }
 
-    CreateDistanceMap(room: Room, id: string, targetPositions: RoomPosition[], maxDistance: number, ignoreImpassable: boolean = true, force: boolean = false) {
-        let roomData = this.GetRoomData(room.name)!;
-        if (roomData.distanceMaps[id]) {
-            if (!force) {
-                return;
-            }
-        }
-
+    // MaxDistance of 99 so max of 2 digits.  For saving mem space
+    CreateDistanceMap(room: Room, targetPositions: RoomPosition[], maxDistance: number = 99, ignoreImpassable: boolean = true, force: boolean = false) {
         let arr = new Array(ROOM_ARRAY_SIZE).fill(0);
         let pendingNodes = [];
         for (let i = 0; i < targetPositions.length; i++) {
@@ -208,7 +203,7 @@ class RoomExtension extends ExtensionBase implements IRoomDataExtension {
             }
         }
 
-        roomData.distanceMaps[id] = arr;
+        return arr;
     }
 
     protected GetNeighborNodes(x: number, y: number, dist: number) {

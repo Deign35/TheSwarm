@@ -113,7 +113,7 @@ class SwarmCLI extends BasicProcess<SwarmCLIMemory> {
         let memory: any = args[3] || {};
 
         for (let i = 0; i < count; i++) {
-            let jobMem = RoomActivityUtils.CreateRoomJob(pkg, roomID, this.View.GetRoomData(roomID)!, CopyObject(memory));
+            let jobMem = RoomActivityUtils.CreateRoomJob(pkg, roomID, this.roomView.GetRoomData(roomID)!, CopyObject(memory));
             this.kernel.startProcess(pkg, jobMem);
         }
     }
@@ -124,7 +124,7 @@ class SwarmCLI extends BasicProcess<SwarmCLIMemory> {
             return;
         }
         let roomID: RoomID = args[0];
-        let roomData = this.View.GetRoomData(roomID);
+        let roomData = this.roomView.GetRoomData(roomID);
         if (!roomData) {
             this.log.warn(`Cannot assimilate a room that has yet to be seen`);
             return;
@@ -138,7 +138,7 @@ class SwarmCLI extends BasicProcess<SwarmCLIMemory> {
         switch (roomType) {
             case (RT_None):
                 if (roomID == 'sim') {
-                    this.View.BootRoom('sim', true);
+                    this.roomView.BootRoom('sim', true);
                 }
                 break;
             case (RT_Home):
@@ -168,7 +168,7 @@ class SwarmCLI extends BasicProcess<SwarmCLIMemory> {
                     return;
                 }
                 let homeID: RoomID = args[2];
-                let homeRoom = this.View.GetRoomData(homeID);
+                let homeRoom = this.roomView.GetRoomData(homeID);
                 if (!homeRoom || homeRoom.RoomType.type != RT_Home) { // || homeRoom.IsHomeRoom
                     this.log.warn(`Cannot make ${roomID} into a harvest room for ${homeID}`);
                     return;

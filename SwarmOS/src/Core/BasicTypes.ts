@@ -10,7 +10,7 @@ export abstract class BasicProcess<T extends MemBase> implements IProcess {
     @extensionInterface(EXT_SpawnRegistry)
     protected spawnRegistry!: ISpawnRegistryExtensions;
     @extensionInterface(EXT_RoomView)
-    protected View!: IRoomDataExtension;
+    protected roomView!: IRoomDataExtension;
 
     get memory(): T { return this.context.memory as T; }
     get pkgName(): string { return this.context.pkgName; }

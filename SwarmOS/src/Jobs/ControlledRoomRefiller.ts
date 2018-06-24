@@ -44,16 +44,16 @@ class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory> {
     protected HandleNoActivity() { }
 
     protected get energyTargets() {
-        return this.View.GetRoomData(this.memory.rID)!.targets.CR_SpawnFill!.energy;
+        return this.roomView.GetRoomData(this.memory.rID)!.targets.CR_SpawnFill!.energy;
     }
     protected get targets() {
-        return this.View.GetRoomData(this.memory.rID)!.targets.CR_SpawnFill!.targets;
+        return this.roomView.GetRoomData(this.memory.rID)!.targets.CR_SpawnFill!.targets;
     }
 
     protected GetNewTarget(creep: Creep): { t: ObjectID, a: ActionType } {
         let actionType: ActionType = AT_NoOp;
         let bestTarget = '';
-        let roomData = this.View.GetRoomData(creep.room.name)!;
+        let roomData = this.roomView.GetRoomData(creep.room.name)!;
         let energyNeeded = creep.carryCapacity - (creep.carry.energy || 0);
         let carryRatio = creep.carry.energy / creep.carryCapacity;
 

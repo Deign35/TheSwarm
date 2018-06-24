@@ -71,7 +71,7 @@ class CreepRegistry extends BasicProcess<CreepRegistry_Memory> {
             }
 
             if (!context.o) {
-                let roomData = this.View.GetRoomData(creep.room.name)!;
+                let roomData = this.roomView.GetRoomData(creep.room.name)!;
                 if (roomData.groups.CR_Work) {
                     let proc = this.kernel.getProcessByPID(roomData.groups.CR_Work);
                     if (proc && (proc as IWorkerGroupProcess).AddCreep) {

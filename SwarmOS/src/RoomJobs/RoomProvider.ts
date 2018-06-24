@@ -9,7 +9,7 @@ import { PackageProviderBase, BasicProcess } from "Core/BasicTypes";
 class RoomProvider extends BasicProcess<RoomProvider_Memory> {
     EnsureRoomJobs() {
         let room = Game.rooms[this.memory.rID];
-        let roomData = this.View.GetRoomData(this.memory.rID)!;
+        let roomData = this.roomView.GetRoomData(this.memory.rID)!;
         if (!roomData) {
             this.kernel.killProcess(this.pid, `RoomProvider couldn't find any data`);
             return;

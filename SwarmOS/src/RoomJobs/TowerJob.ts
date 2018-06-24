@@ -10,10 +10,10 @@ class TowerJob extends BasicProcess<Tower_Memory> {
         return Game.rooms[this.memory.rID];
     }
     get roomData() {
-        return this.View.GetRoomData(this.memory.rID)!;
+        return this.roomView.GetRoomData(this.memory.rID)!;
     }
     RunThread(): ThreadState {
-        let homeRoomData = this.View.GetRoomData(this.memory.rID)!;
+        let homeRoomData = this.roomView.GetRoomData(this.memory.rID)!;
         let provider = this.kernel.getProcessByPID(homeRoomData.activityPID);
         if (provider && provider['RoomJobCheckin']) {
             provider['RoomJobCheckin'](this.pkgName);

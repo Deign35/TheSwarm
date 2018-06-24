@@ -16,7 +16,7 @@ class WorkerActivity extends SoloJob<Worker_Memory> {
     PrepTick() {
         this.hasRun = false;
         this.hasNotified = false;
-        this._roomData = this.View.GetRoomData(this.memory.rID)!;
+        this._roomData = this.roomView.GetRoomData(this.memory.rID)!;
     }
     RunThread(): ThreadState {
         if (!this.hasNotified) {
@@ -79,7 +79,7 @@ class WorkerActivity extends SoloJob<Worker_Memory> {
         }
 
         let carryRatio = _.sum(creep.carry) / creep.carryCapacity;
-        let roomData = this.View.GetRoomData(creep.room.name)!;
+        let roomData = this.roomView.GetRoomData(creep.room.name)!;
         if (roomData.targets.Other.t != TT_None && roomData.targets.Other.at != AT_NoOp) {
             let isValidTarget = false;
             if (roomData.targets.Other.en == 0) {

@@ -17,17 +17,17 @@ export abstract class RoomStateActivity<T extends RoomStateActivity_Memory> exte
     }
     PrepTick() {
         this._room = Game.rooms[this.memory.rID];
-        this._roomData = this.View.GetRoomData(this.memory.rID)!;
+        this._roomData = this.roomView.GetRoomData(this.memory.rID)!;
         if (!this._roomData) {
             throw new Error(`Roomstate activity is missing roomdata ${this.memory.rID}`);
         }
     }
 
-    protected shouldRefresh(frequency: number, offset: number, lastUpdated: number): boolean {
-        if (Game.time - lastUpdated >= frequency) {
+    protected shouldRefresh(frequency: number): boolean {
+        if (Game.time - this.memory.lu >= frequency) {
             return true;
         }
-        return (Game.time + offset) % frequency == 0;
+        return (Game.time + this.roomData.minUpdateOffset) % frequency == 0;
     }
 }
 
@@ -44,7 +44,7 @@ class RoomStateMiscActivity extends RoomStateActivity<RoomStateMisc_Memory> {
         }
 
         this.roomData.owner = (this.room.controller && this.room.controller.owner && this.room.controller.owner.username) || undefined;
-        if (this.shouldRefresh(11, this.roomData.minUpdateOffset, this.memory.lu)) {
+        if (this.shouldRefresh(11)) {
             let newCount = 0;
             this.room.find(FIND_DROPPED_RESOURCES).map((value: Resource) => {
                 newCount += value.energy || 0;

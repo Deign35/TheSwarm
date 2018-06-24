@@ -39,7 +39,7 @@ class ScoutJob extends SoloJob<ScoutJob_Memory> {
             let nextRoom = this.memory.home;
             let bestRoom: RoomState | undefined = undefined;
             for (let i = 0; i < nearby.length; i++) {
-                let data = this.View.GetRoomData(nearby[i]);
+                let data = this.roomView.GetRoomData(nearby[i]);
                 if (!data) {
                     nextRoom = nearby[i];
                     break;
@@ -92,7 +92,7 @@ class ScoutJob extends SoloJob<ScoutJob_Memory> {
     // (TODO): Cache these results for future use (between OS loads)
     protected GatherNearbyRoomIDs(centerRoom: RoomID, distance: number): RoomID[] {
         let nearbyRooms: RoomID[] = [];
-        let roomData = this.View.GetRoomData(centerRoom);
+        let roomData = this.roomView.GetRoomData(centerRoom);
         if (roomData) {
             let nearby = roomData.exits
             if (nearby) {

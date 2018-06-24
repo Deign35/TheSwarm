@@ -17,7 +17,7 @@ export abstract class RoomMonitorBase<T extends RoomMonitor_Memory> extends Basi
     }
     PrepTick() {
         this._room = Game.rooms[this.memory.rID];
-        this._roomData = this.View.GetRoomData(this.memory.rID)!;
+        this._roomData = this.roomView.GetRoomData(this.memory.rID)!;
         if (!this._roomData) {
             throw new Error(`Room monitor is missing roomdata ${this.memory.rID}`);
         }
