@@ -125,6 +125,35 @@ class RoomExtension extends ExtensionBase implements IRoomDataExtension {
         }
     }
 
+    AddDistanceMaps(roomID: RoomID, ids: string[]) {
+        let roomData = this.GetRoomData(roomID)!;
+        let arr = new Array(ROOM_ARRAY_SIZE).fill(0);
+        let idLength = ids.length;
+        for (let i = 0; i < ROOM_ARRAY_SIZE; i++) {
+            let total = 0;
+            for (let j = 0; j < idLength; j++) {
+                total += roomData.distanceMaps[ids[j]][i];
+            }
+            arr[i] = total;
+        }
+
+        return arr;
+    }
+    AverageDistanceMaps(roomID: RoomID, ids: string[]) {
+        let roomData = this.GetRoomData(roomID)!;
+        let arr = new Array(ROOM_ARRAY_SIZE).fill(0);
+        let idLength = ids.length;
+        for (let i = 0; i < ROOM_ARRAY_SIZE; i++) {
+            let total = 0;
+            for (let j = 0; j < idLength; j++) {
+                total += roomData.distanceMaps[ids[j]][i];
+            }
+            arr[i] = Math.ceil(total / idLength);
+        }
+
+        return arr;
+    }
+
     CreateDistanceMap(room: Room, id: string, targetPositions: RoomPosition[], maxDistance: number, ignoreImpassable: boolean = true, force: boolean = false) {
         let roomData = this.GetRoomData(room.name)!;
         if (roomData.distanceMaps[id]) {

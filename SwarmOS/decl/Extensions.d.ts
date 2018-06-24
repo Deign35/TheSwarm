@@ -94,6 +94,8 @@ declare interface IRoomDataExtension extends IPackageExtension {
     GetRoomData(roomID: string): RoomState | undefined;
     BootRoom(roomID: string, force: boolean): void;
     CreateDistanceMap(room: Room, id: string, targetPositions: RoomPosition[], maxDistance: number, ignoreImpassable?: boolean, force?: boolean): void;
+    AddDistanceMaps(roomID: RoomID, ids: string[]): number[];
+    AverageDistanceMaps(roomID: RoomID, ids: string[]): number[];
 }
 
 /**
