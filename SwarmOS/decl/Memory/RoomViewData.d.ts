@@ -41,6 +41,7 @@ interface RoomState extends MemBase {
             tr: RoomID;
         }
     }
+    distanceMaps: IDictionary<ObjectID, number[]>;
 }
 interface RoomState_StructureData {
     [STRUCTURE_CONTAINER]: ObjectID[];
