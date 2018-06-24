@@ -35,15 +35,17 @@ class RoomEnergyMonitor extends BasicProcess<RoomStateMap_Memory> {
             throw new Error(`Room monitor is missing roomdata ${this.memory.rID}`);
         }
         if (this.memory.nb) {
-            let sources = this.room.find(FIND_SOURCES).map((source) => {
-                return source.pos;
-            })
-            this.roomData.distanceMaps[SOURCE_LAYER] = this.roomView.CreateDistanceMap(this.room, sources);
-            let minerals = this.room.find(FIND_MINERALS).map((mineral) => {
-                return mineral.pos;
-            })
-            this.roomData.distanceMaps[MINERAL_LAYER] = this.roomView.CreateDistanceMap(this.room, minerals);
-            this.roomData.distanceMaps[CONTROLLER_LAYER] = this.roomView.CreateDistanceMap(this.room, [this.room.controller!.pos]);
+            let sources = this.room.find(FIND_SOURCES);
+            for (let i = 0; i < sources.length; i++) {
+                this.roomData.distanceMaps[sources[i].id] = DistMap.CreateDistanceMap(this.room, [sources[i].pos]);
+            }
+
+            let minerals = this.room.find(FIND_MINERALS);
+            for (let i = 0; i < minerals.length; i++) {
+                this.roomData.distanceMaps[minerals[i].id] = DistMap.CreateDistanceMap(this.room, [minerals[i].pos]);
+            }
+
+            this.roomData.distanceMaps[this.room.controller!.id] = DistMap.CreateDistanceMap(this.room, [this.room.controller!.pos]);
             this.GenerateContainerMap();
             this.GenerateSpawnEnergyMap();
             this.GenerateImpassableMap();
@@ -76,7 +78,7 @@ class RoomEnergyMonitor extends BasicProcess<RoomStateMap_Memory> {
         }).map((struct) => {
             return struct.pos;
         })
-        this.roomData.distanceMaps[SPAWN_ENERGY_LAYER] = this.roomView.CreateDistanceMap(this.room, spawnEnergyPositions);
+        this.roomData.distanceMaps[SPAWN_ENERGY_LAYER] = DistMap.CreateDistanceMap(this.room, spawnEnergyPositions);
     }
     GenerateContainerMap() {
         let containerPositions = this.room.find(FIND_STRUCTURES, {
@@ -88,7 +90,7 @@ class RoomEnergyMonitor extends BasicProcess<RoomStateMap_Memory> {
         }).map((struct) => {
             return struct.pos
         });
-        this.roomData.distanceMaps[REFILL_ENERGY_LAYER] = this.roomView.CreateDistanceMap(this.room, containerPositions);
+        this.roomData.distanceMaps[REFILL_ENERGY_LAYER] = DistMap.CreateDistanceMap(this.room, containerPositions);
     }
 
     RunThread(): ThreadState {
@@ -98,15 +100,16 @@ class RoomEnergyMonitor extends BasicProcess<RoomStateMap_Memory> {
         if (this.shouldRefresh(473)) {
             this.GenerateSpawnEnergyMap();
         }
+        /*
         if (this.shouldRefresh(31)) {
             this.GenerateImpassableMap();
             // (TODO): These need to somehow be made available 
-            this._cachedImpassableDistances[SOURCE_LAYER] = this.roomView.MultiplyDistanceMaps(this.memory.rID, [SOURCE_LAYER, IMPASSABLE_LAYER]);
-            this._cachedImpassableDistances[MINERAL_LAYER] = this.roomView.MultiplyDistanceMaps(this.memory.rID, [MINERAL_LAYER, IMPASSABLE_LAYER]);
-            this._cachedImpassableDistances[CONTROLLER_LAYER] = this.roomView.MultiplyDistanceMaps(this.memory.rID, [CONTROLLER_LAYER, IMPASSABLE_LAYER]);
-            this._cachedImpassableDistances[SPAWN_ENERGY_LAYER] = this.roomView.MultiplyDistanceMaps(this.memory.rID, [SPAWN_ENERGY_LAYER, IMPASSABLE_LAYER]);
-            this._cachedImpassableDistances[REFILL_ENERGY_LAYER] = this.roomView.MultiplyDistanceMaps(this.memory.rID, [REFILL_ENERGY_LAYER, IMPASSABLE_LAYER]);
-        }
+            this._cachedImpassableDistances[SOURCE_LAYER] = DistMap.MultiplyDistanceMaps(this.memory.rID, [SOURCE_LAYER, IMPASSABLE_LAYER]);
+            this._cachedImpassableDistances[MINERAL_LAYER] = DistMap.MultiplyDistanceMaps(this.memory.rID, [MINERAL_LAYER, IMPASSABLE_LAYER]);
+            this._cachedImpassableDistances[CONTROLLER_LAYER] = DistMap.MultiplyDistanceMaps(this.memory.rID, [CONTROLLER_LAYER, IMPASSABLE_LAYER]);
+            this._cachedImpassableDistances[SPAWN_ENERGY_LAYER] = DistMap.MultiplyDistanceMaps(this.memory.rID, [SPAWN_ENERGY_LAYER, IMPASSABLE_LAYER]);
+            this._cachedImpassableDistances[REFILL_ENERGY_LAYER] = DistMap.MultiplyDistanceMaps(this.memory.rID, [REFILL_ENERGY_LAYER, IMPASSABLE_LAYER]);
+        }*/
 
         this.memory.lu = Game.time;
         return ThreadState_Done;
@@ -114,9 +117,14 @@ class RoomEnergyMonitor extends BasicProcess<RoomStateMap_Memory> {
 
     EndTick() {
         try {
-            let averaged = this.roomView.AverageDistanceMaps('sim', [SOURCE_LAYER, SPAWN_ENERGY_LAYER, REFILL_ENERGY_LAYER])
-            for (let i = 0; i < 2500; i++) {
-                this.VisualizePosition(i % 50, Math.floor(i / 50), averaged[i]);
+            let sources = this.room.find(FIND_SOURCES);
+            let maps = [];
+            for (let i = 0; i < sources.length; i++) {
+                maps.push(this.roomData.distanceMaps[sources[i].id]);
+            }
+            let displayVal = DistMap.MaxDistanceMaps(maps);
+            for (let i = 0; i < displayVal.length; i++) {
+                this.VisualizePosition(i % 50, Math.floor(i / 50), displayVal[i]);
             }
         } catch (ex) {
             console.log(JSON.stringify(ex));
@@ -128,14 +136,14 @@ class RoomEnergyMonitor extends BasicProcess<RoomStateMap_Memory> {
         this.room.visual.rect(x - 0.4, y - 0.4, 0.8, 0.8, {
             fill: fillVal
         });
-        this.room.visual.text('' + val, x, y);
+        this.room.visual.text('' + val, x, y + 0.2);
     }
     protected shouldRefresh(frequency: number): boolean {
         return (Game.time + this.roomData.minUpdateOffset) % frequency == 0;
     }
 
     protected convertValToColor(val: number): string {
-        let percentage = val / 33;
+        let percentage = val / 75;
         let blue = Math.floor(0xff * percentage);
         let red = Math.floor(0xff * (1 - percentage)) * 0x010000;
 

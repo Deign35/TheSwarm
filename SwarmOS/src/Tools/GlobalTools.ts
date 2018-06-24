@@ -3,6 +3,8 @@ declare var Memory: {
 }
 import { Stopwatch } from "./Stopwatch";
 global['Stopwatch'] = Stopwatch;
+import { DistMap } from "./DistMap";
+global['DistMap'] = DistMap;
 
 const NUM_ALLOWED_FAILURES = 10;
 export class GlobalTools {

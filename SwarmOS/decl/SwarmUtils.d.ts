@@ -51,6 +51,18 @@ declare class Stopwatch {
     ToString(): string;
 }
 
+declare var DistMap: {
+    CreateDistanceMap(room: Room, targetPositions: RoomPosition[], maxDistance?: number): number[];
+    AddDistanceMaps(maps: number[][]): number[];
+    AverageDistanceMaps(maps: number[][]): number[];
+    MultiplyDistanceMaps(maps: number[][]): number[];
+    MaxDistanceMaps(maps: number[][]): number[];
+    MinDistanceMaps(maps: number[][]): number[];
+}
+declare const ROOM_HEIGHT = 50;
+declare const ROOM_WIDTH = 50;
+declare const ROOM_ARRAY_SIZE = 2500;
+
 /*declare class SwarmLogger {*/
 declare interface ILogger {
     trace(message: (string | (() => string))): void;
