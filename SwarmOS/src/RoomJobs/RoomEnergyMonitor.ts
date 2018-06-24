@@ -14,9 +14,6 @@ const SPAWN_ENERGY_LAYER = 'energy';
 const REFILL_ENERGY_LAYER = 'refill';
 const IMPASSABLE_LAYER = 'imp';
 
-const ROOM_HEIGHT = 50;
-const ROOM_WIDTH = 50;
-const ROOM_ARRAY_SIZE = ROOM_HEIGHT * ROOM_WIDTH;
 class RoomEnergyMonitor extends BasicProcess<RoomStateMap_Memory> {
     private _room!: Room;
     protected get room(): Room {
@@ -27,7 +24,7 @@ class RoomEnergyMonitor extends BasicProcess<RoomStateMap_Memory> {
         return this._roomData;
     }
 
-    protected _cachedImpassableDistances: IDictionary<string, number[]> = {}
+    protected _cachedImpassableDistances: IDictionary<string, MapArray> = {}
     PrepTick() {
         this._room = Game.rooms[this.memory.rID];
         this._roomData = this.roomView.GetRoomData(this.memory.rID)!;

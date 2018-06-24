@@ -100,7 +100,8 @@
                 "Kernel": "kernel",
                 "Sleep": "sleep",
                 "Interrupt": "interrupt",
-                "Logger": "logger"
+                "Logger": "logger",
+                "MapDirectory": "mapper"
             }
         },
         "TT": {

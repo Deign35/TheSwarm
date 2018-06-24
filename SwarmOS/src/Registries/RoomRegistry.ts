@@ -11,10 +11,6 @@ export const OSPackage: IPackage<RoomStateMemory> = {
     }
 }
 
-const ROOM_HEIGHT = 50;
-const ROOM_WIDTH = 50;
-const ROOM_ARRAY_SIZE = ROOM_HEIGHT * ROOM_WIDTH;
-
 class RoomRegistry extends BasicProcess<RoomStateMemory> {
     get memory(): RoomStateMemory {
         if (!Memory.roomData) {
@@ -33,7 +29,6 @@ class RoomRegistry extends BasicProcess<RoomStateMemory> {
                 this.roomView.BootRoom(roomID, false);
             }
         }
-
         return ThreadState_Done;
     }
 }
@@ -122,6 +117,16 @@ class RoomExtension extends ExtensionBase implements IRoomDataExtension {
                 home: roomID
             }
             this.memory.roomStateData[roomID]!.activityPID = this.kernel.startProcess(SPKG_RoomActivity, newMem);
+        }
+    }
+
+    //(TODO): Make this a new object that works more like processcontexts do.  Holds some extra functionality and cached between ticks
+    CreateRoomStateObject(roomID: string) {
+        let roomData = this.GetRoomData(roomID);
+        if (!roomData) { return; }
+
+        let roomContext = {
+            data: roomData
         }
     }
 }

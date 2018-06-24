@@ -26,6 +26,7 @@ declare type ObjectTypeWithID = Structure | Creep | Source | ConstructionSite | 
 declare type EnergyStructureType = StructureExtension | StructureSpawn | StructureContainer | StructureStorage | StructureLink | StructureTerminal;
 declare type TransferTargetType = EnergyStructureType | Creep;
 
+declare type MapArray = number[];
 declare interface ObjectIDWithPos {
     x: number;
     y: number;
@@ -58,6 +59,8 @@ declare var DistMap: {
     MultiplyDistanceMaps(maps: number[][]): number[];
     MaxDistanceMaps(maps: number[][]): number[];
     MinDistanceMaps(maps: number[][]): number[];
+    ConvertXYToIndex(x: number, y: number): number;
+    ConvertIndexToXY(index: number): { x: number, y: number };
 }
 declare const ROOM_HEIGHT = 50;
 declare const ROOM_WIDTH = 50;

@@ -125,6 +125,11 @@ declare interface ICreepActivityExtensions extends IPackageExtension {
     MoveCreep(creep: Creep, pos: RoomPosition, moveToOpts?: MoveToOpts): ScreepsReturnCode;
 }
 
+declare interface IMapDirectory extends IPackageExtension {
+    CreateMapForRoom(roomID: RoomID, mapID: string, startPositions: RoomPosition[]): boolean;
+    GetMap(roomID: RoomID, mapID: string): MapArray | undefined;
+}
+
 interface RunArgs {
     creep: Creep;
     actionType: ActionType;

@@ -1,16 +1,22 @@
 export abstract class BasicProcess<T extends MemBase> implements IProcess {
     constructor(protected context: IProcessContext) { }
 
-    @extensionInterface(EXT_Kernel)
-    protected kernel!: IKernelExtensions;
+    @extensionInterface(EXT_CreepRegistry)
+    protected creepRegistry!: ICreepRegistryExtensions;
+    @extensionInterface(EXT_CreepActivity)
+    protected creepActivity!: ICreepActivityExtensions;
     @extensionInterface(EXT_Registry)
     protected extensions!: IExtensionRegistry;
+    @extensionInterface(EXT_Kernel)
+    protected kernel!: IKernelExtensions;
+    @extensionInterface(EXT_MapDirectory)
+    protected mapper!: IMapDirectory;
+    @extensionInterface(EXT_RoomView)
+    protected roomView!: IRoomDataExtension;
     @extensionInterface(EXT_Sleep)
     protected sleeper!: IKernelSleepExtension;
     @extensionInterface(EXT_SpawnRegistry)
     protected spawnRegistry!: ISpawnRegistryExtensions;
-    @extensionInterface(EXT_RoomView)
-    protected roomView!: IRoomDataExtension;
 
     get memory(): T { return this.context.memory as T; }
     get pkgName(): string { return this.context.pkgName; }

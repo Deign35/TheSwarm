@@ -4,6 +4,7 @@ import { OSPackage as CreepRegistry } from "Registries/CreepRegistry";
 import { OSPackage as RoomRegistry } from "Registries/RoomRegistry";
 import { OSPackage as SpawnRegistry } from "Registries/SpawnRegistry";
 import { OSPackage as FlagRegistry } from "Registries/FlagRegistry";
+import { OSPackage as MapDirectory } from "Registries/MapDirectory";
 
 import { PackageProviderBase } from "Core/BasicTypes";
 class SwarmManager extends PackageProviderBase<PackageProviderMemory> {
@@ -37,6 +38,7 @@ export const RegistriesPackage: IPackage<{}> = {
         RoomRegistry.install(processRegistry, extensionRegistry);
         SpawnRegistry.install(processRegistry, extensionRegistry);
         FlagRegistry.install(processRegistry, extensionRegistry);
+        MapDirectory.install(processRegistry, extensionRegistry);
 
         processRegistry.register(PKG_SwarmManager, SwarmManager);
     },

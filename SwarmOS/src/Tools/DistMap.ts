@@ -3,7 +3,16 @@ global['ROOM_WIDTH'] = 50;
 global['ROOM_ARRAY_SIZE'] = ROOM_HEIGHT * ROOM_WIDTH;
 
 export class DistMap {
-    static AddDistanceMaps(mapsToAdd: number[][]) {
+    static ConvertXYToIndex(x: number, y: number) {
+        return y * ROOM_WIDTH + x;
+    }
+    static ConvertIndexToXY(index: number) {
+        return {
+            x: index % ROOM_WIDTH,
+            y: Math.floor(index / ROOM_WIDTH)
+        }
+    }
+    static AddDistanceMaps(mapsToAdd: MapArray[]) {
         let arr = new Array(ROOM_ARRAY_SIZE).fill(0);
         let idLength = mapsToAdd.length;
         for (let i = 0; i < ROOM_ARRAY_SIZE; i++) {
@@ -16,7 +25,7 @@ export class DistMap {
 
         return arr;
     }
-    static MaxDistanceMaps(mapsToAdd: number[][]) {
+    static MaxDistanceMaps(mapsToAdd: MapArray[]) {
         let arr = new Array(ROOM_ARRAY_SIZE).fill(0);
         let idLength = mapsToAdd.length;
         for (let i = 0; i < ROOM_ARRAY_SIZE; i++) {
@@ -31,7 +40,7 @@ export class DistMap {
 
         return arr;
     }
-    static MinDistanceMaps(mapsToAdd: number[][]) {
+    static MinDistanceMaps(mapsToAdd: MapArray[]) {
         let arr = new Array(ROOM_ARRAY_SIZE).fill(0);
         let idLength = mapsToAdd.length;
         for (let i = 0; i < ROOM_ARRAY_SIZE; i++) {
@@ -47,7 +56,7 @@ export class DistMap {
         return arr;
     }
 
-    static MultiplyDistanceMaps(mapsToAdd: number[][]) {
+    static MultiplyDistanceMaps(mapsToAdd: MapArray[]) {
         let arr = new Array(ROOM_ARRAY_SIZE).fill(0);
         let idLength = mapsToAdd.length;
         for (let i = 0; i < ROOM_ARRAY_SIZE; i++) {
@@ -61,7 +70,7 @@ export class DistMap {
         return arr;
     }
 
-    static AverageDistanceMaps(mapsToAdd: number[][]) {
+    static AverageDistanceMaps(mapsToAdd: MapArray[]) {
         let arr = new Array(ROOM_ARRAY_SIZE).fill(0);
         let idLength = mapsToAdd.length;
         for (let i = 0; i < ROOM_ARRAY_SIZE; i++) {
