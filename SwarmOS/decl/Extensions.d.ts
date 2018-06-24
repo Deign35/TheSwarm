@@ -128,6 +128,11 @@ declare interface ICreepActivityExtensions extends IPackageExtension {
 declare interface IMapDirectory extends IPackageExtension {
     CreateMapForRoom(roomID: RoomID, mapID: string, startPositions: RoomPosition[]): boolean;
     GetMap(roomID: RoomID, mapID: string): MapArray | undefined;
+    GetMaps(roomID: RoomID): MapArray | undefined
+
+    GenerateImpassableMap(room: Room): boolean;
+    GenerateSpawnEnergyMap(room: Room): boolean;
+    GenerateContainerMap(room: Room): boolean;
 }
 
 interface RunArgs {

@@ -27,6 +27,7 @@ declare type EnergyStructureType = StructureExtension | StructureSpawn | Structu
 declare type TransferTargetType = EnergyStructureType | Creep;
 
 declare type MapArray = number[];
+declare type MapLayers = string | ML_Impassable | ML_Energy | ML_Container;
 declare interface ObjectIDWithPos {
     x: number;
     y: number;

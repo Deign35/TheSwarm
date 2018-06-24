@@ -288,6 +288,19 @@
                 "Swamp": "swamp",
                 "Wall": "wall"
             }
+        },
+        "ML": {
+            "comment": "Map Layer",
+            "enabled": true,
+            "string": true,
+            "type": true,
+            "usePrefix": true,
+            "isArray": true,
+            "entries": [
+                "Impassable",
+                "Energy",
+                "Container"
+            ]
         }
     }
 }
