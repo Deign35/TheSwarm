@@ -140,6 +140,21 @@ class RoomExtension extends ExtensionBase implements IRoomDataExtension {
         return arr;
     }
 
+    MultiplyDistanceMaps(roomID: RoomID, ids: string[]) {
+        let roomData = this.GetRoomData(roomID)!;
+        let arr = new Array(ROOM_ARRAY_SIZE).fill(0);
+        let idLength = ids.length;
+        for (let i = 0; i < ROOM_ARRAY_SIZE; i++) {
+            let total = 1;
+            for (let j = 0; j < idLength; j++) {
+                total *= roomData.distanceMaps[ids[j]][i];
+            }
+            arr[i] = total;
+        }
+
+        return arr;
+    }
+
     AverageDistanceMaps(roomID: RoomID, ids: string[]) {
         let roomData = this.GetRoomData(roomID)!;
         let arr = new Array(ROOM_ARRAY_SIZE).fill(0);
@@ -156,7 +171,7 @@ class RoomExtension extends ExtensionBase implements IRoomDataExtension {
     }
 
     // MaxDistance of 99 so max of 2 digits.  For saving mem space
-    CreateDistanceMap(room: Room, targetPositions: RoomPosition[], maxDistance: number = 99, ignoreImpassable: boolean = false) {
+    CreateDistanceMap(room: Room, targetPositions: RoomPosition[], maxDistance: number = 99) {
         let arr = new Array(ROOM_ARRAY_SIZE).fill(0);
         let pendingNodes = [];
         for (let i = 0; i < targetPositions.length; i++) {
@@ -179,27 +194,6 @@ class RoomExtension extends ExtensionBase implements IRoomDataExtension {
                         arr[yPos * 50 + xPos] = -2;
                     }*/
                     continue;
-                }
-
-                if (!ignoreImpassable) {
-                    let walkable = true;
-                    let lookAt = room.lookAt(xPos, yPos);
-                    for (let i = 0; i < lookAt.length; i++) {
-                        if (lookAt[i].type == LOOK_STRUCTURES) {
-                            if (lookAt[i].structure!.structureType == STRUCTURE_CONTAINER ||
-                                lookAt[i].structure!.structureType == STRUCTURE_PORTAL ||
-                                lookAt[i].structure!.structureType == STRUCTURE_ROAD ||
-                                lookAt[i].structure!.structureType == STRUCTURE_RAMPART) {
-                                continue;
-                            }
-                            walkable = false;
-                            break;
-                        }
-                    }
-
-                    if (!walkable) {
-                        continue;
-                    }
                 }
                 arr[yPos * 50 + xPos] = neighbors[i].dist;
                 pendingNodes.push(neighbors[i]);
