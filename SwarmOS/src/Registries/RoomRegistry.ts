@@ -156,7 +156,7 @@ class RoomExtension extends ExtensionBase implements IRoomDataExtension {
     }
 
     // MaxDistance of 99 so max of 2 digits.  For saving mem space
-    CreateDistanceMap(room: Room, targetPositions: RoomPosition[], maxDistance: number = 99, ignoreImpassable: boolean = true, force: boolean = false) {
+    CreateDistanceMap(room: Room, targetPositions: RoomPosition[], maxDistance: number = 99, ignoreImpassable: boolean = true) {
         let arr = new Array(ROOM_ARRAY_SIZE).fill(0);
         let pendingNodes = [];
         for (let i = 0; i < targetPositions.length; i++) {

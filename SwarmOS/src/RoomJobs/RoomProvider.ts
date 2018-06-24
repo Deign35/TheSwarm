@@ -48,6 +48,14 @@ class RoomProvider extends BasicProcess<RoomProvider_Memory> {
                     roomData.groups.RJ_Tower = this.kernel.startProcess(RJ_Tower, newMem);
                 }
             }
+            if (!roomData.groups.RoomMapMonitor || !this.kernel.getProcessByPID(roomData.groups.RoomMapMonitor)) {
+                let newMem: RoomStateMap_Memory = {
+                    rID: this.memory.rID,
+                    lu: 0,
+                    nb: true
+                }
+                roomData.groups.RoomMapMonitor = this.kernel.startProcess(SPKG_RoomMapMonitor, newMem);
+            }
         }
 
         if (roomData.RoomType.type == RT_Home || roomData.RoomType.type != RT_RemoteHarvest) {

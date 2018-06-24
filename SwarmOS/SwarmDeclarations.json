@@ -239,7 +239,8 @@
                 "CreepActivity",
                 "SpawnActivity",
                 "RoomActivity",
-                "RepetitiveCreepActivity"
+                "RepetitiveCreepActivity",
+                "RoomMapMonitor"
             ]
         },
         "AT": {

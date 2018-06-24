@@ -55,6 +55,8 @@ declare interface RoomStateWorkTarget_Memory extends RoomStateActivity_Memory {
     cSites: ObjectID[];
 }
 
-declare interface RoomEnergyMonitor_Memory extends RoomStateActivity_Memory {
-    
+declare interface RoomStateMap_Memory extends MemBase {
+    lu: number;     // (l)ast (u)pdated
+    nb?: boolean;   // (n)eeds re(b)oot
+    rID: RoomID;    // (t)arget (r)oom
 }
