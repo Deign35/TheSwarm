@@ -64,15 +64,26 @@ class RoomEnergyMonitor extends BasicProcess<RoomStateMap_Memory> {
     }
 
     RunThread(): ThreadState {
-        if (this.shouldRefresh(241) || this.memory.lu == 0) {
+        if (this.shouldRefresh(241)) {
             this.GenerateContainerMap();
         }
-        if (this.shouldRefresh(473) || this.memory.lu == 0) {
+        if (this.shouldRefresh(473)) {
             this.GenerateSpawnEnergyMap();
         }
 
         this.memory.lu = Game.time;
         return ThreadState_Done;
+    }
+
+    EndTick() {
+        try {
+            let averaged = this.roomView.AverageDistanceMaps('sim', [SOURCE_LAYER, SPAWN_ENERGY_LAYER, REFILL_ENERGY_LAYER])
+            for (let i = 0; i < 2500; i++) {
+                this.room.visual.text('' + averaged[i], i % 50, Math.floor(i / 50));
+            }
+        } catch (ex) {
+            console.log(JSON.stringify(ex));
+        }
     }
     protected shouldRefresh(frequency: number): boolean {
         return (Game.time + this.roomData.minUpdateOffset) % frequency == 0;

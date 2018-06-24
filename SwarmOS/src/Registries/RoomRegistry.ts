@@ -156,11 +156,11 @@ class RoomExtension extends ExtensionBase implements IRoomDataExtension {
     }
 
     // MaxDistance of 99 so max of 2 digits.  For saving mem space
-    CreateDistanceMap(room: Room, targetPositions: RoomPosition[], maxDistance: number = 99, ignoreImpassable: boolean = true) {
+    CreateDistanceMap(room: Room, targetPositions: RoomPosition[], maxDistance: number = 99, ignoreImpassable: boolean = false) {
         let arr = new Array(ROOM_ARRAY_SIZE).fill(0);
         let pendingNodes = [];
         for (let i = 0; i < targetPositions.length; i++) {
-            pendingNodes.push({ x: targetPositions[i].x, y: targetPositions[i].y, dist: 1 });
+            pendingNodes.push({ x: targetPositions[i].x, y: targetPositions[i].y, dist: 0 });
             arr[targetPositions[i].y * 50 + targetPositions[i].x] = -1;
         }
 
@@ -173,8 +173,11 @@ class RoomExtension extends ExtensionBase implements IRoomDataExtension {
             for (let i = 0; i < neighbors.length; i++) {
                 let xPos = neighbors[i].x;
                 let yPos = neighbors[i].y;
-                if (xPos < 0 || xPos >= 50 || yPos < 0 || yPos >= 50 || neighbors[i].dist > maxDistance || neighbors[i].dist <= curNode.dist ||
-                    arr[neighbors[i].y * 50 + neighbors[i].x] || Game.map.getTerrainAt(xPos, yPos, room.name) == Terrain_Wall) {
+                if (xPos < 0 || xPos >= 50 || yPos < 0 || yPos >= 50 || neighbors[i].dist > maxDistance ||
+                    arr[neighbors[i].y * 50 + neighbors[i].x] !== 0 || Game.map.getTerrainAt(xPos, yPos, room.name) == Terrain_Wall) {
+                    /*if(neighbors[i].dist == 0) {
+                        arr[yPos * 50 + xPos] = -2;
+                    }*/
                     continue;
                 }
 

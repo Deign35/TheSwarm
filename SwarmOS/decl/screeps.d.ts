@@ -2702,7 +2702,7 @@ declare class RoomVisual {
      * @param style The (optional) text style.
      * @returns The RoomVisual object, for chaining.
      */
-    text(text: string, x: number, y: number, style?: TextStyle): RoomVisual;
+    text(text: string | number, x: number, y: number, style?: TextStyle): RoomVisual;
 
     /**
      * Draw a text label. You can use any valid Unicode characters, including emoji.
@@ -2711,7 +2711,7 @@ declare class RoomVisual {
      * @param style An object describing the style.
      * @returns The RoomVisual object itself, so that you can chain calls.
      */
-    text(text: string, pos: RoomPosition, style?: TextStyle): RoomVisual;
+    text(text: string | number, pos: RoomPosition, style?: TextStyle): RoomVisual;
 
     /**
      * Remove all visuals from the room.
