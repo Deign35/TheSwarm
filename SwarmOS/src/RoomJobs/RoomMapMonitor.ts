@@ -1,11 +1,12 @@
 export const OSPackage: IPackage<SpawnRegistry_Memory> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
-        processRegistry.register(SPKG_RoomMapMonitor, RoomEnergyMonitor);
+        processRegistry.register(SPKG_RoomMapMonitor, RoomMapMonitor);
     }
 }
 
 import { RoomStateActivity } from "./RoomStateActivities";
 import { BasicProcess } from "Core/BasicTypes";
+import { RoomMonitorBase } from "./RoomMonitors";
 
 const SOURCE_LAYER = 'src';
 const MINERAL_LAYER = 'min';
@@ -14,45 +15,33 @@ const SPAWN_ENERGY_LAYER = 'energy';
 const REFILL_ENERGY_LAYER = 'refill';
 const IMPASSABLE_LAYER = 'imp';
 
-class RoomEnergyMonitor extends BasicProcess<RoomStateMap_Memory> {
-    private _room!: Room;
-    protected get room(): Room {
-        return this._room;
-    }
-    private _roomData!: RoomState;
-    protected get roomData() {
-        return this._roomData;
-    }
-
-    protected _cachedImpassableDistances: IDictionary<string, MapArray> = {}
-    PrepTick() {
-        this._room = Game.rooms[this.memory.rID];
-        this._roomData = this.roomView.GetRoomData(this.memory.rID)!;
-        if (!this._roomData) {
-            throw new Error(`Room monitor is missing roomdata ${this.memory.rID}`);
+class RoomMapMonitor extends RoomMonitorBase<RoomMonitor_Memory> {
+    //protected _cachedImpassableDistances: IDictionary<string, MapArray> = {}
+    InitMonitor() {
+        if (!this.room) {
+            throw new Error(`Attempted to initialize RoomMapMonitor(${this.memory.rID} without access to the room`);
         }
-        if (this.memory.nb) {
-            let sources = this.room.find(FIND_SOURCES);
-            for (let i = 0; i < sources.length; i++) {
-                this.roomData.distanceMaps[sources[i].id] = DistMap.CreateDistanceMap(this.room, [sources[i].pos]);
-            }
-
-            let minerals = this.room.find(FIND_MINERALS);
-            for (let i = 0; i < minerals.length; i++) {
-                this.roomData.distanceMaps[minerals[i].id] = DistMap.CreateDistanceMap(this.room, [minerals[i].pos]);
-            }
-
-            this.roomData.distanceMaps[this.room.controller!.id] = DistMap.CreateDistanceMap(this.room, [this.room.controller!.pos]);
-            this.GenerateContainerMap();
-            this.GenerateSpawnEnergyMap();
-            this.GenerateImpassableMap();
-            delete this.memory.nb;
+        let sources = this.room.find(FIND_SOURCES);
+        for (let i = 0; i < sources.length; i++) {
+            this.roomData.distanceMaps[sources[i].id] = DistMap.CreateDistanceMap(this.room, [sources[i].pos]);
         }
+
+        let minerals = this.room.find(FIND_MINERALS);
+        for (let i = 0; i < minerals.length; i++) {
+            this.roomData.distanceMaps[minerals[i].id] = DistMap.CreateDistanceMap(this.room, [minerals[i].pos]);
+        }
+
+        this.roomData.distanceMaps[this.room.controller!.id] = DistMap.CreateDistanceMap(this.room, [this.room.controller!.pos]);
+        this.GenerateContainerMap();
+        this.GenerateSpawnEnergyMap();
+        this.GenerateImpassableMap();
+
+        return true;
     }
 
     GenerateImpassableMap() {
         let impassableMap = new Array(ROOM_ARRAY_SIZE).fill(1);
-        let structures = this.room.find(FIND_STRUCTURES);
+        let structures = this.room!.find(FIND_STRUCTURES);
         for (let i = 0; i < structures.length; i++) {
             if (structures[i].structureType == STRUCTURE_CONTAINER ||
                 structures[i].structureType == STRUCTURE_PORTAL ||
@@ -60,14 +49,15 @@ class RoomEnergyMonitor extends BasicProcess<RoomStateMap_Memory> {
                 structures[i].structureType == STRUCTURE_ROAD) {
                 continue;
             }
-            impassableMap[structures[i].pos.y * 50 + structures[i].pos.x] = 0;
+            impassableMap[structures[i].pos.y * ROOM_WIDTH + structures[i].pos.x] = 0;
         }
 
+        // (TODO): Should add that wall terrain also equal 0.
         this.roomData.distanceMaps[IMPASSABLE_LAYER] = impassableMap;
     }
 
     GenerateSpawnEnergyMap() {
-        let spawnEnergyPositions = this.room.find(FIND_STRUCTURES, {
+        let spawnEnergyPositions = this.room!.find(FIND_STRUCTURES, {
             filter: (struct) => {
                 return struct.structureType == STRUCTURE_SPAWN ||
                     struct.structureType == STRUCTURE_EXTENSION;
@@ -75,10 +65,10 @@ class RoomEnergyMonitor extends BasicProcess<RoomStateMap_Memory> {
         }).map((struct) => {
             return struct.pos;
         })
-        this.roomData.distanceMaps[SPAWN_ENERGY_LAYER] = DistMap.CreateDistanceMap(this.room, spawnEnergyPositions);
+        this.roomData.distanceMaps[SPAWN_ENERGY_LAYER] = DistMap.CreateDistanceMap(this.room!, spawnEnergyPositions);
     }
     GenerateContainerMap() {
-        let containerPositions = this.room.find(FIND_STRUCTURES, {
+        let containerPositions = this.room!.find(FIND_STRUCTURES, {
             filter: (struct) => {
                 return struct.structureType == STRUCTURE_CONTAINER ||
                     struct.structureType == STRUCTURE_STORAGE ||
@@ -87,10 +77,10 @@ class RoomEnergyMonitor extends BasicProcess<RoomStateMap_Memory> {
         }).map((struct) => {
             return struct.pos
         });
-        this.roomData.distanceMaps[REFILL_ENERGY_LAYER] = DistMap.CreateDistanceMap(this.room, containerPositions);
+        this.roomData.distanceMaps[REFILL_ENERGY_LAYER] = DistMap.CreateDistanceMap(this.room!, containerPositions);
     }
 
-    RunThread(): ThreadState {
+    MonitorRoom(): ThreadState {
         if (this.shouldRefresh(241)) {
             this.GenerateContainerMap();
         }
@@ -111,8 +101,7 @@ class RoomEnergyMonitor extends BasicProcess<RoomStateMap_Memory> {
         this.memory.lu = Game.time;
         return ThreadState_Done;
     }
-
-    EndTick() {
+    /*EndTick() {
         try {
             let sources = this.room.find(FIND_SOURCES);
             let maps = [];
@@ -135,9 +124,6 @@ class RoomEnergyMonitor extends BasicProcess<RoomStateMap_Memory> {
         });
         this.room.visual.text('' + val, x, y + 0.2);
     }
-    protected shouldRefresh(frequency: number): boolean {
-        return (Game.time + this.roomData.minUpdateOffset) % frequency == 0;
-    }
 
     protected convertValToColor(val: number): string {
         let percentage = val / 75;
@@ -145,11 +131,9 @@ class RoomEnergyMonitor extends BasicProcess<RoomStateMap_Memory> {
         let red = Math.floor(0xff * (1 - percentage)) * 0x010000;
 
         return `#${(red + blue).toString(16)}`;
-    }
+    }*/
 }
 
-const HIGH_BLUE = 0x0000ff;
-const HIGH_RED = 0xff0000;
 declare interface RoomEnergyState {
     withdraw: { [id in ObjectID]: RoomEnergyNode };
     transfer: { [id in ObjectID]: RoomEnergyNode };

@@ -24,27 +24,35 @@ export abstract class RoomMonitorBase<T extends RoomMonitor_Memory> extends Basi
         if (!this._roomData) {
             throw new Error(`Room monitor is missing roomdata ${this.memory.rID}`);
         }
+        if (this.memory.nb && (!this.InitMonitor || this.InitMonitor())) {
+            delete this.memory.nb;
+        }
     }
 
     RunThread() {
-        let retVal: ThreadState = ThreadState_Done;
-        if (this.shouldRefresh()) {
-            retVal = this.MonitorRoom();
-            if (retVal == ThreadState_Done && this.memory.lu == Game.time) {
-                this.sleeper.sleep(this.pid, this.refreshFrequency - 1);
+        if (this.refreshFrequency <= 1) {
+            return this.MonitorRoom();
+        } else {
+            let retVal: ThreadState = ThreadState_Done;
+            if (this.shouldRefresh(this.refreshFrequency)) {
+                retVal = this.MonitorRoom();
+                if (retVal == ThreadState_Done && this.memory.lu == Game.time) {
+                    this.sleeper.sleep(this.pid, this.refreshFrequency - 1);
+                }
             }
-        }
 
-        return retVal;
+            return retVal;
+        }
     }
 
-    protected shouldRefresh(): boolean {
-        if (Game.time - this.memory.lu >= this.refreshFrequency) {
+    protected shouldRefresh(frequency: number): boolean {
+        if (Game.time - this.memory.lu >= frequency) {
             return true;
         }
-        return (Game.time + this.rngSeed) % this.refreshFrequency == 0;
+        return (Game.time + this.rngSeed) % frequency == 0;
     }
 
+    InitMonitor?(): boolean;
     abstract MonitorRoom(): ThreadState;
 }
 

@@ -49,7 +49,7 @@ class RoomProvider extends BasicProcess<RoomProvider_Memory> {
                 }
             }
             if (!roomData.groups.RoomMapMonitor || !this.kernel.getProcessByPID(roomData.groups.RoomMapMonitor)) {
-                let newMem: RoomStateMap_Memory = {
+                let newMem: RoomMapMonitor_Memory = {
                     rID: this.memory.rID,
                     lu: 0,
                     nb: true
