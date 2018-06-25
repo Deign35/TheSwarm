@@ -3,9 +3,10 @@ export const OSPackage: IPackage<SpawnRegistry_Memory> = {
         processRegistry.register(RJ_WorkTarget, RoomStateWorkerTargetActivity);
     }
 }
-import { RoomStateActivity } from "RoomJobs/RoomStateActivities";
+import { RoomMonitorBase } from "./RoomMonitors";
 
-class RoomStateWorkerTargetActivity extends RoomStateActivity<RoomStateWorkTarget_Memory> {
+class RoomStateWorkerTargetActivity extends RoomMonitorBase<RoomStateWorkTarget_Memory> {
+    protected get refreshFrequency() { return 1; }
     PrepTick() {
         super.PrepTick();
         if (this.roomData.targets.Other.t == TT_Controller || this.roomData.targets.Other.at == AT_Repair) {
@@ -170,7 +171,7 @@ class RoomStateWorkerTargetActivity extends RoomStateActivity<RoomStateWorkTarge
             }
         }
     }
-    RunThread(): ThreadState {
+    MonitorRoom(): ThreadState {
         if (!this.room) {
             return ThreadState_Done;
         }

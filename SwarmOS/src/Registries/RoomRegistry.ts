@@ -74,7 +74,8 @@ class RoomExtension extends ExtensionBase implements IRoomDataExtension {
                     CR_Work: '',
                     RJ_Misc: '',
                     RJ_Structures: '',
-                    RJ_WorkTarget: ''
+                    RJ_WorkTarget: '',
+                    RJ_Mapper: ''
                 },
                 targets: {
                     CR_SpawnFill: {

@@ -32,6 +32,8 @@ class RoomMapMonitor extends RoomMonitorBase<RoomMonitor_Memory> {
         if (!this.room) {
             return ThreadState_Done;
         }
+
+        this.roomData.owner = (this.room.controller && this.room.controller.owner && this.room.controller.owner.username) || undefined;
         if (this.shouldRefresh(241)) {
             this.mapper.GenerateRefillMap(this.room);
         }

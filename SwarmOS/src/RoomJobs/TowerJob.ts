@@ -4,15 +4,16 @@ export const OSPackage: IPackage<SpawnRegistry_Memory> = {
     }
 }
 import { BasicProcess } from "Core/BasicTypes";
+import { RoomMonitorBase } from "./RoomMonitors";
 
-class TowerJob extends BasicProcess<Tower_Memory> {
+class TowerJob extends RoomMonitorBase<RoomMonitor_Memory> {
     get room() {
         return Game.rooms[this.memory.rID];
     }
     get roomData() {
         return this.roomView.GetRoomData(this.memory.rID)!;
     }
-    RunThread(): ThreadState {
+    MonitorRoom(): ThreadState {
         let homeRoomData = this.roomView.GetRoomData(this.memory.rID)!;
         let provider = this.kernel.getProcessByPID(homeRoomData.activityPID);
         if (provider && provider['RoomJobCheckin']) {

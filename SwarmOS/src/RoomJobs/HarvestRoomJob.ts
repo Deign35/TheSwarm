@@ -4,15 +4,11 @@ export const OSPackage: IPackage<SpawnRegistry_Memory> = {
     }
 }
 
-import { RoomStateActivity } from "./RoomStateActivities";
 import { FindNextTo, FindStructureNextTo } from "Tools/TheFinder";
+import { RoomMonitorBase } from "./RoomMonitors";
 
-class RoomStateHarvestActivity extends RoomStateActivity<RoomStateHarvest_Memory> {
-    @extensionInterface(EXT_CreepActivity)
-    protected creepActivity!: ICreepActivityExtensions;
-    @extensionInterface(EXT_CreepRegistry)
-    protected creepRegistry!: ICreepRegistryExtensions;
-    RunThread(): ThreadState {
+class RoomStateHarvestActivity extends RoomMonitorBase<RoomStateHarvest_Memory> {
+    MonitorRoom(): ThreadState {
         if (this.roomData.RoomType.type != RT_Home && this.roomData.RoomType.type != RT_RemoteHarvest) {
             return ThreadState_Done;
         }
