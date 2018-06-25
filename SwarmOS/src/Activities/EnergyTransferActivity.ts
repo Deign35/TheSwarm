@@ -1,9 +1,12 @@
+export const OSPackage: IPackage<SpawnRegistry_Memory> = {
+    install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
+        processRegistry.register(SPKG_EnergyTransferActivity, EnergyTransferActivity);
+    }
+}
+
 import { BasicProcess } from "Core/BasicTypes";
 
 class EnergyTransferActivity extends BasicProcess<EnergyJob_Memory> {
-    @extensionInterface(EXT_CreepRegistry)
-    protected creepRegistry!: ICreepRegistryExtensions;
-
     RunThread(): ThreadState {
         let creep = this.creepRegistry.tryGetCreep(this.memory.c, this.parentPID);
         if (!creep) {

@@ -122,7 +122,7 @@ class RoomStateHarvestActivity extends RoomStateActivity<RoomStateHarvest_Memory
             spLvl: spawnLevel,
         }
 
-        this.memory.harvesters[sourceID].pid = this.kernel.startProcess(CJ_Harvest, harvMem);
+        this.memory.harvesters[sourceID].pid = this.kernel.startProcess(CR_Harvester, harvMem);
         this.kernel.setParent(this.memory.harvesters[sourceID].pid!, this.pid);
     }
 
@@ -134,7 +134,7 @@ class RoomStateHarvestActivity extends RoomStateActivity<RoomStateHarvest_Memory
             rID: this.memory.rID,
             spLvl: 0,
         }
-        let newPID = this.kernel.startProcess(CJ_Harvest, harvMem);
+        let newPID = this.kernel.startProcess(CR_Harvester, harvMem);
         this.kernel.setParent(newPID, this.pid);
     }
 }

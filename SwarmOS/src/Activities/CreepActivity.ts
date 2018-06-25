@@ -7,35 +7,45 @@ export const OSPackage: IPackage<SpawnRegistry_Memory> = {
 import { BasicProcess } from "Core/BasicTypes";
 
 class CreepActivity extends BasicProcess<CreepActivity_Memory> {
-    @extensionInterface(EXT_CreepActivity)
-    protected creepActivity!: ICreepActivityExtensions;
-    @extensionInterface(EXT_CreepRegistry)
-    protected creepRegistry!: ICreepRegistryExtensions;
-
     AssignedCreep?: Creep;
     Target?: ObjectTypeWithID;
     TargetPos?: RoomPosition;
 
+    PrepTick() {
+        this.AssignedCreep = this.creepRegistry.tryGetCreep(this.memory.c, this.parentPID);
+        this.Target = Game.getObjectById(this.memory.t);
+        if (this.memory.p) {
+            this.TargetPos = new RoomPosition(this.memory.p.x || 25, this.memory.p.y || 25, this.memory.p.roomName);
+        }
+    }
     RunThread(): ThreadState {
-        this.LoadActionMemory();
         if (!this.AssignedCreep || (!this.Target && !this.TargetPos) || !this.creepActivity.ValidateActionTarget(this.memory.at, this.Target || this.TargetPos)) {
-            this.EndProcess();
+            this.EndActivity();
             return ThreadState_Done;
         }
 
+        let activityArgs = {
+            actionType: this.memory.at,
+            creep: this.AssignedCreep!,
+            target: this.Target || this.TargetPos || this.AssignedCreep!.pos,
+            amount: this.memory.a,
+            message: this.memory.m,
+            resourceType: this.memory.r,
+        }
+
         if (this.memory.at == AT_MoveToPosition) {
-            let result = this.creepActivity.RunActivity(this.CreateActivityArgs());
+            let result = this.creepActivity.RunActivity(activityArgs);
             if (result == ERR_NOT_IN_RANGE || result == ERR_BUSY || result == ERR_TIRED) {
                 // Not yet there
             } else if (result == OK) {
-                this.EndProcess();
+                this.EndActivity();
             } else if (result == ERR_NO_PATH) {
                 let hasCreep = this.TargetPos!.lookFor(LOOK_CREEPS);
                 if (hasCreep && hasCreep.length > 0 && hasCreep[0].name != this.AssignedCreep.name) {
                     let otherCreep = hasCreep[0];
                     this.creepActivity.MoveCreep(otherCreep, this.AssignedCreep.pos);
                 } else {
-                    this.EndProcess();
+                    this.EndActivity();
                 }
             }
             return ThreadState_Done;
@@ -43,10 +53,10 @@ class CreepActivity extends BasicProcess<CreepActivity_Memory> {
 
         if (!this.creepActivity.CreepIsInRange(this.memory.at, this.AssignedCreep.pos, this.TargetPos || this.Target!.pos)) {
             if (this.creepActivity.MoveCreep(this.AssignedCreep, this.TargetPos || this.Target!.pos) == ERR_NO_PATH) {
-                this.EndProcess();
+                this.EndActivity();
             }
         } else {
-            let result = this.creepActivity.RunActivity(this.CreateActivityArgs());
+            let result = this.creepActivity.RunActivity(activityArgs);
             switch (this.memory.at) {
                 case (AT_ClaimController):
                 case (AT_Drop):
@@ -58,7 +68,7 @@ class CreepActivity extends BasicProcess<CreepActivity_Memory> {
                 case (AT_Transfer):
                 case (AT_Withdraw):
                 case (AT_NoOp):
-                    this.EndProcess();
+                    this.EndActivity();
                     return ThreadState_Done;
                 default:
                     break;
@@ -74,32 +84,24 @@ class CreepActivity extends BasicProcess<CreepActivity_Memory> {
                 }
             }
             // If we get here, then the action result is not accessible.
-            this.EndProcess();
+            this.EndActivity();
         }
 
         return ThreadState_Done;
     }
 
-    protected CreateActivityArgs(): RunArgs {
-        return {
-            actionType: this.memory.at,
-            creep: this.AssignedCreep!,
-            target: this.Target || this.TargetPos || this.AssignedCreep!.pos,
-            amount: this.memory.a,
-            message: this.memory.m,
-            resourceType: this.memory.r,
+    EndActivity() {
+        if (!this.memory.d) {
+            this.EndProcess();
+            return;
         }
-    }
-
-    protected LoadActionMemory() {
-        this.AssignedCreep = this.creepRegistry.tryGetCreep(this.memory.c, this.parentPID);
-        this.Target = Game.getObjectById(this.memory.t);
-        if (this.memory.p) {
-            this.TargetPos = new RoomPosition(this.memory.p.x || 25, this.memory.p.y || 25, this.memory.p.roomName);
+        let parent = this.GetParentProcess();
+        if (parent && parent[this.memory.d]) {
+            parent[this.memory.d](this.memory.c);
         }
-    }
 
-    EndProcess() {
-        super.EndProcess(this.memory.c);
+        //(TODO): Change this to put the activity to sleep so as not to waste creating and destroying over and over
+        // let the parent decide to destroy or not
+        this.EndProcess();
     }
 }

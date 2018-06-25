@@ -43,17 +43,15 @@ export const RoomActivityUtils = {
         });
 
         switch (jobID) {
-            case (CJ_Fortify):
-            case (CJ_Science):
-            case (CJ_Scout):
+            case (CR_Scout):
                 console.log(`Command ${jobID} is not configured`);
                 break;
-            case (CJ_RemoteHarvest):
+            case (CR_RemoteHarvest):
                 jobMem.home = roomData.RoomType.other.tr;
                 break;
-            case (CJ_Harvest):
-            case (CJ_Refill):
-            case (CJ_Work):
+            case (CR_Harvester):
+            case (CR_SpawnFill):
+            case (CR_Work):
                 (jobMem as Worker_Memory).target = {
                     at: AT_NoOp,
                     t: '',

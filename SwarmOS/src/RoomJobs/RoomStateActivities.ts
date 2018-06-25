@@ -66,7 +66,7 @@ class RoomStateMiscActivity extends RoomStateActivity<RoomStateMisc_Memory> {
                         exp: true
                     }
 
-                    this.kernel.startProcess(CJ_Work, newMem);
+                    this.kernel.startProcess(CR_Work, newMem);
                 } else {
                     this.log.debug(`Resources On the ground diff: ${newCount - this.memory.lr}`);
                 }

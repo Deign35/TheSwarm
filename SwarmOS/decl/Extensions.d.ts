@@ -132,7 +132,7 @@ declare interface IMapDirectory extends IPackageExtension {
 
     GenerateImpassableMap(room: Room): boolean;
     GenerateSpawnEnergyMap(room: Room): boolean;
-    GenerateContainerMap(room: Room): boolean;
+    GenerateRefillMap(room: Room): boolean;
 }
 
 interface RunArgs {

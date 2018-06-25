@@ -147,7 +147,7 @@ class SwarmCLI extends BasicProcess<SwarmCLIMemory> {
                     home: roomID,
                     rID: roomID,
                 }
-                this.kernel.startProcess(CJ_BootRefill, bootMem);
+                this.kernel.startProcess(CR_BootFill, bootMem);
                 // Add home room
                 roomData.RoomType = {
                     type: RT_Home,

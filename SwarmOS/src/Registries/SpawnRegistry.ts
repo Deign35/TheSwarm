@@ -208,8 +208,8 @@ class SpawnRegistry extends BasicProcess<SpawnRegistry_Memory> {
         if (req.max && dist > req.max) {
             return UNSPAWNABLE_COST;
         }
-        diff += E2C_MaxSpawnDistance * (req.max || 0);
-        diff -= E2C_SpawnDistance * dist;
+        diff += 200 * (req.max || 0);
+        diff -= 100 * dist;
 
         return diff || UNSPAWNABLE_COST;
     }

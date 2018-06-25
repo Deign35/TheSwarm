@@ -83,7 +83,7 @@ class RoomMonitor_WorkCapacity extends RoomMonitorBase<RoomMonitorWorkCapacity_M
                     exp: true
                 }
 
-                this.kernel.startProcess(CJ_Work, workMem);
+                this.kernel.startProcess(CR_Work, workMem);
                 // (TODO) spawn a small refiller too, just in case the room needs a reboot...
             }
         }
@@ -94,7 +94,6 @@ class RoomMonitor_WorkCapacity extends RoomMonitorBase<RoomMonitorWorkCapacity_M
     }
 }
 
-const IMPASSABLE_LAYER = 'imp';
 class RoomMonitor_Structures extends RoomMonitorBase<RoomMonitor_Memory> {
     MonitorRoom(): ThreadState {
         if (!this.room) {
@@ -120,6 +119,7 @@ class RoomMonitor_Structures extends RoomMonitorBase<RoomMonitor_Memory> {
         }
 
         let impassableMap = new Array(ROOM_ARRAY_SIZE).fill(1);
+        let roadMap = new Array(ROOM_ARRAY_SIZE).fill(0);
         let allStructures = this.room.find(FIND_STRUCTURES);
         for (let i = 0, length = allStructures.length; i < length; i++) {
             let structure = allStructures[i];
@@ -132,13 +132,17 @@ class RoomMonitor_Structures extends RoomMonitorBase<RoomMonitor_Memory> {
                 structure.structureType == STRUCTURE_PORTAL ||
                 structure.structureType == STRUCTURE_RAMPART ||
                 structure.structureType == STRUCTURE_ROAD) {
+                if (structure.structureType == STRUCTURE_ROAD) {
+                    roadMap.push[structure.pos.y * ROOM_WIDTH + structure.pos.x] = 1;
+                }
                 continue;
             }
             impassableMap[structure.pos.y * ROOM_WIDTH + structure.pos.x] = 0;
         }
 
         // (TODO): Should add that wall terrain also equal 0.
-        this.roomData.distanceMaps[IMPASSABLE_LAYER] = impassableMap;
+        this.roomData.distanceMaps[ML_Impassable] = impassableMap;
+        this.roomData.distanceMaps[ML_Road] = roadMap;
 
         this.memory.lu = Game.time;
         return ThreadState_Done;

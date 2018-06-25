@@ -1,6 +1,6 @@
 export const OSPackage: IPackage<SpawnRegistry_Memory> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
-        processRegistry.register(CJ_Harvest, Harvester);
+        processRegistry.register(CR_Harvester, Harvester);
     }
 }
 import { SoloJob } from "./SoloJob";

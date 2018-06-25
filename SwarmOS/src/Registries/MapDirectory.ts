@@ -47,9 +47,9 @@ class MapDirectory extends ExtensionBase implements IMapDirectory {
         }).map((struct) => {
             return struct.pos;
         })
-        return this.CreateMapForRoom(room.name, ML_Energy, spawnEnergyPositions);
+        return this.CreateMapForRoom(room.name, ML_SpawnEnergy, spawnEnergyPositions);
     }
-    GenerateContainerMap(room: Room): boolean {
+    GenerateRefillMap(room: Room): boolean {
         let containerPositions = room.find(FIND_STRUCTURES, {
             filter: (struct) => {
                 return struct.structureType == STRUCTURE_CONTAINER ||
@@ -59,7 +59,7 @@ class MapDirectory extends ExtensionBase implements IMapDirectory {
         }).map((struct) => {
             return struct.pos
         });
-        return this.CreateMapForRoom(room.name, ML_Container, containerPositions);
+        return this.CreateMapForRoom(room.name, ML_RefillEnergy, containerPositions);
     }
     CreateMapForRoom(roomID: RoomID, mapID: string, startPositions: RoomPosition[]): boolean {
         if (Game.rooms[roomID] !== undefined) {

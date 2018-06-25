@@ -2,6 +2,8 @@ global['ROOM_HEIGHT'] = 50;
 global['ROOM_WIDTH'] = 50;
 global['ROOM_ARRAY_SIZE'] = ROOM_HEIGHT * ROOM_WIDTH;
 
+// MaxDistance of 99 so max of 2 digits.  For saving mem space, change to 999 for 3 digit max distance
+const MAX_MAP_DIST = 99;
 export class DistMap {
     static ConvertXYToIndex(x: number, y: number) {
         return y * ROOM_WIDTH + x;
@@ -10,6 +12,23 @@ export class DistMap {
         return {
             x: index % ROOM_WIDTH,
             y: Math.floor(index / ROOM_WIDTH)
+        }
+    }
+    static AddToMap(addVal: number, map: MapArray) {
+        for (let i = 0; i < ROOM_ARRAY_SIZE; i++) {
+            map[i] += addVal;
+        }
+    }
+    static MultiplyMap(mulitplyVal: number, map: MapArray) {
+        for (let i = 0; i < ROOM_ARRAY_SIZE; i++) {
+            map[i] *= mulitplyVal;
+        }
+    }
+    static ReverseMap(map: MapArray) {
+        for (let i = 0; i < ROOM_ARRAY_SIZE; i++) {
+            if (map[i] > 0) {
+                map[i] = MAX_MAP_DIST - map[i];
+            }
         }
     }
     static AddDistanceMaps(mapsToAdd: MapArray[]) {
@@ -84,13 +103,15 @@ export class DistMap {
         return arr;
     }
 
-    // MaxDistance of 99 so max of 2 digits.  For saving mem space
-    static CreateDistanceMap(room: Room, targetPositions: RoomPosition[], maxDistance: number = 99) {
-        let arr = new Array(ROOM_ARRAY_SIZE).fill(0);
-        let pendingNodes = [];
+    static CreateDistanceMap(room: Room, targetPositions: RoomPosition[], maxDistance: number = MAX_MAP_DIST) {
+        if (maxDistance < 0 || maxDistance > MAX_MAP_DIST) {
+            maxDistance = MAX_MAP_DIST;
+        }
+        let arr: MapArray = new Array(ROOM_ARRAY_SIZE).fill(0);
+        let pendingNodes: { x: number, y: number, dist: number }[] = [];
         for (let i = 0; i < targetPositions.length; i++) {
             pendingNodes.push({ x: targetPositions[i].x, y: targetPositions[i].y, dist: 0 });
-            arr[targetPositions[i].y * 50 + targetPositions[i].x] = -1;
+            arr[targetPositions[i].y * ROOM_WIDTH + targetPositions[i].x] = -1;
         }
 
         while (pendingNodes.length > 0) {
@@ -99,21 +120,20 @@ export class DistMap {
                 break;
             }
             let neighbors = this.GetNeighborNodes(curNode.x, curNode.y);
+            let nextDist = curNode.dist + (curNode.dist < maxDistance ? 1 : 0);
             for (let i = 0; i < neighbors.length; i++) {
                 let xPos = neighbors[i].x;
                 let yPos = neighbors[i].y;
-                if (xPos < 0 || xPos >= 50 || yPos < 0 || yPos >= 50 || curNode.dist > maxDistance ||
-                    arr[neighbors[i].y * 50 + neighbors[i].x] !== 0 || Game.map.getTerrainAt(xPos, yPos, room.name) == Terrain_Wall) {
-                    /*if(neighbors[i].dist == 0) {
-                        arr[yPos * 50 + xPos] = -2;
-                    }*/
+                if (xPos < 0 || xPos >= ROOM_WIDTH || yPos < 0 || yPos >= ROOM_HEIGHT ||
+                    arr[neighbors[i].y * ROOM_WIDTH + neighbors[i].x] !== 0 || Game.map.getTerrainAt(xPos, yPos, room.name) == Terrain_Wall) {
                     continue;
                 }
-                arr[yPos * 50 + xPos] = curNode.dist + 1;
+
+                arr[this.ConvertXYToIndex(xPos, yPos)] = nextDist;
                 pendingNodes.push({
                     x: neighbors[i].x,
                     y: neighbors[i].y,
-                    dist: curNode.dist + 1
+                    dist: nextDist
                 });
             }
         }

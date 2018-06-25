@@ -20,14 +20,14 @@ declare type GroupID = string;
 declare type TempAgencyID = string;
 declare type SpawnRequestID = string;
 
-declare type ScreepsPackage = OSPackage | SlimOSPackage | CreepJobsPackage
+declare type ScreepsPackage = OSPackage | SlimOSPackage | CreepRoles
 
 declare type ObjectTypeWithID = Structure | Creep | Source | ConstructionSite | Mineral | Nuke | Resource | Tombstone;
 declare type EnergyStructureType = StructureExtension | StructureSpawn | StructureContainer | StructureStorage | StructureLink | StructureTerminal;
 declare type TransferTargetType = EnergyStructureType | Creep;
 
 declare type MapArray = number[];
-declare type MapLayers = string | ML_Impassable | ML_Energy | ML_Container;
+declare type MapLayers = string | EZMapLayer
 declare interface ObjectIDWithPos {
     x: number;
     y: number;
@@ -62,6 +62,8 @@ declare var DistMap: {
     MinDistanceMaps(maps: number[][]): number[];
     ConvertXYToIndex(x: number, y: number): number;
     ConvertIndexToXY(index: number): { x: number, y: number };
+    AddToMap(addVal: number, map: MapArray): void;
+    MultiplyMap(mulitplyVal: number, map: MapArray): void;
 }
 declare const ROOM_HEIGHT = 50;
 declare const ROOM_WIDTH = 50;
@@ -105,4 +107,4 @@ declare function CLI(command: CLI_Assimilate, roomID: RoomID, roomType: RoomType
 
 declare function CLI(command: CLI_Launch, pkg: ScreepsPackage, startMem: MemBase): ScreepsReturnCode;
 declare function CLI(command: CLI_ChangeFlag, priA: ColorConstant, priB: ColorConstant, secA?: ColorConstant, secB?: ColorConstant): ScreepsReturnCode;
-declare function CLI(command: CLI_Spawn, roomID: RoomID, jobType: CreepJobsPackage, num?: number, mem?: MemBase): ScreepsReturnCode;
+declare function CLI(command: CLI_Spawn, roomID: RoomID, jobType: CreepRoles, num?: number, mem?: MemBase): ScreepsReturnCode;

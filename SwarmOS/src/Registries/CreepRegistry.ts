@@ -93,7 +93,7 @@ class CreepRegistryExtensions extends ExtensionBase implements ICreepRegistryExt
 
             if (creepData.o) {
                 let parentProcess = this.kernel.getProcessByPID(creepData.o);
-                if (parentProcess && (parentProcess.pkgName != CJ_Work || creepType == CT_Worker)) {
+                if (parentProcess && (parentProcess.pkgName != CR_Work || creepType == CT_Worker)) {
                     continue;
                 }
             }

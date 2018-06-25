@@ -62,26 +62,8 @@
                 "Misc",
                 "WorkTarget",
                 "Structures",
-                "Harvest"
-            ]
-        },
-        "CJ": {
-            "comment": "Creep job packages",
-            "enabled": true,
-            "string": true,
-            "isArray": true,
-            "type": true,
-            "usePrefix": true,
-            "combinedType": "CreepJobsPackage",
-            "entries": [
-                "BootRefill",
                 "Harvest",
-                "Refill",
-                "Work",
-                "Science",
-                "Fortify",
-                "Scout",
-                "RemoteHarvest"
+                "Mapper"
             ]
         },
         "EXT": {
@@ -160,14 +142,6 @@
                 "COMPLETE": 3
             }
         },
-        "E2C": {
-            "comment": "Energy to cost conversion",
-            "enabled": true,
-            "entries": {
-                "MaxSpawnDistance": 200,
-                "SpawnDistance": 100
-            }
-        },
         "DEFAULT": {
             "comment": "Default values",
             "enabled": true,
@@ -241,7 +215,7 @@
                 "SpawnActivity",
                 "RoomActivity",
                 "RepetitiveCreepActivity",
-                "RoomMapMonitor"
+                "EnergyTransferActivity"
             ]
         },
         "AT": {
@@ -294,12 +268,14 @@
             "enabled": true,
             "string": true,
             "type": true,
+            "combinedType": "EZMapLayer",
             "usePrefix": true,
             "isArray": true,
             "entries": [
                 "Impassable",
-                "Energy",
-                "Container"
+                "SpawnEnergy",
+                "RefillEnergy",
+                "Road"
             ]
         }
     }

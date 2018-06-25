@@ -1,6 +1,6 @@
 export const OSPackage: IPackage<SpawnRegistry_Memory> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
-        processRegistry.register(CJ_BootRefill, BootstrapRefiller);
+        processRegistry.register(CR_BootFill, BootstrapRefiller);
     }
 }
 

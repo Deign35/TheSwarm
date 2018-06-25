@@ -1,6 +1,6 @@
 export const OSPackage: IPackage<SpawnRegistry_Memory> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
-        processRegistry.register(CJ_Refill, ControlledRoomRefiller);
+        processRegistry.register(CR_SpawnFill, ControlledRoomRefiller);
     }
 }
 import { SoloJob } from "./SoloJob";
