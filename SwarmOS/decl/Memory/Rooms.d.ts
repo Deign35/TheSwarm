@@ -53,6 +53,8 @@ declare interface RoomMonitor_Memory extends MemBase {
 }
 declare interface RoomMonitorWorkCapacity_Memory extends RoomMonitor_Memory {
     lr: number;     // (l)ast (r)esources
+    tA: number;     // (t)rigger on (A)dditional resources
+    tT: number;     // (t)rigger on (T)otal resources
 }
 
 declare interface RoomMapMonitor_Memory extends MemBase {

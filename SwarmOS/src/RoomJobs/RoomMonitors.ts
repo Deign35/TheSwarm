@@ -67,9 +67,10 @@ class RoomMonitor_WorkCapacity extends RoomMonitorBase<RoomMonitorWorkCapacity_M
             newCount += value.energy || 0;
             return value.id;
         });
-        if (this.roomData.RoomType.type == RT_Home && this.room.energyAvailable == this.room.energyCapacityAvailable) {
-            if (this.memory.lr + 300 <= newCount || (this.memory.lr < newCount && newCount > 2000)) { // Should this scale?
+        if (this.room.energyAvailable == this.room.energyCapacityAvailable) {
+            if (this.memory.lr + this.memory.tA <= newCount || (this.memory.lr < newCount && newCount > this.memory.tT)) {
                 // Spawn a worker
+                // Should check if a refiller needs to be spawned or not.
                 this.log.info(`Spawning a worker for ${this.memory.rID}.  Ground resources are growing quite quickly`);
                 let workMem: Worker_Memory = {
                     home: this.memory.hr,
@@ -84,8 +85,6 @@ class RoomMonitor_WorkCapacity extends RoomMonitorBase<RoomMonitorWorkCapacity_M
 
                 this.kernel.startProcess(CJ_Work, workMem);
                 // (TODO) spawn a small refiller too, just in case the room needs a reboot...
-            } else {
-                this.log.info(`Resources On the ground diff: ${newCount - this.memory.lr}`);
             }
         }
 
@@ -95,6 +94,7 @@ class RoomMonitor_WorkCapacity extends RoomMonitorBase<RoomMonitorWorkCapacity_M
     }
 }
 
+const IMPASSABLE_LAYER = 'imp';
 class RoomMonitor_Structures extends RoomMonitorBase<RoomMonitor_Memory> {
     MonitorRoom(): ThreadState {
         if (!this.room) {
@@ -119,17 +119,26 @@ class RoomMonitor_Structures extends RoomMonitorBase<RoomMonitor_Memory> {
             }
         }
 
+        let impassableMap = new Array(ROOM_ARRAY_SIZE).fill(1);
         let allStructures = this.room.find(FIND_STRUCTURES);
         for (let i = 0, length = allStructures.length; i < length; i++) {
             let structure = allStructures[i];
             if (!this.roomData.structures[structure.structureType]) {
                 this.roomData.structures[structure.structureType] = [];
             }
+            this.roomData.structures[structure.structureType]!.push(structure.id);
 
-            if ((this.roomData.structures[structure.structureType] as string[]).length !== undefined) {
-                this.roomData.structures[structure.structureType]!.push(structure.id);
+            if (structure.structureType == STRUCTURE_CONTAINER ||
+                structure.structureType == STRUCTURE_PORTAL ||
+                structure.structureType == STRUCTURE_RAMPART ||
+                structure.structureType == STRUCTURE_ROAD) {
+                continue;
             }
+            impassableMap[structure.pos.y * ROOM_WIDTH + structure.pos.x] = 0;
         }
+
+        // (TODO): Should add that wall terrain also equal 0.
+        this.roomData.distanceMaps[IMPASSABLE_LAYER] = impassableMap;
 
         this.memory.lu = Game.time;
         return ThreadState_Done;

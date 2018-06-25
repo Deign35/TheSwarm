@@ -4,7 +4,7 @@ import { OSPackage as RoomStateActivities } from "RoomJobs/RoomStateActivities";
 import { OSPackage as RoomWorkerTargeting } from "RoomJobs/RoomStateWorkerActivity";
 import { OSPackage as HarvesterRoomJob } from "RoomJobs/HarvestRoomJob";
 
-import { OSPackage as RoomEnergyMonitor } from "RoomJobs/RoomEnergyMonitor";
+import { OSPackage as RoomEnergyMonitor } from "RoomJobs/RoomMapMonitor";
 
 export const RoomJobs: IPackage<{}> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
