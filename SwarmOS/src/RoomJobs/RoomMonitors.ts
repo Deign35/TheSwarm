@@ -15,6 +15,9 @@ export abstract class RoomMonitorBase<T extends RoomMonitor_Memory> extends Basi
     protected get roomData() {
         return this._roomData;
     }
+    protected get refreshFrequency() {
+        return this.memory.fr || 1;
+    }
     PrepTick() {
         this._room = Game.rooms[this.memory.rID];
         this._roomData = this.roomView.GetRoomData(this.memory.rID)!;
@@ -28,7 +31,7 @@ export abstract class RoomMonitorBase<T extends RoomMonitor_Memory> extends Basi
         if (this.shouldRefresh()) {
             retVal = this.MonitorRoom();
             if (retVal == ThreadState_Done && this.memory.lu == Game.time) {
-                this.sleeper.sleep(this.pid, this.memory.fr - 1);
+                this.sleeper.sleep(this.pid, this.refreshFrequency - 1);
             }
         }
 
@@ -36,10 +39,10 @@ export abstract class RoomMonitorBase<T extends RoomMonitor_Memory> extends Basi
     }
 
     protected shouldRefresh(): boolean {
-        if (Game.time - this.memory.lu >= this.memory.fr) {
+        if (Game.time - this.memory.lu >= this.refreshFrequency) {
             return true;
         }
-        return (Game.time + this.rngSeed) % this.memory.fr == 0;
+        return (Game.time + this.rngSeed) % this.refreshFrequency == 0;
     }
 
     abstract MonitorRoom(): ThreadState;

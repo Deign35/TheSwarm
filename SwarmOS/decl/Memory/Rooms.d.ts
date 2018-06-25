@@ -27,7 +27,7 @@ declare interface RoomMonitor_Memory extends MemBase {
     nb?: boolean;   // (n)eeds re(b)oot
     hr: RoomID;     // (h)ome (r)oom
     rID: RoomID;    // (t)arget (r)oom
-    fr: number;     // (fr)equency
+    fr?: number;     // (fr)equency
 }
 declare interface RoomMonitorWorkCapacity_Memory extends RoomMonitor_Memory {
     lr: number;     // (l)ast (r)esources

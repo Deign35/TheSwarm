@@ -13,22 +13,7 @@ export const OSPackage: IPackage<CreepRegistry_Memory> = {
     }
 }
 
-// This order determines the default order of body parts
-const BodyLegend = {
-    t: TOUGH,
-    a: ATTACK,
-    r: RANGED_ATTACK,
-    cl: CLAIM,
-    w: WORK,
-    c: CARRY,
-    h: HEAL,
-    m: MOVE,
-}
-
-// This can eventually become a CreepGroup, but one that controls all the creeps -- Scheduler!!!!
 class CreepRegistry extends BasicProcess<CreepRegistry_Memory> {
-    @extensionInterface(EXT_CreepRegistry)
-    Extensions!: ICreepRegistryExtensions;
     get memory(): CreepRegistry_Memory {
         if (!Memory.creepData) {
             this.log.warn(`Initializing CreepRegistry memory`);
@@ -61,7 +46,7 @@ class CreepRegistry extends BasicProcess<CreepRegistry_Memory> {
             let creep = Game.creeps[creepIDs[i]];
             let context = this.registeredCreeps[creep.name];
             if (!context) {
-                if (!this.Extensions.tryRegisterCreep(creep.name)) {
+                if (!this.creepRegistry.tryRegisterCreep(creep.name)) {
                     this.log.error(`Creep context doesnt exist and couldnt register the creep(${creep.name}).`);
                     return ThreadState_Done;
                 }
@@ -70,7 +55,7 @@ class CreepRegistry extends BasicProcess<CreepRegistry_Memory> {
                 context = this.registeredCreeps[creep.name];
             }
 
-            if (!context.o) {
+            /*if (!context.o) {
                 let roomData = this.roomView.GetRoomData(creep.room.name)!;
                 if (roomData.groups.CR_Work) {
                     let proc = this.kernel.getProcessByPID(roomData.groups.CR_Work);
@@ -78,7 +63,7 @@ class CreepRegistry extends BasicProcess<CreepRegistry_Memory> {
                         (proc as IWorkerGroupProcess).AddCreep(creep.name);
                     }
                 }
-            }
+            }*/
         }
         return ThreadState_Done;
     }
