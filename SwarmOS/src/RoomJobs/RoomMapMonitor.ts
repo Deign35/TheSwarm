@@ -6,7 +6,10 @@ export const OSPackage: IPackage<SpawnRegistry_Memory> = {
 
 import { RoomMonitorBase } from "./RoomMonitors";
 
-class RoomMapMonitor extends RoomMonitorBase<RoomMonitor_Memory> {
+class RoomMapMonitor extends RoomMonitorBase<RoomMapMonitor_Memory> {
+    protected get refreshFrequency() {
+        return 1;
+    }
     InitMonitor() {
         if (!this.room) {
             throw new Error(`Attempted to initialize RoomMapMonitor(${this.memory.rID} without access to the room`);
@@ -33,12 +36,13 @@ class RoomMapMonitor extends RoomMonitorBase<RoomMonitor_Memory> {
             return ThreadState_Done;
         }
 
-        this.roomData.owner = (this.room.controller && this.room.controller.owner && this.room.controller.owner.username) || undefined;
-        if (this.shouldRefresh(241)) {
+        if (this.shouldRefresh(241, this.memory.luRE)) {
             this.mapper.GenerateRefillMap(this.room);
+            this.memory.luRE = Game.time;
         }
-        if (this.shouldRefresh(473)) {
+        if (this.shouldRefresh(473, this.memory.luEN)) {
             this.mapper.GenerateSpawnEnergyMap(this.room);
+            this.memory.luEN = Game.time;
         }
 
         this.memory.lu = Game.time;

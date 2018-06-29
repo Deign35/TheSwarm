@@ -4,6 +4,7 @@ global['ROOM_ARRAY_SIZE'] = ROOM_HEIGHT * ROOM_WIDTH;
 
 // MaxDistance of 99 so max of 2 digits.  For saving mem space, change to 999 for 3 digit max distance
 const MAX_MAP_DIST = 99;
+const START_TOKEN = -1;
 export class DistMap {
     static ConvertXYToIndex(x: number, y: number) {
         return y * ROOM_WIDTH + x;
@@ -30,6 +31,16 @@ export class DistMap {
                 map[i] = MAX_MAP_DIST - map[i];
             }
         }
+    }
+    static ExtractStartPositions(map: MapArray): { x: number, y: number }[] {
+        let arr: { x: number, y: number }[] = [];
+        for (let i = 0; i < ROOM_ARRAY_SIZE; i++) {
+            if (map[i] == START_TOKEN) {
+                arr.push(this.ConvertIndexToXY(i));
+            }
+        }
+
+        return arr;
     }
     static AddDistanceMaps(mapsToAdd: MapArray[]) {
         let arr = new Array(ROOM_ARRAY_SIZE).fill(0);
@@ -111,7 +122,7 @@ export class DistMap {
         let pendingNodes: { x: number, y: number, dist: number }[] = [];
         for (let i = 0; i < targetPositions.length; i++) {
             pendingNodes.push({ x: targetPositions[i].x, y: targetPositions[i].y, dist: 0 });
-            arr[targetPositions[i].y * ROOM_WIDTH + targetPositions[i].x] = -1;
+            arr[targetPositions[i].y * ROOM_WIDTH + targetPositions[i].x] = START_TOKEN;
         }
 
         while (pendingNodes.length > 0) {
@@ -141,7 +152,11 @@ export class DistMap {
         return arr;
     }
 
-    protected static GetNeighborNodes(x: number, y: number) {
+    static GenerateRoadMap(room: Room) {
+
+    }
+
+    static GetNeighborNodes(x: number, y: number) {
         return [
             { x: x - 1, y: y - 1 },
             { x: x - 1, y },

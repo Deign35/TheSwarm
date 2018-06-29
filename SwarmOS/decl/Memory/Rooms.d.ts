@@ -57,8 +57,12 @@ declare interface RoomMonitorWorkCapacity_Memory extends RoomMonitor_Memory {
     tT: number;     // (t)rigger on (T)otal resources
 }
 
-declare interface RoomMapMonitor_Memory extends MemBase {
-    lu: number;     // (l)ast (u)pdated
-    nb?: boolean;   // (n)eeds re(b)oot
-    rID: RoomID;    // (t)arget (r)oom
+declare interface RoomMapMonitor_Memory extends RoomMonitor_Memory {
+    luEN: number;   // Last updated Spawn Energy
+    luRE: number;   // Last updated Refill
+    luRO: number;   // Last updated Roads
+}
+
+declare interface RoomRoadGenerator_Memory extends RoomMonitor_Memory {
+    stage: number;
 }

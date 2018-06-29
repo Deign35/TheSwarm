@@ -64,6 +64,9 @@ declare var DistMap: {
     ConvertIndexToXY(index: number): { x: number, y: number };
     AddToMap(addVal: number, map: MapArray): void;
     MultiplyMap(mulitplyVal: number, map: MapArray): void;
+    ReverseMap(map: MapArray): void;
+    ExtractStartPositions(map: MapArray): { x: number, y: number }[];
+    GetNeighborNodes(x: number, y: number): { x: number, y: number }[];
 }
 declare const ROOM_HEIGHT = 50;
 declare const ROOM_WIDTH = 50;

@@ -52,7 +52,11 @@ class RoomProvider extends BasicProcess<RoomProvider_Memory> {
                 let newMem: RoomMapMonitor_Memory = {
                     rID: this.memory.rID,
                     lu: 0,
-                    nb: true
+                    nb: true,
+                    luEN: 0,
+                    luRE: 0,
+                    luRO: 0,
+                    hr: this.memory.home
                 }
                 roomData.groups.RJ_Mapper = this.kernel.startProcess(RJ_Mapper, newMem);
             }

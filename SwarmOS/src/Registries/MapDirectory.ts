@@ -20,9 +20,6 @@ class MapDirectory extends ExtensionBase implements IMapDirectory {
         return Memory.mapDirectory;
     }
 
-    protected get mapDirectory() {
-        return this.memory.mapDirectory;
-    }
     GenerateImpassableMap(room: Room): boolean {
         let impassableMap = new Array(ROOM_ARRAY_SIZE).fill(1);
         let structures = room.find(FIND_STRUCTURES);
@@ -35,7 +32,7 @@ class MapDirectory extends ExtensionBase implements IMapDirectory {
             }
             impassableMap[structures[i].pos.y * 50 + structures[i].pos.x] = 0;
         }
-        this.mapDirectory[room.name][ML_Impassable] = impassableMap;
+        this.memory[room.name][ML_Impassable] = impassableMap;
         return true;
     }
     GenerateSpawnEnergyMap(room: Room): boolean {
@@ -63,18 +60,21 @@ class MapDirectory extends ExtensionBase implements IMapDirectory {
     }
     CreateMapForRoom(roomID: RoomID, mapID: string, startPositions: RoomPosition[]): boolean {
         if (Game.rooms[roomID] !== undefined) {
-            this.mapDirectory[roomID][mapID] = DistMap.CreateDistanceMap(Game.rooms[roomID], startPositions);
+            if (!this.memory[roomID]) {
+                this.memory[roomID] = {}
+            }
+            this.memory[roomID][mapID] = DistMap.CreateDistanceMap(Game.rooms[roomID], startPositions);
             return true;
         }
         return false;
     }
     GetMap(roomID: RoomID, mapID: string): MapArray | undefined {
-        if (!this.mapDirectory[roomID]) {
+        if (!this.memory[roomID]) {
             return;
         }
-        return this.mapDirectory[roomID][mapID];
+        return this.memory[roomID][mapID];
     }
-    GetMaps(roomID: RoomID): MapArray | undefined {
-        return this.mapDirectory[roomID];
+    GetMaps(roomID: RoomID): IDictionary<string, MapArray> | undefined {
+        return this.memory[roomID];
     }
 }

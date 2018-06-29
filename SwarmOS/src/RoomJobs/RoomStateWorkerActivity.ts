@@ -26,12 +26,12 @@ class RoomStateWorkerTargetActivity extends RoomMonitorBase<RoomStateWorkTarget_
             }
         }
         if (this.room) {
-            if (this.shouldRefresh(17)) {
+            if (this.shouldRefresh(17, this.memory.lu)) {
                 this.memory.cSites = this.room.find(FIND_CONSTRUCTION_SITES).map((value: ConstructionSite) => {
                     return value.id;
                 });
             }
-            if (this.shouldRefresh(27)) {
+            if (this.shouldRefresh(27, this.memory.lu)) {
                 if (this.roomData.owner == MY_USERNAME) {
                     this.roomData.structures = {
                         constructedWall: [],

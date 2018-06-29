@@ -1,6 +1,7 @@
 export const OSPackage: IPackage<SpawnRegistry_Memory> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
-        //processRegistry.register(RJ_Misc, RoomStateMiscActivity);
+        processRegistry.register(RJ_Misc, RoomMonitor_Misc);
+        processRegistry.register(RJ_Structures, RoomMonitor_Structures);
     }
 }
 
@@ -34,7 +35,7 @@ export abstract class RoomMonitorBase<T extends RoomMonitor_Memory> extends Basi
             return this.MonitorRoom();
         } else {
             let retVal: ThreadState = ThreadState_Done;
-            if (this.shouldRefresh(this.refreshFrequency)) {
+            if (this.shouldRefresh(this.refreshFrequency, this.memory.lu)) {
                 retVal = this.MonitorRoom();
                 if (retVal == ThreadState_Done && this.memory.lu == Game.time) {
                     this.sleeper.sleep(this.pid, this.refreshFrequency - 1);
@@ -45,8 +46,8 @@ export abstract class RoomMonitorBase<T extends RoomMonitor_Memory> extends Basi
         }
     }
 
-    protected shouldRefresh(frequency: number): boolean {
-        if (Game.time - this.memory.lu >= frequency) {
+    protected shouldRefresh(frequency: number, lastUpdate: number): boolean {
+        if (Game.time - lastUpdate >= frequency) {
             return true;
         }
         return (Game.time + this.rngSeed) % frequency == 0;
@@ -56,12 +57,13 @@ export abstract class RoomMonitorBase<T extends RoomMonitor_Memory> extends Basi
     abstract MonitorRoom(): ThreadState;
 }
 
-class RoomMonitor_WorkCapacity extends RoomMonitorBase<RoomMonitorWorkCapacity_Memory> {
+class RoomMonitor_Misc extends RoomMonitorBase<RoomMonitorWorkCapacity_Memory> {
     MonitorRoom(): ThreadState {
         if (!this.room) {
             return ThreadState_Done;
         }
 
+        this.roomData.owner = (this.room.controller && this.room.controller.owner && this.room.controller.owner.username) || undefined;
         let newCount = 0;
         this.room.find(FIND_DROPPED_RESOURCES).map((value: Resource) => {
             newCount += value.energy || 0;
