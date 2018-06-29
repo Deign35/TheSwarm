@@ -101,14 +101,14 @@ class CreepRegistryExtensions extends ExtensionBase implements ICreepRegistryExt
             let compareDist = Game.map.getRoomLinearDistance(Game.creeps[creepData.c].room.name, targetRoom);
             let betterMatch = false;
 
-            if (creep.memory.ct == creepType || creepType == CT_Worker) {
+            if (creep.memory.ct == creepType) {//|| creepType == CT_Worker) {
                 if (!bestMatch) {
                     betterMatch = true;
                 } else {
                     if (bestMatch.con.o && !creepData.o) {
                         betterMatch = true;
-                    } else if (creep.memory.ct == creepType && bestMatch.creep.memory.ct != creepType) {
-                        betterMatch = true;
+                        //} else if (creep.memory.ct == creepType && bestMatch.creep.memory.ct != creepType) {
+                        //    betterMatch = true;
                     } else if (bestMatch.creep.memory.lvl != level || bestMatch.creep.memory.lvl == creep.memory.lvl) {
                         if (compareDist < dist) {
                             betterMatch = true;
