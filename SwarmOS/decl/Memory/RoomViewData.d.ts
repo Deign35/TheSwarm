@@ -82,4 +82,5 @@ declare interface RoomState_AttachedCreepGroups {
     [RJ_WorkTarget]: PID;
     [RJ_Harvest]?: PID;
     [RJ_Mapper]: PID;
+    [RJ_RoadGenerator]?: PID;
 }

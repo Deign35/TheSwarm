@@ -35,6 +35,16 @@ class RoomProvider extends BasicProcess<RoomProvider_Memory> {
             roomData.groups.RJ_WorkTarget = this.kernel.startProcess(RJ_WorkTarget, newMem);
         }
 
+        if (!roomData.groups.RJ_Structures || !this.kernel.getProcessByPID(roomData.groups.RJ_Structures)) {
+            let newMem: RoomMonitor_Memory = {
+                rID: this.memory.rID,
+                hr: this.memory.home,
+                lu: 0,
+                nb: true
+            }
+            roomData.groups.RJ_Structures = this.kernel.startProcess(RJ_Structures, newMem);
+        }
+
         if (roomData.RoomType.type == RT_Home) {
             if (!roomData.groups.RJ_Tower || !this.kernel.getProcessByPID(roomData.groups.RJ_Tower)) {
                 if (room.controller!.level >= 3 && room.find(FIND_STRUCTURES, {
@@ -60,6 +70,17 @@ class RoomProvider extends BasicProcess<RoomProvider_Memory> {
                     hr: this.memory.home
                 }
                 roomData.groups.RJ_Mapper = this.kernel.startProcess(RJ_Mapper, newMem);
+            }
+            if (!roomData.groups.RJ_RoadGenerator || !this.kernel.getProcessByPID(roomData.groups.RJ_RoadGenerator)) {
+                let newMem: RoomRoadGenerator_Memory = {
+                    rID: this.memory.rID,
+                    hr: this.memory.home,
+                    nb: true,
+                    lu: 0,
+                    stage: 0,
+                    fr: 1
+                }
+                roomData.groups.RJ_RoadGenerator = this.kernel.startProcess(RJ_RoadGenerator, newMem);
             }
         }
 

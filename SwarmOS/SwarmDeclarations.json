@@ -58,7 +58,8 @@
                 "WorkTarget",
                 "Structures",
                 "Harvest",
-                "Mapper"
+                "Mapper",
+                "RoadGenerator"
             ]
         },
         "EXT": {
