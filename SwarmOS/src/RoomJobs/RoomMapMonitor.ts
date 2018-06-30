@@ -40,6 +40,12 @@ class RoomMapMonitor extends RoomMonitorBase<RoomMapMonitor_Memory> {
             this.mapper.GenerateRefillMap(this.room);
             this.memory.luRE = Game.time;
         }
+
+        if (this.shouldRefresh(397, this.memory.luIM)) {
+            this.mapper.GenerateImpassableMap(this.room);
+            this.memory.luIM = Game.time;
+        }
+        
         if (this.shouldRefresh(473, this.memory.luEN)) {
             this.mapper.GenerateSpawnEnergyMap(this.room);
             this.memory.luEN = Game.time;

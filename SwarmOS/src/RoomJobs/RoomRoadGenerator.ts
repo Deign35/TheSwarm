@@ -54,18 +54,18 @@ class RoomRoadGenerator extends RoomMonitorBase<RoomMonitor_Memory> {
                 break;
             }
             path.push(next);
+            
             if (next.dist < distance || next.dist <= 0) {
                 break;
             }
-
             if (next.dist < curMax) {
                 curMax = next.dist;
             }
-
             if (next.dist > curMax) {
                 this.log.alert(`ASSUMPTION VIOLATION: Currently MakeRoadToPoint is assumed to never put larger values into the search array`);
                 continue;
             }
+
             let neighbors = DistMap.GetNeighborNodes(next.x, next.y);
             for (let i = 0; i < neighbors.length; i++) {
                 let nextIndex = DistMap.ConvertXYToIndex(neighbors[i].x, neighbors[i].y);

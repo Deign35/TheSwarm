@@ -220,7 +220,6 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
                         this._curTickState[pid] = TS_Waiting;
                         break;
                     case (ThreadState_Inactive):
-                    case (ThreadState_Overrun):
                     case (ThreadState_Done):
                         this._curTickState[pid] = TS_Done;
                     default:

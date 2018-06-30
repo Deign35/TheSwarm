@@ -61,6 +61,7 @@ declare interface RoomMapMonitor_Memory extends RoomMonitor_Memory {
     luEN: number;   // Last updated Spawn Energy
     luRE: number;   // Last updated Refill
     luRO: number;   // Last updated Roads
+    luIM: number;   // Last updated Impassable layer
 }
 
 declare interface RoomRoadGenerator_Memory extends RoomMonitor_Memory {

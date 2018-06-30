@@ -56,6 +56,7 @@ class RoomProvider extends BasicProcess<RoomProvider_Memory> {
                     luEN: 0,
                     luRE: 0,
                     luRO: 0,
+                    luIM: 0,
                     hr: this.memory.home
                 }
                 roomData.groups.RJ_Mapper = this.kernel.startProcess(RJ_Mapper, newMem);

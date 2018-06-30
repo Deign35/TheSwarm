@@ -6,7 +6,7 @@
             "string": true,
             "entries": {
                 "USERNAME": "Deign",
-                "SIGNATURE": "Greetings. I'm trying to branch out. -- SwarmOSv1.2.0"
+                "SIGNATURE": "Greetings. *Insert funny turn of phrase here*. -- SwarmOSv1.5.0"
             }
         },
         "PKG": {
@@ -22,12 +22,9 @@
                 "SwarmManager",
                 "SpawnRegistry",
                 "RoomManager",
-                "SimpleOwnedRoom",
-                "BootRoom",
                 "FlagBase",
                 "SwarmCLI",
                 "EmptyProcess",
-                "Cartography",
                 "RoomProvider"
             ]
         },
@@ -41,9 +38,7 @@
             "combinedType": "CreepRoles",
             "entries": [
                 "BootFill",
-                "Fortify",
                 "Harvester",
-                "Science",
                 "Scout",
                 "SpawnFill",
                 "Work",
@@ -174,8 +169,7 @@
                 "Inactive": 0,
                 "Active": 1,
                 "Waiting": 2,
-                "Done": 3,
-                "Overrun": 4
+                "Done": 3
             }
         },
         "CLI": {
@@ -191,16 +185,6 @@
                 "Kill": "kill",
                 "Spawn": "spawn",
                 "ResetMemory": "reset"
-            }
-        },
-        "SET": {
-            "comment": "Settings",
-            "enabled": true,
-            "entries": {
-                "MaxSites": 5,
-                "SiteToWorkRatio": 10000,
-                "TriggerNewWorker": 500,
-                "GroundWorkerRatio": 1200
             }
         },
         "SPKG": {

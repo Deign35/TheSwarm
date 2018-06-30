@@ -78,7 +78,7 @@ class RoomStateHarvestActivity extends RoomMonitorBase<RoomStateHarvest_Memory> 
     SpawnHarvester(sourceID: ObjectID, supportStructure?: ObjectID) {
         this.log.info(`Spawning a harvester for ${sourceID}.`);
         let spawnLevel = 0;
-        if (this.memory.hr != this.memory.rID) { // Remote harvester
+        if (this.roomData.RoomType.type == RT_RemoteHarvest) { // Remote harvester
             spawnLevel = 2;
         } else {
             let homeRoom = Game.rooms[this.memory.hr];
@@ -92,6 +92,9 @@ class RoomStateHarvestActivity extends RoomMonitorBase<RoomStateHarvest_Memory> 
                     let nearby = FindNextTo(source.pos, LOOK_TERRAIN);
                     let hasSpawnedSupport = false;
                     let hasSpawnedHarvester = false;
+
+                    // Spawns a support harvester if there's a total of 2 spaces next to the source.
+                    // Spawns 2 support harvesters if there's a total of 3 spaces next to the source.
                     for (let i = 0; i < nearby.length; i++) {
                         if (nearby[i].terrain !== Terrain_Wall) {
                             if (!hasSpawnedHarvester) {

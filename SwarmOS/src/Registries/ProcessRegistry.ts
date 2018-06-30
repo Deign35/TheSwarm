@@ -14,13 +14,13 @@ export class ProcessRegistry implements IProcessRegistry {
             this.log.error(`Name already registered: ${name}.  Rejected registration`);
             return false;
         }
-        this.log.info(() => `Registered Process: ${name}`);
+        this.log.debug(() => `Registered Process: ${name}`);
         this.registry[name] = constructor;
         return true;
     }
     createNewProcess(name: string, context: IProcessContext): IProcess | undefined {
         if (!this.registry[name]) return;
-        this.log.info(() => `Created ${name}`);
+        this.log.debug(() => `Created ${name}`);
         return new this.registry[name](context);
     }
 }

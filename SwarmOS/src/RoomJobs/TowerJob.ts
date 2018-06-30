@@ -7,6 +7,9 @@ import { BasicProcess } from "Core/BasicTypes";
 import { RoomMonitorBase } from "./RoomMonitors";
 
 class TowerJob extends RoomMonitorBase<RoomMonitor_Memory> {
+    get refreshFrequency() {
+        return 1;
+    }
     get room() {
         return Game.rooms[this.memory.rID];
     }

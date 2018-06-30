@@ -74,9 +74,6 @@ declare interface RoomState_AttachedCreepGroups {
     [CR_Scout]?: PID;
     [CR_SpawnFill]?: PID;
 
-    [CR_Fortify]?: PID;
-    [CR_Science]?: PID;
-
     [RJ_Tower]?: PID;
 
     [CR_Work]: PID;
