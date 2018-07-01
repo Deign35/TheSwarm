@@ -16,11 +16,14 @@ class RoomProvider extends BasicProcess<RoomProvider_Memory> {
         }
 
         if (!roomData.groups.RJ_Misc || !this.kernel.getProcessByPID(roomData.groups.RJ_Misc)) {
-            let newMem: RoomStateMisc_Memory = {
+            let newMem: RoomMonitorWorkCapacity_Memory = {
                 hr: this.memory.home,
                 lr: 0,
                 lu: 0,
-                rID: this.memory.rID
+                rID: this.memory.rID,
+                tA: 200,
+                tT: 2000,
+                nb: true
             }
             roomData.groups.RJ_Misc = this.kernel.startProcess(RJ_Misc, newMem);
         }
@@ -28,9 +31,12 @@ class RoomProvider extends BasicProcess<RoomProvider_Memory> {
             let newMem: RoomStateWorkTarget_Memory = {
                 hr: this.memory.home,
                 lu: 0,
+                luCS: 0,
+                luRE: 0,
                 rID: this.memory.rID,
                 cSites: [],
-                needsRepair: []
+                needsRepair: [],
+                nb: true
             }
             roomData.groups.RJ_WorkTarget = this.kernel.startProcess(RJ_WorkTarget, newMem);
         }
@@ -52,8 +58,11 @@ class RoomProvider extends BasicProcess<RoomProvider_Memory> {
                         return struct.structureType == STRUCTURE_TOWER;
                     }
                 }).length > 0) {
-                    let newMem: Tower_Memory = {
-                        rID: this.memory.rID
+                    let newMem: RoomMonitor_Memory = {
+                        rID: this.memory.rID,
+                        hr: this.memory.home,
+                        lu: 0,
+                        nb: true
                     }
                     roomData.groups.RJ_Tower = this.kernel.startProcess(RJ_Tower, newMem);
                 }
@@ -71,17 +80,6 @@ class RoomProvider extends BasicProcess<RoomProvider_Memory> {
                 }
                 roomData.groups.RJ_Mapper = this.kernel.startProcess(RJ_Mapper, newMem);
             }
-            /*if (!roomData.groups.RJ_RoadGenerator || !this.kernel.getProcessByPID(roomData.groups.RJ_RoadGenerator)) {
-                let newMem: RoomRoadGenerator_Memory = {
-                    rID: this.memory.rID,
-                    hr: this.memory.home,
-                    nb: true,
-                    lu: 0,
-                    stage: 0,
-                    fr: 1
-                }
-                roomData.groups.RJ_RoadGenerator = this.kernel.startProcess(RJ_RoadGenerator, newMem);
-            }*/
         }
 
         if (roomData.RoomType.type == RT_Home || roomData.RoomType.type != RT_RemoteHarvest) {

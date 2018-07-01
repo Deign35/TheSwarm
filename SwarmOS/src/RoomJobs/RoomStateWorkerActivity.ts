@@ -9,29 +9,19 @@ class RoomStateWorkerTargetActivity extends RoomMonitorBase<RoomStateWorkTarget_
     protected get refreshFrequency() { return 1; }
     PrepTick() {
         super.PrepTick();
-        if (this.roomData.targets.Other.t == TT_Controller || this.roomData.targets.Other.at == AT_Repair) {
-            this.roomData.targets.Other.en = 0;
-            this.roomData.targets.Other.at = AT_NoOp;
-            this.roomData.targets.Other.t = TT_None;
-        }
-
-        if (this.room && this.roomData.owner == MY_USERNAME) {
-            if (this.room.controller!.ticksToDowngrade < 2000) {
-                this.roomData.targets.Other = {
-                    target: this.room.controller!.id,
-                    at: AT_Upgrade,
-                    t: TT_Controller,
-                    en: 200
-                }
-            }
+        this.roomData.targets.Other = {
+            t: TT_None,
+            en: 0,
+            at: AT_NoOp,
+            target: ''
         }
         if (this.room) {
-            if (this.shouldRefresh(17, this.memory.lu)) {
+            if (this.shouldRefresh(17, this.memory.luCS)) {
                 this.memory.cSites = this.room.find(FIND_CONSTRUCTION_SITES).map((value: ConstructionSite) => {
                     return value.id;
                 });
             }
-            if (this.shouldRefresh(27, this.memory.lu)) {
+            if (this.shouldRefresh(27, this.memory.luRE)) {
                 if (this.roomData.owner == MY_USERNAME) {
                     this.roomData.structures = {
                         constructedWall: [],
@@ -167,6 +157,17 @@ class RoomStateWorkerTargetActivity extends RoomMonitorBase<RoomStateWorkTarget_
                             t: TT_Creep
                         }
                     }
+                }
+            }
+        }
+
+        if (this.room && this.roomData.owner == MY_USERNAME) {
+            if (this.room.controller!.ticksToDowngrade < 2000) {
+                this.roomData.targets.Other = {
+                    target: this.room.controller!.id,
+                    at: AT_Upgrade,
+                    t: TT_Controller,
+                    en: 200
                 }
             }
         }

@@ -50,8 +50,6 @@ class RoomMapMonitor extends RoomMonitorBase<RoomMapMonitor_Memory> {
             this.mapper.GenerateSpawnEnergyMap(this.room);
             this.memory.luEN = Game.time;
         }
-
-        this.memory.lu = Game.time;
         return ThreadState_Done;
     }
 }

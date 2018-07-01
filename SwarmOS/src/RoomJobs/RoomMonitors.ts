@@ -150,18 +150,3 @@ class RoomMonitor_Structures extends RoomMonitorBase<RoomMonitor_Memory> {
         return ThreadState_Done;
     }
 }
-
-class RoomMonitor_Energy extends RoomMonitorBase<RoomMonitor_Memory> {
-    MonitorRoom(): ThreadState {
-        // Try to best allocate resources and shuffle them around based on needs.
-
-        return ThreadState_Done;
-    }
-}
-
-class RoomMonitor_WorkLocator extends RoomMonitorBase<RoomMonitorWorkTarget_Memory> {
-    MonitorRoom(): ThreadState {
-
-        return ThreadState_Done;
-    }
-}

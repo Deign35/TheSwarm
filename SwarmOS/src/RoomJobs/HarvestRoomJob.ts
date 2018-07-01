@@ -119,6 +119,7 @@ class RoomStateHarvestActivity extends RoomMonitorBase<RoomStateHarvest_Memory> 
             home: this.memory.hr,
             rID: this.memory.rID,
             spLvl: spawnLevel,
+            exp: true
         }
 
         this.memory.harvesters[sourceID].pid = this.kernel.startProcess(CR_Harvester, harvMem);
@@ -132,6 +133,7 @@ class RoomStateHarvestActivity extends RoomMonitorBase<RoomStateHarvest_Memory> 
             home: this.memory.hr,
             rID: this.memory.rID,
             spLvl: 0,
+            exp: true
         }
         let newPID = this.kernel.startProcess(CR_Harvester, harvMem);
         this.kernel.setParent(newPID, this.pid);
