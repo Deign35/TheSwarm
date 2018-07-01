@@ -18,12 +18,8 @@ class TowerJob extends RoomMonitorBase<RoomMonitor_Memory> {
     }
     MonitorRoom(): ThreadState {
         let homeRoomData = this.roomView.GetRoomData(this.memory.rID)!;
-        let provider = this.kernel.getProcessByPID(homeRoomData.activityPID);
-        if (provider && provider['RoomJobCheckin']) {
-            provider['RoomJobCheckin'](this.pkgName);
-        }
-
         let towerIDs = this.roomData.structures.tower!;
+        
         if (!towerIDs || towerIDs.length == 0) {
             this.EndProcess();
             return ThreadState_Done;

@@ -71,7 +71,7 @@ class RoomProvider extends BasicProcess<RoomProvider_Memory> {
                 }
                 roomData.groups.RJ_Mapper = this.kernel.startProcess(RJ_Mapper, newMem);
             }
-            if (!roomData.groups.RJ_RoadGenerator || !this.kernel.getProcessByPID(roomData.groups.RJ_RoadGenerator)) {
+            /*if (!roomData.groups.RJ_RoadGenerator || !this.kernel.getProcessByPID(roomData.groups.RJ_RoadGenerator)) {
                 let newMem: RoomRoadGenerator_Memory = {
                     rID: this.memory.rID,
                     hr: this.memory.home,
@@ -81,7 +81,7 @@ class RoomProvider extends BasicProcess<RoomProvider_Memory> {
                     fr: 1
                 }
                 roomData.groups.RJ_RoadGenerator = this.kernel.startProcess(RJ_RoadGenerator, newMem);
-            }
+            }*/
         }
 
         if (roomData.RoomType.type == RT_Home || roomData.RoomType.type != RT_RemoteHarvest) {

@@ -133,6 +133,7 @@ declare interface IMapDirectory extends IPackageExtension {
     GenerateImpassableMap(room: Room): boolean;
     GenerateSpawnEnergyMap(room: Room): boolean;
     GenerateRefillMap(room: Room): boolean;
+    FindPathFrom(x: number, y: number, distMap: MapArray, pathableMap: MapArray, targetDist?: number): { x: number, y: number, dist: number, index: number }[] | ERR_NO_PATH;
 }
 
 interface RunArgs {

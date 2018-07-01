@@ -8,8 +8,8 @@ const BOTTOM_LEFT = 6;
 const LEFT = 7;
 const TOP_LEFT = 8;
 
-const MAX_WIDTH = 5;
-const MAX_HEIGHT = 5;
+const MAX_WIDTH = 50;
+const MAX_HEIGHT = 50;
 module.exports = {
     GenerateMapping: function () {
         let baseArray = new Array(MAX_WIDTH * MAX_HEIGHT).fill(0).map((un, index) => {
@@ -90,14 +90,9 @@ module.exports = {
             convertedToString += '{';
             let next = baseArray[i];
             let keys = Object.keys(next);
-            if (i == 0) {
-                console.log(JSON.stringify(next));
-                console.log(JSON.stringify(keys));
-            }
             for (let j = 0; j < keys.length; j++) {
                 convertedToString += `${keys[j]}:${JSON.stringify(next[keys[j]])},`
             }
-            //convertedToString += `${JSON.stringify(next)},`;
             convertedToString = convertedToString.slice(0, -1) + '},';
         }
 

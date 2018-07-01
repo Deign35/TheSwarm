@@ -119,9 +119,12 @@ export class DistMap {
             maxDistance = MAX_MAP_DIST;
         }
         let arr: MapArray = new Array(ROOM_ARRAY_SIZE).fill(0);
-        let pendingNodes: { x: number, y: number, dist: number }[] = [];
+        let pendingNodes: { x: number, y: number, dist: number, index: number }[] = [];
         for (let i = 0; i < targetPositions.length; i++) {
-            pendingNodes.push({ x: targetPositions[i].x, y: targetPositions[i].y, dist: 0 });
+            pendingNodes.push({
+                x: targetPositions[i].x, y: targetPositions[i].y, dist: 0,
+                index: DistMap.ConvertXYToIndex(targetPositions[i].x, targetPositions[i].y)
+            });
             arr[targetPositions[i].y * ROOM_WIDTH + targetPositions[i].x] = START_TOKEN;
         }
 
@@ -130,42 +133,25 @@ export class DistMap {
             if (!curNode) {
                 break;
             }
-            let neighbors = this.GetNeighborNodes(curNode.x, curNode.y);
+            let neighbors = neighborMapping[curNode.index];
+            let keys = (Object.keys(neighbors) as any) as number[];
             let nextDist = curNode.dist + (curNode.dist < maxDistance ? 1 : 0);
-            for (let i = 0; i < neighbors.length; i++) {
-                let xPos = neighbors[i].x;
-                let yPos = neighbors[i].y;
-                if (xPos < 0 || xPos >= ROOM_WIDTH || yPos < 0 || yPos >= ROOM_HEIGHT ||
-                    arr[neighbors[i].y * ROOM_WIDTH + neighbors[i].x] !== 0 || Game.map.getTerrainAt(xPos, yPos, room.name) == Terrain_Wall) {
+            for (let i = 0; i < keys.length; i++) {
+                let neighbor = neighbors[keys[i]];
+                if (arr[neighbor.y * ROOM_WIDTH + neighbor.x] !== 0 || Game.map.getTerrainAt(neighbor.x, neighbor.y, room.name) == Terrain_Wall) {
                     continue;
                 }
 
-                arr[this.ConvertXYToIndex(xPos, yPos)] = nextDist;
+                arr[neighbor.index] = nextDist;
                 pendingNodes.push({
-                    x: neighbors[i].x,
-                    y: neighbors[i].y,
-                    dist: nextDist
+                    x: neighbor.x,
+                    y: neighbor.y,
+                    dist: nextDist,
+                    index: neighbor.index
                 });
             }
         }
 
         return arr;
-    }
-
-    static GenerateRoadMap(room: Room) {
-
-    }
-
-    static GetNeighborNodes(x: number, y: number) {
-        return [
-            { x: x - 1, y: y - 1 },
-            { x: x - 1, y },
-            { x: x - 1, y: y + 1 },
-            { x, y: y - 1 },
-            { x, y: y + 1 },
-            { x: x + 1, y: y - 1 },
-            { x: x + 1, y },
-            { x: x + 1, y: y + 1 },
-        ];
     }
 }

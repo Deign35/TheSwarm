@@ -19,7 +19,6 @@ class RoomRoadGenerator extends RoomMonitorBase<RoomMonitor_Memory> {
             return ThreadState_Done;
         }
 
-        debugger;
         let isThreadComplete = true;
         switch (this.stage) {
             case (0):
@@ -32,7 +31,6 @@ class RoomRoadGenerator extends RoomMonitorBase<RoomMonitor_Memory> {
                     this.cache['FocalPoints'].push(spawn.pos);
                     return spawn.pos;
                 });
-                //this.AddPointsToMap('curMap', spawnPositions);*/
                 for (let i = 0; i < spawnPositions.length; i++) {
                     this.MakeRoadFromPoint(this.cache['curMap'], spawnPositions[i], 3);
                 }
@@ -78,51 +76,16 @@ class RoomRoadGenerator extends RoomMonitorBase<RoomMonitor_Memory> {
     }
 
     MakeRoadFromPoint(map: MapArray, point: RoomPosition, distance: number = 1) {
-        let curMax = map[DistMap.ConvertXYToIndex(point.x, point.y)];
-        let remainingTiles = [{ x: point.x, y: point.y, dist: curMax }];
-        let path: { x: number, y: number, dist: number }[] = [];
         let roadMap = this.roomData.distanceMaps[ML_Road];
         let impassableMap = this.roomData.distanceMaps[ML_Impassable];
-        do {
-            let next = remainingTiles.shift();
-            if (!next) {
-                break;
-            }
-            path.push(next);
+        let combinedPathingMap = DistMap.AverageDistanceMaps([impassableMap, roadMap]);
+        let path = this.mapper.FindPathFrom(point.x, point.y, map, combinedPathingMap);
 
-            if (next.dist <= distance || next.dist <= 0) {
-                break;
-            }
-            if (next.dist < curMax) {
-                curMax = next.dist;
-            }
-            if (next.dist > curMax) {
-                this.log.alert(`ASSUMPTION VIOLATION: Currently MakeRoadFromPoint is assumed to never put larger values into the search array`);
-                continue;
-            }
-
-            let neighbors = DistMap.GetNeighborNodes(next.x, next.y);
-            for (let i = 0; i < neighbors.length; i++) {
-                let nextIndex = DistMap.ConvertXYToIndex(neighbors[i].x, neighbors[i].y);
-                if (map[nextIndex] < next.dist) {
-                    remainingTiles.push({ x: neighbors[i].x, y: neighbors[i].y, dist: map[nextIndex] });
-                    break;
-                }
-            }
-            if (remainingTiles.length > 1) {
-                this.log.alert(`ASSUMPTION VIOLATION: MakeRoadFromPoint.. Should only be one position per loop`);
-            }
-        } while (true);
-
-        if (path[path.length - 1].dist != distance) {
-            this.log.alert(`ASSUMPTION VIOLATION: MakeRoadFromPoint.. Path is expected to end at the requested distance.  Path.dist: {${path[path.length - 1].dist}, vs requestedDistance: {${distance}}`);
+        if (path == ERR_NO_PATH) {
+            return;
         }
-        for (let i = 0; i < path.length; i++) {
-            let index = DistMap.ConvertXYToIndex(path[i].x, path[i].y);
-            if (roadMap[index] == 0 &&
-                impassableMap[index] != 0) {
-                this.room!.createConstructionSite(path[i].x, path[i].y, STRUCTURE_ROAD);
-            }
+        for (let i = 1; i < path.length; i++) {
+            this.room!.createConstructionSite(path[i].x, path[i].y, STRUCTURE_ROAD);
         }
     }
 }

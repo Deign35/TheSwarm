@@ -34,7 +34,14 @@ declare interface ObjectIDWithPos {
     id: ObjectID;
 }
 
-declare const CENTER = 0; 
+declare const CENTER = 0;
+declare type neighborMapping = {
+    [dir: number]: {
+        x: number,
+        y: number,
+        index: number
+    }
+}[]
 
 declare interface Profiler {
     clear(): void;
@@ -55,7 +62,7 @@ declare class Stopwatch {
     ToString(): string;
 }
 
-declare var DistMap: {
+declare type IDistMap = {
     CreateDistanceMap(room: Room, targetPositions: RoomPosition[], maxDistance?: number): number[];
     AddDistanceMaps(maps: number[][]): number[];
     AverageDistanceMaps(maps: number[][]): number[];
@@ -68,8 +75,8 @@ declare var DistMap: {
     MultiplyMap(mulitplyVal: number, map: MapArray): void;
     ReverseMap(map: MapArray): void;
     ExtractStartPositions(map: MapArray): { x: number, y: number }[];
-    GetNeighborNodes(x: number, y: number): { x: number, y: number }[];
 }
+declare const DistMap: IDistMap;
 declare const ROOM_HEIGHT = 50;
 declare const ROOM_WIDTH = 50;
 declare const ROOM_ARRAY_SIZE = 2500;

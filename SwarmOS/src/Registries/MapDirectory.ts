@@ -11,6 +11,20 @@ export const OSPackage: IPackage<FlagExtensionsMemory> = {
     }
 }
 
+const CENTER = 0;
+global['CENTER'] = 0;
+const MapDirections = [
+    TOP_LEFT,
+    TOP,
+    TOP_RIGHT,
+    LEFT,
+    RIGHT,
+    BOTTOM_LEFT,
+    BOTTOM,
+    BOTTOM_RIGHT
+];
+const dirKeys = MapDirections.length;
+
 class MapDirectory extends ExtensionBase implements IMapDirectory {
     get memory(): IDictionary<RoomID, IDictionary<MapLayers, MapArray>> {
         if (!Memory.mapDirectory) {
@@ -80,7 +94,10 @@ class MapDirectory extends ExtensionBase implements IMapDirectory {
 
     // PathableMap will have a rating of 0 to 1 of how pathable a position is
     // Use this to find the best neighbor to use.
-    FindPathFrom(x: number, y: number, distMap: MapArray, pathableMap: MapArray) {
+    FindPathFrom(x: number, y: number, distMap: MapArray, pathableMap: MapArray, targetDist: number = 1) {
+        if (targetDist <= 0) {
+            targetDist = 1;
+        }
         let startPos = DistMap.ConvertXYToIndex(x, y);
         let curMax = distMap[startPos];
         if (curMax <= 0) {
@@ -93,31 +110,34 @@ class MapDirectory extends ExtensionBase implements IMapDirectory {
                 break;
             }
             path.push(nextTile);
-
-            if (nextTile.dist <= 0) {
+            if (nextTile.dist <= targetDist) {
                 break;
+            }
+            if (path.length > 200) {
+                this.log.alert(`Path is too long...: ${JSON.stringify(path)}`);
+                return ERR_NO_PATH;
             }
             if (nextTile.dist < curMax) {
                 curMax = nextTile.dist;
             }
-            if (nextTile.dist > curMax) {
-                this.log.alert(`ASSUMPTION VIOLATION: Currently MakeRoadFromPoint is assumed to never put larger values into the search array`);
-                continue;
-            }
 
-            let neighbors = DistMap.GetNeighborNodes(nextTile.x, nextTile.y);
+            let neighbors = neighborMapping[nextTile.index];
             let bestNeighbor = undefined;
-            for (let i = 0; i < neighbors.length; i++) {
-                let nextIndex = DistMap.ConvertXYToIndex(neighbors[i].x, neighbors[i].y);
-                if (pathableMap[nextIndex] > 0 && distMap[nextIndex] < nextTile.dist) {
-                    if (!bestNeighbor || pathableMap[nextIndex] > pathableMap[bestNeighbor.index]) {
-                        bestNeighbor = { x: neighbors[i].x, y: neighbors[i].y, dist: distMap[nextIndex], index: nextIndex };
+            for (let i = 0; i < dirKeys; i++) {
+                if (neighbors[MapDirections[i]]) {
+                    let neighbor = neighbors[MapDirections[i]];
+                    if (pathableMap[neighbor.index] > 0 && distMap[neighbor.index] < nextTile.dist) {
+                        if (!bestNeighbor || pathableMap[neighbor.index] > pathableMap[bestNeighbor.index]) {
+                            bestNeighbor = { x: neighbor.x, y: neighbor.y, dist: distMap[neighbor.index], index: neighbor.index };
+                        }
                     }
                 }
             }
+
             if (!bestNeighbor) {
                 return ERR_NO_PATH;
             }
+            nextTile = bestNeighbor;
         } while (true);
 
         return path;

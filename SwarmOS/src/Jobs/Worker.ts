@@ -19,13 +19,6 @@ class WorkerActivity extends SoloJob<Worker_Memory> {
         this._roomData = this.roomView.GetRoomData(this.memory.rID)!;
     }
     RunThread(): ThreadState {
-        if (!this.hasNotified) {
-            let provider = this.kernel.getProcessByPID(this.roomData.activityPID);
-            if (provider && provider['RoomJobCheckin']) {
-                provider['RoomJobCheckin'](this.pkgName);
-            }
-            this.hasNotified = true;
-        }
         this.hasRun = true;
         super.RunThread();
         if (this.hasRun) {
