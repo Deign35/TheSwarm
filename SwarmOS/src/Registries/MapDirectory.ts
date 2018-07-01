@@ -77,4 +77,49 @@ class MapDirectory extends ExtensionBase implements IMapDirectory {
     GetMaps(roomID: RoomID): IDictionary<string, MapArray> | undefined {
         return this.memory[roomID];
     }
+
+    // PathableMap will have a rating of 0 to 1 of how pathable a position is
+    // Use this to find the best neighbor to use.
+    FindPathFrom(x: number, y: number, distMap: MapArray, pathableMap: MapArray) {
+        let startPos = DistMap.ConvertXYToIndex(x, y);
+        let curMax = distMap[startPos];
+        if (curMax <= 0) {
+
+        }
+        let nextTile = { x, y, dist: curMax, index: startPos };
+        let path: { x: number, y: number, dist: number, index: number }[] = [];
+        do {
+            if (!nextTile) {
+                break;
+            }
+            path.push(nextTile);
+
+            if (nextTile.dist <= 0) {
+                break;
+            }
+            if (nextTile.dist < curMax) {
+                curMax = nextTile.dist;
+            }
+            if (nextTile.dist > curMax) {
+                this.log.alert(`ASSUMPTION VIOLATION: Currently MakeRoadFromPoint is assumed to never put larger values into the search array`);
+                continue;
+            }
+
+            let neighbors = DistMap.GetNeighborNodes(nextTile.x, nextTile.y);
+            let bestNeighbor = undefined;
+            for (let i = 0; i < neighbors.length; i++) {
+                let nextIndex = DistMap.ConvertXYToIndex(neighbors[i].x, neighbors[i].y);
+                if (pathableMap[nextIndex] > 0 && distMap[nextIndex] < nextTile.dist) {
+                    if (!bestNeighbor || pathableMap[nextIndex] > pathableMap[bestNeighbor.index]) {
+                        bestNeighbor = { x: neighbors[i].x, y: neighbors[i].y, dist: distMap[nextIndex], index: nextIndex };
+                    }
+                }
+            }
+            if (!bestNeighbor) {
+                return ERR_NO_PATH;
+            }
+        } while (true);
+
+        return path;
+    }
 }

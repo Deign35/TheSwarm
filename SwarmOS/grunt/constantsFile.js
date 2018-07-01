@@ -182,6 +182,10 @@ module.exports = {
             this.g_file.push(this.setGlobal('primes_' + maxDigit, primesLists[maxDigit]));
             this.d_file.push("declare const primes_" + maxDigit + ": " + primesLists[maxDigit] + '');
         }
+        let mapping = require('./neighborMapping').GenerateMapping();
+
+        this.g_file.push(this.setGlobal('neighborMapping', mapping));
+        this.d_file.push("declare const neighborMapping: " + mapping);
         this.OutputToFile();
     }
 }

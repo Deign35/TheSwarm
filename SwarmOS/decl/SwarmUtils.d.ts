@@ -34,6 +34,8 @@ declare interface ObjectIDWithPos {
     id: ObjectID;
 }
 
+declare const CENTER = 0; 
+
 declare interface Profiler {
     clear(): void;
     output(): void;
