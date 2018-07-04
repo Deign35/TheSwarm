@@ -1,13 +1,13 @@
 export const OSPackage: IPackage<SpawnRegistry_Memory> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
-        processRegistry.register(RJ_RoadGenerator, RoomRoadGenerator);
+        processRegistry.register(RJ_RoadGenerator, RoomPathBuilder);
     }
 }
 
 import { RoomMonitorBase } from "RoomJobs/RoomMonitors";
 
 const RESTART_TOKEN = -1;
-class RoomRoadGenerator extends RoomMonitorBase<RoomMonitor_Memory> {
+class RoomPathBuilder extends RoomMonitorBase<RoomMonitor_Memory> {
     private stage: number = 0;
     private cache: any = {};
     MonitorRoom(): ThreadState {
@@ -15,7 +15,7 @@ class RoomRoadGenerator extends RoomMonitorBase<RoomMonitor_Memory> {
             this.log.error(`Map generation for rooms not under home control has not been enabled yet`);
             return ThreadState_Done;
         }
-        if (!this.room || !this.roomData.distanceMaps[ML_Impassable || !this.roomData.distanceMaps[ML_Road]]) {
+        if (!this.room || !this.roomData.distanceMaps[ML_Impassable] || !this.roomData.distanceMaps[ML_Road]) {
             return ThreadState_Done;
         }
 
@@ -64,7 +64,7 @@ class RoomRoadGenerator extends RoomMonitorBase<RoomMonitor_Memory> {
         if (this.room.name == 'sim') {
             return this.stage % 5 == 0 ? ThreadState_Done : ThreadState_Active;
         }
-        return ThreadState_Done;
+        return ThreadState_Overrun;
     }
     GenerateNewMapAt(mapName: string, startPos: RoomPosition) {
         this.cache[mapName] = DistMap.CreateDistanceMap(this.room!, [startPos]);
