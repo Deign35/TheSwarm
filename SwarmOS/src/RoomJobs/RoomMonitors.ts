@@ -125,10 +125,9 @@ class RoomMonitor_Structures extends RoomMonitorBase<RoomMonitor_Memory> {
         let allStructures = this.room.find(FIND_STRUCTURES);
         for (let i = 0, length = allStructures.length; i < length; i++) {
             let structure = allStructures[i];
-            if (!this.roomData.structures[structure.structureType]) {
-                this.roomData.structures[structure.structureType] = [];
+            if ((this.roomData.structures[structure.structureType] as string[]).length !== undefined) {
+                this.roomData.structures[structure.structureType]!.push(structure.id);
             }
-            this.roomData.structures[structure.structureType]!.push(structure.id);
 
             if (structure.structureType == STRUCTURE_CONTAINER ||
                 structure.structureType == STRUCTURE_PORTAL ||

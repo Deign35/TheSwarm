@@ -7,7 +7,6 @@ import { SoloJob } from "./SoloJob";
 
 class WorkerActivity extends SoloJob<Worker_Memory> {
     private hasRun!: boolean;
-    private hasNotified!: boolean;
     private _roomData!: RoomState;
     protected get roomData() {
         return this._roomData;
@@ -15,7 +14,6 @@ class WorkerActivity extends SoloJob<Worker_Memory> {
 
     PrepTick() {
         this.hasRun = false;
-        this.hasNotified = false;
         this._roomData = this.roomView.GetRoomData(this.memory.rID)!;
     }
     RunThread(): ThreadState {

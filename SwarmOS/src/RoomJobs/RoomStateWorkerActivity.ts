@@ -20,43 +20,9 @@ class RoomStateWorkerTargetActivity extends RoomMonitorBase<RoomStateWorkTarget_
                 this.memory.cSites = this.room.find(FIND_CONSTRUCTION_SITES).map((value: ConstructionSite) => {
                     return value.id;
                 });
+                this.memory.luCS = Game.time;
             }
             if (this.shouldRefresh(27, this.memory.luRE)) {
-                if (this.roomData.owner == MY_USERNAME) {
-                    this.roomData.structures = {
-                        constructedWall: [],
-                        container: [],
-                        extension: [],
-                        lab: [],
-                        link: [],
-                        rampart: [],
-                        road: [],
-                        spawn: [],
-                        tower: []
-                    }
-                } else {
-                    this.roomData.structures = {
-                        container: [],
-                        road: []
-                    }
-                }
-
-                let allStructures = this.room.find(FIND_STRUCTURES);
-                for (let i = 0, length = allStructures.length; i < length; i++) {
-                    let structure = allStructures[i];
-                    if (!this.roomData.structures[structure.structureType]) {
-                        this.roomData.structures[structure.structureType] = [];
-                    }
-
-                    if ((this.roomData.structures[structure.structureType] as string[]).length !== undefined) {
-                        this.roomData.structures[structure.structureType]!.push(structure.id);
-                    }
-
-                    if (structure.hits + 1000 <= structure.hitsMax) {
-                        this.memory.needsRepair.push(structure.id);
-                    }
-                }
-
                 let curEnergyLevel = 0;
                 this.roomData.targets.CR_Work.energy = {};
                 for (let i = 0; i < this.roomData.structures.container.length; i++) {
@@ -64,7 +30,7 @@ class RoomStateWorkerTargetActivity extends RoomMonitorBase<RoomStateWorkTarget_
                     let container = Game.getObjectById(containerID) as StructureContainer;
                     if (!container) { continue; }
                     curEnergyLevel += container.energy || 0;
-                    let sources = container.pos.findInRange(FIND_SOURCES, 1);
+
                     if (!this.roomData.targets.CR_SpawnFill.energy[containerID]) {
                         this.roomData.targets.CR_SpawnFill.energy[containerID] = {
                             a: AT_Withdraw,
@@ -72,6 +38,15 @@ class RoomStateWorkerTargetActivity extends RoomMonitorBase<RoomStateWorkTarget_
                             t: TT_StorageContainer
                         }
                     }
+                    if (!this.roomData.targets.CR_Work.energy[containerID]) {
+                        this.roomData.targets.CR_Work.energy[containerID] = {
+                            a: AT_Withdraw,
+                            p: Priority_Lowest,
+                            t: TT_StorageContainer
+                        }
+                    }
+
+                    let sources = container.pos.findInRange(FIND_SOURCES, 1);
                     if (sources && sources.length > 0) {
                         this.roomData.targets.CR_SpawnFill.energy[containerID].p = Priority_Low
                     } else {
@@ -82,13 +57,7 @@ class RoomStateWorkerTargetActivity extends RoomMonitorBase<RoomStateWorkTarget_
                                 t: TT_StorageContainer
                             }
                         }
-                        if (!this.roomData.targets.CR_Work.energy[containerID]) {
-                            this.roomData.targets.CR_Work.energy[containerID] = {
-                                a: AT_Withdraw,
-                                p: Priority_High,
-                                t: TT_StorageContainer
-                            }
-                        }
+                        this.roomData.targets.CR_Work.energy[containerID].p = Priority_High;
                     }
                 }
 
@@ -158,6 +127,8 @@ class RoomStateWorkerTargetActivity extends RoomMonitorBase<RoomStateWorkTarget_
                         }
                     }
                 }
+
+                this.memory.luRE = Game.time;
             }
         }
 
@@ -190,10 +161,9 @@ class RoomStateWorkerTargetActivity extends RoomMonitorBase<RoomStateWorkTarget_
             }
         }
 
-        let nextTarget;
         if (this.roomData.targets.Other.t != TT_AnyStructure) {
             while (this.memory.needsRepair.length > 0) {
-                nextTarget = Game.getObjectById<Structure>(this.memory.needsRepair.splice(0, 1)![0]);
+                let nextTarget = Game.getObjectById<Structure>(this.memory.needsRepair.splice(0, 1)![0]);
                 if (nextTarget && nextTarget != curTarget) {
                     this.roomData.targets.Other = {
                         t: TT_AnyStructure,
@@ -206,13 +176,23 @@ class RoomStateWorkerTargetActivity extends RoomMonitorBase<RoomStateWorkTarget_
             }
         }
 
+        let nextTarget;
         if (!nextTarget && this.roomData.targets.Other.t != TT_ConstructionSite && this.memory.cSites.length > 0) {
             let siteToBuild: ConstructionSite | undefined = undefined;
             // (TODO): Prioritize here.
             for (let i = 0; i < this.memory.cSites.length; i++) {
                 let site = Game.getObjectById<ConstructionSite>(this.memory.cSites[i]);
                 if (site && site != curTarget) {
+                    if (site.structureType == STRUCTURE_EXTENSION || site.structureType == STRUCTURE_SPAWN) {
+                        siteToBuild = site;
+                        break;
+                    }
+
                     if (!siteToBuild) {
+                        siteToBuild = site;
+                        continue;
+                    }
+                    if (siteToBuild.structureType != STRUCTURE_CONTAINER && site.structureType == STRUCTURE_CONTAINER) {
                         siteToBuild = site;
                     }
                 }
