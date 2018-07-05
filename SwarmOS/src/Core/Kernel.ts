@@ -1,3 +1,5 @@
+import { FileSystem } from "Core/FileSystem";
+
 declare var Memory: {
     kernel: KernelMemory
 }
@@ -14,7 +16,8 @@ const TS_Waiting = 2;
 const TS_Done = 3;
 
 const SEPERATOR = '/';
-const SWARM_MANAGER_FOLDER_PATH = SEPERATOR + 'SwarmManager'
+const SWARM_MANAGER_FOLDER_NAME = 'SwarmManager'
+const SWARM_MANAGER_FOLDER_PATH = SEPERATOR + SWARM_MANAGER_FOLDER_NAME;
 
 declare type TS_Active = 1;
 declare type TS_Waiting = 2;
@@ -28,25 +31,14 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
     }
     private _processCache: IDictionary<PID, IProcess>;
     private _curTickState!: IDictionary<PID, TickState>;
+    private _procTableFile!: IFile<ProcessTable>;
+    private _errorFile!: IFile<string[]>;
 
     get log() {
         return this._logger;
     }
-    get memory(): KernelMemory {
-        if (!Memory.kernel) {
-            Memory.kernel = {
-                processTable: {},
-                processMemory: {},
-                ErrorLog: []
-            };
-        }
-        return Memory.kernel;
-    }
     get processTable(): ProcessTable {
-        return this.memory.processTable;
-    }
-    get processMemory(): IDictionary<PID, string> {
-        return this.memory.processMemory;
+        return this._procTableFile.contents;
     }
 
     installPackage(pack: IPackage<{}>) {
@@ -58,30 +50,41 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
         }
     }
 
+    protected LoadFileSystem() {
+        global['MasterFS'] = new FileSystem();
+        MasterFS.EnsurePath('/kernel');
+        let folder = MasterFS.GetFolder('/kernel')!;
+        this._procTableFile = folder.GetFile<ProcessTable>('procTable')!;
+        if (!this._procTableFile) {
+            folder.SaveFile('procTable', {});
+            this._procTableFile = folder.GetFile<ProcessTable>('procTable')!;
+        }
+        this._errorFile = folder.GetFile<string[]>('errors')!;
+        if (!this._errorFile) {
+            folder.SaveFile('errors', {});
+            this._errorFile = folder.GetFile<string[]>('errors')!;
+        }
+    }
+
     startProcess(packageName: ScreepsPackage, memPath: string, startMem: MemBase, opts?: {
         parentPID?: PID,
         desiredPID?: PID
     }): PID {
-        let newPID: PID | undefined = opts && opts.desiredPID;
-        if (!newPID) {
-            newPID = 'p' + GetSUID();
-        }
+        let newPID: PID = (opts && opts.desiredPID) || 'p' + GetSUID();
         while (this.processTable[newPID] && !this.processTable[newPID].end) {
             newPID += '_' + GetSUID();
         }
-        let pInfo: ProcInfo = {
-            pid: newPID,
-            PKG: packageName,
-        };
-        this.processTable[newPID] = pInfo;
-
         let folder = MasterFS.GetFolder(memPath);
         if (!folder) {
             throw new Error(`Could not create memory for new process.  Kernel.startProcess(${packageName}, ${memPath}, ${JSON.stringify(startMem)}, ${JSON.stringify(opts)})`)
         }
         folder.SaveFile(newPID, startMem);
         let file = folder.GetFile(newPID)!;
-        this.processMemory[newPID] = file.filePath;
+        let pInfo: ProcInfo = {
+            PKG: packageName,
+            path: file.folderPath
+        };
+        this.processTable[newPID] = pInfo;
         this.setParent(newPID, opts && opts.parentPID);
 
         this.PrepTick(newPID);
@@ -97,29 +100,16 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
 
         let kernelContext = this;
         let loggerContext = kernelContext.log.CreateLogContext(pInfo.PKG, DEFAULT_LOG_LEVEL);
-
-        let { path, name } = MasterFS.SplitPath(kernelContext.processMemory[pInfo.pid]);
-        let folder = MasterFS.GetFolder(path);
-        if (!folder) {
-            throw new Error(`Process(${id}) is missing its memory(${kernelContext.processMemory[pInfo.pid]}).`);
-        }
-        let processMem = folder.GetFile(name);
-        if (!processMem) {
-            throw new Error(`Process(${id}) is missing its memory(${kernelContext.processMemory[pInfo.pid]}).`);
-        }
         let context: IProcessContext = {
-            pid: pInfo.pid,
+            pid: id,
             pkgName: pInfo.PKG,
             rngSeed: GetRandomIndex(primes_3000),
-            memPath: kernelContext.processMemory[pInfo.pid],
+            memPath: pInfo.path,
             get isActive() {
                 return kernelContext.processTable[this.pid] && !kernelContext.processTable[this.pid].end;
             },
             get pPID() {
                 return kernelContext.processTable[this.pid] && kernelContext.processTable[this.pid].pP || "";
-            },
-            get memory() {
-                return processMem!.contents;
             },
             get log() {
                 return loggerContext;
@@ -129,7 +119,7 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
         Object.freeze(context);
         let process = this.processRegistry.createNewProcess(pInfo.PKG, context);
         if (!process) {
-            throw new Error(`Could not create process ${pInfo.pid} ${pInfo.PKG}`);
+            throw new Error(`Could not create process ${id} ${pInfo.PKG}`);
         }
         this._processCache[id] = process;
         if (process.PrepTick) {
@@ -138,7 +128,7 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
         return process;
     }
 
-    killProcess(id: PID, msg: string = ''): void {
+    killProcess(id: PID, msg: string): void {
         let pInfo = this.processTable[id];
         if (!pInfo) return;
         if (msg) {
@@ -148,10 +138,8 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
         let ids = Object.keys(this.processTable);
         for (let i = 0; i < ids.length; i++) {
             let otherPI = this.processTable[ids[i]]
-            if (otherPI.pP === pInfo.pid) {
-                if (!otherPI.end) {
-                    this.killProcess(ids[i], msg);
-                }
+            if (otherPI && !otherPI.end && otherPI.pP === ids[i]) {
+                this.killProcess(ids[i], msg);
             }
         }
     }
@@ -179,6 +167,7 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
     }
 
     loop() {
+        this.LoadFileSystem();
         this._curTickState = {};
         let processIDs = Object.keys(this.processTable);
         for (let i = 0; i < processIDs.length; i++) {
@@ -186,7 +175,7 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
             if (pInfo.end) continue;
             if (pInfo.sl) {
                 if (pInfo.sl! <= Game.time) {
-                    this.wake(pInfo.pid);
+                    this.wake(processIDs[i]);
                 }
             }
             if (!pInfo.sl) {
@@ -196,9 +185,9 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
 
         let activeThreadIDs = Object.keys(this._curTickState);
         if (activeThreadIDs.length == 0) {
-            let SwarmManagerMemory: PackageProviderMemory = {
-                services: {}
+            let SwarmManagerMemory: MemBase = {
             }
+            MasterFS.CreateFolder('', SWARM_MANAGER_FOLDER_NAME);
             this.startProcess(PKG_SwarmManager, SWARM_MANAGER_FOLDER_PATH, SwarmManagerMemory, {
                 desiredPID: 'Boot'
             });
@@ -305,10 +294,9 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
 
         if (pInfo.end && pInfo.end + 100 <= Game.time) {
             if (pInfo.err) {
-                this.memory.ErrorLog.push(`[${pid}] - ${pInfo.err}`);
+                this._errorFile.contents[pid + '_' + pInfo.end] = pInfo.err;
             }
             delete this.processTable[pid];
-            delete this.processMemory[pid];
             delete this._processCache[pid];
             return;
         }

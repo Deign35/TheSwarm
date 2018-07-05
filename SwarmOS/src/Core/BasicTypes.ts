@@ -1,6 +1,5 @@
 export abstract class BasicProcess<T extends MemBase> implements IProcess {
     constructor(protected context: IProcessContext) { }
-
     @extensionInterface(EXT_Registry)
     protected extensions!: IExtensionRegistry;
     @extensionInterface(EXT_Kernel)
@@ -10,7 +9,8 @@ export abstract class BasicProcess<T extends MemBase> implements IProcess {
     @extensionInterface(EXT_Sleep)
     protected sleeper!: IKernelSleepExtension;
 
-    get memory(): T { return this.context.memory as T; }
+    private _procFile!: IFile<T>;
+    get memory(): T { return this._procFile.contents; }
     get pkgName(): string { return this.context.pkgName; }
     get pid(): PID { return this.context.pid; }
     get parentPID(): PID { return this.context.pPID; }
@@ -21,25 +21,31 @@ export abstract class BasicProcess<T extends MemBase> implements IProcess {
     get log() { return this.context.log; }
     get rngSeed(): number { return this.context.rngSeed; }
 
-    PrepTick?(): void;
+    PrepTick(): void {
+        this._procFile = MasterFS.GetFile<T>(this.context.memPath, this.pid)!;
+        if (!this._procFile) {
+            throw new Error(`BasicProcess.PrepTick(Process file missing: ${this.context.memPath}/::/${this.pid})`)
+        }
+    }
     abstract RunThread(): ThreadState;
     EndTick?(): void;
 
-    protected EndProcess(cbVal?: string) {
-        let proc = this.GetParentProcess();
-        if (proc) {
-            if (this.memory.HC && proc[this.memory.HC]) {
-                this.sleeper.wake(this.parentPID);
-                cbVal = cbVal || this.memory.CV;
-                if (cbVal) {
-                    proc[this.memory.HC](cbVal, this.pid); // Notify the parent using the given callback function.
-                }
-            }
+    private _hasEnded = false;
+    OnChildProcessEnd?(proc: BasicProcess<any>, endReason: string): void;
+    EndProcess(endReason: string) {
+        if (this._hasEnded) {
+            return;
         }
-        this.kernel.killProcess(this.pid);
+        this._hasEnded = true;
+        let proc = this.GetParentProcess();
+        if (proc && proc.OnChildProcessEnd) {
+            proc.OnChildProcessEnd(this, endReason);
+        }
+        MasterFS.DeleteFile(this.context.memPath, this.pid);
+        this.kernel.killProcess(this.pid, endReason);
     }
 }
-
+/*
 const SCAN_FREQUENCY = 15;
 export abstract class PackageProviderBase<T extends PackageProviderMemory> extends BasicProcess<T> {
     protected abstract RequiredServices: SDictionary<ProviderService>;
@@ -75,7 +81,7 @@ export abstract class PackageProviderBase<T extends PackageProviderMemory> exten
         this.sleeper.sleep(this.pid, SCAN_FREQUENCY);
         return ThreadState_Done;
     }
-}
+}*/
 
 export abstract class ExtensionBase implements IPackageExtension {
     constructor(protected extensionRegistry: IExtensionRegistry) {

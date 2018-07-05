@@ -53,6 +53,8 @@ import { RegistriesPackage } from "Registries/index";
 import { RoomJobs } from "RoomJobs/index";
 
 kernel.installPackages([ActivitiesPackage, CreepJobsPackage, FlagPackage, RegistriesPackage, RoomJobs]);*/
+import { RegistriesPackage } from "Registries/index";
+kernel.installPackage(RegistriesPackage);
 
 export function loop() {
     try {

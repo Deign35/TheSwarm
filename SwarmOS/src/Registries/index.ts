@@ -1,14 +1,17 @@
 import { OSPackage as MapDirectory } from "Registries/MapDirectory";
-
-import { PackageProviderBase } from "Core/BasicTypes";
-class SwarmManager extends PackageProviderBase<PackageProviderMemory> {
-    protected get RequiredServices(): SDictionary<ProviderService> {
-        return this._reqServices;
+import { BasicProcess } from "Core/BasicTypes";
+class SwarmManager extends BasicProcess<any> {
+    RunThread(): ThreadState {
+        if (!this.memory.count) {
+            this.memory.count = 0;
+        }
+        this.memory.count++;
+        this.log.info(`Ping(${this.memory.count})`);
+        return ThreadState_Done;
     }
-    private _reqServices: SDictionary<ProviderService> = {}
 }
 
-export const RegistriesPackage: IPackage<{}> = {
+export const RegistriesPackage: IPackage<MemBase> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
         MapDirectory.install(processRegistry, extensionRegistry);
         processRegistry.register(PKG_SwarmManager, SwarmManager);

@@ -1,15 +1,10 @@
-import { ExtensionBase } from "./BasicTypes";
-
 declare var Memory: {
-    FileSystem: IDictionary<string, MemBase>;
+    FileSystem: IDictionary<string, IDictionary<string, MemBase>>;
 }
 const SEPERATOR = '/';
 
 class File<T> implements IFile<T> {
-    constructor(private _pathStr: string, private _contents: T) {
-        let { path, name } = MasterFS.SplitPath(_pathStr);
-        this._folderPath = path;
-        this._fileName = name;
+    constructor(private _folderPath: string, private _fileName: string, private _contents: T) {
         this._lastUpdated = Game.time;
     }
     set contents(overWrite: T) {
@@ -19,14 +14,9 @@ class File<T> implements IFile<T> {
     get contents(): T {
         return this._contents;
     }
-    get filePath(): string {
-        return this._pathStr;
-    }
-    private _folderPath: string;
     get folderPath(): string {
         return this._folderPath;
     }
-    private _fileName: string;
     get fileName(): string {
         return this._fileName;
     }
@@ -56,10 +46,11 @@ class Folder implements IFolder {
     }
 
     SaveFile<T>(fileName: string, mem: T) {
-        let fullPath = this.Path + SEPERATOR + fileName;
-        this._fileSystemMemory[fullPath] = mem;
+        debugger;
+        //let fullPath = this.Path + SEPERATOR + fileName;
+        this._fileSystemMemory[this.Path][fileName] = mem;
         if (!this.GetFile(fileName)) {
-            this._files[fileName] = new File(fullPath, mem);
+            this._files[fileName] = new File(this.Path, fileName, mem);
         }
         this._files[fileName].contents = mem;
     }
@@ -69,8 +60,8 @@ class Folder implements IFolder {
     DeleteFile(fileName: string) {
         let file = this.GetFile(fileName);
         if (file) {
-            if (this._fileSystemMemory[file.filePath]) {
-                delete this._fileSystemMemory[file.filePath];
+            if (this._fileSystemMemory[file.folderPath]) {
+                delete this._fileSystemMemory[file.folderPath][fileName];
             }
             delete this._files[file.fileName];
         }
@@ -80,7 +71,9 @@ class Folder implements IFolder {
     }
     CreateFolder(folderName: string) {
         if (!this._folders[folderName]) {
-            this._folders[folderName] = new Folder(this.Path + SEPERATOR + folderName);
+            let path = this.Path + SEPERATOR + folderName;
+            this._folders[folderName] = new Folder(path);
+            this._fileSystemMemory[path] = {};
         }
     }
     DeleteFolder() {
@@ -94,7 +87,7 @@ class Folder implements IFolder {
         }
     }
 }
-export class FileSystem extends ExtensionBase implements IFileSystem {
+export class FileSystem implements IFileSystem {
     private _memoryCache!: IFolder;
     private _folderCache!: IDictionary<string, IFolder>;
     protected get memory() {
@@ -112,10 +105,14 @@ export class FileSystem extends ExtensionBase implements IFileSystem {
                 if (!memPath || !this.memory[memPath]) {
                     continue;
                 }
-                let file = this.memory[memPath];
-                let { path, name } = this.SplitPath(memPath);
-                this.EnsurePath(path);
-                this.GetFolder(path)!.SaveFile(name, file);
+                let folderData = this.memory[memPath];
+                let folderKeys = Object.keys(folderData);
+                this.EnsurePath(memPath);
+                let folder = this.GetFolder(memPath)!;
+                for (let i = 0; i < folderKeys.length; i++) {
+                    let fileName = folderKeys[i];
+                    folder.SaveFile(fileName, folderData[fileName]);
+                }
             }
         }
         return this._memoryCache;
@@ -129,7 +126,7 @@ export class FileSystem extends ExtensionBase implements IFileSystem {
     SplitPath(pathStr: string): { path: string, name: string } {
         let lastIndex = pathStr.lastIndexOf(SEPERATOR);
         return {
-            path: pathStr.slice(0, lastIndex - 1),
+            path: pathStr.slice(0, lastIndex),
             name: pathStr.slice(lastIndex + 1)
         }
     }

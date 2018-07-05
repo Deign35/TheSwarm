@@ -1,14 +1,9 @@
 import { Logger } from "Core/Logger";
 var OS_Logger = new Logger();
 
-
 import { ExtensionRegistry } from "Registries/ExtensionRegistry";
 export var extensionRegistry = new ExtensionRegistry(OS_Logger);
 extensionRegistry.register(EXT_Logger, OS_Logger);
-
-import { FileSystem } from "Core/FileSystem";
-global['MasterFS'] = new FileSystem(extensionRegistry);
-extensionRegistry.register(EXT_FileSystem, MasterFS);
 
 import { ProcessRegistry } from "Registries/ProcessRegistry";
 export var processRegistry = new ProcessRegistry(OS_Logger);

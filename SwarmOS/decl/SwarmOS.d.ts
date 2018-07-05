@@ -22,6 +22,9 @@ declare interface IProcess {
     PrepTick?(): void;
     EndTick?(): void;
     RunThread(): ThreadState;
+
+    EndProcess(reason: string): void;
+    OnChildProcessEnd?(proc: IProcess, reason: string): void
 }
 
 declare interface _ProcessConstructor {
@@ -30,7 +33,6 @@ declare interface _ProcessConstructor {
 
 declare interface IProcessContext {
     readonly log: ILogger;
-    readonly memory: MemBase;
     readonly pkgName: string;
     readonly pid: PID;
     readonly pPID: PID;
@@ -41,7 +43,7 @@ declare interface IProcessContext {
 
 declare interface ProcInfo {
     PKG: string;// Package name to load
-    pid: PID;   // process id
+    path: string;// mem path
     pP?: PID;   // parent pid
     end?: number; // Ended -- When the process ended
     err?: string; // Error
@@ -96,7 +98,6 @@ declare interface IFolder {
 }
 declare interface IFile<T> {
     contents: T;
-    readonly filePath: string;
     readonly folderPath: string;
     readonly fileName: string;
 }
