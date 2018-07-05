@@ -17,49 +17,7 @@
             "type": true,
             "combinedType": "OSPackage",
             "entries": [
-                "FlagManager",
-                "CreepRegistry",
-                "SwarmManager",
-                "SpawnRegistry",
-                "RoomManager",
-                "FlagBase",
-                "SwarmCLI",
-                "EmptyProcess",
-                "RoomProvider"
-            ]
-        },
-        "CR": {
-            "comment": "Creep roles",
-            "enabled": true,
-            "string": true,
-            "isArray": true,
-            "usePrefix": true,
-            "type": true,
-            "combinedType": "CreepRoles",
-            "entries": [
-                "BootFill",
-                "Harvester",
-                "Scout",
-                "SpawnFill",
-                "Work",
-                "RemoteHarvest"
-            ]
-        },
-        "RJ": {
-            "enabled": true,
-            "string": true,
-            "isArray": true,
-            "usePrefix": true,
-            "type": true,
-            "combinedType": "RoomJobs",
-            "entries": [
-                "Tower",
-                "Misc",
-                "WorkTarget",
-                "Structures",
-                "Harvest",
-                "Mapper",
-                "RoadGenerator"
+                "SwarmManager"
             ]
         },
         "EXT": {
@@ -69,15 +27,9 @@
             "type": true,
             "combinedType": "OSExtension",
             "entries": {
-                "CreepRegistry": "creeps",
-                "CreepActivity": "c_activity",
                 "Registry": "extRegistry",
-                "SpawnRegistry": "spawner",
-                "RoomView": "roomView",
-                "Flags": "flags",
                 "Kernel": "kernel",
                 "Sleep": "sleep",
-                "Interrupt": "interrupt",
                 "Logger": "logger",
                 "MapDirectory": "mapper",
                 "FileSystem": "file"
@@ -145,21 +97,6 @@
             "entries": {
                 "LOG_LEVEL": "2",
                 "LOG_ID": "\"SwarmOS\""
-            }
-        },
-        "Priority": {
-            "comment": "Priority values",
-            "enabled": true,
-            "combinedType": "Priority",
-            "type": true,
-            "entries": {
-                "Hold": -1,
-                "Lowest": 1,
-                "Low": 3,
-                "Medium": 5,
-                "High": 7,
-                "Highest": 9,
-                "EMERGENCY": 10
             }
         },
         "ThreadState": {
@@ -255,7 +192,6 @@
             "string": true,
             "type": true,
             "combinedType": "EZMapLayer",
-            "usePrefix": true,
             "isArray": true,
             "entries": [
                 "Impassable",

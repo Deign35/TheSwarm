@@ -1,7 +1,7 @@
 // CLI(CLI_Launch, PKG_EmptyProcess, {})
 export const OSPackage: IPackage<SpawnRegistry_Memory> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
-        processRegistry.register(PKG_EmptyProcess, EmptyProcess);
+        //processRegistry.register(PKG_EmptyProcess, EmptyProcess);
     }
 }
 
@@ -9,9 +9,6 @@ import { BasicProcess } from "Core/BasicTypes";
 
 const ENABLE_PROFILING = true;
 class EmptyProcess extends BasicProcess<MemBase> {
-    @extensionInterface(EXT_CreepRegistry)
-    protected creepRegistry!: ICreepRegistryExtensions;
-
     RunThread(): ThreadState {
         let start = Game.cpu.getUsed();
         try {

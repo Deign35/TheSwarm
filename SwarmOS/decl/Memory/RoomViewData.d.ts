@@ -14,7 +14,7 @@ interface RoomState extends MemBase {
     mineralIDs: ObjectID[];
     minUpdateOffset: number;
     structures: RoomState_StructureData;
-    groups: RoomState_AttachedCreepGroups;
+    //groups: RoomState_AttachedCreepGroups;
     targets: {
         CR_SpawnFill: AttachedCreepGroup_Memory
         CR_Work: AttachedCreepGroup_Memory
@@ -61,14 +61,14 @@ interface RoomState_StructureData {
 declare interface WorkerTarget_Memory extends MemBase {
     a: ActionType;  // (a)ctionType
     t: TargetType;  // (o)bject type
-    p: Priority;    // (p)riority
+    p: number;    // (p)riority
 }
 declare type WorkerTargetDictionary = IDictionary<ObjectID, WorkerTarget_Memory>;
 declare interface AttachedCreepGroup_Memory {
     energy: WorkerTargetDictionary;
     targets: WorkerTargetDictionary;
 }
-
+/*
 declare interface RoomState_AttachedCreepGroups {
     [CR_Harvester]?: IDictionary<ObjectID, PID>;
     [CR_Scout]?: PID;
@@ -83,4 +83,4 @@ declare interface RoomState_AttachedCreepGroups {
     [RJ_Harvest]?: PID;
     [RJ_Mapper]: PID;
     [RJ_RoadGenerator]?: PID;
-}
+}*/

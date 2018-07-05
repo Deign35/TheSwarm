@@ -22,7 +22,7 @@ declare interface SpawnRequest extends MemBase {
     con: SpawnContext;  // Context
     id: SpawnRequestID; // requestID
     loc: RoomID;        // Where the spawn request originates
-    pri: Priority;      // How much of a priority is this spawn??
+    pri: number;      // How much of a priority is this spawn??
     spSta: SpawnState;    // Current Spawn state
 
     dm?: ScreepsObject_CreepMemory;           // Default memory

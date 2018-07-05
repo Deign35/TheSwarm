@@ -14,15 +14,9 @@ declare interface IPackageInterfaces {
     [EXT_Registry]: IExtensionRegistry;
 
     [EXT_FileSystem]: IFileSystem;
-
-    [EXT_SpawnRegistry]: ISpawnRegistryExtensions;
-    [EXT_Flags]: undefined;
-    [EXT_Interrupt]: IKernelNotificationsExtension;
     [EXT_Kernel]: IKernelExtensions;
-    [EXT_RoomView]: IRoomDataExtension;
     [EXT_Sleep]: IKernelSleepExtension;
     [EXT_Logger]: IKernelLoggerExtensions;
-    [EXT_CreepRegistry]: ICreepRegistryExtensions;
 }
 
 /**
@@ -46,7 +40,7 @@ declare interface IExtensionRegistry extends IPackageExtension {
  */
 declare interface IKernelExtensions extends IPackageExtension {
     installPackages(packages: IPackage<MemBase>[]): void;
-    startProcess(packageName: string, savePath: string, parentPID?: PID): PID;
+    startProcess(packageName: string, savePath: string, startMem: MemBase,  parentPID?: PID): PID;
     killProcess(pid?: PID, msg?: string): void;
     getProcessByPID(pid: PID): IProcess | undefined;
     setParent(pid: PID, parentId?: PID): boolean;
@@ -103,7 +97,7 @@ declare interface IRoomDataExtension extends IPackageExtension {
 declare interface ISpawnRegistryExtensions extends IPackageExtension {
     cancelRequest(id?: SpawnRequestID): boolean;
     getRequestStatus(id?: SpawnRequestID): SpawnState;
-    requestSpawn(context: SpawnContext, location: RoomID, spawnPriority: Priority,
+    requestSpawn(context: SpawnContext, location: RoomID, spawnPriority: number,
         maxSpawnDistance?: number, startMem?: ScreepsObject_CreepMemory): SpawnRequestID;
     getRequestContext(id?: SpawnRequestID): SpawnContext | undefined;
 }
@@ -115,7 +109,7 @@ declare interface ICreepRegistryExtensions extends IPackageExtension {
     tryFindCompatibleCreep(creepType: CT_ALL, level: number, targetRoom: RoomID, maxDistance?: number): string | undefined
     tryRegisterCreep(creepID: CreepID): boolean;
     tryGetCreep(id?: CreepID, requestingPID?: PID): Creep | undefined;
-    tryReserveCreep(id?: CreepID, requestingPID?: PID, priority?: Priority): boolean;
+    tryReserveCreep(id?: CreepID, requestingPID?: PID, priority?: number): boolean;
     releaseCreep(id?: CreepID, requestingPID?: PID): void;
 }
 

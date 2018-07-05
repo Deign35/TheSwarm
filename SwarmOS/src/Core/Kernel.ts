@@ -58,15 +58,22 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
         }
     }
 
-    startProcess(packageName: ScreepsPackage, memPath: string, parentPID?: PID): PID {
+    startProcess(packageName: ScreepsPackage, memPath: string, startMem: MemBase, parentPID?: PID): PID {
         let pid = 'p' + GetSUID() as PID;
         let pInfo: ProcInfo = {
             pid: pid,
             PKG: packageName
         };
-
         this.processTable[pid] = pInfo;
-        this.processMemory[pid] = memPath;
+
+        let { path, name } = MasterFS.SplitPath(memPath);
+        let folder = MasterFS.GetFolder(path);
+        if (!folder) {
+            throw new Error(`Could not create memory for new process.  Kernel.startProcess(${packageName}, ${memPath}, ${JSON.stringify(startMem)}, ${parentPID})`)
+        }
+        folder.SaveFile(pid, startMem);
+        let file = folder.GetFile(pid)!;
+        this.processMemory[pid] = file.filePath;
         this.setParent(pid, parentPID);
 
         this.PrepTick(pid);
@@ -184,13 +191,7 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
             let SwarmManagerMemory: PackageProviderMemory = {
                 services: {}
             }
-            let swarmManagerFolder = MasterFS.GetFolder(SWARM_MANAGER_FOLDER_PATH);
-            if (!swarmManagerFolder) {
-                MasterFS.EnsurePath(SWARM_MANAGER_FOLDER_PATH);
-                swarmManagerFolder = MasterFS.GetFolder(SWARM_MANAGER_FOLDER_PATH)!;
-                swarmManagerFolder.SaveFile('Boot', SwarmManagerMemory); // (TODO): Change to use GetFile, and have the file save its fileAttributes
-            }
-            this.startProcess(PKG_SwarmManager, SWARM_MANAGER_FOLDER_PATH + SEPERATOR + 'Boot');
+            this.startProcess(PKG_SwarmManager, SWARM_MANAGER_FOLDER_PATH + SEPERATOR + 'Boot', SwarmManagerMemory);
             // Initialization doesn't work on the first tick for some reason.  So skip the first tick.
             return;
         }

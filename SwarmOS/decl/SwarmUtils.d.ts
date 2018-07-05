@@ -20,7 +20,7 @@ declare type GroupID = string;
 declare type TempAgencyID = string;
 declare type SpawnRequestID = string;
 
-declare type ScreepsPackage = OSPackage | SlimOSPackage | CreepRoles
+declare type ScreepsPackage = OSPackage | SlimOSPackage
 
 declare type ObjectTypeWithID = Structure | Creep | Source | ConstructionSite | Mineral | Nuke | Resource | Tombstone;
 declare type EnergyStructureType = StructureExtension | StructureSpawn | StructureContainer | StructureStorage | StructureLink | StructureTerminal;
@@ -119,4 +119,4 @@ declare function CLI(command: CLI_Assimilate, roomID: RoomID, roomType: RoomType
 
 declare function CLI(command: CLI_Launch, pkg: ScreepsPackage, startMem: MemBase): ScreepsReturnCode;
 declare function CLI(command: CLI_ChangeFlag, priA: ColorConstant, priB: ColorConstant, secA?: ColorConstant, secB?: ColorConstant): ScreepsReturnCode;
-declare function CLI(command: CLI_Spawn, roomID: RoomID, jobType: CreepRoles, num?: number, mem?: MemBase): ScreepsReturnCode;
+//declare function CLI(command: CLI_Spawn, roomID: RoomID, jobType: CreepRoles, num?: number, mem?: MemBase): ScreepsReturnCode;
