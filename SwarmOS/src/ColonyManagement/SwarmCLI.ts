@@ -114,7 +114,12 @@ class SwarmCLI extends BasicProcess<SwarmCLIMemory> {
 
         for (let i = 0; i < count; i++) {
             let jobMem = RoomActivityUtils.CreateRoomJob(pkg, roomID, this.roomView.GetRoomData(roomID)!, CopyObject(memory));
-            this.kernel.startProcess(pkg, jobMem);
+            let folderPath = `/rooms/${roomID}/creeps/${pkg}`;
+            MasterFS.EnsurePath(folderPath)
+            let folder = MasterFS.GetFolder(folderPath)!;
+            let fileName = 'CLI_' + GetSUID();
+            folder.SaveFile(fileName, jobMem);
+            this.kernel.startProcess(pkg, folder.GetFile(fileName)!.filePath);
         }
     }
 
@@ -147,7 +152,11 @@ class SwarmCLI extends BasicProcess<SwarmCLIMemory> {
                     home: roomID,
                     rID: roomID,
                 }
-                this.kernel.startProcess(CR_BootFill, bootMem);
+                let folderPath = `/rooms/${roomID}/creeps/${CR_BootFill}`;
+                MasterFS.EnsurePath(folderPath)
+                let folder = MasterFS.GetFolder(folderPath)!;
+                folder.SaveFile('boot', bootMem);
+                this.kernel.startProcess(CR_BootFill, folder.GetFile('boot')!.filePath);
                 // Add home room
                 roomData.RoomType = {
                     type: RT_Home,
