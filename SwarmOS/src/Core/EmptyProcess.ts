@@ -22,7 +22,7 @@ class EmptyProcess extends ProcessBase<MemBase> {
         let start = Game.cpu.getUsed();
         try {
             this.count++;
-            this.log.info(`${this.pid} -- Message(${this.count})`);
+            this.log.info(`[${Game.time}] -- ${this.pid} -- Message(${this.count})`);
             if (this.count > 25) {
                 this.EndProcess('Count has completed');
             }

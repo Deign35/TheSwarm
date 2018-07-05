@@ -12,8 +12,6 @@ declare interface IPackageExtension { }
 declare interface IPackageInterfaces {
     [index: string]: IPackageExtension | undefined;
     [EXT_Registry]: IExtensionRegistry;
-
-    [EXT_FileSystem]: IFileSystem;
     [EXT_Kernel]: IKernelExtensions;
     [EXT_Logger]: IKernelLoggerExtensions;
 }

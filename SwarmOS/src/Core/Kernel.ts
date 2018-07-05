@@ -39,7 +39,6 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
     }
 
     protected LoadFileSystem() {
-        debugger;
         global['MasterFS'] = new FileSystem();
         MasterFS.EnsurePath(KERNEL_FOLDER_PATH);
         let folder = MasterFS.GetFolder(KERNEL_FOLDER_PATH)!;

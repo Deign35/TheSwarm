@@ -7,15 +7,14 @@ export abstract class ProcessBase<T extends MemBase> implements IProcess {
 
     private _procFile!: IFile<T>;
     get memory(): T { return this._procFile.contents; }
+    get log() { return this.context.log; }  // (TODO): Make registration include log values for the context?
+    get rngSeed(): number { return this.context.rngSeed; }
     get pkgName(): string { return this.context.pkgName; }
     get pid(): PID { return this.context.pid; }
     get parentPID(): PID { return this.context.pPID; }
     GetParentProcess<K extends IProcess>(): K | undefined {
         return this.parentPID ? this.kernel.getProcessByPID(this.parentPID) as K : undefined;
     }
-
-    get log() { return this.context.log; }
-    get rngSeed(): number { return this.context.rngSeed; }
 
     PrepTick(): void {
         this._procFile = MasterFS.GetFile<T>(this.context.memPath, this.pid)!;
