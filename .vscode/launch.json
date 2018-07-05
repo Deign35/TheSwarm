@@ -4,14 +4,16 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [{
-        "type": "node",
-        "request": "launch",
-        "name": "TryMiscJSCode",
-        "program": "${workspaceFolder}\\SwarmOS\\test\\MiscTestFile.js",
-        "cwd": "${workspaceFolder}",
-        "outFiles": [
-            "${workspaceFolder}/**/*.js",
-            "${workspaceFolder}/**/*.ts"
-        ]
-    }]
+            "type": "node",
+            "request": "launch",
+            "name": "TryMiscJSCode",
+            "program": "${workspaceFolder}\\SwarmOS\\test\\MiscTestFile.js",
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "FileRegistryTests",
+            "program": "${workspaceFolder}\\SwarmOS\\test\\FileRegistryTests.js",
+        }
+    ]
 }
