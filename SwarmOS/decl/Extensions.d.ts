@@ -13,7 +13,7 @@ declare interface IPackageInterfaces {
     [index: string]: IPackageExtension | undefined;
     [EXT_Registry]: IExtensionRegistry;
 
-    [EXT_FileRegistry]: IFileRegistry;
+    [EXT_FileSystem]: IFileSystem;
 
     [EXT_SpawnRegistry]: ISpawnRegistryExtensions;
     [EXT_Flags]: undefined;
@@ -137,13 +137,21 @@ declare interface IMapDirectory extends IPackageExtension {
     GenerateRefillMap(room: Room): boolean;
     FindPathFrom(x: number, y: number, distMap: MapArray, pathableMap: MapArray, targetDist?: number): { x: number, y: number, dist: number, index: number }[] | ERR_NO_PATH;
 }
-
+declare interface IFolder {
+    SaveFile<T>(fileName: string, mem: IFile<T>): void;
+    GetFile<T>(fileName: string): IFile<T> | undefined;
+    DeleteFile(fileName: string): void;
+    GetFolder(folderName: string): IFolder;
+    CreateFolder(folderName: string): void;
+    DeleteFolder(): void;
+}
 declare interface IFile<T> { }
-declare interface IFileRegistry extends IPackageExtension {
+declare interface IFileSystem extends IPackageExtension {
+    GetFolder(pathStr: string): IFolder | undefined
     EnsurePath(path: string): void
-    CreateFolder(path: string, folderName: string): boolean;
+    CreateFolder(path: string, folderName: string): void;
     DeleteFolder(path: string, folderName: string): void;
-    SaveFile<T>(path: string, fileName: string, mem: IFile<T>): boolean;
+    SaveFile<T>(path: string, fileName: string, mem: IFile<T>): void;
     GetFile<T>(path: string, fileName: string): IFile<T> | undefined;
     DeleteFile(path: string, fileName: string): void;
     CopyFile(fromPath: string, fileName: string, toPath: string, deleteOriginal?: boolean, newFileName?: string): boolean

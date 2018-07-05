@@ -80,7 +80,7 @@
                 "Interrupt": "interrupt",
                 "Logger": "logger",
                 "MapDirectory": "mapper",
-                "FileRegistry": "file"
+                "FileSystem": "file"
             }
         },
         "TT": {

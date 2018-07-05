@@ -2,11 +2,59 @@
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-class ExtensionBase {
-    constructor() {}
-}
+exports.OSPackage = {
+    install(processRegistry, extensionRegistry) {
+        extensionRegistry.register(EXT_FileSystem, new FileSystem());
+    }
+};
 const SEPERATOR = '/';
-class FileRegistry extends ExtensionBase {
+class Folder {
+    constructor(Path) {
+        this.Path = Path;
+        if (!Memory.FileSystem) {
+            Memory.FileSystem = {};
+        }
+        this._fileSystemMemory = Memory.FileSystem;
+        this._folders = {};
+        this._files = {};
+    }
+    SaveFile(fileName, mem) {
+        let fullPath = this.Path + SEPERATOR + fileName;
+        this._fileSystemMemory[fullPath] = mem;
+        this._files[fileName] = mem;
+    }
+    GetFile(fileName) {
+        return this._files[fileName];
+    }
+    DeleteFile(fileName) {
+        let fullPath = this.Path + SEPERATOR + fileName;
+        if (this._fileSystemMemory[fullPath]) {
+            delete this._fileSystemMemory[fullPath];
+        }
+        if (this._files[fileName]) {
+            delete this._files[fileName];
+        }
+    }
+    GetFolder(folderName) {
+        return this._folders[folderName];
+    }
+    CreateFolder(folderName) {
+        if (!this._folders[folderName]) {
+            this._folders[folderName] = new Folder(this.Path + SEPERATOR + folderName);
+        }
+    }
+    DeleteFolder() {
+        let fileNames = Object.keys(this._files);
+        for (let i = 0; i < fileNames.length; i++) {
+            this.DeleteFile(fileNames[i]);
+        }
+        let folderNames = Object.keys(this._folders);
+        for (let i = 0; i < folderNames.length; i++) {
+            this._folders[folderNames[i]].DeleteFolder();
+        }
+    }
+}
+class FileSystem {
     get memory() {
         if (!Memory.FileSystem) {
             Memory.FileSystem = {};
@@ -15,11 +63,8 @@ class FileRegistry extends ExtensionBase {
     }
     get MemCache() {
         if (!this._memoryCache) {
-            this._memoryCache = {
-                c: {},
-                f: {},
-                p: '',
-            };
+            let context = this;
+            this._memoryCache = new Folder('');
             let keys = Object.keys(this.memory);
             while (keys.length > 0) {
                 let memPath = keys.shift();
@@ -35,99 +80,78 @@ class FileRegistry extends ExtensionBase {
         }
         return this._memoryCache;
     }
-    get PathCache() {
-        if (!this._pathCache) {
-            this._pathCache = {};
+    get FolderCache() {
+        if (!this._folderCache) {
+            this._folderCache = {};
         }
-        return this._pathCache;
+        return this._folderCache;
     }
     GetFolder(pathStr) {
-        let mem = this.MemCache;
-        let path = this.PathCache[pathStr];
-        if (!path) {
-            path = pathStr.split(SEPERATOR);
-            this.PathCache[pathStr] = path;
-        }
-        for (let i = 1, length = path.length; i < length; i++) {
-            if (mem.c && mem.c[path[i]]) {
-                mem = mem.c[path[i]];
-            } else {
-                return undefined;
+        if (!this.FolderCache[pathStr]) {
+            let curFolder = this.MemCache;
+            let path = pathStr.split(SEPERATOR);
+            for (let i = 1; i < path.length; i++) {
+                if (curFolder && curFolder.GetFolder) {
+                    curFolder = curFolder.GetFolder(path[i]);
+                } else {
+                    return undefined;
+                }
             }
+            this.FolderCache[pathStr] = curFolder;
         }
-        return mem;
+        return this.FolderCache[pathStr];
     }
     EnsurePath(pathStr) {
-        let path = this.PathCache[pathStr];
-        if (!path) {
-            //path = pathStr.split(/[\/\\]/gi);
-            path = pathStr.split(SEPERATOR);
-            this.PathCache[pathStr] = path;
-        }
-        let curPath = '';
-        for (let i = 1; i < path.length; i++) {
-            let nextFolder = path[i];
-            let nextPath = curPath + SEPERATOR + nextFolder;
-            if (!this.GetFolder(nextPath) && !this.CreateFolder(curPath, nextFolder)) {
-                throw new Error(`Failed to create path(${pathStr}).  Loop[${i}](curPath(${curPath}), nextFolder(${nextFolder})`);
+        if (!this.FolderCache[pathStr]) {
+            let path = pathStr.split(SEPERATOR);
+            let curFolder = this.MemCache;
+            for (let i = 1; i < path.length; i++) {
+                curFolder.CreateFolder(path[i]);
+                curFolder = curFolder.GetFolder(path[i]);
             }
-            curPath = nextPath;
+            this.FolderCache[pathStr] = curFolder;
         }
     }
     CreateFolder(path, folderName) {
-        let folder = this.GetFolder(path);
-        if (folder) {
-            if (!folder.c[folderName]) {
-                folder.c[folderName] = {
-                    c: {},
-                    f: {},
-                    p: path,
-                };
+        let fullPath = path + SEPERATOR + folderName;
+        if (!this._folderCache[fullPath]) {
+            let folder = this.GetFolder(path);
+            if (!folder) {
+                return;
             }
-            return true;
+            if (!folder.GetFolder(folderName)) {
+                folder.CreateFolder(folderName);
+            }
+            this._folderCache[fullPath] = folder.GetFolder(folderName);
         }
-        return false;
     }
     DeleteFolder(path, folderName) {
-        let folder = this.GetFolder(path);
-        if (folder && folder.c[folderName]) {
-            const fullPath = path + SEPERATOR + folderName;
-            let fileNames = Object.keys(folder.c[folderName].f);
-            for (let i = 0; i < fileNames.length; i++) {
-                this.DeleteFile(fullPath, fileNames[i]);
-            }
-            let childFolders = Object.keys(folder.c[folderName].c);
-            for (let i = 0; i < childFolders.length; i++) {
-                this.DeleteFolder(fullPath, childFolders[i]);
-            }
-            delete folder.c[folderName];
+        const fullPath = path + SEPERATOR + folderName;
+        if (this.FolderCache[fullPath]) {
+            delete this.FolderCache[fullPath];
+        }
+        let folder = this.GetFolder(fullPath);
+        if (folder) {
+            folder.DeleteFolder();
         }
     }
     SaveFile(path, fileName, mem) {
         let folder = this.GetFolder(path);
         if (folder) {
-            let filePath = path + SEPERATOR + fileName;
-            this.memory[filePath] = mem;
-            folder.f[fileName] = this.memory[filePath];
-            return true;
+            folder.SaveFile(fileName, mem);
         }
-        return false;
     }
     GetFile(path, fileName) {
         let folder = this.GetFolder(path);
         if (folder) {
-            return folder.f[fileName] && folder.f[fileName];
+            return folder.GetFile(fileName);
         }
         return undefined;
     }
     DeleteFile(path, fileName) {
         let folder = this.GetFolder(path);
-        if (folder && folder.f[fileName]) {
-            let fullPath = path + SEPERATOR + fileName;
-            if (this.memory[fullPath]) {
-                delete this.memory[fullPath];
-            }
-            delete folder.f[fileName];
+        if (folder) {
+            folder.DeleteFile(fileName);
         }
     }
     CopyFile(fromPath, fileName, toPath, deleteOriginal = true, newFileName) {
@@ -138,7 +162,9 @@ class FileRegistry extends ExtensionBase {
         if (deleteOriginal) {
             this.DeleteFile(fromPath, fileName);
         }
-        return this.SaveFile(toPath, newFileName || fileName, file);
+        this.SaveFile(toPath, newFileName || fileName, file);
+        return true;
     }
 }
-exports.FileRegistry = FileRegistry;
+exports.FileSystem = FileSystem;
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiRmlsZVN5c3RlbS5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uLy4uLy4uL3NyYy9Db3JlL0ZpbGVTeXN0ZW0udHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7QUFBYSxRQUFBLFNBQVMsR0FBbUM7SUFDckQsT0FBTyxDQUFDLGVBQWlDLEVBQUUsaUJBQXFDO1FBQzVFLGlCQUFpQixDQUFDLFFBQVEsQ0FBQyxjQUFjLEVBQUUsSUFBSSxVQUFVLEVBQUUsQ0FBQyxDQUFDO0lBQ2pFLENBQUM7Q0FDSixDQUFBO0FBSUQsTUFBTSxTQUFTLEdBQUcsR0FBRyxDQUFDO0FBQ3RCO0lBQ0ksWUFBbUIsSUFBWTtRQUFaLFNBQUksR0FBSixJQUFJLENBQVE7UUFDM0IsSUFBSSxDQUFDLE1BQU0sQ0FBQyxVQUFVLEVBQUU7WUFDcEIsTUFBTSxDQUFDLFVBQVUsR0FBRyxFQUFFLENBQUM7U0FDMUI7UUFDRCxJQUFJLENBQUMsaUJBQWlCLEdBQUcsTUFBTSxDQUFDLFVBQVUsQ0FBQztRQUMzQyxJQUFJLENBQUMsUUFBUSxHQUFHLEVBQUUsQ0FBQztRQUNuQixJQUFJLENBQUMsTUFBTSxHQUFHLEVBQUUsQ0FBQztJQUNyQixDQUFDO0lBS0QsUUFBUSxDQUFDLFFBQWdCLEVBQUUsR0FBZTtRQUN0QyxJQUFJLFFBQVEsR0FBRyxJQUFJLENBQUMsSUFBSSxHQUFHLFNBQVMsR0FBRyxRQUFRLENBQUM7UUFDaEQsSUFBSSxDQUFDLGlCQUFpQixDQUFDLFFBQVEsQ0FBQyxHQUFHLEdBQUcsQ0FBQztRQUN2QyxJQUFJLENBQUMsTUFBTSxDQUFDLFFBQVEsQ0FBQyxHQUFHLEdBQUcsQ0FBQztJQUNoQyxDQUFDO0lBQ0QsT0FBTyxDQUFDLFFBQWdCO1FBQ3BCLE9BQU8sSUFBSSxDQUFDLE1BQU0sQ0FBQyxRQUFRLENBQUMsQ0FBQztJQUNqQyxDQUFDO0lBQ0QsVUFBVSxDQUFDLFFBQWdCO1FBQ3ZCLElBQUksUUFBUSxHQUFHLElBQUksQ0FBQyxJQUFJLEdBQUcsU0FBUyxH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
