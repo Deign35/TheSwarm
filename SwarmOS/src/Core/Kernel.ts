@@ -104,7 +104,7 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
                 return kernelContext.processTable[this.pid] && kernelContext.processTable[this.pid].pP || "";
             },
             get memory() {
-                return processMem!;
+                return processMem!.contents;
             },
             get log() {
                 return loggerContext;

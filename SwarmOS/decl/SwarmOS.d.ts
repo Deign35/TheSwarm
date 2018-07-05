@@ -85,20 +85,27 @@ declare interface IWorkerGroupProcess extends IProcess {
 
 
 declare interface IFolder {
-    SaveFile<T>(fileName: string, mem: IFile<T>): void;
+    GetFolderNames(): string[];
+    GetFileNames(): string[];
+    SaveFile<T>(fileName: string, mem: T): void;
     GetFile<T>(fileName: string): IFile<T> | undefined;
     DeleteFile(fileName: string): void;
     GetFolder(folderName: string): IFolder;
     CreateFolder(folderName: string): void;
     DeleteFolder(): void;
 }
-declare interface IFile<T> { }
+declare interface IFile<T> {
+    contents: T;
+    readonly filePath: string;
+    readonly folderPath: string;
+    readonly fileName: string;
+}
 declare interface IFileSystem extends IPackageExtension {
     GetFolder(pathStr: string): IFolder | undefined
     EnsurePath(path: string): void
     CreateFolder(path: string, folderName: string): void;
     DeleteFolder(path: string, folderName: string): void;
-    SaveFile<T>(path: string, fileName: string, mem: IFile<T>): void;
+    SaveFile<T>(path: string, fileName: string, mem: T): void;
     GetFile<T>(path: string, fileName: string): IFile<T> | undefined;
     DeleteFile(path: string, fileName: string): void;
     CopyFile(fromPath: string, fileName: string, toPath: string, deleteOriginal?: boolean, newFileName?: string): boolean

@@ -1,9 +1,40 @@
 import { ExtensionBase } from "./BasicTypes";
 
 declare var Memory: {
-    FileSystem: IDictionary<string, IFile<any>>;
+    FileSystem: IDictionary<string, MemBase>;
 }
 const SEPERATOR = '/';
+
+class File<T> implements IFile<T> {
+    constructor(private _pathStr: string, private _contents: T) {
+        let { path, name } = MasterFS.SplitPath(_pathStr);
+        this._folderPath = path;
+        this._fileName = name;
+        this._lastUpdated = Game.time;
+    }
+    set contents(overWrite: T) {
+        this._contents = overWrite;
+        this._lastUpdated = Game.time;
+    }
+    get contents(): T {
+        return this._contents;
+    }
+    get filePath(): string {
+        return this._pathStr;
+    }
+    private _folderPath: string;
+    get folderPath(): string {
+        return this._folderPath;
+    }
+    private _fileName: string;
+    get fileName(): string {
+        return this._fileName;
+    }
+    private _lastUpdated: number;
+    get lastUpdated(): number {
+        return this._lastUpdated;
+    }
+}
 class Folder implements IFolder {
     constructor(public Path: string) {
         if (!Memory.FileSystem) {
@@ -13,25 +44,35 @@ class Folder implements IFolder {
         this._folders = {};
         this._files = {};
     }
-    private _fileSystemMemory: IDictionary<string, IFile<any>>;
+    private _fileSystemMemory: IDictionary<string, MemBase>;
     private _folders: IDictionary<string, Folder>;
-    private _files: IDictionary<string, IFile<any>>;
+    private _files: IDictionary<string, File<any>>;
 
-    SaveFile(fileName: string, mem: IFile<any>) {
+    GetFolderNames() {
+        return Object.keys(this._folders);
+    }
+    GetFileNames() {
+        return Object.keys(this._files);
+    }
+
+    SaveFile<T>(fileName: string, mem: T) {
         let fullPath = this.Path + SEPERATOR + fileName;
         this._fileSystemMemory[fullPath] = mem;
-        this._files[fileName] = mem;
+        if (!this.GetFile(fileName)) {
+            this._files[fileName] = new File(fullPath, mem);
+        }
+        this._files[fileName].contents = mem;
     }
-    GetFile(fileName: string) {
-        return this._files[fileName];
+    GetFile<T>(fileName: string): File<T> | undefined {
+        return this._files[fileName]
     }
     DeleteFile(fileName: string) {
-        let fullPath = this.Path + SEPERATOR + fileName;
-        if (this._fileSystemMemory[fullPath]) {
-            delete this._fileSystemMemory[fullPath];
-        }
-        if (this._files[fileName]) {
-            delete this._files[fileName];
+        let file = this.GetFile(fileName);
+        if (file) {
+            if (this._fileSystemMemory[file.filePath]) {
+                delete this._fileSystemMemory[file.filePath];
+            }
+            delete this._files[file.fileName];
         }
     }
     GetFolder(folderName: string) {
@@ -64,7 +105,6 @@ export class FileSystem extends ExtensionBase implements IFileSystem {
     }
     protected get MemCache() {
         if (!this._memoryCache) {
-            let context = this;
             this._memoryCache = new Folder('');
             let keys = Object.keys(this.memory);
             while (keys.length > 0) {
@@ -75,7 +115,7 @@ export class FileSystem extends ExtensionBase implements IFileSystem {
                 let file = this.memory[memPath];
                 let { path, name } = this.SplitPath(memPath);
                 this.EnsurePath(path);
-                this.SaveFile(path, name, file);
+                this.GetFolder(path)!.SaveFile(name, file);
             }
         }
         return this._memoryCache;
@@ -121,7 +161,7 @@ export class FileSystem extends ExtensionBase implements IFileSystem {
     }
     CreateFolder(path: string, folderName: string) {
         let fullPath = path + SEPERATOR + folderName;
-        if (!this._folderCache[fullPath]) {
+        if (!this.FolderCache[fullPath]) {
             let folder = this.GetFolder(path);
             if (!folder) {
                 return;
@@ -129,24 +169,33 @@ export class FileSystem extends ExtensionBase implements IFileSystem {
             if (!folder.GetFolder(folderName)) {
                 folder.CreateFolder(folderName);
             }
-            this._folderCache[fullPath] = folder.GetFolder(folderName);
+            this.FolderCache[fullPath] = folder.GetFolder(folderName);
         }
     }
     DeleteFolder(path: string, folderName: string) {
         const fullPath = path + SEPERATOR + folderName;
+        let folder = this.GetFolder(fullPath);
+        if (folder) {
+            let childFolders = folder.GetFolderNames();
+            for (let i = 0; i < childFolders.length; i++) {
+                this.DeleteFolder(fullPath, childFolders[i]);
+            }
+            folder.DeleteFolder();
+        }
         if (this.FolderCache[fullPath]) {
             delete this.FolderCache[fullPath];
         }
-        let folder = this.GetFolder(fullPath);
-        if (folder) {
-            folder.DeleteFolder();
-        }
     }
-    SaveFile<T>(path: string, fileName: string, mem: IFile<T>) {
+    SaveFile<T>(path: string, fileName: string, mem: T) {
         let folder = this.GetFolder(path);
-        if (folder) {
+        if (!folder) {
+            throw new Error(`Error(${ERR_NOT_FOUND})--FileSystem.SaveFile(path[${path}])`);
+        }
+        if (!folder.GetFile(fileName)) {
             folder.SaveFile(fileName, mem);
         }
+        let file = folder.GetFile(fileName)!;
+        file.contents = mem;
     }
     GetFile<T>(path: string, fileName: string): IFile<T> | undefined {
         let folder = this.GetFolder(path);
