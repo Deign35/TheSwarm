@@ -46,7 +46,7 @@ declare interface IExtensionRegistry extends IPackageExtension {
  */
 declare interface IKernelExtensions extends IPackageExtension {
     installPackages(packages: IPackage<MemBase>[]): void;
-    startProcess(packageName: string, startContext: MemBase): PID;
+    startProcess(packageName: string, savePath: string, parentPID?: PID): PID;
     killProcess(pid?: PID, msg?: string): void;
     getProcessByPID(pid: PID): IProcess | undefined;
     setParent(pid: PID, parentId?: PID): boolean;
@@ -136,25 +136,6 @@ declare interface IMapDirectory extends IPackageExtension {
     GenerateSpawnEnergyMap(room: Room): boolean;
     GenerateRefillMap(room: Room): boolean;
     FindPathFrom(x: number, y: number, distMap: MapArray, pathableMap: MapArray, targetDist?: number): { x: number, y: number, dist: number, index: number }[] | ERR_NO_PATH;
-}
-declare interface IFolder {
-    SaveFile<T>(fileName: string, mem: IFile<T>): void;
-    GetFile<T>(fileName: string): IFile<T> | undefined;
-    DeleteFile(fileName: string): void;
-    GetFolder(folderName: string): IFolder;
-    CreateFolder(folderName: string): void;
-    DeleteFolder(): void;
-}
-declare interface IFile<T> { }
-declare interface IFileSystem extends IPackageExtension {
-    GetFolder(pathStr: string): IFolder | undefined
-    EnsurePath(path: string): void
-    CreateFolder(path: string, folderName: string): void;
-    DeleteFolder(path: string, folderName: string): void;
-    SaveFile<T>(path: string, fileName: string, mem: IFile<T>): void;
-    GetFile<T>(path: string, fileName: string): IFile<T> | undefined;
-    DeleteFile(path: string, fileName: string): void;
-    CopyFile(fromPath: string, fileName: string, toPath: string, deleteOriginal?: boolean, newFileName?: string): boolean
 }
 interface RunArgs {
     creep: Creep;

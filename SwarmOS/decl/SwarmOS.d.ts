@@ -36,6 +36,7 @@ declare interface IProcessContext {
     readonly pPID: PID;
     readonly isActive: boolean;
     readonly rngSeed: number;
+    readonly memPath: string;
 }
 
 declare interface ProcInfo {
@@ -81,3 +82,28 @@ declare interface IWorkerGroupProcess extends IProcess {
     AddCreep(creepID: CreepID): void;
     RemoveCreep(creepID: CreepID): void;
 }
+
+
+declare interface IFolder {
+    SaveFile<T>(fileName: string, mem: IFile<T>): void;
+    GetFile<T>(fileName: string): IFile<T> | undefined;
+    DeleteFile(fileName: string): void;
+    GetFolder(folderName: string): IFolder;
+    CreateFolder(folderName: string): void;
+    DeleteFolder(): void;
+}
+declare interface IFile<T> { }
+declare interface IFileSystem extends IPackageExtension {
+    GetFolder(pathStr: string): IFolder | undefined
+    EnsurePath(path: string): void
+    CreateFolder(path: string, folderName: string): void;
+    DeleteFolder(path: string, folderName: string): void;
+    SaveFile<T>(path: string, fileName: string, mem: IFile<T>): void;
+    GetFile<T>(path: string, fileName: string): IFile<T> | undefined;
+    DeleteFile(path: string, fileName: string): void;
+    CopyFile(fromPath: string, fileName: string, toPath: string, deleteOriginal?: boolean, newFileName?: string): boolean
+
+    SplitPath(pathStr: string): { path: string, name: string };
+}
+
+declare const MasterFS: IFileSystem;

@@ -13,6 +13,9 @@ const TS_Active = 1;
 const TS_Waiting = 2;
 const TS_Done = 3;
 
+const SEPERATOR = '/';
+const SWARM_MANAGER_FOLDER_PATH = SEPERATOR + 'SwarmManager'
+
 declare type TS_Active = 1;
 declare type TS_Waiting = 2;
 declare type TS_Done = 3;
@@ -42,7 +45,7 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
     get processTable(): ProcessTable {
         return this.memory.processTable;
     }
-    get processMemory(): ProcessMemory {
+    get processMemory(): IDictionary<PID, string> {
         return this.memory.processMemory;
     }
 
@@ -55,7 +58,7 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
         }
     }
 
-    startProcess(packageName: ScreepsPackage, startMemory: MemBase): PID {
+    startProcess(packageName: ScreepsPackage, memPath: string, parentPID?: PID): PID {
         let pid = 'p' + GetSUID() as PID;
         let pInfo: ProcInfo = {
             pid: pid,
@@ -63,7 +66,8 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
         };
 
         this.processTable[pid] = pInfo;
-        this.processMemory[pid] = startMemory || {};
+        this.processMemory[pid] = memPath;
+        this.setParent(pid, parentPID);
 
         this.PrepTick(pid);
         return pid;
@@ -77,19 +81,30 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
         }
 
         let kernelContext = this;
-        let loggerContext = kernelContext.log.CreateLogContext(pInfo.PKG, DEFAULT_LOG_LEVEL)
+        let loggerContext = kernelContext.log.CreateLogContext(pInfo.PKG, DEFAULT_LOG_LEVEL);
+
+        let { path, name } = MasterFS.SplitPath(kernelContext.processMemory[pInfo.pid]);
+        let folder = MasterFS.GetFolder(path);
+        if (!folder) {
+            throw new Error(`Process(${id}) is missing its memory(${kernelContext.processMemory[pInfo.pid]}).`);
+        }
+        let processMem = folder.GetFile(name);
+        if (!processMem) {
+            throw new Error(`Process(${id}) is missing its memory(${kernelContext.processMemory[pInfo.pid]}).`);
+        }
         let context: IProcessContext = {
             pid: pInfo.pid,
             pkgName: pInfo.PKG,
             rngSeed: GetRandomIndex(primes_3000),
+            memPath: kernelContext.processMemory[pInfo.pid],
             get isActive() {
-                return kernelContext.processTable[id] && !kernelContext.processTable[id].end;
+                return kernelContext.processTable[this.pid] && !kernelContext.processTable[this.pid].end;
             },
             get pPID() {
-                return kernelContext.processTable[id] && kernelContext.processTable[id].pP || "";
+                return kernelContext.processTable[this.pid] && kernelContext.processTable[this.pid].pP || "";
             },
             get memory() {
-                return kernelContext.processMemory[pInfo.pid];
+                return processMem!;
             },
             get log() {
                 return loggerContext;
@@ -137,9 +152,11 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
         return this._processCache[pid];
     }
 
-    // (TODO): Update startprocess to take a parentpid as a parameter
     setParent(pid: PID, parentPID?: PID): boolean {
         if (!this.processTable[pid]) {
+            return false;
+        }
+        if (parentPID && !this.getProcessByPID(parentPID)) {
             return false;
         }
         this.processTable[pid].pP = parentPID;
@@ -167,14 +184,19 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
             let SwarmManagerMemory: PackageProviderMemory = {
                 services: {}
             }
-            this.startProcess(PKG_SwarmManager, SwarmManagerMemory);
+            let swarmManagerFolder = MasterFS.GetFolder(SWARM_MANAGER_FOLDER_PATH);
+            if (!swarmManagerFolder) {
+                MasterFS.EnsurePath(SWARM_MANAGER_FOLDER_PATH);
+                swarmManagerFolder = MasterFS.GetFolder(SWARM_MANAGER_FOLDER_PATH)!;
+                swarmManagerFolder.SaveFile('Boot', SwarmManagerMemory); // (TODO): Change to use GetFile, and have the file save its fileAttributes
+            }
+            this.startProcess(PKG_SwarmManager, SWARM_MANAGER_FOLDER_PATH + SEPERATOR + 'Boot');
             // Initialization doesn't work on the first tick for some reason.  So skip the first tick.
             return;
         }
 
         let loopStates = {};
         while (activeThreadIDs.length > 0) {
-            let protectionValue = activeThreadIDs.length;
             this.RunThreads(activeThreadIDs);
             activeThreadIDs = [];
             let allIDs = Object.keys(this._curTickState);
@@ -241,7 +263,7 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
         let pInfo = this.processTable[pid];
         try {
             let proc = this.getProcessByPID(pid);
-            if (proc) {
+            if (proc && !this.processTable[pid].end) {
                 if (proc.PrepTick) {
                     proc.PrepTick();
                 }

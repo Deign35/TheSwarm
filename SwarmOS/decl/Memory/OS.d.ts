@@ -6,7 +6,7 @@ declare interface MemBase {
 /** Core OS */
 declare interface KernelMemory extends MemBase {
     processTable: ProcessTable;
-    processMemory: ProcessMemory;
+    processMemory: IDictionary<PID, string>
 
     ErrorLog: string[];
 }

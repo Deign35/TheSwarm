@@ -1,8 +1,5 @@
-export const OSPackage: IPackage<SpawnRegistry_Memory> = {
-    install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
-        extensionRegistry.register(EXT_FileSystem, new FileSystem());
-    }
-}
+import { ExtensionBase } from "./BasicTypes";
+
 declare var Memory: {
     FileSystem: IDictionary<string, IFile<any>>;
 }
@@ -56,7 +53,7 @@ class Folder implements IFolder {
         }
     }
 }
-export class FileSystem implements IFileSystem {
+export class FileSystem extends ExtensionBase implements IFileSystem {
     private _memoryCache!: IFolder;
     private _folderCache!: IDictionary<string, IFolder>;
     protected get memory() {
@@ -76,10 +73,9 @@ export class FileSystem implements IFileSystem {
                     continue;
                 }
                 let file = this.memory[memPath];
-                let fileName = memPath.slice(memPath.lastIndexOf(SEPERATOR) + 1);
-                let filePath = memPath.substr(0, memPath.length - fileName.length - 1);
-                this.EnsurePath(filePath);
-                this.SaveFile(filePath, fileName, file);
+                let { path, name } = this.SplitPath(memPath);
+                this.EnsurePath(path);
+                this.SaveFile(path, name, file);
             }
         }
         return this._memoryCache;
@@ -89,6 +85,13 @@ export class FileSystem implements IFileSystem {
             this._folderCache = {}
         }
         return this._folderCache;
+    }
+    SplitPath(pathStr: string): { path: string, name: string } {
+        let lastIndex = pathStr.lastIndexOf(SEPERATOR);
+        return {
+            path: pathStr.slice(0, lastIndex - 1),
+            name: pathStr.slice(lastIndex + 1)
+        }
     }
     GetFolder(pathStr: string): IFolder | undefined {
         if (!this.FolderCache[pathStr]) {
