@@ -13,6 +13,8 @@ declare interface IPackageInterfaces {
     [index: string]: IPackageExtension | undefined;
     [EXT_Registry]: IExtensionRegistry;
 
+    [EXT_FileRegistry]: IFileRegistry;
+
     [EXT_SpawnRegistry]: ISpawnRegistryExtensions;
     [EXT_Flags]: undefined;
     [EXT_Interrupt]: IKernelNotificationsExtension;
@@ -136,6 +138,16 @@ declare interface IMapDirectory extends IPackageExtension {
     FindPathFrom(x: number, y: number, distMap: MapArray, pathableMap: MapArray, targetDist?: number): { x: number, y: number, dist: number, index: number }[] | ERR_NO_PATH;
 }
 
+declare interface IFile<T> { }
+declare interface IFileRegistry extends IPackageExtension {
+    EnsurePath(path: string): void
+    CreateFolder(path: string, folderName: string): boolean;
+    DeleteFolder(path: string, folderName: string): void;
+    SaveFile<T>(path: string, fileName: string, mem: IFile<T>): boolean;
+    GetFile<T>(path: string, fileName: string): IFile<T> | undefined;
+    DeleteFile(path: string, fileName: string): void;
+    CopyFile(fromPath: string, fileName: string, toPath: string, deleteOriginal?: boolean, newFileName?: string): boolean
+}
 interface RunArgs {
     creep: Creep;
     actionType: ActionType;

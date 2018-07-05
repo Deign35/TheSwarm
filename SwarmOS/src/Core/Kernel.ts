@@ -25,7 +25,6 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
     }
     private _processCache: IDictionary<PID, IProcess>;
     private _curTickState!: IDictionary<PID, TickState>;
-    private _overrunThreads!: PID[];
 
     get log() {
         return this._logger;
@@ -149,7 +148,6 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
 
     loop() {
         this._curTickState = {};
-        this._overrunThreads = [];
         let processIDs = Object.keys(this.processTable);
         for (let i = 0; i < processIDs.length; i++) {
             let pInfo = this.processTable[processIDs[i]];
@@ -197,24 +195,6 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
             }
         }
 
-        let overrunThreads = _.unique(this._overrunThreads);
-        this._overrunThreads = [];
-        while (overrunThreads.length > 0) {
-            let curCPU = Game.cpu.getUsed();
-            let allowedCPU = Game.cpu.limit;
-            if (allowedCPU * 0.90 < curCPU) {
-                break;
-            }
-            let process = this.getProcessByPID(overrunThreads.shift()!);
-            if (!process) {
-                continue;
-            }
-            let result = process.RunThread();
-            if (result == ThreadState_Overrun) {
-                overrunThreads.push(process.pid);
-            }
-        }
-
         processIDs = Object.keys(this.processTable);
         for (let i = 0; i < processIDs.length; i++) {
             this.EndTick(processIDs[i]);
@@ -239,8 +219,6 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
                     case (ThreadState_Waiting):
                         this._curTickState[pid] = TS_Waiting;
                         break;
-                    case (ThreadState_Overrun):
-                        this._overrunThreads.push(pid);
                     case (ThreadState_Inactive):
                     case (ThreadState_Done):
                         this._curTickState[pid] = TS_Done;

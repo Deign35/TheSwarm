@@ -64,7 +64,7 @@ class RoomPathBuilder extends RoomMonitorBase<RoomMonitor_Memory> {
         if (this.room.name == 'sim') {
             return this.stage % 5 == 0 ? ThreadState_Done : ThreadState_Active;
         }
-        return ThreadState_Overrun;
+        return ThreadState_Done;
     }
     GenerateNewMapAt(mapName: string, startPos: RoomPosition) {
         this.cache[mapName] = DistMap.CreateDistanceMap(this.room!, [startPos]);
