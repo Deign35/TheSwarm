@@ -9,6 +9,13 @@
                 "SIGNATURE": "Greetings. *Insert funny turn of phrase here*. -- SwarmOSv1.5.0"
             }
         },
+        "C": {
+            "comment": "Constants",
+            "enabled": true,
+            "entries": {
+                "SEPERATOR": "'/'"
+            }
+        },
         "PKG": {
             "comment": "Package names for installation",
             "enabled": true,
@@ -17,7 +24,7 @@
             "type": true,
             "combinedType": "OSPackage",
             "entries": [
-                "SwarmManager"
+                "Core"
             ]
         },
         "EXT": {
@@ -29,39 +36,8 @@
             "entries": {
                 "Registry": "extRegistry",
                 "Kernel": "kernel",
-                "Sleep": "sleep",
                 "Logger": "logger",
-                "MapDirectory": "mapper",
                 "FileSystem": "file"
-            }
-        },
-        "TT": {
-            "comment": "Type of target for quickly determining how to interact with the object",
-            "enabled": true,
-            "type": true,
-            "combinedType": "TargetType",
-            "entries": {
-                "None": 0,
-                "ConstructionSite": 1,
-                "Resource": 2,
-                "StorageContainer": 3,
-                "Lab": 4,
-                "Controller": 5,
-                "Source": 6,
-                "Creep": 7,
-                "AnyStructure": 10
-            }
-        },
-        "RT": {
-            "comment": "Type of room for quickly determining how to interact with the room",
-            "enabled": true,
-            "type": true,
-            "combinedType": "RoomType",
-            "entries": {
-                "None": 0,
-                "Home": 1,
-                "RemoteHarvest": 2,
-                "Other": 3
             }
         },
         "LOG": {
@@ -77,18 +53,6 @@
                 "INFO": "2",
                 "TRACE": "0",
                 "WARN": "3"
-            }
-        },
-        "SP": {
-            "comment": "Spawn State -- The state of a given spawn request",
-            "enabled": true,
-            "type": true,
-            "combinedType": "SpawnState",
-            "entries": {
-                "ERROR": -1,
-                "QUEUED": 1,
-                "SPAWNING": 2,
-                "COMPLETE": 3
             }
         },
         "DEFAULT": {
@@ -111,36 +75,6 @@
                 "Done": 3
             }
         },
-        "CLI": {
-            "comment": "Command line actions",
-            "enabled": true,
-            "combinedType": "CLI_Command",
-            "type": true,
-            "string": true,
-            "entries": {
-                "Launch": "launch",
-                "ChangeFlag": "flagColor",
-                "Assimilate": "addRoom",
-                "Kill": "kill",
-                "Spawn": "spawn",
-                "ResetMemory": "reset"
-            }
-        },
-        "SPKG": {
-            "comment": "Activity packages",
-            "enabled": true,
-            "combinedType": "SlimOSPackage",
-            "type": true,
-            "string": true,
-            "isArray": true,
-            "entries": [
-                "CreepActivity",
-                "SpawnActivity",
-                "RoomActivity",
-                "RepetitiveCreepActivity",
-                "EnergyTransferActivity"
-            ]
-        },
         "AT": {
             "comment": "Action type",
             "enabled": true,
@@ -153,10 +87,10 @@
                 "Build": 3,
                 "Drop": 4,
                 "Harvest": 5,
-                "MoveToPosition": 6,
+                "SignController": 6,
                 "Pickup": 7,
                 "Repair": 8,
-                "RequestTransfer": 9,
+                "Suicide": 9,
                 "Transfer": 10,
                 "Upgrade": 11,
                 "Withdraw": 12,
@@ -169,8 +103,8 @@
                 "RangedHeal": 19,
                 "RangedMassAttack": 20,
                 "ReserveController": 21,
-                "SignController": 22,
-                "Suicide": 23,
+                "RequestTransfer": 22,
+                "MoveToPosition": 23,
                 "MoveToRoom": 24
             }
         },
@@ -185,20 +119,6 @@
                 "Swamp": "swamp",
                 "Wall": "wall"
             }
-        },
-        "ML": {
-            "comment": "Map Layer",
-            "enabled": true,
-            "string": true,
-            "type": true,
-            "combinedType": "EZMapLayer",
-            "isArray": true,
-            "entries": [
-                "Impassable",
-                "SpawnEnergy",
-                "RefillEnergy",
-                "Road"
-            ]
         }
     }
 }

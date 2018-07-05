@@ -20,14 +20,13 @@ declare type GroupID = string;
 declare type TempAgencyID = string;
 declare type SpawnRequestID = string;
 
-declare type ScreepsPackage = OSPackage | SlimOSPackage
+declare type ScreepsPackage = OSPackage
 
 declare type ObjectTypeWithID = Structure | Creep | Source | ConstructionSite | Mineral | Nuke | Resource | Tombstone;
 declare type EnergyStructureType = StructureExtension | StructureSpawn | StructureContainer | StructureStorage | StructureLink | StructureTerminal;
 declare type TransferTargetType = EnergyStructureType | Creep;
 
 declare type MapArray = number[];
-declare type MapLayers = string | EZMapLayer
 declare interface ObjectIDWithPos {
     x: number;
     y: number;
@@ -112,11 +111,22 @@ declare interface IStatistics {
 
 declare var GStats: IStatistics;
 
-// SwarmCLI
+/** Stats */
+declare type RoomStats = {}
+declare type MarketStats = {}
+declare type CollectionStats = {}
+declare type StatsMemoryStructure = {
+    rooms: { [id: string]: RoomStats }
+    market: MarketStats
+    totalGCL: number
+}
+declare interface ProfilerMemory {
+    data: { [name: string]: ProfilerData };
+    start?: number;
+    total: number;
+}
 
-//declare function CLI(command: CLI_Command, ...args: any[]): ScreepsReturnCode;
-declare function CLI(command: CLI_Assimilate, roomID: RoomID, roomType: RoomType, homeRoom?: RoomID): ScreepsReturnCode;
-
-declare function CLI(command: CLI_Launch, pkg: ScreepsPackage, startMem: MemBase): ScreepsReturnCode;
-declare function CLI(command: CLI_ChangeFlag, priA: ColorConstant, priB: ColorConstant, secA?: ColorConstant, secB?: ColorConstant): ScreepsReturnCode;
-//declare function CLI(command: CLI_Spawn, roomID: RoomID, jobType: CreepRoles, num?: number, mem?: MemBase): ScreepsReturnCode;
+interface ProfilerData {
+    calls: number;
+    time: number;
+}

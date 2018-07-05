@@ -87,6 +87,7 @@ declare interface IWorkerGroupProcess extends IProcess {
 
 
 declare interface IFolder {
+    readonly Path: string;
     GetFolderNames(): string[];
     GetFileNames(): string[];
     SaveFile<T>(fileName: string, mem: T): void;
@@ -98,6 +99,7 @@ declare interface IFolder {
 }
 declare interface IFile<T> {
     contents: T;
+    readonly filePath: string;
     readonly folderPath: string;
     readonly fileName: string;
 }
@@ -110,8 +112,16 @@ declare interface IFileSystem extends IPackageExtension {
     GetFile<T>(path: string, fileName: string): IFile<T> | undefined;
     DeleteFile(path: string, fileName: string): void;
     CopyFile(fromPath: string, fileName: string, toPath: string, deleteOriginal?: boolean, newFileName?: string): boolean
-
-    SplitPath(pathStr: string): { path: string, name: string };
 }
 
 declare const MasterFS: IFileSystem;
+
+declare interface MemBase {
+    CV?: string; // Default (C)allback (V)alue to the HC.
+    HC?: string; // (H)andle of the (C)allback function for informing the parent process that this process has died.
+}
+
+/** Core OS */
+declare type ProcessMemory = {
+    [id in PID]: MemBase;
+}

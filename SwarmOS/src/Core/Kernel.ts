@@ -1,23 +1,11 @@
-import { FileSystem } from "Core/FileSystem";
-
-declare var Memory: {
-    kernel: KernelMemory
-}
-
-declare type ProcessCache = {
-    [id in PID]: {
-        context: IProcessContext;
-        process: IProcess;
-    }
-}
+import { FileSystem } from "Core/FileSystem/FileSystem";
 
 const TS_Active = 1;
 const TS_Waiting = 2;
 const TS_Done = 3;
 
-const SEPERATOR = '/';
-const SWARM_MANAGER_FOLDER_NAME = 'SwarmManager'
-const SWARM_MANAGER_FOLDER_PATH = SEPERATOR + SWARM_MANAGER_FOLDER_NAME;
+const KERNEL_FOLDER_NAME = 'Kernel'
+const KERNEL_FOLDER_PATH = C_SEPERATOR + KERNEL_FOLDER_NAME;
 
 declare type TS_Active = 1;
 declare type TS_Waiting = 2;
@@ -51,9 +39,10 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
     }
 
     protected LoadFileSystem() {
+        debugger;
         global['MasterFS'] = new FileSystem();
-        MasterFS.EnsurePath('/kernel');
-        let folder = MasterFS.GetFolder('/kernel')!;
+        MasterFS.EnsurePath(KERNEL_FOLDER_PATH);
+        let folder = MasterFS.GetFolder(KERNEL_FOLDER_PATH)!;
         this._procTableFile = folder.GetFile<ProcessTable>('procTable')!;
         if (!this._procTableFile) {
             folder.SaveFile('procTable', {});
@@ -114,7 +103,7 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
             get log() {
                 return loggerContext;
             },
-            getExtensionInterface: kernelContext.extensionRegistry.get.bind(kernelContext.extensionRegistry)
+            extensionRegistry: kernelContext.extensionRegistry.get.bind(kernelContext.extensionRegistry)
         };
         Object.freeze(context);
         let process = this.processRegistry.createNewProcess(pInfo.PKG, context);
@@ -185,11 +174,11 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
 
         let activeThreadIDs = Object.keys(this._curTickState);
         if (activeThreadIDs.length == 0) {
-            let SwarmManagerMemory: MemBase = {
+            let coreMem: MemBase = {
             }
-            MasterFS.CreateFolder('', SWARM_MANAGER_FOLDER_NAME);
-            this.startProcess(PKG_SwarmManager, SWARM_MANAGER_FOLDER_PATH, SwarmManagerMemory, {
-                desiredPID: 'Boot'
+            MasterFS.CreateFolder('', KERNEL_FOLDER_NAME);
+            this.startProcess(PKG_Core, KERNEL_FOLDER_PATH, coreMem, {
+                desiredPID: 'Core'
             });
             // Initialization doesn't work on the first tick for some reason.  So skip the first tick.
             return;

@@ -1,8 +1,6 @@
 ﻿declare var Memory: {
     VERSION: string;
     counter: number;
-    kernel: KernelMemory;
-    spawnData: SpawnRegistry_Memory;
 }
 let startLoad = Game.cpu.getUsed(); // Will not use any prototype defined version of getUsed
 // Ensure all constants are initialized
@@ -53,8 +51,6 @@ import { RegistriesPackage } from "Registries/index";
 import { RoomJobs } from "RoomJobs/index";
 
 kernel.installPackages([ActivitiesPackage, CreepJobsPackage, FlagPackage, RegistriesPackage, RoomJobs]);*/
-import { RegistriesPackage } from "Registries/index";
-kernel.installPackage(RegistriesPackage);
 
 export function loop() {
     try {

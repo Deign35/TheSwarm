@@ -15,7 +15,6 @@ declare interface IPackageInterfaces {
 
     [EXT_FileSystem]: IFileSystem;
     [EXT_Kernel]: IKernelExtensions;
-    [EXT_Sleep]: IKernelSleepExtension;
     [EXT_Logger]: IKernelLoggerExtensions;
 }
 
@@ -23,7 +22,8 @@ declare interface IPackageInterfaces {
  * A process can access the registry via this function.
  */
 declare interface IProcessContext {
-    getExtensionInterface<T extends keyof IPackageInterfaces>(interfaceId: T): IPackageInterfaces[T];
+    extensionRegistry: IExtensionRegistry;
+    //getExtensionInterface<T extends keyof IPackageInterfaces>(interfaceId: T): IPackageInterfaces[T];
 }
 
 /**
@@ -47,6 +47,8 @@ declare interface IKernelExtensions extends IPackageExtension {
     killProcess(pid: PID | undefined, msg: string): void;
     getProcessByPID(pid: PID): IProcess | undefined;
     setParent(pid: PID, parentId?: PID): boolean;
+    sleep(pid: PID, ticks: number): void;
+    wake(pid: PID): void;
 }
 
 /**
@@ -80,15 +82,13 @@ declare interface IKernelNotificationsExtension extends IPackageExtension {
  * Allows a process to be put to sleep or awoken
  */
 declare interface IKernelSleepExtension extends IPackageExtension {
-    sleep(pid: PID, ticks: number): void;
-    wake(pid: PID): void;
 }
 
 /**
  * Room data retrieves currently saved information for a given room.
  * Giving back constructionSites, structures, sources, and other information.
  * Is updated on a regular schedule by the RoomManager.
- */
+ *
 declare interface IRoomDataExtension extends IPackageExtension {
     GetRoomData(roomID: string): RoomState | undefined;
     BootRoom(roomID: string, force: boolean): void;
@@ -96,18 +96,18 @@ declare interface IRoomDataExtension extends IPackageExtension {
 
 /**
  * Extension for processes to be able to request creep spawning.
- */
+ *
 declare interface ISpawnRegistryExtensions extends IPackageExtension {
     cancelRequest(id?: SpawnRequestID): boolean;
     getRequestStatus(id?: SpawnRequestID): SpawnState;
     requestSpawn(context: SpawnContext, location: RoomID, spawnPriority: number,
         maxSpawnDistance?: number, startMem?: ScreepsObject_CreepMemory): SpawnRequestID;
     getRequestContext(id?: SpawnRequestID): SpawnContext | undefined;
-}
+}*/
 
 /**
  * Registry for creep management and ownership control
- */
+ *
 declare interface ICreepRegistryExtensions extends IPackageExtension {
     tryFindCompatibleCreep(creepType: CT_ALL, level: number, targetRoom: RoomID, maxDistance?: number): string | undefined
     tryRegisterCreep(creepID: CreepID): boolean;
@@ -125,13 +125,10 @@ declare interface ICreepActivityExtensions extends IPackageExtension {
 }
 
 declare interface IMapDirectory extends IPackageExtension {
-    CreateMapForRoom(roomID: RoomID, mapID: string, startPositions: RoomPosition[]): boolean;
-    GetMap(roomID: RoomID, mapID: string): MapArray | undefined;
-    GetMaps(roomID: RoomID): IDictionary<string, MapArray> | undefined
-
-    GenerateImpassableMap(room: Room): boolean;
-    GenerateSpawnEnergyMap(room: Room): boolean;
-    GenerateRefillMap(room: Room): boolean;
+    CreateMapForRoom(roomID: RoomID, mapID: string, startPositions: RoomPosition[]): MapArray | undefined;
+    GenerateImpassableMap(room: Room): MapArray | undefined;
+    GenerateSpawnEnergyMap(room: Room): MapArray | undefined;
+    GenerateRefillMap(room: Room): MapArray | undefined;
     FindPathFrom(x: number, y: number, distMap: MapArray, pathableMap: MapArray, targetDist?: number): { x: number, y: number, dist: number, index: number }[] | ERR_NO_PATH;
 }
 interface RunArgs {
@@ -142,4 +139,4 @@ interface RunArgs {
     amount?: number;
     message?: string;
     resourceType?: ResourceConstant;
-}
+}*/

@@ -1,91 +1,7 @@
+import { Folder } from "./Folder";
+
 declare var Memory: {
     FileSystem: IDictionary<string, IDictionary<string, MemBase>>;
-}
-const SEPERATOR = '/';
-
-class File<T> implements IFile<T> {
-    constructor(private _folderPath: string, private _fileName: string, private _contents: T) {
-        this._lastUpdated = Game.time;
-    }
-    set contents(overWrite: T) {
-        this._contents = overWrite;
-        this._lastUpdated = Game.time;
-    }
-    get contents(): T {
-        return this._contents;
-    }
-    get folderPath(): string {
-        return this._folderPath;
-    }
-    get fileName(): string {
-        return this._fileName;
-    }
-    private _lastUpdated: number;
-    get lastUpdated(): number {
-        return this._lastUpdated;
-    }
-}
-class Folder implements IFolder {
-    constructor(public Path: string) {
-        if (!Memory.FileSystem) {
-            Memory.FileSystem = {};
-        }
-        this._fileSystemMemory = Memory.FileSystem;
-        this._folders = {};
-        this._files = {};
-    }
-    private _fileSystemMemory: IDictionary<string, MemBase>;
-    private _folders: IDictionary<string, Folder>;
-    private _files: IDictionary<string, File<any>>;
-
-    GetFolderNames() {
-        return Object.keys(this._folders);
-    }
-    GetFileNames() {
-        return Object.keys(this._files);
-    }
-
-    SaveFile<T>(fileName: string, mem: T) {
-        debugger;
-        //let fullPath = this.Path + SEPERATOR + fileName;
-        this._fileSystemMemory[this.Path][fileName] = mem;
-        if (!this.GetFile(fileName)) {
-            this._files[fileName] = new File(this.Path, fileName, mem);
-        }
-        this._files[fileName].contents = mem;
-    }
-    GetFile<T>(fileName: string): File<T> | undefined {
-        return this._files[fileName]
-    }
-    DeleteFile(fileName: string) {
-        let file = this.GetFile(fileName);
-        if (file) {
-            if (this._fileSystemMemory[file.folderPath]) {
-                delete this._fileSystemMemory[file.folderPath][fileName];
-            }
-            delete this._files[file.fileName];
-        }
-    }
-    GetFolder(folderName: string) {
-        return this._folders[folderName];
-    }
-    CreateFolder(folderName: string) {
-        if (!this._folders[folderName]) {
-            let path = this.Path + SEPERATOR + folderName;
-            this._folders[folderName] = new Folder(path);
-            this._fileSystemMemory[path] = {};
-        }
-    }
-    DeleteFolder() {
-        let fileNames = Object.keys(this._files);
-        for (let i = 0; i < fileNames.length; i++) {
-            this.DeleteFile(fileNames[i]);
-        }
-        let folderNames = Object.keys(this._folders);
-        for (let i = 0; i < folderNames.length; i++) {
-            this._folders[folderNames[i]].DeleteFolder();
-        }
-    }
 }
 export class FileSystem implements IFileSystem {
     private _memoryCache!: IFolder;
@@ -124,7 +40,7 @@ export class FileSystem implements IFileSystem {
         return this._folderCache;
     }
     SplitPath(pathStr: string): { path: string, name: string } {
-        let lastIndex = pathStr.lastIndexOf(SEPERATOR);
+        let lastIndex = pathStr.lastIndexOf(C_SEPERATOR);
         return {
             path: pathStr.slice(0, lastIndex),
             name: pathStr.slice(lastIndex + 1)
@@ -133,7 +49,7 @@ export class FileSystem implements IFileSystem {
     GetFolder(pathStr: string): IFolder | undefined {
         if (!this.FolderCache[pathStr]) {
             let curFolder = this.MemCache;
-            let path = pathStr.split(SEPERATOR);
+            let path = pathStr.split(C_SEPERATOR);
             for (let i = 1; i < path.length; i++) {
                 if (curFolder && curFolder.GetFolder) {
                     curFolder = curFolder.GetFolder(path[i]);
@@ -147,7 +63,7 @@ export class FileSystem implements IFileSystem {
     }
     EnsurePath(pathStr: string) {
         if (!this.FolderCache[pathStr]) {
-            let path = pathStr.split(SEPERATOR);
+            let path = pathStr.split(C_SEPERATOR);
             let curFolder = this.MemCache;
             for (let i = 1; i < path.length; i++) {
                 curFolder.CreateFolder(path[i]);
@@ -157,7 +73,7 @@ export class FileSystem implements IFileSystem {
         }
     }
     CreateFolder(path: string, folderName: string) {
-        let fullPath = path + SEPERATOR + folderName;
+        let fullPath = path + C_SEPERATOR + folderName;
         if (!this.FolderCache[fullPath]) {
             let folder = this.GetFolder(path);
             if (!folder) {
@@ -170,7 +86,7 @@ export class FileSystem implements IFileSystem {
         }
     }
     DeleteFolder(path: string, folderName: string) {
-        const fullPath = path + SEPERATOR + folderName;
+        const fullPath = path + C_SEPERATOR + folderName;
         let folder = this.GetFolder(fullPath);
         if (folder) {
             let childFolders = folder.GetFolderNames();
