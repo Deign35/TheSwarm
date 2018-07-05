@@ -1,4 +1,5 @@
 import { FileSystem } from "Core/FileSystem/FileSystem";
+import { profile } from "Tools/Profiler";
 
 const TS_Active = 1;
 const TS_Waiting = 2;
@@ -12,6 +13,7 @@ declare type TS_Waiting = 2;
 declare type TS_Done = 3;
 declare type TickState = TS_Active | TS_Waiting | TS_Done;
 
+@profile
 export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension {
     constructor(private processRegistry: IProcessRegistry, private extensionRegistry: IExtensionRegistry,
         private _logger: IKernelLoggerExtensions) {
@@ -176,9 +178,9 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
             let emptyMem: MemBase = {
             }
             MasterFS.CreateFolder('', KERNEL_FOLDER_NAME);
-            this.startProcess(PKG_EmptyProcess, KERNEL_FOLDER_PATH, emptyMem, {
-                desiredPID: 'Empty'
-            });
+            this.startProcess(PKG_CLIProcessor, KERNEL_FOLDER_PATH, {}, {
+                desiredPID: 'CLI',
+            })
             // Initialization doesn't work on the first tick for some reason.  So skip the first tick.
             return;
         }

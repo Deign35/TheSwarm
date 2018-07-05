@@ -18,6 +18,7 @@ declare interface IProcess {
     parentPID?: PID;
     rngSeed?: number;
     memory: MemBase
+    memPath: string;
 
     PrepTick?(): void;
     EndTick?(): void;

@@ -3,7 +3,7 @@ var OS_Logger = new Logger();
 
 import { ExtensionRegistry } from "Core/ExtensionRegistry";
 export var extensionRegistry = new ExtensionRegistry(OS_Logger);
-extensionRegistry.register(EXT_Logger, OS_Logger);
+//extensionRegistry.register(EXT_Logger, OS_Logger);
 
 import { ProcessRegistry } from "Core/ProcessRegistry";
 export var processRegistry = new ProcessRegistry(OS_Logger);
@@ -15,3 +15,5 @@ extensionRegistry.register(EXT_Kernel, kernel);
 
 import { OSPackage } from "Core/EmptyProcess";
 OSPackage.install(processRegistry, extensionRegistry);
+import { CLIPackage } from "./CLI/index";
+CLIPackage.install(processRegistry, extensionRegistry);

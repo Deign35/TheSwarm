@@ -5,7 +5,7 @@ export const OSPackage: IPackage<MemBase> = {
     }
 }
 
-import { ProcessBase } from "Core/Types/ProcessBase";
+import { ProcessBase } from "Core/Types/ProcessTypes";
 
 const ENABLE_PROFILING = true;
 class EmptyProcess extends ProcessBase<MemBase> {

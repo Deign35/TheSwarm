@@ -24,7 +24,7 @@
             "type": true,
             "combinedType": "OSPackage",
             "entries": [
-                "Core",
+                "CLIProcessor",
                 "EmptyProcess"
             ]
         },

@@ -42,7 +42,7 @@ declare type neighborMapping = {
     }
 }[]
 
-declare interface Profiler {
+declare interface IProfiler {
     clear(): void;
     output(): void;
     start(): void;
@@ -50,6 +50,7 @@ declare interface Profiler {
     stop(): void;
     toString(): string;
 }
+declare const Profiler: IProfiler;
 declare function extensionInterface(interfaceId: string): (target: any, propertyKey: string) => any
 declare function extensionExposure(interfaceId: string): (target: any, propertyKey: string) => any
 

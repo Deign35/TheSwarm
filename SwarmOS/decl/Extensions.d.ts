@@ -13,7 +13,6 @@ declare interface IPackageInterfaces {
     [index: string]: IPackageExtension | undefined;
     [EXT_Registry]: IExtensionRegistry;
     [EXT_Kernel]: IKernelExtensions;
-    [EXT_Logger]: IKernelLoggerExtensions;
 }
 
 /**

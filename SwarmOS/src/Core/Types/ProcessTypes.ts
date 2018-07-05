@@ -12,6 +12,7 @@ export abstract class ProcessBase<T extends MemBase> implements IProcess {
     get pkgName(): string { return this.context.pkgName; }
     get pid(): PID { return this.context.pid; }
     get parentPID(): PID { return this.context.pPID; }
+    get memPath(): string { return this.context.memPath; }
     GetParentProcess<K extends IProcess>(): K | undefined {
         return this.parentPID ? this.kernel.getProcessByPID(this.parentPID) as K : undefined;
     }
@@ -42,6 +43,22 @@ export abstract class ProcessBase<T extends MemBase> implements IProcess {
         }
         MasterFS.DeleteFile(this.context.memPath, this.pid);
         this.kernel.killProcess(this.pid, endReason);
+    }
+}
+
+export abstract class ProcessBase_Storage extends ProcessBase<any> {
+    private _folderPath!: string;
+    get FolderPath(): string {
+        if (!this._folderPath) {
+            this._folderPath = this.memPath + C_SEPERATOR + this.pid;
+        }
+        return this._folderPath;
+    }
+    folder!: IFolder;
+    PrepTick() {
+        let folderPath = MasterFS.EnsurePath(this.FolderPath);
+        this.folder = MasterFS.GetFolder(this.FolderPath)!;
+        super.PrepTick();
     }
 }
 

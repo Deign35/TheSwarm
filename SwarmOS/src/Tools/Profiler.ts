@@ -1,7 +1,7 @@
 declare var Memory: {
     profiler: ProfilerMemory
 }
-export function init(): Profiler {
+export function init(): IProfiler {
     const defaults = {
         data: {},
         total: 0,
@@ -9,7 +9,7 @@ export function init(): Profiler {
 
     if (!Memory.profiler) { Memory.profiler = defaults; }
 
-    const cli: Profiler = {
+    const cli: IProfiler = {
         clear() {
             const running = isEnabled();
             Memory.profiler = defaults;
@@ -94,8 +94,6 @@ export function profile(
     key?: string | symbol,
     _descriptor?: TypedPropertyDescriptor<Function>,
 ): void {
-    if (!false) { return; }
-
     if (key) {
         // case of method decorator
         wrapFunction(target, key);
@@ -162,6 +160,9 @@ function outputProfilerData() {
         return result as OutputData;
     });
 
+    if (Object.keys(data).length == 0) {
+        return;
+    }
     data.sort((lhs, rhs) => rhs.cpuPerTick - lhs.cpuPerTick);
 
     ///////
