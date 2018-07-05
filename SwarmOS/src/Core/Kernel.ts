@@ -174,11 +174,11 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
 
         let activeThreadIDs = Object.keys(this._curTickState);
         if (activeThreadIDs.length == 0) {
-            let coreMem: MemBase = {
+            let emptyMem: MemBase = {
             }
             MasterFS.CreateFolder('', KERNEL_FOLDER_NAME);
-            this.startProcess(PKG_Core, KERNEL_FOLDER_PATH, coreMem, {
-                desiredPID: 'Core'
+            this.startProcess(PKG_EmptyProcess, KERNEL_FOLDER_PATH, emptyMem, {
+                desiredPID: 'Empty'
             });
             // Initialization doesn't work on the first tick for some reason.  So skip the first tick.
             return;

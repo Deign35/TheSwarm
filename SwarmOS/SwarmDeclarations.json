@@ -24,7 +24,8 @@
             "type": true,
             "combinedType": "OSPackage",
             "entries": [
-                "Core"
+                "Core",
+                "EmptyProcess"
             ]
         },
         "EXT": {

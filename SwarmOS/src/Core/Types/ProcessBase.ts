@@ -22,7 +22,11 @@ export abstract class ProcessBase<T extends MemBase> implements IProcess {
         if (!this._procFile) {
             throw new Error(`BasicProcess.PrepTick(Process file missing: ${this.context.memPath}/::/${this.pid})`)
         }
+        if (this.OnTickStart) {
+            this.OnTickStart();
+        }
     }
+    OnTickStart?(): void;
     abstract RunThread(): ThreadState;
     EndTick?(): void;
 
