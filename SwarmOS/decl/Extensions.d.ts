@@ -40,7 +40,10 @@ declare interface IExtensionRegistry extends IPackageExtension {
  */
 declare interface IKernelExtensions extends IPackageExtension {
     installPackages(packages: IPackage<MemBase>[]): void;
-    startProcess(packageName: string, savePath: string, startMem: MemBase,  parentPID?: PID): PID;
+    startProcess(packageName: string, savePath: string, startMem: MemBase, opts?: {
+        parentPID?: PID,
+        desiredPID?: PID
+    }): PID;
     killProcess(pid?: PID, msg?: string): void;
     getProcessByPID(pid: PID): IProcess | undefined;
     setParent(pid: PID, parentId?: PID): boolean;

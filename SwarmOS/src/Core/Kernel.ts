@@ -58,26 +58,34 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
         }
     }
 
-    startProcess(packageName: ScreepsPackage, memPath: string, startMem: MemBase, parentPID?: PID): PID {
-        let pid = 'p' + GetSUID() as PID;
-        let pInfo: ProcInfo = {
-            pid: pid,
-            PKG: packageName
-        };
-        this.processTable[pid] = pInfo;
-
-        let { path, name } = MasterFS.SplitPath(memPath);
-        let folder = MasterFS.GetFolder(path);
-        if (!folder) {
-            throw new Error(`Could not create memory for new process.  Kernel.startProcess(${packageName}, ${memPath}, ${JSON.stringify(startMem)}, ${parentPID})`)
+    startProcess(packageName: ScreepsPackage, memPath: string, startMem: MemBase, opts?: {
+        parentPID?: PID,
+        desiredPID?: PID
+    }): PID {
+        let newPID: PID | undefined = opts && opts.desiredPID;
+        if (!newPID) {
+            newPID = 'p' + GetSUID();
         }
-        folder.SaveFile(pid, startMem);
-        let file = folder.GetFile(pid)!;
-        this.processMemory[pid] = file.filePath;
-        this.setParent(pid, parentPID);
+        while (this.processTable[newPID] && !this.processTable[newPID].end) {
+            newPID += '_' + GetSUID();
+        }
+        let pInfo: ProcInfo = {
+            pid: newPID,
+            PKG: packageName,
+        };
+        this.processTable[newPID] = pInfo;
 
-        this.PrepTick(pid);
-        return pid;
+        let folder = MasterFS.GetFolder(memPath);
+        if (!folder) {
+            throw new Error(`Could not create memory for new process.  Kernel.startProcess(${packageName}, ${memPath}, ${JSON.stringify(startMem)}, ${JSON.stringify(opts)})`)
+        }
+        folder.SaveFile(newPID, startMem);
+        let file = folder.GetFile(newPID)!;
+        this.processMemory[newPID] = file.filePath;
+        this.setParent(newPID, opts && opts.parentPID);
+
+        this.PrepTick(newPID);
+        return newPID;
     }
 
     createProcess(id: PID): IProcess {
@@ -191,7 +199,9 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
             let SwarmManagerMemory: PackageProviderMemory = {
                 services: {}
             }
-            this.startProcess(PKG_SwarmManager, SWARM_MANAGER_FOLDER_PATH + SEPERATOR + 'Boot', SwarmManagerMemory);
+            this.startProcess(PKG_SwarmManager, SWARM_MANAGER_FOLDER_PATH, SwarmManagerMemory, {
+                desiredPID: 'Boot'
+            });
             // Initialization doesn't work on the first tick for some reason.  So skip the first tick.
             return;
         }
