@@ -27,6 +27,8 @@ if (!Memory.VERSION || Memory.VERSION != SWARM_VERSION_DATE) {
             }
             Memory[id] = undefined;
         }
+        Profiler.stop();
+        Profiler.clear();
         console.log(`SIM UPDATE RESET - Memory Cleaned`);
     }
 

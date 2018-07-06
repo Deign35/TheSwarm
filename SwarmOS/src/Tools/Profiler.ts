@@ -36,7 +36,7 @@ export function init(): IProfiler {
 
         stop() {
             if (!isEnabled()) { return; }
-            const timeRunning = Game.time - Memory.profiler.start!;
+            const timeRunning = (Game.time - Memory.profiler.start!) || 1;
             Memory.profiler.total += timeRunning;
             delete Memory.profiler.start;
             return "Profiler stopped";
@@ -138,9 +138,8 @@ interface OutputData {
 function outputProfilerData() {
     let totalTicks = Memory.profiler.total;
     if (Memory.profiler.start) {
-        totalTicks += Game.time - Memory.profiler.start;
+        totalTicks += (Game.time - Memory.profiler.start) + 1;
     }
-    totalTicks = totalTicks || 1;
 
     ///////
     // Process data
@@ -165,7 +164,6 @@ function outputProfilerData() {
         return;
     }
     data.sort((lhs, rhs) => rhs.cpuPerTick - lhs.cpuPerTick);
-    debugger;
     /*RawMemory.setActiveSegments([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
     if (RawMemory.segments[0]) {
         RawMemory.segments[0] = (JSON.stringify(data));
