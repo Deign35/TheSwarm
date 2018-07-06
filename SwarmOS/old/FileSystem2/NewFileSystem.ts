@@ -1,17 +1,12 @@
-import { FileDrive } from "./Drive";
-
-declare var Memory: {
-    FileSystem: IDictionary<string, IDictionary<string, MemBase>>;
-}
-
-export class FileSystem2 implements IFileSystem2 {
+import { DDrive } from "./Drive";
+export class FileSystem2 implements IFileSystem {
     private static version = 0;
     constructor() {
         this._hash = `${Game.time}_${FileSystem2.version++}`;
         this._drives = {};
         let driveIDs = Object.keys(Memory.FileSystem);
         for (let i = 0; i < driveIDs.length; i++) {
-            this._drives[driveIDs[i]] = new FileDrive(driveIDs[i]);
+            this._drives[driveIDs[i]] = new DDrive(driveIDs[i]);
         }
     }
 
