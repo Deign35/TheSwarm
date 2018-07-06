@@ -13,7 +13,17 @@
             "comment": "Constants",
             "enabled": true,
             "entries": {
-                "SEPERATOR": "'/'"
+                "SEPERATOR": "'/'",
+                "STATS_SAVETO_MEMORY": "1",
+                "STATS_SAVETO_SEGMENT": "1"
+            }
+        },
+        "SEG": {
+            "comment": "Designated segments",
+            "enabled": true,
+            "entries": {
+                "Profiler": 0,
+                "Stats": 1
             }
         },
         "PKG": {

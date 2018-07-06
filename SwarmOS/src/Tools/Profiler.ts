@@ -164,12 +164,8 @@ function outputProfilerData() {
         return;
     }
     data.sort((lhs, rhs) => rhs.cpuPerTick - lhs.cpuPerTick);
-    /*RawMemory.setActiveSegments([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
-    if (RawMemory.segments[0]) {
-        RawMemory.segments[0] = (JSON.stringify(data));
-    }*/
+    RawMemory.segments[SEG_Profiler] = (JSON.stringify(data));
     GStats.addSimpleStat('totalCPU', totalCpu);
-
 
     ///////
     // Format data
