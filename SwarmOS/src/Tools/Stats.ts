@@ -74,7 +74,7 @@ const CONFIG: StatsConfig = {
     driver: 'Graphite', // Graphite, InfluxDB
     types: ['memory'], // memory, segment, console
     key: '__stats',
-    segment: 30,
+    segment: 1,
     divider: ';',  // "\n",
     baseStats: true,
 }

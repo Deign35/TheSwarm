@@ -58,15 +58,14 @@ kernel.installPackages([ActivitiesPackage, CreepJobsPackage, FlagPackage, Regist
 
 export function loop() {
     try {
-        Profiler.clear();
         Profiler.start();
         GStats.reset();
         kernel.loop();
     } finally {
         kernel.log.DumpLogToConsole();
-        GStats.commit();
-        Profiler.start();
         Profiler.output();
+        Profiler.stop();
+        GStats.commit();
     }
 }
 

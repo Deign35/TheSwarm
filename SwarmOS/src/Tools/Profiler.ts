@@ -140,6 +140,7 @@ function outputProfilerData() {
     if (Memory.profiler.start) {
         totalTicks += Game.time - Memory.profiler.start;
     }
+    totalTicks = totalTicks || 1;
 
     ///////
     // Process data
@@ -164,6 +165,13 @@ function outputProfilerData() {
         return;
     }
     data.sort((lhs, rhs) => rhs.cpuPerTick - lhs.cpuPerTick);
+    debugger;
+    /*RawMemory.setActiveSegments([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
+    if (RawMemory.segments[0]) {
+        RawMemory.segments[0] = (JSON.stringify(data));
+    }*/
+    GStats.addSimpleStat('totalCPU', totalCpu);
+
 
     ///////
     // Format data
@@ -195,16 +203,3 @@ function outputProfilerData() {
     output += `\t\t\t${totalCpu.toFixed(2)} average CPU profiled per tick`;
     console.log(output);
 }
-
-// debugging
-// function printObject(obj: object) {
-//   const name = obj.constructor ? obj.constructor.name : (obj as any).name;
-//   console.log("  Keys of :", name, ":");
-//   Object.ownKeys(obj).forEach((k) => {
-//     try {
-//       console.log(`    ${k}: ${Object.get(obj, k)}`);
-//     } catch (e) {
-//       // nothing
-//     }
-//   });
-// }
