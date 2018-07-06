@@ -89,14 +89,11 @@ declare interface IWorkerGroupProcess extends IProcess {
 
 declare interface IFolder {
     readonly Path: string;
-    GetFolderNames(): string[];
     GetFileNames(): string[];
     SaveFile<T>(fileName: string, mem: T): void;
     GetFile<T>(fileName: string): IFile<T> | undefined;
     DeleteFile(fileName: string): void;
-    GetFolder(folderName: string): IFolder;
-    CreateFolder(folderName: string): void;
-    DeleteFolder(): void;
+    DeleteFiles(): void;
 }
 declare interface IFile<T> {
     contents: T;
@@ -106,13 +103,8 @@ declare interface IFile<T> {
 }
 declare interface IFileSystem extends IPackageExtension {
     GetFolder(pathStr: string): IFolder | undefined
-    EnsurePath(path: string): void
-    CreateFolder(path: string, folderName: string): void;
-    DeleteFolder(path: string, folderName: string): void;
-    SaveFile<T>(path: string, fileName: string, mem: T): void;
-    GetFile<T>(path: string, fileName: string): IFile<T> | undefined;
-    DeleteFile(path: string, fileName: string): void;
-    CopyFile(fromPath: string, fileName: string, toPath: string, deleteOriginal?: boolean, newFileName?: string): boolean
+    EnsurePath(path: string): void;
+    readonly InstanceHash: string;
 }
 
 declare const MasterFS: IFileSystem;

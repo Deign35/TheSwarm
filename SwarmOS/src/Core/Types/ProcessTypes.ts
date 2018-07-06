@@ -13,14 +13,16 @@ export abstract class ProcessBase<T extends MemBase> implements IProcess {
     get pid(): PID { return this.context.pid; }
     get parentPID(): PID { return this.context.pPID; }
     get memPath(): string { return this.context.memPath; }
+    get memFolder(): IFolder { return this._folder; }
     GetParentProcess<K extends IProcess>(): K | undefined {
         return this.parentPID ? this.kernel.getProcessByPID(this.parentPID) as K : undefined;
     }
-
+    private _folder!: IFolder;
     PrepTick(): void {
-        this._procFile = MasterFS.GetFile<T>(this.context.memPath, this.pid)!;
+        this._folder = MasterFS.GetFolder(`${this.memPath}`)!;
+        this._procFile = this.memFolder.GetFile<T>(this.pid)!;
         if (!this._procFile) {
-            throw new Error(`BasicProcess.PrepTick(Process file missing: ${this.context.memPath}/::/${this.pid})`)
+            throw new Error(`BasicProcess.PrepTick(Process file missing: ${this.context.memPath}::${this.pid})`)
         }
         if (this.OnTickStart) {
             this.OnTickStart();
@@ -41,24 +43,8 @@ export abstract class ProcessBase<T extends MemBase> implements IProcess {
         if (proc && proc.OnChildProcessEnd) {
             proc.OnChildProcessEnd(this, endReason);
         }
-        MasterFS.DeleteFile(this.context.memPath, this.pid);
+        this._folder.DeleteFile(this.pid);
         this.kernel.killProcess(this.pid, endReason);
-    }
-}
-
-export abstract class ProcessBase_Storage extends ProcessBase<any> {
-    private _folderPath!: string;
-    get FolderPath(): string {
-        if (!this._folderPath) {
-            this._folderPath = this.memPath + C_SEPERATOR + this.pid;
-        }
-        return this._folderPath;
-    }
-    folder!: IFolder;
-    PrepTick() {
-        let folderPath = MasterFS.EnsurePath(this.FolderPath);
-        this.folder = MasterFS.GetFolder(this.FolderPath)!;
-        super.PrepTick();
     }
 }
 

@@ -6,15 +6,6 @@
 let startLoad = Game.cpu.getUsed(); // Will not use any prototype defined version of getUsed
 // Ensure all constants are initialized
 require('globalConstants');
-
-import * as ProfilerDef from "Tools/Profiler";
-global['Profiler'] = ProfilerDef.init();
-import * as Stats from "Tools/Stats";
-Stats.setup();
-
-import "Tools/GlobalTools";
-import "Tools_Prototypes";
-
 // Update the OS as needed
 const RESET_IN_SIM_ON_UPDATE = true;
 if (!Memory.VERSION || Memory.VERSION != SWARM_VERSION_DATE) {
@@ -22,13 +13,8 @@ if (!Memory.VERSION || Memory.VERSION != SWARM_VERSION_DATE) {
     if (RESET_IN_SIM_ON_UPDATE && !!Game.rooms.sim) {
         console.log('SIM UPDATE RESET ENACTED');
         for (let id in Memory) {
-            if (id == 'profiler') {
-                continue;
-            }
             Memory[id] = undefined;
         }
-        Profiler.stop();
-        Profiler.clear();
         console.log(`SIM UPDATE RESET - Memory Cleaned`);
     }
 
@@ -47,8 +33,16 @@ if (!Memory.VERSION || Memory.VERSION != SWARM_VERSION_DATE) {
     Memory.VERSION = SWARM_VERSION_DATE;
     console.log(`Updating OS complete`)
 }
-
 import { kernel } from "Core/index";
+
+import * as ProfilerDef from "Tools/Profiler";
+global['Profiler'] = new ProfilerDef.ImplementedProfiler();
+import * as Stats from "Tools/Stats";
+Stats.setup();
+
+import "Tools/GlobalTools";
+import "Tools_Prototypes";
+
 
 /*import { ActivitiesPackage } from "Activities/index";
 import { CreepJobsPackage } from "Jobs/index";
@@ -60,13 +54,12 @@ kernel.installPackages([ActivitiesPackage, CreepJobsPackage, FlagPackage, Regist
 
 export function loop() {
     try {
-        Profiler.start();
         GStats.reset();
         kernel.loop();
+    } catch (e) {
+        console.log(`Loop Error(${JSON.stringify(e)})`)
     } finally {
         kernel.log.DumpLogToConsole();
-        Profiler.output();
-        Profiler.stop();
         GStats.commit();
     }
 }

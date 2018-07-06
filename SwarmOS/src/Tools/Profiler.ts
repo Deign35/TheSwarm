@@ -1,57 +1,164 @@
-declare var Memory: {
-    profiler: ProfilerMemory
+
+declare interface ProfilerFile {
+    data: any,
+    total: number,
+    start?: number
 }
-export function init(): IProfiler {
-    const defaults = {
-        data: {},
-        total: 0,
-    };
 
-    if (!Memory.profiler) { Memory.profiler = defaults; }
+interface OutputData {
+    name: string;
+    calls: number;
+    cpuPerCall: number;
+    callsPerTick: number;
+    cpuPerTick: number;
+}
+const PROFILER_PATH = `S:`
+const PROFILER_FILENAME = `Profiler`
+export class ImplementedProfiler implements IProfiler {
+    constructor() {
+        this._fsHash = MasterFS.InstanceHash;
+        this._folder = MasterFS.GetFolder(PROFILER_PATH)!;
+        if (!this._folder) {
+            MasterFS.EnsurePath(PROFILER_PATH);
+            this._folder = MasterFS.GetFolder(PROFILER_PATH)!;
+        }
+        if (!this._folder.GetFile(PROFILER_FILENAME)) {
+            this._folder.SaveFile<ProfilerMemory>(PROFILER_FILENAME, {
+                data: {},
+                total: 0
+            })
+        }
+    }
+    private _fsHash!: string;
+    private _folder!: IFolder;
+    get folder() {
+        if (this._fsHash != MasterFS.InstanceHash) {
+            MasterFS.EnsurePath(PROFILER_PATH);
+            this._folder = MasterFS.GetFolder(PROFILER_PATH)!;
+        }
+        return this._folder;
+    }
+    get file(): IFile<ProfilerMemory> {
+        return this.folder!.GetFile<ProfilerMemory>(PROFILER_FILENAME)!;
+    }
+    get memory(): ProfilerMemory {
+        return this.file.contents;
+    }
+    isEnabled() {
+        return !!this.memory.start;
+    }
 
-    const cli: IProfiler = {
-        clear() {
-            const running = isEnabled();
-            Memory.profiler = defaults;
-            if (running) { Memory.profiler.start = Game.time; }
-            return "Profiler Memory cleared";
-        },
+    clear() {
+        let clearedMem: ProfilerMemory = {
+            data: {},
+            total: 0
+        }
+        if (this.isEnabled()) {
+            clearedMem.start = Game.time;
+        }
+        this.folder.SaveFile(PROFILER_FILENAME, clearedMem);
+        return 'Profiler memory cleared'
+    }
 
-        output() {
-            outputProfilerData();
-            return "Done";
-        },
+    output() {
+        let totalTicks = this.memory.total || 1;
+        if (this.memory.start) {
+            totalTicks += (Game.time - this.memory.start);
+        }
 
-        start() {
-            Memory.profiler.start = Game.time;
-            return "Profiler started";
-        },
+        ///////
+        // Process data
+        let totalCpu = 0;  // running count of average total CPU use per tick
+        let calls: number;
+        let time: number;
+        let result: Partial<OutputData>;
+        const data = Object.getOwnPropertyNames(this.memory.data).map((key) => {
+            calls = this.memory.data[key].calls;
+            time = this.memory.data[key].time;
+            result = {};
+            result.name = `${key}`;
+            result.calls = calls;
+            result.cpuPerCall = time / calls;
+            result.callsPerTick = calls / totalTicks;
+            result.cpuPerTick = time / totalTicks;
+            totalCpu += result.cpuPerTick;
+            return result as OutputData;
+        });
 
-        status() {
-            if (isEnabled()) {
-                return "Profiler is running";
-            }
-            return "Profiler is stopped";
-        },
+        if (Object.keys(data).length == 0) {
+            return;
+        }
+        data.sort((lhs, rhs) => rhs.cpuPerTick - lhs.cpuPerTick);
+        RawMemory.segments[SEG_Profiler] = (JSON.stringify(data));
+        GStats.addSimpleStat('totalCPU', totalCpu);
 
-        stop() {
-            if (!isEnabled()) { return; }
-            const timeRunning = (Game.time - Memory.profiler.start!) || 1;
-            Memory.profiler.total += timeRunning;
-            delete Memory.profiler.start;
-            return "Profiler stopped";
-        },
+        ///////
+        // Format data
+        let output = "";
 
-        toString() {
-            return "Profiler.start() - Starts the profiler\n" +
-                "Profiler.stop() - Stops/Pauses the profiler\n" +
-                "Profiler.status() - Returns whether is profiler is currently running or not\n" +
-                "Profiler.output() - Pretty-prints the collected profiler data to the console\n" +
-                this.status();
-        },
-    };
+        // get function name max length
+        const longestName = (_.max(data, (d) => d.name.length)).name.length + 2;
 
-    return cli;
+        //// Header line
+        output += _.padRight("Function", longestName);
+        output += _.padLeft("Tot Calls", 12);
+        output += _.padLeft("CPU/Call", 12);
+        output += _.padLeft("Calls/Tick", 12);
+        output += _.padLeft("CPU/Tick", 12);
+        output += _.padLeft("% of Tot\n", 12);
+
+        ////  Data lines
+        data.forEach((d) => {
+            output += _.padRight(`${d.name}`, longestName);
+            output += _.padLeft(`${d.calls}`, 12);
+            output += _.padLeft(`${d.cpuPerCall.toFixed(2)}ms`, 12);
+            output += _.padLeft(`${d.callsPerTick.toFixed(2)}`, 12);
+            output += _.padLeft(`${d.cpuPerTick.toFixed(2)}ms`, 12);
+            output += _.padLeft(`${(d.cpuPerTick / totalCpu * 100).toFixed(0)} %\n`, 12);
+        });
+
+        //// Footer line
+        output += `${totalTicks} total ticks measured`;
+        output += `\t\t\t${totalCpu.toFixed(2)} average CPU profiled per tick`;
+        console.log(output);
+        return 'Profiler output complete';
+    }
+    start() {
+        if (this.isEnabled()) {
+            this.stop();
+        }
+        this.memory.start = Game.time;
+        return 'Profiler start ' + Game.time;
+    }
+    stop() {
+        if (!this.isEnabled()) {
+            return;// 'Attempted to stop profiler, but its already stopped(' + Game.time + ').';
+        }
+        const timeRunning = (Game.time - this.memory.start!) || 1;
+        this.memory.total += timeRunning;
+        this.memory.start = undefined
+
+        return 'Profiler end ' + Game.time;
+    }
+    toString() {
+        return "Profiler.start() - Starts the profiler\n" +
+            "Profiler.stop() - Stops/Pauses the profiler\n" +
+            "Profiler.status() - Returns whether is profiler is currently running or not\n" +
+            "Profiler.output() - Pretty-prints the collected profiler data to the console\n" +
+            this.isEnabled();
+    }
+    record(key: string | symbol, time: number) {
+        let dataRecord = this.memory.data[key];
+        if (!dataRecord) {
+            this.memory.data[key] = {
+                calls: 0,
+                time: 0,
+            };
+            dataRecord = this.memory.data[key];
+        }
+        dataRecord.calls++;
+        dataRecord.time += time;
+    }
 }
 
 function wrapFunction(obj: object, key: PropertyKey, className?: string) {
@@ -76,11 +183,11 @@ function wrapFunction(obj: object, key: PropertyKey, className?: string) {
     ///////////
 
     obj[key] = function (this: any, ...args: any[]) {
-        if (isEnabled()) {
+        if (!!(MasterFS.GetFolder(PROFILER_PATH)!.GetFile<ProfilerMemory>(PROFILER_FILENAME)!.contents.start)) {
             const start = Game.cpu.getUsed();
             const result = originalFunction.apply(this, args);
             const end = Game.cpu.getUsed();
-            record(memKey, end - start);
+            Profiler.record(memKey, end - start);
             return result;
         }
         return originalFunction.apply(this, args);
@@ -94,6 +201,9 @@ export function profile(
     key?: string | symbol,
     _descriptor?: TypedPropertyDescriptor<Function>,
 ): void {
+    if ((C_PROFILER_ENABLED as number) == 0) {
+        return;
+    }
     if (key) {
         // case of method decorator
         wrapFunction(target, key);
@@ -109,91 +219,4 @@ export function profile(
     Object.getOwnPropertyNames(ctor.prototype).forEach((k) => {
         wrapFunction(ctor.prototype, k, className);
     });
-
-}
-
-function isEnabled(): boolean {
-    return Memory.profiler.start !== undefined;
-}
-
-function record(key: string | symbol, time: number) {
-    if (!Memory.profiler.data[key]) {
-        Memory.profiler.data[key] = {
-            calls: 0,
-            time: 0,
-        };
-    }
-    Memory.profiler.data[key].calls++;
-    Memory.profiler.data[key].time += time;
-}
-
-interface OutputData {
-    name: string;
-    calls: number;
-    cpuPerCall: number;
-    callsPerTick: number;
-    cpuPerTick: number;
-}
-
-function outputProfilerData() {
-    let totalTicks = Memory.profiler.total;
-    if (Memory.profiler.start) {
-        totalTicks += (Game.time - Memory.profiler.start) + 1;
-    }
-
-    ///////
-    // Process data
-    let totalCpu = 0;  // running count of average total CPU use per tick
-    let calls: number;
-    let time: number;
-    let result: Partial<OutputData>;
-    const data = Object.getOwnPropertyNames(Memory.profiler.data).map((key) => {
-        calls = Memory.profiler.data[key].calls;
-        time = Memory.profiler.data[key].time;
-        result = {};
-        result.name = `${key}`;
-        result.calls = calls;
-        result.cpuPerCall = time / calls;
-        result.callsPerTick = calls / totalTicks;
-        result.cpuPerTick = time / totalTicks;
-        totalCpu += result.cpuPerTick;
-        return result as OutputData;
-    });
-
-    if (Object.keys(data).length == 0) {
-        return;
-    }
-    data.sort((lhs, rhs) => rhs.cpuPerTick - lhs.cpuPerTick);
-    RawMemory.segments[SEG_Profiler] = (JSON.stringify(data));
-    GStats.addSimpleStat('totalCPU', totalCpu);
-
-    ///////
-    // Format data
-    let output = "";
-
-    // get function name max length
-    const longestName = (_.max(data, (d) => d.name.length)).name.length + 2;
-
-    //// Header line
-    output += _.padRight("Function", longestName);
-    output += _.padLeft("Tot Calls", 12);
-    output += _.padLeft("CPU/Call", 12);
-    output += _.padLeft("Calls/Tick", 12);
-    output += _.padLeft("CPU/Tick", 12);
-    output += _.padLeft("% of Tot\n", 12);
-
-    ////  Data lines
-    data.forEach((d) => {
-        output += _.padRight(`${d.name}`, longestName);
-        output += _.padLeft(`${d.calls}`, 12);
-        output += _.padLeft(`${d.cpuPerCall.toFixed(2)}ms`, 12);
-        output += _.padLeft(`${d.callsPerTick.toFixed(2)}`, 12);
-        output += _.padLeft(`${d.cpuPerTick.toFixed(2)}ms`, 12);
-        output += _.padLeft(`${(d.cpuPerTick / totalCpu * 100).toFixed(0)} %\n`, 12);
-    });
-
-    //// Footer line
-    output += `${totalTicks} total ticks measured`;
-    output += `\t\t\t${totalCpu.toFixed(2)} average CPU profiled per tick`;
-    console.log(output);
 }

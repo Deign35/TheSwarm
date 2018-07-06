@@ -46,9 +46,10 @@ declare interface IProfiler {
     clear(): void;
     output(): void;
     start(): void;
-    status(): void;
+    isEnabled(): void;
     stop(): void;
     toString(): string;
+    record(key: string | symbol, time: number): void;
 }
 declare const Profiler: IProfiler;
 declare function extensionInterface(interfaceId: string): (target: any, propertyKey: string) => any

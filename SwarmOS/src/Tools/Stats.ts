@@ -57,8 +57,8 @@ export class Statistics implements IStatistics {
     public commit(): void {
         this.addBaseStats();
         if (C_STATS_SAVETO_MEMORY) {
-            MasterFS.EnsurePath('/Stats');
-            MasterFS.SaveFile('/Stats', 'stats', this.stats);
+            MasterFS.EnsurePath(`S:${C_SEPERATOR}Stats`);
+            MasterFS.GetFolder(`S:${C_SEPERATOR}Stats`)!.SaveFile('stats', this.stats);
         }
 
         if (C_STATS_SAVETO_SEGMENT) {

@@ -1,23 +1,20 @@
 import { FileSystem } from "Core/FileSystem/FileSystem";
-import { profile } from "Tools/Profiler";
 
 const TS_Active = 1;
 const TS_Waiting = 2;
 const TS_Done = 3;
-
-const KERNEL_FOLDER_NAME = 'Kernel'
-const KERNEL_FOLDER_PATH = C_SEPERATOR + KERNEL_FOLDER_NAME;
 
 declare type TS_Active = 1;
 declare type TS_Waiting = 2;
 declare type TS_Done = 3;
 declare type TickState = TS_Active | TS_Waiting | TS_Done;
 
-@profile
+const CORE_FOLDER_PATH = 'Core';
 export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension {
     constructor(private processRegistry: IProcessRegistry, private extensionRegistry: IExtensionRegistry,
         private _logger: IKernelLoggerExtensions) {
         this._processCache = {};
+        this.LoadFileSystem();
     }
     private _processCache: IDictionary<PID, IProcess>;
     private _curTickState!: IDictionary<PID, TickState>;
@@ -41,9 +38,9 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
     }
 
     protected LoadFileSystem() {
-        global['MasterFS'] = new FileSystem();
-        MasterFS.EnsurePath(KERNEL_FOLDER_PATH);
-        let folder = MasterFS.GetFolder(KERNEL_FOLDER_PATH)!;
+        global['MasterFS'] = new FileSystem("S:");
+        MasterFS.EnsurePath(`S:${C_SEPERATOR}Core`);
+        let folder = MasterFS.GetFolder(`S:${C_SEPERATOR}Core`)!;
         this._procTableFile = folder.GetFile<ProcessTable>('procTable')!;
         if (!this._procTableFile) {
             folder.SaveFile('procTable', {});
@@ -175,10 +172,8 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
 
         let activeThreadIDs = Object.keys(this._curTickState);
         if (activeThreadIDs.length == 0) {
-            let emptyMem: MemBase = {
-            }
-            MasterFS.CreateFolder('', KERNEL_FOLDER_NAME);
-            this.startProcess(PKG_CLIProcessor, KERNEL_FOLDER_PATH, {}, {
+            MasterFS.EnsurePath(`S:${C_SEPERATOR}CLI`);
+            this.startProcess(PKG_CLIProcessor, `S:${C_SEPERATOR}CLI`, {}, {
                 desiredPID: 'CLI',
             })
             // Initialization doesn't work on the first tick for some reason.  So skip the first tick.
