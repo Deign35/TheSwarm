@@ -6,7 +6,7 @@ declare var Memory: {
 
 let version = 0;
 export class FileSystem implements IFileSystem {
-    constructor(private rootFolderName: string) {
+    constructor(private rootFolderName: string, private _memory: IDictionary<string, IDictionary<string, MemBase>>) {
         this._fsHash = `${Game.time}_${version++}`;
         let keys = Object.keys(this.memory);
         this._rootDrive = new Folder(rootFolderName, this.memory);
@@ -32,13 +32,10 @@ export class FileSystem implements IFileSystem {
         return this._fsHash;
     }
     protected get memory() {
-        if (!Memory.FileSystem) {
-            Memory.FileSystem = {};
+        if (!this._memory[this.rootFolderName]) {
+            this._memory[this.rootFolderName] = {};
         }
-        if (!Memory.FileSystem[this.rootFolderName]) {
-            Memory.FileSystem[this.rootFolderName] = {};
-        }
-        return Memory.FileSystem;
+        return this._memory;
     }
     private _rootDrive: IFolder;
     protected get Drive() {

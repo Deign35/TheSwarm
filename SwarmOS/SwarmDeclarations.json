@@ -23,6 +23,9 @@
             "comment": "Designated segments",
             "enabled": true,
             "entries": {
+                "Master_Drive": "\"M:\"",
+                "Cache_Drive": "\"C:\"",
+                "Temp_Drive": "\"T:\"",
                 "Profiler": 0,
                 "Stats": 1
             }

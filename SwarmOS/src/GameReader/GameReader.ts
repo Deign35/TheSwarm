@@ -3,17 +3,19 @@ declare interface RootFile {
     rf: string; // (r)oom (f)older
 }
 
-const GameReaderFileLocation = `S:\\GameData`;
+const GameReaderFolderName = 'GameData';
+const GameReaderFolderPath = `${SEG_Temp_Drive}${C_SEPERATOR}${GameReaderFolderName}`;
 const CREEP_FOLDER = 'creeps';
 const ROOM_FOLDER = 'rooms';
 
-class GameReader {
+export class GameReader {
+    static get FolderPath() { return GameReaderFolderPath; }
     private static rootFolder: IFolder;
     private static masterFile: RootFile;
     private static folders: IDictionary<string, IFolder>;
     static ReadGameState() {
-        MasterFS.EnsurePath(GameReaderFileLocation);
-        this.rootFolder = MasterFS.GetFolder(GameReaderFileLocation)!;
+        MasterFS.EnsurePath(GameReaderFolderPath);
+        this.rootFolder = MasterFS.GetFolder(GameReaderFolderPath)!;
         if (!this.rootFolder.GetFile('GR.Dat')) {
             this.rootFolder.SaveFile('GR.Dat', {});
         }
@@ -30,10 +32,10 @@ class GameReader {
     }
 
     private static LoadFolder(folder: string, index: string) {
-        this.folders[index] = MasterFS.GetFolder(`${GameReaderFileLocation}${C_SEPERATOR}${folder}`)!;
+        this.folders[index] = MasterFS.GetFolder(`${GameReaderFolderPath}${C_SEPERATOR}${folder}`)!;
     }
 
-    private static CreateCreepDataFile() {
+    private static CreateCreepDataFiles() {
         let curFiles = this.folders[CREEP_FOLDER].GetFileNames();
         let keys = Object.keys(curFiles);
         for (let i = 0; i < keys.length; i++) {
@@ -45,10 +47,15 @@ class GameReader {
 
         let creepNames = Object.keys(Game.creeps);
         for (let i = 0; i < creepNames.length; i++) {
-            let file = this.folders[CREEP_FOLDER].GetFile(creepNames[i]);
-            if (!file) {
-                this.folders[CREEP_FOLDER].SaveFile(creepNames[i], {});
+            let creepName = creepNames[i];
+            if (!this.folders[CREEP_FOLDER].GetFile(creepName)) {
+                this.folders[CREEP_FOLDER].SaveFile(creepName, {});
             }
+            this.UpdateCreepFile(this.folders[CREEP_FOLDER].GetFile(creepName)!, Game.creeps[creepName]);
         }
+    }
+
+    private static UpdateCreepFile(file: IFile<any>, creep: Creep) {
+
     }
 }

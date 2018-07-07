@@ -16,5 +16,4 @@ extensionRegistry.register(EXT_Kernel, kernel);
 import { OSPackage } from "Core/Types/EmptyProcess";
 OSPackage.install(processRegistry, extensionRegistry);
 import { CLIPackage } from "./CLI/index";
-import { Folder } from "./FileSystem/Folder";
 CLIPackage.install(processRegistry, extensionRegistry);

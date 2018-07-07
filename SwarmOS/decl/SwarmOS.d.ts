@@ -107,6 +107,8 @@ declare interface IFileSystem extends IPackageExtension {
 }
 
 declare const MasterFS: IFileSystem;
+declare const GCache: IFolder;
+declare const TCache: IFolder;
 
 declare interface MemBase {
     CV?: string; // Default (C)allback (V)alue to the HC.

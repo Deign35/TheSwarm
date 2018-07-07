@@ -1,5 +1,3 @@
-import { FileSystem } from "Core/FileSystem/FileSystem";
-
 const TS_Active = 1;
 const TS_Waiting = 2;
 const TS_Done = 3;
@@ -38,9 +36,8 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
     }
 
     protected LoadFileSystem() {
-        global['MasterFS'] = new FileSystem("S:");
-        MasterFS.EnsurePath(`S:${C_SEPERATOR}Core`);
-        let folder = MasterFS.GetFolder(`S:${C_SEPERATOR}Core`)!;
+        MasterFS.EnsurePath(`${SEG_Master_Drive}${C_SEPERATOR}${CORE_FOLDER_PATH}`);
+        let folder = MasterFS.GetFolder(`${SEG_Master_Drive}${C_SEPERATOR}${CORE_FOLDER_PATH}`)!;
         this._procTableFile = folder.GetFile<ProcessTable>('procTable')!;
         if (!this._procTableFile) {
             folder.SaveFile('procTable', {});
@@ -170,8 +167,8 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
 
         let activeThreadIDs = Object.keys(this._curTickState);
         if (activeThreadIDs.length == 0) {
-            MasterFS.EnsurePath(`S:${C_SEPERATOR}CLI`);
-            this.startProcess(PKG_CLIProcessor, `S:${C_SEPERATOR}CLI`, {
+            MasterFS.EnsurePath(`${SEG_Master_Drive}${C_SEPERATOR}CLI`);
+            this.startProcess(PKG_CLIProcessor, `${SEG_Master_Drive}${C_SEPERATOR}CLI`, {
                 desiredPID: 'CLI',
             })
             // Initialization doesn't work on the first tick for some reason.  So skip the first tick.

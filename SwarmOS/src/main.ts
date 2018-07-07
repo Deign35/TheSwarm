@@ -33,6 +33,8 @@ if (!Memory.VERSION || Memory.VERSION != SWARM_VERSION_DATE) {
     Memory.VERSION = SWARM_VERSION_DATE;
     console.log(`Updating OS complete`)
 }
+import * as FS from "FileSystem/index";
+FS.InitializeFileSystem();
 import { kernel } from "Core/index";
 
 import * as ProfilerDef from "Tools/Profiler";
@@ -42,6 +44,7 @@ Stats.setup();
 
 import "Tools/GlobalTools";
 import "Tools_Prototypes";
+import { GameReader } from "GameReader/GameReader"
 
 
 /*import { ActivitiesPackage } from "Activities/index";
@@ -54,6 +57,7 @@ kernel.installPackages([ActivitiesPackage, CreepJobsPackage, FlagPackage, Regist
 
 export function loop() {
     try {
+        FS.RefreshFileSystem();
         GStats.reset();
         kernel.loop();
     } catch (e) {

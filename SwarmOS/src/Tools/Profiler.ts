@@ -12,7 +12,7 @@ interface OutputData {
     callsPerTick: number;
     cpuPerTick: number;
 }
-const PROFILER_PATH = `S:`
+const PROFILER_PATH = `${SEG_Master_Drive}`
 const PROFILER_FILENAME = `Profiler`
 export class ImplementedProfiler implements IProfiler {
     constructor() {
