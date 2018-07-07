@@ -5,11 +5,8 @@ declare var Memory: {
 }
 
 export class Folder implements IFolder {
-    constructor(public Path: string) {
-        if (!Memory.FileSystem) {
-            Memory.FileSystem = {};
-        }
-        this._fileSystemMemory = Memory.FileSystem;
+    constructor(public Path: string, rootMemory: IDictionary<string, IDictionary<string, MemBase>>) {
+        this._fileSystemMemory = rootMemory;
         if (!this._fileSystemMemory[this.Path]) {
             this._fileSystemMemory[this.Path] = {};
         }

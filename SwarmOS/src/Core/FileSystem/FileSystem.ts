@@ -7,9 +7,9 @@ declare var Memory: {
 let version = 0;
 export class FileSystem implements IFileSystem {
     constructor(private rootFolderName: string) {
-        this._fileTick = `${Game.time}_${version++}`;
+        this._fsHash = `${Game.time}_${version++}`;
         let keys = Object.keys(this.memory);
-        this._rootDrive = new Folder(rootFolderName);
+        this._rootDrive = new Folder(rootFolderName, this.memory);
         this._folderCache = {}
         while (keys.length > 0) {
             let memPath = keys.shift();
@@ -27,9 +27,9 @@ export class FileSystem implements IFileSystem {
             }
         }
     }
-    private _fileTick: string;
-    get InstanceHash() {
-        return this._fileTick;
+    private _fsHash: string;
+    get FSHash() {
+        return this._fsHash;
     }
     protected get memory() {
         if (!Memory.FileSystem) {
@@ -53,57 +53,7 @@ export class FileSystem implements IFileSystem {
     }
     EnsurePath(pathStr: string) {
         if (!this.FolderCache[pathStr]) {
-            this.FolderCache[pathStr] = new Folder(pathStr);
+            this.FolderCache[pathStr] = new Folder(pathStr, this.memory);
         }
     }
-    /*CreateFolder(path: string, folderName: string) {
-        this.EnsurePath(`${path}${C_SEPERATOR}${folderName}`);
-    }
-    /*DeleteFolder(path: string, folderName: string) {
-        const fullPath = `${path}${C_SEPERATOR}${folderName}`;
-        let folder = this.GetFolder(fullPath);
-        if (folder) {
-            let childFolders = folder.GetFolderNames();
-            for (let i = 0; i < childFolders.length; i++) {
-                this.DeleteFolder(fullPath, childFolders[i]);
-            }
-            folder.DeleteFiles();
-        }
-        if (this.FolderCache[fullPath]) {
-            delete this.FolderCache[fullPath];
-        }
-    }
-    SaveFile<T>(path: string, fileName: string, mem: T) {
-        let folder = this.GetFolder(path);
-        if (!folder) {
-            throw new Error(`Error(${ERR_NOT_FOUND})--FileSystem.SaveFile(path[${path}])`);
-        }
-        if (!folder.GetFile(fileName)) {
-            folder.SaveFile(fileName, mem);
-        }
-        let file = folder.GetFile(fileName)!;
-        file.contents = mem;
-    }
-    GetFile<T>(path: string, fileName: string): IFile<T> | undefined {
-        let folder = this.GetFolder(path);
-        if (folder) {
-            return folder.GetFile(fileName)
-        }
-        return undefined;
-    }
-    DeleteFile(path: string, fileName: string): void {
-        let folder = this.GetFolder(path);
-        if (folder) {
-            folder.DeleteFile(fileName);
-        }
-    }
-    CopyFile(fromPath: string, fileName: string, toPath: string, deleteOriginal: boolean = true, newFileName?: string): boolean {
-        let file = this.GetFile(fromPath, fileName);
-        if (!file) { return false; }
-        if (deleteOriginal) {
-            this.DeleteFile(fromPath, fileName);
-        }
-        this.SaveFile(toPath, newFileName || fileName, file);
-        return true;
-    }*/
 }

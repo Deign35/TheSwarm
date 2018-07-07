@@ -1,12 +1,10 @@
-export abstract class ProcessBase<T extends MemBase> implements IProcess {
+export abstract class ProcessBase implements IProcess {
     constructor(protected context: IProcessContext) { }
     @extensionInterface(EXT_Registry)
     protected extensions!: IExtensionRegistry;
     @extensionInterface(EXT_Kernel)
     protected kernel!: IKernelExtensions;
 
-    private _procFile!: IFile<T>;
-    get memory(): T { return this._procFile.contents; }
     get log() { return this.context.log; }  // (TODO): Make registration include log values for the context?
     get rngSeed(): number { return this.context.rngSeed; }
     get pkgName(): string { return this.context.pkgName; }
@@ -20,10 +18,6 @@ export abstract class ProcessBase<T extends MemBase> implements IProcess {
     private _folder!: IFolder;
     PrepTick(): void {
         this._folder = MasterFS.GetFolder(`${this.memPath}`)!;
-        this._procFile = this.memFolder.GetFile<T>(this.pid)!;
-        if (!this._procFile) {
-            throw new Error(`BasicProcess.PrepTick(Process file missing: ${this.context.memPath}::${this.pid})`)
-        }
         if (this.OnTickStart) {
             this.OnTickStart();
         }
@@ -33,7 +27,7 @@ export abstract class ProcessBase<T extends MemBase> implements IProcess {
     EndTick?(): void;
 
     private _hasEnded = false;
-    OnChildProcessEnd?(proc: ProcessBase<any>, endReason: string): void;
+    OnChildProcessEnd?(proc: ProcessBase, endReason: string): void;
     EndProcess(endReason: string) {
         if (this._hasEnded) {
             return;
@@ -43,7 +37,6 @@ export abstract class ProcessBase<T extends MemBase> implements IProcess {
         if (proc && proc.OnChildProcessEnd) {
             proc.OnChildProcessEnd(this, endReason);
         }
-        this._folder.DeleteFile(this.pid);
         this.kernel.killProcess(this.pid, endReason);
     }
 }

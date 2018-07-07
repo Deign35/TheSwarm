@@ -17,7 +17,6 @@ declare interface IProcess {
     pid: PID;
     parentPID?: PID;
     rngSeed?: number;
-    memory: MemBase
     memPath: string;
 
     PrepTick?(): void;
@@ -104,7 +103,7 @@ declare interface IFile<T> {
 declare interface IFileSystem extends IPackageExtension {
     GetFolder(pathStr: string): IFolder | undefined
     EnsurePath(path: string): void;
-    readonly InstanceHash: string;
+    readonly FSHash: string;
 }
 
 declare const MasterFS: IFileSystem;

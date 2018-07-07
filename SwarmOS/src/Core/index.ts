@@ -13,7 +13,7 @@ export var kernel = new Kernel(processRegistry, extensionRegistry, OS_Logger);
 
 extensionRegistry.register(EXT_Kernel, kernel);
 
-import { OSPackage } from "Core/EmptyProcess";
+import { OSPackage } from "Core/Types/EmptyProcess";
 OSPackage.install(processRegistry, extensionRegistry);
 import { CLIPackage } from "./CLI/index";
 import { Folder } from "./FileSystem/Folder";

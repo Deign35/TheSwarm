@@ -11,7 +11,7 @@ import { profile } from "Tools/Profiler";
 const ENABLE_PROFILING = true;
 
 @profile
-class CLIProcessor extends ProcessBase<CLI_Memory> {
+class CLIProcessor extends ProcessBase {
     RunThread(): ThreadState {
         try {
             this.log.alert(`CLI Tick: ${Game.time}`);

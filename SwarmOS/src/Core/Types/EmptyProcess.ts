@@ -8,24 +8,11 @@ export const OSPackage: IPackage<MemBase> = {
 import { ProcessBase } from "Core/Types/ProcessTypes";
 
 const ENABLE_PROFILING = true;
-class EmptyProcess extends ProcessBase<MemBase> {
-    private get count() {
-        if (!this.memory['count']) {
-            this.memory['count'] = 0;
-        }
-        return this.memory['count'];
-    }
-    private set count(num) {
-        this.memory['count'] = num;
-    }
+class EmptyProcess extends ProcessBase {
     RunThread(): ThreadState {
         let start = Game.cpu.getUsed();
         try {
-            this.count++;
-            this.log.info(`[${Game.time}] -- ${this.pid} -- Message(${this.count})`);
-            if (this.count > 25) {
-                this.EndProcess('Count has completed');
-            }
+            this.log.info(`[${Game.time}] -- ${this.pid} -- Message()`);
         } catch (ex) {
             this.log.info(`An exception occurred while trying experimental stuff (${ex})`);
         }

@@ -16,7 +16,7 @@ const PROFILER_PATH = `S:`
 const PROFILER_FILENAME = `Profiler`
 export class ImplementedProfiler implements IProfiler {
     constructor() {
-        this._fsHash = MasterFS.InstanceHash;
+        this._fsHash = MasterFS.FSHash;
         this._folder = MasterFS.GetFolder(PROFILER_PATH)!;
         if (!this._folder) {
             MasterFS.EnsurePath(PROFILER_PATH);
@@ -32,7 +32,7 @@ export class ImplementedProfiler implements IProfiler {
     private _fsHash!: string;
     private _folder!: IFolder;
     get folder() {
-        if (this._fsHash != MasterFS.InstanceHash) {
+        if (this._fsHash != MasterFS.FSHash) {
             MasterFS.EnsurePath(PROFILER_PATH);
             this._folder = MasterFS.GetFolder(PROFILER_PATH)!;
         }

@@ -53,7 +53,7 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
         }
     }
 
-    startProcess(packageName: ScreepsPackage, memPath: string, startMem: MemBase, opts?: {
+    startProcess(packageName: ScreepsPackage, memPath: string, opts?: {
         parentPID?: PID,
         desiredPID?: PID
     }): PID {
@@ -63,13 +63,11 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
         }
         let folder = MasterFS.GetFolder(memPath);
         if (!folder) {
-            throw new Error(`Could not create memory for new process.  Kernel.startProcess(${packageName}, ${memPath}, ${JSON.stringify(startMem)}, ${JSON.stringify(opts)})`)
+            throw new Error(`Could not create memory for new process.  Kernel.startProcess(${packageName}, ${memPath}, ${JSON.stringify(opts)})`)
         }
-        folder.SaveFile(newPID, startMem);
-        let file = folder.GetFile(newPID)!;
         let pInfo: ProcInfo = {
             PKG: packageName,
-            path: file.folderPath
+            path: memPath
         };
         this.processTable[newPID] = pInfo;
         this.setParent(newPID, opts && opts.parentPID);
@@ -173,7 +171,7 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
         let activeThreadIDs = Object.keys(this._curTickState);
         if (activeThreadIDs.length == 0) {
             MasterFS.EnsurePath(`S:${C_SEPERATOR}CLI`);
-            this.startProcess(PKG_CLIProcessor, `S:${C_SEPERATOR}CLI`, {}, {
+            this.startProcess(PKG_CLIProcessor, `S:${C_SEPERATOR}CLI`, {
                 desiredPID: 'CLI',
             })
             // Initialization doesn't work on the first tick for some reason.  So skip the first tick.
