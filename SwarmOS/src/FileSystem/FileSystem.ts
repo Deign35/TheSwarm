@@ -6,7 +6,9 @@ declare var Memory: {
 
 let version = 0;
 export class FileSystem implements IFileSystem {
+    private _beginTick: number;
     constructor(private rootFolderName: string, private _memory: IDictionary<string, IDictionary<string, MemBase>>) {
+        this._beginTick = Game.time;
         this._fsHash = `${Game.time}_${version++}`;
         let keys = Object.keys(this.memory);
         this._rootDrive = new Folder(rootFolderName, this.memory);
@@ -51,5 +53,15 @@ export class FileSystem implements IFileSystem {
         if (!this.FolderCache[pathStr]) {
             this.FolderCache[pathStr] = new Folder(pathStr, this.memory);
         }
+    }
+
+    RecordStats() {
+        //let folderStats = {};
+        GStats.addStat(`FS${C_SEPERATOR}${this.rootFolderName}${C_SEPERATOR}${this.FSHash}`, {
+            //folderStats: folderStats,
+            numFolders: Object.keys(this._folderCache).length,
+            size: JSON.stringify(this._memory).length,
+            start: this._beginTick,
+        });
     }
 }

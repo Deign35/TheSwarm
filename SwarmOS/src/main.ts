@@ -59,6 +59,7 @@ export function loop() {
         FS.RefreshFileSystem();
         GStats.reset();
         kernel.loop();
+        FS.RecordStats();
     } catch (e) {
         console.log(`Loop Error(${(e as Error).message})\nStack(${(e as Error).stack})`);
     } finally {

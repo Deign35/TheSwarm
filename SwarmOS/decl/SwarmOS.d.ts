@@ -109,6 +109,7 @@ declare interface IFile<T> {
 declare interface IFileSystem extends IPackageExtension {
     GetFolder(pathStr: string): IFolder | undefined
     EnsurePath(path: string): void;
+    RecordStats(): void;
     readonly FSHash: string;
 }
 

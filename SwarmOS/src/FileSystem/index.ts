@@ -30,3 +30,13 @@ export function RefreshFileSystem() {
         tick: Game.time,
     })
 }
+
+export function RecordStats() {
+    TCache.RecordStats();
+    if (Game.time % 11 == 0) {
+        RAM.RecordStats();
+    }
+    if (Game.time % 29 == 0) {
+        MasterFS.RecordStats();
+    }
+}
