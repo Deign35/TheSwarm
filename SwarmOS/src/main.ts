@@ -44,7 +44,6 @@ Stats.setup();
 
 import "Tools/GlobalTools";
 import "Tools_Prototypes";
-import { GameReader } from "GameReader/GameReader"
 
 
 /*import { ActivitiesPackage } from "Activities/index";
@@ -61,7 +60,7 @@ export function loop() {
         GStats.reset();
         kernel.loop();
     } catch (e) {
-        console.log(`Loop Error(${JSON.stringify(e)})`)
+        console.log(`Loop Error(${(e as Error).message})\nStack(${(e as Error).stack})`);
     } finally {
         kernel.log.DumpLogToConsole();
         GStats.commit();

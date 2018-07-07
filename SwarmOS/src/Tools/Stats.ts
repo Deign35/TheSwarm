@@ -58,7 +58,7 @@ export class Statistics implements IStatistics {
         this.addBaseStats();
         if (C_STATS_SAVETO_MEMORY) {
             MasterFS.EnsurePath(`${SEG_Master_Drive}${C_SEPERATOR}Stats`);
-            MasterFS.GetFolder(`${SEG_Master_Drive}${C_SEPERATOR}Stats`)!.SaveFile('stats', this.stats);
+            MasterFS.GetFolder(`${SEG_Master_Drive}${C_SEPERATOR}Stats`)!.CreateFile('stats', this.stats);
         }
 
         if (C_STATS_SAVETO_SEGMENT) {

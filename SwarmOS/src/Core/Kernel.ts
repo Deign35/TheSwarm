@@ -22,8 +22,8 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
     get log() {
         return this._logger;
     }
-    get processTable(): ProcessTable {
-        return this._procTableFile.contents;
+    get processTable(): IFile<ProcessTable> {
+        return this._procTableFile;
     }
 
     installPackage(pack: IPackage<{}>) {
@@ -40,12 +40,12 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
         let folder = MasterFS.GetFolder(`${SEG_Master_Drive}${C_SEPERATOR}${CORE_FOLDER_PATH}`)!;
         this._procTableFile = folder.GetFile<ProcessTable>('procTable')!;
         if (!this._procTableFile) {
-            folder.SaveFile('procTable', {});
+            folder.CreateFile('procTable');
             this._procTableFile = folder.GetFile<ProcessTable>('procTable')!;
         }
         this._errorFile = folder.GetFile<string[]>('errors')!;
         if (!this._errorFile) {
-            folder.SaveFile('errors', {});
+            folder.CreateFile('errors');
             this._errorFile = folder.GetFile<string[]>('errors')!;
         }
     }
@@ -55,7 +55,7 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
         desiredPID?: PID
     }): PID {
         let newPID: PID = (opts && opts.desiredPID) || 'p' + GetSUID();
-        while (this.processTable[newPID] && !this.processTable[newPID].end) {
+        while (this.processTable.Get(newPID) && !this.processTable.Get<ProcInfo>(newPID).end) {
             newPID += '_' + GetSUID();
         }
         let folder = MasterFS.GetFolder(memPath);
@@ -66,7 +66,7 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
             PKG: packageName,
             path: memPath
         };
-        this.processTable[newPID] = pInfo;
+        this.processTable.Set(newPID, pInfo);
         this.setParent(newPID, opts && opts.parentPID);
 
         this.PrepTick(newPID);
@@ -75,7 +75,7 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
 
     createProcess(id: PID): IProcess {
         this.log.debug(`ConstructProcess ${id}`);
-        let pInfo = this.processTable[id];
+        let pInfo = this.processTable.Get<ProcInfo>(id);
         if (!pInfo) {
             throw new Error(`Process ${id} does not exist`);
         }
@@ -88,10 +88,10 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
             rngSeed: GetRandomIndex(primes_3000),
             memPath: pInfo.path,
             get isActive() {
-                return kernelContext.processTable[this.pid] && !kernelContext.processTable[this.pid].end;
+                return kernelContext.processTable.Get(this.pid) && !kernelContext.processTable.Get<ProcInfo>(this.pid).end;
             },
             get pPID() {
-                return kernelContext.processTable[this.pid] && kernelContext.processTable[this.pid].pP || "";
+                return kernelContext.processTable.Get<ProcInfo>(this.pid) && kernelContext.processTable.Get<ProcInfo>(this.pid).pP || "";
             },
             get log() {
                 return loggerContext;
@@ -111,15 +111,15 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
     }
 
     killProcess(id: PID, msg: string): void {
-        let pInfo = this.processTable[id];
+        let pInfo = this.processTable.Get<ProcInfo>(id);
         if (!pInfo) return;
         if (msg) {
             this.log.info(`${id} killed - ${msg}`);
         }
         pInfo.end = Game.time;
-        let ids = Object.keys(this.processTable);
+        let ids = this.processTable.GetDataIDs();
         for (let i = 0; i < ids.length; i++) {
-            let otherPI = this.processTable[ids[i]]
+            let otherPI = this.processTable.Get<ProcInfo>(ids[i]);
             if (otherPI && !otherPI.end && otherPI.pP === ids[i]) {
                 this.killProcess(ids[i], msg);
             }
@@ -127,10 +127,9 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
     }
 
     getProcessByPID(pid: PID): IProcess | undefined {
-        if (!this.processTable[pid] || this.processTable[pid].end) {
+        if (!this.processTable.Get(pid) || this.processTable.Get<ProcInfo>(pid).end) {
             return;
         }
-
         if (!this._processCache[pid]) {
             this.createProcess(pid);
         }
@@ -138,22 +137,22 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
     }
 
     setParent(pid: PID, parentPID?: PID): boolean {
-        if (!this.processTable[pid]) {
+        if (!this.processTable.Get(pid)) {
             return false;
         }
         if (parentPID && !this.getProcessByPID(parentPID)) {
             return false;
         }
-        this.processTable[pid].pP = parentPID;
+        this.processTable.Get<ProcInfo>(pid).pP = parentPID;
         return true;
     }
 
     loop() {
         this.LoadFileSystem();
         this._curTickState = {};
-        let processIDs = Object.keys(this.processTable);
+        let processIDs = this.processTable.GetDataIDs();
         for (let i = 0; i < processIDs.length; i++) {
-            let pInfo = this.processTable[processIDs[i]];
+            let pInfo = this.processTable.Get<ProcInfo>(processIDs[i]);
             if (pInfo.end) continue;
             if (pInfo.sl) {
                 if (pInfo.sl! <= Game.time) {
@@ -197,7 +196,7 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
             }
         }
 
-        processIDs = Object.keys(this.processTable);
+        processIDs = this.processTable.GetDataIDs();
         for (let i = 0; i < processIDs.length; i++) {
             this.EndTick(processIDs[i]);
         }
@@ -206,7 +205,7 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
     private RunThreads(ids: PID[]) {
         while (ids.length > 0) {
             let pid = ids.shift()!;
-            let pInfo = this.processTable[pid];
+            let pInfo = this.processTable.Get<ProcInfo>(pid);
             try {
                 let process = this.getProcessByPID(pid);
                 if (!process) {
@@ -228,7 +227,7 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
                         break;
                 }
             } catch (e) {
-                let pInfo = this.processTable[pid];
+                let pInfo = this.processTable.Get<ProcInfo>(pid);
                 this.killProcess(pid, `Kernel.loop()`);
                 pInfo.err = e.stack || e.toString();
                 this.log.error(`[${pid}] ${pInfo.PKG} crashed\n${e.stack}`);
@@ -240,10 +239,10 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
         if (this._curTickState[pid]) {
             return;
         }
-        let pInfo = this.processTable[pid];
+        let pInfo = this.processTable.Get<ProcInfo>(pid);
         try {
             let proc = this.getProcessByPID(pid);
-            if (proc && !this.processTable[pid].end) {
+            if (proc && !pInfo.end) {
                 if (proc.PrepTick) {
                     proc.PrepTick();
                 }
@@ -257,7 +256,7 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
     }
 
     private EndTick(pid: PID) {
-        let pInfo = this.processTable[pid];
+        let pInfo = this.processTable.Get<ProcInfo>(pid);
         if (this._curTickState[pid]) {
             let proc = this.getProcessByPID(pid);
             if (proc && proc.EndTick) {
@@ -274,22 +273,23 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
 
         if (pInfo.end && pInfo.end + 100 <= Game.time) {
             if (pInfo.err) {
-                this._errorFile.contents[pid + '_' + pInfo.end] = pInfo.err;
+                this._errorFile.Set(pid + '_' + pInfo.end, pInfo.err);
             }
-            delete this.processTable[pid];
+            this.processTable.Remove(pid);
             delete this._processCache[pid];
             return;
         }
     }
 
     sleep(pid: PID, ticks: number): void {
-        let pInfo = this.processTable[pid];
+        let pInfo = this.processTable.Get<ProcInfo>(pid);
         pInfo.sl = Game.time + ticks;
     }
 
     wake(pid: PID): void {
-        if (this.processTable[pid] && this.processTable[pid].sl) {
-            delete this.processTable[pid].sl;
+        let pInfo = this.processTable.Get<ProcInfo>(pid);
+        if (pInfo && pInfo.sl) {
+            delete pInfo.sl;
             this.PrepTick(pid);
             this._curTickState[pid] = TS_Waiting;
         }

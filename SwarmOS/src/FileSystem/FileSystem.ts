@@ -22,8 +22,7 @@ export class FileSystem implements IFileSystem {
             this.EnsurePath(memPath);
             let folder = this.GetFolder(memPath)!;
             for (let i = 0; i < fileIDs.length; i++) {
-                let fileName = fileIDs[i];
-                folder.SaveFile(fileName, folderData[fileName]);
+                folder.CreateFile(fileIDs[i], folderData[fileIDs[i]]);
             }
         }
     }

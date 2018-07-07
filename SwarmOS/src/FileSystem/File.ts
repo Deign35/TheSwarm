@@ -1,17 +1,21 @@
-declare var Memory: {
-    FileSystem: IDictionary<string, IDictionary<string, MemBase>>;
-}
-
 export class File<T> implements IFile<T> {
+    GetRawFileData(): T {
+        return this._contents;
+    }
+    Get<U>(id: string): U {
+        return this._contents[id];
+    }
+    Set<U>(id: string, val: U): void {
+        this._contents[id] = val;
+    }
+    Remove(id: string) {
+        delete this._contents[id];
+    }
+    GetDataIDs() {
+        return Object.keys(this._contents);
+    }
     constructor(private _folderPath: string, private _fileName: string, private _contents: T) {
         this._lastUpdated = Game.time;
-    }
-    set contents(overWrite: T) {
-        this._contents = overWrite;
-        this._lastUpdated = Game.time;
-    }
-    get contents(): T {
-        return this._contents;
     }
     get filePath(): string {
         return this.folderPath + C_SEPERATOR + this.fileName;

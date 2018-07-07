@@ -24,7 +24,7 @@
             "enabled": true,
             "entries": {
                 "Master_Drive": "\"M:\"",
-                "Cache_Drive": "\"C:\"",
+                "RAM_Drive": "\"R:\"",
                 "Temp_Drive": "\"T:\"",
                 "Profiler": 0,
                 "Stats": 1

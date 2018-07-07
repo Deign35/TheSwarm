@@ -12,7 +12,7 @@ interface OutputData {
     callsPerTick: number;
     cpuPerTick: number;
 }
-const PROFILER_PATH = `${SEG_Master_Drive}`
+const PROFILER_PATH = `${SEG_Master_Drive}${C_SEPERATOR}Core`
 const PROFILER_FILENAME = `Profiler`
 export class ImplementedProfiler implements IProfiler {
     constructor() {
@@ -23,7 +23,7 @@ export class ImplementedProfiler implements IProfiler {
             this._folder = MasterFS.GetFolder(PROFILER_PATH)!;
         }
         if (!this._folder.GetFile(PROFILER_FILENAME)) {
-            this._folder.SaveFile<ProfilerMemory>(PROFILER_FILENAME, {
+            this._folder.CreateFile<ProfilerMemory>(PROFILER_FILENAME, {
                 data: {},
                 total: 0
             })
@@ -41,11 +41,8 @@ export class ImplementedProfiler implements IProfiler {
     get file(): IFile<ProfilerMemory> {
         return this.folder!.GetFile<ProfilerMemory>(PROFILER_FILENAME)!;
     }
-    get memory(): ProfilerMemory {
-        return this.file.contents;
-    }
     isEnabled() {
-        return !!this.memory.start;
+        return !!this.file.Get('start');
     }
 
     clear() {
@@ -56,14 +53,14 @@ export class ImplementedProfiler implements IProfiler {
         if (this.isEnabled()) {
             clearedMem.start = Game.time;
         }
-        this.folder.SaveFile(PROFILER_FILENAME, clearedMem);
+        this.folder.CreateFile(PROFILER_FILENAME, clearedMem);
         return 'Profiler memory cleared'
     }
 
     output() {
-        let totalTicks = this.memory.total || 1;
-        if (this.memory.start) {
-            totalTicks += (Game.time - this.memory.start);
+        let totalTicks = this.file.Get<number>('total') || 1;
+        if (this.file.Get('start')) {
+            totalTicks += (Game.time - this.file.Get<number>('start'));
         }
 
         ///////
@@ -72,9 +69,10 @@ export class ImplementedProfiler implements IProfiler {
         let calls: number;
         let time: number;
         let result: Partial<OutputData>;
-        const data = Object.getOwnPropertyNames(this.memory.data).map((key) => {
-            calls = this.memory.data[key].calls;
-            time = this.memory.data[key].time;
+        let rawData = this.file.Get('data');
+        const data = Object.getOwnPropertyNames(rawData).map((key) => {
+            calls = rawData[key].calls;
+            time = rawData[key].time;
             result = {};
             result.name = `${key}`;
             result.calls = calls;
@@ -127,16 +125,16 @@ export class ImplementedProfiler implements IProfiler {
         if (this.isEnabled()) {
             this.stop();
         }
-        this.memory.start = Game.time;
+        this.file.Set('start', Game.time);
         return 'Profiler start ' + Game.time;
     }
     stop() {
         if (!this.isEnabled()) {
             return;// 'Attempted to stop profiler, but its already stopped(' + Game.time + ').';
         }
-        const timeRunning = (Game.time - this.memory.start!) || 1;
-        this.memory.total += timeRunning;
-        this.memory.start = undefined
+        const timeRunning = (Game.time - this.file.Get<number>('start')) || 1;
+        this.file.Set('total', timeRunning + this.file.Get<number>('total'));
+        this.file.Remove('start');
 
         return 'Profiler end ' + Game.time;
     }
@@ -147,14 +145,15 @@ export class ImplementedProfiler implements IProfiler {
             "Profiler.output() - Pretty-prints the collected profiler data to the console\n" +
             this.isEnabled();
     }
-    record(key: string | symbol, time: number) {
-        let dataRecord = this.memory.data[key];
+    record(key: string, time: number) {
+        let data = this.file.Get('data');
+        let dataRecord = data[key];
         if (!dataRecord) {
-            this.memory.data[key] = {
+            data[key] = {
                 calls: 0,
                 time: 0,
             };
-            dataRecord = this.memory.data[key];
+            dataRecord = data[key];
         }
         dataRecord.calls++;
         dataRecord.time += time;
@@ -183,7 +182,7 @@ function wrapFunction(obj: object, key: PropertyKey, className?: string) {
     ///////////
 
     obj[key] = function (this: any, ...args: any[]) {
-        if (!!(MasterFS.GetFolder(PROFILER_PATH)!.GetFile<ProfilerMemory>(PROFILER_FILENAME)!.contents.start)) {
+        if (!!(MasterFS.GetFolder(PROFILER_PATH)!.GetFile<ProfilerMemory>(PROFILER_FILENAME)!.Get('start'))) {
             const start = Game.cpu.getUsed();
             const result = originalFunction.apply(this, args);
             const end = Game.cpu.getUsed();

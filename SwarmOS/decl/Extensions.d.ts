@@ -37,7 +37,7 @@ declare interface IExtensionRegistry extends IPackageExtension {
  */
 declare interface IKernelExtensions extends IPackageExtension {
     installPackages(packages: IPackage<MemBase>[]): void;
-    startProcess(packageName: string, savePath: string, opts?: {
+    startProcess(packageName: ScreepsPackage, memPath: string, opts?: {
         parentPID?: PID,
         desiredPID?: PID
     }): PID;

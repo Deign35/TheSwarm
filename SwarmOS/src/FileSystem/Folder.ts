@@ -1,9 +1,4 @@
 import { File } from "./File";
-
-declare var Memory: {
-    FileSystem: IDictionary<string, IDictionary<string, MemBase>>;
-}
-
 export class Folder implements IFolder {
     constructor(public Path: string, rootMemory: IDictionary<string, IDictionary<string, MemBase>>) {
         this._fileSystemMemory = rootMemory;
@@ -23,12 +18,11 @@ export class Folder implements IFolder {
     GetFileNames() {
         return Object.keys(this._files);
     }
-    SaveFile<T>(fileName: string, mem: T) {
-        this._fileSystemMemory[this.Path][fileName] = mem;
+    CreateFile<T>(fileName: string, contents?: T) {
         if (!this.GetFile(fileName)) {
-            this._files[fileName] = new File(this.Path, fileName, mem);
+            this._fileSystemMemory[this.Path][fileName] = contents || {};
+            this._files[fileName] = new File(this.Path, fileName, this._fileSystemMemory[this.Path][fileName]);
         }
-        this._files[fileName].contents = mem;
     }
     GetFile<T>(fileName: string): File<T> | undefined {
         return this._files[fileName]

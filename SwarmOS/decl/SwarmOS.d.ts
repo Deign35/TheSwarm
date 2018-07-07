@@ -89,16 +89,22 @@ declare interface IWorkerGroupProcess extends IProcess {
 declare interface IFolder {
     readonly Path: string;
     GetFileNames(): string[];
-    SaveFile<T>(fileName: string, mem: T): void;
+    CreateFile<T>(fileName: string, data?: T): void;
     GetFile<T>(fileName: string): IFile<T> | undefined;
     DeleteFile(fileName: string): void;
     DeleteFiles(): void;
 }
 declare interface IFile<T> {
-    contents: T;
     readonly filePath: string;
     readonly folderPath: string;
     readonly fileName: string;
+
+    Get<U>(id: string): U;
+    Set<U>(id: string, val: U): void;
+    Remove(id: string): void;
+
+    GetRawFileData(): T;
+    GetDataIDs(): string[];
 }
 declare interface IFileSystem extends IPackageExtension {
     GetFolder(pathStr: string): IFolder | undefined
@@ -107,8 +113,8 @@ declare interface IFileSystem extends IPackageExtension {
 }
 
 declare const MasterFS: IFileSystem;
-declare const GCache: IFolder;
-declare const TCache: IFolder;
+declare const RAM: IFileSystem;
+declare const TCache: IFileSystem;
 
 declare interface MemBase {
     CV?: string; // Default (C)allback (V)alue to the HC.
