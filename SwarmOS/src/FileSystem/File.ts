@@ -2,10 +2,10 @@ export class File<T> implements IFile<T> {
     GetRawFileData(): T {
         return this._contents;
     }
-    Get<U>(id: string): U {
+    Get<U extends keyof T>(id: U): T[U] {
         return this._contents[id];
     }
-    Set<U>(id: string, val: U): void {
+    Set<U extends keyof T>(id: U, val: T[U]): void {
         this._contents[id] = val;
     }
     Remove(id: string) {

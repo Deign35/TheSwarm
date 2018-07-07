@@ -99,8 +99,8 @@ declare interface IFile<T> {
     readonly folderPath: string;
     readonly fileName: string;
 
-    Get<U>(id: string): U;
-    Set<U>(id: string, val: U): void;
+    Get<U extends keyof T>(id: U): T[U];
+    Set<U extends keyof T>(id: U, val: T[U]): void
     Remove(id: string): void;
 
     GetRawFileData(): T;

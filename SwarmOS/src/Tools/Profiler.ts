@@ -58,9 +58,9 @@ export class ImplementedProfiler implements IProfiler {
     }
 
     output() {
-        let totalTicks = this.file.Get<number>('total') || 1;
+        let totalTicks = this.file.Get('total') || 1;
         if (this.file.Get('start')) {
-            totalTicks += (Game.time - this.file.Get<number>('start'));
+            totalTicks += (Game.time - (this.file.Get('start') || 0));
         }
 
         ///////
@@ -132,8 +132,8 @@ export class ImplementedProfiler implements IProfiler {
         if (!this.isEnabled()) {
             return;// 'Attempted to stop profiler, but its already stopped(' + Game.time + ').';
         }
-        const timeRunning = (Game.time - this.file.Get<number>('start')) || 1;
-        this.file.Set('total', timeRunning + this.file.Get<number>('total'));
+        const timeRunning = (Game.time - (this.file.Get('start') || 0)) || 1;
+        this.file.Set('total', timeRunning + this.file.Get('total'));
         this.file.Remove('start');
 
         return 'Profiler end ' + Game.time;
@@ -160,7 +160,7 @@ export class ImplementedProfiler implements IProfiler {
     }
 }
 
-function wrapFunction(obj: object, key: PropertyKey, className?: string) {
+function wrapFunction(obj: object, key: string, className?: string) {
     const descriptor = Object.getOwnPropertyDescriptor(obj, key);
     if (!descriptor || descriptor.get || descriptor.set) { return; }
 
@@ -194,10 +194,10 @@ function wrapFunction(obj: object, key: PropertyKey, className?: string) {
 }
 
 export function profile(target: Function): void;
-export function profile(target: object, key: string | symbol, _descriptor: TypedPropertyDescriptor<Function>): void;
+export function profile(target: object, key: string, _descriptor: TypedPropertyDescriptor<Function>): void;
 export function profile(
     target: object | Function,
-    key?: string | symbol,
+    key?: string,
     _descriptor?: TypedPropertyDescriptor<Function>,
 ): void {
     if ((C_PROFILER_ENABLED as number) == 0) {
