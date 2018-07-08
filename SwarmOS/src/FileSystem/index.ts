@@ -25,9 +25,9 @@ export function InitializeFileSystem() {
 
 export function RefreshFileSystem() {
     Memory.FileSystem = MasterFS.GetDataBacking();
-    global['Flash'] = new FileSystem(SEG_Temp_Drive, {});
-    Flash.EnsurePath(SEG_Temp_Drive);
-    Flash.GetFolder(SEG_Temp_Drive)!.CreateFile('dat', {
+    global['Flash'] = new FileSystem(SEG_Flash_Drive, {});
+    Flash.EnsurePath(SEG_Flash_Drive);
+    Flash.GetFolder(SEG_Flash_Drive)!.CreateFile('dat', {
         tick: Game.time,
     })
 }

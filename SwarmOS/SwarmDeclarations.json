@@ -25,7 +25,7 @@
             "entries": {
                 "Master_Drive": "\"M:\"",
                 "RAM_Drive": "\"R:\"",
-                "Temp_Drive": "\"T:\"",
+                "Flash_Drive": "\"F:\"",
                 "Profiler": 0,
                 "Stats": 1
             }
@@ -40,7 +40,8 @@
             "entries": [
                 "CLIProcessor",
                 "EmptyProcess",
-                "Player"
+                "Player",
+                "Test"
             ]
         },
         "APKG": {
@@ -145,6 +146,17 @@
                 "Plain": "plain",
                 "Swamp": "swamp",
                 "Wall": "wall"
+            }
+        },
+        "CLI": {
+            "comment": "Command line commands",
+            "enabled": true,
+            "combinedType": "CLI_Command",
+            "string": true,
+            "type": true,
+            "entries": {
+                "ResetMemory": "reset",
+                "Launch": "launch"
             }
         }
     }
