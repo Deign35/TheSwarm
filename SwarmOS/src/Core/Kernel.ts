@@ -165,10 +165,10 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
         }
 
         let activeThreadIDs = Object.keys(this._curTickState);
-        if (activeThreadIDs.length == 0) {
-            MasterFS.EnsurePath(`${SEG_Master_Drive}${C_SEPERATOR}CLI`);
-            this.startProcess(PKG_CLIProcessor, `${SEG_Master_Drive}${C_SEPERATOR}CLI`, {
-                desiredPID: 'CLI',
+        if (activeThreadIDs.length == 0 || !this.getProcessByPID('pl')) {
+            MasterFS.EnsurePath(SEG_Master_Drive);
+            this.startProcess(PKG_Player, SEG_Master_Drive, {
+                desiredPID: 'pl',
             })
             // Initialization doesn't work on the first tick for some reason.  So skip the first tick.
             return;

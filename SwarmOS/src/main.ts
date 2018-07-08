@@ -45,6 +45,8 @@ Stats.setup();
 import "Tools/GlobalTools";
 import "Tools_Prototypes";
 
+import { GameAnalyzers } from "GameAnalyzers/index";
+kernel.installPackages([GameAnalyzers]);
 
 /*import { ActivitiesPackage } from "Activities/index";
 import { CreepJobsPackage } from "Jobs/index";
@@ -60,6 +62,7 @@ export function loop() {
         GStats.reset();
         kernel.loop();
         FS.RecordStats();
+        //RawMemory.set(JSON.stringify(MasterFS.GetDataBacking()));
     } catch (e) {
         console.log(`Loop Error(${(e as Error).message})\nStack(${(e as Error).stack})`);
     } finally {

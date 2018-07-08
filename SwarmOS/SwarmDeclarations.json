@@ -39,7 +39,19 @@
             "combinedType": "OSPackage",
             "entries": [
                 "CLIProcessor",
-                "EmptyProcess"
+                "EmptyProcess",
+                "Player"
+            ]
+        },
+        "APKG": {
+            "comment": "Package names for game analyzers",
+            "enabled": true,
+            "string": true,
+            "isArray": true,
+            "type": true,
+            "combinedType": "AnalyzerPackages",
+            "entries": [
+                "Room"
             ]
         },
         "EXT": {

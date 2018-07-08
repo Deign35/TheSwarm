@@ -13,6 +13,8 @@ export var kernel = new Kernel(processRegistry, extensionRegistry, OS_Logger);
 
 extensionRegistry.register(EXT_Kernel, kernel);
 
+import { OSPackage as Player } from "Core/Player"
+Player.install(processRegistry, extensionRegistry);
 import { OSPackage } from "Core/Types/EmptyProcess";
 OSPackage.install(processRegistry, extensionRegistry);
 import { CLIPackage } from "./CLI/index";

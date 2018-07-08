@@ -19,10 +19,12 @@ export class Folder implements IFolder {
         return Object.keys(this._files);
     }
     CreateFile<T>(fileName: string, contents?: T) {
-        if (!this.GetFile(fileName)) {
+        if (!this._files[fileName]) {
             this._fileSystemMemory[this.Path][fileName] = contents || {};
             this._files[fileName] = new File(this.Path, fileName, this._fileSystemMemory[this.Path][fileName]);
         }
+
+        return this.GetFile<T>(fileName)!;
     }
     GetFile<T>(fileName: string): File<T> | undefined {
         return this._files[fileName]

@@ -3,18 +3,15 @@ export const OSPackage: IPackage<MemBase> = {
         processRegistry.register(PKG_CLIProcessor, CLIProcessor)
     }
 }
-declare interface CLI_Memory extends MemBase {
-
-}
+declare interface CLI_Memory extends MemBase { }
 import { ProcessBase } from "Core/Types/ProcessTypes";
 import { profile } from "Tools/Profiler";
-const ENABLE_PROFILING = true;
 
 @profile
 class CLIProcessor extends ProcessBase {
     RunThread(): ThreadState {
         try {
-            this.log.alert(`CLI Tick: ${Game.time}`);
+            let file = this.memFolder.CreateFile('test.dat');
         } catch (ex) {
             this.log.info(`An exception occurred while trying experimental stuff (${ex})`);
         }

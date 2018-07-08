@@ -89,7 +89,7 @@ declare interface IWorkerGroupProcess extends IProcess {
 declare interface IFolder {
     readonly Path: string;
     GetFileNames(): string[];
-    CreateFile<T>(fileName: string, data?: T): void;
+    CreateFile<T>(fileName: string, data?: T): IFile<T>;
     GetFile<T>(fileName: string): IFile<T> | undefined;
     DeleteFile(fileName: string): void;
     DeleteFiles(): void;
@@ -108,14 +108,15 @@ declare interface IFile<T> {
 }
 declare interface IFileSystem extends IPackageExtension {
     GetFolder(pathStr: string): IFolder | undefined
-    EnsurePath(path: string): void;
+    EnsurePath(path: string): IFolder;
     RecordStats(): void;
+    GetDataBacking(): any;
     readonly FSHash: string;
 }
 
 declare const MasterFS: IFileSystem;
 declare const RAM: IFileSystem;
-declare const TCache: IFileSystem;
+declare const Flash: IFileSystem;
 
 declare interface MemBase {
     CV?: string; // Default (C)allback (V)alue to the HC.

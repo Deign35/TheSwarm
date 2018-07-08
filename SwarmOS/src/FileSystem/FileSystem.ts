@@ -49,10 +49,12 @@ export class FileSystem implements IFileSystem {
     GetFolder(pathStr: string): IFolder | undefined {
         return this.FolderCache[pathStr];
     }
-    EnsurePath(pathStr: string) {
+    EnsurePath(pathStr: string): IFolder {
         if (!this.FolderCache[pathStr]) {
             this.FolderCache[pathStr] = new Folder(pathStr, this.memory);
         }
+
+        return this.FolderCache[pathStr];
     }
 
     RecordStats() {
@@ -63,5 +65,9 @@ export class FileSystem implements IFileSystem {
             size: JSON.stringify(this._memory).length,
             start: this._beginTick,
         });
+    }
+
+    GetDataBacking() {
+        return this.memory;
     }
 }
