@@ -8,13 +8,6 @@ let startLoad = Game.cpu.getUsed(); // Will not use any prototype defined versio
 // Ensure all constants are initialized
 require('globalConstants');
 
-/*
-import * as Profiler from "Tools/Profiler";
-global['Profiler'] = Profiler.init();
-import * as Stats from "Tools/Stats";
-Stats.setup();
-*/
-
 import "Tools/GlobalTools";
 import "Tools/Prototypes";
 
@@ -58,11 +51,9 @@ kernel.installPackages([ActivitiesPackage, CreepJobsPackage, FlagPackage, Regist
 
 export function loop() {
     try {
-        GStats.reset();
         kernel.loop();
     } finally {
         kernel.log.DumpLogToConsole();
-        GStats.commit();
     }
 }
 

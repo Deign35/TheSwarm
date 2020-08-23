@@ -21,14 +21,6 @@ declare type ScreepsPackage = OSPackage | SlimOSPackage | CreepJobsPackage
 
 declare type ObjectTypeWithID = Structure | Creep | Source | ConstructionSite | Mineral | Nuke | Resource | Tombstone;
 
-declare interface Profiler {
-    clear(): void;
-    output(): void;
-    start(): void;
-    status(): void;
-    stop(): void;
-    toString(): string;
-}
 declare function extensionInterface(interfaceId: string): (target: any, propertyKey: string) => any
 
 declare class Stopwatch {
@@ -58,21 +50,9 @@ declare interface ILogger {
 declare function CopyObject<T>(obj: T): T;
 declare function GetSpawnCost(body: BodyPartConstant[]): number;
 declare function ConstructBodyArray(bodyPartsList: [BodyPartConstant, number][]): BodyPartConstant[];
-declare function DoTest(testID: string, memObject: any, testFunction: () => void,
-    workingVersion?: (exc: Error) => void): void
 declare function GetSUID(): string;
 declare function GetRandomIndex(list: any[]): number;
 declare function GetRandomID<T>(dictionaryObject: SDictionary<T>): T | undefined;
-
-
-declare interface IStatistics {
-    addSimpleStat(name: string, value?: any): void;
-    commit(): void;
-    addStat(name: string, tags?: { [id: string]: any }, values?: { [id: string]: any }): void;
-    reset(): void
-}
-
-declare var GStats: IStatistics;
 
 // SwarmCLI
 
