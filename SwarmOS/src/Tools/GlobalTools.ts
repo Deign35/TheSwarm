@@ -4,7 +4,6 @@ declare var Memory: {
 import { Stopwatch } from "./Stopwatch";
 global['Stopwatch'] = Stopwatch;
 
-const NUM_ALLOWED_FAILURES = 10;
 export class GlobalTools {
     static CopyObject<T>(obj: T): T {
         return JSON.parse(JSON.stringify(obj));

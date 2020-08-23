@@ -8,13 +8,15 @@ let startLoad = Game.cpu.getUsed(); // Will not use any prototype defined versio
 // Ensure all constants are initialized
 require('globalConstants');
 
+/*
 import * as Profiler from "Tools/Profiler";
 global['Profiler'] = Profiler.init();
 import * as Stats from "Tools/Stats";
 Stats.setup();
+*/
 
 import "Tools/GlobalTools";
-import "Tools_Prototypes";
+import "Tools/Prototypes";
 
 // Update the OS as needed
 const RESET_IN_SIM_ON_UPDATE = false;
