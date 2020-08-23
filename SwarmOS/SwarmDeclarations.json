@@ -17,9 +17,10 @@
             "type": true,
             "combinedType": "OSPackage",
             "entries": [
-                "SwarmManager",
+                "EmptyProcess",
                 "FlagBase",
-                "EmptyProcess"
+                "SpawnManager",
+                "SwarmManager"
             ]
         },
         "EXT": {
