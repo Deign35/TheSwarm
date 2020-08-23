@@ -4,7 +4,7 @@ export const OSPackage: IPackage<RoomStateMemory> = {
     }
 }
 
-import { PackageProviderBase, BasicProcess } from "Core/BasicTypes";
+import { BasicProcess } from "Core/BasicTypes";
 
 const RequiredJobs = [
     RJ_Misc,

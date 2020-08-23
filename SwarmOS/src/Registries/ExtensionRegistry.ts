@@ -9,10 +9,11 @@ export class ExtensionRegistry implements IExtensionRegistry {
         this.registry = {};
         this.register(EXT_Registry, this);
     }
+
+    private _logger: ILogger;
     protected get log() {
         return this._logger;
     }
-    private _logger: ILogger;
     protected get logID() {
         return ExtensionRegistry_LogContext.logID;
     }
