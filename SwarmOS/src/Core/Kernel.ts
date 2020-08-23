@@ -143,6 +143,15 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
     loop() {
         this._curTickState = {};
         let processIDs = Object.keys(this.processTable);
+        if (processIDs.length == 0) {
+            let SwarmManagerMemory: PackageProviderMemory = {
+                services: {}
+            }
+            this.startProcess(PKG_SwarmManager, SwarmManagerMemory);
+            // Initialization doesn't work on the first tick for some reason.  So skip the first tick.
+            return;
+        }
+
         for (let i = 0; i < processIDs.length; i++) {
             let pInfo = this.processTable[processIDs[i]];
             if (pInfo.sl) {
@@ -156,15 +165,6 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
         }
 
         let activeThreadIDs = Object.keys(this._curTickState);
-        if (activeThreadIDs.length == 0) {
-            let SwarmManagerMemory: PackageProviderMemory = {
-                services: {}
-            }
-            this.startProcess(PKG_SwarmManager, SwarmManagerMemory);
-            // Initialization doesn't work on the first tick for some reason.  So skip the first tick.
-            return;
-        }
-
         while (activeThreadIDs.length > 0) {
             let protectionValue = activeThreadIDs.length;
             this.RunThreads(activeThreadIDs);
