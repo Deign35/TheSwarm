@@ -2,7 +2,6 @@
     VERSION: string;
     counter: number;
     kernel: KernelMemory;
-    spawnData: SpawnRegistry_Memory;
 }
 let startLoad = Game.cpu.getUsed(); // Will not use any prototype defined version of getUsed
 // Ensure all constants are initialized

@@ -17,9 +17,70 @@
             "type": true,
             "combinedType": "OSPackage",
             "entries": [
+                "FlagManager",
+                "CreepRegistry",
                 "SwarmManager",
+                "SpawnRegistry",
+                "RoomManager",
+                "SimpleOwnedRoom",
+                "BootRoom",
                 "FlagBase",
-                "EmptyProcess"
+                "SwarmCLI",
+                "EmptyProcess",
+                "Cartography",
+                "RoomProvider"
+            ]
+        },
+        "CR": {
+            "comment": "Creep roles",
+            "enabled": true,
+            "string": true,
+            "isArray": true,
+            "usePrefix": true,
+            "type": true,
+            "combinedType": "CreepRoles",
+            "entries": [
+                "BootFill",
+                "Fortify",
+                "Harvester",
+                "Science",
+                "Scout",
+                "SpawnFill",
+                "Work",
+                "RemoteHarvest"
+            ]
+        },
+        "RJ": {
+            "enabled": true,
+            "string": true,
+            "isArray": true,
+            "usePrefix": true,
+            "type": true,
+            "combinedType": "RoomJobs",
+            "entries": [
+                "Tower",
+                "Misc",
+                "WorkTarget",
+                "Structures"
+            ]
+        },
+        "CJ": {
+            "comment": "Creep job packages",
+            "enabled": true,
+            "string": true,
+            "isArray": true,
+            "type": true,
+            "usePrefix": true,
+            "combinedType": "CreepJobsPackage",
+            "entries": [
+                "BootRefill",
+                "Harvest",
+                "Refill",
+                "Work",
+                "Science",
+                "Fortify",
+                "Scout",
+                "RemoteHarvest"
             ]
         },
         "EXT": {
@@ -29,10 +90,16 @@
             "type": true,
             "combinedType": "OSExtension",
             "entries": {
-                "Logger": "logger",
-                "Kernel": "kernel",
+                "CreepRegistry": "creeps",
+                "CreepActivity": "c_activity",
                 "Registry": "extRegistry",
-                "Sleep": "sleep"
+                "SpawnRegistry": "spawner",
+                "RoomView": "roomView",
+                "Flags": "flags",
+                "Kernel": "kernel",
+                "Sleep": "sleep",
+                "Interrupt": "interrupt",
+                "Logger": "logger"
             }
         },
         "TT": {
@@ -52,19 +119,31 @@
                 "AnyStructure": 10
             }
         },
+        "RT": {
+            "comment": "Type of room for quickly determining how to interact with the room",
+            "enabled": true,
+            "type": true,
+            "combinedType": "RoomType",
+            "entries": {
+                "None": 0,
+                "Home": 1,
+                "RemoteHarvest": 2,
+                "Other": 3
+            }
+        },
         "LOG": {
             "comment": "Logger Priority",
             "enabled": true,
             "type": true,
             "combinedType": "LogLevel",
             "entries": {
-                "ALERT": 6,
-                "DEBUG": 1,
-                "ERROR": 4,
-                "FATAL": 5,
-                "INFO": 2,
-                "TRACE": 0,
-                "WARN": 3
+                "ALERT": "6",
+                "DEBUG": "1",
+                "ERROR": "4",
+                "FATAL": "5",
+                "INFO": "2",
+                "TRACE": "0",
+                "WARN": "3"
             }
         },
         "SP": {
@@ -77,6 +156,14 @@
                 "QUEUED": 1,
                 "SPAWNING": 2,
                 "COMPLETE": 3
+            }
+        },
+        "E2C": {
+            "comment": "Energy to cost conversion",
+            "enabled": true,
+            "entries": {
+                "MaxSpawnDistance": 200,
+                "SpawnDistance": 100
             }
         },
         "DEFAULT": {
@@ -114,6 +201,42 @@
                 "Done": 3,
                 "Overrun": 4
             }
+        },
+        "CLI": {
+            "comment": "Command line actions",
+            "enabled": true,
+            "combinedType": "CLI_Command",
+            "type": true,
+            "string": true,
+            "entries": {
+                "Launch": "launch",
+                "ChangeFlag": "flagColor",
+                "Assimilate": "addRoom"
+            }
+        },
+        "SET": {
+            "comment": "Settings",
+            "enabled": true,
+            "entries": {
+                "MaxSites": 5,
+                "SiteToWorkRatio": 10000,
+                "TriggerNewWorker": 500,
+                "GroundWorkerRatio": 1200
+            }
+        },
+        "SPKG": {
+            "comment": "Activity packages",
+            "enabled": true,
+            "combinedType": "SlimOSPackage",
+            "type": true,
+            "string": true,
+            "isArray": true,
+            "entries": [
+                "CreepActivity",
+                "SpawnActivity",
+                "RoomActivity",
+                "RepetitiveCreepActivity"
+            ]
         },
         "AT": {
             "comment": "Action type",

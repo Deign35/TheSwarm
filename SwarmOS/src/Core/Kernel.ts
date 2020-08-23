@@ -147,6 +147,7 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
             let SwarmManagerMemory: PackageProviderMemory = {
                 services: {}
             }
+            this.log.alert('Booting up the SwarmManager');
             this.startProcess(PKG_SwarmManager, SwarmManagerMemory);
             // Initialization doesn't work on the first tick for some reason.  So skip the first tick.
             return;

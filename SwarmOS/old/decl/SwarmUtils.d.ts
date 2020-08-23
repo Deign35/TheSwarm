@@ -17,7 +17,7 @@ declare type PlayerID = string;
 declare type PID = string;
 declare type SpawnRequestID = string;
 
-declare type ScreepsPackage = OSPackage
+declare type ScreepsPackage = OSPackage | SlimOSPackage | CreepJobsPackage
 
 declare type ObjectTypeWithID = Structure | Creep | Source | ConstructionSite | Mineral | Nuke | Resource | Tombstone;
 
@@ -53,3 +53,11 @@ declare function ConstructBodyArray(bodyPartsList: [BodyPartConstant, number][])
 declare function GetSUID(): string;
 declare function GetRandomIndex(list: any[]): number;
 declare function GetRandomID<T>(dictionaryObject: SDictionary<T>): T | undefined;
+
+// SwarmCLI
+
+//declare function CLI(command: CLI_Command, ...args: any[]): ScreepsReturnCode;
+declare function CLI(command: CLI_Assimilate, roomID: RoomID, roomType: RoomType, homeRoom?: RoomID): ScreepsReturnCode;
+
+declare function CLI(command: CLI_Launch, pkg: ScreepsPackage, startMem: MemBase): ScreepsReturnCode;
+declare function CLI(command: CLI_ChangeFlag, priA: ColorConstant, priB: ColorConstant, secA?: ColorConstant, secB?: ColorConstant): ScreepsReturnCode;

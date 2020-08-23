@@ -13,14 +13,9 @@ declare interface IPackageInterfaces {
     [index: string]: IPackageExtension | undefined;
     [EXT_Registry]: IExtensionRegistry;
 
-    [EXT_SpawnRegistry]: ISpawnRegistryExtensions;
-    [EXT_Flags]: undefined;
-    [EXT_Interrupt]: IKernelNotificationsExtension;
     [EXT_Kernel]: IKernelExtensions;
-    [EXT_RoomView]: IRoomDataExtension;
     [EXT_Sleep]: IKernelSleepExtension;
     [EXT_Logger]: IKernelLoggerExtensions;
-    [EXT_CreepRegistry]: ICreepRegistryExtensions;
 }
 
 /**
@@ -69,70 +64,9 @@ declare interface IKernelLoggerExtensions extends IPackageExtension, ILogger {
 }
 
 /**
- * Notifications can be used to wake a sleeping process or otherwise message across process.
- * Messages will queue up for the tick and will be sent on the following tick.
- */
-declare interface IKernelNotificationsExtension extends IPackageExtension {
-    Notify(id: string): void;
-    Subscribe(id: string): void;
-    UnSubscribe(id: string): void;
-}
-
-/**
  * Allows a process to be put to sleep or awoken
  */
 declare interface IKernelSleepExtension extends IPackageExtension {
     sleep(pid: PID, ticks: number): void;
     wake(pid: PID): void;
-}
-
-/**
- * Room data retrieves currently saved information for a given room.
- * Giving back constructionSites, structures, sources, and other information.
- * Is updated on a regular schedule by the RoomManager.
- */
-declare interface IRoomDataExtension extends IPackageExtension {
-    GetRoomData(roomID: string): RoomState | undefined;
-    SetScoutNexus(roomID: string): void;
-    BootRoom(roomID: string, force: boolean): void;
-}
-
-/**
- * Extension for processes to be able to request creep spawning.
- */
-declare interface ISpawnRegistryExtensions extends IPackageExtension {
-    cancelRequest(id?: SpawnRequestID): boolean;
-    getRequestStatus(id?: SpawnRequestID): SpawnState;
-    requestSpawn(context: SpawnContext, location: RoomID, spawnPriority: Priority,
-        maxSpawnDistance?: number, startMem?: CreepMemory): SpawnRequestID;
-    getRequestContext(id?: SpawnRequestID): SpawnContext | undefined;
-}
-
-/**
- * Registry for creep management and ownership control
- */
-declare interface ICreepRegistryExtensions extends IPackageExtension {
-    tryFindCompatibleCreep(creepType: CT_ALL, level: number, targetRoom: RoomID, maxDistance?: number): string | undefined
-    tryRegisterCreep(creepID: CreepID): boolean;
-    tryGetCreep(id?: CreepID, requestingPID?: PID): Creep | undefined;
-    tryReserveCreep(id?: CreepID, requestingPID?: PID, priority?: Priority): boolean;
-    releaseCreep(id?: CreepID, requestingPID?: PID): void;
-}
-
-declare interface ICreepActivityExtensions extends IPackageExtension {
-    CreateNewCreepActivity(actionMem: CreepActivity_Memory, parentPID: PID): PID | undefined;
-    RunActivity(args: RunArgs): ScreepsReturnCode;
-    ValidateActionTarget(actionType: ActionType, target: any): boolean;
-    CreepIsInRange(actionType: ActionType, pos1: RoomPosition, pos2: RoomPosition): boolean;
-    MoveCreep(creep: Creep, pos: RoomPosition): ScreepsReturnCode;
-}
-
-interface RunArgs {
-    creep: Creep;
-    actionType: ActionType;
-
-    target?: any;
-    amount?: number;
-    message?: string;
-    resourceType?: ResourceConstant;
 }

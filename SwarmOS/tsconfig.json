@@ -23,7 +23,7 @@
         "src/**/*.ts",
         "src/**/*.js",
         "decl/**/*.ts",
-        "node_modules/@types/**/*.d.ts"
+        "node_modules/@types/**/*.d.ts", "old/decl/Memory/Activities.d.ts"
     ],
     "exclude": [
         "node_modules",
