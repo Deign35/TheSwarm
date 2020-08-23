@@ -225,7 +225,7 @@ class CreepActivityExtensions extends ExtensionBase implements ICreepActivityExt
         this.extensionRegistry.getKernel().setParent(newPID, parentPID);
         return newPID;
     }
-    protected GetSquareDistance(pos1: { x: number, y: number }, pos2: { x: number, y: number }) {
+    protected GetLinearDistance(pos1: { x: number, y: number }, pos2: { x: number, y: number }) {
         let xDiff = pos1.x - pos2.x;
         xDiff *= xDiff < 0 ? -1 : 1;
         let yDiff = pos1.y - pos2.y;
@@ -238,7 +238,7 @@ class CreepActivityExtensions extends ExtensionBase implements ICreepActivityExt
     }
 
     CreepIsInRange(actionType: ActionType, pos1: RoomPosition, pos2: RoomPosition) {
-        let distance = this.GetSquareDistance(pos1, pos2);
+        let distance = this.GetLinearDistance(pos1, pos2);
         if (actionType == AT_Build || actionType == AT_RangedAttack || actionType == AT_RangedHeal || actionType == AT_Repair || actionType == AT_Upgrade) {
             return distance <= 3;
         } else if (actionType == AT_Drop || actionType == AT_Suicide) {
