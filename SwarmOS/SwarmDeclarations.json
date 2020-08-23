@@ -6,7 +6,7 @@
             "string": true,
             "entries": {
                 "USERNAME": "Deign",
-                "SIGNATURE": "Greetings.  I don't bite. -- SwarmOSv1.1.0"
+                "SIGNATURE": "Greetings.  I don't bite. -- SwarmOSv2.0.0"
             }
         },
         "PKG": {
@@ -268,7 +268,6 @@
                 "ReserveController": 21,
                 "SignController": 22,
                 "Suicide": 23,
-
                 "Pull": 24
             }
         }
