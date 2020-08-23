@@ -39,12 +39,12 @@ class BootstrapRefiller extends SoloJob<BootstrapRefiller_Memory> {
             c: creep.name,
             e: []
         }
-        if (creep.carry.energy == 0) {
+        if (creep.store[RESOURCE_ENERGY] == 0) {
             // get energy
             let roomData = this.View.GetRoomData(this.memory.rID)!;
             for (let i = 0; i < roomData.resources.length; i++) {
                 let resource = Game.getObjectById<Resource>(roomData.resources[i]);
-                if (resource && (resource.energy || 0) >= creep.carryCapacity) {
+                if (resource && (resource.energy || 0) >= creep.store.getCapacity()) {
                     newActivity.at = AT_Pickup;
                     newActivity.t = resource.id;
                     break;
@@ -86,7 +86,7 @@ class BootstrapRefiller extends SoloJob<BootstrapRefiller_Memory> {
                         let creeps = creep.room.find(FIND_MY_CREEPS);
                         for (let i = 0; i < creeps.length; i++) {
                             let creep = creeps[i];
-                            if (creep.memory.ct == CT_Worker && creep.carry.energy * 5 <= creep.carryCapacity) {
+                            if (creep.memory.ct == CT_Worker && creep.store[RESOURCE_ENERGY] * 5 <= creep.store.getCapacity()) {
                                 newActivity.t = creep.id;
                                 break;
                             }

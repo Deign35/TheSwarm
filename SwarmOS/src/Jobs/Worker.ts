@@ -81,18 +81,18 @@ class WorkerActivity extends SoloJob<Worker_Memory> {
             }, this.pid);
         }
 
-        let carryRatio = _.sum(creep.carry) / creep.carryCapacity;
+        let carryRatio = creep.store.getUsedCapacity() / creep.store.getCapacity();
         let roomData = this.View.GetRoomData(creep.room.name)!;
         if (roomData.targets.Other.t != TT_None && roomData.targets.Other.at != AT_NoOp) {
             let isValidTarget = false;
             if (roomData.targets.Other.en == 0) {
                 return;
             }
-            if (roomData.targets.Other.en > creep.carryCapacity) {
+            if (roomData.targets.Other.en > creep.store.getCapacity()) {
                 isValidTarget = carryRatio > 0.25;
             }
-            if (roomData.targets.Other.en <= creep.carryCapacity) {
-                isValidTarget = creep.carry.energy >= roomData.targets.Other.en;
+            if (roomData.targets.Other.en <= creep.store.getCapacity()) {
+                isValidTarget = creep.store[RESOURCE_ENERGY] >= roomData.targets.Other.en;
             }
             if (isValidTarget) {
                 let nextTarget = Game.getObjectById<ObjectTypeWithID>(roomData.targets.Other.target);
@@ -103,7 +103,7 @@ class WorkerActivity extends SoloJob<Worker_Memory> {
                         t: nextTarget.id,
                     }, this.pid);
                     if (newActivity) {
-                        roomData.targets.Other.en -= creep.carry.energy;
+                        roomData.targets.Other.en -= creep.store[RESOURCE_ENERGY];
                         return newActivity;
                     }
                 }
@@ -114,7 +114,7 @@ class WorkerActivity extends SoloJob<Worker_Memory> {
 
         // This means that 98 / 100 energy = go get more energy when current target is done.  Ok for some, but not for repairs if energy needed is 99
         // (TODO): Fix this. ^^^
-        if (creep.carry.energy < creep.carryCapacity) {
+        if (creep.store[RESOURCE_ENERGY] < creep.store.getCapacity()) {
             let targetIDs = Object.keys(roomData.targets.CR_Work.energy);
             let bestTarget: ObjectTypeWithID | undefined = undefined;
             let bestData: WorkerTarget_Memory | undefined = undefined;
@@ -138,10 +138,10 @@ class WorkerActivity extends SoloJob<Worker_Memory> {
                 } else if (tarData.a == AT_Harvest) {
                     enAvailable = (target as Source).energy;
                 } else if (tarData.a == AT_RequestTransfer) {
-                    enAvailable = (target as Creep).carry.energy;
+                    enAvailable = (target as Creep).store[RESOURCE_ENERGY];
                 }
 
-                if (enAvailable < creep.carryCapacity) {
+                if (enAvailable < creep.store.getCapacity()) {
                     continue;
                 }
 
