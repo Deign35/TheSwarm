@@ -67,8 +67,8 @@ class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory> {
         let actionType: ActionType = AT_NoOp;
         let bestTarget = '';
         let roomData = this.View.GetRoomData(creep.room.name)!;
-        let energyNeeded = creep.carryCapacity - (creep.carry.energy || 0);
-        let carryRatio = creep.carry.energy / creep.carryCapacity;
+        let energyNeeded = creep.store.getCapacity() - (creep.store[RESOURCE_ENERGY] || 0);
+        let carryRatio = creep.store[RESOURCE_ENERGY] / creep.store.getCapacity();
 
         let closestDist = 1000;
         if (carryRatio < 0.25) {
@@ -100,7 +100,7 @@ class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory> {
             }
         }
 
-        if (actionType == AT_NoOp && creep.carry.energy > 0) {
+        if (actionType == AT_NoOp && creep.store[RESOURCE_ENERGY] > 0) {
             // Find a delivery target
             let targets = this.targets;
             let targetIDs = Object.keys(targets);
@@ -118,14 +118,14 @@ class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory> {
                         targetWants = (nextTarget as StructureTerminal).energyCapacity - (nextTarget as StructureContainer).energy;
                         break;
                     case (TT_Creep):
-                        targetWants = (nextTarget as Creep).carryCapacity - (nextTarget as Creep).carry.energy;
+                        targetWants = (nextTarget as Creep).store.getCapacity() - (nextTarget as Creep).store[RESOURCE_ENERGY];
                         break;
                 }
 
                 if (targetWants == 0) {
                     continue;
                 }
-                if (targetWants > creep.carryCapacity || targetWants <= creep.carry.energy) {
+                if (targetWants > creep.store.getCapacity() || targetWants <= creep.store[RESOURCE_ENERGY]) {
                     let dist = nextTarget.pos.getRangeTo(creep.pos);
                     if (dist < closestDist) {
                         closestDist = dist;
@@ -136,7 +136,7 @@ class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory> {
             }
         }
 
-        if (actionType == AT_NoOp && creep.carry.energy != creep.carryCapacity) {
+        if (actionType == AT_NoOp && creep.store[RESOURCE_ENERGY] != creep.store.getCapacity()) {
             // Find a container to withdraw from.
             let targets = this.energyTargets;
             let targetIDs = Object.keys(targets);

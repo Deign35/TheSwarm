@@ -106,7 +106,7 @@ class RemoteHarvester extends SoloJob<RemoteHarvester_Memory> {
         }
 
         if ((container as ConstructionSite).progressTotal) {
-            if (creep.carry.energy == creep.carryCapacity) {
+            if (creep.store[RESOURCE_ENERGY] == creep.store.getCapacity()) {
                 return this.creepActivity.CreateNewCreepActivity({
                     at: AT_Build,
                     c: creep.name,

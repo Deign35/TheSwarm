@@ -259,7 +259,7 @@ class CreepActivityExtensions extends ExtensionBase implements ICreepActivityExt
             case (AT_GenerateSafeMode): return creep.generateSafeMode(target);
             case (AT_Harvest):
                 let res = creep.harvest(target);
-                if (res == OK && creep.carry.energy == creep.carryCapacity) {
+                if (res == OK && creep.store[RESOURCE_ENERGY] == creep.store.getCapacity()) {
                     return ERR_FULL;
                 }
                 return res;
@@ -339,7 +339,7 @@ class CreepActivityExtensions extends ExtensionBase implements ICreepActivityExt
                         return true;
                     }
                 } else {
-                    if ((target as Creep).carry.energy < (target as Creep).carryCapacity * 0.8) {
+                    if ((target as Creep).store[RESOURCE_ENERGY] < (target as Creep).store.getCapacity() * 0.8) {
                         return true;
                     }
                 }

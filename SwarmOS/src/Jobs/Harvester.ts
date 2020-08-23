@@ -82,7 +82,7 @@ class Harvester extends SoloJob<HarvesterMemory> {
             }, this.pid);
         }
         let container = Game.getObjectById<StructureContainer | ConstructionSite>(this.memory.sup);
-        if (creep.carry.energy > 0) {
+        if (creep.store[RESOURCE_ENERGY] > 0) {
             if (container) {
                 if ((container as StructureContainer).hitsMax) {
                     if (((container as StructureContainer).hits + (REPAIR_POWER * creep.getActiveBodyparts(WORK))) <= (container as StructureContainer).hitsMax) {
