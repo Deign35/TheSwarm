@@ -54,6 +54,7 @@ module.exports = {
             this.d_file.push(this.declareString(constDef.combinedType, combinedTypeVal.slice(0, -3), 'type', ' = '));
         }
         this.g_file.push('');
+        this.d_file.push('');
     },
     OutputBodyDefs: function (creepID, defEntries) {
         let combinedBodyTypeDef = '';
