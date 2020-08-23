@@ -149,7 +149,7 @@ class RoomStateStructureActivity extends RoomStateActivity<RoomStateActivity_Mem
             }
             for (let i = 0; i < this.roomData.structures.container.length; i++) {
                 let containerID = this.roomData.structures.container[i];
-                let container = Game.getObjectById(containerID) as StructureContainer;
+                let container = Game.getObjectById<StructureContainer>(containerID);
                 if (!container) { continue; }
                 curEnergyLevel += container.energy || 0;
                 let sources = container.pos.findInRange(FIND_SOURCES, 1);

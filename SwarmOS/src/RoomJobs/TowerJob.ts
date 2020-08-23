@@ -35,7 +35,7 @@ class TowerJob extends BasicProcess<Tower_Memory> {
         }
         for (let i = 0; i < towerIDs.length; i++) {
             let tower = Game.getObjectById<StructureTower>(towerIDs[i])!;
-            if (tower.energy > 0) {
+            if (tower.store[RESOURCE_ENERGY] > 0) {
                 let closestCreep = 0
                 let distance = tower.pos.getRangeTo(hostiles[closestCreep]);
                 for (let j = 1; j < hostiles.length; j++) {

@@ -209,7 +209,8 @@ class CreepActivityExtensions extends ExtensionBase implements ICreepActivityExt
         if (!creep) {
             return undefined;
         }
-        let target = actionMem.t ? Game.getObjectById(actionMem.t) : undefined;
+        let target: ObjectTypeWithID | RoomPosition | null | undefined  =
+                actionMem.t ? Game.getObjectById<ObjectTypeWithID>(actionMem.t) : undefined;
         if (!target && actionMem.p) {
             target = new RoomPosition(actionMem.p.x || 25, actionMem.p.y || 25, actionMem.p.roomName);
         } else if (!target) {
@@ -344,7 +345,7 @@ class CreepActivityExtensions extends ExtensionBase implements ICreepActivityExt
                     }
                 }
                 return false;
-            case (AT_Withdraw): return (target as Structure).structureType && (!!(target as StructureContainer).storeCapacity || !!(target as StructureLink).energyCapacity);
+            case (AT_Withdraw): return (target as Structure).structureType && !!(target as StructureContainer).store;
 
             case (AT_Drop):
             case (AT_MoveByPath):

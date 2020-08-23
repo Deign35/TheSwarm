@@ -59,7 +59,7 @@ class BootstrapRefiller extends SoloJob<BootstrapRefiller_Memory> {
             newActivity.at = AT_Transfer;
             // find a delivery target
             let spawn = creep.room.find(FIND_MY_SPAWNS);
-            if (spawn.length > 0 && spawn[0].energy < spawn[0].energyCapacity) {
+            if (spawn.length > 0 && spawn[0].store[RESOURCE_ENERGY] < spawn[0].store.getCapacity()!) {
                 newActivity.t = spawn[0].id;
             } else {
                 let spawnTainer = FindStructureNextTo(spawn[0].pos, STRUCTURE_CONTAINER, {
@@ -75,8 +75,8 @@ class BootstrapRefiller extends SoloJob<BootstrapRefiller_Memory> {
                     let extensions = this.View.GetRoomData(this.memory.rID)!.structures.extension;
                     if (extensions && extensions.length > 0) {
                         for (let i = 0; i < extensions.length; i++) {
-                            let extension = Game.getObjectById(extensions[i]) as StructureExtension;
-                            if (extension && extension.energy < extension.energyCapacity) {
+                            let extension = Game.getObjectById<StructureExtension>(extensions[i]);
+                            if (extension && extension.store[RESOURCE_ENERGY] < extension.store.getCapacity()!) {
                                 newActivity.t = extension.id;
                                 break;
                             }

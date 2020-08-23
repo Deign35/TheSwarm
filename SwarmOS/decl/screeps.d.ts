@@ -1081,16 +1081,6 @@ interface Creep extends RoomObject {
      */
     body: BodyPartDefinition[];
     /**
-     * An object with the creep's cargo contents.
-     * @deprecated Is an alias for Creep.store
-     */
-    carry: StoreDefinition;
-    /**
-     * The total amount of resources the creep can carry.
-     * @deprecated alias for Creep.store.getCapacity
-     */
-    carryCapacity: number;
-    /**
      * The movement fatigue indicator. If it is greater than zero, the creep cannot move.
      */
     fatigue: number;
@@ -2817,20 +2807,6 @@ interface GameMap {
      */
     getRoomLinearDistance(roomName1: string, roomName2: string, continuous?: boolean): number;
     /**
-     * Get terrain type at the specified room position. This method works for any room in the world even if you have no access to it.
-     * @param x X position in the room.
-     * @param y Y position in the room.
-     * @param roomName The room name.
-     * @deprecated use `Game.map.getRoomTerrain` instead
-     */
-    getTerrainAt(x: number, y: number, roomName: string): Terrain;
-    /**
-     * Get terrain type at the specified room position. This method works for any room in the world even if you have no access to it.
-     * @param pos The position object.
-     * @deprecated use `Game.map.getRoomTerrain` instead
-     */
-    getTerrainAt(pos: RoomPosition): Terrain;
-    /**
      * Get room terrain for the specified room. This method works for any room in the world even if you have no access to it.
      * @param roomName String name of the room.
      */
@@ -2839,14 +2815,6 @@ interface GameMap {
      * Returns the world size as a number of rooms between world corners. For example, for a world with rooms from W50N50 to E50S50 this method will return 102.
      */
     getWorldSize(): number;
-
-    /**
-     * Check if the room is available to move into.
-     * @param roomName The room name.
-     * @returns A boolean value.
-     * @deprecated Use `Game.map.getRoomStatus` instead
-     */
-    isRoomAvailable(roomName: string): boolean;
 
     /**
      * Get the room status to determine if it's available, or in a reserved area.
@@ -3107,18 +3075,6 @@ interface PathFinder {
         goal: RoomPosition | { pos: RoomPosition; range: number } | Array<RoomPosition | { pos: RoomPosition; range: number }>,
         opts?: PathFinderOpts,
     ): PathFinderPath;
-    /**
-     * Specify whether to use this new experimental pathfinder in game objects methods.
-     * This method should be invoked every tick. It affects the following methods behavior:
-     * * `Room.findPath`
-     * * `RoomPosition.findPathTo`
-     * * `RoomPosition.findClosestByPath`
-     * * `Creep.moveTo`
-     *
-     * @deprecated This method is deprecated and will be removed soon.
-     * @param isEnabled Whether to activate the new pathfinder or deactivate.
-     */
-    use(isEnabled: boolean): undefined;
 }
 
 /**
@@ -3239,16 +3195,6 @@ declare const PathFinder: PathFinder;
  * You can upgrade their abilities ("powers") up to your account Global Power Level (see `Game.gpl`).
  */
 interface PowerCreep extends RoomObject {
-    /**
-     * An object with the creep's cargo contents.
-     * @deprecated An alias for Creep.store.
-     */
-    carry: StoreDefinition;
-    /**
-     * The total amount of resources the creep can carry.
-     * @deprecated An alias for Creep.store.getCapacity().
-     */
-    carryCapacity: number;
     /**
      * The power creep's class, one of the `POWER_CLASS` constants.
      */
@@ -3489,19 +3435,6 @@ interface RawMemory {
         id: number;
         data: string;
     };
-
-    /**
-     *  @deprecated Use `InterShardMemory` instead.
-     *
-     *  A string with a shared memory segment available on every world shard. Maximum string length is 100 KB.
-     *
-     * **Warning:** this segment is not safe for concurrent usage! All shards have shared access to the same instance of
-     * data. When the segment contents is changed by two shards simultaneously, you may lose some data, since the segment
-     * string value is written all at once atomically. You must implement your own system to determine when each shard is
-     * allowed to rewrite the inter-shard memory, e.g. based on mutual exclusions.
-     *
-     */
-    interShardSegment: string;
 
     /**
      * Get a raw string representation of the Memory object.
@@ -4441,16 +4374,6 @@ declare const Source: SourceConstructor;
 interface StructureSpawn extends OwnedStructure<STRUCTURE_SPAWN> {
     readonly prototype: StructureSpawn;
     /**
-     * The amount of energy containing in the spawn.
-     * @deprecated An alias for .store[RESOURCE_ENERGY].
-     */
-    energy: number;
-    /**
-     * The total amount of energy the spawn can contain
-     * @deprecated An alias for .store.getCapacity(RESOURCE_ENERGY).
-     */
-    energyCapacity: number;
-    /**
      * A shorthand to `Memory.spawns[spawn.name]`. You can use it for quick access
      * the spawn’s specific memory data object.
      *
@@ -4471,40 +4394,6 @@ interface StructureSpawn extends OwnedStructure<STRUCTURE_SPAWN> {
      * A Store object that contains cargo of this structure.
      */
     store: Store<RESOURCE_ENERGY, false>;
-    /**
-     * Check if a creep can be created.
-     *
-     * @deprecated This method is deprecated and will be removed soon. Please use `StructureSpawn.spawnCreep` with `dryRun` flag instead.
-     * @param body An array describing the new creep’s body. Should contain 1 to 50 elements with one of these constants: WORK, MOVE, CARRY, ATTACK, RANGED_ATTACK, HEAL, TOUGH, CLAIM
-     * @param name The name of a new creep.
-     *
-     * It should be unique creep name, i.e. the Game.creeps object should not contain another creep with the same name (hash key).
-     *
-     * If not defined, a random name will be generated.
-     */
-    canCreateCreep(body: BodyPartConstant[], name?: string): ScreepsReturnCode;
-    /**
-     * Start the creep spawning process.
-     *
-     * @deprecated This method is deprecated and will be removed soon. Please use `StructureSpawn.spawnCreep` instead.
-     * @param body An array describing the new creep’s body. Should contain 1 to 50 elements with one of these constants: WORK, MOVE, CARRY, ATTACK, RANGED_ATTACK, HEAL, TOUGH, CLAIM
-     * @param name The name of a new creep.
-     *
-     * It should be unique creep name, i.e. the Game.creeps object should not contain another creep with the same name (hash key).
-     *
-     * If not defined, a random name will be generated.
-     * @param memory The memory of a new creep. If provided, it will be immediately stored into Memory.creeps[name].
-     * @returns The name of a new creep or one of these error codes:
-     * ```
-     * ERR_NOT_OWNER            -1  You are not the owner of this spawn.
-     * ERR_NAME_EXISTS          -3  There is a creep with the same name already.
-     * ERR_BUSY                 -4  The spawn is already in process of spawning another creep.
-     * ERR_NOT_ENOUGH_ENERGY    -6  The spawn and its extensions contain not enough energy to create a creep with the given body.
-     * ERR_INVALID_ARGS         -10 Body is not properly described.
-     * ERR_RCL_NOT_ENOUGH       -14 Your Room Controller level is not enough to use this spawn.
-     * ```
-     */
-    createCreep(body: BodyPartConstant[], name?: string, memory?: CreepMemory): ScreepsReturnCode | string;
 
     /**
      * Start the creep spawning process. The required energy amount can be withdrawn from all spawns and extensions in the room.
@@ -4844,18 +4733,6 @@ declare const StructureController: StructureControllerConstructor;
  */
 interface StructureExtension extends OwnedStructure<STRUCTURE_EXTENSION> {
     readonly prototype: StructureExtension;
-
-    /**
-     * The amount of energy containing in the extension.
-     * @deprecated An alias for .store[RESOURCE_ENERGY].
-     */
-    energy: number;
-    /**
-     * The total amount of energy the extension can contain.
-     * @deprecated An alias for .store.getCapacity(RESOURCE_ENERGY).
-     */
-    energyCapacity: number;
-
     /**
      * A Store object that contains cargo of this structure.
      */
@@ -4876,16 +4753,6 @@ interface StructureLink extends OwnedStructure<STRUCTURE_LINK> {
      * The amount of game ticks the link has to wait until the next transfer is possible.
      */
     cooldown: number;
-    /**
-     * The amount of energy containing in the link.
-     * @deprecated An alias for .store[RESOURCE_ENERGY].
-     */
-    energy: number;
-    /**
-     * The total amount of energy the link can contain.
-     * @deprecated An alias for .store.getCapacity(RESOURCE_ENERGY).
-     */
-    energyCapacity: number;
     /**
      * A Store object that contains cargo of this structure.
      */
@@ -4969,26 +4836,6 @@ declare const StructurePowerBank: StructurePowerBankConstructor;
 interface StructurePowerSpawn extends OwnedStructure<STRUCTURE_POWER_SPAWN> {
     readonly prototype: StructurePowerSpawn;
     /**
-     * The amount of energy containing in this structure.
-     * @deprecated An alias for .store[RESOURCE_ENERGY].
-     */
-    energy: number;
-    /**
-     * The total amount of energy this structure can contain.
-     * @deprecated An alias for .store.getCapacity(RESOURCE_ENERGY).
-     */
-    energyCapacity: number;
-    /**
-     * The amount of power containing in this structure.
-     * @deprecated An alias for .store[RESOURCE_POWER].
-     */
-    power: number;
-    /**
-     * The total amount of power this structure can contain.
-     * @deprecated An alias for .store.getCapacity(RESOURCE_POWER).
-     */
-    powerCapacity: number;
-    /**
      *
      */
     store: Store<RESOURCE_ENERGY | RESOURCE_POWER, false>;
@@ -5059,11 +4906,6 @@ interface StructureStorage extends OwnedStructure<STRUCTURE_STORAGE> {
      * An object with the storage contents.
      */
     store: StoreDefinition;
-    /**
-     * The total amount of resources the storage can contain.
-     * @deprecated An alias for .store.getCapacity().
-     */
-    storeCapacity: number;
 }
 
 interface StructureStorageConstructor extends _Constructor<StructureStorage>, _ConstructorById<StructureStorage> {}
@@ -5077,17 +4919,6 @@ declare const StructureStorage: StructureStorageConstructor;
  */
 interface StructureTower extends OwnedStructure<STRUCTURE_TOWER> {
     readonly prototype: StructureTower;
-
-    /**
-     * The amount of energy containing in this structure.
-     * @deprecated An alias for .store[RESOURCE_ENERGY].
-     */
-    energy: number;
-    /**
-     * The total amount of energy this structure can contain.
-     * @deprecated An alias for .store.getCapacity(RESOURCE_ENERGY).
-     */
-    energyCapacity: number;
     /**
      * A Store object that contains cargo of this structure.
      */
@@ -5154,30 +4985,10 @@ interface StructureLab extends OwnedStructure<STRUCTURE_LAB> {
      */
     cooldown: number;
     /**
-     * The amount of energy containing in the lab. Energy is used for boosting creeps.
-     * @deprecated An alias for .store[RESOURCE_ENERGY].
-     */
-    energy: number;
-    /**
-     * The total amount of energy the lab can contain.
-     * @deprecated An alias for .store.getCapacity(RESOURCE_ENERGY).
-     */
-    energyCapacity: number;
-    /**
-     * The amount of mineral resources containing in the lab.
-     * @deprecated An alias for lab.store[lab.mineralType].
-     */
-    mineralAmount: number;
-    /**
      * The type of minerals containing in the lab. Labs can contain only one mineral type at the same time.
      * Null in case there is no mineral resource in the lab.
      */
     mineralType: MineralConstant | MineralCompoundConstant | null;
-    /**
-     * The total amount of minerals the lab can contain.
-     * @deprecated An alias for lab.store.getCapacity(lab.mineralType || yourMineral).
-     */
-    mineralCapacity: number;
     /**
      * A Store object that contains cargo of this structure.
      */
@@ -5231,11 +5042,6 @@ interface StructureTerminal extends OwnedStructure<STRUCTURE_TERMINAL> {
      */
     store: StoreDefinition;
     /**
-     * The total amount of resources the storage can contain.
-     * @deprecated An alias for .store.getCapacity().
-     */
-    storeCapacity: number;
-    /**
      * Sends resource to a Terminal in another room with the specified name.
      * @param resourceType One of the RESOURCE_* constants.
      * @param amount The amount of resources to be sent.
@@ -5260,11 +5066,6 @@ interface StructureContainer extends Structure<STRUCTURE_CONTAINER> {
      */
     store: StoreDefinition;
     /**
-     * The total amount of resources the structure can contain.
-     * @deprecated An alias for .store.getCapacity().
-     */
-    storeCapacity: number;
-    /**
      * The amount of game ticks when this container will lose some hit points.
      */
     ticksToDecay: number;
@@ -5283,26 +5084,6 @@ declare const StructureContainer: StructureContainerConstructor;
  */
 interface StructureNuker extends OwnedStructure<STRUCTURE_NUKER> {
     readonly prototype: StructureNuker;
-    /**
-     * The amount of energy contained in this structure.
-     * @deprecated An alias for .store[RESOURCE_ENERGY].
-     */
-    energy: number;
-    /**
-     * The total amount of energy this structure can contain.
-     * @deprecated An alias for .store.getCapacity(RESOURCE_ENERGY).
-     */
-    energyCapacity: number;
-    /**
-     * The amount of energy contained in this structure.
-     * @deprecated An alias for .store[RESOURCE_GHODIUM].
-     */
-    ghodium: number;
-    /**
-     * The total amount of energy this structure can contain.
-     * @deprecated An alias for .store.getCapacity(RESOURCE_GHODIUM).
-     */
-    ghodiumCapacity: number;
     /**
      * The amount of game ticks the link has to wait until the next transfer is possible.
      */

@@ -35,7 +35,7 @@ class RoomStateWorkerTargetActivity extends RoomStateActivity<RoomStateActivity_
         if (!this.room) {
             return ThreadState_Done;
         }
-        let curTarget = Game.getObjectById(this.roomData.targets.Other.target);
+        let curTarget = Game.getObjectById<ObjectTypeWithID>(this.roomData.targets.Other.target);
         if (curTarget && this.roomData.targets.Other.en > 0 && this.roomData.targets.Other.t != TT_None &&
             this.roomData.targets.Other.at != AT_NoOp) {
             return ThreadState_Waiting;

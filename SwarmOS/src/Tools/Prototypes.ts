@@ -37,7 +37,7 @@ if (!StructureContainer.prototype.SwarmOS) {
         },
         energyCapacity: {
             get() {
-                return this.storeCapacity - _.sum(this.store) + this.energy;
+                return this.store.getCapacity() - _.sum(this.store) + this.energy;
             }
         },
         SwarmOS: {
@@ -57,7 +57,7 @@ if (!StructureStorage.prototype.SwarmOS) {
         },
         energyCapacity: {
             get() {
-                return this.storeCapacity - _.sum(this.store) + this.energy;
+                return this.store.getCapacity() - _.sum(this.store) + this.energy;
             }
         },
         SwarmOS: {
@@ -77,7 +77,7 @@ if (!StructureTerminal.prototype.SwarmOS) {
         },
         energyCapacity: {
             get() {
-                return this.storeCapacity - _.sum(this.store) + this.energy;
+                return this.store.getCapacity() - _.sum(this.store) + this.energy;
             }
         },
         SwarmOS: {
