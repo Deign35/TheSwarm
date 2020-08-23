@@ -13,21 +13,21 @@
         "name": "Deign"
     },
     "devDependencies": {
-        "@types/lodash": "^3.10.2",
-        "grunt": "^1.0.2",
+        "@types/lodash": "^3.10.3",
+        "grunt": "^1.3.0",
         "grunt-contrib-clean": "^1.1.0",
         "grunt-contrib-concat": "^1.0.1",
         "grunt-contrib-copy": "^1.0.0",
-        "grunt-contrib-uglify": "^3.3.0",
+        "grunt-contrib-uglify": "^3.4.0",
         "grunt-file-append": "0.0.7",
         "grunt-screeps": "^1.4.0",
-        "grunt-ts": "^6.0.0-beta.19",
-        "typed-screeps": "^2.3.0",
-        "npm": "^5.8.0",
-        "typescript": "^2.8.3"
+        "grunt-ts": "^6.0.0-beta.22",
+        "npm": "^6.14.6",
+        "typed-screeps": "^2.5.3",
+        "typescript": "^2.9.2"
     },
     "dependencies": {
-        "lodash": "3.10.1",
+        "lodash": "4.17.20",
         "source-map": "^0.6.1"
     }
 }
