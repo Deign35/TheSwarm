@@ -15,7 +15,6 @@ declare type RoomID = string;
 
 declare type PlayerID = string;
 declare type PID = string;
-declare type SpawnRequestID = string;
 
 declare type ScreepsPackage = OSPackage
 

@@ -27,7 +27,7 @@ const BodyLegend = {
 // additionally, presize the array.
 const ConvertContextToSpawnBody = function (context: SpawnContext) {
     let body = [];
-    let bodyDef = CreepBodies.get(context.c)[context.l];
+    let bodyDef = CreepBodies.get(context.creep_type)[context.level];
     for (let bodyID in BodyLegend) {
         if (bodyDef[bodyID]) {
             for (let i = 0; i < bodyDef[bodyID]; i++) {
