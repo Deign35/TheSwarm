@@ -141,8 +141,15 @@ class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory> {
             let targets = this.energyTargets;
             let targetIDs = Object.keys(targets);
             for (let i = 0; i < targetIDs.length; i++) {
-                let nexttarget = Game.getObjectById<ObjectTypeWithID>(targetIDs[i]);
-                if (!nexttarget) { continue; }
+                let nextTarget = Game.getObjectById<ObjectTypeWithID>(targetIDs[i]);
+                if (!nextTarget) { continue; }
+
+                let dist = nextTarget.pos.getRangeTo(creep.pos);
+                if (dist < closestDist) {
+                    closestDist = dist;
+                    bestTarget = nextTarget.id;
+                    actionType = AT_Withdraw;
+                }
             }
         }
 
