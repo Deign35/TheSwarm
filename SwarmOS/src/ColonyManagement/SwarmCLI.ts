@@ -79,7 +79,7 @@ class SwarmCLI extends BasicProcess<SwarmCLIMemory> {
         let flagIDs = Object.keys(Game.flags);
         for (let i = 0; i < flagIDs.length; i++) {
             let flag = Game.flags[flagIDs[i]];
-            this.log.info(`Checking flag(${flag.name}`);
+            this.log.info(`Checking flag(${flag.name})`);
             if (flag.color == priA) {
                 if (!secA || flag.secondaryColor == secA) {
                     this.log.info(`PrimaryMatch`)

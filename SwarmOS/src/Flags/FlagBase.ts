@@ -20,7 +20,7 @@ export const OSPackage: IPackage<SpawnRegistry_Memory> = {
  *      WHITE_ --
  *      YELLOW_ --
  * 
- * BROWN_ -- Advancd constructionSite
+ * BROWN_ -- Advanced constructionSites
  *      BLUE_ -- StructureExtractor
  *      BROWN_ -- StructureSpawn
  *      CYAN_ -- StructreObserver

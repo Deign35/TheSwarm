@@ -25,7 +25,7 @@ declare interface SpawnRequest extends MemBase {
     pri: Priority;      // How much of a priority is this spawn??
     spSta: SpawnState;    // Current Spawn state
 
-    dm?: ScreepsObject_CreepMemory;           // Default memory
+    dm?: CreepMemory;           // Default memory
     max?: number;       // Max spawning distance allowed for this spawn.
     spawner?: StructureID; // ID of the spawner that this creep is being spawned at.
 }

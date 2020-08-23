@@ -65,7 +65,7 @@ declare interface IKernelLoggerExtensions extends IPackageExtension, ILogger {
     alert(message: (string | (() => string)), logID?: string): void;
 
     CreateLogContext(logID: string, logLevel?: LogLevel): ILogger;
-    DumpLogToConsole(endTick?: boolean): void;
+    DumpLogToConsole(): void;
 }
 
 /**
@@ -104,7 +104,7 @@ declare interface ISpawnRegistryExtensions extends IPackageExtension {
     cancelRequest(id?: SpawnRequestID): boolean;
     getRequestStatus(id?: SpawnRequestID): SpawnState;
     requestSpawn(context: SpawnContext, location: RoomID, spawnPriority: Priority,
-        maxSpawnDistance?: number, startMem?: ScreepsObject_CreepMemory): SpawnRequestID;
+        maxSpawnDistance?: number, startMem?: CreepMemory): SpawnRequestID;
     getRequestContext(id?: SpawnRequestID): SpawnContext | undefined;
 }
 

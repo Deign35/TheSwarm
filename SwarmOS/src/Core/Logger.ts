@@ -76,7 +76,6 @@ export class Logger implements IKernelLoggerExtensions {
     protected InitQueue(): void {
         let ids = Object.keys(this.logContexts);
         for (let i = 0, length = ids.length; i < length; i++) {
-
             this.logContexts[ids[i]].logs = []
         }
 
@@ -131,8 +130,7 @@ export class Logger implements IKernelLoggerExtensions {
         }
     }
 
-    DumpLogToConsole(endTick: boolean = true): void {
-
+    DumpLogToConsole(): void {
         let logOutputs = [];
         let ids = Object.keys(this.logContexts);
         for (let i = 0, length = ids.length; i < length; i++) {

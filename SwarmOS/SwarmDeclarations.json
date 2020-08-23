@@ -267,7 +267,9 @@
                 "RangedMassAttack": 20,
                 "ReserveController": 21,
                 "SignController": 22,
-                "Suicide": 23
+                "Suicide": 23,
+
+                "Pull": 24
             }
         }
     }

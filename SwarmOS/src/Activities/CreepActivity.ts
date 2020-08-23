@@ -15,7 +15,7 @@ class CreepActivity extends BasicProcess<CreepActivity_Memory> {
     protected View!: IRoomDataExtension;
 
     AssignedCreep?: Creep;
-    Target?: ObjectTypeWithID;
+    Target?: ObjectTypeWithID | null;
     TargetPos?: RoomPosition;
 
     RunThread(): ThreadState {
@@ -90,7 +90,9 @@ class CreepActivity extends BasicProcess<CreepActivity_Memory> {
 
     protected LoadActionMemory() {
         this.AssignedCreep = this.creepRegistry.tryGetCreep(this.memory.c, this.parentPID);
-        this.Target = Game.getObjectById(this.memory.t);
+        if (this.memory.t) {
+            this.Target = Game.getObjectById(this.memory.t);
+        }
         if (this.memory.p) {
             this.TargetPos = new RoomPosition(this.memory.p.x || 25, this.memory.p.y || 25, this.memory.p.roomName);
         }

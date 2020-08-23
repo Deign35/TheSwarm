@@ -1,6 +1,6 @@
 declare var Memory: {
     creepData: CreepRegistry_Memory;
-    creeps: SDictionary<ScreepsObject_CreepMemory>;
+    creeps: SDictionary<CreepMemory>;
 }
 
 import { BasicProcess, ExtensionBase } from "Core/BasicTypes";
@@ -16,18 +16,6 @@ export const OSPackage: IPackage<CreepRegistry_Memory> = {
 const PKG_CreepRegistry_LogContext: LogContext = {
     logID: PKG_CreepRegistry,
     logLevel: LOG_INFO
-}
-
-// This order determines the default order of body parts
-const BodyLegend = {
-    t: TOUGH,
-    a: ATTACK,
-    r: RANGED_ATTACK,
-    cl: CLAIM,
-    w: WORK,
-    c: CARRY,
-    h: HEAL,
-    m: MOVE,
 }
 
 // This can eventually become a CreepGroup, but one that controls all the creeps -- Scheduler!!!!
@@ -97,6 +85,7 @@ class CreepRegistry extends BasicProcess<CreepRegistry_Memory> {
         return ThreadState_Done;
     }
 }
+
 class CreepRegistryExtensions extends ExtensionBase implements ICreepRegistryExtensions {
     get memory(): CreepRegistry_Memory {
         if (!Memory.creepData) {
@@ -114,7 +103,6 @@ class CreepRegistryExtensions extends ExtensionBase implements ICreepRegistryExt
     tryFindCompatibleCreep(creepType: CT_ALL, level: number, targetRoom: RoomID, maxDistance: number = 3): string | undefined {
         let bestMatch: { con: CreepContext, creep: Creep } | undefined = undefined;
         let dist = maxDistance + 1;
-        let desiredBody = CreepBodies[creepType][level];
         let creepIDs = Object.keys(this.registeredCreeps);
         for (let i = 0; i < creepIDs.length; i++) {
             let creepData = this.registeredCreeps[creepIDs[i]];
@@ -288,8 +276,8 @@ class CreepActivityExtensions extends ExtensionBase implements ICreepActivityExt
             case (AT_Upgrade): return creep.upgradeController(target);
 
             case (AT_RequestTransfer):
-                if ((target as Creep).transfer) {
-                    return (target as Creep).transfer(creep, args.resourceType || RESOURCE_ENERGY, args.amount || 0);
+                if (target.transfer) {
+                    return target.transfer(creep, args.resourceType || RESOURCE_ENERGY, args.amount || 0);
                 }
                 break;
             case (AT_SignController): return creep.signController(target, args.message || '');

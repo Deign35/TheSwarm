@@ -53,7 +53,7 @@ class BootstrapRefiller extends SoloJob<BootstrapRefiller_Memory> {
             if (newActivity.at == AT_NoOp) {
                 newActivity.at = AT_Harvest;
                 let source = creep.pos.findClosestByRange(FIND_SOURCES);
-                newActivity.t = source.id;
+                newActivity.t = source!.id;
             }
         } else {
             newActivity.at = AT_Transfer;
