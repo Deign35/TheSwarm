@@ -105,7 +105,7 @@ class SpawnRegistry extends BasicProcess<SpawnRegistry_Memory> {
         }
 
         let spawnIDs = Object.keys(Game.spawns);
-        let activeSpawns = {};
+        let activeSpawns : SDictionary<StructureSpawn> = {};
 
         for (let i = 0, length = spawnIDs.length; i < length; i++) {
             let spawn = Game.spawns[spawnIDs[i]];
@@ -130,8 +130,7 @@ class SpawnRegistry extends BasicProcess<SpawnRegistry_Memory> {
         this.log.debug(`Begin Spawner`);
         let { activeRequests, activeSpawns, sortedSpawnIDs, usedRequestIDs } = this.AnalyzeSpawnRequests();
 
-        let requests = Object.keys(this.memory);
-        if (requests.length == 0) {
+        if (Object.keys(this.memory).length == 0) {
             // Inform the temp worker group
             //this.log.warn(`No spawn requests in the queue.  You have spawn capacity available.`);
             return ThreadState_Done;

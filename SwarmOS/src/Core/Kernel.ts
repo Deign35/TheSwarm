@@ -2,13 +2,6 @@ declare var Memory: {
     kernel: KernelMemory
 }
 
-declare type ProcessCache = {
-    [id in PID]: {
-        context: IProcessContext;
-        process: IProcess;
-    }
-}
-
 const TS_Active = 1;
 const TS_Waiting = 2;
 const TS_Done = 3;
@@ -20,7 +13,7 @@ declare type TickState = TS_Active | TS_Waiting | TS_Done;
 
 export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension {
     constructor(private processRegistry: IProcessRegistry, private extensionRegistry: IExtensionRegistry,
-        private _logger: IKernelLoggerExtensions) {
+                private _logger: IKernelLoggerExtensions) {
         this._processCache = {};
     }
     private _processCache: IDictionary<PID, IProcess>;

@@ -81,7 +81,8 @@ export abstract class PackageProviderBase<T extends PackageProviderMemory> exten
 
 export abstract class ExtensionBase implements IPackageExtension {
     constructor(protected extensionRegistry: IExtensionRegistry) {
-        this._logger = (extensionRegistry.get(EXT_Logger) as IKernelLoggerExtensions)!.CreateLogContext(this.logID, this.logLevel);
+        this._logger = (extensionRegistry.get(EXT_Logger) as IKernelLoggerExtensions)!
+                        .CreateLogContext(this.logID, this.logLevel);
     }
 
     private _logger: ILogger;

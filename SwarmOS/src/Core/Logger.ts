@@ -6,8 +6,8 @@ interface ILogLevelSetting {
     }
 }
 
-const LOGGER_SEPARATOR = `<font color="yellow">-----------------------------------------------------------------------</font>`;
-const CONTEXT_SEPARATOR = `<font color="white">-----------------------------------------------------------------------</font>`;
+const CONTEXT_SEPARATOR =
+        `<font color="white">-----------------------------------------------------------------------</font>`;
 
 const DEFAULT_LOG_FONT_SIZE = 2;
 const LOGGER_SETTINGS: EDictionary<ILogLevelSetting> = {
@@ -84,7 +84,8 @@ export class Logger implements IKernelLoggerExtensions {
         }
     }
 
-    protected log(message: (string | (() => string)), contextID: string = DEFAULT_LOG_ID, severity: LogLevel = DEFAULT_LOG_LEVEL) {
+    protected log(message: (string | (() => string)), contextID: string = DEFAULT_LOG_ID,
+                  severity: LogLevel = DEFAULT_LOG_LEVEL) {
         let context = this.logContexts[contextID];
         if (!context) {
             this.logContexts[contextID] = {
@@ -167,7 +168,8 @@ export class Logger implements IKernelLoggerExtensions {
         let queues = context.logs;
         if (queues.length == 0) { return undefined; }
         let output = () => {
-            let outStr = `${CONTEXT_SEPARATOR}\n${this.MakeFontTag(LOG_WARN)}Begin Log[${logID}] - {${context.logLevel}}</font>\n`;
+            let outStr =
+                `${CONTEXT_SEPARATOR}\n${this.MakeFontTag(LOG_WARN)}Begin Log[${logID}] - {${context.logLevel}}</font>\n`;
             while (queues.length > 0) {
                 outStr += queues.shift() + '\n';
             }
