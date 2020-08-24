@@ -34,14 +34,25 @@ class RoomManager extends BasicProcess<RoomStateMemory> {
   }
 
   @extensionInterface(EXT_RoomManager)
-  RoomView!: RoomManagerExtension;
+  roomManager!: IRoomManagerExtension;
   RunThread(): ThreadState {
+    for (let roomID in Game.rooms) {
+      let data = this.roomManager.GetRoomData(roomID);
+      if (!data) {
+        continue;
+      }
+
+      if (!data.activityPID || !this.kernel.getProcessByPID(data.activityPID)) {
+        // Launch some process here...
+        this.log.info(`Room ${roomID} is not running a process`);
+      }
+    }
 
     return ThreadState_Done;
   }
 }
 
-class RoomManagerExtension extends ExtensionBase {
+class RoomManagerExtension extends ExtensionBase implements IRoomManagerExtension {
   get memory(): RoomStateMemory {
     if (!Memory.roomData) {
       this.log.warn(`Initializing RoomManager memory`);
@@ -63,26 +74,17 @@ class RoomManagerExtension extends ExtensionBase {
     let roomState = this.memory.roomStateData[roomID];
     if (!roomState) {
       let room = Game.rooms[roomID];
-      this.memory.roomStateData[roomID] = {
-        owner: '',
-        lastUpdated: 0,
-        lastEnergy: 0,
-        cSites: [],
-        resources: [],
-        tombstones: [],
-        needsRepair: [],
-        mineralIDs: room.find(FIND_MINERALS)!.map((val: Mineral) => {
+      if (room) {
+        this.memory.roomStateData[roomID] = {
+          activityPID: '',
+          owner: '',
+          mineralIDs: room.find(FIND_MINERALS)!.map((val: Mineral) => {
             return val.id;
-        }),
-        minUpdateOffset: GetRandomIndex(primes_1000) || 73,
-        sourceIDs: room.find(FIND_SOURCES)!.map((val: Source) => {
+          }),
+          sourceIDs: room.find(FIND_SOURCES)!.map((val: Source) => {
             return val.id;
-        }),
-        structures: {
-            container: [],
-            road: []
-        },
-        activityPID: '',
+          }),
+        }
       }
     }
 

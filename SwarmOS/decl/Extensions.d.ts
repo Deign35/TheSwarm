@@ -82,3 +82,10 @@ declare interface ISpawnManagerExtensions extends IPackageExtension {
   requestSpawn(context: SpawnContext, location: RoomID, spawnPriority: Priority,
     maxDistance?: number, startMem?: CreepMemory): SpawnID;
 }
+
+/**
+ * Room data retrieves currently saved information for a given room.
+ */
+declare interface IRoomManagerExtension extends IPackageExtension {
+  GetRoomData(roomID: string): RoomState | undefined;
+}

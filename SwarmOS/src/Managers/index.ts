@@ -19,7 +19,9 @@ class SwarmManager extends PackageProviderBase<PackageProviderMemory> {
 
 export const RegistriesPackage: IPackage<{}> = {
   install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
+    RoomManager.install(processRegistry, extensionRegistry);
     SpawnManager.install(processRegistry, extensionRegistry);
+
     processRegistry.register(PKG_SwarmManager, SwarmManager);
   },
 }

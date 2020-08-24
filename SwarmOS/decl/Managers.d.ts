@@ -21,7 +21,7 @@ declare interface SpawnRequest extends MemBase {
   spawner?: StructureID;       // ID of the spawner that this creep is being spawned at.
 }
 
-/** RoomViewData */
+/** RoomManager */
 declare interface RoomStateMemory extends MemBase {
   roomStateData: {
     [id in RoomID]: RoomState
@@ -29,31 +29,8 @@ declare interface RoomStateMemory extends MemBase {
 }
 
 interface RoomState extends MemBase {
-  lastUpdated: number;
-  lastEnergy: number;
-
-  cSites: ObjectID[];
-  mineralIDs: ObjectID[];
-  resources: ObjectID[];
-  sourceIDs: ObjectID[];
-  tombstones: ObjectID[];
-  needsRepair: ObjectID[];
-  minUpdateOffset: number;
-  structures: RoomState_StructureData;
   activityPID: PID;
+  mineralIDs: ObjectID[];
   owner?: PlayerID;
-}
-
-interface RoomState_StructureData {
-  [STRUCTURE_CONTAINER]: ObjectID[];
-  [STRUCTURE_ROAD]: ObjectID[]
-
-  [STRUCTURE_EXTENSION]?: ObjectID[];
-  [STRUCTURE_LAB]?: ObjectID[];
-  [STRUCTURE_LINK]?: ObjectID[];
-  [STRUCTURE_RAMPART]?: ObjectID[];
-  [STRUCTURE_SPAWN]?: ObjectID[];
-  [STRUCTURE_TOWER]?: ObjectID[];
-  [STRUCTURE_WALL]?: ObjectID[];
-  [id: string]: ObjectID[] | undefined;
+  sourceIDs: ObjectID[];
 }
