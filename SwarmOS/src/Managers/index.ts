@@ -8,13 +8,14 @@ class SwarmManager extends PackageProviderBase<PackageProviderMemory> {
     }
     private _reqServices: SDictionary<ProviderService> = {
         spawnManager: {
-            processname: PKG_SpawnManager
+            processName: PKG_SpawnManager
         }
     }
 }
 
 export const RegistriesPackage: IPackage<{}> = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
+        SpawnManager.install(processRegistry, extensionRegistry);
         processRegistry.register(PKG_SwarmManager, SwarmManager);
     },
 }

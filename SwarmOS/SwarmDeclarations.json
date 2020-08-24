@@ -33,7 +33,8 @@
                 "Logger": "logger",
                 "Kernel": "kernel",
                 "Registry": "extRegistry",
-                "Sleep": "sleep"
+                "Sleep": "sleep",
+                "SpawnManager": "spawn"
             }
         },
         "TT": {

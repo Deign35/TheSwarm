@@ -16,6 +16,7 @@ declare interface IPackageInterfaces {
     [EXT_Kernel]: IKernelExtensions;
     [EXT_Sleep]: IKernelSleepExtension;
     [EXT_Logger]: IKernelLoggerExtensions;
+    [EXT_SpawnManager]: ISpawnManagerExtensions;
 }
 
 /**
@@ -69,4 +70,15 @@ declare interface IKernelLoggerExtensions extends IPackageExtension, ILogger {
 declare interface IKernelSleepExtension extends IPackageExtension {
     sleep(pid: PID, ticks: number): void;
     wake(pid: PID): void;
+}
+
+/**
+ * Extension for processes to be able to request creep spawning.
+ */
+declare interface ISpawnManagerExtensions extends IPackageExtension {
+    cancelRequest(id?: SpawnRequestID): boolean;
+    getRequestContext(id?: SpawnRequestID): SpawnContext | undefined;
+    getRequestStatus(id?: SpawnRequestID): SpawnState;
+    requestSpawn(context: SpawnContext, location: RoomID, spawnPriority: Priority,
+        maxDistance?: number, startMem?: CreepMemory): SpawnID;
 }

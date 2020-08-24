@@ -9,6 +9,8 @@ export abstract class BasicProcess<T extends MemBase> implements IProcess {
     protected extensions!: IExtensionRegistry;
     @extensionInterface(EXT_Sleep)
     protected sleeper!: IKernelSleepExtension;
+    @extensionInterface(EXT_SpawnManager)
+    protected spawnManager!: ISpawnManagerExtensions;
 
     get memory(): T { return this.context.memory as T; }
     get pkgName(): string { return this.context.pkgName; }
