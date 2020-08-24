@@ -13,11 +13,6 @@ export const OSPackage: IPackage<any> = {
     }
 }
 
-const PKG_SpawnManager_LogContext: LogContext = {
-    logID: PKG_SpawnManager,
-    logLevel: LOG_INFO
-}
-
 // This order determines the default order of body parts
 const BodyLegend = {
     t: TOUGH,
@@ -30,8 +25,6 @@ const BodyLegend = {
     m: MOVE,
 }
 
-// (TODO) -- Convert this to auto generated -- maybe also optional ordering??
-// additionally, presize the array.
 const ConvertContextToSpawnBody = function (context: SpawnContext) {
     let body = [];
     let bodyDef = CreepBodies[context.creepType][context.level];
@@ -46,9 +39,12 @@ const ConvertContextToSpawnBody = function (context: SpawnContext) {
     return body;
 }
 
+const PKG_SpawnManager_LogContext: LogContext = {
+    logID: PKG_SpawnManager,
+    logLevel: LOG_INFO
+}
+
 class SpawnManager extends BasicProcess<SpawnManager_Memory> {
-    @extensionInterface(EXT_SpawnManager)
-    Extensions!: SpawnManagerExtensions;
 
     get memory() {
         if (!Memory.spawnData) {
@@ -91,7 +87,7 @@ class SpawnManager extends BasicProcess<SpawnManager_Memory> {
         });
 
         let usedRequestIDs: string[] = [];
-        let activeRequests = this.AnalyzeSpawnRequests();
+        let activeRequests = this.analyzeSpawnRequests();
         let requestIDs = Object.keys(activeRequests);
         for (let i = 0, iLength = sortedSpawnIDs.length; i < iLength; i++) {
             let spawn: StructureSpawn = activeSpawns[sortedSpawnIDs[i]];
@@ -136,7 +132,7 @@ class SpawnManager extends BasicProcess<SpawnManager_Memory> {
         return ThreadState_Done;
     }
 
-    protected AnalyzeSpawnRequests(): SDictionary<SpawnRequest> {
+    protected analyzeSpawnRequests(): SDictionary<SpawnRequest> {
         let activeRequests = {};
 
         let requests = Object.keys(this.memory);
@@ -198,7 +194,7 @@ class SpawnManager extends BasicProcess<SpawnManager_Memory> {
 class SpawnManagerExtensions extends ExtensionBase implements ISpawnManagerExtensions {
     get memory(): SpawnManager_Memory {
         if (!Memory.spawnData) {
-            this.log.warn(`Initializing RoomManager memory`);
+            this.log.warn(`Initializing SpawnManager memory`);
             Memory.spawnData = {}
         }
         return Memory.spawnData;
