@@ -212,7 +212,6 @@ class SpawnManagerExtensions extends ExtensionBase implements ISpawnManagerExten
 
         return false;
     }
-
     getRequestContext(id?: SpawnRequestID): SpawnContext | undefined {
         if (id && this.memory[id]) {
             return this.memory[id].spawnContext;
