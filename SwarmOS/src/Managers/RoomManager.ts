@@ -35,6 +35,7 @@ class RoomManager extends BasicProcess<RoomStateMemory> {
 
   @extensionInterface(EXT_RoomManager)
   roomManager!: IRoomManagerExtension;
+
   RunThread(): ThreadState {
     for (let roomID in Game.rooms) {
       let data = this.roomManager.GetRoomData(roomID);

@@ -7,7 +7,7 @@ import { BasicProcess, ExtensionBase } from "Core/BasicTypes";
 
 export const OSPackage: IPackage<CreepManager_Memory> = {
   install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
-    processRegistry.register(PKG_CreepManager, CreepRegistry);
+    processRegistry.register(PKG_CreepManager, CreepManager);
     extensionRegistry.register(EXT_CreepManager, new CreepManagerExtensions(extensionRegistry));
   }
 }
@@ -17,27 +17,28 @@ const PKG_CreepManager_LogContext: LogContext = {
   logLevel: LOG_INFO
 }
 
-class CreepRegistry extends BasicProcess<CreepManager_Memory> {
+class CreepManager extends BasicProcess<CreepManager_Memory> {
   @extensionInterface(EXT_CreepManager)
   Extensions!: ICreepManagerExtensions;
 
   get memory(): CreepManager_Memory {
     if (!Memory.creepData) {
-      this.log.warn(`Initializing CreepRegistry memory`);
+      this.log.warn(`Initializing CreepManager memory`);
       Memory.creepData = {
         registeredCreeps: {}
       }
     }
+
     return Memory.creepData;
+  }
+  protected get registeredCreeps() {
+    return this.memory.registeredCreeps;
   }
   protected get logID(): string {
     return PKG_CreepManager_LogContext.logID;
   }
   protected get logLevel(): LogLevel {
     return PKG_CreepManager_LogContext.logLevel!;
-  }
-  protected get registeredCreeps() {
-    return this.memory.registeredCreeps;
   }
 
   PrepTick() {
@@ -46,6 +47,7 @@ class CreepRegistry extends BasicProcess<CreepManager_Memory> {
       if (!this.kernel.getProcessByPID(this.registeredCreeps[creepIDs[i]].ownerPID!)) {
         delete this.memory.registeredCreeps[creepIDs[i]].ownerPID;
       }
+
       if (!Game.creeps[creepIDs[i]]) {
         delete this.memory.registeredCreeps[creepIDs[i]];
         delete Memory.creeps[creepIDs[i]];
@@ -63,9 +65,9 @@ class CreepRegistry extends BasicProcess<CreepManager_Memory> {
           this.log.error(`Creep context doesnt exist and couldnt register the creep(${creep.name}).`);
           continue;
         }
-        context = this.registeredCreeps[creep.name];
       }
     }
+
     return ThreadState_Done;
   }
 }
@@ -73,11 +75,12 @@ class CreepRegistry extends BasicProcess<CreepManager_Memory> {
 class CreepManagerExtensions extends ExtensionBase implements ICreepManagerExtensions {
   get memory(): CreepManager_Memory {
     if (!Memory.creepData) {
-      this.log.warn(`Initializing CreepRegistry memory`);
+      this.log.warn(`Initializing CreepManager memory`);
       Memory.creepData = {
         registeredCreeps: {}
       }
     }
+
     return Memory.creepData;
   }
   protected get registeredCreeps() {
