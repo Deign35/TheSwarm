@@ -34,3 +34,12 @@ interface RoomState extends MemBase {
   owner?: PlayerID;
   sourceIDs: ObjectID[];
 }
+
+/** Creepmanager */
+declare interface CreepContext {
+  ownerPID?: PID;        // (o)wner process
+}
+
+declare interface CreepManager_Memory extends MemBase {
+  registeredCreeps: { [id in CreepID]: CreepContext };
+}

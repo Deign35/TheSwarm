@@ -17,6 +17,7 @@
             "type": true,
             "combinedType": "OSPackage",
             "entries": [
+                "CreepManager",
                 "EmptyProcess",
                 "FlagBase",
                 "RoomManager",
@@ -31,6 +32,7 @@
             "type": true,
             "combinedType": "OSExtension",
             "entries": {
+                "CreepManager": "creeps",
                 "Logger": "logger",
                 "Kernel": "kernel",
                 "Registry": "extRegistry",

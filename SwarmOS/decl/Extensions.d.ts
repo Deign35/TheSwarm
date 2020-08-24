@@ -89,3 +89,13 @@ declare interface ISpawnManagerExtensions extends IPackageExtension {
 declare interface IRoomManagerExtension extends IPackageExtension {
   GetRoomData(roomID: string): RoomState | undefined;
 }
+
+/**
+ * Registry for creep management and ownership control
+ */
+declare interface ICreepManagerExtensions extends IPackageExtension {
+  tryRegisterCreep(creepID: CreepID): boolean;
+  tryGetCreep(id: CreepID, requestingPID: PID): Creep | undefined;
+  tryReserveCreep(id: CreepID, requestingPID: PID): boolean;
+  releaseCreep(id: CreepID, requestingPID: PID): void;
+}
