@@ -23,26 +23,26 @@ declare type ObjectTypeWithID = Structure | Creep | Source | ConstructionSite | 
 declare function extensionInterface(interfaceId: string): (target: any, propertyKey: string) => any
 
 declare class Stopwatch {
-    Start(): void;
-    Stop(): void;
-    Reset(): void;
-    Lap(): void;
-    ToString(): string;
+  Start(): void;
+  Stop(): void;
+  Reset(): void;
+  Lap(): void;
+  ToString(): string;
 }
 
 declare interface LogContext {
-    logID: string,
-    logLevel?: LogLevel,
+  logID: string,
+  logLevel?: LogLevel,
 }
 /*declare class SwarmLogger {*/
 declare interface ILogger {
-    trace(message: (string | (() => string))): void;
-    debug(message: (string | (() => string))): void;
-    info(message: (string | (() => string))): void;
-    warn(message: (string | (() => string))): void;
-    error(message: (string | (() => string))): void;
-    fatal(message: (string | (() => string))): void;
-    alert(message: (string | (() => string))): void;
+  trace(message: (string | (() => string))): void;
+  debug(message: (string | (() => string))): void;
+  info(message: (string | (() => string))): void;
+  warn(message: (string | (() => string))): void;
+  error(message: (string | (() => string))): void;
+  fatal(message: (string | (() => string))): void;
+  alert(message: (string | (() => string))): void;
 }
 
 

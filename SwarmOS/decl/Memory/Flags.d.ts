@@ -1,6 +1,6 @@
 /** Flag Memory */
 declare interface FlagProcess_Memory extends MemBase {
-    flagID: FlagID;
+  flagID: FlagID;
 }
 
 /** Flags Extension memory */
