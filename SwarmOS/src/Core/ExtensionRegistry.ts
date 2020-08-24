@@ -18,7 +18,7 @@ export class ExtensionRegistry implements IExtensionRegistry {
     return ExtensionRegistry_LogContext.logID;
   }
   protected get logLevel(): LogLevel {
-    return ExtensionRegistry_LogContext.logLevel!;
+    return ExtensionRegistry_LogContext.logLevel;
   }
 
   private registry: { [interfaceId: string]: IPackageExtension };

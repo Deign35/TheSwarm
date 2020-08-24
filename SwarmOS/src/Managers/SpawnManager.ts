@@ -57,7 +57,7 @@ class SpawnManager extends BasicProcess<SpawnManager_Memory> {
     return PKG_SpawnManager_LogContext.logID;
   }
   protected get logLevel(): LogLevel {
-    return PKG_SpawnManager_LogContext.logLevel!;
+    return PKG_SpawnManager_LogContext.logLevel;
   }
 
   RunThread(): ThreadState {

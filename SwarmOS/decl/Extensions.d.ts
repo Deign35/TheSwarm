@@ -60,7 +60,7 @@ declare interface IKernelLoggerExtensions extends IPackageExtension, ILogger {
   fatal(message: (string | (() => string)), logID?: string): void;
   alert(message: (string | (() => string)), logID?: string): void;
 
-  CreateLogContext(logID: string, logLevel?: LogLevel): ILogger;
+  CreateLogContext(logID: string, logLevel: LogLevel): ILogger;
   DumpLogToConsole(): void;
 }
 

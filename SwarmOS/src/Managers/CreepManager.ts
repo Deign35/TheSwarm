@@ -38,7 +38,7 @@ class CreepManager extends BasicProcess<CreepManager_Memory> {
     return PKG_CreepManager_LogContext.logID;
   }
   protected get logLevel(): LogLevel {
-    return PKG_CreepManager_LogContext.logLevel!;
+    return PKG_CreepManager_LogContext.logLevel;
   }
 
   PrepTick() {

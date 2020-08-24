@@ -30,7 +30,7 @@ class RoomManager extends BasicProcess<RoomStateMemory> {
     return PKG_RoomManager_LogContext.logID;
   }
   protected get logLevel(): LogLevel {
-    return PKG_RoomManager_LogContext.logLevel!;
+    return PKG_RoomManager_LogContext.logLevel;
   }
 
   @extensionInterface(EXT_RoomManager)
@@ -68,7 +68,7 @@ class RoomManagerExtension extends ExtensionBase implements IRoomManagerExtensio
     return PKG_RoomManager_LogContext.logID;
   }
   protected get logLevel(): LogLevel {
-    return PKG_RoomManager_LogContext.logLevel!;
+    return PKG_RoomManager_LogContext.logLevel;
   }
 
   GetRoomData(roomID: string): RoomState {

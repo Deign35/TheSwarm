@@ -32,7 +32,7 @@ declare class Stopwatch {
 
 declare interface LogContext {
   logID: string,
-  logLevel?: LogLevel,
+  logLevel: LogLevel,
 }
 /*declare class SwarmLogger {*/
 declare interface ILogger {

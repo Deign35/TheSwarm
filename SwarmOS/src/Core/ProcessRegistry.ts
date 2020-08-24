@@ -15,7 +15,7 @@ export class ProcessRegistry implements IProcessRegistry {
     return ProcessRegistry_LogContext.logID;
   }
   protected get logLevel(): LogLevel {
-    return ProcessRegistry_LogContext.logLevel!;
+    return ProcessRegistry_LogContext.logLevel;
   }
 
   private registry: { [name: string]: _ProcessConstructor } = {};
