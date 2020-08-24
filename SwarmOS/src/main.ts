@@ -41,7 +41,7 @@ if (!Memory.VERSION || Memory.VERSION != SWARM_VERSION_DATE) {
 import { kernel } from "Core/index";
 
 import { FlagPackage } from "Flags/index";
-import { RegistriesPackage as ManagersPackage } from "Managers/index";
+import { ManagersPackage } from "Managers/index";
 
 kernel.installPackages([FlagPackage, ManagersPackage]);
 
