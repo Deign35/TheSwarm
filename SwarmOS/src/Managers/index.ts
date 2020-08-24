@@ -1,5 +1,6 @@
 import { PackageProviderBase } from "Core/BasicTypes";
 
+import { OSPackage as RoomManager } from "./RoomManager";
 import { OSPackage as SpawnManager } from "./SpawnManager";
 
 class SwarmManager extends PackageProviderBase<PackageProviderMemory> {
@@ -9,6 +10,9 @@ class SwarmManager extends PackageProviderBase<PackageProviderMemory> {
   private _reqServices: SDictionary<ProviderService> = {
     spawnManager: {
       processName: PKG_SpawnManager
+    },
+    roomManager: {
+      processName: PKG_RoomManager
     }
   }
 }
