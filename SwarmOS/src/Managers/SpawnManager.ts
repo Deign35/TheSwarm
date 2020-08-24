@@ -45,7 +45,6 @@ const PKG_SpawnManager_LogContext: LogContext = {
 }
 
 class SpawnManager extends BasicProcess<SpawnManager_Memory> {
-
   get memory() {
     if (!Memory.spawnData) {
       this.log.warn(`Initializing SpawnManager memory`);
@@ -120,7 +119,8 @@ class SpawnManager extends BasicProcess<SpawnManager_Memory> {
         }
       }
 
-      if (spawnRequest.request && spawnRequest.bodyCost > 0 && spawnRequest.request.spawnPriority == minPriority) {
+      if (spawnRequest.request && spawnRequest.bodyCost > 0 &&
+        spawnRequest.request.spawnPriority == minPriority) {
         if (this.spawnCreep(spawn, spawnRequest.request)) {
           usedRequestIDs.push(spawnRequest.request.spawnID);
         }
