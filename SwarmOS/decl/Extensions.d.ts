@@ -40,7 +40,7 @@ declare interface IExtensionRegistry extends IPackageExtension {
  * Extensions for processes to interface with the OS kernel
  */
 declare interface IKernelExtensions extends IPackageExtension {
-  installPackages(packages: IPackage<MemBase>[]): void;
+  installPackages(packages: IPackage[]): void;
   startProcess(packageName: string, startContext: MemBase): PID;
   killProcess(pid?: PID, msg?: string): void;
   getProcessByPID(pid: PID): IProcess | undefined;

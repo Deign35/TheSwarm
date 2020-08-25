@@ -5,7 +5,7 @@ declare var Memory: {
 
 import { BasicProcess, ExtensionBase } from "Core/BasicTypes";
 
-export const OSPackage: IPackage<CreepManager_Memory> = {
+export const OSPackage: IPackage = {
   install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
     processRegistry.register(PKG_CreepManager, CreepManager);
     extensionRegistry.register(EXT_CreepManager, new CreepManagerExtensions(extensionRegistry));
@@ -20,7 +20,7 @@ const PKG_CreepManager_LogContext: LogContext = {
 
 class CreepManager extends BasicProcess<CreepManager_Memory> {
   @extensionInterface(EXT_CreepManager)
-  Extensions!: ICreepManagerExtensions;
+  creepExtensions!: ICreepManagerExtensions;
 
   get memory(): CreepManager_Memory {
     if (!Memory.creepData) {
@@ -62,7 +62,7 @@ class CreepManager extends BasicProcess<CreepManager_Memory> {
       let creep = Game.creeps[creepIDs[i]];
       let context = this.registeredCreeps[creep.name];
       if (!context) {
-        if (!this.Extensions.tryRegisterCreep(creep.name)) {
+        if (!this.creepExtensions.tryRegisterCreep(creep.name)) {
           this.log.error(`Creep context doesnt exist and couldnt register the creep(${creep.name}).`);
           continue;
         }

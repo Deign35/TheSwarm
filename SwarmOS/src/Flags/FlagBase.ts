@@ -1,6 +1,6 @@
 import { BasicProcess } from "Core/BasicTypes";
 
-export const OSPackage: IPackage<FlagProcess_Memory> = {
+export const OSPackage: IPackage = {
   install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
     processRegistry.register(PKG_FlagBase, FlagBase);
   }

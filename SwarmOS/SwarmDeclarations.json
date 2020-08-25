@@ -52,6 +52,16 @@
                 "Harvester": "harvester"
             }
         },
+        "RJ": {
+            "comment": "Room job packages for installation",
+            "enabled": true,
+            "string": true,
+            "type": true,
+            "combinedType": "RoomJob",
+            "entries": {
+                "Creeps": "creeps"
+            }
+        },
         "TT": {
             "comment": "Type of target for quickly determining how to interact with the object",
             "enabled": true,
