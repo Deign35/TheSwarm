@@ -6,12 +6,18 @@ export const OSPackage: IPackage = {
 
 import { BasicProcess } from "Core/BasicTypes";
 
-const PKG_EmptyProcess_LogContext: LogContext = {
+const RJ_Creeps_LogContext: LogContext = {
   logID: RJ_Creeps,
   logLevel: LOG_INFO
 }
 
 class RoomJobCreeps extends BasicProcess<IRoomJobCreeps_Memory> implements IRoomJobCreeps {
+  protected get logID(): string {
+    return RJ_Creeps_LogContext.logID;
+  }
+  protected get logLevel(): LogLevel {
+    return RJ_Creeps_LogContext.logLevel;
+  }
   SurrenderCreep(creepID: string): void {
   }
   RunThread(): ThreadState {
