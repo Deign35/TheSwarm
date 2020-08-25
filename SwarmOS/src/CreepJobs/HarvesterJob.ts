@@ -4,20 +4,14 @@ export const OSPackage: IPackage<MemBase> = {
   }
 }
 
-import { BasicProcess } from "Core/BasicTypes";
+import { CreepJob } from "./CreepJob";
 
 const CJ_Harvester_LogContext: LogContext = {
   logID: CJ_Harvester,
   logLevel: LOG_INFO
 }
 
-const ENABLE_PROFILING = true;
-class HarvesterJob extends BasicProcess<HarvesterJob_Memory> {
-  @extensionInterface(EXT_RoomManager)
-  roomManager!: IRoomManagerExtension;
-  @extensionInterface(EXT_SpawnManager)
-  spawnManager!: ISpawnManagerExtensions
-
+class HarvesterJob extends CreepJob<HarvesterJob_Memory> {
   protected get logID(): string {
     return CJ_Harvester_LogContext.logID;
   }
@@ -25,24 +19,7 @@ class HarvesterJob extends BasicProcess<HarvesterJob_Memory> {
     return CJ_Harvester_LogContext.logLevel;
   }
 
-  PrepTick() {
-  }
-
   RunThread(): ThreadState {
-    let start = Game.cpu.getUsed();
-    try {
-
-    } catch (ex) {
-      this.log.info(`An exception occurred while trying experimental stuff (${ex})`);
-    }
-
-    if (ENABLE_PROFILING) {
-      this.log.info(`Experimental CPU used (${Game.cpu.getUsed() - start})`);
-    }
     return ThreadState_Done;
-  }
-
-  CallbackFunction(spawnID: SpawnRequestID) {
-    this.log.info(`Callback function called: ${spawnID}`);
   }
 }
