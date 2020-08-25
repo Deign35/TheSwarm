@@ -80,7 +80,7 @@ declare interface ISpawnManagerExtensions extends IPackageExtension {
   getRequestContext(id?: SpawnRequestID): SpawnContext | undefined;
   getRequestStatus(id?: SpawnRequestID): SpawnState;
   requestSpawn(context: SpawnContext, location: RoomID, spawnPriority: Priority,
-    maxDistance?: number, startMem?: CreepMemory): SpawnID;
+    startMem: CreepMemory, maxDistance?: number): SpawnID;
 }
 
 /**
@@ -100,7 +100,7 @@ declare interface ICreepManagerExtensions extends IPackageExtension {
   releaseCreep(id: CreepID, requestingPID: PID): void;
 }
 
-interface RunArgs {
+interface CreepActionArgs {
   creep: Creep;
   actionType: ActionType;
 
@@ -111,7 +111,7 @@ interface RunArgs {
 }
 
 declare interface ICreepActionExtensions extends IPackageExtension {
-  RunCreepAction(args: RunArgs): ScreepsReturnCode;
+  RunCreepAction(args: CreepActionArgs): ScreepsReturnCode;
   ValidateActionTarget(actionType: ActionType, target: any): boolean;
   CreepIsInRange(actionType: ActionType, pos1: RoomPosition, pos2: RoomPosition): boolean;
   MoveCreep(creep: Creep, pos: RoomPosition): ScreepsReturnCode;

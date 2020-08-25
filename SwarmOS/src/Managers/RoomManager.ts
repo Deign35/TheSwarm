@@ -17,6 +17,9 @@ const PKG_RoomManager_LogContext: LogContext = {
 }
 
 class RoomManager extends BasicProcess<RoomStateMemory> {
+  @extensionInterface(EXT_RoomManager)
+  roomManager!: IRoomManagerExtension;
+
   get memory(): RoomStateMemory {
     if (!Memory.roomData) {
       this.log.warn(`Initializing RoomManager memory`);
@@ -32,9 +35,6 @@ class RoomManager extends BasicProcess<RoomStateMemory> {
   protected get logLevel(): LogLevel {
     return PKG_RoomManager_LogContext.logLevel;
   }
-
-  @extensionInterface(EXT_RoomManager)
-  roomManager!: IRoomManagerExtension;
 
   RunThread(): ThreadState {
     for (let roomID in Game.rooms) {

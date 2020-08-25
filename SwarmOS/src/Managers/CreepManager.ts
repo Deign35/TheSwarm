@@ -32,14 +32,14 @@ class CreepManager extends BasicProcess<CreepManager_Memory> {
 
     return Memory.creepData;
   }
-  protected get registeredCreeps() {
-    return this.memory.registeredCreeps;
-  }
   protected get logID(): string {
     return PKG_CreepManager_LogContext.logID;
   }
   protected get logLevel(): LogLevel {
     return PKG_CreepManager_LogContext.logLevel;
+  }
+  protected get registeredCreeps() {
+    return this.memory.registeredCreeps;
   }
 
   PrepTick() {
@@ -136,7 +136,7 @@ class CreepActionExtensions extends ExtensionBase implements ICreepActionExtensi
     return xDiff > yDiff ? xDiff : yDiff;
   }
 
-  RunCreepAction(args: RunArgs) {
+  RunCreepAction(args: CreepActionArgs) {
     let creep = args.creep;
     let actionType = args.actionType;
     let target = args.target;
