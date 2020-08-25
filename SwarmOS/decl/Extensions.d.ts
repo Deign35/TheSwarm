@@ -99,3 +99,20 @@ declare interface ICreepManagerExtensions extends IPackageExtension {
   tryReserveCreep(id: CreepID, requestingPID: PID): boolean;
   releaseCreep(id: CreepID, requestingPID: PID): void;
 }
+
+interface RunArgs {
+  creep: Creep;
+  actionType: ActionType;
+
+  target?: any;
+  amount?: number;
+  message?: string;
+  resourceType?: ResourceConstant;
+}
+
+declare interface ICreepActionExtensions extends IPackageExtension {
+  RunCreepAction(args: RunArgs): ScreepsReturnCode;
+  ValidateActionTarget(actionType: ActionType, target: any): boolean;
+  CreepIsInRange(actionType: ActionType, pos1: RoomPosition, pos2: RoomPosition): boolean;
+  MoveCreep(creep: Creep, pos: RoomPosition): ScreepsReturnCode;
+}
