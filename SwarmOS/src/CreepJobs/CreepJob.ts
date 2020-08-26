@@ -8,7 +8,6 @@ export abstract class CreepJob<T extends CreepJob_Memory> extends BasicProcess<T
   @extensionInterface(EXT_SpawnManager)
   spawnManager!: ISpawnManagerExtensions;
 
-
   protected assignedCreep?: Creep;
 
   PrepTick() {
@@ -27,14 +26,6 @@ export abstract class CreepJob<T extends CreepJob_Memory> extends BasicProcess<T
       // Let the parent know about the creep being released.
       (this.GetParentProcess() as IRoomJobCreeps).SurrenderCreep(this.memory.creepID);
     }
-  }
-
-  protected GetLinearDistance(pos1: { x: number, y: number }, pos2: { x: number, y: number }) {
-    let xDiff = pos1.x - pos2.x;
-    xDiff *= xDiff < 0 ? -1 : 1;
-    let yDiff = pos1.y - pos2.y;
-    yDiff *= yDiff < 0 ? -1 : 1;
-    return xDiff > yDiff ? xDiff : yDiff;
   }
 
   RunCreepAction(args: CreepActionArgs) {
@@ -107,6 +98,14 @@ export abstract class CreepJob<T extends CreepJob_Memory> extends BasicProcess<T
     return creep.moveTo(pos);
   }
 
+  protected GetLinearDistance(pos1: { x: number, y: number }, pos2: { x: number, y: number }) {
+    let xDiff = pos1.x - pos2.x;
+    xDiff *= xDiff < 0 ? -1 : 1;
+    let yDiff = pos1.y - pos2.y;
+    yDiff *= yDiff < 0 ? -1 : 1;
+    return xDiff > yDiff ? xDiff : yDiff;
+  }
+
   CreepIsInRange(actionType: ActionType, pos1: RoomPosition, pos2: RoomPosition) {
     let distance = this.GetLinearDistance(pos1, pos2);
     if (actionType == AT_Build || actionType == AT_RangedAttack ||
@@ -164,3 +163,5 @@ export abstract class CreepJob<T extends CreepJob_Memory> extends BasicProcess<T
       default:
         return target && !!(target as RoomPosition).isNearTo;
     }
+  }
+}
