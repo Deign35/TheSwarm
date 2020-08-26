@@ -64,7 +64,7 @@ class SpawnManager extends BasicProcess<SpawnManager_Memory> {
     this.log.debug(`Begin SpawnManager`);
     let requests = Object.keys(this.memory);
     if (requests.length == 0) {
-      this.log.warn(`No spawn requests in the queue.  You have spawn capacity available.`);
+      this.log.debug(`No spawn requests in the queue.  You have spawn capacity available.`);
       return ThreadState_Done;
     }
 

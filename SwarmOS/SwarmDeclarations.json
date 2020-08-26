@@ -32,7 +32,6 @@
             "type": true,
             "combinedType": "OSExtension",
             "entries": {
-                "CreepActions": "creepActions",
                 "CreepManager": "creepManager",
                 "Logger": "logger",
                 "Kernel": "kernel",
