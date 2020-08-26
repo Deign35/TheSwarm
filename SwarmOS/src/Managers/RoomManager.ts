@@ -44,8 +44,6 @@ class RoomManager extends BasicProcess<RoomStateMemory> {
       }
 
       if (!data.activityPID || !this.kernel.getProcessByPID(data.activityPID)) {
-        // Launch some process here...
-        this.log.info(`Room ${roomID} is not running a process`);
         data.activityPID = this.kernel.startProcess(RJ_Creeps, {
           harvester: '',
           room: roomID
@@ -82,7 +80,6 @@ class RoomManagerExtension extends ExtensionBase implements IRoomManagerExtensio
       if (room) {
         this.memory.roomStateData[roomID] = {
           activityPID: '',
-          owner: '',
           mineralIDs: room.find(FIND_MINERALS)!.map((val: Mineral) => {
             return val.id;
           }),
@@ -94,5 +91,12 @@ class RoomManagerExtension extends ExtensionBase implements IRoomManagerExtensio
     }
 
     return roomState;
+  }
+
+  ScanRoom(roomID: string) {
+    let roomState = this.GetRoomData(roomID);
+    if (!roomState || !Game.rooms[roomID]) {
+      return;
+    }
   }
 }

@@ -48,7 +48,8 @@
             "type": true,
             "combinedType": "CreepJob",
             "entries": {
-                "Harvester": "harvester"
+                "Harvester": "harvester",
+                "Worker": "worker"
             }
         },
         "RJ": {

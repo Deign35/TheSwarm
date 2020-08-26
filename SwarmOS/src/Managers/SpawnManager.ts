@@ -123,15 +123,6 @@ class SpawnManager extends BasicProcess<SpawnManager_Memory> {
         spawnRequest.request.spawnPriority == minPriority) {
         if (this.spawnCreep(spawn, spawnRequest.request)) {
           usedRequestIDs.push(spawnRequest.request.spawnID);
-
-          let process = this.kernel.getProcessByPID(spawnRequest.request.spawnContext.owner_pid);
-          if (process) {
-            try {
-              process[spawnRequest.request.spawnContext.HC](spawnRequest.request.spawnID);
-            } catch (e) {
-              this.log.error(`A spawn request failed to callback the requester: ${e.stack || e.toString()}`);
-            }
-          }
         }
       }
     }

@@ -25,13 +25,13 @@ class RoomJobCreeps extends BasicProcess<IRoomJobCreeps_Memory> implements IRoom
     try {
       let harvesterProcess = this.kernel.getProcessByPID(this.memory.harvester);
       if (!harvesterProcess) {
-        let sourceIDs = this.roomManager.GetRoomData(this.memory.room)?.sourceIDs;
+        let sourceIDs = this.roomManager.GetRoomData(this.memory.room)!.sourceIDs;
         if (sourceIDs) {
           let sources = {};
           for (let i = 0; i < sourceIDs.length; i++) {
             sources[sourceIDs[i]] = "";
           }
-          this.kernel.startProcess(CJ_Harvester, {
+          this.memory.harvester = this.kernel.startProcess(CJ_Harvester, {
             room: this.memory.room,
             creepIDs: [],
             sources: sources,

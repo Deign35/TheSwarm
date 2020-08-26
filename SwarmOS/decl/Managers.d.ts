@@ -4,7 +4,6 @@ declare type SpawnManager_Memory = MemBase & {
   [id in SpawnID]: SpawnRequest
 }
 declare interface SpawnContext extends MemBase {
-  HC: string          // Callback address for notifying when spawning has happened.
   creepName: CreepID; // (n)ame
   creepType: CT_ALL;  // (c)reep type
   level: number;  // (l)evel
@@ -32,7 +31,6 @@ declare interface RoomStateMemory extends MemBase {
 interface RoomState extends MemBase {
   activityPID: PID;
   mineralIDs: ObjectID[];
-  owner?: PlayerID;
   sourceIDs: ObjectID[];
 }
 
