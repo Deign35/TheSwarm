@@ -32,6 +32,7 @@ interface RoomState extends MemBase {
   lastUpdated: number;
 
   activityPIDs: {
+    RPKG_EnergyManager: PID,
     RPKG_Towers: PID
   }
   cSites: ObjectID[];

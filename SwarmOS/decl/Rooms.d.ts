@@ -3,5 +3,9 @@ declare interface RoomMemory extends MemBase {
 }
 
 declare interface TowerMemory extends RoomMemory {
-  
+
+}
+
+declare interface EnergyManagerMemory extends RoomMemory {
+  harvesterPIDs: IDictionary<ObjectID, PID>;
 }

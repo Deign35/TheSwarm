@@ -53,6 +53,14 @@ class RoomManager extends BasicProcess<RoomStateMemory> {
         } as TowerMemory);
         this.kernel.setParent(data.activityPIDs[RPKG_Towers], this.pid);
       }
+
+      if (!data.activityPIDs.RPKG_EnergyManager || !this.kernel.getProcessByPID(data.activityPIDs.RPKG_EnergyManager)) {
+        data.activityPIDs.RPKG_EnergyManager = this.kernel.startProcess(RPKG_EnergyManager, {
+          harvesterPIDs: {},
+          roomID: roomID
+        } as EnergyManagerMemory);
+        this.kernel.setParent(data.activityPIDs.RPKG_EnergyManager, this.pid);
+      }
     }
 
     return ThreadState_Done;
@@ -85,6 +93,7 @@ class RoomManagerExtension extends ExtensionBase implements IRoomManagerExtensio
         this.memory.roomStateData[roomID] = {
           lastUpdated: 0,
           activityPIDs: {
+            RPKG_EnergyManager: '',
             RPKG_Towers: ''
           },
           mineralIDs: room.find(FIND_MINERALS)!.map((val: Mineral) => {

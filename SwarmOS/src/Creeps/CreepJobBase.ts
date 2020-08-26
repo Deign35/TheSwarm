@@ -5,14 +5,13 @@ export abstract class CreepJobBase<T extends CreepMemBase> extends BasicProcess<
   creepManager!: ICreepManagerExtensions;
   @extensionInterface(EXT_RoomManager)
   roomManager!: IRoomManagerExtension;
+  @extensionInterface(EXT_SpawnManager)
+  spawnManager!: ISpawnManagerExtensions;
 
   AssignedCreep?: Creep;
 
   PrepTick() {
     this.AssignedCreep = this.creepManager.tryGetCreep(this.memory.creepID, this.pid);
-    if (!this.AssignedCreep) {
-      this.kernel.killProcess(this.pid);
-    }
   }
 
 

@@ -1,7 +1,7 @@
-//import { OSPackage as RoomScanner } from "./RoomScanner"
+import { OSPackage as Harvester } from "./Harvester"
 
 export const CreepsPackage: IPackage = {
   install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
-    //RoomScanner.install(processRegistry, extensionRegistry);
+    Harvester.install(processRegistry, extensionRegistry);
   }
 }

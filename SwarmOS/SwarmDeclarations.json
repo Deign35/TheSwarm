@@ -58,6 +58,7 @@
             "type": true,
             "combinedType": "RoomPackages",
             "entries": {
+                "EnergyManager": "energyManager",
                 "Towers": "towers"
             }
         },

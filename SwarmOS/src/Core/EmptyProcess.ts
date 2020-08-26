@@ -13,6 +13,13 @@ const PKG_EmptyProcess_LogContext: LogContext = {
 
 const ENABLE_PROFILING = true;
 class EmptyProcess extends BasicProcess<MemBase> {
+  protected get logID(): string {
+    return PKG_EmptyProcess_LogContext.logID;
+  }
+  protected get logLevel(): LogLevel {
+    return PKG_EmptyProcess_LogContext.logLevel;
+  }
+
   RunThread(): ThreadState {
     let start = Game.cpu.getUsed();
     try {
