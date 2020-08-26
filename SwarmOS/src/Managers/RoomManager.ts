@@ -43,11 +43,14 @@ class RoomManager extends BasicProcess<RoomStateMemory> {
         continue;
       }
 
-      if (Game.time - data.lastUpdated > 17) {
+      if (Game.time - data.lastUpdated > 31) {
         this.roomManager.ScanRoom(roomID);
       }
 
-      if (!data.activityPID || !this.kernel.getProcessByPID(data.activityPID)) {
+      if (!data.activityPIDs[RPKG_Towers] || !this.kernel.getProcessByPID(data.activityPIDs[RPKG_Towers])) {
+        data.activityPIDs[RPKG_Towers] = this.kernel.startProcess(RPKG_Towers, {
+          roomID: roomID
+        } as TowerMemory);
       }
     }
 
@@ -80,7 +83,9 @@ class RoomManagerExtension extends ExtensionBase implements IRoomManagerExtensio
       if (room) {
         this.memory.roomStateData[roomID] = {
           lastUpdated: 0,
-          activityPID: '',
+          activityPIDs: {
+            RPKG_Towers: ''
+          },
           mineralIDs: room.find(FIND_MINERALS)!.map((val: Mineral) => {
             return val.id;
           }),
@@ -88,7 +93,10 @@ class RoomManagerExtension extends ExtensionBase implements IRoomManagerExtensio
             return val.id;
           }),
           cSites: [],
-          needsRepair: []
+          needsRepair: [],
+          structures: {
+            tower: []
+          }
         }
       }
     }
@@ -110,9 +118,17 @@ class RoomManagerExtension extends ExtensionBase implements IRoomManagerExtensio
 
     roomState.needsRepair = [];
     let structures = Game.rooms[roomID].find(FIND_STRUCTURES);
+
+    roomState.structures = {
+      tower: []
+    }
     for (let i = 0; i < structures.length; i++) {
       if (structures[i].hits < structures[i].hitsMax * 0.75) {
         roomState.needsRepair.push(structures[i].id);
+      }
+
+      if (structures[i].structureType == STRUCTURE_TOWER) {
+        roomState.structures[STRUCTURE_TOWER]!.push(structures[i].id);
       }
     }
 

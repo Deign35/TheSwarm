@@ -31,11 +31,18 @@ declare interface RoomStateMemory extends MemBase {
 interface RoomState extends MemBase {
   lastUpdated: number;
 
-  activityPID: PID;
+  activityPIDs: {
+    RPKG_Towers: PID
+  }
   cSites: ObjectID[];
   mineralIDs: ObjectID[];
   sourceIDs: ObjectID[];
   needsRepair: ObjectID[];
+  structures: RoomState_StructureData;
+}
+
+interface RoomState_StructureData {
+  [STRUCTURE_TOWER]: ObjectID[];
 }
 
 /** Creepmanager */

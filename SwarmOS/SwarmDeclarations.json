@@ -58,7 +58,7 @@
             "type": true,
             "combinedType": "RoomPackages",
             "entries": {
-                "RoomScanner": "scanner"
+                "Towers": "towers"
             }
         },
         "TT": {
