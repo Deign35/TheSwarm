@@ -51,6 +51,7 @@ class RoomManager extends BasicProcess<RoomStateMemory> {
         data.activityPIDs[RPKG_Towers] = this.kernel.startProcess(RPKG_Towers, {
           roomID: roomID
         } as TowerMemory);
+        this.kernel.setParent(data.activityPIDs[RPKG_Towers], this.pid);
       }
     }
 
