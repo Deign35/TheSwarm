@@ -76,9 +76,9 @@ declare interface IKernelSleepExtension extends IPackageExtension {
  * Extension for processes to be able to request creep spawning.
  */
 declare interface ISpawnManagerExtensions extends IPackageExtension {
-  cancelRequest(id?: SpawnRequestID): boolean;
-  getRequestContext(id?: SpawnRequestID): SpawnContext | undefined;
-  getRequestStatus(id?: SpawnRequestID): SpawnState;
+  cancelRequest(id: SpawnRequestID): boolean;
+  getRequestContext(id: SpawnRequestID): SpawnContext | undefined;
+  getRequestStatus(id: SpawnRequestID): SpawnState;
   requestSpawn(context: SpawnContext, location: RoomID, spawnPriority: Priority,
     startMem: CreepMemory, maxDistance?: number): SpawnID;
 }

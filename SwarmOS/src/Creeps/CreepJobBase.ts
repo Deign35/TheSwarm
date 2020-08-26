@@ -14,8 +14,6 @@ export abstract class CreepJobBase<T extends CreepMemBase> extends BasicProcess<
     this.AssignedCreep = this.creepManager.tryGetCreep(this.memory.creepID, this.pid);
   }
 
-
-
   protected GetLinearDistance(pos1: { x: number, y: number }, pos2: { x: number, y: number }) {
     let xDiff = pos1.x - pos2.x;
     xDiff *= xDiff < 0 ? -1 : 1;

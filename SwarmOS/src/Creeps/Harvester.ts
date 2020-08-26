@@ -34,10 +34,12 @@ class Harvester extends CreepJobBase<HarvesterMemory> {
             parentPID: this.pid
           }, 3);
       } else {
-        if (spawnStatus == SP_SPAWNING) {
+        if (spawnStatus == SP_SPAWNING || spawnStatus == SP_COMPLETE) {
           let spawnContext = this.spawnManager.getRequestContext(this.memory.creepID)!;
-          this.memory.creepID = spawnContext.creepName;
-          this.creepManager.tryReserveCreep(spawnContext.creepName, this.pid);
+          if (this.spawnManager.cancelRequest(this.memory.creepID)) {
+            this.memory.creepID = spawnContext.creepName;
+            this.creepManager.tryReserveCreep(spawnContext.creepName, this.pid);
+          }
         }
       }
 
