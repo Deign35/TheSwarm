@@ -1,7 +1,7 @@
-//import { OSPackage as RoomScanner } from "./RoomScanner"
+import { OSPackage as TowerJob } from "./TowerJob"
 
 export const RoomsPackage: IPackage = {
   install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
-    //RoomScanner.install(processRegistry, extensionRegistry);
+    TowerJob.install(processRegistry, extensionRegistry);
   }
 }
