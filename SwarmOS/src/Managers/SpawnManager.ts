@@ -4,7 +4,7 @@ declare var Memory: {
 
 import { BasicProcess, ExtensionBase } from "Core/BasicTypes";
 
-export const OSPackage: IPackage<any> = {
+export const OSPackage: IPackage = {
   install(processRegistry: IProcessRegistry,
     extensionRegistry: IExtensionRegistry) {
     processRegistry.register(PKG_SpawnManager, SpawnManager);

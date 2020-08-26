@@ -1,4 +1,28 @@
-declare interface IPackage<MemBase> {
+declare interface MemBase {
+  HC?: string; // (H)andle of the (C)allback function for informing the parent process that this process has died.
+}
+
+/** Core OS */
+declare interface KernelMemory extends MemBase {
+  processTable: ProcessTable;
+  processMemory: ProcessMemory;
+
+  ErrorLog: string[];
+}
+declare type ProcessMemory = {
+  [id in PID]: MemBase;
+}
+
+declare interface PackageProviderMemory extends MemBase {
+  services: {
+    [id: string]: {
+      pid: PID,
+      serviceID: string
+    }
+  }
+}
+
+declare interface IPackage {
   install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry): void;
 }
 declare interface IKernel extends IKernelExtensions, IKernelSleepExtension {

@@ -43,8 +43,9 @@ import { kernel } from "Core/index";
 import { CreepJobPackage } from "CreepJobs/index";
 import { FlagPackage } from "Flags/index";
 import { ManagersPackage } from "Managers/index";
+import { RoomJobPackage } from "RoomJobs/index";
 
-kernel.installPackages([CreepJobPackage, FlagPackage, ManagersPackage]);
+kernel.installPackages([CreepJobPackage, FlagPackage, ManagersPackage, RoomJobPackage]);
 
 export function loop() {
   try {

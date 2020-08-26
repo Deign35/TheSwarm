@@ -21,7 +21,7 @@ class SwarmManager extends PackageProviderBase<PackageProviderMemory> {
   }
 }
 
-export const ManagersPackage: IPackage<{}> = {
+export const ManagersPackage: IPackage = {
   install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
     CreepManager.install(processRegistry, extensionRegistry);
     RoomManager.install(processRegistry, extensionRegistry);

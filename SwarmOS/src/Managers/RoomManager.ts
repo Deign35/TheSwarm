@@ -4,7 +4,7 @@ declare var Memory: {
 
 import { ExtensionBase, BasicProcess } from "Core/BasicTypes";
 
-export const OSPackage: IPackage<RoomStateMemory> = {
+export const OSPackage: IPackage = {
   install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
     processRegistry.register(PKG_RoomManager, RoomManager);
     extensionRegistry.register(EXT_RoomManager, new RoomManagerExtension(extensionRegistry));

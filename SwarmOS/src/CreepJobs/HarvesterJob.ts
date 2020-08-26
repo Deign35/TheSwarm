@@ -1,4 +1,4 @@
-export const OSPackage: IPackage<MemBase> = {
+export const OSPackage: IPackage = {
   install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
     processRegistry.register(CJ_Harvester, HarvesterJob);
   }

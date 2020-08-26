@@ -39,10 +39,10 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
     return this.memory.processMemory;
   }
 
-  installPackage(pack: IPackage<{}>) {
+  installPackage(pack: IPackage) {
     pack.install(this.processRegistry, this.extensionRegistry);
   }
-  installPackages(pack: IPackage<{}>[]) {
+  installPackages(pack: IPackage[]) {
     for (let id in pack) {
       this.installPackage(pack[id]);
     }

@@ -8,6 +8,27 @@ export abstract class CreepJob<T extends CreepJob_Memory> extends BasicProcess<T
   @extensionInterface(EXT_SpawnManager)
   spawnManager!: ISpawnManagerExtensions;
 
+
+  protected assignedCreep?: Creep;
+
+  PrepTick() {
+    if (this.memory.creepID) {
+      this.assignedCreep = this.creepManager.tryGetCreep(this.memory.creepID, this.pid);
+    }
+  }
+
+  AssignCreep(creepID: CreepID) {
+    this.creepManager.tryReserveCreep(creepID, this.pid);
+  }
+
+  ReleaseCreep() {
+    if (this.memory.creepID) {
+      this.creepManager.releaseCreep(this.memory.creepID, this.pid);
+      // Let the parent know about the creep being released.
+      (this.GetParentProcess() as IRoomJobCreeps).SurrenderCreep(this.memory.creepID);
+    }
+  }
+
   protected GetLinearDistance(pos1: { x: number, y: number }, pos2: { x: number, y: number }) {
     let xDiff = pos1.x - pos2.x;
     xDiff *= xDiff < 0 ? -1 : 1;
@@ -143,5 +164,3 @@ export abstract class CreepJob<T extends CreepJob_Memory> extends BasicProcess<T
       default:
         return target && !!(target as RoomPosition).isNearTo;
     }
-  }
-}
