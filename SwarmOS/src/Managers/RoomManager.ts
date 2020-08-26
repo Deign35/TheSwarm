@@ -46,6 +46,10 @@ class RoomManager extends BasicProcess<RoomStateMemory> {
       if (!data.activityPID || !this.kernel.getProcessByPID(data.activityPID)) {
         // Launch some process here...
         this.log.info(`Room ${roomID} is not running a process`);
+        data.activityPID = this.kernel.startProcess(RJ_Creeps, {
+          harvester: '',
+          room: roomID
+        } as IRoomJobCreeps_Memory)
       }
     }
 
