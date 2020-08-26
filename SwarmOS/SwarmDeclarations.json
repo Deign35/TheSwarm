@@ -41,25 +41,24 @@
                 "SpawnManager": "spawnManager"
             }
         },
-        "CJ": {
-            "comment": "Creep job packages for installation",
+        "CPKG": {
+            "comment": "Creep packages for installation",
             "enabled": true,
             "string": true,
             "type": true,
-            "combinedType": "CreepJob",
+            "combinedType": "CreepPackages",
             "entries": {
-                "Harvester": "harvester",
-                "Worker": "worker"
+                "Harvester": "harvester"
             }
         },
-        "RJ": {
-            "comment": "Room job packages for installation",
+        "RPKG": {
+            "comment": "Room packages for installation",
             "enabled": true,
             "string": true,
             "type": true,
-            "combinedType": "RoomJob",
+            "combinedType": "RoomPackages",
             "entries": {
-                "Creeps": "creeps"
+                "RoomScanner": "scanner"
             }
         },
         "TT": {

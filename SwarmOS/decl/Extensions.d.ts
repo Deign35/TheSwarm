@@ -88,6 +88,7 @@ declare interface ISpawnManagerExtensions extends IPackageExtension {
  */
 declare interface IRoomManagerExtension extends IPackageExtension {
   GetRoomData(roomID: string): RoomState | undefined;
+  ScanRoom(roomID: string): void;
 }
 
 /**

@@ -43,11 +43,11 @@ class RoomManager extends BasicProcess<RoomStateMemory> {
         continue;
       }
 
+      if (Game.time - data.lastUpdated > 17) {
+        this.roomManager.ScanRoom(roomID);
+      }
+
       if (!data.activityPID || !this.kernel.getProcessByPID(data.activityPID)) {
-        data.activityPID = this.kernel.startProcess(RJ_Creeps, {
-          harvester: '',
-          room: roomID
-        } as IRoomJobCreeps_Memory)
       }
     }
 
@@ -79,6 +79,7 @@ class RoomManagerExtension extends ExtensionBase implements IRoomManagerExtensio
       let room = Game.rooms[roomID];
       if (room) {
         this.memory.roomStateData[roomID] = {
+          lastUpdated: 0,
           activityPID: '',
           mineralIDs: room.find(FIND_MINERALS)!.map((val: Mineral) => {
             return val.id;
@@ -86,6 +87,8 @@ class RoomManagerExtension extends ExtensionBase implements IRoomManagerExtensio
           sourceIDs: room.find(FIND_SOURCES)!.map((val: Source) => {
             return val.id;
           }),
+          cSites: [],
+          needsRepair: []
         }
       }
     }
@@ -98,5 +101,21 @@ class RoomManagerExtension extends ExtensionBase implements IRoomManagerExtensio
     if (!roomState || !Game.rooms[roomID]) {
       return;
     }
+
+    roomState.cSites = [];
+    let cSites = Game.rooms[roomID].find(FIND_CONSTRUCTION_SITES);
+    for (let i = 0; i < cSites.length; i++) {
+      roomState.cSites.push(cSites[i].id);
+    }
+
+    roomState.needsRepair = [];
+    let structures = Game.rooms[roomID].find(FIND_STRUCTURES);
+    for (let i = 0; i < structures.length; i++) {
+      if (structures[i].hits < structures[i].hitsMax * 0.75) {
+        roomState.needsRepair.push(structures[i].id);
+      }
+    }
+
+    roomState.lastUpdated = Game.time;
   }
 }
