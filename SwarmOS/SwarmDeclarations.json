@@ -48,7 +48,8 @@
             "type": true,
             "combinedType": "CreepPackages",
             "entries": {
-                "Harvester": "harvester"
+                "Harvester": "harvester",
+                "Harvester_1": "harvester_1"
             }
         },
         "RPKG": {

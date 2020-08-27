@@ -43,7 +43,7 @@ class RoomManager extends BasicProcess<RoomStateMemory> {
         continue;
       }
 
-      if (Game.time - data.lastUpdated > 31) {
+      if (Game.time - data.lastUpdated > 23) {
         this.roomManager.ScanRoom(roomID);
       }
 
@@ -106,7 +106,10 @@ class RoomManagerExtension extends ExtensionBase implements IRoomManagerExtensio
           needsRepair: [],
           structures: {
             tower: []
-          }
+          },
+          resources: [],
+          tombstones: [],
+          ruins: []
         }
       }
     }
@@ -140,6 +143,24 @@ class RoomManagerExtension extends ExtensionBase implements IRoomManagerExtensio
       if (structures[i].structureType == STRUCTURE_TOWER) {
         roomState.structures[STRUCTURE_TOWER]!.push(structures[i].id);
       }
+    }
+
+    roomState.resources = [];
+    let resources = Game.rooms[roomID].find(FIND_DROPPED_RESOURCES);
+    for (let i = 0; i < resources.length; i++) {
+      roomState.resources.push(resources[i].id);
+    }
+
+    roomState.tombstones = [];
+    let tombstones = Game.rooms[roomID].find(FIND_TOMBSTONES);
+    for (let i = 0; i < tombstones.length; i++) {
+      roomState.tombstones.push(tombstones[i].id);
+    }
+
+    roomState.ruins = [];
+    let ruins = Game.rooms[roomID].find(FIND_RUINS);
+    for (let i = 0; i < ruins.length; i++) {
+      roomState.ruins.push(ruins[i].id);
     }
 
     roomState.lastUpdated = Game.time;

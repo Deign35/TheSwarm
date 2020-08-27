@@ -19,27 +19,21 @@ class Harvester extends CreepJobBase<HarvesterMemory> {
     return CPKG_Harvester_LogContext.logLevel;
   }
 
+  GetCreepSpawnName(): string {
+    return this.memory.roomID + '_Harvester_' + GetRandomIndex(primes_1000);
+  }
+  GetCreepSpawnBody(): BodyPartConstant[] {
+    let room = Game.rooms[this.memory.roomID];
+    if (room.energyCapacityAvailable >= 800) {
+      return [WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE];
+    } else if (room.energyCapacityAvailable >= 550) {
+      return [WORK, WORK, WORK, WORK, WORK, MOVE];
+    }
+    return [WORK, WORK, MOVE];
+  }
+
   RunThread(): ThreadState {
     if (!this.AssignedCreep) {
-      let spawnStatus = this.spawnManager.getRequestStatus(this.memory.creepID);
-      if (spawnStatus == SP_ERROR) {
-        this.memory.creepID = this.spawnManager.requestSpawn({
-          creepName: this.memory.roomID + '_Harvester_' + GetRandomIndex(primes_1000),
-          body: [WORK, CARRY, CARRY, MOVE, MOVE],
-          owner_pid: this.pid
-        }, this.memory.roomID, Priority_High, {
-            parentPID: this.pid
-          }, 3);
-      } else {
-        if (spawnStatus == SP_SPAWNING || spawnStatus == SP_COMPLETE) {
-          let spawnContext = this.spawnManager.getRequestContext(this.memory.creepID)!;
-          if (this.spawnManager.cancelRequest(this.memory.creepID)) {
-            this.memory.creepID = spawnContext.creepName;
-            this.creepManager.tryReserveCreep(spawnContext.creepName, this.pid);
-          }
-        }
-      }
-
       return ThreadState_Done;
     }
 
@@ -60,6 +54,7 @@ class Harvester extends CreepJobBase<HarvesterMemory> {
         this.MoveCreep(this.AssignedCreep, target.pos);
       }
     }
+
     return ThreadState_Done;
   }
 }

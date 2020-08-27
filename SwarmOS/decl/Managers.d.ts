@@ -39,6 +39,9 @@ interface RoomState extends MemBase {
   sourceIDs: ObjectID[];
   needsRepair: ObjectID[];
   structures: RoomState_StructureData;
+  resources: ObjectID[];
+  tombstones: ObjectID[];
+  ruins: ObjectID[];
 }
 
 interface RoomState_StructureData {

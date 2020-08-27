@@ -37,9 +37,42 @@ class EnergyManager extends BasicProcess<EnergyManagerMemory> {
           creepID: ''
         } as HarvesterMemory);
 
+        /*let pid = this.kernel.startProcess(CPKG_Harvester_1, {
+          gatherer: {
+            action: AT_NoOp,
+            creepID: '',
+            spawnID: '',
+            target: '',
+            gathering: true
+          },
+          harvester: {
+            action: AT_Harvest,
+            creepID: '',
+            spawnID: '',
+            target: sourceIDs[i]
+          },
+          roomID: this.memory.roomID
+        } as Harvester_1_Memory);*/
+
         this.memory.harvesterPIDs[sourceIDs[i]] = pid;
       }
     }
+
+    /*let mineralIDs = this.roomData.mineralIDs;
+    for (let i = 0; i < mineralIDs.length; i++) {
+      let extractor = this.room.lookForAt(LOOK_STRUCTURES, Game.getObjectById(mineralIDs[i]) as Mineral);
+      if (extractor.length > 0 && extractor[0].structureType == STRUCTURE_EXTRACTOR) {
+        if (!this.memory.harvesterPIDs[mineralIDs[i]] ||
+          !this.kernel.getProcessByPID(this.memory.harvesterPIDs[mineralIDs[i]])) {
+            let pid = this.kernel.startProcess(CPKG_Harvester, {
+              roomID: this.memory.roomID,
+              targetID: mineralIDs[i],
+              creepID: ''
+            } as HarvesterMemory);
+            this.memory.harvesterPIDs[mineralIDs[i]] = pid;
+        }
+      }
+    }*/
 
     return ThreadState_Done;
   }

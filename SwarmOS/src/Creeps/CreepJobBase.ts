@@ -10,8 +10,31 @@ export abstract class CreepJobBase<T extends CreepMemBase> extends BasicProcess<
 
   AssignedCreep?: Creep;
 
+  abstract GetCreepSpawnName(): string;
+  abstract GetCreepSpawnBody(): BodyPartConstant[];
+
   PrepTick() {
     this.AssignedCreep = this.creepManager.tryGetCreep(this.memory.creepID, this.pid);
+    if (!this.AssignedCreep) {
+      let spawnStatus = this.spawnManager.getRequestStatus(this.memory.creepID);
+      if (spawnStatus == SP_ERROR) {
+        this.memory.creepID = this.spawnManager.requestSpawn({
+          creepName: this.GetCreepSpawnName(),
+          body: this.GetCreepSpawnBody(),
+          owner_pid: this.pid
+        }, this.memory.roomID, Priority_High, {
+            parentPID: this.pid
+          }, 3);
+      } else {
+        if (spawnStatus == SP_SPAWNING || spawnStatus == SP_COMPLETE) {
+          let spawnContext = this.spawnManager.getRequestContext(this.memory.creepID)!;
+          if (this.spawnManager.cancelRequest(this.memory.creepID)) {
+            this.memory.creepID = spawnContext.creepName;
+            this.creepManager.tryReserveCreep(spawnContext.creepName, this.pid);
+          }
+        }
+      }
+    }
   }
 
   protected GetLinearDistance(pos1: { x: number, y: number }, pos2: { x: number, y: number }) {
