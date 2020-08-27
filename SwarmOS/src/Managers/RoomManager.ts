@@ -105,6 +105,9 @@ class RoomManagerExtension extends ExtensionBase implements IRoomManagerExtensio
           cSites: [],
           needsRepair: [],
           structures: {
+            container: [],
+            extension: [],
+            spawn: [],
             tower: []
           },
           resources: [],
@@ -133,15 +136,22 @@ class RoomManagerExtension extends ExtensionBase implements IRoomManagerExtensio
     let structures = Game.rooms[roomID].find(FIND_STRUCTURES);
 
     roomState.structures = {
+      container: [],
+      extension: [],
+      spawn: [],
       tower: []
     }
+
+    let structureTypeIDs = Object.keys(roomState.structures);
     for (let i = 0; i < structures.length; i++) {
       if (structures[i].hits < structures[i].hitsMax * 0.75) {
         roomState.needsRepair.push(structures[i].id);
       }
 
-      if (structures[i].structureType == STRUCTURE_TOWER) {
-        roomState.structures[STRUCTURE_TOWER]!.push(structures[i].id);
+      for (let j = 0; j < structureTypeIDs.length; j++) {
+        if (structures[i].structureType == structureTypeIDs[j]) {
+          roomState.structures[structureTypeIDs[j]]!.push(structures[i].id);
+        }
       }
     }
 

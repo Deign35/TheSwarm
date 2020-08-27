@@ -31,3 +31,6 @@ declare interface HarvesterMemory extends SoloJob_Memory {
     source: ObjectID;
     container: ObjectID;
 }
+declare interface ControlledRoomRefiller_Memory extends SoloJob_Memory {
+
+}

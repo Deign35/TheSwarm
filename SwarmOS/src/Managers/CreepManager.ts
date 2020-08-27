@@ -127,42 +127,42 @@ class CreepManagerExtensions extends ExtensionBase implements ICreepManagerExten
 
   CreateNewCreepActivity(actionMem: SingleCreepAction_Memory, parentPID: PID): PID | undefined {
     if (!actionMem || !parentPID || !actionMem.creepID || !actionMem.action) {
-        return undefined;
+      return undefined;
     }
     let creep = this.tryGetCreep(actionMem.creepID, parentPID);
     if (!creep) {
-        return undefined;
+      return undefined;
     }
-    let target: ObjectTypeWithID | RoomPosition | null | undefined  =
-            actionMem.targetID ? Game.getObjectById<ObjectTypeWithID>(actionMem.targetID) : undefined;
+    let target: ObjectTypeWithID | RoomPosition | null | undefined =
+      actionMem.targetID ? Game.getObjectById<ObjectTypeWithID>(actionMem.targetID) : undefined;
     if (!target && actionMem.pos) {
-        target = new RoomPosition(actionMem.pos.x || 25, actionMem.pos.y || 25, actionMem.pos.roomName);
+      target = new RoomPosition(actionMem.pos.x || 25, actionMem.pos.y || 25, actionMem.pos.roomName);
     } else if (!target) {
-        target = creep.pos;
+      target = creep.pos;
     }
 
     if (!target || !this.ValidateActionTarget(actionMem.action, target)) {
-        return undefined;
+      return undefined;
     }
 
     let newPID = this.extensionRegistry.getKernel().startProcess(APKG_CreepActivity, actionMem);
     this.extensionRegistry.getKernel().setParent(newPID, parentPID);
     return newPID;
-}
+  }
 
-protected GetLinearDistance(pos1: { x: number, y: number }, pos2: { x: number, y: number }) {
-  let xDiff = pos1.x - pos2.x;
-  xDiff *= xDiff < 0 ? -1 : 1;
-  let yDiff = pos1.y - pos2.y;
-  yDiff *= yDiff < 0 ? -1 : 1;
-  return xDiff > yDiff ? xDiff : yDiff;
-}
+  protected GetLinearDistance(pos1: { x: number, y: number }, pos2: { x: number, y: number }) {
+    let xDiff = pos1.x - pos2.x;
+    xDiff *= xDiff < 0 ? -1 : 1;
+    let yDiff = pos1.y - pos2.y;
+    yDiff *= yDiff < 0 ? -1 : 1;
+    return xDiff > yDiff ? xDiff : yDiff;
+  }
 
-RunCreepAction(args: CreepActionArgs) {
-  let creep = args.creep;
-  let actionType = args.actionType;
-  let target = args.target;
-  switch (actionType) {
+  RunCreepAction(args: CreepActionArgs) {
+    let creep = args.creep;
+    let actionType = args.actionType;
+    let target = args.target;
+    switch (actionType) {
       case (AT_Attack): return creep.attack(target);
       case (AT_AttackController): return creep.attackController(target);
       case (AT_Build): return creep.build(target);
@@ -170,79 +170,79 @@ RunCreepAction(args: CreepActionArgs) {
       case (AT_Dismantle): return creep.dismantle(target);
       case (AT_GenerateSafeMode): return creep.generateSafeMode(target);
       case (AT_Harvest):
-          let res = creep.harvest(target);
-          if (res == OK && creep.store[RESOURCE_ENERGY] == creep.store.getCapacity()) {
-              return ERR_FULL;
-          }
-          return res;
+        let res = creep.harvest(target);
+        if (res == OK && creep.store[RESOURCE_ENERGY] == creep.store.getCapacity()) {
+          return ERR_FULL;
+        }
+        return res;
       case (AT_Heal): return creep.heal(target);
       case (AT_Pickup): return creep.pickup(target);
       case (AT_RangedAttack): return creep.rangedAttack(target);
       case (AT_RangedHeal): return creep.rangedHeal(target);
       case (AT_Repair):
-          if ((target as Structure).hits == (target as Structure).hitsMax) {
-              return ERR_INVALID_TARGET;
-          }
-          return creep.repair(target);
+        if ((target as Structure).hits == (target as Structure).hitsMax) {
+          return ERR_INVALID_TARGET;
+        }
+        return creep.repair(target);
       case (AT_ReserveController): return creep.reserveController(target);
       case (AT_Upgrade): return creep.upgradeController(target);
 
       case (AT_RequestTransfer):
-          if (target.transfer) {
-              return target.transfer(creep, args.resourceType || RESOURCE_ENERGY, args.amount || 0);
-          }
-          break;
+        if (target.transfer) {
+          return target.transfer(creep, args.resourceType || RESOURCE_ENERGY, args.amount || 0);
+        }
+        break;
       case (AT_SignController): return creep.signController(target, args.message || '');
       case (AT_Transfer): return creep.transfer(target, args.resourceType || RESOURCE_ENERGY, args.amount || 0);
       case (AT_Withdraw): return creep.withdraw(target, args.resourceType || RESOURCE_ENERGY, args.amount || 0);
 
       case (AT_Drop): return creep.drop(args.resourceType || RESOURCE_ENERGY, args.amount || 0);
       case (AT_MoveByPath):
-          break;
+        break;
       case (AT_MoveToPosition):
-          if ((target as Structure).pos) {
-              target = (target as Structure).pos;
+        if ((target as Structure).pos) {
+          target = (target as Structure).pos;
+        }
+        let result = creep.moveTo(target);
+        let dist = creep.pos.getRangeTo(target);
+        if (dist <= (args.amount || 0)) {
+          if (creep.pos.isNearTo(target)) {
+            let creeps = (target as RoomPosition).lookFor(LOOK_CREEPS);
+            if (creeps.length > 0 && creeps[0].name != creep.name) {
+              return ERR_NO_PATH;
+            }
+            return result;
           }
-          let result = creep.moveTo(target);
-          let dist = creep.pos.getRangeTo(target);
-          if (dist <= (args.amount || 0)) {
-              if (creep.pos.isNearTo(target)) {
-                  let creeps = (target as RoomPosition).lookFor(LOOK_CREEPS);
-                  if (creeps.length > 0 && creeps[0].name != creep.name) {
-                      return ERR_NO_PATH;
-                  }
-                  return result;
-              }
-          } else {
-              return ERR_NOT_IN_RANGE;
-          }
+        } else {
+          return ERR_NOT_IN_RANGE;
+        }
       case (AT_RangedMassAttack): return creep.rangedMassAttack();
       case (AT_Suicide): return creep.suicide();
       case (AT_NoOp): return OK;
+    }
+
+    return ERR_INVALID_ARGS;
   }
 
-  return ERR_INVALID_ARGS;
-}
+  MoveCreep(creep: Creep, pos: RoomPosition) {
+    return creep.moveTo(pos);
+  }
 
-MoveCreep(creep: Creep, pos: RoomPosition) {
-  return creep.moveTo(pos);
-}
-
-CreepIsInRange(actionType: ActionType, pos1: RoomPosition, pos2: RoomPosition) {
-  let distance = this.GetLinearDistance(pos1, pos2);
-  if (actionType == AT_Build || actionType == AT_RangedAttack ||
+  CreepIsInRange(actionType: ActionType, pos1: RoomPosition, pos2: RoomPosition) {
+    let distance = this.GetLinearDistance(pos1, pos2);
+    if (actionType == AT_Build || actionType == AT_RangedAttack ||
       actionType == AT_RangedHeal || actionType == AT_Repair ||
       actionType == AT_Upgrade) {
       return distance <= 3;
-  } else if (actionType == AT_Drop || actionType == AT_Suicide) {
+    } else if (actionType == AT_Drop || actionType == AT_Suicide) {
       return distance == 0;
-  } else {
+    } else {
       return distance <= 1;
+    }
   }
-}
 
-ValidateActionTarget(actionType: ActionType, target: any) {
-  switch (actionType) {
+  ValidateActionTarget(actionType: ActionType, target: any) {
+    switch (actionType) {
       case (AT_Attack): return !!(target as Creep | Structure).hitsMax;
       case (AT_AttackController): return (target as Structure).structureType == STRUCTURE_CONTROLLER;
       case (AT_Build): return (target as ConstructionSite).structureType && !(target as Structure).hitsMax;
@@ -260,20 +260,20 @@ ValidateActionTarget(actionType: ActionType, target: any) {
       case (AT_Upgrade): return (target as Structure).structureType == STRUCTURE_CONTROLLER;
       case (AT_SignController): return (target as Structure).structureType == STRUCTURE_CONTROLLER;
       case (AT_Transfer):
-          if (!(target as Creep | Structure).hitsMax) {
-              return false;
-          }
-
-          if ((target as Structure).structureType) {
-              if ((target as StructureStorage).energy < (target as StructureTerminal).energyCapacity) {
-                  return true;
-              }
-          } else {
-              if ((target as Creep).store[RESOURCE_ENERGY] < (target as Creep).store.getCapacity() * 0.8) {
-                  return true;
-              }
-          }
+        if (!(target as Creep | Structure).hitsMax) {
           return false;
+        }
+
+        if ((target as Structure).structureType) {
+          if ((target as StructureStorage).store.getFreeCapacity(RESOURCE_ENERGY)) {
+            return true;
+          }
+        } else {
+          if ((target as Creep).store[RESOURCE_ENERGY] < (target as Creep).store.getCapacity() * 0.8) {
+            return true;
+          }
+        }
+        return false;
       case (AT_Withdraw): return (target as Structure).structureType && !!(target as StructureContainer).store;
 
       case (AT_Drop):
@@ -283,7 +283,7 @@ ValidateActionTarget(actionType: ActionType, target: any) {
       case (AT_Suicide):
       case (AT_NoOp):
       default:
-          return target && !!(target as RoomPosition).isNearTo;
+        return target && !!(target as RoomPosition).isNearTo;
+    }
   }
-}
 }
