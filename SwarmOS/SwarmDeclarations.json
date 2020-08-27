@@ -48,7 +48,8 @@
             "type": true,
             "combinedType": "ActivitiesPackage",
             "entries": {
-                "CreepActivity": "creepActivity"
+                "CreepActivity": "creepActivity",
+                "SpawnActivity": "spawnActivity"
             }
         },
         "CPKG": {

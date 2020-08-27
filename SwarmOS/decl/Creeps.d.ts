@@ -35,3 +35,14 @@ declare interface SingleCreepAction_Memory extends MemBase {
   resourceType?: ResourceConstant // (r)esource type to withdraw or transfer
   targetID?: ObjectID;   // (t)arget
 }
+declare interface SpawnActivity_Memory extends MemBase {
+  sID: string;
+}
+
+declare interface SoloJob_Memory extends MemBase {
+  activityPID?: PID;        // (a)ctivity
+  creepID?: CreepID;    // (c)reep
+  expires?: boolean;  // (exp)pires -- Kill the process when the creep dies
+  roomID: RoomID;    // (h)ome room
+  targetRoom: RoomID;     // (t)arget (r)oom
+}
