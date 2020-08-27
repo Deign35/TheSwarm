@@ -11,15 +11,15 @@ class SpawnActivity extends BasicProcess<SpawnActivity_Memory> {
     protected spawnManager!: ISpawnManagerExtensions;
 
     RunThread(): ThreadState {
-        let status = this.spawnManager.getRequestStatus(this.memory.sID);
+        let status = this.spawnManager.getRequestStatus(this.memory.spawnID);
         let newCreepName = undefined;
         switch (status) {
             case (SP_QUEUED):
-                let context = this.spawnManager.getRequestContext(this.memory.sID)!;
+                let context = this.spawnManager.getRequestContext(this.memory.spawnID)!;
                 break;
             case (SP_COMPLETE):
             case (SP_SPAWNING):
-                newCreepName = this.spawnManager.getRequestContext(this.memory.sID)!.creepName;
+                newCreepName = this.spawnManager.getRequestContext(this.memory.spawnID)!.creepName;
             case (SP_ERROR):
             default:
                 this.EndProcess(newCreepName);
@@ -28,7 +28,7 @@ class SpawnActivity extends BasicProcess<SpawnActivity_Memory> {
     }
 
     protected EndProcess(creepName?: string) {
-        this.spawnManager.cancelRequest(this.memory.sID);
+        this.spawnManager.cancelRequest(this.memory.spawnID);
         super.EndProcess(creepName);
     }
 }

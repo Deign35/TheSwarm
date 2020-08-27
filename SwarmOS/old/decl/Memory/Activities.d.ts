@@ -1,4 +1,4 @@
-declare interface SpawnActivity_Memory extends MemBase {
+/*declare interface SpawnActivity_Memory extends MemBase {
     sID: string;
 }
 declare interface CreepActivity_Memory extends SingleCreepActivity_Memory {
@@ -20,4 +20,4 @@ declare interface SingleCreepActivity_Memory extends MemBase {
     p?: { x?: number, y?: number, roomName: string };  // (p)osition to move to
     r?: ResourceConstant // (r)esource type to withdraw or transfer
     t?: ObjectID;   // (t)arget
-}
+}*/
