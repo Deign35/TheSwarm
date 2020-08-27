@@ -23,3 +23,15 @@ declare interface Harvester_1_Memory extends MemBase {
   harvester: CreepRoleMemory;
   gatherer: GathererMemory;
 }
+
+declare interface SingleCreepAction_Memory extends MemBase {
+  creepID: CreepID;
+  action: ActionType;
+  amount?: number;     // (a)mount for resource transfers
+  num?: number;     // (n)umber of times to run this action
+  exemptedFailures?: ScreepsReturnCode[];    // (e)xempted failures
+  message?: string;     // (m)essage to write to a say or signcontroller
+  pos?: { x?: number, y?: number, roomName: string };  // (p)osition to move to
+  resourceType?: ResourceConstant // (r)esource type to withdraw or transfer
+  targetID?: ObjectID;   // (t)arget
+}
