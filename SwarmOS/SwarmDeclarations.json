@@ -41,6 +41,16 @@
                 "SpawnManager": "spawnManager"
             }
         },
+        "APKG": {
+            "comment": "Activities packages for installation",
+            "enabled": true,
+            "string": true,
+            "type": true,
+            "combinedType": "ActivitiesPackage",
+            "entries": {
+                "CreepActivity": "creepActivity"
+            }
+        },
         "CPKG": {
             "comment": "Creep packages for installation",
             "enabled": true,

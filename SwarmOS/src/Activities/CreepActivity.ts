@@ -1,6 +1,6 @@
 export const OSPackage: IPackage = {
     install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
-        processRegistry.register(SPKG_CreepActivity, CreepActivity);
+        processRegistry.register(APKG_CreepActivity, CreepActivity);
     }
 }
 
