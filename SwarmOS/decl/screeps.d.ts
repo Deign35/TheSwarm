@@ -2986,8 +2986,6 @@ interface Memory {
 }
 
 interface CreepMemory {
-    creepType: CT_ALL,
-    level: number,
     parentPID: PID
 }
 interface FlagMemory { }

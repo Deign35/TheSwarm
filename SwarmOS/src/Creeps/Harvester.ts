@@ -25,12 +25,9 @@ class Harvester extends CreepJobBase<HarvesterMemory> {
       if (spawnStatus == SP_ERROR) {
         this.memory.creepID = this.spawnManager.requestSpawn({
           creepName: this.memory.roomID + '_Harvester_' + GetRandomIndex(primes_1000),
-          creepType: CT_Harvester,
-          level: 0,
+          body: [WORK, CARRY, CARRY, MOVE, MOVE],
           owner_pid: this.pid
         }, this.memory.roomID, Priority_High, {
-            creepType: CT_Harvester,
-            level: 0,
             parentPID: this.pid
           }, 3);
       } else {

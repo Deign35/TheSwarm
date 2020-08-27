@@ -13,30 +13,13 @@ export const OSPackage: IPackage = {
   }
 }
 
-// This order determines the default order of body parts
-const BodyLegend = {
-  t: TOUGH,
-  a: ATTACK,
-  r: RANGED_ATTACK,
-  cl: CLAIM,
-  w: WORK,
-  c: CARRY,
-  h: HEAL,
-  m: MOVE,
-}
-
-const ConvertContextToSpawnBody = function (context: SpawnContext) {
-  let body = [];
-  let bodyDef = CreepBodies[context.creepType][context.level];
-  for (let bodyID in BodyLegend) {
-    if (bodyDef[bodyID]) {
-      for (let i = 0; i < bodyDef[bodyID]; i++) {
-        body.push(BodyLegend[bodyID]);
-      }
-    }
+const ConvertBodyToCost = function (body: BodyPartConstant[]) {
+  let cost = 0;
+  for (let i = 0; i < body.length; i++) {
+    cost += BODYPART_COST[body[i]];
   }
 
-  return body;
+  return cost;
 }
 
 const PKG_SpawnManager_LogContext: LogContext = {
@@ -99,9 +82,9 @@ class SpawnManager extends BasicProcess<SpawnManager_Memory> {
         if (usedRequestIDs.includes(request.spawnID)) {
           continue;
         }
-        let body = CreepBodies[request.spawnContext.creepType]
-        [request.spawnContext.level];
-        if (spawn.room.energyCapacityAvailable < body.cost) {
+        let body = request.spawnContext.body;
+        let bodyCost = ConvertBodyToCost(body);
+        if (spawn.room.energyCapacityAvailable < bodyCost) {
           continue;
         }
         if (request.spawnPriority < minPriority) {
@@ -109,13 +92,13 @@ class SpawnManager extends BasicProcess<SpawnManager_Memory> {
         }
 
         minPriority = request.spawnPriority;
-        if (body.cost > spawn.room.energyAvailable) {
+        if (bodyCost > spawn.room.energyAvailable) {
           continue;
         }
 
-        if (!spawnRequest.request || body.cost > spawnRequest.bodyCost ||
+        if (!spawnRequest.request || bodyCost > spawnRequest.bodyCost ||
           request.spawnPriority > spawnRequest.request.spawnPriority) {
-          spawnRequest = { request: request, bodyCost: body.cost };
+          spawnRequest = { request: request, bodyCost: bodyCost };
         }
       }
 
@@ -157,14 +140,12 @@ class SpawnManager extends BasicProcess<SpawnManager_Memory> {
   protected spawnCreep(spawn: StructureSpawn, req: SpawnRequest): boolean {
     let spawnResult = ERR_INVALID_ARGS as ScreepsReturnCode;
     let spawnMem: CreepMemory = Object.assign(req.defaultMemory || {}, {
-      creepType: req.spawnContext.creepType,
-      level: req.spawnContext.level,
       parentPID: req.spawnContext.owner_pid
     });
 
     while (spawnResult != OK && req.spawnState == SP_QUEUED) {
       spawnResult = spawn.spawnCreep(
-        ConvertContextToSpawnBody(req.spawnContext),
+        req.spawnContext.body,
         req.spawnContext.creepName,
         { memory: spawnMem });
       switch (spawnResult) {

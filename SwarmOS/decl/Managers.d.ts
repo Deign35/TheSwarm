@@ -5,8 +5,7 @@ declare type SpawnManager_Memory = MemBase & {
 }
 declare interface SpawnContext extends MemBase {
   creepName: CreepID; // (n)ame
-  creepType: CT_ALL;  // (c)reep type
-  level: number;  // (l)evel
+  body: BodyPartConstant[];  // Body definition
   owner_pid: PID;     // creep parent (p)id
 }
 declare interface SpawnRequest extends MemBase {
