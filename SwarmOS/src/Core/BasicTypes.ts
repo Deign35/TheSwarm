@@ -28,7 +28,14 @@ export abstract class BasicProcess<T extends MemBase> implements IProcess {
   abstract RunThread(): ThreadState;
   EndTick?(): void;
 
-  protected EndProcess() {
+  protected EndProcess(cbVal?: string) {
+    let proc = this.GetParentProcess();
+    if (proc) {
+      this.sleeper.wake(this.parentPID);
+      if (cbVal && this.memory.HC) {
+        proc[this.memory.HC](cbVal, this.pid); // Notify the parent using the given callback function.
+      }
+    }
     this.kernel.killProcess(this.pid);
   }
 }
