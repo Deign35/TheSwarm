@@ -49,7 +49,10 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
   }
 
   startProcess(packageName: ScreepsPackage, startMemory: MemBase): PID {
-    let pid = 'p' + GetSUID() as PID;
+    let pid = "" as PID;
+    do {
+      pid = 'p' + Math.floor(Math.random() * 100000) as PID;
+    } while (this.processTable[pid]);
     let pInfo: ProcInfo = {
       pid: pid,
       PKG: packageName
