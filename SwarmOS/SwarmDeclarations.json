@@ -49,6 +49,7 @@
             "combinedType": "ActivitiesPackage",
             "entries": {
                 "CreepActivity": "creepActivity",
+                "RepetitiveCreepActivity": "repetitiveCreepActivity",
                 "SpawnActivity": "spawnActivity"
             }
         },

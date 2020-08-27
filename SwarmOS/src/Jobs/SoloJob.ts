@@ -3,6 +3,10 @@ import { BasicProcess } from "Core/BasicTypes";
 export abstract class SoloJob<T extends SoloJob_Memory> extends BasicProcess<T> {
     @extensionInterface(EXT_CreepManager)
     creepManager!: ICreepManagerExtensions;
+    @extensionInterface(EXT_RoomManager)
+    roomManager!: IRoomManagerExtension;
+    @extensionInterface(EXT_SpawnManager)
+    spawnManager!: ISpawnManagerExtensions;
 
     protected get homeRoom(): Room {
         return Game.rooms[this.memory.roomID];
@@ -37,7 +41,7 @@ export abstract class SoloJob<T extends SoloJob_Memory> extends BasicProcess<T> 
     CreateSpawnActivity() {
         let sID = this.GetNewSpawnID();
         let spawnMem: SpawnActivity_Memory = {
-            sID: sID,
+            spawnID: sID,
             HC: 'CreateCreepActivity'
         }
         this.memory.activityPID = this.kernel.startProcess(APKG_SpawnActivity, spawnMem)

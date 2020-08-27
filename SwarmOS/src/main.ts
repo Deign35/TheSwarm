@@ -41,12 +41,12 @@ if (!Memory.VERSION || Memory.VERSION != SWARM_VERSION_DATE) {
 import { kernel } from "Core/index";
 
 import { ActivitiesPackage } from "Activities/index";
-import { CreepsPackage } from "Creeps/index";
 import { FlagPackage } from "Flags/index";
+import { JobsPackage } from "Jobs/index";
 import { ManagersPackage } from "Managers/index";
 import { RoomsPackage } from "Rooms/index";
 
-kernel.installPackages([ActivitiesPackage, CreepsPackage, FlagPackage, ManagersPackage, RoomsPackage]);
+kernel.installPackages([ActivitiesPackage, FlagPackage, JobsPackage, ManagersPackage, RoomsPackage]);
 
 export function loop() {
   try {

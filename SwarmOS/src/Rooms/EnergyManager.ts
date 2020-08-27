@@ -32,9 +32,9 @@ class EnergyManager extends BasicProcess<EnergyManagerMemory> {
       if (!this.memory.harvesterPIDs[sourceIDs[i]] ||
         !this.kernel.getProcessByPID(this.memory.harvesterPIDs[sourceIDs[i]])) {
         let pid = this.kernel.startProcess(CPKG_Harvester, {
-          roomID: this.memory.roomID,
-          targetID: sourceIDs[i],
-          creepID: ''
+          roomID: this.room.name,
+          source: sourceIDs[i],
+          targetRoom: this.room.name,
         } as HarvesterMemory);
 
         /*let pid = this.kernel.startProcess(CPKG_Harvester_1, {

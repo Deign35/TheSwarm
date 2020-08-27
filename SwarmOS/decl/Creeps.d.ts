@@ -1,29 +1,3 @@
-declare interface CreepMemBase extends MemBase {
-  roomID: RoomID;
-  creepID: CreepID;
-}
-
-declare interface HarvesterMemory extends CreepMemBase {
-  targetID: ObjectID;
-}
-
-declare interface CreepRoleMemory {
-  creepID: CreepID;
-  spawnID: SpawnRequestID;
-  target: ObjectID;
-  action: ActionType;
-}
-
-declare interface GathererMemory extends CreepRoleMemory {
-  gathering: boolean;
-}
-
-declare interface Harvester_1_Memory extends MemBase {
-  roomID: RoomID;
-  harvester: CreepRoleMemory;
-  gatherer: GathererMemory;
-}
-
 declare interface SingleCreepAction_Memory extends MemBase {
   creepID: CreepID;
   action: ActionType;
@@ -35,8 +9,15 @@ declare interface SingleCreepAction_Memory extends MemBase {
   resourceType?: ResourceConstant // (r)esource type to withdraw or transfer
   targetID?: ObjectID;   // (t)arget
 }
+
+declare interface RepetitiveCreepActivity_Memory extends MemBase {
+    actions: SingleCreepAction_Memory[];    // (a)ctions
+    creepID: CreepID;
+    childPID?: PID;
+}
+
 declare interface SpawnActivity_Memory extends MemBase {
-  sID: string;
+  spawnID: SpawnRequestID;
 }
 
 declare interface SoloJob_Memory extends MemBase {
@@ -45,4 +26,8 @@ declare interface SoloJob_Memory extends MemBase {
   expires?: boolean;  // (exp)pires -- Kill the process when the creep dies
   roomID: RoomID;    // (h)ome room
   targetRoom: RoomID;     // (t)arget (r)oom
+}
+declare interface HarvesterMemory extends SoloJob_Memory {
+    source: ObjectID;
+    container: ObjectID;
 }
