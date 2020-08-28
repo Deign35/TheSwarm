@@ -166,7 +166,7 @@ class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory> {
             continue;
           }
 
-          if (targetWants > creep.store.getCapacity() || targetWants <= creep.store[RESOURCE_ENERGY]) {
+          if (targetWants > creep.store[RESOURCE_ENERGY] || targetWants <= creep.store[RESOURCE_ENERGY]) {
             let dist = nextTarget.pos.getRangeTo(creep.pos);
             if (dist < closestDist) {
               closestDist = dist;

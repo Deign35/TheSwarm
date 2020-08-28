@@ -35,7 +35,7 @@ interface RoomState extends MemBase {
     RPKG_Towers: PID
   }
   cSites: ObjectID[];
-  mineralID: ObjectID;
+  mineralIDs: ObjectID[];
   sourceIDs: ObjectID[];
   needsRepair: ObjectID[];
   structures: RoomState_StructureData;
@@ -51,6 +51,7 @@ interface RoomState_StructureData {
   [STRUCTURE_EXTRACTOR]: ObjectID[];
   [STRUCTURE_SPAWN]: ObjectID[];
   [STRUCTURE_STORAGE]: ObjectID[];
+  [STRUCTURE_TERMINAL]: ObjectID[];
   [STRUCTURE_TOWER]: ObjectID[];
 }
 

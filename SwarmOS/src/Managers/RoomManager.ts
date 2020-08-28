@@ -59,6 +59,7 @@ class RoomManager extends BasicProcess<RoomStateMemory> {
           harvesterPIDs: {},
           refillerPID: '',
           workerPIDs: [],
+          mineralHarvesterPID: '',
           roomID: roomID
         } as EnergyManagerMemory);
         this.kernel.setParent(data.activityPIDs.RPKG_EnergyManager, this.pid);
@@ -98,7 +99,7 @@ class RoomManagerExtension extends ExtensionBase implements IRoomManagerExtensio
             RPKG_EnergyManager: '',
             RPKG_Towers: ''
           },
-          mineralID: room.find(FIND_MINERALS)!.map((val: Mineral) => {
+          mineralIDs: room.find(FIND_MINERALS)!.map((val: Mineral) => {
             return val.id;
           }),
           sourceIDs: room.find(FIND_SOURCES)!.map((val: Source) => {
@@ -113,6 +114,7 @@ class RoomManagerExtension extends ExtensionBase implements IRoomManagerExtensio
             extractor: [],
             spawn: [],
             storage: [],
+            terminal: [],
             tower: []
           },
           resources: [],
@@ -147,6 +149,7 @@ class RoomManagerExtension extends ExtensionBase implements IRoomManagerExtensio
       extractor: [],
       spawn: [],
       storage: [],
+      terminal: [],
       tower: []
     }
 

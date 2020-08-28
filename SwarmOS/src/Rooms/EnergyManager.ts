@@ -75,13 +75,13 @@ class EnergyManager extends BasicProcess<EnergyManagerMemory> {
       } as Worker_Memory))
     }
 
-    if (this.roomData.mineralID && this.roomData.structures[STRUCTURE_EXTRACTOR].length > 0 &&
-        (!this.memory.mineralHarvesterPID || !this.kernel.getProcessByPID(this.memory.mineralHarvesterPID))) {
+    if (this.roomData.mineralIDs.length > 0 && this.roomData.structures[STRUCTURE_EXTRACTOR].length > 0 &&
+      (!this.memory.mineralHarvesterPID || !this.kernel.getProcessByPID(this.memory.mineralHarvesterPID))) {
       let extractor = Game.getObjectById<StructureExtractor>(this.roomData.structures[STRUCTURE_EXTRACTOR][0]);
       if (extractor) {
         let pid = this.kernel.startProcess(CPKG_MineralHarvester, {
           roomID: this.memory.roomID,
-          squad: [ { }, { } ],
+          squad: [{}, {}],
           targetRoom: this.memory.roomID,
         } as MineralHarvester_Memory);
         this.memory.mineralHarvesterPID = pid;
