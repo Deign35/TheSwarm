@@ -75,21 +75,18 @@ class EnergyManager extends BasicProcess<EnergyManagerMemory> {
       } as Worker_Memory))
     }
 
-    /*let mineralIDs = this.roomData.mineralIDs;
-    for (let i = 0; i < mineralIDs.length; i++) {
-      let extractor = this.room.lookForAt(LOOK_STRUCTURES, Game.getObjectById(mineralIDs[i]) as Mineral);
-      if (extractor.length > 0 && extractor[0].structureType == STRUCTURE_EXTRACTOR) {
-        if (!this.memory.harvesterPIDs[mineralIDs[i]] ||
-          !this.kernel.getProcessByPID(this.memory.harvesterPIDs[mineralIDs[i]])) {
-            let pid = this.kernel.startProcess(CPKG_Harvester, {
-              roomID: this.memory.roomID,
-              targetID: mineralIDs[i],
-              creepID: ''
-            } as HarvesterMemory);
-            this.memory.harvesterPIDs[mineralIDs[i]] = pid;
-        }
+    if (this.roomData.mineralID && this.roomData.structures[STRUCTURE_EXTRACTOR].length > 0 &&
+        (!this.memory.mineralHarvesterPID || !this.kernel.getProcessByPID(this.memory.mineralHarvesterPID))) {
+      let extractor = Game.getObjectById<StructureExtractor>(this.roomData.structures[STRUCTURE_EXTRACTOR][0]);
+      if (extractor) {
+        let pid = this.kernel.startProcess(CPKG_MineralHarvester, {
+          roomID: this.memory.roomID,
+          squad: [ { }, { } ],
+          targetRoom: this.memory.roomID,
+        } as MineralHarvester_Memory);
+        this.memory.mineralHarvesterPID = pid;
       }
-    }*/
+    }
 
     return ThreadState_Done;
   }

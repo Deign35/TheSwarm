@@ -98,7 +98,7 @@ class RoomManagerExtension extends ExtensionBase implements IRoomManagerExtensio
             RPKG_EnergyManager: '',
             RPKG_Towers: ''
           },
-          mineralIDs: room.find(FIND_MINERALS)!.map((val: Mineral) => {
+          mineralID: room.find(FIND_MINERALS)!.map((val: Mineral) => {
             return val.id;
           }),
           sourceIDs: room.find(FIND_SOURCES)!.map((val: Source) => {

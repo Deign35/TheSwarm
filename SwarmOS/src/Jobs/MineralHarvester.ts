@@ -32,7 +32,7 @@ class MineralHarvester extends SquadJob<MineralHarvester_Memory> {
   }
   protected CreateCustomCreepActivity(squadID: number, creep: Creep): string | undefined {
     let roomData = this.roomManager.GetRoomData(this.memory.roomID)!;
-    let mineral = Game.getObjectById<Mineral>(roomData.mineralIDs[0])!;
+    let mineral = Game.getObjectById<Mineral>(roomData.mineralID[0])!;
     if (squadID == 0) {
       if (mineral.pos.getRangeTo(creep.pos) > 1) {
         let targetPos = mineral.pos;
