@@ -7,6 +7,15 @@ export const OSPackage: IPackage = {
 import { SquadJob } from "./SquadJob";
 
 class MineralHarvester extends SquadJob<MineralHarvester_Memory> {
+  CreateSpawnActivity(squadID: number) {
+    let roomData = this.roomManager.GetRoomData(this.memory.roomID)!;
+    let mineral = Game.getObjectById<Mineral>(roomData.mineralIDs[0])!;
+    if (mineral.ticksToRegeneration > 0) {
+      this.sleeper.sleep(this.pid, mineral.ticksToRegeneration);
+      return;
+    }
+    super.CreateSpawnActivity(squadID);
+  }
   protected GetNewSpawnID(squadID: number): string {
     if (squadID == 0) {
       let body = [WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, MOVE, MOVE, MOVE, MOVE, MOVE];
@@ -18,10 +27,10 @@ class MineralHarvester extends SquadJob<MineralHarvester_Memory> {
           parentPID: this.pid
         }, 1);
     } else if (squadID == 1) {
-      let body = [CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE];
+      let body = [CARRY, CARRY, CARRY, MOVE, MOVE, MOVE];
       return this.spawnManager.requestSpawn({
         body: body,
-        creepName: this.memory.roomID + (Game.time + '_HMR').slice(-6),
+        creepName: this.memory.roomID + (Game.time + '_HMR').slice(-7),
         owner_pid: this.pid
       }, this.memory.roomID, Priority_Low, {
           parentPID: this.pid
