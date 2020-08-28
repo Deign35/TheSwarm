@@ -110,6 +110,7 @@ class RoomManagerExtension extends ExtensionBase implements IRoomManagerExtensio
             container: [],
             controller: [],
             extension: [],
+            extractor: [],
             spawn: [],
             storage: [],
             tower: []
@@ -143,6 +144,7 @@ class RoomManagerExtension extends ExtensionBase implements IRoomManagerExtensio
       container: [],
       controller: [],
       extension: [],
+      extractor: [],
       spawn: [],
       storage: [],
       tower: []

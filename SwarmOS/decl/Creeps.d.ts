@@ -41,3 +41,19 @@ declare interface Worker_Memory extends SoloJob_Memory {
     tt: TargetType;
   }
 }
+
+declare interface SquadJob_Memory extends MemBase {
+  expires?: boolean;
+  roomID: RoomID;
+  targetRoom: RoomID;
+  squad: {
+    activityPID?: PID;
+    creepID?: CreepID;
+  }[];
+}
+
+declare interface MineralHarvester_Memory extends SquadJob_Memory {
+  container: ObjectID,
+  squad: [ { activityPID?: PID, creepID?: CreepID },
+           { activityPID?: PID, creepID?: CreepID } ]
+}
