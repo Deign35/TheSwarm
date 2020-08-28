@@ -174,6 +174,16 @@ class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory> {
           }
         }
 
+        if (actionType == AT_NoOp && Game.rooms[this.memory.roomID]) {
+          let target = Game.rooms[this.memory.roomID].terminal;
+          if (target) {
+            let targetWants = 50000 - target.store.getUsedCapacity(RESOURCE_ENERGY);
+            if (targetWants > 0) {
+              bestTarget = target.id;
+              actionType = AT_Transfer;
+            }
+          }
+        }
       }
     }
 
