@@ -18,7 +18,7 @@ export abstract class SoloJob<T extends SoloJob_Memory> extends BasicProcess<T> 
       this.creep = this.creepManager.tryGetCreep(this.memory.creepID, this.pid) as Creep | undefined;
       if (this.creep && !this.creep.spawning) {
         if (!this.memory.activityPID || !this.kernel.getProcessByPID(this.memory.activityPID)) {
-          this.CreateCreepActivity(this.memory.creepID!);
+          this.CreateActivityForCreep(this.memory.creepID!);
         }
       }
     }
@@ -49,7 +49,7 @@ export abstract class SoloJob<T extends SoloJob_Memory> extends BasicProcess<T> 
   }
   protected abstract GetNewSpawnID(): string;
 
-  CreateCreepActivity(creepID: CreepID) {
+  CreateActivityForCreep(creepID: CreepID) {
     this.creepManager.tryReserveCreep(creepID, this.pid);
     this.creep = this.creepManager.tryGetCreep(creepID, this.pid);
     this.memory.creepID = creepID;
@@ -59,18 +59,30 @@ export abstract class SoloJob<T extends SoloJob_Memory> extends BasicProcess<T> 
       }
       return;
     }
-    this.memory.activityPID = this.CreateCustomCreepActivity(this.creep);
-    if (!this.memory.activityPID) {
-      this.HandleNoActivity();
+
+    let targetRoom = this.GetTargetRoomForCreep(this.creep);
+    if (this.creep.room.name != targetRoom) {
+      this.memory.activityPID = this.kernel.startProcess(APKG_MoveToRoomActivity,{
+        creepID: creepID,
+        targetRoom: targetRoom
+      } as MoveToRoomActivity_Memory);
     } else {
-      this.kernel.setParent(this.memory.activityPID, this.pid);
-      let childActivity = this.kernel.getProcessByPID(this.memory.activityPID)!;
-      if (!childActivity.memory.HC) {
-        childActivity.memory.HC = 'CreateCreepActivity';
+      this.memory.activityPID = this.CreateCustomCreepActivity(this.creep);
+      if (!this.memory.activityPID) {
+        this.HandleNoActivity();
+      } else {
+        this.kernel.setParent(this.memory.activityPID, this.pid);
+        let childActivity = this.kernel.getProcessByPID(this.memory.activityPID)!;
+        if (!childActivity.memory.HC) {
+          childActivity.memory.HC = 'CreateCreepActivity';
+        }
       }
     }
   }
   protected abstract CreateCustomCreepActivity(creep: Creep): PID | undefined;
+  protected GetTargetRoomForCreep(creep: Creep) : RoomID {
+    return this.memory.targetRoom;
+  }
   protected HandleNoActivity() {
     this.EndProcess();
   }

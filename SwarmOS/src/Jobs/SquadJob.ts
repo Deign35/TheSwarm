@@ -20,7 +20,7 @@ export abstract class SquadJob<T extends SquadJob_Memory> extends BasicProcess<T
         if (creep && !creep.spawning) {
           if (!this.memory.squad[i].activityPID ||
             !this.kernel.getProcessByPID(this.memory.squad[i].activityPID!)) {
-            this.CreateCreepActivity(i, this.memory.squad[i].creepID!);
+            this.CreateActivityForCreep(i, this.memory.squad[i].creepID!);
           }
         }
       }
@@ -55,13 +55,13 @@ export abstract class SquadJob<T extends SquadJob_Memory> extends BasicProcess<T
   AssignCreep(creepID: CreepID, pid: PID) {
     for (let i = 0; i < this.memory.squad.length; i++) {
       if (this.memory.squad[i].activityPID && this.memory.squad[i].activityPID == pid) {
-        this.CreateCreepActivity(i, creepID);
+        this.CreateActivityForCreep(i, creepID);
         return;
       }
     }
   }
 
-  CreateCreepActivity(squadID: number, creepID: CreepID) {
+  CreateActivityForCreep(squadID: number, creepID: CreepID) {
     this.creepManager.tryReserveCreep(creepID, this.pid);
     let creep = this.creepManager.tryGetCreep(creepID, this.pid);
     this.memory.squad[squadID].creepID = creepID;
@@ -71,18 +71,30 @@ export abstract class SquadJob<T extends SquadJob_Memory> extends BasicProcess<T
       }
       return;
     }
-    this.memory.squad[squadID].activityPID = this.CreateCustomCreepActivity(squadID, creep);
-    if (!this.memory.squad[squadID].activityPID) {
-      this.HandleNoActivity();
+    
+    let targetRoom = this.GetTargetRoomForCreep(squadID);
+    if (creep.room.name != targetRoom) {
+      this.memory.squad[squadID].activityPID = this.kernel.startProcess(APKG_MoveToRoomActivity,{
+        creepID: creepID,
+        targetRoom: targetRoom
+      } as MoveToRoomActivity_Memory);
     } else {
-      this.kernel.setParent(this.memory.squad[squadID].activityPID!, this.pid);
-      let childActivity = this.kernel.getProcessByPID(this.memory.squad[squadID].activityPID!)!;
-      if (!childActivity.memory.HC) {
-        childActivity.memory.HC = 'AssignCreep';
+      this.memory.squad[squadID].activityPID = this.CreateCustomCreepActivity(squadID, creep);
+      if (!this.memory.squad[squadID].activityPID) {
+        this.HandleNoActivity();
+      } else {
+        this.kernel.setParent(this.memory.squad[squadID].activityPID!, this.pid);
+        let childActivity = this.kernel.getProcessByPID(this.memory.squad[squadID].activityPID!)!;
+        if (!childActivity.memory.HC) {
+          childActivity.memory.HC = 'AssignCreep';
+        }
       }
     }
   }
   protected abstract CreateCustomCreepActivity(squadID: number, creep: Creep): PID | undefined;
+  protected GetTargetRoomForCreep(squadID: number) : RoomID {
+    return this.memory.targetRoom;
+  }
   protected HandleNoActivity() {
     this.EndProcess();
   }

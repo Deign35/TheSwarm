@@ -10,6 +10,13 @@ declare interface SingleCreepAction_Memory extends MemBase {
   targetID?: ObjectID;   // (t)arget
 }
 
+declare interface MoveToRoomActivity_Memory extends MemBase {
+  creepID: CreepID;
+  targetRoom: RoomID;
+  moveTarget: RoomPosition;
+  route: { exit: ExitConstant, room: string }[];
+}
+
 declare interface RepetitiveCreepActivity_Memory extends MemBase {
   actions: SingleCreepAction_Memory[];    // (a)ctions
   creepID: CreepID;
