@@ -43,6 +43,7 @@ declare interface ILogger {
   error(message: (string | (() => string))): void;
   fatal(message: (string | (() => string))): void;
   alert(message: (string | (() => string))): void;
+  recordActionTaken(): void;
 }
 
 

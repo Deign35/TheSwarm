@@ -162,41 +162,45 @@ class CreepManagerExtensions extends ExtensionBase implements ICreepManagerExten
     let creep = args.creep;
     let actionType = args.actionType;
     let target = args.target;
+    let actionResult: ScreepsReturnCode = ERR_INVALID_ARGS;
     switch (actionType) {
-      case (AT_Attack): return creep.attack(target);
-      case (AT_AttackController): return creep.attackController(target);
-      case (AT_Build): return creep.build(target);
-      case (AT_ClaimController): return creep.claimController(target);
-      case (AT_Dismantle): return creep.dismantle(target);
-      case (AT_GenerateSafeMode): return creep.generateSafeMode(target);
+      case (AT_Attack): actionResult = creep.attack(target); break;
+      case (AT_AttackController): actionResult = creep.attackController(target); break;
+      case (AT_Build): actionResult = creep.build(target); break;
+      case (AT_ClaimController): actionResult = creep.claimController(target); break;
+      case (AT_Dismantle): actionResult = creep.dismantle(target); break;
+      case (AT_GenerateSafeMode): actionResult = creep.generateSafeMode(target); break;
       case (AT_Harvest):
         let res = creep.harvest(target);
-        if (res == OK && creep.store.getUsedCapacity() == creep.store.getCapacity()) {
-          return ERR_FULL;
+        if (res == OK) {
+          this.log.recordActionTaken();
+          if (creep.store.getUsedCapacity() == creep.store.getCapacity()) {
+            return ERR_FULL;
+          }
         }
         return res;
-      case (AT_Heal): return creep.heal(target);
-      case (AT_Pickup): return creep.pickup(target);
-      case (AT_RangedAttack): return creep.rangedAttack(target);
-      case (AT_RangedHeal): return creep.rangedHeal(target);
+      case (AT_Heal): actionResult = creep.heal(target); break;
+      case (AT_Pickup): actionResult = creep.pickup(target); break;
+      case (AT_RangedAttack): actionResult = creep.rangedAttack(target); break;
+      case (AT_RangedHeal): actionResult = creep.rangedHeal(target); break;
       case (AT_Repair):
         if ((target as Structure).hits == (target as Structure).hitsMax) {
           return ERR_INVALID_TARGET;
         }
-        return creep.repair(target);
-      case (AT_ReserveController): return creep.reserveController(target);
-      case (AT_Upgrade): return creep.upgradeController(target);
+        actionResult = creep.repair(target);
+        break;
+      case (AT_ReserveController): actionResult = creep.reserveController(target); break;
+      case (AT_Upgrade): actionResult = creep.upgradeController(target); break;
 
       case (AT_RequestTransfer):
         if (target.transfer) {
-          return target.transfer(creep, args.resourceType || RESOURCE_ENERGY, args.amount || 0);
+          actionResult = target.transfer(creep, args.resourceType || RESOURCE_ENERGY, args.amount || 0);
         }
         break;
-      case (AT_SignController): return creep.signController(target, args.message || '');
-      case (AT_Transfer): return creep.transfer(target, args.resourceType || RESOURCE_ENERGY, args.amount || 0);
-      case (AT_Withdraw): return creep.withdraw(target, args.resourceType || RESOURCE_ENERGY, args.amount || 0);
-
-      case (AT_Drop): return creep.drop(args.resourceType || RESOURCE_ENERGY, args.amount || 0);
+      case (AT_SignController): actionResult = creep.signController(target, args.message || ''); break;
+      case (AT_Transfer): actionResult = creep.transfer(target, args.resourceType || RESOURCE_ENERGY, args.amount || 0); break;
+      case (AT_Withdraw): actionResult = creep.withdraw(target, args.resourceType || RESOURCE_ENERGY, args.amount || 0); break;
+      case (AT_Drop): actionResult = creep.drop(args.resourceType || RESOURCE_ENERGY, args.amount || 0); break;
       case (AT_MoveByPath):
         break;
       case (AT_MoveToPosition):
@@ -216,12 +220,15 @@ class CreepManagerExtensions extends ExtensionBase implements ICreepManagerExten
         } else {
           return ERR_NOT_IN_RANGE;
         }
-      case (AT_RangedMassAttack): return creep.rangedMassAttack();
-      case (AT_Suicide): return creep.suicide();
+      case (AT_RangedMassAttack): actionResult = creep.rangedMassAttack(); break;
+      case (AT_Suicide): actionResult = creep.suicide(); break;
       case (AT_NoOp): return OK;
     }
 
-    return ERR_INVALID_ARGS;
+    if (actionResult == OK) {
+      this.log.recordActionTaken();
+    }
+    return actionResult;
   }
 
   MoveCreep(creep: Creep, pos: RoomPosition) {

@@ -42,7 +42,7 @@ export abstract class SoloJob<T extends SoloJob_Memory> extends BasicProcess<T> 
     let sID = this.GetNewSpawnID();
     let spawnMem: SpawnActivity_Memory = {
       spawnID: sID,
-      HC: 'CreateCreepActivity'
+      HC: 'CreateActivityForCreep'
     }
     this.memory.activityPID = this.kernel.startProcess(APKG_SpawnActivity, spawnMem)
     this.kernel.setParent(this.memory.activityPID, this.pid);
@@ -62,7 +62,7 @@ export abstract class SoloJob<T extends SoloJob_Memory> extends BasicProcess<T> 
 
     let targetRoom = this.GetTargetRoomForCreep(this.creep);
     if (this.creep.room.name != targetRoom) {
-      this.memory.activityPID = this.kernel.startProcess(APKG_MoveToRoomActivity,{
+      this.memory.activityPID = this.kernel.startProcess(APKG_MoveToRoomActivity, {
         creepID: creepID,
         targetRoom: targetRoom
       } as MoveToRoomActivity_Memory);
@@ -80,7 +80,7 @@ export abstract class SoloJob<T extends SoloJob_Memory> extends BasicProcess<T> 
     }
   }
   protected abstract CreateCustomCreepActivity(creep: Creep): PID | undefined;
-  protected GetTargetRoomForCreep(creep: Creep) : RoomID {
+  protected GetTargetRoomForCreep(creep: Creep): RoomID {
     return this.memory.targetRoom;
   }
   protected HandleNoActivity() {

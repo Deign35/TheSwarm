@@ -72,6 +72,7 @@ export class Logger implements IKernelLoggerExtensions {
     this.InitQueue();
   }
   private logContexts: SDictionary<LoggerContext>;
+  private numActionsTaken: number = 0;
 
   protected InitQueue(): void {
     let ids = Object.keys(this.logContexts);
@@ -82,6 +83,8 @@ export class Logger implements IKernelLoggerExtensions {
     if (!this.logContexts[DEFAULT_LOG_ID]) {
       this.CreateLogContext(DEFAULT_LOG_ID, DEFAULT_LOG_LEVEL);
     }
+
+    this.numActionsTaken = 0;
   }
 
   protected log(message: (string | (() => string)), contextID: string = DEFAULT_LOG_ID, severity: LogLevel = DEFAULT_LOG_LEVEL) {
@@ -109,6 +112,9 @@ export class Logger implements IKernelLoggerExtensions {
   info(message: (string | (() => string)), contextID?: string) { return this.log(message, contextID, LOG_INFO); }
   trace(message: (string | (() => string)), contextID?: string) { return this.log(message, contextID, LOG_TRACE); }
   warn(message: (string | (() => string)), contextID?: string) { return this.log(message, contextID, LOG_WARN); }
+  recordActionTaken() {
+    this.numActionsTaken++;
+  }
 
   CreateLogContext(logID: string, logLevel: LogLevel): ILogger {
     if (!this.logContexts[logID]) {
@@ -126,7 +132,8 @@ export class Logger implements IKernelLoggerExtensions {
       fatal: (message: (string | (() => string))) => { self.fatal(message, logID); },
       info: (message: (string | (() => string))) => { self.info(message, logID); },
       trace: (message: (string | (() => string))) => { self.trace(message, logID); },
-      warn: (message: (string | (() => string))) => { self.warn(message, logID); }
+      warn: (message: (string | (() => string))) => { self.warn(message, logID); },
+      recordActionTaken: () => { self.recordActionTaken() }
     }
   }
 
@@ -146,14 +153,15 @@ export class Logger implements IKernelLoggerExtensions {
       console.log(logOutputs[i]);
     }
 
-    // Reset the logger
-    this.InitQueue();
-
     let headerStyle: TextStyle = { align: 'left', color: 'white', backgroundColor: 'black', opacity: 0.7 };
     let vis = new RoomVisual();
     vis.text(`[${Game.time}]`, 0, 0, headerStyle);
 
-    vis.text(`CPU: (${Game.cpu.getUsed().toFixed(3)}\/${Game.cpu.limit} -- [${Game.cpu.bucket}])`, 0, 1, headerStyle);
+    let gameCpuUsed = (Game.cpu.getUsed() + (this.numActionsTaken * 0.2)).toFixed(3);
+    vis.text(`CPU: (${gameCpuUsed}\/${Game.cpu.limit} -- [${Game.cpu.bucket}])`, 0, 1, headerStyle);
+
+    // Reset the logger
+    this.InitQueue();
   }
 
   private ShouldLog(minLevel: LogLevel, messageLevel: LogLevel) {
