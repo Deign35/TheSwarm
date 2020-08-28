@@ -57,6 +57,8 @@ class RoomManager extends BasicProcess<RoomStateMemory> {
       if (!data.activityPIDs.RPKG_EnergyManager || !this.kernel.getProcessByPID(data.activityPIDs.RPKG_EnergyManager)) {
         data.activityPIDs.RPKG_EnergyManager = this.kernel.startProcess(RPKG_EnergyManager, {
           harvesterPIDs: {},
+          refillerPID: '',
+          workerPIDs: [],
           roomID: roomID
         } as EnergyManagerMemory);
         this.kernel.setParent(data.activityPIDs.RPKG_EnergyManager, this.pid);
@@ -106,8 +108,10 @@ class RoomManagerExtension extends ExtensionBase implements IRoomManagerExtensio
           needsRepair: [],
           structures: {
             container: [],
+            controller: [],
             extension: [],
             spawn: [],
+            storage: [],
             tower: []
           },
           resources: [],
@@ -137,8 +141,10 @@ class RoomManagerExtension extends ExtensionBase implements IRoomManagerExtensio
 
     roomState.structures = {
       container: [],
+      controller: [],
       extension: [],
       spawn: [],
+      storage: [],
       tower: []
     }
 

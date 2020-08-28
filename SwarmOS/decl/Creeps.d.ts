@@ -11,9 +11,9 @@ declare interface SingleCreepAction_Memory extends MemBase {
 }
 
 declare interface RepetitiveCreepActivity_Memory extends MemBase {
-    actions: SingleCreepAction_Memory[];    // (a)ctions
-    creepID: CreepID;
-    childPID?: PID;
+  actions: SingleCreepAction_Memory[];    // (a)ctions
+  creepID: CreepID;
+  childPID?: PID;
 }
 
 declare interface SpawnActivity_Memory extends MemBase {
@@ -28,9 +28,16 @@ declare interface SoloJob_Memory extends MemBase {
   targetRoom: RoomID;     // (t)arget (r)oom
 }
 declare interface HarvesterMemory extends SoloJob_Memory {
-    source: ObjectID;
-    container: ObjectID;
+  source: ObjectID;
+  container: ObjectID;
 }
 declare interface ControlledRoomRefiller_Memory extends SoloJob_Memory {
-
+  lastTime: number;
+}
+declare interface Worker_Memory extends SoloJob_Memory {
+  target: {
+    t: ObjectID;
+    at: ActionType;
+    tt: TargetType;
+  }
 }

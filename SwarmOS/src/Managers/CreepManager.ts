@@ -171,7 +171,7 @@ class CreepManagerExtensions extends ExtensionBase implements ICreepManagerExten
       case (AT_GenerateSafeMode): return creep.generateSafeMode(target);
       case (AT_Harvest):
         let res = creep.harvest(target);
-        if (res == OK && creep.store[RESOURCE_ENERGY] == creep.store.getCapacity()) {
+        if (res == OK && creep.store.getUsedCapacity() == creep.store.getCapacity()) {
           return ERR_FULL;
         }
         return res;
@@ -269,7 +269,7 @@ class CreepManagerExtensions extends ExtensionBase implements ICreepManagerExten
             return true;
           }
         } else {
-          if ((target as Creep).store[RESOURCE_ENERGY] < (target as Creep).store.getCapacity() * 0.8) {
+          if ((target as Creep).store.getUsedCapacity() < (target as Creep).store.getCapacity() * 0.8) {
             return true;
           }
         }

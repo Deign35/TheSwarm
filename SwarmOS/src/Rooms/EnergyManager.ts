@@ -46,9 +46,33 @@ class EnergyManager extends BasicProcess<EnergyManagerMemory> {
       let pid = this.kernel.startProcess(CPKG_ControlledRoomRefiller, {
         roomID: this.room.name,
         targetRoom: this.room.name,
+        lastTime: Game.time
       } as ControlledRoomRefiller_Memory);
 
       this.memory.refillerPID = pid;
+    }
+
+    for (let i = 0; i < this.memory.workerPIDs.length; i++) {
+      if (!this.kernel.getProcessByPID(this.memory.workerPIDs[i])) {
+        this.memory.workerPIDs.splice(i--, 1);
+      }
+    }
+
+    let numWorkers = 3;
+    if (this.room.controller) {
+      if (this.room.controller.level == 2) {
+        numWorkers = 8;
+      } else if (this.room.controller.level == 3) {
+        numWorkers = 8;
+      }
+    }
+
+    while (this.memory.workerPIDs.length < numWorkers) {
+      this.memory.workerPIDs.push(this.kernel.startProcess(CPKG_Worker, {
+        roomID: this.memory.roomID,
+        targetRoom: this.memory.roomID,
+        expires: true
+      } as Worker_Memory))
     }
 
     /*let mineralIDs = this.roomData.mineralIDs;

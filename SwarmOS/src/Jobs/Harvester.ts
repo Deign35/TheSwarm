@@ -18,11 +18,11 @@ class Harvester extends SoloJob<HarvesterMemory> {
 
   protected GetNewSpawnID(): string {
     let targetRoom = Game.rooms[this.memory.targetRoom];
-    let spawnLevel = 0; // (TODO): Update this value based on if targetRoom is reserved
+    let body: BodyPartConstant[] = [WORK, WORK, MOVE]; // (TODO): Update this value based on if targetRoom is reserved
     if (targetRoom.energyCapacityAvailable >= 800) {
-      spawnLevel = 2;
+      body = [WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE];
     } else if (targetRoom.energyCapacityAvailable >= 550) {
-      spawnLevel = 1;
+      body = [WORK, WORK, WORK, WORK, WORK, MOVE];
     } else {
       let source = Game.getObjectById(this.memory.source)! as Source;
       let count = 0;
@@ -30,16 +30,14 @@ class Harvester extends SoloJob<HarvesterMemory> {
       LookAtGround(targetRoom.id, new RoomPosition(source.pos.x - 1, source.pos.y + 1, targetRoom.name),
         new RoomPosition(source.pos.x + 1, source.pos.y - 1, targetRoom.name), (x, y, terrain) => {
           if (terrain != TERRAIN_MASK_WALL) {
-            if (count++ > 0) {
+            if (count < 3 && count++ > 0) {
               this.SpawnSupportHarvester();
             }
           }
         });
     }
     return this.spawnManager.requestSpawn({
-      body: spawnLevel == 2 ? [WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE] :
-        spawnLevel == 1 ? [WORK, WORK, WORK, WORK, WORK, MOVE] :
-          [WORK, WORK, MOVE],
+      body: body,
       creepName: this.memory.targetRoom + '_H_' + this.memory.source.slice(-1),
       owner_pid: this.pid
     }, this.memory.targetRoom, Priority_High, {
@@ -50,11 +48,20 @@ class Harvester extends SoloJob<HarvesterMemory> {
   protected CreateCustomCreepActivity(creep: Creep): string | undefined {
     let source = Game.getObjectById<Source>(this.memory.source)!;
     if (source.pos.getRangeTo(creep.pos) > 1) {
+      let targetPos = source.pos;
+      let dist = 1;
+      if (this.memory.container) {
+        let container = Game.getObjectById<StructureContainer>(this.memory.container);
+        if (container) {
+          targetPos = container.pos;
+          dist = 0;
+        }
+      }
       return this.creepManager.CreateNewCreepActivity({
         action: AT_MoveToPosition,
         creepID: creep.name,
-        pos: source.pos,
-        amount: 1
+        pos: targetPos,
+        amount: dist
       }, this.pid);
     }
 
@@ -96,7 +103,7 @@ class Harvester extends SoloJob<HarvesterMemory> {
           let structs = creep.pos.lookFor(LOOK_STRUCTURES);
           for (let i = 0; i < structs.length; i++) {
             if (structs[i].structureType == STRUCTURE_CONTAINER) {
-              this.memory.container = sites[0].id;
+              this.memory.container = structs[0].id;
             }
           }
         }

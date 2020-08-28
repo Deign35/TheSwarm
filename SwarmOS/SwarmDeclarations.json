@@ -61,7 +61,8 @@
             "combinedType": "CreepPackages",
             "entries": {
                 "ControlledRoomRefiller": "controlledRoomRefiller",
-                "Harvester": "harvester"
+                "Harvester": "harvester",
+                "Worker": "worker"
             }
         },
         "RPKG": {

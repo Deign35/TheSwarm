@@ -45,9 +45,11 @@ interface RoomState extends MemBase {
 }
 
 interface RoomState_StructureData {
+  [STRUCTURE_CONTROLLER]: ObjectID[];
   [STRUCTURE_CONTAINER]: ObjectID[];
   [STRUCTURE_EXTENSION]: ObjectID[];
   [STRUCTURE_SPAWN]: ObjectID[];
+  [STRUCTURE_STORAGE]: ObjectID[];
   [STRUCTURE_TOWER]: ObjectID[];
 }
 

@@ -24,6 +24,7 @@ class SpawnActivity extends BasicProcess<SpawnActivity_Memory> {
             default:
                 this.EndProcess(newCreepName);
         }
+
         return ThreadState_Done;
     }
 

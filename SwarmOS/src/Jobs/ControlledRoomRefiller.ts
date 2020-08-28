@@ -8,9 +8,39 @@ import { SoloJob } from "./SoloJob";
 class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory> {
     RunThread() {
         let creep = Game.creeps[this.memory.creepID!];
-        if (creep && !creep.spawning && creep.ticksToLive! < 80) {
+        if (((creep && !creep.spawning && creep.ticksToLive! < 80) ||
+            !creep && Game.time - this.memory.lastTime > 250) &&
+            !this.memory.expires) {
+            if (this.memory.creepID) {
+                delete this.memory.activityPID;
+            }
             delete this.memory.creepID;
-            delete this.memory.activityPID;
+            this.memory.lastTime = Game.time;
+        }
+
+        if (!this.memory.creepID && Game.time - this.memory.lastTime > 200 && !this.memory.expires) {
+            this.memory.lastTime = Game.time;
+            this.log.alert("Spawning an emergency refiller for room: " + this.memory.roomID);
+            let sID = this.spawnManager.requestSpawn({
+                body: [CARRY, CARRY, CARRY, MOVE, MOVE, MOVE],
+                creepName: this.memory.roomID + "_Ref_Emergency",
+                owner_pid: this.pid,
+            }, this.memory.roomID, Priority_EMERGENCY, {
+                    parentPID: this.pid
+                }, 1);
+            let spawnMem: SpawnActivity_Memory = {
+                spawnID: sID,
+                HC: 'CreateCreepActivity'
+            }
+            let spawnPID = this.kernel.startProcess(APKG_SpawnActivity, spawnMem);
+            let pid = this.kernel.startProcess(CPKG_ControlledRoomRefiller, {
+                roomID: this.memory.roomID,
+                targetRoom: this.memory.roomID,
+                lastTime: Game.time,
+                activityPID: spawnPID,
+                expires: true
+            } as ControlledRoomRefiller_Memory);
+            this.kernel.setParent(spawnPID, pid);
         }
         return super.RunThread();
     }
@@ -28,7 +58,7 @@ class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory> {
             body: body,
             creepName: newName,
             owner_pid: this.pid
-        }, this.memory.roomID, Priority_Medium, {
+        }, this.memory.roomID, Priority_High, {
                 parentPID: this.pid
             }, 1);
         return sID;
@@ -41,20 +71,20 @@ class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory> {
         }
 
         return this.creepManager.CreateNewCreepActivity({
-            targetID: nextTask.t,
-            action: nextTask.a,
+            targetID: nextTask.targetID,
+            action: nextTask.action,
             creepID: creep.name
         }, this.pid);
     }
 
     protected HandleNoActivity() { }
 
-    protected GetNewTarget(creep: Creep): { t: ObjectID, a: ActionType } {
+    protected GetNewTarget(creep: Creep): { targetID: ObjectID, action: ActionType } {
         let actionType: ActionType = AT_NoOp;
         let bestTarget = '';
         let roomData = this.roomManager.GetRoomData(creep.room.name)!;
-        let energyNeeded = creep.store.getCapacity() - (creep.store[RESOURCE_ENERGY] || 0);
-        let carryRatio = creep.store[RESOURCE_ENERGY] / creep.store.getCapacity();
+        let energyNeeded = creep.store.getCapacity() - (creep.store.getUsedCapacity() || 0);
+        let carryRatio = creep.store.getUsedCapacity() / creep.store.getCapacity();
 
         let closestDist = 1000;
         if (carryRatio < 0.25) {
@@ -79,6 +109,20 @@ class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory> {
                         if (dist < closestDist) {
                             closestDist = dist;
                             bestTarget = tombstone.id;
+                            actionType = AT_Withdraw;
+                        }
+                    }
+                }
+            }
+
+            if (actionType == AT_NoOp && roomData.structures[STRUCTURE_CONTAINER].length > 0) {
+                for (let i = 0; i < roomData.structures[STRUCTURE_CONTAINER].length; i++) {
+                    let container = Game.getObjectById<StructureContainer>(roomData.structures[STRUCTURE_CONTAINER][i]);
+                    if (container && (container.store[RESOURCE_ENERGY] || -1) >= energyNeeded) {
+                        let dist = container.pos.getRangeTo(creep.pos);
+                        if (dist < closestDist) {
+                            closestDist = dist;
+                            bestTarget = container.id;
                             actionType = AT_Withdraw;
                         }
                     }
@@ -110,7 +154,7 @@ class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory> {
             }
         }
 
-        if (actionType == AT_NoOp && creep.store[RESOURCE_ENERGY] != creep.store.getCapacity()) {
+        if (actionType == AT_NoOp && creep.store.getFreeCapacity() > 0) {
             // Find a container to withdraw from.
             let targets = this.roomManager.GetRoomData(this.memory.roomID)!.structures[STRUCTURE_CONTAINER]
             for (let i = 0; i < targets.length; i++) {
@@ -126,9 +170,20 @@ class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory> {
             }
         }
 
+        if (actionType == AT_NoOp) {
+            let targets = this.roomManager.GetRoomData(this.memory.roomID)!.structures[STRUCTURE_STORAGE];
+            if (targets.length > 0) {
+                let nextTarget = Game.getObjectById<StructureStorage>(targets[0]);
+                if (nextTarget) {
+                    bestTarget = nextTarget.id;
+                    actionType = creep.store.getUsedCapacity() != creep.store.getCapacity() ? AT_Withdraw : AT_Transfer;
+                }
+            }
+        }
+
         return {
-            a: actionType,
-            t: bestTarget
+            action: actionType,
+            targetID: bestTarget
         }
     }
 }
