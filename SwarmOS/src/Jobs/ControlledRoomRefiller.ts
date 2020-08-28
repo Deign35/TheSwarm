@@ -48,7 +48,9 @@ class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory> {
   protected GetNewSpawnID(): string {
     let newName = this.memory.roomID + '_Ref';
     let body = [CARRY, CARRY, MOVE, MOVE];
-    if (this.homeRoom.energyCapacityAvailable >= 800) {
+    if (this.homeRoom.energyCapacityAvailable >= 1200) {
+      body = [CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+    } else if (this.homeRoom.energyCapacityAvailable >= 800) {
       body = [CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
     } else if (this.homeRoom.energyCapacityAvailable >= 400) {
       body = [CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE];
