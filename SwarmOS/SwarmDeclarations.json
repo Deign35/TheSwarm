@@ -20,6 +20,7 @@
                 "CreepManager",
                 "EmptyProcess",
                 "FlagBase",
+                "FlagManager",
                 "RoomManager",
                 "SpawnManager",
                 "SwarmManager"

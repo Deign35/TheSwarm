@@ -1,6 +1,7 @@
 import { PackageProviderBase } from "Core/BasicTypes";
 
 import { OSPackage as CreepManager } from "./CreepManager";
+import { OSPackage as FlagManager } from "./FlagManager";
 import { OSPackage as RoomManager } from "./RoomManager";
 import { OSPackage as SpawnManager } from "./SpawnManager";
 
@@ -11,6 +12,9 @@ class SwarmManager extends PackageProviderBase<PackageProviderMemory> {
   private _reqServices: SDictionary<ProviderService> = {
     creepManager: {
       processName: PKG_CreepManager
+    },
+    flagManager: {
+      processName: PKG_FlagManager
     },
     roomManager: {
       processName: PKG_RoomManager
@@ -24,6 +28,7 @@ class SwarmManager extends PackageProviderBase<PackageProviderMemory> {
 export const ManagersPackage: IPackage = {
   install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
     CreepManager.install(processRegistry, extensionRegistry);
+    FlagManager.install(processRegistry, extensionRegistry);
     RoomManager.install(processRegistry, extensionRegistry);
     SpawnManager.install(processRegistry, extensionRegistry);
 
