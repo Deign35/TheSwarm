@@ -67,6 +67,7 @@
                 "ControlledRoomRefiller": "controlledRoomRefiller",
                 "Harvester": "harvester",
                 "MineralHarvester": "mineralHarvester",
+                "Scout": "scout",
                 "Worker": "worker"
             }
         },

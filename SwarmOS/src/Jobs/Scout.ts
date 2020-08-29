@@ -1,6 +1,6 @@
 export const OSPackage: IPackage = {
   install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
-    processRegistry.register(CPKG_Worker, Scout);
+    processRegistry.register(CPKG_Scout, Scout);
   }
 }
 import { SoloJob } from "./SoloJob";
@@ -14,7 +14,7 @@ class Scout extends SoloJob<Scout_Memory> {
     let targetRoom: RoomID | undefined = creep.room.name;
     do {
       let exits = Game.map.describeExits(creep.room.name);
-      switch(Math.floor(Math.random() * 4)) {
+      switch (Math.floor(Math.random() * 4)) {
         case (0): {
           targetRoom = exits[FIND_EXIT_TOP];
           break;
@@ -27,7 +27,7 @@ class Scout extends SoloJob<Scout_Memory> {
           targetRoom = exits[FIND_EXIT_BOTTOM];
           break;
         }
-        case(3): {
+        case (3): {
           targetRoom = exits[FIND_EXIT_LEFT];
           break;
         }
