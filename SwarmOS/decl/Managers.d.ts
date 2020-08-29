@@ -55,11 +55,19 @@ interface RoomState_StructureData {
   [STRUCTURE_TOWER]: ObjectID[];
 }
 
-/** Creepmanager */
+/** CreepManager */
 declare interface CreepContext {
   ownerPID?: PID;        // (o)wner process
 }
 
 declare interface CreepManager_Memory extends MemBase {
   registeredCreeps: { [id in CreepID]: CreepContext };
+}
+
+/** MarketManager */
+declare interface MarketManager_Memory extends MemBase {
+  terminals: {
+    [id: string]: string
+  }
+  lastUpdate: number;
 }

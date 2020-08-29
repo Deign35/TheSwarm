@@ -22,6 +22,7 @@
                 "EmptyProcess",
                 "FlagBase",
                 "FlagManager",
+                "MarketManager",
                 "RoomManager",
                 "SpawnManager",
                 "SwarmManager"

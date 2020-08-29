@@ -5,7 +5,7 @@ import { BasicProcess } from "Core/BasicTypes";
 
 export const OSPackage: IPackage = {
   install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
-    processRegistry.register(PKG_FlagManager, FlagRegistry);
+    processRegistry.register(PKG_FlagManager, FlagManager);
   }
 }
 const PKG_FlagManager_LogContext: LogContext = {
@@ -13,7 +13,7 @@ const PKG_FlagManager_LogContext: LogContext = {
   logLevel: LOG_INFO
 }
 
-class FlagRegistry extends BasicProcess<FlagExtensionsMemory> {
+class FlagManager extends BasicProcess<FlagExtensionsMemory> {
   get memory(): FlagExtensionsMemory {
     if (!Memory.flagData) {
       this.log.warn(`Initializing FlagRegistry memory`);
