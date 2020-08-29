@@ -54,18 +54,24 @@ class Worker extends SoloJob<Worker_Memory> {
     let roomData = this.roomManager.GetRoomData(creep.room.name)!;
     if (carryRatio > 0.50) {
       for (let i = 0; i < roomData.needsRepair.length; i++) {
-        return this.creepManager.CreateNewCreepActivity({
-          action: AT_Repair,
-          creepID: creep.name,
-          targetID: roomData.needsRepair[i]
-        }, this.pid);
+        let repairTarget = Game.getObjectById(roomData.needsRepair[i]);
+        if (repairTarget) {
+          return this.creepManager.CreateNewCreepActivity({
+            action: AT_Repair,
+            creepID: creep.name,
+            targetID: roomData.needsRepair[i]
+          }, this.pid);
+        }
       }
       for (let i = 0; i < roomData.cSites.length; i++) {
-        return this.creepManager.CreateNewCreepActivity({
-          action: AT_Build,
-          creepID: creep.name,
-          targetID: roomData.cSites[i]
-        }, this.pid);
+        let buildTarget = Game.getObjectById(roomData.cSites[i]);
+        if (buildTarget) {
+          return this.creepManager.CreateNewCreepActivity({
+            action: AT_Build,
+            creepID: creep.name,
+            targetID: roomData.cSites[i]
+          }, this.pid);
+        }
       }
 
       return this.creepManager.CreateNewCreepActivity({
@@ -94,6 +100,7 @@ class Worker extends SoloJob<Worker_Memory> {
         }
       }
     }
+
     if (actionType == AT_NoOp && roomData.tombstones.length > 0) {
       for (let i = 0; i < roomData.tombstones.length; i++) {
         let tombstone = Game.getObjectById<Tombstone>(roomData.tombstones[i]);
