@@ -1,11 +1,11 @@
 export const OSPackage: IPackage = {
   install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
-    processRegistry.register(CPKG_Worker, WorkerActivity);
+    processRegistry.register(CPKG_Worker, Worker);
   }
 }
 import { SoloJob } from "./SoloJob";
 
-class WorkerActivity extends SoloJob<Worker_Memory> {
+class Worker extends SoloJob<Worker_Memory> {
 
   private hasRun!: boolean;
   private _roomData!: RoomState;

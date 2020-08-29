@@ -42,11 +42,9 @@ declare interface ControlledRoomRefiller_Memory extends SoloJob_Memory {
   lastTime: number;
 }
 declare interface Worker_Memory extends SoloJob_Memory {
-  target: {
-    t: ObjectID;
-    at: ActionType;
-    tt: TargetType;
-  }
+}
+declare interface Scout_Memory extends SoloJob_Memory {
+  
 }
 
 declare interface SquadJob_Memory extends MemBase {

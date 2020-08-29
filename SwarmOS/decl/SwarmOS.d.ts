@@ -99,3 +99,7 @@ declare interface IWorkerGroupProcess extends IProcess {
   AddCreep(creepID: CreepID): void;
   RemoveCreep(creepID: CreepID): void;
 }
+
+declare interface SwarmCLIMemory extends MemBase {
+  commands: any[]
+}

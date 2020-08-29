@@ -17,6 +17,7 @@
             "type": true,
             "combinedType": "OSPackage",
             "entries": [
+                "CLIManager",
                 "CreepManager",
                 "EmptyProcess",
                 "FlagBase",
@@ -77,6 +78,17 @@
             "entries": {
                 "EnergyManager": "energyManager",
                 "Towers": "towers"
+            }
+        },
+        "CLI": {
+            "comment": "Command line actions",
+            "enabled": true,
+            "combinedType": "CLI_Command",
+            "type": true,
+            "string": true,
+            "entries": {
+                "Launch": "launch",
+                "ChangeFlag": "flagColor"
             }
         },
         "TT": {
