@@ -8,7 +8,7 @@ import { SoloJob } from "./SoloJob";
 class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory> {
   RunThread() {
     let creep = Game.creeps[this.memory.creepID!];
-    if (((creep && !creep.spawning && creep.ticksToLive! < 80) ||
+    if (((creep && !creep.spawning && creep.ticksToLive! < 40) ||
       !creep && Game.time - this.memory.lastTime > 250) &&
       !this.memory.expires) {
       if (this.memory.creepID) {
@@ -30,7 +30,7 @@ class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory> {
         }, 1);
       let spawnMem: SpawnActivity_Memory = {
         spawnID: sID,
-        HC: 'CreateCreepActivity'
+        HC: 'CreateActivityForCreep'
       }
       let spawnPID = this.kernel.startProcess(APKG_SpawnActivity, spawnMem);
       let pid = this.kernel.startProcess(CPKG_ControlledRoomRefiller, {

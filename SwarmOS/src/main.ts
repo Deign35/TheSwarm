@@ -56,8 +56,7 @@ export function loop() {
   }
 }
 
-let endLoad = Game.cpu.getUsed();
 if (!Game.rooms['sim']) {
   kernel.log.info(() => `SwarmOS reloaded - Begin: ${startLoad}cpu`);
-  kernel.log.info(() => `SwarmOS reloaded - Used: ${endLoad - startLoad}cpu`);
+  kernel.log.info(() => `SwarmOS reloaded - Used: ${Game.cpu.getUsed() - startLoad}cpu`);
 }
