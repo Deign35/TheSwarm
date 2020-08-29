@@ -37,7 +37,7 @@ class MarketManager extends BasicProcess<MarketManager_Memory> {
   private MARKET_MANAGER_ENABLED = false;
   RunThread(): ThreadState {
     if (!this.MARKET_MANAGER_ENABLED) return ThreadState_Done;
-    if (Game.rooms['sim']) return ThreadState_Done;
+    if (Game.rooms['sim'] || Game.cpu.getUsed() > (Game.cpu.limit * 0.75)) return ThreadState_Done;
     if (Game.time - this.memory.lastUpdate > 1000) {
       let roomIDs = Object.keys(Game.rooms);
       for (let i = 0; i < roomIDs.length; i++) {
