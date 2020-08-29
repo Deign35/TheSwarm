@@ -34,9 +34,9 @@ class Scout extends SoloJob<Scout_Memory> {
         default:
           break;
       }
-    } while (targetRoom && creep.room.findExitTo(targetRoom) > 0);
+    } while (!targetRoom || creep.room.findExitTo(targetRoom) < 0);
 
-    this.memory.targetRoom = targetRoom!;
+    this.memory.targetRoom = targetRoom;
   }
 
   protected GetNewSpawnID(): string {
