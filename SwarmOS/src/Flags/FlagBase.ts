@@ -28,7 +28,7 @@ export const OSPackage: IPackage = {
  *      GREY_ -- StructureNuker
  *      ORANGE_ -- StructureStorage
  *      PURPLE_ -- StructureTerminal
- *      RED_ --
+ *      RED_ -- StructureFactory
  *      WHITE_ --
  *      YELLOW_ --
  * 
@@ -146,6 +146,8 @@ class FlagBase extends BasicProcess<FlagProcess_Memory> {
         csCreated = flag.room.createConstructionSite(flag.pos, STRUCTURE_TERMINAL);
         break;
       case (COLOR_RED):
+        csCreated = flag.room.createConstructionSite(flag.pos, STRUCTURE_FACTORY);
+        break;
       case (COLOR_WHITE):
       case (COLOR_YELLOW):
       default:

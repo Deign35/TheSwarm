@@ -75,7 +75,8 @@ class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory> {
     return this.creepManager.CreateNewCreepActivity({
       targetID: nextTask.targetID,
       action: nextTask.action,
-      creepID: creep.name
+      creepID: creep.name,
+      resourceType: RESOURCE_ENERGY
     }, this.pid);
   }
 
@@ -90,19 +91,6 @@ class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory> {
 
     let closestDist = 1000;
     if (carryRatio < 0.25) {
-      if (roomData.resources.length > 0) {
-        for (let i = 0; i < roomData.resources.length; i++) {
-          let resource = Game.getObjectById<Resource>(roomData.resources[i]);
-          if (resource && resource.resourceType == RESOURCE_ENERGY && (resource.amount || -1) >= energyNeeded) {
-            let dist = resource.pos.getRangeTo(creep.pos);
-            if (dist < closestDist) {
-              closestDist = dist;
-              bestTarget = resource.id;
-              actionType = AT_Pickup;
-            }
-          }
-        }
-      }
       if (actionType == AT_NoOp && roomData.tombstones.length > 0) {
         for (let i = 0; i < roomData.tombstones.length; i++) {
           let tombstone = Game.getObjectById<Tombstone>(roomData.tombstones[i]);
@@ -112,6 +100,34 @@ class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory> {
               closestDist = dist;
               bestTarget = tombstone.id;
               actionType = AT_Withdraw;
+            }
+          }
+        }
+      }
+
+      if (actionType == AT_NoOp && roomData.ruins.length > 0) {
+        for (let i = 0; i < roomData.ruins.length; i++) {
+          let ruins = Game.getObjectById<Ruin>(roomData.ruins[i]);
+          if (ruins && (ruins.store[RESOURCE_ENERGY] || -1) >= energyNeeded) {
+            let dist = ruins.pos.getRangeTo(creep.pos);
+            if (dist < closestDist) {
+              closestDist = dist;
+              bestTarget = ruins.id;
+              actionType = AT_Withdraw;
+            }
+          }
+        }
+      }
+
+      if (roomData.resources.length > 0) {
+        for (let i = 0; i < roomData.resources.length; i++) {
+          let resource = Game.getObjectById<Resource>(roomData.resources[i]);
+          if (resource && resource.resourceType == RESOURCE_ENERGY && (resource.amount || -1) >= energyNeeded) {
+            let dist = resource.pos.getRangeTo(creep.pos);
+            if (dist < closestDist) {
+              closestDist = dist;
+              bestTarget = resource.id;
+              actionType = AT_Pickup;
             }
           }
         }

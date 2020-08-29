@@ -281,7 +281,7 @@ class CreepManagerExtensions extends ExtensionBase implements ICreepManagerExten
           }
         }
         return false;
-      case (AT_Withdraw): return (target as Structure).structureType && !!(target as StructureContainer).store;
+      case (AT_Withdraw): return ((target as Structure).structureType || (target as Ruin).structure) && !!(target as StructureContainer).store;
 
       case (AT_Drop):
       case (AT_MoveByPath):
