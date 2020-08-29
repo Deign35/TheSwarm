@@ -53,6 +53,9 @@ export function loop() {
     kernel.loop();
   } finally {
     kernel.log.DumpLogToConsole();
+    if (Game.cpu.bucket == 10000) {
+      Game.cpu.generatePixel();
+    }
   }
 }
 

@@ -10,7 +10,7 @@ export const OSPackage: IPackage = {
  * (TODO): Building priority
  * BLUE_ -- Basic constructionSites
  *      BLUE_ -- StructureExtension
- *      BROWN_ --StructureContainer
+ *      BROWN_ -- StructureContainer
  *      CYAN_ -- StructreLab
  *      GREEN_ -- StructureLink
  *      GREY_ -- StructureRampart

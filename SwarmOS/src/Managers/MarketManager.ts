@@ -34,7 +34,9 @@ class MarketManager extends BasicProcess<MarketManager_Memory> {
     return PKG_MarketManager_LogContext.logLevel!;
   }
 
+  private MARKET_MANAGER_ENABLED = false;
   RunThread(): ThreadState {
+    if (!this.MARKET_MANAGER_ENABLED) return ThreadState_Done;
     if (Game.rooms['sim']) return ThreadState_Done;
     if (Game.time - this.memory.lastUpdate > 1000) {
       let roomIDs = Object.keys(Game.rooms);
@@ -52,6 +54,10 @@ class MarketManager extends BasicProcess<MarketManager_Memory> {
     let terminalIDs = Object.keys(this.memory.terminals);
     for (let i = 0; i < terminalIDs.length; i++) {
       let terminal = Game.getObjectById<StructureTerminal>(this.memory.terminals[terminalIDs[i]]);
+      if (!terminal) {
+        delete this.memory.terminals[terminalIDs[i--]];
+        continue;
+      }
       if (terminal && !((terminal.cooldown | 0) > 0)) {
         if (this.memory.terminals[terminalIDs[i]]) {
           let order = Game.market.getOrderById(this.memory.terminals[terminalIDs[i]]);
@@ -118,7 +124,10 @@ class MarketManager extends BasicProcess<MarketManager_Memory> {
       let cheapestSeller = sortedSellOrders[sellTypes[i]][0];
       let biggestBuyer = sortedBuyOrders[sellTypes[i]][0];
       if (cheapestSeller.price < biggestBuyer.price * 0.9) {
-        
+        let amountToBuy = Math.min(cheapestSeller.amount, biggestBuyer.amount);
+        for (let j = 0; j < terminalIDs.length; j++) {
+          let terminal = Game.getObjectById<StructureTerminal>(terminalIDs[j]);
+        }
       }
     }
 
