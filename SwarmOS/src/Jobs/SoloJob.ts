@@ -74,7 +74,7 @@ export abstract class SoloJob<T extends SoloJob_Memory> extends BasicProcess<T> 
         this.kernel.setParent(this.memory.activityPID, this.pid);
         let childActivity = this.kernel.getProcessByPID(this.memory.activityPID)!;
         if (!childActivity.memory.HC) {
-          childActivity.memory.HC = 'CreateCreepActivity';
+          childActivity.memory.HC = 'CreateActivityForCreep';
         }
       }
     }
