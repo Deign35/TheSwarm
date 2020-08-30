@@ -71,26 +71,19 @@ export abstract class SquadJob<T extends SquadJob_Memory> extends BasicProcess<T
       }
       return;
     }
-    
-    let targetRoom = this.GetTargetRoomForCreep(squadID);
-    if (creep.room.name != targetRoom) {
-      this.memory.squad[squadID].activityPID = this.kernel.startProcess(APKG_MoveToRoomActivity,{
-        creepID: creepID,
-        targetRoom: targetRoom
-      } as MoveToRoomActivity_Memory);
+
+    this.memory.squad[squadID].activityPID = this.CreateCustomCreepActivity(squadID, creep);
+    if (!this.memory.squad[squadID].activityPID) {
+      this.HandleNoActivity();
     } else {
-      this.memory.squad[squadID].activityPID = this.CreateCustomCreepActivity(squadID, creep);
-      if (!this.memory.squad[squadID].activityPID) {
-        this.HandleNoActivity();
-      } else {
-        this.kernel.setParent(this.memory.squad[squadID].activityPID!, this.pid);
-        let childActivity = this.kernel.getProcessByPID(this.memory.squad[squadID].activityPID!)!;
-        if (!childActivity.memory.HC) {
-          childActivity.memory.HC = 'AssignCreep';
-        }
+      this.kernel.setParent(this.memory.squad[squadID].activityPID!, this.pid);
+      let childActivity = this.kernel.getProcessByPID(this.memory.squad[squadID].activityPID!)!;
+      if (!childActivity.memory.HC) {
+        childActivity.memory.HC = 'AssignCreep';
       }
     }
   }
+
   protected abstract CreateCustomCreepActivity(squadID: number, creep: Creep): PID | undefined;
   protected GetTargetRoomForCreep(squadID: number) : RoomID {
     return this.memory.targetRoom;

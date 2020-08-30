@@ -52,7 +52,6 @@
             "combinedType": "ActivitiesPackage",
             "entries": {
                 "CreepActivity": "creepActivity",
-                "MoveToRoomActivity": "moveToRoomActivity",
                 "RepetitiveCreepActivity": "repetitiveCreepActivity",
                 "SpawnActivity": "spawnActivity"
             }
@@ -65,6 +64,7 @@
             "combinedType": "CreepPackages",
             "entries": {
                 "ControlledRoomRefiller": "controlledRoomRefiller",
+                "ExperimentalSquad": "experimentalSquad",
                 "Harvester": "harvester",
                 "MineralHarvester": "mineralHarvester",
                 "Scout": "scout",

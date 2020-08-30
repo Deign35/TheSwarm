@@ -24,7 +24,6 @@ class CLIManager extends BasicProcess<SwarmCLIMemory> {
       return this.memory.commands;
   }
 
-  // (TODO): Reset room.
   RunThread(): ThreadState {
       let cmd = this.commands.shift();
       if (cmd) {
