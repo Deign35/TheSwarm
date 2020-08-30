@@ -116,7 +116,7 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
     }
   }
 
-  getProcessByPID(pid: PID): IProcess | undefined {
+  getProcessByPID<T extends IProcess>(pid: PID): T | undefined {
     if (!this.processTable[pid] || this.processTable[pid].end) {
       return;
     }
@@ -124,7 +124,7 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
     if (!this._processCache[pid]) {
       this.createProcess(pid);
     }
-    return this._processCache[pid];
+    return this._processCache[pid] as T;
   }
 
   // (TODO): Update startprocess to take a parentpid as a parameter

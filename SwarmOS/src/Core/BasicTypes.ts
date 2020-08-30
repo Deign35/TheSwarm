@@ -33,7 +33,12 @@ export abstract class BasicProcess<T extends MemBase> implements IProcess {
     if (proc) {
       this.sleeper.wake(this.parentPID);
       if (cbVal && this.memory.HC) {
-        proc[this.memory.HC](cbVal, this.pid); // Notify the parent using the given callback function.
+        if (proc[this.memory.HC]) {
+          proc[this.memory.HC](cbVal, this.pid); // Notify the parent using the given callback function.
+        } else {
+          this.log.error("Attempted to callback to parent process with undefined callback.");
+          this.log.error(`Parent: ${proc.pid} -- HC: ${this.memory.HC}`);
+        }
       }
     }
     this.kernel.killProcess(this.pid);

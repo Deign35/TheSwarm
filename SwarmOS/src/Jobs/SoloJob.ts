@@ -19,15 +19,14 @@ export abstract class SoloJob<T extends SoloJob_Memory> extends BasicProcess<T> 
       if (this.creep && !this.creep.spawning) {
         if (!this.memory.activityPID || !this.kernel.getProcessByPID(this.memory.activityPID)) {
           this.CreateActivityForCreep(this.memory.creepID!);
+          this.memory.hasRun = true;
         }
       }
     }
 
     if (!this.creep) {
-      if (!this.memory.activityPID) {
-        this.CreateSpawnActivity();
-      } else if (!this.kernel.getProcessByPID(this.memory.activityPID)) {
-        if (this.memory.expires) {
+      if (!this.memory.activityPID || !this.kernel.getProcessByPID(this.memory.activityPID)) {
+        if (this.memory.expires && this.memory.hasRun) {
           this.EndProcess();
         } else {
           this.CreateSpawnActivity();
@@ -72,7 +71,7 @@ export abstract class SoloJob<T extends SoloJob_Memory> extends BasicProcess<T> 
         this.HandleNoActivity();
       } else {
         this.kernel.setParent(this.memory.activityPID, this.pid);
-        let childActivity = this.kernel.getProcessByPID(this.memory.activityPID)!;
+        let childActivity = this.kernel.getProcessByPID<SoloJob<T>>(this.memory.activityPID)!;
         if (!childActivity.memory.HC) {
           childActivity.memory.HC = 'CreateActivityForCreep';
         }

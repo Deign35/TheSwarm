@@ -30,6 +30,7 @@ declare interface SpawnActivity_Memory extends MemBase {
 declare interface SoloJob_Memory extends MemBase {
   activityPID?: PID;        // (a)ctivity
   creepID?: CreepID;    // (c)reep
+  hasRun?: boolean;
   expires?: boolean;  // (exp)pires -- Kill the process when the creep dies
   roomID: RoomID;    // (h)ome room
   targetRoom: RoomID;     // (t)arget (r)oom
@@ -44,7 +45,7 @@ declare interface ControlledRoomRefiller_Memory extends SoloJob_Memory {
 declare interface Worker_Memory extends SoloJob_Memory {
 }
 declare interface Scout_Memory extends SoloJob_Memory {
-  
+
 }
 
 declare interface SquadJob_Memory extends MemBase {
@@ -59,6 +60,6 @@ declare interface SquadJob_Memory extends MemBase {
 
 declare interface MineralHarvester_Memory extends SquadJob_Memory {
   container: ObjectID,
-  squad: [ { activityPID?: PID, creepID?: CreepID },
-           { activityPID?: PID, creepID?: CreepID } ]
+  squad: [{ activityPID?: PID, creepID?: CreepID },
+    { activityPID?: PID, creepID?: CreepID }]
 }

@@ -39,7 +39,7 @@ class Worker extends SoloJob<Worker_Memory> {
         MOVE, MOVE, MOVE, MOVE,
         MOVE, MOVE, MOVE, MOVE]
     } else if (energyCapacity >= 600) {
-      body = [WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE];
+      body = [WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE];
     }
     return this.spawnManager.requestSpawn({
       body: body,
