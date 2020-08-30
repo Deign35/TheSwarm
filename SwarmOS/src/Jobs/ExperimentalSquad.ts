@@ -6,39 +6,49 @@ export const OSPackage: IPackage = {
 
 import { SquadJob } from "./SquadJob";
 
-class ExperimentalSquad extends SquadJob<MineralHarvester_Memory> {
-  CreateSpawnActivity(squadID: number) {
-    super.CreateSpawnActivity(squadID);
-  }
+class ExperimentalSquad extends SquadJob<ExperimentalSquad_Memory> {
   protected GetNewSpawnID(squadID: number): string {
     if (squadID == 0) {
-      let body = [WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, MOVE, MOVE, MOVE, MOVE, MOVE];
+      let body = [WORK, WORK, WORK, WORK, WORK, MOVE, MOVE, MOVE, MOVE, MOVE];
       return this.spawnManager.requestSpawn({
         body: body,
-        creepName: this.memory.roomID + (Game.time + '_HM').slice(-6),
+        creepName: this.memory.targetRoom + (Game.time + '_Har').slice(-8),
         owner_pid: this.pid
-      }, this.memory.roomID, Priority_Medium, {
+      }, this.memory.targetRoom, Priority_Low, {
           parentPID: this.pid
-        }, 1);
+        }, 3);
     } else if (squadID == 1) {
-      let body = [CARRY, CARRY, CARRY, MOVE, MOVE, MOVE];
+      let body = [CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
+                  MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
       return this.spawnManager.requestSpawn({
         body: body,
-        creepName: this.memory.roomID + (Game.time + '_HMR').slice(-7),
+        creepName: this.memory.targetRoom + (Game.time + '_Ref').slice(-8),
         owner_pid: this.pid
-      }, this.memory.roomID, Priority_Low, {
+      }, this.memory.targetRoom, Priority_Lowest, {
           parentPID: this.pid
-        }, 1)
+        }, 3)
+    } else if (squadID == 2) {
+      let body = [WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE];
+      return this.spawnManager.requestSpawn({
+        body: body,
+        creepName: this.memory.targetRoom + (Game.time + '_Bui').slice(-8),
+        owner_pid: this.pid
+      }, this.memory.targetRoom, Priority_Lowest, {
+        parentPID: this.pid
+      }, 3);
     } else {
       throw new Error("Squad has too many units");
     }
   }
   protected CreateCustomCreepActivity(squadID: number, creep: Creep): string | undefined {
     let roomData = this.roomManager.GetRoomData(this.memory.roomID)!;
-    let mineral = Game.getObjectById<Mineral>(roomData.mineralIDs[0])!;
+    let source = Game.getObjectById<Source>(this.memory.sourceID);
     if (squadID == 0) {
-      if (mineral.pos.getRangeTo(creep.pos) > 1) {
-        let targetPos = mineral.pos;
+      if (!source || creep.room.name != source.room.name) {
+        return this.MoveToRoom(creep, this.memory.targetRoom);
+      }
+      if (source.pos.getRangeTo(creep.pos) > 1) {
+        let targetPos = source.pos;
         let dist = 1;
         if (this.memory.container) {
           let container = Game.getObjectById<StructureContainer>(this.memory.container);
@@ -54,58 +64,106 @@ class ExperimentalSquad extends SquadJob<MineralHarvester_Memory> {
           amount: dist
         }, this.pid);
       }
-
-      if (!this.memory.container) {
-        let structs = creep.pos.lookFor(LOOK_STRUCTURES);
-        for (let i = 0; i < structs.length; i++) {
-          if (structs[i].structureType == STRUCTURE_CONTAINER) {
-            this.memory.container = structs[0].id;
+  
+      if (source.energy > 0) {
+        return this.creepManager.CreateNewCreepActivity({
+          targetID: source.id,
+          action: AT_Harvest,
+          creepID: creep.name,
+          exemptedFailures: [ERR_FULL]
+        }, this.pid);
+      }
+      let container = Game.getObjectById<StructureContainer | ConstructionSite>(this.memory.container);
+      if (creep.store[RESOURCE_ENERGY] > 0) {
+        if (container) {
+          if ((container as StructureContainer).hitsMax) {
+            if (((container as StructureContainer).hits + (REPAIR_POWER * creep.getActiveBodyparts(WORK))) <= (container as StructureContainer).hitsMax) {
+              return this.creepManager.CreateNewCreepActivity({
+                action: AT_Repair,
+                creepID: creep.name,
+                targetID: container.id
+              }, this.pid)
+            }
+          } else if ((container as ConstructionSite).progressTotal) {
+            return this.creepManager.CreateNewCreepActivity({
+              action: AT_Build,
+              creepID: creep.name,
+              targetID: container.id
+            }, this.pid);
+          } else {
+            delete this.memory.container;
+          }
+        } else {
+          let sites = creep.pos.lookFor(LOOK_CONSTRUCTION_SITES);
+          if (sites && sites.length > 0) {
+            if (sites[0].structureType == STRUCTURE_CONTAINER) {
+              this.memory.container = sites[0].id;
+            }
+          } else {
+            let structs = creep.pos.lookFor(LOOK_STRUCTURES);
+            for (let i = 0; i < structs.length; i++) {
+              if (structs[i].structureType == STRUCTURE_CONTAINER) {
+                this.memory.container = structs[0].id;
+              }
+            }
           }
         }
       }
-      if (roomData.structures[STRUCTURE_EXTRACTOR].length > 0) {
-        return this.creepManager.CreateNewCreepActivity({
-          action: AT_Harvest,
-          creepID: creep.name,
-          targetID: mineral.id
-        }, this.pid);
-      }
+  
+      return;
     } else if (squadID == 1) {
       if (creep.store.getUsedCapacity() > creep.store.getFreeCapacity()) {
-        // Deposit to the terminal
-        if (roomData.structures[STRUCTURE_TERMINAL].length > 0) {
-          let terminal = Game.getObjectById<StructureTerminal>(roomData.structures[STRUCTURE_TERMINAL][0]);
-          if (terminal) {
+        if (creep.room.name != this.memory.roomID) {
+          return this.MoveToRoom(creep, this.memory.roomID);
+        }
+        if (creep.room.storage) {
+          return this.creepManager.CreateNewCreepActivity({
+            action: AT_Transfer,
+            creepID: creep.name,
+            targetID: creep.room.storage.id,
+            resourceType: RESOURCE_ENERGY
+          }, this.pid);
+        }
+      } else {
+        if (!source || creep.room.name != source.room.name) {
+          return this.MoveToRoom(creep, this.memory.targetRoom);
+        }
+        // Go get energy
+        return this.GoGetEnergy(creep);
+      }
+    } else if (squadID == 2) {
+      if (!source || creep.room.name != source.room.name) {
+        return this.MoveToRoom(creep, this.memory.targetRoom);
+      }
+
+      if (creep.store.getUsedCapacity() > creep.store.getFreeCapacity()) {
+        // Use the energy building or repairing
+        let roomData = this.roomManager.GetRoomData(creep.room.name)!;
+        for (let i = 0; i < roomData.needsRepair.length; i++) {
+          let targetToRepair = Game.getObjectById<Structure>(roomData.needsRepair[i]);
+          if (targetToRepair && targetToRepair.hits < targetToRepair.hitsMax) {
             return this.creepManager.CreateNewCreepActivity({
-              action: AT_Transfer,
+              action: AT_Repair,
               creepID: creep.name,
-              targetID: terminal.id,
-              resourceType: mineral.mineralType
+              targetID: targetToRepair.id
             }, this.pid);
           }
         }
-      }
-      for (let i = 0; i < roomData.resources.length; i++) {
-        let resource = Game.getObjectById<Resource>(roomData.resources[i]);
-        if (resource && resource.resourceType == mineral.mineralType) {
-          return this.creepManager.CreateNewCreepActivity({
-            action: AT_Pickup,
-            creepID: creep.name,
-            targetID: resource.id
-          }, this.pid)
-        }
-      }
 
-      if (this.memory.container) {
-        let container = Game.getObjectById<StructureContainer>(this.memory.container);
-        if (container) {
-          return this.creepManager.CreateNewCreepActivity({
-            action: AT_Withdraw,
-            creepID: creep.name,
-            resourceType: mineral.mineralType,
-            targetID: container.id
-          }, this.pid);
+        for (let i = 0; i < roomData.cSites.length; i++) {
+          let targetToBuild = Game.getObjectById<ConstructionSite>(roomData.cSites[i]);
+          if (targetToBuild) {
+            return this.creepManager.CreateNewCreepActivity({
+              action: AT_Build,
+              creepID: creep.name,
+              targetID: targetToBuild.id
+            }, this.pid);
+          }
         }
+      } else {
+        // Go get energy
+        return this.GoGetEnergy(creep);
+
       }
     } else {
       throw new Error("Squad has too many units");
@@ -115,4 +173,43 @@ class ExperimentalSquad extends SquadJob<MineralHarvester_Memory> {
   }
 
   HandleNoActivity() { }
+
+  MoveToRoom(creep: Creep, targetRoom: RoomID) {
+    const route = Game.map.findRoute(creep.room.name, targetRoom);
+        if (route == -2) { return; }
+        let exit = null;
+        for (let i = 0; i < route.length; i++) {
+          exit = creep.pos.findClosestByRange(route[i].exit);
+        }
+        if (!exit) { return; }
+        return this.creepManager.CreateNewCreepActivity({
+          action: AT_MoveToPosition,
+          creepID: creep.name,
+          pos: exit,
+          amount: 0
+        }, this.pid);
+  }
+
+  GoGetEnergy(creep: Creep) {
+    let roomData = this.roomManager.GetRoomData(creep.room.name)!;
+    for (let i = 0; i < roomData.resources.length; i++) {
+      let resource = Game.getObjectById<Resource>(roomData.resources[i]);
+      if (!resource || resource.amount < creep.store.getFreeCapacity()) continue;
+
+      return this.creepManager.CreateNewCreepActivity({
+        action: AT_Pickup,
+        creepID: creep.name,
+        targetID: resource.id
+      }, this.pid);
+    }
+
+    let container = Game.getObjectById<StructureContainer>(this.memory.container);
+    if (!container) return undefined;
+
+    return this.creepManager.CreateNewCreepActivity({
+      action: AT_Withdraw,
+      creepID: creep.name,
+      targetID: container.id
+    }, this.pid);
+  }
 }

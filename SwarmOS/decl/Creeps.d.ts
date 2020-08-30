@@ -59,7 +59,15 @@ declare interface SquadJob_Memory extends MemBase {
 }
 
 declare interface MineralHarvester_Memory extends SquadJob_Memory {
-  container: ObjectID,
+  container: ObjectID;
   squad: [{ activityPID?: PID, creepID?: CreepID },
     { activityPID?: PID, creepID?: CreepID }]
+}
+
+declare interface ExperimentalSquad_Memory extends SquadJob_Memory {
+  container: ObjectID;
+  sourceID: ObjectID;
+  squad: [{ activityPID?: PID, creepID?: CreepID },
+  { activityPID?: PID, creepID?: CreepID },
+  { activityPID?: PID, creepID?: CreepID }]
 }
