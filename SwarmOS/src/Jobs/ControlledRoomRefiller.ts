@@ -119,7 +119,7 @@ class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory> {
         }
       }
 
-      if (roomData.resources.length > 0) {
+      if (actionType == AT_NoOp && roomData.resources.length > 0) {
         for (let i = 0; i < roomData.resources.length; i++) {
           let resource = Game.getObjectById<Resource>(roomData.resources[i]);
           if (resource && resource.resourceType == RESOURCE_ENERGY && (resource.amount || -1) >= energyNeeded) {

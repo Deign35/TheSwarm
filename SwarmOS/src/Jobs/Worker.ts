@@ -121,17 +121,6 @@ class Worker extends SoloJob<Worker_Memory> {
         bestTarget = storage.id;
         actionType = AT_Withdraw;
       }
-      /*for (let i = 0; i < roomData.structures[STRUCTURE_CONTAINER].length; i++) {
-          let container = Game.getObjectById<StructureContainer>(roomData.structures[STRUCTURE_CONTAINER][i]);
-          if (container && (container.store[RESOURCE_ENERGY] || -1) >= energyNeeded) {
-              let dist = container.pos.getRangeTo(creep.pos);
-              if (dist < closestDist) {
-                  closestDist = dist;
-                  bestTarget = container.id;
-                  actionType = AT_Withdraw;
-              }
-          }
-      }*/
     }
 
     return this.creepManager.CreateNewCreepActivity({
