@@ -76,7 +76,9 @@ class MarketManager extends BasicProcess<MarketManager_Memory> {
 
     if (!canTransfer) return ThreadState_Done;
 
-    let allOrders = Game.market.getAllOrders();
+    let allOrders = Game.market.getAllOrders({
+      resourceType: RESOURCE_ENERGY
+    });
     let sellOrders = [];
     let buyOrders = [];
     for (let i = 0; i < allOrders.length; i++) {
@@ -125,8 +127,20 @@ class MarketManager extends BasicProcess<MarketManager_Memory> {
       let biggestBuyer = sortedBuyOrders[sellTypes[i]][0];
       if (cheapestSeller.price < biggestBuyer.price * 0.9) {
         let amountToBuy = Math.min(cheapestSeller.amount, biggestBuyer.amount);
+        let leastCost = 100000000;
+        let bestTerminal = undefined;
         for (let j = 0; j < terminalIDs.length; j++) {
-          let terminal = Game.getObjectById<StructureTerminal>(terminalIDs[j]);
+          let terminal = Game.getObjectById<StructureTerminal>(terminalIDs[j])!;
+          let totalCost = Game.market.calcTransactionCost(amountToBuy, terminal.room.name, cheapestSeller.roomName!);
+          totalCost += Game.market.calcTransactionCost(amountToBuy, terminal.room.name, biggestBuyer.roomName!);
+          if (leastCost > totalCost) {
+            leastCost = totalCost;
+            bestTerminal = terminal;
+          }
+        }
+
+        if (bestTerminal) {
+          // Check that the cost of the energy is less than what I could make just selling the energy.
         }
       }
     }
