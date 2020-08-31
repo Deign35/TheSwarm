@@ -58,7 +58,7 @@ class EnergyManager extends BasicProcess<EnergyManagerMemory> {
       }
     }
 
-    let numWorkers = 5;
+    let numWorkers = 4;
     if (this.room.controller) {
       if (this.room.controller.level == 1) {
         numWorkers = 8;
@@ -67,7 +67,7 @@ class EnergyManager extends BasicProcess<EnergyManagerMemory> {
       } else if (this.room.controller.level == 3) {
         numWorkers = 6;
       } else if (this.room.controller.level == 4) {
-        numWorkers = 5;
+        numWorkers = 4;
       }
       if (this.room.controller.level <= 3 && this.roomData.cSites.length == 0) {
         numWorkers *= 2;

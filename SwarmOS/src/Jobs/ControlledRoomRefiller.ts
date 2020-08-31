@@ -90,7 +90,7 @@ class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory> {
     let carryRatio = creep.store.getUsedCapacity() / creep.store.getCapacity();
 
     let closestDist = 1000;
-    if (carryRatio < 0.25) {
+    if (carryRatio < 0.10) {
       if (actionType == AT_NoOp && roomData.tombstones.length > 0) {
         for (let i = 0; i < roomData.tombstones.length; i++) {
           let tombstone = Game.getObjectById<Tombstone>(roomData.tombstones[i]);
@@ -144,6 +144,15 @@ class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory> {
               actionType = AT_Withdraw;
             }
           }
+        }
+      }
+
+      if (actionType == AT_NoOp && creep.room.storage) {
+        let storage = creep.room.storage;
+        if ((storage.store[RESOURCE_ENERGY] || -1) >= energyNeeded) {
+          closestDist = 0;
+          bestTarget = storage.id;
+          actionType = AT_Withdraw;
         }
       }
     }

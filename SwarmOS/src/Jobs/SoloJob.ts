@@ -22,6 +22,8 @@ export abstract class SoloJob<T extends SoloJob_Memory> extends BasicProcess<T> 
           this.memory.hasRun = true;
         }
       }
+    } else {
+      this.creep = undefined;
     }
 
     if (!this.creep) {

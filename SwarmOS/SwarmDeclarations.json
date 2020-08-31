@@ -89,8 +89,23 @@
             "type": true,
             "string": true,
             "entries": {
+                "Assimilate": "assimilate",
+                "ChangeFlag": "flagColor",
+                "ClearLog": "clearLog",
+                "Kill": "kill",
                 "Launch": "launch",
-                "ChangeFlag": "flagColor"
+                "SetWallStrength": "setWallStrength"
+            }
+        },
+        "RT": {
+            "comment": "Type of room for determining how to interact with a room",
+            "enabled": true,
+            "type": true,
+            "combinedType": "RoomType",
+            "entries": {
+                "Nuetral": 0,
+                "Home": 1,
+                "RemoteHarvest": 2
             }
         },
         "TT": {

@@ -32,12 +32,12 @@ class Worker extends SoloJob<Worker_Memory> {
     let homeRoom = Game.rooms[this.memory.roomID];
     let energyCapacity = homeRoom.energyCapacityAvailable;
     let body = [WORK, CARRY, CARRY, MOVE, MOVE];
-    if (energyCapacity >= 1200) {
+    if (energyCapacity >= 1100) {
       body = [WORK, WORK, WORK, WORK,
         CARRY, CARRY, CARRY, CARRY,
         CARRY, CARRY, CARRY, CARRY,
         MOVE, MOVE, MOVE, MOVE,
-        MOVE, MOVE, MOVE, MOVE]
+        MOVE, MOVE]
     } else if (energyCapacity >= 600) {
       body = [WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE];
     }
