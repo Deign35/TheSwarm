@@ -67,6 +67,9 @@ class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory> {
   }
 
   protected CreateCustomCreepActivity(creep: Creep): string | undefined {
+    if ((creep.ticksToLive || 0) < 60 && creep.store.getUsedCapacity() < 0.10) {
+      return;
+    }
     let nextTask = this.GetNewTarget(creep);
     if (!nextTask) {
       return;
