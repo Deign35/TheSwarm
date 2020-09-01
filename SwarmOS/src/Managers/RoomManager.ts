@@ -47,22 +47,24 @@ class RoomManager extends BasicProcess<RoomStateMemory> {
         this.roomManager.ScanRoom(roomID);
       }
 
-      if (!data.activityPIDs[RPKG_Towers] || !this.kernel.getProcessByPID(data.activityPIDs[RPKG_Towers])) {
-        data.activityPIDs[RPKG_Towers] = this.kernel.startProcess(RPKG_Towers, {
-          roomID: roomID
-        } as TowerMemory);
-        this.kernel.setParent(data.activityPIDs[RPKG_Towers], this.pid);
-      }
+      if (data.roomType == RT_Home) {
+        if (!data.activityPIDs[RPKG_Towers] || !this.kernel.getProcessByPID(data.activityPIDs[RPKG_Towers])) {
+          data.activityPIDs[RPKG_Towers] = this.kernel.startProcess(RPKG_Towers, {
+            roomID: roomID
+          } as TowerMemory);
+          this.kernel.setParent(data.activityPIDs[RPKG_Towers], this.pid);
+        }
 
-      if (!data.activityPIDs.RPKG_EnergyManager || !this.kernel.getProcessByPID(data.activityPIDs.RPKG_EnergyManager)) {
-        data.activityPIDs.RPKG_EnergyManager = this.kernel.startProcess(RPKG_EnergyManager, {
-          harvesterPIDs: {},
-          refillerPID: '',
-          workerPIDs: [],
-          mineralHarvesterPID: '',
-          roomID: roomID
-        } as EnergyManagerMemory);
-        this.kernel.setParent(data.activityPIDs.RPKG_EnergyManager, this.pid);
+        if (!data.activityPIDs.RPKG_EnergyManager || !this.kernel.getProcessByPID(data.activityPIDs.RPKG_EnergyManager)) {
+          data.activityPIDs.RPKG_EnergyManager = this.kernel.startProcess(RPKG_EnergyManager, {
+            harvesterPIDs: {},
+            refillerPID: '',
+            workerPIDs: [],
+            mineralHarvesterPID: '',
+            roomID: roomID
+          } as EnergyManagerMemory);
+          this.kernel.setParent(data.activityPIDs.RPKG_EnergyManager, this.pid);
+        }
       }
     }
 
@@ -94,6 +96,9 @@ class RoomManagerExtension extends ExtensionBase implements IRoomManagerExtensio
       let room = Game.rooms[roomID];
       if (room) {
         this.memory.roomStateData[roomID] = {
+          roomType: RT_Nuetral,
+          wallStrength: 0,
+          rampartStrength: 0,
           lastUpdated: 0,
           activityPIDs: {
             RPKG_EnergyManager: '',
@@ -155,11 +160,28 @@ class RoomManagerExtension extends ExtensionBase implements IRoomManagerExtensio
 
     let structureTypeIDs = Object.keys(roomState.structures);
     for (let i = 0; i < structures.length; i++) {
-      if (structures[i].hits < structures[i].hitsMax * 0.75) {
+      if ((structures[i].hits < structures[i].hitsMax * 0.75) &&
+        structures[i].structureType != STRUCTURE_WALL &&
+        structures[i].structureType != STRUCTURE_RAMPART) {
         roomState.needsRepair.push(structures[i].id);
       }
 
+      if (structures[i].structureType == STRUCTURE_WALL) {
+        if (structures[i].hits < (roomState.wallStrength || 0)) {
+          roomState.needsRepair.push(structures[i].id);
+        }
+      }
+
+      if (structures[i].structureType == STRUCTURE_RAMPART) {
+        if (structures[i].hits < (roomState.rampartStrength || 0)) {
+          roomState.needsRepair.push(structures[i].id);
+        }
+      }
+
       for (let j = 0; j < structureTypeIDs.length; j++) {
+        if (!roomState.structures[structureTypeIDs[j]]) {
+          roomState.structures[structureTypeIDs[j]] = [];
+        }
         if (structures[i].structureType == structureTypeIDs[j]) {
           roomState.structures[structureTypeIDs[j]]!.push(structures[i].id);
         }

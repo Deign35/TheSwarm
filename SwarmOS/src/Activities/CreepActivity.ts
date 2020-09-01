@@ -92,7 +92,7 @@ class CreepActivity extends BasicProcess<SingleCreepAction_Memory> {
       this.Target = Game.getObjectById<ObjectTypeWithID | null>(this.memory.targetID);
     }
     if (this.memory.pos) {
-      this.TargetPos = new RoomPosition(this.memory.pos.x || 25, this.memory.pos.y || 25, this.memory.pos.roomName);
+      this.TargetPos = new RoomPosition(this.memory.pos.x || 0, this.memory.pos.y || 0, this.memory.pos.roomName);
     }
   }
 }

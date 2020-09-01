@@ -208,6 +208,7 @@ class CreepManagerExtensions extends ExtensionBase implements ICreepManagerExten
           target = (target as Structure).pos;
         }
         let result = creep.moveTo(target);
+        this.log.recordActionTaken();
         let dist = creep.pos.getRangeTo(target);
         if (dist <= (args.amount || 0)) {
           if (creep.pos.isNearTo(target)) {

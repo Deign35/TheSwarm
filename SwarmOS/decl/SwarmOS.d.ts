@@ -103,3 +103,5 @@ declare interface IWorkerGroupProcess extends IProcess {
 declare interface SwarmCLIMemory extends MemBase {
   commands: any[]
 }
+
+declare function CLI(command: CLI_Command, ...args: any[]): ScreepsReturnCode;

@@ -28,7 +28,10 @@ declare interface RoomStateMemory extends MemBase {
 }
 
 interface RoomState extends MemBase {
+  roomType: RoomType;
   lastUpdated: number;
+  wallStrength?: number;
+  rampartStrength?: number;
 
   activityPIDs: {
     RPKG_EnergyManager: PID,

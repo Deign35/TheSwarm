@@ -276,4 +276,8 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
       this._curTickState[pid] = TS_Waiting;
     }
   }
+
+  clearErrorLog(): void {
+    this.memory.ErrorLog = [];
+  }
 }
