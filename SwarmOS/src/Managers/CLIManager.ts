@@ -163,11 +163,34 @@ global['CLI'] = function (command: CLI_Command, ...args: any[]) {
   return OK;
 }
 
-/*
+const help = function () {
+  let msg = "SwarmOS 2.0 commands:\n";
+  msg += "CLI_Assimilate: Add the assimilated room to the Swarm.\n"
+  msg += "ex: CLI(CLI_Assimilate, \"W57S27\", RT_Home)\n\n";
+
+  msg += "CLIChangeFlag: Changes the color for all flags.\n";
+  msg += "ex: CLI(CLI_ChangeFlag, COLOR_RED, COLOR_BLUE, COLOR_PURPLE, COLOR_ORANGE)\n";
+  msg += "This will convert Red and Purple flags to Blue and Orange ones.\n\n";
+
+  msg += "CLI_ClearLog: Clears the error log for the kernel.\n";
+  msg += "CLI_Kill: Kills the provided process by PID.\n";
+  msg += "CLI_Launch: Launches a program.\n";
+  msg += "ex: CLI(CLI_Launch, CPKG_Scout, { roomID: \"W57S27\", targetRoom: \"W57S26\" })\n\n";
+
+  msg += "CLI_SetWallStrength: Sets the walls and ramparts strength for a room.\n";
+  msg += "ex: CLI(CLI_SetWallStrength, \"W57S26\", 1000, 2000)\n";
+  msg += "This will set wall strength to 1000 and rampart strength to 2000.\n\n";
+
+  return msg;
+}
+global['help'] = help();
+
+
 global['qb'] = function () {
   CLI(CLI_Assimilate, 'sim', RT_Home);
 }
 
+/*
 global['rb'] = function () {
   CLI(CLI_Assimilate, 'sim', RT_None);
 }*/
