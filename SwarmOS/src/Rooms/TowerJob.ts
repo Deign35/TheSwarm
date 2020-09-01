@@ -15,6 +15,19 @@ class TowerJob extends BasicProcess<TowerMemory> {
     return this.roomManager.GetRoomData(this.memory.roomID)!;
   }
   RunThread(): ThreadState {
+    for (let i = 0; i < this.roomData.needsRepair.length; i++) {
+      let target = Game.getObjectById<Structure>(this.roomData.needsRepair[i]);
+      if (target && target.structureType == STRUCTURE_RAMPART && target.hits <= 300) {
+        for (let j = 0; j < this.roomData.structures[STRUCTURE_TOWER].length; j++) {
+          let tower = Game.getObjectById<StructureTower>(this.roomData.structures[STRUCTURE_TOWER][j]);
+          if (tower && tower.store[RESOURCE_ENERGY] > 800) {
+            tower.repair(target);
+
+          }
+        }
+      }
+    }
+
     let otherCreeps = this.room.find(FIND_HOSTILE_CREEPS);
     if (otherCreeps.length == 0) {
       this.sleeper.sleep(this.pid, 6);

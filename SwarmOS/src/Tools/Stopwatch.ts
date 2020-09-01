@@ -1,6 +1,6 @@
 export class Stopwatch {
   protected cummulativeTime: number = 0;
-  protected startTime: number = Game.time;
+  protected startTime: number = 0;
   protected laps: number[] = [];
   Reset() {
     this.laps = [];
