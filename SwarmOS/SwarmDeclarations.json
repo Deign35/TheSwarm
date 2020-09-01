@@ -203,7 +203,8 @@
                 "ReserveController": 21,
                 "SignController": 22,
                 "Suicide": 23,
-                "Pull": 24
+                "Pull": 24,
+                "RenewCreep": 25
             }
         }
     }

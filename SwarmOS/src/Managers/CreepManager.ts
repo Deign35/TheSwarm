@@ -222,6 +222,7 @@ class CreepManagerExtensions extends ExtensionBase implements ICreepManagerExten
         }
       case (AT_RangedMassAttack): actionResult = creep.rangedMassAttack(); break;
       case (AT_Suicide): actionResult = creep.suicide(); break;
+      case (AT_RenewCreep): actionResult = (target as StructureSpawn).renewCreep(creep); break;
       case (AT_NoOp): return OK;
     }
 
@@ -282,6 +283,7 @@ class CreepManagerExtensions extends ExtensionBase implements ICreepManagerExten
         }
         return false;
       case (AT_Withdraw): return ((target as Structure).structureType || (target as Ruin).structure) && !!(target as StructureContainer).store;
+      case (AT_RenewCreep): return ((target as StructureSpawn).structureType && (target as StructureSpawn).structureType == STRUCTURE_SPAWN);
 
       case (AT_Drop):
       case (AT_MoveByPath):
