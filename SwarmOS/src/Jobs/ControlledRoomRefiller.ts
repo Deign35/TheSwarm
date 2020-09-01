@@ -67,6 +67,17 @@ class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory> {
   }
 
   protected CreateCustomCreepActivity(creep: Creep): string | undefined {
+    if (creep.store.getUsedCapacity() < 0.10 &&
+    (creep.ticksToLive || 1500) < 1500 - (600 / creep.body.length)) {
+      let spawn = creep.pos.findClosestByRange(FIND_MY_SPAWNS);
+      if (spawn && !spawn.spawning && spawn.store[RESOURCE_ENERGY] > (creep.bodyCost / 2.5) / creep.body.length) {
+        return this.creepManager.CreateNewCreepActivity({
+          targetID: spawn.id,
+          action: AT_RenewCreep,
+          creepID: creep.name
+        }, this.pid);
+      }
+    }
     if ((creep.ticksToLive || 0) < 60 && creep.store.getUsedCapacity() < 0.10) {
       return;
     }

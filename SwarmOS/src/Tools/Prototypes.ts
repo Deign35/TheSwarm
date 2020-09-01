@@ -27,3 +27,18 @@ if (!Room.prototype.SwarmOS) {
     }
   });
 }
+
+if (!Creep.prototype.SwarmOS) {
+  Object.defineProperties(Creep.prototype, {
+    bodyCost: {
+      get() {
+        return _.sum(this.body, (bodyPart: BodyPartDefinition) => { return BODYPART_COST[bodyPart.type]});
+      }
+    },
+    SwarmOS: {
+      get() {
+        return true;
+      }
+    }
+  });
+}
