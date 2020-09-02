@@ -65,6 +65,7 @@ declare interface MineralHarvester_Memory extends SquadJob_Memory {
 }
 
 declare interface ExperimentalSquad_Memory extends SquadJob_Memory {
+  invasion: number;
   container: ObjectID;
   sourceID: ObjectID;
   squad: [{ activityPID?: PID, creepID?: CreepID }, // Harvester

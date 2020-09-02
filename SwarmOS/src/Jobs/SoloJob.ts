@@ -52,7 +52,7 @@ export abstract class SoloJob<T extends SoloJob_Memory> extends BasicProcess<T> 
     this.memory.activityPID = this.kernel.startProcess(APKG_SpawnActivity, spawnMem)
     this.kernel.setParent(this.memory.activityPID, this.pid);
   }
-  protected abstract GetNewSpawnID(): string;
+  protected abstract GetNewSpawnID(): string | undefined;
 
   CreateActivityForCreep(creepID: CreepID) {
     this.creepManager.tryReserveCreep(creepID, this.pid);

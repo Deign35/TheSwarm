@@ -54,7 +54,7 @@ export abstract class SquadJob<T extends SquadJob_Memory> extends BasicProcess<T
     this.memory.squad[squadID].activityPID = this.kernel.startProcess(APKG_SpawnActivity, spawnMem)
     this.kernel.setParent(this.memory.squad[squadID].activityPID!, this.pid);
   }
-  protected abstract GetNewSpawnID(squadID: number): string;
+  protected abstract GetNewSpawnID(squadID: number): string | undefined;
 
   AssignCreep(creepID: CreepID, pid: PID) {
     for (let i = 0; i < this.memory.squad.length; i++) {
@@ -89,7 +89,7 @@ export abstract class SquadJob<T extends SquadJob_Memory> extends BasicProcess<T
   }
 
   protected abstract CreateCustomCreepActivity(squadID: number, creep: Creep): PID | undefined;
-  protected GetTargetRoomForCreep(squadID: number) : RoomID {
+  protected GetTargetRoomForCreep(squadID: number): RoomID {
     return this.memory.targetRoom;
   }
   protected HandleNoActivity() {

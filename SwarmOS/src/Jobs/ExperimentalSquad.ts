@@ -7,7 +7,30 @@ export const OSPackage: IPackage = {
 import { SquadJob } from "./SquadJob";
 
 class ExperimentalSquad extends SquadJob<ExperimentalSquad_Memory> {
-  protected GetNewSpawnID(squadID: number): string {
+  RunThread() {
+    if (!this.memory.invasion && Game.rooms[this.memory.targetRoom]) {
+      let invaders = Game.rooms[this.memory.targetRoom].find(FIND_HOSTILE_CREEPS);
+      for (let i = 0; i < invaders.length; i++) {
+        if (invaders[i].owner.username == "Invader") {
+          this.log.alert(`Invasion detected`);
+          this.memory.invasion = invaders[i].ticksToLive!;
+        }
+      }
+    }
+
+    if (this.memory.invasion) {
+      this.memory.invasion--;
+      if (this.memory.invasion <= 0) {
+        delete this.memory.invasion;
+      }
+    }
+    return super.RunThread();
+  }
+
+  protected GetNewSpawnID(squadID: number) {
+    if (this.memory.invasion > 0) {
+      return;
+    }
     if (squadID == 0) {
       let body = [WORK, WORK, WORK, WORK, WORK, MOVE, MOVE, MOVE, MOVE, MOVE];
       return this.spawnManager.requestSpawn({
