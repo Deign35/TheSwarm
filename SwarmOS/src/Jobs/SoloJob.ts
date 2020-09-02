@@ -41,6 +41,10 @@ export abstract class SoloJob<T extends SoloJob_Memory> extends BasicProcess<T> 
 
   CreateSpawnActivity() {
     let sID = this.GetNewSpawnID();
+    if (!sID) {
+      return;
+    }
+
     let spawnMem: SpawnActivity_Memory = {
       spawnID: sID,
       HC: 'CreateActivityForCreep'

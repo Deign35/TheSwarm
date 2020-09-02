@@ -43,6 +43,10 @@ export abstract class SquadJob<T extends SquadJob_Memory> extends BasicProcess<T
 
   CreateSpawnActivity(squadID: number) {
     let sID = this.GetNewSpawnID(squadID);
+    if (!sID) {
+      return;
+    }
+
     let spawnMem: SpawnActivity_Memory = {
       spawnID: sID,
       HC: 'AssignCreep'
