@@ -42,6 +42,12 @@ class RoomManager extends BasicProcess<RoomStateMemory> {
       if (!data) {
         continue;
       }
+      if (Game.rooms[roomID] && Game.rooms[roomID].controller && Game.rooms[roomID].controller!.my) {
+        let vis: RoomVisual = new RoomVisual(roomID);
+
+        const headerStyle: TextStyle = { align: 'left', color: 'white', backgroundColor: 'black', opacity: 0.7 };
+        vis.text(`Energy: ${Game.rooms[roomID].energyAvailable}/${Game.rooms[roomID].energyCapacityAvailable}`, 0, 2, headerStyle);
+      }
 
       if (Game.time - data.lastUpdated > 23) {
         this.roomManager.ScanRoom(roomID);

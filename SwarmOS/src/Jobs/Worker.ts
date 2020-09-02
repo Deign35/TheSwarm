@@ -87,19 +87,6 @@ class Worker extends SoloJob<Worker_Memory> {
     let energyNeeded = creep.store.getCapacity() - (creep.store.getUsedCapacity() || 0);
 
     let closestDist = 1000;
-    if (roomData.resources.length > 0) {
-      for (let i = 0; i < roomData.resources.length; i++) {
-        let resource = Game.getObjectById<Resource>(roomData.resources[i]);
-        if (resource && resource.resourceType == RESOURCE_ENERGY && (resource.amount || -1) >= energyNeeded) {
-          let dist = resource.pos.getRangeTo(creep.pos);
-          if (dist < closestDist) {
-            closestDist = dist;
-            bestTarget = resource.id;
-            actionType = AT_Pickup;
-          }
-        }
-      }
-    }
 
     if (actionType == AT_NoOp && roomData.tombstones.length > 0) {
       for (let i = 0; i < roomData.tombstones.length; i++) {
@@ -110,6 +97,20 @@ class Worker extends SoloJob<Worker_Memory> {
             closestDist = dist;
             bestTarget = tombstone.id;
             actionType = AT_Withdraw;
+          }
+        }
+      }
+    }
+
+    if (actionType == AT_NoOp && roomData.resources.length > 0) {
+      for (let i = 0; i < roomData.resources.length; i++) {
+        let resource = Game.getObjectById<Resource>(roomData.resources[i]);
+        if (resource && resource.resourceType == RESOURCE_ENERGY && (resource.amount || -1) >= energyNeeded) {
+          let dist = resource.pos.getRangeTo(creep.pos);
+          if (dist < closestDist) {
+            closestDist = dist;
+            bestTarget = resource.id;
+            actionType = AT_Pickup;
           }
         }
       }

@@ -28,7 +28,7 @@ class ExperimentalSquad extends SquadJob<ExperimentalSquad_Memory> {
           parentPID: this.pid
         }, 3)
     } else if (squadID == 2) {
-      let body = [WORK, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE];
+      let body = [WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE];
       return this.spawnManager.requestSpawn({
         body: body,
         creepName: this.memory.targetRoom + "_" + (Game.time + '_Bui').slice(-8),

@@ -161,12 +161,25 @@ class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory> {
         }
       }
 
-      if (actionType == AT_NoOp && creep.room.storage) {
-        let storage = creep.room.storage;
-        if ((storage.store[RESOURCE_ENERGY] || -1) >= energyNeeded) {
-          closestDist = 0;
-          bestTarget = storage.id;
-          actionType = AT_Withdraw;
+      if (creep.room.storage) {
+        let targets = this.roomManager.GetRoomData(this.memory.roomID)!.structures[STRUCTURE_EXTENSION].concat(
+          this.roomManager.GetRoomData(this.memory.roomID)!.structures[STRUCTURE_SPAWN]);
+        let shouldUseStorage = false;
+        for (let i = 0; i < targets.length; i++) {
+          let nextTarget = Game.getObjectById<ObjectTypeWithID>(targets[i]) as StructureExtension | StructureSpawn;
+          if (!nextTarget) { continue; }
+          if ((nextTarget.store.getFreeCapacity(RESOURCE_ENERGY) || 0) > 0) {
+            shouldUseStorage = true;
+            break;
+          }
+        }
+        if (actionType == AT_NoOp || shouldUseStorage) {
+          let storage = creep.room.storage;
+          if ((storage.store[RESOURCE_ENERGY] || -1) >= energyNeeded) {
+            closestDist = 0;
+            bestTarget = storage.id;
+            actionType = AT_Withdraw;
+          }
         }
       }
     }

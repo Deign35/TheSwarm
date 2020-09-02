@@ -73,4 +73,4 @@ declare interface ExperimentalSquad_Memory extends SquadJob_Memory {
     { activityPID?: PID, creepID?: CreepID }]       // Claimer
 }
 
-//CLI(CLI_Launch, CPKG_ExperimentalSquad, { roomID: "W57S27", targetRoom: "W57S28", sourceID: '59f19f7582100e1594f34eff', squad: [{}, {}, {}]})
+//CLI(CLI_Launch, CPKG_ExperimentalSquad, { roomID: "W57S27", targetRoom: "W57S28", sourceID: '59f19f7582100e1594f34eff', squad: [{}, {}, {}, {}]})
