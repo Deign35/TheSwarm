@@ -17,7 +17,7 @@ class ExperimentalSquad extends SquadJob<ExperimentalSquad_Memory> {
       }, this.memory.targetRoom, Priority_Low, {
           parentPID: this.pid
         }, 3);
-    } else if (squadID == 1) {
+    } else if (squadID == 1 || squadID == 4 || squadID == 5) {
       let body = [CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
         MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
       return this.spawnManager.requestSpawn({
@@ -50,7 +50,6 @@ class ExperimentalSquad extends SquadJob<ExperimentalSquad_Memory> {
     }
   }
   protected CreateCustomCreepActivity(squadID: number, creep: Creep): string | undefined {
-    let roomData = this.roomManager.GetRoomData(this.memory.roomID)!;
     if (squadID == 0) {
       if (creep.room.name != this.memory.targetRoom) {
         return this.MoveToRoom(creep, this.memory.targetRoom);
@@ -120,7 +119,7 @@ class ExperimentalSquad extends SquadJob<ExperimentalSquad_Memory> {
       }
 
       return;
-    } else if (squadID == 1) {
+    } else if (squadID == 1 || squadID == 4 || squadID == 5) {
       if (creep.store.getUsedCapacity() > creep.store.getFreeCapacity()) {
         if (creep.room.name != this.memory.roomID) {
           return this.MoveToRoom(creep, this.memory.roomID);
