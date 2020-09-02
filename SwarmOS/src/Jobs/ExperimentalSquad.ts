@@ -12,46 +12,55 @@ class ExperimentalSquad extends SquadJob<ExperimentalSquad_Memory> {
       let body = [WORK, WORK, WORK, WORK, WORK, MOVE, MOVE, MOVE, MOVE, MOVE];
       return this.spawnManager.requestSpawn({
         body: body,
-        creepName: this.memory.targetRoom + (Game.time + '_Har').slice(-8),
+        creepName: this.memory.targetRoom + "_" + (Game.time + '_Har').slice(-8),
         owner_pid: this.pid
       }, this.memory.targetRoom, Priority_Low, {
           parentPID: this.pid
         }, 3);
     } else if (squadID == 1) {
       let body = [CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
-                  MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
       return this.spawnManager.requestSpawn({
         body: body,
-        creepName: this.memory.targetRoom + (Game.time + '_Ref').slice(-8),
+        creepName: this.memory.targetRoom + "_" + (Game.time + '_Ref').slice(-8),
         owner_pid: this.pid
       }, this.memory.targetRoom, Priority_Lowest, {
           parentPID: this.pid
         }, 3)
     } else if (squadID == 2) {
-      let body = [WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE];
+      let body = [WORK, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE];
       return this.spawnManager.requestSpawn({
         body: body,
-        creepName: this.memory.targetRoom + (Game.time + '_Bui').slice(-8),
+        creepName: this.memory.targetRoom + "_" + (Game.time + '_Bui').slice(-8),
         owner_pid: this.pid
       }, this.memory.targetRoom, Priority_Lowest, {
-        parentPID: this.pid
-      }, 3);
+          parentPID: this.pid
+        }, 3);
+    } else if (squadID == 3) {
+      let body = [CLAIM, CLAIM, MOVE, MOVE]
+      return this.spawnManager.requestSpawn({
+        body: body,
+        creepName: this.memory.targetRoom + "_" + (Game.time + '_Cla').slice(-8),
+        owner_pid: this.pid
+      }, this.memory.targetRoom, Priority_Lowest, {
+          parentPID: this.pid
+        }, 3)
     } else {
       throw new Error("Squad has too many units");
     }
   }
   protected CreateCustomCreepActivity(squadID: number, creep: Creep): string | undefined {
     let roomData = this.roomManager.GetRoomData(this.memory.roomID)!;
-    let source = Game.getObjectById<Source>(this.memory.sourceID);
     if (squadID == 0) {
-      if (!source || creep.room.name != source.room.name) {
+      if (creep.room.name != this.memory.targetRoom) {
         return this.MoveToRoom(creep, this.memory.targetRoom);
       }
+      let source = Game.getObjectById<Source>(this.memory.sourceID)!;
       if (source.pos.getRangeTo(creep.pos) > 1) {
         let targetPos = source.pos;
         let dist = 1;
         if (this.memory.container) {
-          let container = Game.getObjectById<StructureContainer>(this.memory.container);
+          let container = Game.getObjectById<StructureContainer | ConstructionSite>(this.memory.container);
           if (container) {
             targetPos = container.pos;
             dist = 0;
@@ -64,7 +73,7 @@ class ExperimentalSquad extends SquadJob<ExperimentalSquad_Memory> {
           amount: dist
         }, this.pid);
       }
-  
+
       if (source.energy > 0) {
         return this.creepManager.CreateNewCreepActivity({
           targetID: source.id,
@@ -109,7 +118,7 @@ class ExperimentalSquad extends SquadJob<ExperimentalSquad_Memory> {
           }
         }
       }
-  
+
       return;
     } else if (squadID == 1) {
       if (creep.store.getUsedCapacity() > creep.store.getFreeCapacity()) {
@@ -125,14 +134,14 @@ class ExperimentalSquad extends SquadJob<ExperimentalSquad_Memory> {
           }, this.pid);
         }
       } else {
-        if (!source || creep.room.name != source.room.name) {
+        if (creep.room.name != this.memory.targetRoom) {
           return this.MoveToRoom(creep, this.memory.targetRoom);
         }
         // Go get energy
         return this.GoGetEnergy(creep);
       }
     } else if (squadID == 2) {
-      if (!source || creep.room.name != source.room.name) {
+      if (creep.room.name != this.memory.targetRoom) {
         return this.MoveToRoom(creep, this.memory.targetRoom);
       }
 
@@ -165,6 +174,18 @@ class ExperimentalSquad extends SquadJob<ExperimentalSquad_Memory> {
         return this.GoGetEnergy(creep);
 
       }
+    } else if (squadID == 3) {
+      if (creep.room.name != this.memory.targetRoom) {
+        return this.MoveToRoom(creep, this.memory.targetRoom);
+      }
+
+      if (creep.room.controller) {
+        return this.creepManager.CreateNewCreepActivity({
+          action: AT_ReserveController,
+          creepID: creep.name,
+          targetID: creep.room.controller.id
+        }, this.pid)
+      }
     } else {
       throw new Error("Squad has too many units");
     }
@@ -175,19 +196,20 @@ class ExperimentalSquad extends SquadJob<ExperimentalSquad_Memory> {
   HandleNoActivity() { }
 
   MoveToRoom(creep: Creep, targetRoom: RoomID) {
+    // TODO: Cache findRoute to the global cache.
     const route = Game.map.findRoute(creep.room.name, targetRoom);
-        if (route == -2) { return; }
-        let exit = null;
-        for (let i = 0; i < route.length; i++) {
-          exit = creep.pos.findClosestByRange(route[i].exit);
-        }
-        if (!exit) { return; }
-        return this.creepManager.CreateNewCreepActivity({
-          action: AT_MoveToPosition,
-          creepID: creep.name,
-          pos: exit,
-          amount: 0
-        }, this.pid);
+    if (route == -2) { return; }
+    let exit = null;
+    for (let i = 0; i < route.length; i++) {
+      exit = creep.pos.findClosestByPath(route[i].exit);
+    }
+    if (!exit) { return; }
+    return this.creepManager.CreateNewCreepActivity({
+      action: AT_MoveToPosition,
+      creepID: creep.name,
+      pos: exit,
+      amount: 0
+    }, this.pid);
   }
 
   GoGetEnergy(creep: Creep) {

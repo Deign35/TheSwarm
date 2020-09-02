@@ -180,6 +180,12 @@ class SpawnManagerExtensions extends ExtensionBase implements ISpawnManagerExten
     }
     return Memory.spawnData;
   }
+  protected get logID(): string {
+    return PKG_SpawnManager_LogContext.logID;
+  }
+  protected get logLevel(): LogLevel {
+    return PKG_SpawnManager_LogContext.logLevel;
+  }
 
   cancelRequest(id: SpawnRequestID): boolean {
     if (this.memory[id]) {

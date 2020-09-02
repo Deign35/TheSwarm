@@ -74,3 +74,8 @@ declare interface MarketManager_Memory extends MemBase {
   }
   lastUpdate: number;
 }
+
+/** MapManager */
+declare interface MapManager_Memory extends MemBase {
+
+}

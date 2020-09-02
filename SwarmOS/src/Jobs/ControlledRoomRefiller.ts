@@ -68,7 +68,7 @@ class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory> {
 
   protected CreateCustomCreepActivity(creep: Creep): string | undefined {
     if (creep.store.getUsedCapacity() < 0.10 &&
-    (creep.ticksToLive || 1500) < 1500 - (600 / creep.body.length)) {
+      (creep.ticksToLive || 1500) < 1500 - (600 / creep.body.length)) {
       let spawn = creep.pos.findClosestByRange(FIND_MY_SPAWNS);
       if (spawn && !spawn.spawning && spawn.store[RESOURCE_ENERGY] > (creep.bodyCost / 2.5) / creep.body.length) {
         return this.creepManager.CreateNewCreepActivity({
@@ -228,7 +228,7 @@ class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory> {
       }
     }
 
-    if (actionType == AT_NoOp && creep.store.getFreeCapacity() > 0) {
+    /*if (actionType == AT_NoOp && creep.store.getFreeCapacity() > 0) {
       // Find a container to withdraw from.
       let targets = this.roomManager.GetRoomData(this.memory.roomID)!.structures[STRUCTURE_CONTAINER]
       for (let i = 0; i < targets.length; i++) {
@@ -242,7 +242,7 @@ class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory> {
           actionType = AT_Withdraw;
         }
       }
-    }
+    }*/
 
     if (actionType == AT_NoOp) {
       let targets = this.roomManager.GetRoomData(this.memory.roomID)!.structures[STRUCTURE_STORAGE];

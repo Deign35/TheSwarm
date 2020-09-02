@@ -117,3 +117,7 @@ interface CreepActionArgs {
   message?: string;
   resourceType?: ResourceConstant;
 }
+
+declare interface IMapManagerExtensions extends IPackageExtension {
+  GetRoute(from: RoomID, to: RoomID): { exit: ExitConstant, room: string }[] | -2;
+}

@@ -83,6 +83,12 @@ class CreepManagerExtensions extends ExtensionBase implements ICreepManagerExten
 
     return Memory.creepData;
   }
+  protected get logID(): string {
+    return PKG_CreepManager_LogContext.logID;
+  }
+  protected get logLevel(): LogLevel {
+    return PKG_CreepManager_LogContext.logLevel;
+  }
   protected get registeredCreeps() {
     return this.memory.registeredCreeps;
   }
@@ -284,7 +290,7 @@ class CreepManagerExtensions extends ExtensionBase implements ICreepManagerExten
         }
         return false;
       case (AT_Withdraw): return ((target as Structure).structureType || (target as Ruin).structure || (target as Tombstone).deathTime) && !!(target as StructureContainer).store;
-      case (AT_RenewCreep): return ((target as StructureSpawn).structureType && (target as StructureSpawn).structureType == STRUCTURE_SPAWN);
+      case (AT_RenewCreep): return ((target as StructureSpawn).structureType && (target as StructureSpawn).structureType == STRUCTURE_SPAWN && !(target as StructureSpawn).spawning);
 
       case (AT_Drop):
       case (AT_MoveByPath):

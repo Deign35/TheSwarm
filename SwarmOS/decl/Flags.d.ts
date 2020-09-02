@@ -4,4 +4,4 @@ declare interface FlagProcess_Memory extends MemBase {
 }
 
 /** Flags Extension memory */
-declare type FlagExtensionsMemory = MemBase & IDictionary<FlagID, PID>
+declare type FlagManagerMemory = MemBase & IDictionary<FlagID, PID>

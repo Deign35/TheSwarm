@@ -1,5 +1,5 @@
 declare var Memory: {
-  flagData: FlagExtensionsMemory
+  flagData: FlagManagerMemory
 }
 import { BasicProcess } from "Core/BasicTypes";
 
@@ -13,10 +13,10 @@ const PKG_FlagManager_LogContext: LogContext = {
   logLevel: LOG_INFO
 }
 
-class FlagManager extends BasicProcess<FlagExtensionsMemory> {
-  get memory(): FlagExtensionsMemory {
+class FlagManager extends BasicProcess<FlagManagerMemory> {
+  get memory(): FlagManagerMemory {
     if (!Memory.flagData) {
-      this.log.warn(`Initializing FlagRegistry memory`);
+      this.log.warn(`Initializing FlagManager memory`);
       Memory.flagData = {}
     }
     return Memory.flagData;
