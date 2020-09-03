@@ -28,7 +28,7 @@ class ExperimentalSquad extends SquadJob<ExperimentalSquad_Memory> {
       const room = Game.rooms[this.memory.targetRoom];
       const vis = new RoomVisual(this.memory.targetRoom);
       let pos = new RoomPosition(25, 25, this.memory.targetRoom);
-      if (room.controller) {
+      if (room && room.controller) {
         pos = room.controller.pos;
       }
 

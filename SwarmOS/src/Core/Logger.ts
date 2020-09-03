@@ -157,7 +157,7 @@ export class Logger implements IKernelLoggerExtensions {
     const vis = new RoomVisual();
     vis.text(`[${Game.time}]`, 0, 0, headerStyle);
 
-    const gameCpuUsed = (Game.cpu.getUsed() + (this.numActionsTaken * 0.2)).toFixed(3);
+    const gameCpuUsed = (Game.cpu.getUsed()).toFixed(3);
     vis.text(`CPU: (${gameCpuUsed}\/${Game.cpu.limit} -- [${Game.cpu.bucket}])`, 0, 1, headerStyle);
 
     // Reset the logger

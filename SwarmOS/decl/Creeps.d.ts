@@ -72,7 +72,8 @@ declare interface ExperimentalSquad_Memory extends SquadJob_Memory {
     { activityPID?: PID, creepID?: CreepID },       // Collecter
     { activityPID?: PID, creepID?: CreepID },       // Builder
     { activityPID?: PID, creepID?: CreepID },       // Claimer
-    { activityPID?: PID, creepID?: CreepID }]       // Collector 2
+    { activityPID?: PID, creepID?: CreepID },       // Collector 2
+    { activityPID?: PID, creepID?: CreepID }]       // Collector 3
 }
 
 //CLI(CLI_Launch, CPKG_ExperimentalSquad, { roomID: "W57S27", targetRoom: "W57S28", sourceID: '59f19f7582100e1594f34eff', squad: [{}, {}, {}, {}, {}, {}]})
