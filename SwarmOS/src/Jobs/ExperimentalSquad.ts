@@ -25,6 +25,14 @@ class ExperimentalSquad extends SquadJob<ExperimentalSquad_Memory> {
       if (this.memory.invasion <= 0) {
         delete this.memory.invasion;
       }
+      const room = Game.rooms[this.memory.targetRoom];
+      const vis = new RoomVisual(this.memory.targetRoom);
+      let pos = new RoomPosition(25, 25, this.memory.targetRoom);
+      if (room.controller) {
+        pos = room.controller.pos;
+      }
+
+      vis.text(`${this.memory.invasion}`, pos.x, pos.y);
     }
     return super.RunThread();
   }
