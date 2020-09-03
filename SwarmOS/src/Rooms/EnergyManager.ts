@@ -19,22 +19,18 @@ class EnergyManager extends BasicProcess<EnergyManagerMemory> {
   protected get logLevel(): LogLevel {
     return RPKG_EnergyManager_LogContext.logLevel;
   }
-  get room() {
-    return Game.rooms[this.memory.roomID];
-  }
-  get roomData() {
-    return this.roomManager.GetRoomData(this.memory.roomID)!;
-  }
 
   RunThread(): ThreadState {
-    const sourceIDs = this.roomData.sourceIDs;
+    const room = Game.rooms[this.memory.roomID];
+    const roomData = this.roomManager.GetRoomData(this.memory.roomID)!;
+    const sourceIDs = roomData.sourceIDs;
     for (let i = 0; i < sourceIDs.length; i++) {
       if (!this.memory.harvesterPIDs[sourceIDs[i]] ||
         !this.kernel.getProcessByPID(this.memory.harvesterPIDs[sourceIDs[i]])) {
         const pid = this.kernel.startProcess(CPKG_Harvester, {
-          roomID: this.room.name,
+          roomID: this.memory.roomID,
           source: sourceIDs[i],
-          targetRoom: this.room.name,
+          targetRoom: this.memory.roomID,
         } as HarvesterMemory);
 
         this.memory.harvesterPIDs[sourceIDs[i]] = pid;
@@ -44,8 +40,8 @@ class EnergyManager extends BasicProcess<EnergyManagerMemory> {
     if (!this.memory.refillerPID ||
       !this.kernel.getProcessByPID(this.memory.refillerPID)) {
       const pid = this.kernel.startProcess(CPKG_ControlledRoomRefiller, {
-        roomID: this.room.name,
-        targetRoom: this.room.name,
+        roomID: this.memory.roomID,
+        targetRoom: this.memory.roomID,
         lastTime: Game.time
       } as ControlledRoomRefiller_Memory);
 
@@ -58,16 +54,16 @@ class EnergyManager extends BasicProcess<EnergyManagerMemory> {
       }
     }
 
-    let numWorkers = this.roomManager.GetRoomData(this.memory.roomID)!.sourceIDs.length;
-    if (this.room.controller) {
-      if (this.room.controller.level == 1) {
+    let numWorkers = sourceIDs.length;
+    if (room.controller) {
+      if (room.controller.level == 1) {
         numWorkers *= 4;
-      } else if (this.room.controller.level == 2) {
+      } else if (room.controller.level == 2) {
         numWorkers *= 4;
-      } else if (this.room.controller.level == 3) {
+      } else if (room.controller.level == 3) {
         numWorkers *= 3;
       }
-      if (this.room.controller.level <= 5 && this.roomData.cSites.length == 0) {
+      if (room.controller.level <= 5 && roomData.cSites.length == 0) {
         numWorkers *= 2;
       }
     }
@@ -80,9 +76,9 @@ class EnergyManager extends BasicProcess<EnergyManagerMemory> {
       } as Worker_Memory))
     }
 
-    if (this.roomData.mineralIDs.length > 0 && this.roomData.structures[STRUCTURE_EXTRACTOR].length > 0 &&
+    if (roomData.mineralIDs.length > 0 && roomData.structures[STRUCTURE_EXTRACTOR].length > 0 &&
       (!this.memory.mineralHarvesterPID || !this.kernel.getProcessByPID(this.memory.mineralHarvesterPID))) {
-      const extractor = Game.getObjectById<StructureExtractor>(this.roomData.structures[STRUCTURE_EXTRACTOR][0]);
+      const extractor = Game.getObjectById<StructureExtractor>(roomData.structures[STRUCTURE_EXTRACTOR][0]);
       if (extractor) {
         const pid = this.kernel.startProcess(CPKG_MineralHarvester, {
           roomID: this.memory.roomID,
