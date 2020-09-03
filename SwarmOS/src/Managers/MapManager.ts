@@ -57,12 +57,11 @@ class MapManagerExtensions extends ExtensionBase implements IMapManagerExtension
   }
 
   GetRoute(from: RoomID, to: RoomID) {
-    if (MapCache[from][to]) {
-      return MapCache[from][to];
-    }
-
     if (!MapCache[from]) {
       MapCache[from] = {};
+    }
+    if (MapCache[from][to]) {
+      return MapCache[from][to];
     }
 
     const route = Game.map.findRoute(from, to);

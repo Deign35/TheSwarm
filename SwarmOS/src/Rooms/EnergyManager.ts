@@ -58,16 +58,14 @@ class EnergyManager extends BasicProcess<EnergyManagerMemory> {
       }
     }
 
-    let numWorkers = 2;
+    let numWorkers = this.roomManager.GetRoomData(this.memory.roomID)!.sourceIDs.length;
     if (this.room.controller) {
       if (this.room.controller.level == 1) {
-        numWorkers = 8;
+        numWorkers *= 4;
       } else if (this.room.controller.level == 2) {
-        numWorkers = 8;
+        numWorkers *= 4;
       } else if (this.room.controller.level == 3) {
-        numWorkers = 6;
-      } else if (this.room.controller.level == 4) {
-        numWorkers = 2;
+        numWorkers *= 3;
       }
       if (this.room.controller.level <= 5 && this.roomData.cSites.length == 0) {
         numWorkers *= 2;
