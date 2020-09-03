@@ -24,15 +24,15 @@ class CreepActivity extends BasicProcess<SingleCreepAction_Memory> {
     }
 
     if (this.memory.action == AT_MoveToPosition) {
-      let result = this.creepManager.RunCreepAction(this.CreateActivityArgs());
+      const result = this.creepManager.RunCreepAction(this.CreateActivityArgs());
       if (result == ERR_NOT_IN_RANGE || result == ERR_BUSY || result == ERR_TIRED) {
         // Not yet there
       } else if (result == OK) {
         this.EndProcess();
       } else if (result == ERR_NO_PATH) {
-        let hasCreep = this.TargetPos!.lookFor(LOOK_CREEPS);
+        const hasCreep = this.TargetPos!.lookFor(LOOK_CREEPS);
         if (hasCreep && hasCreep.length > 0) {
-          let otherCreep = hasCreep[0];
+          const otherCreep = hasCreep[0];
           this.creepManager.MoveCreep(otherCreep, this.AssignedCreep.pos);
         }
       }
@@ -42,7 +42,7 @@ class CreepActivity extends BasicProcess<SingleCreepAction_Memory> {
     if (!this.creepManager.CreepIsInRange(this.memory.action, this.AssignedCreep.pos, this.TargetPos || this.Target!.pos)) {
       this.creepManager.MoveCreep(this.AssignedCreep, this.TargetPos || this.Target!.pos);
     } else {
-      let result = this.creepManager.RunCreepAction(this.CreateActivityArgs());
+      const result = this.creepManager.RunCreepAction(this.CreateActivityArgs());
       switch (this.memory.action) {
         case (AT_ClaimController):
         case (AT_Drop):
@@ -89,7 +89,7 @@ class CreepActivity extends BasicProcess<SingleCreepAction_Memory> {
   protected LoadActionMemory() {
     this.AssignedCreep = this.creepManager.tryGetCreep(this.memory.creepID, this.parentPID);
     if (this.memory.targetID) {
-      this.Target = Game.getObjectById<ObjectTypeWithID | null>(this.memory.targetID);
+      this.Target = Game.getObjectById<ObjectTypeWithID>(this.memory.targetID);
     }
     if (this.memory.pos) {
       this.TargetPos = new RoomPosition(this.memory.pos.x || 0, this.memory.pos.y || 0, this.memory.pos.roomName);

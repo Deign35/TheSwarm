@@ -42,8 +42,8 @@ class CreepManager extends BasicProcess<CreepManager_Memory> {
   }
 
   PrepTick() {
-    let creepIDs = Object.keys(this.registeredCreeps);
-    for (let i = 0; i < creepIDs.length; i++) {
+    const creepIDs = Object.keys(this.registeredCreeps);
+    for (let i = 0, length = creepIDs.length; i < length; i++) {
       if (!this.kernel.getProcessByPID(this.registeredCreeps[creepIDs[i]].ownerPID!)) {
         delete this.memory.registeredCreeps[creepIDs[i]].ownerPID;
       }
@@ -56,10 +56,10 @@ class CreepManager extends BasicProcess<CreepManager_Memory> {
   }
 
   RunThread(): ThreadState {
-    let creepIDs = Object.keys(Game.creeps);
+    const creepIDs = Object.keys(Game.creeps);
     for (let i = 0, length = creepIDs.length; i < length; i++) {
-      let creep = Game.creeps[creepIDs[i]];
-      let context = this.registeredCreeps[creep.name];
+      const creep = Game.creeps[creepIDs[i]];
+      const context = this.registeredCreeps[creep.name];
       if (!context) {
         if (!this.creepExtensions.tryRegisterCreep(creep.name)) {
           this.log.error(`Creep context doesnt exist and couldnt register the creep(${creep.name}).`);
@@ -103,7 +103,7 @@ class CreepManagerExtensions extends ExtensionBase implements ICreepManagerExten
   }
 
   tryGetCreep(id: CreepID, requestingPID: PID): Creep | undefined {
-    let creepData = this.registeredCreeps[id];
+    const creepData = this.registeredCreeps[id];
     if (!creepData || !Game.creeps[id] || !creepData.ownerPID || creepData.ownerPID != requestingPID) {
       return undefined;
     }
@@ -135,7 +135,7 @@ class CreepManagerExtensions extends ExtensionBase implements ICreepManagerExten
     if (!actionMem || !parentPID || !actionMem.creepID || !actionMem.action) {
       return undefined;
     }
-    let creep = this.tryGetCreep(actionMem.creepID, parentPID);
+    const creep = this.tryGetCreep(actionMem.creepID, parentPID);
     if (!creep) {
       return undefined;
     }
@@ -151,7 +151,7 @@ class CreepManagerExtensions extends ExtensionBase implements ICreepManagerExten
       return undefined;
     }
 
-    let newPID = this.extensionRegistry.getKernel().startProcess(APKG_CreepActivity, actionMem);
+    const newPID = this.extensionRegistry.getKernel().startProcess(APKG_CreepActivity, actionMem);
     this.extensionRegistry.getKernel().setParent(newPID, parentPID);
     return newPID;
   }
@@ -165,8 +165,8 @@ class CreepManagerExtensions extends ExtensionBase implements ICreepManagerExten
   }
 
   RunCreepAction(args: CreepActionArgs) {
-    let creep = args.creep;
-    let actionType = args.actionType;
+    const creep = args.creep;
+    const actionType = args.actionType;
     let target = args.target;
     let actionResult: ScreepsReturnCode = ERR_INVALID_ARGS;
     switch (actionType) {
@@ -177,7 +177,7 @@ class CreepManagerExtensions extends ExtensionBase implements ICreepManagerExten
       case (AT_Dismantle): actionResult = creep.dismantle(target); break;
       case (AT_GenerateSafeMode): actionResult = creep.generateSafeMode(target); break;
       case (AT_Harvest):
-        let res = creep.harvest(target);
+        const res = creep.harvest(target);
         if (res == OK) {
           this.log.recordActionTaken();
           if (creep.store.getUsedCapacity() == creep.store.getCapacity()) {
@@ -213,16 +213,16 @@ class CreepManagerExtensions extends ExtensionBase implements ICreepManagerExten
         if ((target as Structure).pos) {
           target = (target as Structure).pos;
         }
-        let result = creep.moveTo(target);
+        const result = creep.moveTo(target);
         this.log.recordActionTaken();
 
-        let dist = creep.pos.getRangeTo(target);
+        const dist = creep.pos.getRangeTo(target);
         if (dist == 1 && (target.x == 0 || target.x == 49 || target.y == 0 || target.y == 49)) {
           return OK;
         }
         if (dist <= (args.amount || 0)) {
           if (creep.pos.isNearTo(target)) {
-            let creeps = (target as RoomPosition).lookFor(LOOK_CREEPS);
+            const creeps = (target as RoomPosition).lookFor(LOOK_CREEPS);
             if (creeps.length > 0 && creeps[0].name != creep.name) {
               return ERR_NO_PATH;
             }
@@ -248,7 +248,7 @@ class CreepManagerExtensions extends ExtensionBase implements ICreepManagerExten
   }
 
   CreepIsInRange(actionType: ActionType, pos1: RoomPosition, pos2: RoomPosition) {
-    let distance = this.GetLinearDistance(pos1, pos2);
+    const distance = this.GetLinearDistance(pos1, pos2);
     if (actionType == AT_Build || actionType == AT_RangedAttack ||
       actionType == AT_RangedHeal || actionType == AT_Repair ||
       actionType == AT_Upgrade) {

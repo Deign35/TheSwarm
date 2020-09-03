@@ -17,7 +17,7 @@ export class GlobalTools {
     return bodyCost;
   }
   static ConstructBodyArray(bodyPartsList: [BodyPartConstant, number][]): BodyPartConstant[] {
-    let body: BodyPartConstant[] = [];
+    const body: BodyPartConstant[] = [];
     for (let i = 0; i < bodyPartsList.length; i++) {
       for (let j = 0; j < bodyPartsList[i][1]; j++) {
         body.push(bodyPartsList[i][0]);
@@ -40,10 +40,11 @@ export class GlobalTools {
   }
 
   static GetRandomID<T>(dictionaryObject: SDictionary<T>): T | undefined {
-    let index = this.GetRandomIndex(Object.keys(dictionaryObject));
+    const index = this.GetRandomIndex(Object.keys(dictionaryObject));
     return (dictionaryObject && dictionaryObject[index]) || undefined;
   }
 }
+
 global['CopyObject'] = GlobalTools.CopyObject;
 global['GetSpawnCost'] = GlobalTools.GetSpawnCost;
 global['ConstructBodyArray'] = GlobalTools.ConstructBodyArray;

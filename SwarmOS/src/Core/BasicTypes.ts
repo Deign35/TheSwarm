@@ -29,7 +29,7 @@ export abstract class BasicProcess<T extends MemBase> implements IProcess {
   EndTick?(): void;
 
   protected EndProcess(cbVal?: string) {
-    let proc = this.GetParentProcess();
+    const proc = this.GetParentProcess();
     if (proc) {
       this.sleeper.wake(this.parentPID);
       if (cbVal && this.memory.HC) {
@@ -57,7 +57,7 @@ export abstract class PackageProviderBase<T extends PackageProviderMemory> exten
   }
 
   RunThread(): ThreadState {
-    let ids = Object.keys(this.RequiredServices)
+    const ids = Object.keys(this.RequiredServices)
     for (let i = 0, length = ids.length; i < length; i++) {
       let service = this.memory.services[ids[i]];
       let process = (service && service.pid) ? this.kernel.getProcessByPID(service.pid) : undefined;
@@ -65,7 +65,7 @@ export abstract class PackageProviderBase<T extends PackageProviderMemory> exten
       if (!service || !process) {
         this.log.info(() => `Initializing package service ${ids[i]}`);
 
-        let initData = this.RequiredServices[ids[i]];
+        const initData = this.RequiredServices[ids[i]];
         this.addPKGService(ids[i], initData.processName, initData.startContext);
         service = this.memory.services[ids[i]];
         process = (service && service.pid) ? this.kernel.getProcessByPID(service.pid) : undefined;

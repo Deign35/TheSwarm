@@ -75,7 +75,7 @@ export class Logger implements IKernelLoggerExtensions {
   private numActionsTaken: number = 0;
 
   protected InitQueue(): void {
-    let ids = Object.keys(this.logContexts);
+    const ids = Object.keys(this.logContexts);
     for (let i = 0, length = ids.length; i < length; i++) {
       this.logContexts[ids[i]].logs = []
     }
@@ -138,11 +138,11 @@ export class Logger implements IKernelLoggerExtensions {
   }
 
   DumpLogToConsole(): void {
-    let logOutputs = [];
-    let ids = Object.keys(this.logContexts);
+    const logOutputs = [];
+    const ids = Object.keys(this.logContexts);
     for (let i = 0, length = ids.length; i < length; i++) {
-      let context = this.logContexts[ids[i]];
-      let log = this.compileContext(ids[i], context);
+      const context = this.logContexts[ids[i]];
+      const log = this.compileContext(ids[i], context);
 
       if (log) {
         logOutputs.push(log);
@@ -153,11 +153,11 @@ export class Logger implements IKernelLoggerExtensions {
       console.log(logOutputs[i]);
     }
 
-    let headerStyle: TextStyle = { align: 'left', color: 'white', backgroundColor: 'black', opacity: 0.7 };
-    let vis = new RoomVisual();
+    const headerStyle: TextStyle = { align: 'left', color: 'white', backgroundColor: 'black', opacity: 0.7 };
+    const vis = new RoomVisual();
     vis.text(`[${Game.time}]`, 0, 0, headerStyle);
 
-    let gameCpuUsed = (Game.cpu.getUsed() + (this.numActionsTaken * 0.2)).toFixed(3);
+    const gameCpuUsed = (Game.cpu.getUsed() + (this.numActionsTaken * 0.2)).toFixed(3);
     vis.text(`CPU: (${gameCpuUsed}\/${Game.cpu.limit} -- [${Game.cpu.bucket}])`, 0, 1, headerStyle);
 
     // Reset the logger
@@ -172,9 +172,9 @@ export class Logger implements IKernelLoggerExtensions {
   }
 
   private compileContext(logID: string, context: LoggerContext) {
-    let queues = context.logs;
+    const queues = context.logs;
     if (queues.length == 0) { return undefined; }
-    let output = () => {
+    const output = () => {
       let outStr = `${CONTEXT_SEPARATOR}\n${this.MakeFontTag(LOG_WARN)}Begin Log[${logID}] - {${context.logLevel}}</font>\n`;
       while (queues.length > 0) {
         outStr += queues.shift() + '\n';

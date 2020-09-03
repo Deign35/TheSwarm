@@ -65,7 +65,7 @@ class MapManagerExtensions extends ExtensionBase implements IMapManagerExtension
       MapCache[from] = {};
     }
 
-    let route = Game.map.findRoute(from, to);
+    const route = Game.map.findRoute(from, to);
     MapCache[from][to] = route;
     return route;
   }

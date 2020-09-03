@@ -11,11 +11,10 @@ class SpawnActivity extends BasicProcess<SpawnActivity_Memory> {
   protected spawnManager!: ISpawnManagerExtensions;
 
   RunThread(): ThreadState {
-    let status = this.spawnManager.getRequestStatus(this.memory.spawnID);
+    const status = this.spawnManager.getRequestStatus(this.memory.spawnID);
     let newCreepName = undefined;
     switch (status) {
       case (SP_QUEUED):
-        let context = this.spawnManager.getRequestContext(this.memory.spawnID)!;
         break;
       case (SP_COMPLETE):
       case (SP_SPAWNING):

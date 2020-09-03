@@ -11,7 +11,7 @@ class ExperimentalSquad extends SquadJob<ExperimentalSquad_Memory> {
   mapManager!: IMapManagerExtensions;
   RunThread() {
     if (!this.memory.invasion && Game.rooms[this.memory.targetRoom] && Game.time % 5 == 0) {
-      let invaders = Game.rooms[this.memory.targetRoom].find(FIND_HOSTILE_CREEPS);
+      const invaders = Game.rooms[this.memory.targetRoom].find(FIND_HOSTILE_CREEPS);
       for (let i = 0; i < invaders.length; i++) {
         if (invaders[i].owner.username == "Invader") {
           this.log.alert(`Invasion detected`);
@@ -34,7 +34,7 @@ class ExperimentalSquad extends SquadJob<ExperimentalSquad_Memory> {
       return;
     }
     if (squadID == 0) {
-      let body = [WORK, WORK, WORK, WORK, WORK, MOVE, MOVE, MOVE, MOVE, MOVE];
+      const body = [WORK, WORK, WORK, WORK, WORK, MOVE, MOVE, MOVE, MOVE, MOVE];
       return this.spawnManager.requestSpawn({
         body: body,
         creepName: this.memory.targetRoom + "_" + (Game.time + '_Har').slice(-8),
@@ -43,7 +43,7 @@ class ExperimentalSquad extends SquadJob<ExperimentalSquad_Memory> {
           parentPID: this.pid
         }, 3);
     } else if (squadID == 1 || squadID == 4 || squadID == 5) {
-      let body = [CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
+      const body = [CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
         MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
       return this.spawnManager.requestSpawn({
         body: body,
@@ -53,7 +53,7 @@ class ExperimentalSquad extends SquadJob<ExperimentalSquad_Memory> {
           parentPID: this.pid
         }, 3)
     } else if (squadID == 2) {
-      let body = [WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE];
+      const body = [WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE];
       return this.spawnManager.requestSpawn({
         body: body,
         creepName: this.memory.targetRoom + "_" + (Game.time + '_Bui').slice(-8),
@@ -62,7 +62,7 @@ class ExperimentalSquad extends SquadJob<ExperimentalSquad_Memory> {
           parentPID: this.pid
         }, 3);
     } else if (squadID == 3) {
-      let body = [CLAIM, CLAIM, MOVE, MOVE]
+      const body = [CLAIM, CLAIM, MOVE, MOVE]
       return this.spawnManager.requestSpawn({
         body: body,
         creepName: this.memory.targetRoom + "_" + (Game.time + '_Cla').slice(-8),
@@ -79,7 +79,7 @@ class ExperimentalSquad extends SquadJob<ExperimentalSquad_Memory> {
       if (creep.room.name != this.memory.targetRoom) {
         return this.MoveToRoom(creep, this.memory.targetRoom);
       }
-      let source = Game.getObjectById<Source>(this.memory.sourceID)!;
+      const source = Game.getObjectById<Source>(this.memory.sourceID)!;
       if (source.pos.getRangeTo(creep.pos) > 1) {
         let targetPos = source.pos;
         let dist = 1;
@@ -106,7 +106,8 @@ class ExperimentalSquad extends SquadJob<ExperimentalSquad_Memory> {
           exemptedFailures: [ERR_FULL]
         }, this.pid);
       }
-      let container = Game.getObjectById<StructureContainer | ConstructionSite>(this.memory.container);
+
+      const container = Game.getObjectById<StructureContainer | ConstructionSite>(this.memory.container);
       if (creep.store[RESOURCE_ENERGY] > 0) {
         if (container) {
           if ((container as StructureContainer).hitsMax) {
@@ -127,13 +128,13 @@ class ExperimentalSquad extends SquadJob<ExperimentalSquad_Memory> {
             delete this.memory.container;
           }
         } else {
-          let sites = creep.pos.lookFor(LOOK_CONSTRUCTION_SITES);
+          const sites = creep.pos.lookFor(LOOK_CONSTRUCTION_SITES);
           if (sites && sites.length > 0) {
             if (sites[0].structureType == STRUCTURE_CONTAINER) {
               this.memory.container = sites[0].id;
             }
           } else {
-            let structs = creep.pos.lookFor(LOOK_STRUCTURES);
+            const structs = creep.pos.lookFor(LOOK_STRUCTURES);
             for (let i = 0; i < structs.length; i++) {
               if (structs[i].structureType == STRUCTURE_CONTAINER) {
                 this.memory.container = structs[0].id;
@@ -171,9 +172,9 @@ class ExperimentalSquad extends SquadJob<ExperimentalSquad_Memory> {
 
       if (creep.store.getUsedCapacity() > creep.store.getFreeCapacity()) {
         // Use the energy building or repairing
-        let roomData = this.roomManager.GetRoomData(creep.room.name)!;
+        const roomData = this.roomManager.GetRoomData(creep.room.name)!;
         for (let i = 0; i < roomData.needsRepair.length; i++) {
-          let targetToRepair = Game.getObjectById<Structure>(roomData.needsRepair[i]);
+          const targetToRepair = Game.getObjectById<Structure>(roomData.needsRepair[i]);
           if (targetToRepair && targetToRepair.hits < targetToRepair.hitsMax) {
             return this.creepManager.CreateNewCreepActivity({
               action: AT_Repair,
@@ -184,7 +185,7 @@ class ExperimentalSquad extends SquadJob<ExperimentalSquad_Memory> {
         }
 
         for (let i = 0; i < roomData.cSites.length; i++) {
-          let targetToBuild = Game.getObjectById<ConstructionSite>(roomData.cSites[i]);
+          const targetToBuild = Game.getObjectById<ConstructionSite>(roomData.cSites[i]);
           if (targetToBuild) {
             return this.creepManager.CreateNewCreepActivity({
               action: AT_Build,
@@ -238,9 +239,9 @@ class ExperimentalSquad extends SquadJob<ExperimentalSquad_Memory> {
   }
 
   GoGetEnergy(creep: Creep) {
-    let roomData = this.roomManager.GetRoomData(creep.room.name)!;
+    const roomData = this.roomManager.GetRoomData(creep.room.name)!;
     for (let i = 0; i < roomData.resources.length; i++) {
-      let resource = Game.getObjectById<Resource>(roomData.resources[i]);
+      const resource = Game.getObjectById<Resource>(roomData.resources[i]);
       if (!resource || resource.amount < creep.store.getFreeCapacity()) continue;
 
       return this.creepManager.CreateNewCreepActivity({
@@ -250,7 +251,7 @@ class ExperimentalSquad extends SquadJob<ExperimentalSquad_Memory> {
       }, this.pid);
     }
 
-    let container = Game.getObjectById<StructureContainer>(this.memory.container);
+    const container = Game.getObjectById<StructureContainer>(this.memory.container);
     if (!container) return undefined;
 
     return this.creepManager.CreateNewCreepActivity({

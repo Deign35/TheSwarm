@@ -38,12 +38,12 @@ class RoomManager extends BasicProcess<RoomStateMemory> {
 
   RunThread(): ThreadState {
     for (let roomID in Game.rooms) {
-      let data = this.roomManager.GetRoomData(roomID);
+      const data = this.roomManager.GetRoomData(roomID);
       if (!data) {
         continue;
       }
       if (Game.rooms[roomID] && Game.rooms[roomID].controller && Game.rooms[roomID].controller!.my) {
-        let vis: RoomVisual = new RoomVisual(roomID);
+        const vis: RoomVisual = new RoomVisual(roomID);
 
         const headerStyle: TextStyle = { align: 'left', color: 'white', backgroundColor: 'black', opacity: 0.7 };
         vis.text(`Energy: ${Game.rooms[roomID].energyAvailable}/${Game.rooms[roomID].energyCapacityAvailable}`, 0, 2, headerStyle);
@@ -97,9 +97,9 @@ class RoomManagerExtension extends ExtensionBase implements IRoomManagerExtensio
   }
 
   GetRoomData(roomID: string): RoomState {
-    let roomState = this.memory.roomStateData[roomID];
+    const roomState = this.memory.roomStateData[roomID];
     if (!roomState) {
-      let room = Game.rooms[roomID];
+      const room = Game.rooms[roomID];
       if (room) {
         this.memory.roomStateData[roomID] = {
           roomType: RT_Nuetral,
@@ -145,13 +145,13 @@ class RoomManagerExtension extends ExtensionBase implements IRoomManagerExtensio
     }
 
     roomState.cSites = [];
-    let cSites = Game.rooms[roomID].find(FIND_CONSTRUCTION_SITES);
+    const cSites = Game.rooms[roomID].find(FIND_CONSTRUCTION_SITES);
     for (let i = 0; i < cSites.length; i++) {
       roomState.cSites.push(cSites[i].id);
     }
 
     roomState.needsRepair = [];
-    let structures = Game.rooms[roomID].find(FIND_STRUCTURES);
+    const structures = Game.rooms[roomID].find(FIND_STRUCTURES);
 
     roomState.structures = {
       container: [],
@@ -164,7 +164,7 @@ class RoomManagerExtension extends ExtensionBase implements IRoomManagerExtensio
       tower: []
     }
 
-    let structureTypeIDs = Object.keys(roomState.structures);
+    const structureTypeIDs = Object.keys(roomState.structures);
     for (let i = 0; i < structures.length; i++) {
       if ((structures[i].hits < structures[i].hitsMax * 0.75) &&
         structures[i].structureType != STRUCTURE_WALL &&
@@ -195,19 +195,19 @@ class RoomManagerExtension extends ExtensionBase implements IRoomManagerExtensio
     }
 
     roomState.resources = [];
-    let resources = Game.rooms[roomID].find(FIND_DROPPED_RESOURCES);
+    const resources = Game.rooms[roomID].find(FIND_DROPPED_RESOURCES);
     for (let i = 0; i < resources.length; i++) {
       roomState.resources.push(resources[i].id);
     }
 
     roomState.tombstones = [];
-    let tombstones = Game.rooms[roomID].find(FIND_TOMBSTONES);
+    const tombstones = Game.rooms[roomID].find(FIND_TOMBSTONES);
     for (let i = 0; i < tombstones.length; i++) {
       roomState.tombstones.push(tombstones[i].id);
     }
 
     roomState.ruins = [];
-    let ruins = Game.rooms[roomID].find(FIND_RUINS);
+    const ruins = Game.rooms[roomID].find(FIND_RUINS);
     for (let i = 0; i < ruins.length; i++) {
       roomState.ruins.push(ruins[i].id);
     }

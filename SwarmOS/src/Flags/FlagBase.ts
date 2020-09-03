@@ -46,7 +46,7 @@ class FlagBase extends BasicProcess<FlagProcess_Memory> {
     return Game.flags[this.memory.flagID];
   }
   RunThread(): ThreadState {
-    let flag = this.flag;
+    const flag = this.flag;
     if (!flag) {
       this.kernel.killProcess(this.pid, `FlagBase.RunThread()`);
       return ThreadState_Done;
@@ -75,7 +75,7 @@ class FlagBase extends BasicProcess<FlagProcess_Memory> {
   }
 
   protected createBasicSite() {
-    let flag = this.flag;
+    const flag = this.flag;
     if (!flag.room) {
       return;
     }
@@ -118,7 +118,7 @@ class FlagBase extends BasicProcess<FlagProcess_Memory> {
     }
   }
   protected createAdvancedSite() {
-    let flag = this.flag;
+    const flag = this.flag;
     if (!flag.room) {
       return;
     }

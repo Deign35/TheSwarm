@@ -29,7 +29,7 @@ class Scout extends SoloJob<Scout_Memory> {
       }
       let targetRoom: RoomID | undefined = creep.room.name;
       do {
-        let exits = Game.map.describeExits(creep.room.name);
+        const exits = Game.map.describeExits(creep.room.name);
         switch (Math.floor(Math.random() * 4)) {
           case (0): {
             targetRoom = exits[FIND_EXIT_TOP];

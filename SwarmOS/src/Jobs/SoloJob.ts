@@ -40,12 +40,12 @@ export abstract class SoloJob<T extends SoloJob_Memory> extends BasicProcess<T> 
   }
 
   CreateSpawnActivity() {
-    let sID = this.GetNewSpawnID();
+    const sID = this.GetNewSpawnID();
     if (!sID) {
       return;
     }
 
-    let spawnMem: SpawnActivity_Memory = {
+    const spawnMem: SpawnActivity_Memory = {
       spawnID: sID,
       HC: 'CreateActivityForCreep'
     }
@@ -70,7 +70,7 @@ export abstract class SoloJob<T extends SoloJob_Memory> extends BasicProcess<T> 
       this.HandleNoActivity();
     } else {
       this.kernel.setParent(this.memory.activityPID, this.pid);
-      let childActivity = this.kernel.getProcessByPID<SoloJob<T>>(this.memory.activityPID)!;
+      const childActivity = this.kernel.getProcessByPID<SoloJob<T>>(this.memory.activityPID)!;
       if (!childActivity.memory.HC) {
         childActivity.memory.HC = 'CreateActivityForCreep';
       }

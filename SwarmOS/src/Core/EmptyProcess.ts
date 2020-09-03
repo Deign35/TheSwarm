@@ -21,7 +21,7 @@ class EmptyProcess extends BasicProcess<MemBase> {
   }
 
   RunThread(): ThreadState {
-    let start = Game.cpu.getUsed();
+    const start = Game.cpu.getUsed();
     try {
 
     } catch (ex) {

@@ -53,7 +53,7 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
     do {
       pid = 'p' + Math.floor(Math.random() * 100000) as PID;
     } while (this.processTable[pid]);
-    let pInfo: ProcInfo = {
+    const pInfo: ProcInfo = {
       pid: pid,
       PKG: packageName
     };
@@ -67,13 +67,13 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
 
   createProcess(id: PID): IProcess {
     this.log.debug(`ConstructProcess ${id}`);
-    let pInfo = this.processTable[id];
+    const pInfo = this.processTable[id];
     if (!pInfo) {
       throw new Error(`Process ${id} does not exist`);
     }
 
-    let kernelContext = this;
-    let context: IProcessContext = {
+    const kernelContext = this;
+    const context: IProcessContext = {
       pid: pInfo.pid,
       pkgName: pInfo.PKG,
       rngSeed: GetRandomIndex(primes_3000),
@@ -89,7 +89,7 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
       getPackageInterface: kernelContext.extensionRegistry.get.bind(kernelContext.extensionRegistry)
     };
     Object.freeze(context);
-    let process = this.processRegistry.createNewProcess(pInfo.PKG, context);
+    const process = this.processRegistry.createNewProcess(pInfo.PKG, context);
     if (!process) {
       throw new Error(`Could not create process ${pInfo.pid} ${pInfo.PKG}`);
     }
@@ -98,19 +98,19 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
   }
 
   killProcess(id: PID, msg: string = ''): void {
-    let pinfo = this.processTable[id];
+    const pinfo = this.processTable[id];
     if (!pinfo) return;
     if (msg) {
       this.log.info(`${id} killed - ${msg}`);
     }
     pinfo.end = Game.time;
-    let ids = Object.keys(this.processTable);
+    const ids = Object.keys(this.processTable);
     for (let i = 0; i < ids.length; i++) {
-      let id = ids[i];
-      let pi = this.processTable[id]
+      const otherID = ids[i];
+      const pi = this.processTable[otherID]
       if (pi.pP === pinfo.pid) {
         if (!pi.end) {
-          this.killProcess(id, msg);
+          this.killProcess(otherID, msg);
         }
       }
     }
@@ -150,7 +150,7 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
     }
 
     for (let i = 0; i < processIDs.length; i++) {
-      let pInfo = this.processTable[processIDs[i]];
+      const pInfo = this.processTable[processIDs[i]];
       if (pInfo.sl) {
         if (pInfo.sl <= Game.time) {
           this.wake(pInfo.pid);
@@ -161,13 +161,13 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
       }
     }
 
-    let activeThreadIDs = Object.keys(this._curTickState);
+    const activeThreadIDs = Object.keys(this._curTickState);
     while (activeThreadIDs.length > 0) {
-      let protectionValue = activeThreadIDs.length;
+      const protectionValue = activeThreadIDs.length;
       this.RunThreads(activeThreadIDs);
-      let allIDs = Object.keys(this._curTickState);
+      const allIDs = Object.keys(this._curTickState);
       for (let i = 0; i < allIDs.length; i++) {
-        let state = this._curTickState[allIDs[i]]
+        const state = this._curTickState[allIDs[i]]
         if (state == TS_Waiting || state == TS_Active) {
           activeThreadIDs.push(allIDs[i]);
           this._curTickState[allIDs[i]] = TS_Active;
@@ -189,14 +189,14 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
 
   private RunThreads(ids: PID[]) {
     while (ids.length > 0) {
-      let pid = ids.shift()!;
+      const pid = ids.shift()!;
       try {
-        let process = this.getProcessByPID(pid);
+        const process = this.getProcessByPID(pid);
         if (!process) {
           this._curTickState[pid] = TS_Done;
           continue;
         }
-        let result = process.RunThread();
+        const result = process.RunThread();
         switch (result) {
           case (ThreadState_Active):
             ids.push(pid);
@@ -213,7 +213,7 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
         }
       } catch (e) {
         this.killProcess(pid, `Kernel.loop()`);
-        let pInfo = this.processTable[pid];
+        const pInfo = this.processTable[pid];
         pInfo.err = e.stack || e.toString();
         this.log.error(`[${pid}] ${pInfo.PKG} crashed\n${e.stack}`);
       }
@@ -225,23 +225,23 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
       return;
     }
     try {
-      let proc = this.getProcessByPID(pid)!;
+      const proc = this.getProcessByPID(pid)!;
       if (proc.PrepTick) {
         proc.PrepTick();
       }
       this._curTickState[pid] = TS_Active;
     } catch (e) {
       this.killProcess(pid, `Kernel.PrepTick()`);
-      let pInfo = this.processTable[pid];
+      const pInfo = this.processTable[pid];
       pInfo.err = e.stack || e.toString();
       this.log.error(`[${pid}] ${pInfo.PKG} crashed\n${e.stack}`);
     }
   }
 
   private EndTick(pid: PID) {
-    let pInfo = this.processTable[pid];
+    const pInfo = this.processTable[pid];
     if (this._curTickState[pid]) {
-      let proc = this.getProcessByPID(pid);
+      const proc = this.getProcessByPID(pid);
       if (proc && proc.EndTick) {
         try {
           proc.EndTick();
@@ -265,7 +265,7 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
   }
 
   sleep(pid: PID, ticks: number): void {
-    let pInfo = this.processTable[pid];
+    const pInfo = this.processTable[pid];
     pInfo.sl = Game.time + ticks;
   }
 

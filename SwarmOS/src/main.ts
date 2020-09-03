@@ -3,7 +3,7 @@
   counter: number;
   kernel: KernelMemory;
 }
-let startLoad = Game.cpu.getUsed(); // Will not use any prototype defined version of getUsed
+const startLoad = Game.cpu.getUsed(); // Will not use any prototype defined version of getUsed
 // Ensure all constants are initialized
 require('globalConstants');
 

@@ -8,8 +8,8 @@ import { SquadJob } from "./SquadJob";
 
 class MineralHarvester extends SquadJob<MineralHarvester_Memory> {
   CreateSpawnActivity(squadID: number) {
-    let roomData = this.roomManager.GetRoomData(this.memory.roomID)!;
-    let mineral = Game.getObjectById<Mineral>(roomData.mineralIDs[0])!;
+    const roomData = this.roomManager.GetRoomData(this.memory.roomID)!;
+    const mineral = Game.getObjectById<Mineral>(roomData.mineralIDs[0])!;
     if (mineral.ticksToRegeneration > 0) {
       this.sleeper.sleep(this.pid, mineral.ticksToRegeneration);
       return;
@@ -18,7 +18,7 @@ class MineralHarvester extends SquadJob<MineralHarvester_Memory> {
   }
   protected GetNewSpawnID(squadID: number): string {
     if (squadID == 0) {
-      let body = [WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, MOVE, MOVE, MOVE, MOVE, MOVE];
+      const body = [WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, MOVE, MOVE, MOVE, MOVE, MOVE];
       return this.spawnManager.requestSpawn({
         body: body,
         creepName: this.memory.roomID + (Game.time + '_HM').slice(-6),
@@ -27,7 +27,7 @@ class MineralHarvester extends SquadJob<MineralHarvester_Memory> {
           parentPID: this.pid
         }, 1);
     } else if (squadID == 1) {
-      let body = [CARRY, CARRY, CARRY, MOVE, MOVE, MOVE];
+      const body = [CARRY, CARRY, CARRY, MOVE, MOVE, MOVE];
       return this.spawnManager.requestSpawn({
         body: body,
         creepName: this.memory.roomID + (Game.time + '_HMR').slice(-7),
@@ -40,8 +40,8 @@ class MineralHarvester extends SquadJob<MineralHarvester_Memory> {
     }
   }
   protected CreateCustomCreepActivity(squadID: number, creep: Creep): string | undefined {
-    let roomData = this.roomManager.GetRoomData(this.memory.roomID)!;
-    let mineral = Game.getObjectById<Mineral>(roomData.mineralIDs[0])!;
+    const roomData = this.roomManager.GetRoomData(this.memory.roomID)!;
+    const mineral = Game.getObjectById<Mineral>(roomData.mineralIDs[0])!;
     if (squadID == 0) {
       if (mineral.pos.getRangeTo(creep.pos) > 1) {
         let targetPos = mineral.pos;
@@ -62,7 +62,7 @@ class MineralHarvester extends SquadJob<MineralHarvester_Memory> {
       }
 
       if (!this.memory.container) {
-        let structs = creep.pos.lookFor(LOOK_STRUCTURES);
+        const structs = creep.pos.lookFor(LOOK_STRUCTURES);
         for (let i = 0; i < structs.length; i++) {
           if (structs[i].structureType == STRUCTURE_CONTAINER) {
             this.memory.container = structs[0].id;
@@ -80,7 +80,7 @@ class MineralHarvester extends SquadJob<MineralHarvester_Memory> {
       if (creep.store.getUsedCapacity() > creep.store.getFreeCapacity()) {
         // Deposit to the terminal
         if (roomData.structures[STRUCTURE_TERMINAL].length > 0) {
-          let terminal = Game.getObjectById<StructureTerminal>(roomData.structures[STRUCTURE_TERMINAL][0]);
+          const terminal = Game.getObjectById<StructureTerminal>(roomData.structures[STRUCTURE_TERMINAL][0]);
           if (terminal) {
             return this.creepManager.CreateNewCreepActivity({
               action: AT_Transfer,
@@ -92,7 +92,7 @@ class MineralHarvester extends SquadJob<MineralHarvester_Memory> {
         }
       }
       for (let i = 0; i < roomData.resources.length; i++) {
-        let resource = Game.getObjectById<Resource>(roomData.resources[i]);
+        const resource = Game.getObjectById<Resource>(roomData.resources[i]);
         if (resource && resource.resourceType == mineral.mineralType) {
           return this.creepManager.CreateNewCreepActivity({
             action: AT_Pickup,
@@ -103,7 +103,7 @@ class MineralHarvester extends SquadJob<MineralHarvester_Memory> {
       }
 
       if (this.memory.container) {
-        let container = Game.getObjectById<StructureContainer>(this.memory.container);
+        const container = Game.getObjectById<StructureContainer>(this.memory.container);
         if (container) {
           return this.creepManager.CreateNewCreepActivity({
             action: AT_Withdraw,

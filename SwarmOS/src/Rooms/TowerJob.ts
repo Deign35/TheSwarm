@@ -8,18 +8,13 @@ import { BasicProcess } from "Core/BasicTypes";
 class TowerJob extends BasicProcess<TowerMemory> {
   @extensionInterface(EXT_RoomManager)
   protected roomManager!: IRoomManagerExtension;
-  get room() {
-    return Game.rooms[this.memory.roomID];
-  }
-  get roomData() {
-    return this.roomManager.GetRoomData(this.memory.roomID)!;
-  }
   RunThread(): ThreadState {
-    for (let i = 0; i < this.roomData.needsRepair.length; i++) {
-      let target = Game.getObjectById<Structure>(this.roomData.needsRepair[i]);
+    let roomData = this.roomManager.GetRoomData(this.memory.roomID)!;
+    for (let i = 0; i < roomData.needsRepair.length; i++) {
+      const target = Game.getObjectById<Structure>(roomData.needsRepair[i]);
       if (target && target.structureType == STRUCTURE_RAMPART && target.hits <= 300) {
-        for (let j = 0; j < this.roomData.structures[STRUCTURE_TOWER].length; j++) {
-          let tower = Game.getObjectById<StructureTower>(this.roomData.structures[STRUCTURE_TOWER][j]);
+        for (let j = 0; j < roomData.structures[STRUCTURE_TOWER].length; j++) {
+          const tower = Game.getObjectById<StructureTower>(roomData.structures[STRUCTURE_TOWER][j]);
           if (tower && tower.store[RESOURCE_ENERGY] > 800) {
             tower.repair(target);
 
@@ -28,21 +23,21 @@ class TowerJob extends BasicProcess<TowerMemory> {
       }
     }
 
-    let otherCreeps = this.room.find(FIND_HOSTILE_CREEPS);
+    const otherCreeps = Game.rooms[this.memory.roomID].find(FIND_HOSTILE_CREEPS);
     if (otherCreeps.length == 0) {
       this.sleeper.sleep(this.pid, 6);
       return ThreadState_Done;
     }
 
-    let hostiles = this.GetHostileTargets(otherCreeps);
+    const hostiles = this.GetHostileTargets(otherCreeps);
     if (hostiles.length == 0) {
       this.sleeper.sleep(this.pid, 6);
       return ThreadState_Done;
     }
 
-    let towerIDs = this.roomData.structures.tower;
+    const towerIDs = roomData.structures.tower;
     for (let i = 0; i < towerIDs.length; i++) {
-      let tower = Game.getObjectById<StructureTower>(towerIDs[i])!;
+      const tower = Game.getObjectById<StructureTower>(towerIDs[i])!;
       if (tower.store[RESOURCE_ENERGY] > 0) {
         let closestCreep = 0
         let distance = tower.pos.getRangeTo(hostiles[closestCreep]);
@@ -50,7 +45,7 @@ class TowerJob extends BasicProcess<TowerMemory> {
           if (distance <= 5) {
             break;
           }
-          let dist = tower.pos.getRangeTo(hostiles[j]);
+          const dist = tower.pos.getRangeTo(hostiles[j]);
           if (dist < distance) {
             closestCreep = j;
             distance = dist;
@@ -67,7 +62,7 @@ class TowerJob extends BasicProcess<TowerMemory> {
             }
             damage -= damage * TOWER_FALLOFF * (distance - TOWER_OPTIMAL_RANGE) / (TOWER_FALLOFF_RANGE - TOWER_OPTIMAL_RANGE)
           }
-          let expectedDamage = Math.floor(damage);
+          const expectedDamage = Math.floor(damage);
           if (expectedDamage > hostiles[closestCreep].hits) {
             hostiles.splice(closestCreep);
           }
@@ -79,11 +74,11 @@ class TowerJob extends BasicProcess<TowerMemory> {
   }
 
   GetHostileTargets(possibleTargets: Creep[]): Creep[] {
-    let hostiles: Creep[] = [];
-    let workers: Creep[] = [];
-    let claimers: Creep[] = [];
+    const hostiles: Creep[] = [];
+    const workers: Creep[] = [];
+    const claimers: Creep[] = [];
     for (let i = 0; i < possibleTargets.length; i++) {
-      let creep = possibleTargets[i];
+      const creep = possibleTargets[i];
       if (creep.getActiveBodyparts(HEAL) > 0) {
         return [creep];
       }

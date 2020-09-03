@@ -42,12 +42,12 @@ export abstract class SquadJob<T extends SquadJob_Memory> extends BasicProcess<T
   }
 
   CreateSpawnActivity(squadID: number) {
-    let sID = this.GetNewSpawnID(squadID);
+    const sID = this.GetNewSpawnID(squadID);
     if (!sID) {
       return;
     }
 
-    let spawnMem: SpawnActivity_Memory = {
+    const spawnMem: SpawnActivity_Memory = {
       spawnID: sID,
       HC: 'AssignCreep'
     }
@@ -67,7 +67,7 @@ export abstract class SquadJob<T extends SquadJob_Memory> extends BasicProcess<T
 
   CreateActivityForCreep(squadID: number, creepID: CreepID) {
     this.creepManager.tryReserveCreep(creepID, this.pid);
-    let creep = this.creepManager.tryGetCreep(creepID, this.pid);
+    const creep = this.creepManager.tryGetCreep(creepID, this.pid);
     this.memory.squad[squadID].creepID = creepID;
     if (!creep) {
       if (this.memory.expires) {
@@ -81,7 +81,7 @@ export abstract class SquadJob<T extends SquadJob_Memory> extends BasicProcess<T
       this.HandleNoActivity();
     } else {
       this.kernel.setParent(this.memory.squad[squadID].activityPID!, this.pid);
-      let childActivity = this.kernel.getProcessByPID(this.memory.squad[squadID].activityPID!)!;
+      const childActivity = this.kernel.getProcessByPID(this.memory.squad[squadID].activityPID!)!;
       if (!childActivity.memory.HC) {
         childActivity.memory.HC = 'AssignCreep';
       }

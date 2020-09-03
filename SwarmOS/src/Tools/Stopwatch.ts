@@ -20,7 +20,7 @@ export class Stopwatch {
   }
   Lap() {
     if (this.startTime > 0) {
-      let lapTime = Game.cpu.getUsed() - this.startTime;
+      const lapTime = Game.cpu.getUsed() - this.startTime;
       this.cummulativeTime += lapTime;
       this.startTime = lapTime - this.startTime;
       this.laps.push(lapTime);

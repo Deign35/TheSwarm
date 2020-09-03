@@ -31,12 +31,12 @@ class FlagManager extends BasicProcess<FlagManagerMemory> {
   RunThread(): ThreadState {
     for (let id in Game.flags) {
       let flagProcess;
-      let flagPID = this.memory[id];
+      const flagPID = this.memory[id];
       if (flagPID) {
         flagProcess = this.kernel.getProcessByPID(flagPID);
       }
       if (!flagProcess) {
-        let flagContext: FlagProcess_Memory = {
+        const flagContext: FlagProcess_Memory = {
           flagID: id
         }
         this.memory[id] = this.kernel.startProcess(PKG_FlagBase, flagContext);

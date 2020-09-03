@@ -29,8 +29,8 @@ class Worker extends SoloJob<Worker_Memory> {
   }
 
   protected GetNewSpawnID(): string {
-    let homeRoom = Game.rooms[this.memory.roomID];
-    let energyCapacity = homeRoom.energyCapacityAvailable;
+    const homeRoom = Game.rooms[this.memory.roomID];
+    const energyCapacity = homeRoom.energyCapacityAvailable;
     let body = [WORK, CARRY, CARRY, MOVE, MOVE];
     if (energyCapacity >= 1100) {
       body = [WORK, WORK, WORK, WORK,
@@ -50,11 +50,11 @@ class Worker extends SoloJob<Worker_Memory> {
       }, 3);
   }
   protected CreateCustomCreepActivity(creep: Creep): string | undefined {
-    let carryRatio = creep.store.getUsedCapacity() / creep.store.getCapacity();
-    let roomData = this.roomManager.GetRoomData(creep.room.name)!;
+    const carryRatio = creep.store.getUsedCapacity() / creep.store.getCapacity();
+    const roomData = this.roomManager.GetRoomData(creep.room.name)!;
     if (carryRatio > 0.50) {
       for (let i = 0; i < roomData.needsRepair.length; i++) {
-        let repairTarget = Game.getObjectById(roomData.needsRepair[i]);
+        const repairTarget = Game.getObjectById(roomData.needsRepair[i]);
         if (repairTarget) {
           return this.creepManager.CreateNewCreepActivity({
             action: AT_Repair,
@@ -64,7 +64,7 @@ class Worker extends SoloJob<Worker_Memory> {
         }
       }
       for (let i = 0; i < roomData.cSites.length; i++) {
-        let buildTarget = Game.getObjectById(roomData.cSites[i]);
+        const buildTarget = Game.getObjectById(roomData.cSites[i]);
         if (buildTarget) {
           return this.creepManager.CreateNewCreepActivity({
             action: AT_Build,
@@ -84,15 +84,15 @@ class Worker extends SoloJob<Worker_Memory> {
 
     let actionType: ActionType = AT_NoOp;
     let bestTarget = '';
-    let energyNeeded = creep.store.getCapacity() - (creep.store.getUsedCapacity() || 0);
+    const energyNeeded = creep.store.getCapacity() - (creep.store.getUsedCapacity() || 0);
 
     let closestDist = 1000;
 
     if (actionType == AT_NoOp && roomData.tombstones.length > 0) {
       for (let i = 0; i < roomData.tombstones.length; i++) {
-        let tombstone = Game.getObjectById<Tombstone>(roomData.tombstones[i]);
+        const tombstone = Game.getObjectById<Tombstone>(roomData.tombstones[i]);
         if (tombstone && (tombstone.store[RESOURCE_ENERGY] || -1) >= energyNeeded) {
-          let dist = tombstone.pos.getRangeTo(creep.pos);
+          const dist = tombstone.pos.getRangeTo(creep.pos);
           if (dist < closestDist) {
             closestDist = dist;
             bestTarget = tombstone.id;
@@ -104,9 +104,9 @@ class Worker extends SoloJob<Worker_Memory> {
 
     if (actionType == AT_NoOp && roomData.resources.length > 0) {
       for (let i = 0; i < roomData.resources.length; i++) {
-        let resource = Game.getObjectById<Resource>(roomData.resources[i]);
+        const resource = Game.getObjectById<Resource>(roomData.resources[i]);
         if (resource && resource.resourceType == RESOURCE_ENERGY && (resource.amount || -1) >= energyNeeded) {
-          let dist = resource.pos.getRangeTo(creep.pos);
+          const dist = resource.pos.getRangeTo(creep.pos);
           if (dist < closestDist) {
             closestDist = dist;
             bestTarget = resource.id;
@@ -117,7 +117,7 @@ class Worker extends SoloJob<Worker_Memory> {
     }
 
     if (actionType == AT_NoOp && roomData.structures[STRUCTURE_STORAGE].length > 0) {
-      let storage = Game.getObjectById<StructureStorage>(roomData.structures[STRUCTURE_STORAGE][0]);
+      const storage = Game.getObjectById<StructureStorage>(roomData.structures[STRUCTURE_STORAGE][0]);
       if (storage) {
         bestTarget = storage.id;
         actionType = AT_Withdraw;

@@ -20,7 +20,7 @@ class RepetitiveCreepActivity extends BasicProcess<RepetitiveCreepActivity_Memor
 
   protected CreateActivityArgs(creepID: CreepID) {
     this.creepManager.tryReserveCreep(creepID, this.parentPID);
-    let creep = this.creepManager.tryGetCreep(creepID, this.parentPID);
+    const creep = this.creepManager.tryGetCreep(creepID, this.parentPID);
 
     if (!creep || this.memory.actions.length == 0) {
       this.EndProcess();
@@ -28,7 +28,7 @@ class RepetitiveCreepActivity extends BasicProcess<RepetitiveCreepActivity_Memor
     }
 
     while (this.memory.actions.length > 0) {
-      let nextActivity = this.memory.actions.shift()!;
+      const nextActivity = this.memory.actions.shift()!;
       let activityMemory: SingleCreepAction_Memory = CopyObject(nextActivity) as SingleCreepAction_Memory;
       activityMemory.creepID = this.memory.creepID;
       this.memory.childPID = this.creepManager.CreateNewCreepActivity(activityMemory, this.parentPID);

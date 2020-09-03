@@ -27,11 +27,11 @@ class EnergyManager extends BasicProcess<EnergyManagerMemory> {
   }
 
   RunThread(): ThreadState {
-    let sourceIDs = this.roomData.sourceIDs;
+    const sourceIDs = this.roomData.sourceIDs;
     for (let i = 0; i < sourceIDs.length; i++) {
       if (!this.memory.harvesterPIDs[sourceIDs[i]] ||
         !this.kernel.getProcessByPID(this.memory.harvesterPIDs[sourceIDs[i]])) {
-        let pid = this.kernel.startProcess(CPKG_Harvester, {
+        const pid = this.kernel.startProcess(CPKG_Harvester, {
           roomID: this.room.name,
           source: sourceIDs[i],
           targetRoom: this.room.name,
@@ -43,7 +43,7 @@ class EnergyManager extends BasicProcess<EnergyManagerMemory> {
 
     if (!this.memory.refillerPID ||
       !this.kernel.getProcessByPID(this.memory.refillerPID)) {
-      let pid = this.kernel.startProcess(CPKG_ControlledRoomRefiller, {
+      const pid = this.kernel.startProcess(CPKG_ControlledRoomRefiller, {
         roomID: this.room.name,
         targetRoom: this.room.name,
         lastTime: Game.time
@@ -84,9 +84,9 @@ class EnergyManager extends BasicProcess<EnergyManagerMemory> {
 
     if (this.roomData.mineralIDs.length > 0 && this.roomData.structures[STRUCTURE_EXTRACTOR].length > 0 &&
       (!this.memory.mineralHarvesterPID || !this.kernel.getProcessByPID(this.memory.mineralHarvesterPID))) {
-      let extractor = Game.getObjectById<StructureExtractor>(this.roomData.structures[STRUCTURE_EXTRACTOR][0]);
+      const extractor = Game.getObjectById<StructureExtractor>(this.roomData.structures[STRUCTURE_EXTRACTOR][0]);
       if (extractor) {
-        let pid = this.kernel.startProcess(CPKG_MineralHarvester, {
+        const pid = this.kernel.startProcess(CPKG_MineralHarvester, {
           roomID: this.memory.roomID,
           squad: [{}, {}],
           targetRoom: this.memory.roomID,

@@ -27,7 +27,7 @@ class CLIManager extends BasicProcess<SwarmCLIMemory> {
   }
 
   RunThread(): ThreadState {
-    let cmd = this.commands.shift();
+    const cmd = this.commands.shift();
     if (cmd) {
       try {
         this.log.info(`Processing CLI_${cmd.command}(${JSON.stringify(cmd.args)})`)
@@ -90,14 +90,14 @@ class CLIManager extends BasicProcess<SwarmCLIMemory> {
       this.log.warn(`Invalid number of arguments`);
       return;
     }
-    let roomID: RoomID = args[0];
-    let roomData = this.roomManager.GetRoomData(roomID);
+    const roomID: RoomID = args[0];
+    const roomData = this.roomManager.GetRoomData(roomID);
     if (!roomData) {
       this.log.warn(`Cannot assimilate a room that has yet to be seen`);
       return;
     }
 
-    let roomType: RoomType = args[1];
+    const roomType: RoomType = args[1];
     if (roomType != 0 && roomData.roomType == roomType) {
       this.log.info(`Room already assimilated as ${roomType}`);
       return;
@@ -114,8 +114,8 @@ class CLIManager extends BasicProcess<SwarmCLIMemory> {
           return;
         }
         roomData.roomType = RT_RemoteHarvest;
-        let homeID: RoomID = args[2];
-        let homeRoom = this.roomManager.GetRoomData(homeID);
+        const homeID: RoomID = args[2];
+        const homeRoom = this.roomManager.GetRoomData(homeID);
         if (!homeRoom) { // || homeRoom.IsHomeRoom
           this.log.warn(`Cannot make ${roomID} into a harvest room for ${homeID}`);
           return;
@@ -126,9 +126,9 @@ class CLIManager extends BasicProcess<SwarmCLIMemory> {
   }
 
   ChangeFlagColors(priA: ColorConstant, priB: ColorConstant, secA?: ColorConstant, secB?: ColorConstant) {
-    let flagIDs = Object.keys(Game.flags);
+    const flagIDs = Object.keys(Game.flags);
     for (let i = 0; i < flagIDs.length; i++) {
-      let flag = Game.flags[flagIDs[i]];
+      const flag = Game.flags[flagIDs[i]];
       this.log.info(`Checking flag(${flag.name})`);
       if (flag.color == priA) {
         if (!secA || flag.secondaryColor == secA) {

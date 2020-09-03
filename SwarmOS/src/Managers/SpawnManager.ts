@@ -5,11 +5,9 @@ declare var Memory: {
 import { BasicProcess, ExtensionBase } from "Core/BasicTypes";
 
 export const OSPackage: IPackage = {
-  install(processRegistry: IProcessRegistry,
-    extensionRegistry: IExtensionRegistry) {
+  install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
     processRegistry.register(PKG_SpawnManager, SpawnManager);
-    extensionRegistry.register(EXT_SpawnManager,
-      new SpawnManagerExtensions(extensionRegistry));
+    extensionRegistry.register(EXT_SpawnManager, new SpawnManagerExtensions(extensionRegistry));
   }
 }
 
@@ -45,16 +43,16 @@ class SpawnManager extends BasicProcess<SpawnManager_Memory> {
 
   RunThread(): ThreadState {
     this.log.debug(`Begin SpawnManager`);
-    let requests = Object.keys(this.memory);
+    const requests = Object.keys(this.memory);
     if (requests.length == 0) {
       this.log.debug(`No spawn requests in the queue.  You have spawn capacity available.`);
       return ThreadState_Done;
     }
 
-    let spawnIDs = Object.keys(Game.spawns);
-    let activeSpawns = {};
+    const spawnIDs = Object.keys(Game.spawns);
+    const activeSpawns = {};
     for (let i = 0, length = spawnIDs.length; i < length; i++) {
-      let spawn = Game.spawns[spawnIDs[i]];
+      const spawn = Game.spawns[spawnIDs[i]];
       if (spawn.isActive() && !spawn.spawning) {
         activeSpawns[spawnIDs[i]] = spawn;
       }
@@ -63,27 +61,27 @@ class SpawnManager extends BasicProcess<SpawnManager_Memory> {
       // No spawn capacity
       return ThreadState_Done;
     }
-    let sortedSpawnIDs = Object.keys(activeSpawns).sort((a, b) => {
+    const sortedSpawnIDs = Object.keys(activeSpawns).sort((a, b) => {
       return activeSpawns[a].room.energyAvailable >
         activeSpawns[b].room.energyAvailable ? -1 : 1;
     });
 
-    let usedRequestIDs: string[] = [];
-    let activeRequests = this.analyzeSpawnRequests();
-    let requestIDs = Object.keys(activeRequests);
+    const usedRequestIDs: string[] = [];
+    const activeRequests = this.analyzeSpawnRequests();
+    const requestIDs = Object.keys(activeRequests);
     for (let i = 0, iLength = sortedSpawnIDs.length; i < iLength; i++) {
-      let spawn: StructureSpawn = activeSpawns[sortedSpawnIDs[i]];
+      const spawn: StructureSpawn = activeSpawns[sortedSpawnIDs[i]];
       let spawnRequest: { request?: SpawnRequest, bodyCost: number } =
         { request: undefined, bodyCost: 0 };
       let minPriority: Priority = Priority_Hold;
 
       for (let j = 0, jLength = requestIDs.length; j < jLength; j++) {
-        let request = this.memory[requestIDs[j]];
+        const request = this.memory[requestIDs[j]];
         if (usedRequestIDs.includes(request.spawnID)) {
           continue;
         }
-        let body = request.spawnContext.body;
-        let bodyCost = ConvertBodyToCost(body);
+        const body = request.spawnContext.body;
+        const bodyCost = ConvertBodyToCost(body);
         if (spawn.room.energyCapacityAvailable < bodyCost) {
           continue;
         }
@@ -116,11 +114,11 @@ class SpawnManager extends BasicProcess<SpawnManager_Memory> {
   }
 
   protected analyzeSpawnRequests(): SDictionary<SpawnRequest> {
-    let activeRequests = {};
+    const activeRequests = {};
 
-    let requests = Object.keys(this.memory);
+    const requests = Object.keys(this.memory);
     for (let i = 0; i < requests.length; i++) {
-      let request = this.memory[requests[i]];
+      const request = this.memory[requests[i]];
       if (request.spawnState != SP_QUEUED) {
         if (request.spawnState == SP_SPAWNING) {
           if (!Game.creeps[request.spawnContext.creepName]) {
@@ -139,7 +137,7 @@ class SpawnManager extends BasicProcess<SpawnManager_Memory> {
 
   protected spawnCreep(spawn: StructureSpawn, req: SpawnRequest): boolean {
     let spawnResult = ERR_INVALID_ARGS as ScreepsReturnCode;
-    let spawnMem: CreepMemory = Object.assign(req.defaultMemory || {}, {
+    const spawnMem: CreepMemory = Object.assign(req.defaultMemory || {}, {
       parentPID: req.spawnContext.owner_pid
     });
 
@@ -208,10 +206,10 @@ class SpawnManagerExtensions extends ExtensionBase implements ISpawnManagerExten
     if (!this.memory[id]) {
       return SP_ERROR;
     }
-    let spawnRequest = this.memory[id];
+    const spawnRequest = this.memory[id];
 
     if (spawnRequest.spawnState == SP_SPAWNING) {
-      let creep = Game.creeps[spawnRequest.spawnContext.creepName];
+      const creep = Game.creeps[spawnRequest.spawnContext.creepName];
       if (creep && !creep.spawning) {
         this.memory[id].spawnState = SP_COMPLETE;
         spawnRequest.spawnState = SP_COMPLETE;
@@ -223,7 +221,7 @@ class SpawnManagerExtensions extends ExtensionBase implements ISpawnManagerExten
 
   requestSpawn(context: SpawnContext, location: RoomID, spawnPriority: Priority,
     startMem: CreepMemory, maxDistance: number = 3): SpawnID {
-    let newRequest: SpawnRequest = {
+    const newRequest: SpawnRequest = {
       defaultMemory: startMem,
       maxDist: maxDistance,
       spawnContext: context,
