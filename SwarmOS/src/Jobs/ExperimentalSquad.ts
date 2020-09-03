@@ -7,8 +7,10 @@ export const OSPackage: IPackage = {
 import { SquadJob } from "./SquadJob";
 
 class ExperimentalSquad extends SquadJob<ExperimentalSquad_Memory> {
+  @extensionInterface(EXT_MapManager)
+  mapManager!: IMapManagerExtensions;
   RunThread() {
-    if (!this.memory.invasion && Game.rooms[this.memory.targetRoom]) {
+    if (!this.memory.invasion && Game.rooms[this.memory.targetRoom] && Game.time % 5 == 0) {
       let invaders = Game.rooms[this.memory.targetRoom].find(FIND_HOSTILE_CREEPS);
       for (let i = 0; i < invaders.length; i++) {
         if (invaders[i].owner.username == "Invader") {
@@ -219,7 +221,8 @@ class ExperimentalSquad extends SquadJob<ExperimentalSquad_Memory> {
 
   MoveToRoom(creep: Creep, targetRoom: RoomID) {
     // TODO: Cache findRoute to the global cache.
-    const route = Game.map.findRoute(creep.room.name, targetRoom);
+    const route = this.mapManager.GetRoute(creep.room.name, targetRoom);
+    //const route = Game.map.findRoute(creep.room.name, targetRoom);
     if (route == -2) { return; }
     let exit = null;
     for (let i = 0; i < route.length; i++) {
