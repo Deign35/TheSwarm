@@ -19,7 +19,7 @@ class RoomBooter extends SoloJob<RoomBooter_Memory> {
       }
     }
 
-    const homeRoom = Game.rooms[this.memory.roomID];
+    const homeRoom = Game.rooms[this.memory.homeRoom];
     const energyCapacity = homeRoom.energyCapacityAvailable;
     let body = [WORK, CARRY, CARRY, MOVE, MOVE];
     if (energyCapacity >= 1100) {

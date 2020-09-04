@@ -83,6 +83,7 @@
             "combinedType": "RoomPackages",
             "entries": {
                 "EnergyManager": "energyManager",
+                "RemoteManager": "remoteManager",
                 "Towers": "towers"
             }
         },

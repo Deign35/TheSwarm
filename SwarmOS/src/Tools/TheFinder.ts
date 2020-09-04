@@ -29,12 +29,10 @@ export function FindNextTo(position: RoomPosition, lookConstant: LookConstant, o
 
 declare type ExamineGround = (x: number, y: number, terrain: number) => void;
 export function LookAtGround(roomID: RoomID, positionTopLeft: RoomPosition, positionBottomRight: RoomPosition, func: ExamineGround) {
-  if (Game.rooms[roomID]) {
-    const terrain = Game.rooms[roomID].getTerrain();
-    for (let x = positionTopLeft.x; x <= positionBottomRight.x; x++) {
-      for (let y = positionTopLeft.y; y >= positionBottomRight.y; y--) {
-        func(x, y, terrain.get(x, y));
-      }
+  const terrain = Game.map.getRoomTerrain(roomID);
+  for (let x = positionTopLeft.x; x <= positionBottomRight.x; x++) {
+    for (let y = positionTopLeft.y; y >= positionBottomRight.y; y--) {
+      func(x, y, terrain.get(x, y));
     }
   }
 }

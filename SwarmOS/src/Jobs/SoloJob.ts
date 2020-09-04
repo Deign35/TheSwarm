@@ -3,30 +3,26 @@ import { BasicProcess } from "Core/BasicTypes";
 export abstract class SoloJob<T extends SoloJob_Memory> extends BasicProcess<T> {
   @extensionInterface(EXT_CreepManager)
   creepManager!: ICreepManagerExtensions;
+  @extensionInterface(EXT_MapManager)
+  mapManager!: IMapManagerExtensions;
   @extensionInterface(EXT_RoomManager)
   roomManager!: IRoomManagerExtension;
   @extensionInterface(EXT_SpawnManager)
   spawnManager!: ISpawnManagerExtensions;
 
-  protected get homeRoom(): Room {
-    return Game.rooms[this.memory.roomID];
-  }
-  protected creep: Creep | undefined;
-
   RunThread(): ThreadState {
+    let creep: Creep | undefined = undefined;
     if (this.memory.creepID) {
-      this.creep = this.creepManager.tryGetCreep(this.memory.creepID, this.pid) as Creep | undefined;
-      if (this.creep && !this.creep.spawning) {
+      creep = this.creepManager.tryGetCreep(this.memory.creepID, this.pid) as Creep | undefined;
+      if (creep && !creep.spawning) {
         if (!this.memory.activityPID || !this.kernel.getProcessByPID(this.memory.activityPID)) {
           this.CreateActivityForCreep(this.memory.creepID!);
           this.memory.hasRun = true;
         }
       }
-    } else {
-      this.creep = undefined;
     }
 
-    if (!this.creep) {
+    if (!creep) {
       if (!this.memory.activityPID || !this.kernel.getProcessByPID(this.memory.activityPID)) {
         if (this.memory.expires && this.memory.hasRun) {
           this.EndProcess();
@@ -56,16 +52,16 @@ export abstract class SoloJob<T extends SoloJob_Memory> extends BasicProcess<T> 
 
   CreateActivityForCreep(creepID: CreepID) {
     this.creepManager.tryReserveCreep(creepID, this.pid);
-    this.creep = this.creepManager.tryGetCreep(creepID, this.pid);
+    const creep = this.creepManager.tryGetCreep(creepID, this.pid);
     this.memory.creepID = creepID;
-    if (!this.creep) {
+    if (!creep) {
       if (this.memory.expires) {
         this.EndProcess();
       }
       return;
     }
 
-    this.memory.activityPID = this.CreateCustomCreepActivity(this.creep);
+    this.memory.activityPID = this.CreateCustomCreepActivity(creep);
     if (!this.memory.activityPID) {
       this.HandleNoActivity();
     } else {
@@ -78,9 +74,6 @@ export abstract class SoloJob<T extends SoloJob_Memory> extends BasicProcess<T> 
   }
 
   protected abstract CreateCustomCreepActivity(creep: Creep): PID | undefined;
-  protected GetTargetRoomForCreep(creep: Creep): RoomID {
-    return this.memory.targetRoom;
-  }
   protected HandleNoActivity() {
     this.EndProcess();
   }
@@ -90,5 +83,23 @@ export abstract class SoloJob<T extends SoloJob_Memory> extends BasicProcess<T> 
       this.creepManager.releaseCreep(this.memory.creepID, this.pid);
       super.EndProcess(this.memory.creepID);
     }
+  }
+
+  MoveToRoom(creep: Creep, targetRoom: RoomID) {
+    // TODO: Cache findRoute to the global cache.
+    const route = this.mapManager.GetRoute(creep.room.name, targetRoom);
+    //const route = Game.map.findRoute(creep.room.name, targetRoom);
+    if (route == -2) { return; }
+    let exit = null;
+    if (route.length > 0) {
+      exit = creep.pos.findClosestByPath(route[0].exit);
+    }
+    if (!exit) { return; }
+    return this.creepManager.CreateNewCreepActivity({
+      action: AT_MoveToPosition,
+      creepID: creep.name,
+      pos: exit,
+      amount: 0
+    }, this.pid);
   }
 }

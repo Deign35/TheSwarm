@@ -29,7 +29,7 @@ class Worker extends SoloJob<Worker_Memory> {
   }
 
   protected GetNewSpawnID(): string {
-    const homeRoom = Game.rooms[this.memory.roomID];
+    const homeRoom = Game.rooms[this.memory.homeRoom];
     const energyCapacity = homeRoom.energyCapacityAvailable;
     let body = [WORK, CARRY, CARRY, MOVE, MOVE];
     if (energyCapacity >= 1100) {
@@ -43,9 +43,9 @@ class Worker extends SoloJob<Worker_Memory> {
     }
     return this.spawnManager.requestSpawn({
       body: body,
-      creepName: this.memory.roomID + '_' + (Game.time + '_WR').slice(-6),
+      creepName: this.memory.homeRoom + '_' + (Game.time + '_WR').slice(-6),
       owner_pid: this.pid
-    }, this.memory.roomID, Priority_Low, {
+    }, this.memory.homeRoom, Priority_Low, {
         parentPID: this.pid
       }, 1);
   }

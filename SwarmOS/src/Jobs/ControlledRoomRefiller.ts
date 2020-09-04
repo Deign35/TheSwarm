@@ -20,12 +20,12 @@ class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory> {
 
     if (!this.memory.creepID && Game.time - this.memory.lastTime > 200 && !this.memory.expires) {
       this.memory.lastTime = Game.time;
-      this.log.alert("Spawning an emergency refiller for room: " + this.memory.roomID);
+      this.log.alert("Spawning an emergency refiller for room: " + this.memory.homeRoom);
       const sID = this.spawnManager.requestSpawn({
         body: [CARRY, CARRY, CARRY, MOVE, MOVE, MOVE],
-        creepName: this.memory.roomID + "_Ref_Emergency",
+        creepName: this.memory.homeRoom + "_Ref_Emergency",
         owner_pid: this.pid,
-      }, this.memory.roomID, Priority_EMERGENCY, {
+      }, this.memory.homeRoom, Priority_EMERGENCY, {
           parentPID: this.pid
         }, 1);
       const spawnMem: SpawnActivity_Memory = {
@@ -34,8 +34,8 @@ class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory> {
       }
       const spawnPID = this.kernel.startProcess(APKG_SpawnActivity, spawnMem);
       const pid = this.kernel.startProcess(CPKG_ControlledRoomRefiller, {
-        roomID: this.memory.roomID,
-        targetRoom: this.memory.roomID,
+        homeRoom: this.memory.homeRoom,
+        targetRoom: this.memory.homeRoom,
         lastTime: Game.time,
         activityPID: spawnPID,
         expires: true
@@ -46,21 +46,30 @@ class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory> {
   }
 
   protected GetNewSpawnID(): string {
-    const newName = this.memory.roomID + '_Ref';
+    const homeRoom = Game.rooms[this.memory.homeRoom];
+    const newName = this.memory.homeRoom + '_Ref';
     let body = [CARRY, CARRY, MOVE, MOVE];
-    if (this.homeRoom.energyCapacityAvailable >= 1200) {
-      body = [CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
-    } else if (this.homeRoom.energyCapacityAvailable >= 800) {
-      body = [CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
-    } else if (this.homeRoom.energyCapacityAvailable >= 400) {
-      body = [CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE];
+    if (homeRoom.energyCapacityAvailable >= 1600) {
+      body = [CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
+        CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
+        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
+        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+    } else if (homeRoom.energyCapacityAvailable >= 1200) {
+      body = [CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
+        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+    } else if (homeRoom.energyCapacityAvailable >= 800) {
+      body = [CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
+        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+    } else if (homeRoom.energyCapacityAvailable >= 400) {
+      body = [CARRY, CARRY, CARRY, CARRY,
+        MOVE, MOVE, MOVE, MOVE];
     }
 
     const sID = this.spawnManager.requestSpawn({
       body: body,
       creepName: newName,
       owner_pid: this.pid
-    }, this.memory.roomID, Priority_High, {
+    }, this.memory.homeRoom, Priority_High, {
         parentPID: this.pid
       }, 1);
     return sID;
@@ -162,8 +171,8 @@ class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory> {
       }
 
       if (creep.room.storage) {
-        const targets = this.roomManager.GetRoomData(this.memory.roomID)!.structures[STRUCTURE_EXTENSION].concat(
-          this.roomManager.GetRoomData(this.memory.roomID)!.structures[STRUCTURE_SPAWN]);
+        const targets = this.roomManager.GetRoomData(this.memory.homeRoom)!.structures[STRUCTURE_EXTENSION].concat(
+          this.roomManager.GetRoomData(this.memory.homeRoom)!.structures[STRUCTURE_SPAWN]);
         let shouldUseStorage = false;
         for (let i = 0; i < targets.length; i++) {
           let nextTarget = Game.getObjectById<ObjectTypeWithID>(targets[i]) as StructureExtension | StructureSpawn;
@@ -186,7 +195,7 @@ class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory> {
 
     if (actionType == AT_NoOp && creep.store[RESOURCE_ENERGY] > 0) {
       // Find a delivery target
-      let targets = this.roomManager.GetRoomData(this.memory.roomID)!.structures[STRUCTURE_TOWER];
+      let targets = this.roomManager.GetRoomData(this.memory.homeRoom)!.structures[STRUCTURE_TOWER];
       for (let i = 0; i < targets.length; i++) {
         const nextTarget = Game.getObjectById<ObjectTypeWithID>(targets[i]) as StructureTower;
         if (!nextTarget) { continue; }
@@ -207,8 +216,8 @@ class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory> {
       }
 
       if (actionType == AT_NoOp) {
-        targets = this.roomManager.GetRoomData(this.memory.roomID)!.structures[STRUCTURE_EXTENSION].concat(
-          this.roomManager.GetRoomData(this.memory.roomID)!.structures[STRUCTURE_SPAWN]);
+        targets = this.roomManager.GetRoomData(this.memory.homeRoom)!.structures[STRUCTURE_EXTENSION].concat(
+          this.roomManager.GetRoomData(this.memory.homeRoom)!.structures[STRUCTURE_SPAWN]);
         for (let i = 0; i < targets.length; i++) {
           const nextTarget = Game.getObjectById<ObjectTypeWithID>(targets[i]) as StructureExtension | StructureSpawn;
           if (!nextTarget) { continue; }
@@ -228,8 +237,8 @@ class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory> {
           }
         }
 
-        if (actionType == AT_NoOp && Game.rooms[this.memory.roomID]) {
-          const target = Game.rooms[this.memory.roomID].terminal;
+        if (actionType == AT_NoOp && Game.rooms[this.memory.homeRoom]) {
+          const target = Game.rooms[this.memory.homeRoom].terminal;
           if (target) {
             const targetWants = 50000 - target.store.getUsedCapacity(RESOURCE_ENERGY);
             if (targetWants > 0) {
@@ -242,7 +251,7 @@ class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory> {
     }
 
     if (actionType == AT_NoOp) {
-      const targets = this.roomManager.GetRoomData(this.memory.roomID)!.structures[STRUCTURE_STORAGE];
+      const targets = this.roomManager.GetRoomData(this.memory.homeRoom)!.structures[STRUCTURE_STORAGE];
       if (targets.length > 0) {
         const nextTarget = Game.getObjectById<StructureStorage>(targets[0]);
         if (nextTarget) {

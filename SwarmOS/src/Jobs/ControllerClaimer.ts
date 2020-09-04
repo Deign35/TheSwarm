@@ -24,7 +24,8 @@ class ControllerClaimer extends SoloJob<ControllerClaimer_Memory> {
         parentPID: this.pid
       }, 10);
   }
-  protected CreateCustomCreepActivity(creep: Creep): string | undefined {
+
+  protected CreateCustomCreepActivity(creep: Creep): PID | undefined {
     if (creep.room.name != this.memory.targetRoom) {
       const route = this.mapManager.GetRoute(creep.room.name, this.memory.targetRoom);
       if (route == -2) {

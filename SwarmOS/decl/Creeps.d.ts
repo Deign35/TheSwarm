@@ -32,12 +32,13 @@ declare interface SoloJob_Memory extends MemBase {
   creepID?: CreepID;    // (c)reep
   hasRun?: boolean;
   expires?: boolean;  // (exp)pires -- Kill the process when the creep dies
-  roomID: RoomID;    // (h)ome room
+  homeRoom: RoomID;    // (h)ome room
   targetRoom: RoomID;     // (t)arget (r)oom
 }
 declare interface HarvesterMemory extends SoloJob_Memory {
   source: ObjectID;
   container: ObjectID;
+  remoteHarvester?: boolean;
 }
 declare interface ControlledRoomRefiller_Memory extends SoloJob_Memory {
   lastTime: number;

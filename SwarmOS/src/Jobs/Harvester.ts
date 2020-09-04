@@ -17,18 +17,18 @@ class Harvester extends SoloJob<HarvesterMemory> {
   }
 
   protected GetNewSpawnID(): string {
-    const targetRoom = Game.rooms[this.memory.targetRoom];
-    let body: BodyPartConstant[] = [WORK, WORK, MOVE]; // (TODO): Update this value based on if targetRoom is reserved
-    if (targetRoom.energyCapacityAvailable >= 800) {
+    const homeRoom = Game.rooms[this.memory.homeRoom];
+    let body: BodyPartConstant[] = [WORK, WORK, MOVE];
+    if (homeRoom.energyCapacityAvailable >= 800) {
       body = [WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE];
-    } else if (targetRoom.energyCapacityAvailable >= 550) {
+    } else if (homeRoom.energyCapacityAvailable >= 550) {
       body = [WORK, WORK, WORK, WORK, WORK, MOVE];
     } else {
       const source = Game.getObjectById(this.memory.source)! as Source;
       let count = 0;
 
-      LookAtGround(targetRoom.id, new RoomPosition(source.pos.x - 1, source.pos.y + 1, targetRoom.name),
-        new RoomPosition(source.pos.x + 1, source.pos.y - 1, targetRoom.name), (x, y, terrain) => {
+      LookAtGround(this.memory.targetRoom, new RoomPosition(source.pos.x - 1, source.pos.y + 1, this.memory.targetRoom),
+        new RoomPosition(source.pos.x + 1, source.pos.y - 1, this.memory.targetRoom), (x, y, terrain) => {
           if (terrain != TERRAIN_MASK_WALL) {
             if (count < 3 && count++ > 0) {
               this.SpawnSupportHarvester();
@@ -40,12 +40,15 @@ class Harvester extends SoloJob<HarvesterMemory> {
       body: body,
       creepName: this.memory.targetRoom + '_H_' + this.memory.source.slice(-1),
       owner_pid: this.pid
-    }, this.memory.targetRoom, Priority_High, {
+    }, this.memory.targetRoom, this.memory.remoteHarvester ? Priority_Low : Priority_High, {
         parentPID: this.pid
-      }, 1);
+      }, 3);
   }
 
   protected CreateCustomCreepActivity(creep: Creep): string | undefined {
+    if (creep.room.name != this.memory.targetRoom) {
+      return this.MoveToRoom(creep, this.memory.targetRoom);
+    }
     const source = Game.getObjectById<Source>(this.memory.source)!;
     if (source.pos.getRangeTo(creep.pos) > 1) {
       let targetPos = source.pos;
@@ -122,7 +125,7 @@ class Harvester extends SoloJob<HarvesterMemory> {
       body: [WORK, WORK, MOVE],
       creepName: 'SH' + GetRandomIndex(primes_100),
       owner_pid: this.pid
-    }, this.memory.roomID, Priority_Medium, {
+    }, this.memory.homeRoom, Priority_Medium, {
         parentPID: this.pid
       }, 1);
 

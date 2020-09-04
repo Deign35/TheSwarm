@@ -28,7 +28,7 @@ class EnergyManager extends BasicProcess<EnergyManagerMemory> {
       if (!this.memory.harvesterPIDs[sourceIDs[i]] ||
         !this.kernel.getProcessByPID(this.memory.harvesterPIDs[sourceIDs[i]])) {
         const pid = this.kernel.startProcess(CPKG_Harvester, {
-          roomID: this.memory.roomID,
+          homeRoom: this.memory.roomID,
           source: sourceIDs[i],
           targetRoom: this.memory.roomID,
         } as HarvesterMemory);
@@ -40,7 +40,7 @@ class EnergyManager extends BasicProcess<EnergyManagerMemory> {
     if (!this.memory.refillerPID ||
       !this.kernel.getProcessByPID(this.memory.refillerPID)) {
       const pid = this.kernel.startProcess(CPKG_ControlledRoomRefiller, {
-        roomID: this.memory.roomID,
+        homeRoom: this.memory.roomID,
         targetRoom: this.memory.roomID,
         lastTime: Game.time
       } as ControlledRoomRefiller_Memory);
@@ -72,7 +72,7 @@ class EnergyManager extends BasicProcess<EnergyManagerMemory> {
 
     while (this.memory.workerPIDs.length < numWorkers) {
       this.memory.workerPIDs.push(this.kernel.startProcess(CPKG_Worker, {
-        roomID: this.memory.roomID,
+        homeRoom: this.memory.roomID,
         targetRoom: this.memory.roomID,
         expires: true
       } as Worker_Memory))
