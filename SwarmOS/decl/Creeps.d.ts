@@ -47,6 +47,10 @@ declare interface Worker_Memory extends SoloJob_Memory {
 declare interface Scout_Memory extends SoloJob_Memory {
 
 }
+declare interface RoomBooter_Memory extends SoloJob_Memory { }
+declare interface ControllerClaimer_Memory extends SoloJob_Memory {
+  onlyReserve: boolean;
+}
 
 declare interface SquadJob_Memory extends MemBase {
   expires?: boolean;
@@ -76,4 +80,5 @@ declare interface ExperimentalSquad_Memory extends SquadJob_Memory {
     { activityPID?: PID, creepID?: CreepID }]       // Collector 3
 }
 
-//CLI(CLI_Launch, CPKG_ExperimentalSquad, { roomID: "W57S27", targetRoom: "W57S28", sourceID: '59f19f7582100e1594f34eff', squad: [{}, {}, {}, {}, {}, {}]})
+//CLI(CLI_Launch, CPKG_ExperimentalSquad, { roomID: "W57S27", targetRoom: "W57S26", sourceID: '59f19f7582100e1594f34ef7', container: '5f50c63989cd9d54bc834454', squad: [{}, {}, {}, {}, {}, {}]})
+//CLI(CLI_Launch, CPKG_RoomBooter, { roomID: "W57S27", targetRoom: "W55S27", expires: true })

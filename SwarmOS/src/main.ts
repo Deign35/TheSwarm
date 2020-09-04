@@ -48,13 +48,17 @@ import { RoomsPackage } from "Rooms/index";
 
 kernel.installPackages([ActivitiesPackage, FlagPackage, JobsPackage, ManagersPackage, RoomsPackage]);
 
+let gameTimeOfLastGeneratePixel = Game.time;
 export function loop() {
   try {
     kernel.loop();
   } finally {
     kernel.log.DumpLogToConsole();
     if (Game.cpu.bucket == 10000) {
-      Game.cpu.generatePixel();
+      if (Game.cpu.generatePixel() == OK) {
+        console.log(`Ticks between pixels: ${Game.time - gameTimeOfLastGeneratePixel}`);
+        gameTimeOfLastGeneratePixel = Game.time;
+      }
     }
   }
 }

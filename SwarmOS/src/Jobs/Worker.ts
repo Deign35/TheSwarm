@@ -43,11 +43,11 @@ class Worker extends SoloJob<Worker_Memory> {
     }
     return this.spawnManager.requestSpawn({
       body: body,
-      creepName: this.memory.roomID + (Game.time + '_WR').slice(-6),
+      creepName: this.memory.roomID + '_' + (Game.time + '_WR').slice(-6),
       owner_pid: this.pid
     }, this.memory.roomID, Priority_Low, {
         parentPID: this.pid
-      }, 3);
+      }, 1);
   }
   protected CreateCustomCreepActivity(creep: Creep): string | undefined {
     const carryRatio = creep.store.getUsedCapacity() / creep.store.getCapacity();

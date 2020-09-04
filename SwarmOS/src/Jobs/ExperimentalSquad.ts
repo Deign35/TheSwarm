@@ -234,8 +234,8 @@ class ExperimentalSquad extends SquadJob<ExperimentalSquad_Memory> {
     //const route = Game.map.findRoute(creep.room.name, targetRoom);
     if (route == -2) { return; }
     let exit = null;
-    for (let i = 0; i < route.length; i++) {
-      exit = creep.pos.findClosestByPath(route[i].exit);
+    if (route.length > 0) {
+      exit = creep.pos.findClosestByPath(route[0].exit);
     }
     if (!exit) { return; }
     return this.creepManager.CreateNewCreepActivity({

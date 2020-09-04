@@ -42,7 +42,7 @@ class Harvester extends SoloJob<HarvesterMemory> {
       owner_pid: this.pid
     }, this.memory.targetRoom, Priority_High, {
         parentPID: this.pid
-      }, 3);
+      }, 1);
   }
 
   protected CreateCustomCreepActivity(creep: Creep): string | undefined {

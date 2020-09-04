@@ -26,6 +26,8 @@ const PKG_SpawnManager_LogContext: LogContext = {
 }
 
 class SpawnManager extends BasicProcess<SpawnManager_Memory> {
+  @extensionInterface(EXT_MapManager)
+  mapManager!: IMapManagerExtensions;
   get memory() {
     if (!Memory.spawnData) {
       this.log.warn(`Initializing SpawnManager memory`);
@@ -78,6 +80,10 @@ class SpawnManager extends BasicProcess<SpawnManager_Memory> {
       for (let j = 0, jLength = requestIDs.length; j < jLength; j++) {
         const request = this.memory[requestIDs[j]];
         if (usedRequestIDs.includes(request.spawnID)) {
+          continue;
+        }
+        const path = this.mapManager.GetRoute(spawn.room.name, request.spawnOrigin);
+        if (path == -2 || path.length > request.maxDist) {
           continue;
         }
         const body = request.spawnContext.body;

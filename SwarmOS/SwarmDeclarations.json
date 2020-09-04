@@ -66,9 +66,11 @@
             "combinedType": "CreepPackages",
             "entries": {
                 "ControlledRoomRefiller": "controlledRoomRefiller",
+                "ControllerClaimer": "controllerClaimer",
                 "ExperimentalSquad": "experimentalSquad",
                 "Harvester": "harvester",
                 "MineralHarvester": "mineralHarvester",
+                "RoomBooter": "roomBooter",
                 "Scout": "scout",
                 "Worker": "worker"
             }
