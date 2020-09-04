@@ -8,14 +8,8 @@ import { SoloJob } from "./SoloJob";
 class Worker extends SoloJob<Worker_Memory> {
 
   private hasRun!: boolean;
-  private _roomData!: RoomState;
-  protected get roomData() {
-    return this._roomData;
-  }
-
   PrepTick() {
     this.hasRun = false;
-    this._roomData = this.roomManager.GetRoomData(this.memory.targetRoom)!;
   }
   RunThread(): ThreadState {
     this.hasRun = true;
@@ -43,13 +37,16 @@ class Worker extends SoloJob<Worker_Memory> {
     }
     return this.spawnManager.requestSpawn({
       body: body,
-      creepName: this.memory.homeRoom + '_' + (Game.time + '_WR').slice(-6),
+      creepName: this.memory.targetRoom + '_' + (Game.time + '_WR').slice(-6),
       owner_pid: this.pid
-    }, this.memory.homeRoom, Priority_Low, {
+    }, this.memory.targetRoom, Priority_Low, {
         parentPID: this.pid
       }, 1);
   }
   protected CreateCustomCreepActivity(creep: Creep): string | undefined {
+    if (creep.room.name != this.memory.targetRoom) {
+      return this.MoveToRoom(creep, this.memory.targetRoom);
+    }
     const carryRatio = creep.store.getUsedCapacity() / creep.store.getCapacity();
     const roomData = this.roomManager.GetRoomData(creep.room.name)!;
     if (carryRatio > 0.50) {
@@ -74,19 +71,19 @@ class Worker extends SoloJob<Worker_Memory> {
         }
       }
 
-      return this.creepManager.CreateNewCreepActivity({
-        action: AT_Upgrade,
-        creepID: creep.name,
-        targetID: roomData.structures[STRUCTURE_CONTROLLER][0]
-      }, this.pid)
+      if (creep.room.controller && creep.room.controller.my) {
+        return this.creepManager.CreateNewCreepActivity({
+          action: AT_Upgrade,
+          creepID: creep.name,
+          targetID: roomData.structures[STRUCTURE_CONTROLLER][0]
+        }, this.pid)
+      }
     }
-
 
     let actionType: ActionType = AT_NoOp;
     let bestTarget = '';
-    const energyNeeded = creep.store.getCapacity() - (creep.store.getUsedCapacity() || 0);
-
     let closestDist = 1000;
+    const energyNeeded = creep.store.getFreeCapacity();
 
     if (actionType == AT_NoOp && roomData.tombstones.length > 0) {
       for (let i = 0; i < roomData.tombstones.length; i++) {
@@ -121,6 +118,20 @@ class Worker extends SoloJob<Worker_Memory> {
       if (storage) {
         bestTarget = storage.id;
         actionType = AT_Withdraw;
+      }
+    }
+
+    if (actionType == AT_NoOp && roomData.structures[STRUCTURE_CONTAINER].length > 0) {
+      for (let i = 0; i < roomData.structures[STRUCTURE_CONTAINER].length; i++) {
+        const container = Game.getObjectById<StructureContainer>(roomData.structures[STRUCTURE_CONTAINER][i]);
+        if (container && container.store.getUsedCapacity(RESOURCE_ENERGY) >= energyNeeded) {
+          const dist = container.pos.getRangeTo(creep.pos);
+          if (dist < closestDist) {
+            closestDist = dist;
+            bestTarget = container.id;
+            actionType = AT_Withdraw;
+          }
+        }
       }
     }
 

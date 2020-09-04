@@ -56,7 +56,7 @@ class RoomManager extends BasicProcess<RoomStateMemory> {
       if (data.roomType == RT_Home) {
         if (!data.activityPIDs[RPKG_Towers] || !this.kernel.getProcessByPID(data.activityPIDs[RPKG_Towers])) {
           data.activityPIDs[RPKG_Towers] = this.kernel.startProcess(RPKG_Towers, {
-            roomID: roomID
+            homeRoom: roomID
           } as TowerMemory);
           this.kernel.setParent(data.activityPIDs[RPKG_Towers], this.pid);
         }
@@ -67,7 +67,7 @@ class RoomManager extends BasicProcess<RoomStateMemory> {
             refillerPID: '',
             workerPIDs: [],
             mineralHarvesterPID: '',
-            roomID: roomID
+            homeRoom: roomID
           } as EnergyManagerMemory);
           this.kernel.setParent(data.activityPIDs.RPKG_EnergyManager, this.pid);
         }

@@ -10,7 +10,7 @@ class RemoteManager extends BasicProcess<RemoteManager_Memory> {
   protected roomManager!: IRoomManagerExtension;
   RunThread(): ThreadState {
     const room = Game.rooms[this.memory.targetRoom];
-    const homeRoom = Game.rooms[this.memory.roomID];
+    const homeRoom = Game.rooms[this.memory.homeRoom];
     const roomData = this.roomManager.GetRoomData(this.memory.targetRoom);
     if (!this.memory.invasion && Game.rooms[this.memory.targetRoom] && Game.time % 5 == 0) {
       const invaders = Game.rooms[this.memory.targetRoom].find(FIND_HOSTILE_CREEPS);

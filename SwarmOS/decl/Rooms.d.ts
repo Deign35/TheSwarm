@@ -1,5 +1,5 @@
 declare interface RoomMemory extends MemBase {
-  roomID: RoomID;
+  homeRoom: RoomID;
 }
 
 declare interface TowerMemory extends RoomMemory { }
@@ -13,7 +13,8 @@ declare interface EnergyManagerMemory extends RoomMemory {
 
 declare interface RemoteManager_Memory extends RoomMemory {
   targetRoom: RoomID;
-  harvesterPIDs: PID[];
+  harvesterPIDs: Record<ObjectID, PID>;
+  numRefillers: number;
   refillerPIDs: PID[];
   workerPID: PID;
   claimerPID: PID;

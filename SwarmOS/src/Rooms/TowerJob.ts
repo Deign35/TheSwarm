@@ -9,7 +9,7 @@ class TowerJob extends BasicProcess<TowerMemory> {
   @extensionInterface(EXT_RoomManager)
   protected roomManager!: IRoomManagerExtension;
   RunThread(): ThreadState {
-    let roomData = this.roomManager.GetRoomData(this.memory.roomID)!;
+    let roomData = this.roomManager.GetRoomData(this.memory.homeRoom)!;
     for (let i = 0; i < roomData.needsRepair.length; i++) {
       const target = Game.getObjectById<Structure>(roomData.needsRepair[i]);
       if (target && target.structureType == STRUCTURE_RAMPART && target.hits <= 300) {
@@ -23,7 +23,7 @@ class TowerJob extends BasicProcess<TowerMemory> {
       }
     }
 
-    const otherCreeps = Game.rooms[this.memory.roomID].find(FIND_HOSTILE_CREEPS);
+    const otherCreeps = Game.rooms[this.memory.homeRoom].find(FIND_HOSTILE_CREEPS);
     if (otherCreeps.length == 0) {
       this.sleeper.sleep(this.pid, 6);
       return ThreadState_Done;
