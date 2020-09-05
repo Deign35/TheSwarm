@@ -56,7 +56,8 @@ class RemoteManager extends BasicProcess<RemoteManager_Memory> {
       } as Worker_Memory);
     }
 
-    for (const id in this.memory.harvesterPIDs) {
+    const sources = this.roomManager.GetRoomData(this.memory.targetRoom)!.sourceIDs;
+    for (const id of sources) {
       if (!this.memory.harvesterPIDs[id] || !this.kernel.getProcessByPID(this.memory.harvesterPIDs[id])) {
         this.memory.harvesterPIDs[id] = this.kernel.startProcess(CPKG_Harvester, {
           expires: true,
@@ -74,7 +75,8 @@ class RemoteManager extends BasicProcess<RemoteManager_Memory> {
       }
     }
 
-    while (this.memory.refillerPIDs.length < this.memory.numRefillers) {
+    const numWorkers = this.memory.numRefillers * sources.length;
+    while (this.memory.refillerPIDs.length < numWorkers) {
       this.memory.refillerPIDs.push(this.kernel.startProcess(CPKG_RemoteRefiller, {
         expires: true,
         homeRoom: this.memory.homeRoom,
