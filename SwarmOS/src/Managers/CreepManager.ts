@@ -237,9 +237,6 @@ class CreepManagerExtensions extends ExtensionBase implements ICreepManagerExten
       case (AT_NoOp): return OK;
     }
 
-    if (actionResult == OK) {
-      this.log.recordActionTaken();
-    }
     return actionResult;
   }
 

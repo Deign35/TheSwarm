@@ -67,10 +67,19 @@ class RoomManager extends BasicProcess<RoomStateMemory> {
             refillerPID: '',
             workerPIDs: [],
             mineralHarvesterPID: '',
-            homeRoom: roomID
+            homeRoom: roomID,
+            numWorkers: 2
           } as EnergyManagerMemory);
           this.kernel.setParent(data.activityPIDs.RPKG_EnergyManager, this.pid);
         }
+      } else if (data.roomType == RT_RemoteHarvest) {
+        data.activityPIDs[RPKG_RemoteManager] = this.kernel.startProcess(RPKG_RemoteManager, {
+          harvesterPIDs: {},
+          numRefillers: 3,
+          refillerPIDs: [],
+          targetRoom: roomID,
+          homeRoom: data.homeRoom,
+        } as RemoteManager_Memory);
       }
     }
 

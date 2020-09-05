@@ -110,7 +110,7 @@ class CLIManager extends BasicProcess<SwarmCLIMemory> {
         break;
       case (RT_RemoteHarvest):
         if (args.length != 3) {
-          this.log.warn(`Invalid number of arguments`);
+          this.log.warn(`Must provide a home room`);
           return;
         }
         roomData.roomType = RT_RemoteHarvest;
@@ -120,6 +120,9 @@ class CLIManager extends BasicProcess<SwarmCLIMemory> {
           this.log.warn(`Cannot make ${roomID} into a harvest room for ${homeID}`);
           return;
         }
+
+        roomData.roomType = RT_RemoteHarvest;
+        roomData.homeRoom = homeID;
         // Add as remote harvest room to homeRoom
         break;
     }
@@ -175,7 +178,7 @@ const help = function () {
   msg += "CLI_ClearLog: Clears the error log for the kernel.\n";
   msg += "CLI_Kill: Kills the provided process by PID.\n";
   msg += "CLI_Launch: Launches a program.\n";
-  msg += "ex: CLI(CLI_Launch, CPKG_Scout, { roomID: \"W57S27\", targetRoom: \"W57S26\" })\n\n";
+  msg += "ex: CLI(CLI_Launch, CPKG_Scout, { homeRoom: \"W57S27\", targetRoom: \"W57S26\" })\n\n";
 
   msg += "CLI_SetWallStrength: Sets the walls and ramparts strength for a room.\n";
   msg += "ex: CLI(CLI_SetWallStrength, \"W57S26\", 1000, 2000)\n";

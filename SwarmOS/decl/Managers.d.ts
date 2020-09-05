@@ -32,6 +32,7 @@ interface RoomState extends MemBase {
   lastUpdated: number;
   wallStrength?: number;
   rampartStrength?: number;
+  homeRoom?: RoomID;
 
   activityPIDs: {
     RPKG_EnergyManager: PID,

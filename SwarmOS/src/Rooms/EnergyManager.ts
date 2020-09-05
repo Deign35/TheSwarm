@@ -34,6 +34,7 @@ class EnergyManager extends BasicProcess<EnergyManagerMemory> {
         } as HarvesterMemory);
 
         this.memory.harvesterPIDs[sourceIDs[i]] = pid;
+        this.kernel.setParent(pid, this.pid);
       }
     }
 
@@ -46,6 +47,7 @@ class EnergyManager extends BasicProcess<EnergyManagerMemory> {
       } as ControlledRoomRefiller_Memory);
 
       this.memory.refillerPID = pid;
+      this.kernel.setParent(pid, this.pid);
     }
 
     for (let i = 0; i < this.memory.workerPIDs.length; i++) {
@@ -54,7 +56,7 @@ class EnergyManager extends BasicProcess<EnergyManagerMemory> {
       }
     }
 
-    let numWorkers = sourceIDs.length;
+    let numWorkers = this.memory.numWorkers || sourceIDs.length;
     if (room.controller) {
       if (room.controller.level == 1) {
         numWorkers *= 4;
@@ -88,6 +90,7 @@ class EnergyManager extends BasicProcess<EnergyManagerMemory> {
           targetRoom: this.memory.homeRoom,
         } as MineralHarvester_Memory);
         this.memory.mineralHarvesterPID = pid;
+        this.kernel.setParent(pid, this.pid);
       }
     }
 

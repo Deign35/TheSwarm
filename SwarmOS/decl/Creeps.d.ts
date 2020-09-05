@@ -43,15 +43,13 @@ declare interface HarvesterMemory extends SoloJob_Memory {
 declare interface ControlledRoomRefiller_Memory extends SoloJob_Memory {
   lastTime: number;
 }
-declare interface Worker_Memory extends SoloJob_Memory {
-}
-declare interface Scout_Memory extends SoloJob_Memory {
-
-}
+declare interface Worker_Memory extends SoloJob_Memory { }
+declare interface Scout_Memory extends SoloJob_Memory { }
 declare interface RoomBooter_Memory extends SoloJob_Memory { }
 declare interface ControllerClaimer_Memory extends SoloJob_Memory {
   onlyReserve: boolean;
 }
+declare interface RemoteRefiller_Memory extends SoloJob_Memory { }
 
 declare interface SquadJob_Memory extends MemBase {
   expires?: boolean;
@@ -81,5 +79,5 @@ declare interface ExperimentalSquad_Memory extends SquadJob_Memory {
     { activityPID?: PID, creepID?: CreepID }]       // Collector 3
 }
 
-//CLI(CLI_Launch, CPKG_ExperimentalSquad, { roomID: "W57S27", targetRoom: "W57S26", sourceID: '59f19f7582100e1594f34ef7', container: '5f50c63989cd9d54bc834454', squad: [{}, {}, {}, {}, {}, {}]})
-//CLI(CLI_Launch, CPKG_RoomBooter, { roomID: "W57S27", targetRoom: "W55S27", expires: true })
+//CLI(CLI_Launch, CPKG_ExperimentalSquad, { homeRoom: "W57S27", targetRoom: "W57S26", sourceID: '59f19f7582100e1594f34ef7', container: '5f50c63989cd9d54bc834454', squad: [{}, {}, {}, {}, {}, {}]})
+//CLI(CLI_Launch, CPKG_RoomBooter, { homeRoom: "W57S27", targetRoom: "W55S27", expires: true })

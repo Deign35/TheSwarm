@@ -55,6 +55,11 @@ class CreepActivity extends BasicProcess<SingleCreepAction_Memory> {
         case (AT_Withdraw):
           this.EndProcess();
           return ThreadState_Done;
+        case (AT_RenewCreep):
+          if (result == ERR_BUSY) {
+            this.EndProcess();
+            return ThreadState_Done;
+          }
         default:
           break;
       }

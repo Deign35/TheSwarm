@@ -1,11 +1,11 @@
 export const OSPackage: IPackage = {
   install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
-    processRegistry.register(CPKG_ControlledRoomRefiller, ControlledRoomRefiller);
+    processRegistry.register(CPKG_RemoteRefiller, RemoteRefiller);
   }
 }
 import { SoloJob } from "./SoloJob";
 
-class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory> {
+class RemoteRefiller extends SoloJob<RemoteRefiller_Memory> {
   protected GetNewSpawnID(): string {
     const body = [CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
       MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];

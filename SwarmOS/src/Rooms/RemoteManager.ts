@@ -9,15 +9,17 @@ class RemoteManager extends BasicProcess<RemoteManager_Memory> {
   @extensionInterface(EXT_RoomManager)
   protected roomManager!: IRoomManagerExtension;
   RunThread(): ThreadState {
-    const room = Game.rooms[this.memory.targetRoom];
-    const homeRoom = Game.rooms[this.memory.homeRoom];
-    const roomData = this.roomManager.GetRoomData(this.memory.targetRoom);
-    if (!this.memory.invasion && Game.rooms[this.memory.targetRoom] && Game.time % 5 == 0) {
-      const invaders = Game.rooms[this.memory.targetRoom].find(FIND_HOSTILE_CREEPS);
+    const targetRoom = Game.rooms[this.memory.targetRoom];
+    if (!this.memory.invasion && targetRoom) {
+      const invaders = targetRoom.find(FIND_HOSTILE_CREEPS);
       for (let i = 0; i < invaders.length; i++) {
         if (invaders[i].owner.username == "Invader") {
           this.log.alert(`Invasion detected: ${this.memory.targetRoom}`);
           this.memory.invasion = invaders[i].ticksToLive!;
+          /**
+           * Need to take this as an opportunity to evacuate the room.
+           * And spawn an attacker.
+           */
         }
       }
     }
@@ -29,13 +31,58 @@ class RemoteManager extends BasicProcess<RemoteManager_Memory> {
       }
       const vis = new RoomVisual(this.memory.targetRoom);
       let pos = new RoomPosition(25, 25, this.memory.targetRoom);
-      if (room && room.controller) {
-        pos = room.controller.pos;
+      if (targetRoom && targetRoom.controller) {
+        pos = targetRoom.controller.pos;
       }
 
       vis.text(`${this.memory.invasion}`, pos.x, pos.y);
       return ThreadState_Done;
     }
+
+    if (!this.memory.claimerPID || !this.kernel.getProcessByPID(this.memory.claimerPID)) {
+      this.memory.claimerPID = this.kernel.startProcess(CPKG_ControllerClaimer, {
+        expires: true,
+        homeRoom: this.memory.homeRoom,
+        onlyReserve: true,
+        targetRoom: this.memory.targetRoom
+      } as ControllerClaimer_Memory);
+    }
+
+    if (!this.memory.workerPID || !this.kernel.getProcessByPID(this.memory.workerPID)) {
+      this.memory.workerPID = this.kernel.startProcess(CPKG_Worker, {
+        expires: true,
+        homeRoom: this.memory.homeRoom,
+        targetRoom: this.memory.targetRoom
+      } as Worker_Memory);
+    }
+
+    for (const id in this.memory.harvesterPIDs) {
+      if (!this.memory.harvesterPIDs[id] || !this.kernel.getProcessByPID(this.memory.harvesterPIDs[id])) {
+        this.memory.harvesterPIDs[id] = this.kernel.startProcess(CPKG_Harvester, {
+          expires: true,
+          homeRoom: this.memory.homeRoom,
+          remoteHarvester: true,
+          source: id,
+          targetRoom: this.memory.targetRoom
+        } as HarvesterMemory);
+      }
+    }
+
+    for (let i = 0; i < this.memory.refillerPIDs.length; i++) {
+      if (!this.kernel.getProcessByPID(this.memory.refillerPIDs[i])) {
+        this.memory.refillerPIDs.splice(i--, 1);
+      }
+    }
+
+    while (this.memory.refillerPIDs.length < this.memory.numRefillers) {
+      this.memory.refillerPIDs.push(this.kernel.startProcess(CPKG_RemoteRefiller, {
+        expires: true,
+        homeRoom: this.memory.homeRoom,
+        targetRoom: this.memory.targetRoom
+      } as RemoteRefiller_Memory));
+    }
+
+    this.sleeper.sleep(this.pid, 5);
     return ThreadState_Done;
   }
 }

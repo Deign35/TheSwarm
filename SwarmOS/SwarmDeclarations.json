@@ -70,6 +70,7 @@
                 "ExperimentalSquad": "experimentalSquad",
                 "Harvester": "harvester",
                 "MineralHarvester": "mineralHarvester",
+                "RemoteRefiller": "remoteRefiller",
                 "RoomBooter": "roomBooter",
                 "Scout": "scout",
                 "Worker": "worker"

@@ -16,6 +16,9 @@ class Scout extends SoloJob<Scout_Memory> {
       }, 3);
   }
   protected CreateCustomCreepActivity(creep: Creep): string | undefined {
+    if (creep.room.name != this.memory.targetRoom) {
+      return this.MoveToRoom(creep, this.memory.targetRoom);
+    }
     let movePosition = new RoomPosition(25, 25, creep.room.name);
     if (creep.room.name == this.memory.targetRoom) {
       if (creep.room.controller && (!creep.room.controller.sign ||
