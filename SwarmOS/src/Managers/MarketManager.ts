@@ -34,15 +34,19 @@ class MarketManager extends BasicProcess<MarketManager_Memory> {
     return PKG_MarketManager_LogContext.logLevel!;
   }
 
-  private MARKET_MANAGER_ENABLED = false;
   RunThread(): ThreadState {
-    if (!this.MARKET_MANAGER_ENABLED) return ThreadState_Done;
-    if (Game.rooms['sim'] || Game.cpu.getUsed() > (Game.cpu.limit * 0.75)) return ThreadState_Done;
+    return ThreadState_Done;
+  }
+
+  private MARKET_MANAGER_ENABLED = false;
+  EndTick() {
+    if (!this.MARKET_MANAGER_ENABLED) return;
+    if (Game.rooms['sim'] || Game.cpu.getUsed() > (Game.cpu.limit * 0.75)) return;
     if (Game.time - this.memory.lastUpdate > 1000) {
-      let roomIDs = Object.keys(Game.rooms);
+      const roomIDs = Object.keys(Game.rooms);
       for (let i = 0; i < roomIDs.length; i++) {
-        let room = Game.rooms[roomIDs[i]];
-        if (room.terminal && !this.memory.terminals[room.terminal.id]) {
+        const room = Game.rooms[roomIDs[i]];
+        if (room.terminal && room.terminal.my && !this.memory.terminals[room.terminal.id]) {
           this.memory.terminals[room.terminal.id] = "";
         }
       }
@@ -61,10 +65,10 @@ class MarketManager extends BasicProcess<MarketManager_Memory> {
       if (terminal && !((terminal.cooldown | 0) > 0)) {
         if (this.memory.terminals[terminalIDs[i]]) {
           let order = Game.market.getOrderById(this.memory.terminals[terminalIDs[i]]);
+          this.memory.terminals[terminalIDs[i]] = '';
           if (order) {
             Game.market.deal(order.id, order.amount, terminal.room.name);
-            this.memory.terminals[terminalIDs[i]] = '';
-            return ThreadState_Done;
+            return;
           } else {
             canTransfer = true;
           }
@@ -74,7 +78,7 @@ class MarketManager extends BasicProcess<MarketManager_Memory> {
       }
     }
 
-    if (!canTransfer) return ThreadState_Done;
+    if (!canTransfer) return;
 
     let allOrders = Game.market.getAllOrders({
       resourceType: RESOURCE_ENERGY

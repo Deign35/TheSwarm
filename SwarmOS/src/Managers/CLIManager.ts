@@ -33,7 +33,7 @@ class CLIManager extends BasicProcess<SwarmCLIMemory> {
         this.log.info(`Processing CLI_${cmd.command}(${JSON.stringify(cmd.args)})`)
         switch (cmd.command) {
           case (CLI_Assimilate):
-            if (cmd.args && cmd.args.length == 2) {
+            if (cmd.args && cmd.args.length >= 2) {
               this.Assimilate(cmd.args);
             }
             break;

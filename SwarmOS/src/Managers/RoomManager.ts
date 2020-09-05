@@ -38,19 +38,27 @@ class RoomManager extends BasicProcess<RoomStateMemory> {
 
   RunThread(): ThreadState {
     for (let roomID in Game.rooms) {
-      const data = this.roomManager.GetRoomData(roomID);
+      const data = this.roomManager.GetRoomData(roomID)!;
       if (!data) {
         continue;
       }
-      if (Game.rooms[roomID] && Game.rooms[roomID].controller && Game.rooms[roomID].controller!.my) {
+      if (Game.time - data.lastUpdated > 23) {
+        this.roomManager.ScanRoom(roomID);
+      }
+
+      const room = Game.rooms[roomID];
+      if (room && room.controller && room.controller.my) {
         const vis: RoomVisual = new RoomVisual(roomID);
 
         const headerStyle: TextStyle = { align: 'left', color: 'white', backgroundColor: 'black', opacity: 0.7 };
-        vis.text(`Energy: ${Game.rooms[roomID].energyAvailable}/${Game.rooms[roomID].energyCapacityAvailable}`, 0, 2, headerStyle);
+        vis.text(`Energy: ${room.energyAvailable}/${room.energyCapacityAvailable}`, 0, 2, headerStyle);
       }
+    }
 
-      if (Game.time - data.lastUpdated > 23) {
-        this.roomManager.ScanRoom(roomID);
+    for (let roomID in this.memory.roomStateData) {
+      const data = this.roomManager.GetRoomData(roomID);
+      if (!data) {
+        continue;
       }
 
       if (data.roomType == RT_Home) {
@@ -61,8 +69,8 @@ class RoomManager extends BasicProcess<RoomStateMemory> {
           this.kernel.setParent(data.activityPIDs[RPKG_Towers], this.pid);
         }
 
-        if (!data.activityPIDs.RPKG_EnergyManager || !this.kernel.getProcessByPID(data.activityPIDs.RPKG_EnergyManager)) {
-          data.activityPIDs.RPKG_EnergyManager = this.kernel.startProcess(RPKG_EnergyManager, {
+        if (!data.activityPIDs[RPKG_EnergyManager] || !this.kernel.getProcessByPID(data.activityPIDs[RPKG_EnergyManager])) {
+          data.activityPIDs[RPKG_EnergyManager] = this.kernel.startProcess(RPKG_EnergyManager, {
             harvesterPIDs: {},
             refillerPID: '',
             workerPIDs: [],
@@ -70,16 +78,19 @@ class RoomManager extends BasicProcess<RoomStateMemory> {
             homeRoom: roomID,
             numWorkers: 2
           } as EnergyManagerMemory);
-          this.kernel.setParent(data.activityPIDs.RPKG_EnergyManager, this.pid);
+          this.kernel.setParent(data.activityPIDs[RPKG_EnergyManager], this.pid);
         }
       } else if (data.roomType == RT_RemoteHarvest) {
-        data.activityPIDs[RPKG_RemoteManager] = this.kernel.startProcess(RPKG_RemoteManager, {
-          harvesterPIDs: {},
-          numRefillers: 3,
-          refillerPIDs: [],
-          targetRoom: roomID,
-          homeRoom: data.homeRoom,
-        } as RemoteManager_Memory);
+        if (!data.activityPIDs[RPKG_RemoteManager] || !this.kernel.getProcessByPID(data.activityPIDs[RPKG_RemoteManager])) {
+          data.activityPIDs[RPKG_RemoteManager] = this.kernel.startProcess(RPKG_RemoteManager, {
+            harvesterPIDs: {},
+            numRefillers: 3,
+            refillerPIDs: [],
+            targetRoom: roomID,
+            homeRoom: data.homeRoom,
+          } as RemoteManager_Memory);
+          this.kernel.setParent(data.activityPIDs[RPKG_RemoteManager], this.pid);
+        }
       }
     }
 
@@ -106,11 +117,11 @@ class RoomManagerExtension extends ExtensionBase implements IRoomManagerExtensio
   }
 
   GetRoomData(roomID: string): RoomState {
-    const roomState = this.memory.roomStateData[roomID];
+    let roomState = this.memory.roomStateData[roomID];
     if (!roomState) {
       const room = Game.rooms[roomID];
       if (room) {
-        this.memory.roomStateData[roomID] = {
+        roomState = {
           roomType: RT_Nuetral,
           wallStrength: 0,
           rampartStrength: 0,
@@ -141,6 +152,7 @@ class RoomManagerExtension extends ExtensionBase implements IRoomManagerExtensio
           tombstones: [],
           ruins: []
         }
+        this.memory.roomStateData[roomID] = roomState;
       }
     }
 
