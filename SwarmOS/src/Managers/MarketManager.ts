@@ -9,7 +9,7 @@ export const OSPackage: IPackage = {
   }
 }
 const PKG_MarketManager_LogContext: LogContext = {
-  logID: PKG_FlagManager,
+  logID: PKG_MarketManager,
   logLevel: LOG_INFO
 }
 

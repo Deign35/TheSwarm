@@ -9,6 +9,11 @@ export const OSPackage: IPackage = {
   }
 }
 
+const PKG_CLIManager_LogContext: LogContext = {
+  logID: PKG_CLIManager,
+  logLevel: LOG_INFO
+}
+
 import { BasicProcess } from "Core/BasicTypes";
 
 class CLIManager extends BasicProcess<SwarmCLIMemory> {
@@ -22,6 +27,12 @@ class CLIManager extends BasicProcess<SwarmCLIMemory> {
       }
     }
     return Memory.CLI;
+  }
+  protected get logID(): string {
+    return PKG_CLIManager_LogContext.logID;
+  }
+  protected get logLevel(): LogLevel {
+    return PKG_CLIManager_LogContext.logLevel;
   }
   protected get commands() {
     return this.memory.commands;
@@ -58,6 +69,11 @@ class CLIManager extends BasicProcess<SwarmCLIMemory> {
                 cmd.args.push(undefined);
               }
               this.ChangeFlagColors(cmd.args[0], cmd.args[1], cmd.args[2], cmd.args[3]);
+            }
+            break;
+          case (CLI_GetNumWorkers):
+            if (cmd.args && cmd.args.length == 1) {
+              this.GetNumWorkers(cmd.args[0]);
             }
             break;
           case (CLI_Kill):
@@ -211,6 +227,17 @@ class CLIManager extends BasicProcess<SwarmCLIMemory> {
     }
   }
 
+  GetNumWorkers(roomID: RoomID) {
+    let roomData = this.roomManager.GetRoomData(roomID);
+    if (roomData) {
+      if (roomData.activityPIDs[RPKG_EnergyManager]) {
+        this.log.info(`Numworkers for ${roomID} -- ${(Memory.kernel.processMemory[roomData.activityPIDs[RPKG_EnergyManager]] as EnergyManager_Memory).numWorkers}`)
+      } else if (roomData.activityPIDs[RPKG_RemoteManager]) {
+        this.log.info(`Numworkers for ${roomID} -- ${(Memory.kernel.processMemory[roomData.activityPIDs[RPKG_RemoteManager]] as RemoteManager_Memory).numRefillers}`)
+      }
+    }
+  }
+
   SetNumWorkers(roomID: RoomID, numWorkers: number) {
     let roomData = this.roomManager.GetRoomData(roomID);
     if (roomData && roomData.activityPIDs[RPKG_EnergyManager]) {
@@ -247,6 +274,8 @@ const help = function () {
   msg += "CLI_Launch: Launches a program.\n";
   msg += "ex: CLI(CLI_Launch, CPKG_Scout, { homeRoom: \"W57S27\", targetRoom: \"W57S26\" })\n\n";
 
+  msg += "CLI_GetNumWorkers: Gets the number of workers for a given room.\n";
+  msg += "ex: CLI(CLI_GetNumWorkers, \"W57S27\")\n";
   msg += "CLI_SetNumWorkers: Sets the number of workers or refillers depending on room type.\n";
   msg += "ex: CLI(CLI_SetNumWorkers, \"W57S27\", 3)\n\n";
 

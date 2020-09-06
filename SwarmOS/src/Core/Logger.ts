@@ -72,7 +72,6 @@ export class Logger implements IKernelLoggerExtensions {
     this.InitQueue();
   }
   private logContexts: SDictionary<LoggerContext>;
-  private numActionsTaken: number = 0;
 
   protected InitQueue(): void {
     const ids = Object.keys(this.logContexts);
@@ -83,8 +82,6 @@ export class Logger implements IKernelLoggerExtensions {
     if (!this.logContexts[DEFAULT_LOG_ID]) {
       this.CreateLogContext(DEFAULT_LOG_ID, DEFAULT_LOG_LEVEL);
     }
-
-    this.numActionsTaken = 0;
   }
 
   protected log(message: (string | (() => string)), contextID: string = DEFAULT_LOG_ID, severity: LogLevel = DEFAULT_LOG_LEVEL) {
@@ -112,9 +109,6 @@ export class Logger implements IKernelLoggerExtensions {
   info(message: (string | (() => string)), contextID?: string) { return this.log(message, contextID, LOG_INFO); }
   trace(message: (string | (() => string)), contextID?: string) { return this.log(message, contextID, LOG_TRACE); }
   warn(message: (string | (() => string)), contextID?: string) { return this.log(message, contextID, LOG_WARN); }
-  recordActionTaken() {
-    this.numActionsTaken++;
-  }
 
   CreateLogContext(logID: string, logLevel: LogLevel): ILogger {
     if (!this.logContexts[logID]) {
@@ -133,7 +127,6 @@ export class Logger implements IKernelLoggerExtensions {
       info: (message: (string | (() => string))) => { self.info(message, logID); },
       trace: (message: (string | (() => string))) => { self.trace(message, logID); },
       warn: (message: (string | (() => string))) => { self.warn(message, logID); },
-      recordActionTaken: () => { self.recordActionTaken() }
     }
   }
 

@@ -103,7 +103,7 @@ declare interface ICreepManagerExtensions extends IPackageExtension {
 
   CreateNewCreepActivity(actionMem: SingleCreepAction_Memory, parentPID: PID): PID | undefined;
   RunCreepAction(args: CreepActionArgs): ScreepsReturnCode;
-  ValidateActionTarget(actionType: ActionType, target: any): boolean;
+  ValidateActionTarget(actionType: ActionType, target: any, resourceType?: ResourceConstant): boolean;
   CreepIsInRange(actionType: ActionType, pos1: RoomPosition, pos2: RoomPosition): boolean;
   MoveCreep(creep: Creep, pos: RoomPosition): ScreepsReturnCode;
 }

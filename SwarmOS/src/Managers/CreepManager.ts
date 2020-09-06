@@ -179,13 +179,19 @@ class CreepManagerExtensions extends ExtensionBase implements ICreepManagerExten
       case (AT_Harvest):
         const res = creep.harvest(target);
         if (res == OK) {
-          this.log.recordActionTaken();
           if (creep.store.getUsedCapacity() == creep.store.getCapacity()) {
             return ERR_FULL;
           }
         }
         return res;
-      case (AT_Heal): actionResult = creep.heal(target); break;
+      case (AT_Heal):
+        actionResult = creep.heal(target);
+        if (actionResult == OK) {
+          if (!this.ValidateActionTarget(AT_Heal, target)) {
+            return ERR_FULL;
+          }
+        }
+        break;
       case (AT_Pickup): actionResult = creep.pickup(target); break;
       case (AT_RangedAttack): actionResult = creep.rangedAttack(target); break;
       case (AT_RangedHeal): actionResult = creep.rangedHeal(target); break;
@@ -214,8 +220,6 @@ class CreepManagerExtensions extends ExtensionBase implements ICreepManagerExten
           target = (target as Structure).pos;
         }
         const result = creep.moveTo(target);
-        this.log.recordActionTaken();
-
         const dist = creep.pos.getRangeTo(target);
         if (dist == 1 && (target.x == 0 || target.x == 49 || target.y == 0 || target.y == 49)) {
           return OK;
@@ -257,7 +261,7 @@ class CreepManagerExtensions extends ExtensionBase implements ICreepManagerExten
     }
   }
 
-  ValidateActionTarget(actionType: ActionType, target: any, otherData?: any) {
+  ValidateActionTarget(actionType: ActionType, target: any, resourceType?: ResourceConstant) {
     switch (actionType) {
       case (AT_Attack): return !!(target as Creep | Structure).hitsMax;
       case (AT_AttackController): return (target as Structure).structureType == STRUCTURE_CONTROLLER;
@@ -266,7 +270,7 @@ class CreepManagerExtensions extends ExtensionBase implements ICreepManagerExten
       case (AT_Dismantle): return (target as Structure).structureType && !!(target as Structure).hitsMax;
       case (AT_GenerateSafeMode): return (target as Structure).structureType == STRUCTURE_CONTROLLER;
       case (AT_Harvest): return !(target as Structure).structureType && (!!(target as Source).energyCapacity || !!(target as Mineral).mineralType);
-      case (AT_Heal): return !!(target as Creep).ticksToLive;
+      case (AT_Heal): return !!(target as Creep).ticksToLive && ((target as Creep).hits < (target as Creep).hitsMax);
       case (AT_Pickup): return !!(target as Resource).resourceType;
       case (AT_RangedAttack): return !!(target as Creep | Structure).hitsMax
       case (AT_RangedHeal): return !!(target as Creep | Structure).hitsMax
@@ -281,11 +285,11 @@ class CreepManagerExtensions extends ExtensionBase implements ICreepManagerExten
         }
 
         if ((target as Structure).structureType) {
-          if ((target as StructureStorage).store.getFreeCapacity(otherData)) {
+          if ((target as StructureStorage).store.getFreeCapacity(resourceType)) {
             return true;
           }
         } else {
-          if ((target as Creep).store.getUsedCapacity(otherData)! < (target as Creep).store.getCapacity() * 0.8) {
+          if ((target as Creep).store.getUsedCapacity(resourceType)! < (target as Creep).store.getCapacity() * 0.8) {
             return true;
           }
         }

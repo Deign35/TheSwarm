@@ -22,11 +22,11 @@ class RemoteProtector extends BattleSquad<RemoteProtector_Memory> {
       }
 
       const body = hostiles.length > 1 ? [TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH,
-        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
-        ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, MOVE] :
+        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
+        ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, HEAL, MOVE] :
         [TOUGH, TOUGH, TOUGH, TOUGH, TOUGH,
-          MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
-          ATTACK, ATTACK, ATTACK, MOVE];
+          MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
+          ATTACK, ATTACK, ATTACK, HEAL, MOVE];
       return this.spawnManager.requestSpawn({
         body: body,
         creepName: this.memory.targetRoom + "_" + (Game.time + '_RP').slice(-6),
@@ -47,6 +47,18 @@ class RemoteProtector extends BattleSquad<RemoteProtector_Memory> {
 
       const hostiles = creep.room.find(FIND_HOSTILE_CREEPS);
       if (hostiles.length == 0) {
+        const allies = creep.room.find(FIND_MY_CREEPS);
+        for (let i = 0; i < allies.length; i++) {
+          if (allies[i].hits < allies[i].hitsMax) {
+            return this.creepManager.CreateNewCreepActivity({
+              action: AT_Heal,
+              creepID: creep.name,
+              targetID: allies[i].id,
+            }, this.pid);
+          }
+        }
+
+        this.sleeper.sleep(this.pid, 10);
         return;
       }
 
@@ -91,4 +103,6 @@ class RemoteProtector extends BattleSquad<RemoteProtector_Memory> {
       throw new Error("Too many in RemoteProtectorSquad");
     }
   }
+
+  HandleNoActivity(squadID: number) { }
 }

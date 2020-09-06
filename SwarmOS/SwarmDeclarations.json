@@ -111,6 +111,7 @@
                 "CancelLabOrder": "cancelLabOrder",
                 "ChangeFlag": "flagColor",
                 "ClearLog": "clearLog",
+                "GetNumWorkers": "getNumWorkers",
                 "Kill": "kill",
                 "Launch": "launch",
                 "LabOrder": "labOrder",

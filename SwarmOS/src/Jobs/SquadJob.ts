@@ -78,7 +78,7 @@ export abstract class SquadJob<T extends SquadJob_Memory> extends BasicProcess<T
 
     this.memory.squad[squadID].activityPID = this.CreateCustomCreepActivity(squadID, creep);
     if (!this.memory.squad[squadID].activityPID) {
-      this.HandleNoActivity();
+      this.HandleNoActivity(squadID);
     } else {
       this.kernel.setParent(this.memory.squad[squadID].activityPID!, this.pid);
       const childActivity = this.kernel.getProcessByPID(this.memory.squad[squadID].activityPID!)!;
@@ -89,7 +89,7 @@ export abstract class SquadJob<T extends SquadJob_Memory> extends BasicProcess<T
   }
 
   protected abstract CreateCustomCreepActivity(squadID: number, creep: Creep): PID | undefined;
-  protected HandleNoActivity() {
+  protected HandleNoActivity(squadID: number) {
     this.EndProcess();
   }
 
