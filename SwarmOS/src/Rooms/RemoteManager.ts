@@ -10,23 +10,27 @@ class RemoteManager extends BasicProcess<RemoteManager_Memory> {
   protected roomManager!: IRoomManagerExtension;
   RunThread(): ThreadState {
     const targetRoom = Game.rooms[this.memory.targetRoom];
-    if (!this.memory.invasion && targetRoom) {
+    if (!this.memory.invasion && targetRoom && Game.time % 11 == 0) {
       const invaders = targetRoom.find(FIND_HOSTILE_CREEPS);
       for (let i = 0; i < invaders.length; i++) {
         if (invaders[i].owner.username == "Invader") {
           this.log.alert(`Invasion detected: ${this.memory.targetRoom}`);
           this.memory.invasion = invaders[i].ticksToLive!;
-          /**
-           * Need to take this as an opportunity to evacuate the room.
-           * And spawn an attacker.
-           */
+          if (!this.memory.remoteProtector || !this.kernel.getProcessByPID(this.memory.remoteProtector)) {
+            this.memory.remoteProtector = this.kernel.startProcess(BPKG_RemoteProtector, {
+              homeRoom: this.memory.homeRoom,
+              squad: [{}],
+              targetRoom: this.memory.targetRoom
+            } as RemoteProtector_Memory);
+          }
         }
       }
     }
 
     if (this.memory.invasion) {
       this.memory.invasion--;
-      if (this.memory.invasion <= 0) {
+      const invaders = targetRoom.find(FIND_HOSTILE_CREEPS);
+      if (this.memory.invasion <= 0 || invaders.length == 0) {
         delete this.memory.invasion;
       }
       const vis = new RoomVisual(this.memory.targetRoom);

@@ -20,6 +20,7 @@ declare interface RemoteManager_Memory extends RoomMemory {
   workerPID?: PID;
   claimerPID?: PID;
   invasion?: number;
+  remoteProtector?: PID;
 }
 
 declare interface LabManager_Memory extends RoomMemory {

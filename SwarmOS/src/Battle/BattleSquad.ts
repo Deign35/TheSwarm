@@ -1,16 +1,14 @@
 import { BasicProcess } from "Core/BasicTypes";
 
-export abstract class SquadJob<T extends SquadJob_Memory> extends BasicProcess<T> {
+export abstract class BattleSquad<T extends BattleSquad_Memory> extends BasicProcess<T> {
   @extensionInterface(EXT_CreepManager)
   creepManager!: ICreepManagerExtensions;
+  @extensionInterface(EXT_MapManager)
+  mapManager!: IMapManagerExtensions;
   @extensionInterface(EXT_RoomManager)
   roomManager!: IRoomManagerExtension;
   @extensionInterface(EXT_SpawnManager)
   spawnManager!: ISpawnManagerExtensions;
-
-  protected get homeRoom(): Room {
-    return Game.rooms[this.memory.roomID];
-  }
 
   RunThread(): ThreadState {
     for (let i = 0; i < this.memory.squad.length; i++) {
@@ -51,7 +49,7 @@ export abstract class SquadJob<T extends SquadJob_Memory> extends BasicProcess<T
       spawnID: sID,
       HC: 'AssignCreep'
     }
-    this.memory.squad[squadID].activityPID = this.kernel.startProcess(APKG_SpawnActivity, spawnMem)
+    this.memory.squad[squadID].activityPID = this.kernel.startProcess(APKG_SpawnActivity, spawnMem);
     this.kernel.setParent(this.memory.squad[squadID].activityPID!, this.pid);
   }
   protected abstract GetNewSpawnID(squadID: number): string | undefined;
@@ -101,5 +99,21 @@ export abstract class SquadJob<T extends SquadJob_Memory> extends BasicProcess<T
     }
 
     super.EndProcess();
+  }
+
+  MoveToRoom(creep: Creep, targetRoom: RoomID) {
+    const route = this.mapManager.GetRoute(creep.room.name, targetRoom);
+    if (route == -2) { return; }
+    let exit = null;
+    if (route.length > 0) {
+      exit = creep.pos.findClosestByPath(route[0].exit);
+    }
+    if (!exit) { return; }
+    return this.creepManager.CreateNewCreepActivity({
+      action: AT_MoveToPosition,
+      creepID: creep.name,
+      pos: exit,
+      amount: 0
+    }, this.pid);
   }
 }

@@ -1,4 +1,4 @@
-export const OSPackage: IPackage = {
+/*export const OSPackage: IPackage = {
   install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
     processRegistry.register(CPKG_ExperimentalSquad, ExperimentalSquad);
   }
@@ -268,4 +268,4 @@ class ExperimentalSquad extends SquadJob<ExperimentalSquad_Memory> {
       targetID: container.id
     }, this.pid);
   }
-}
+}*/

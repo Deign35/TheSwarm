@@ -51,8 +51,8 @@ class Worker extends SoloJob<Worker_Memory> {
     const roomData = this.roomManager.GetRoomData(creep.room.name)!;
     if (carryRatio > 0.50) {
       for (let i = 0; i < roomData.needsRepair.length; i++) {
-        const repairTarget = Game.getObjectById(roomData.needsRepair[i]);
-        if (repairTarget) {
+        const repairTarget = Game.getObjectById<Structure>(roomData.needsRepair[i]);
+        if (repairTarget && repairTarget.hitsMax > repairTarget.hits) {
           return this.creepManager.CreateNewCreepActivity({
             action: AT_Repair,
             creepID: creep.name,

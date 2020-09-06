@@ -77,6 +77,16 @@
                 "Worker": "worker"
             }
         },
+        "BPKG": {
+            "comment": "Battle packages for offense and defense",
+            "enabled": true,
+            "string": true,
+            "type": true,
+            "combinedType": "BattlePackages",
+            "entries": {
+                "RemoteProtector": "remoteProtector"
+            }
+        },
         "RPKG": {
             "comment": "Room packages for installation",
             "enabled": true,

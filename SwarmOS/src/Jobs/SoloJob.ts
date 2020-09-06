@@ -86,9 +86,7 @@ export abstract class SoloJob<T extends SoloJob_Memory> extends BasicProcess<T> 
   }
 
   MoveToRoom(creep: Creep, targetRoom: RoomID) {
-    // TODO: Cache findRoute to the global cache.
     const route = this.mapManager.GetRoute(creep.room.name, targetRoom);
-    //const route = Game.map.findRoute(creep.room.name, targetRoom);
     if (route == -2) { return; }
     let exit = null;
     if (route.length > 0) {

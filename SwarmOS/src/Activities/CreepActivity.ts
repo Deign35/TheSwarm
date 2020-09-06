@@ -63,6 +63,13 @@ class CreepActivity extends BasicProcess<SingleCreepAction_Memory> {
         default:
           break;
       }
+
+      if (this.memory.num != undefined && result == OK) {
+        this.memory.num -= 1;
+        if (this.memory.num <= 0) {
+          this.EndProcess();
+        }
+      }
       if (result == OK || result == ERR_BUSY || result == ERR_TIRED || result == ERR_NOT_IN_RANGE) {
         return ThreadState_Done;
       }
