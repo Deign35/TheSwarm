@@ -88,13 +88,13 @@ class Scientist extends SoloJob<Scientist_Memory> {
           break;
         }
 
-        if (lab1.mineralType == undefined || lab1.store[lab1.mineralType] < halfCapacity) {
+        if (lab1.mineralType == undefined || lab1.store[lab1.mineralType] < halfCapacity && terminal.store[order.input_1.mineral] > 0) {
           curAction = AT_Withdraw;
           target = terminal.id;
           actionResource = order.input_1.mineral;
           break;
         }
-        if (lab2.mineralType == undefined || lab2.store[lab2.mineralType] < halfCapacity) {
+        if (lab2.mineralType == undefined || lab2.store[lab2.mineralType] < halfCapacity && terminal.store[order.input_2.mineral] > 0) {
           curAction = AT_Withdraw;
           target = terminal.id;
           actionResource = order.input_2.mineral;
