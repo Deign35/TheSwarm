@@ -80,8 +80,11 @@ class Scientist extends SoloJob<Scientist_Memory> {
         }
         let lab3 = Game.getObjectById<StructureLab>(order.output_id);
         if (!lab3) { continue; }
-        if (lab3.mineralType && (lab3.mineralType != REACTIONS[order.input_1.mineral][order.input_2.mineral] ||
+        if (lab3.mineralType && (order.input_1.mineral == RESOURCE_ENERGY ||
+          order.input_2.mineral == RESOURCE_ENERGY ||
+          lab3.mineralType != REACTIONS[order.input_1.mineral][order.input_2.mineral] ||
           lab3.store.getUsedCapacity(lab3.mineralType) > halfCapacity)) {
+
           curAction = AT_Withdraw;
           target = lab3.id;
           actionResource = lab3.mineralType;

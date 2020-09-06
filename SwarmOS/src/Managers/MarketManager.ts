@@ -111,9 +111,9 @@ class MarketManager extends BasicProcess<MarketManager_Memory> {
 
       const cheapestSeller = sellOrders[0];
       const biggestBuyer = buyOrders[0];
-      this.log.info(`cheapest seller: ${cheapestSeller.price} / ${cheapestSeller.amount}\nbiggest buyer: ${biggestBuyer.price} / ${biggestBuyer.amount}`);
+      this.log.info(`cheapest seller: ${cheapestSeller.price} / ${cheapestSeller.remainingAmount}\nbiggest buyer: ${biggestBuyer.price} / ${biggestBuyer.remainingAmount}`);
       if (cheapestSeller.price < biggestBuyer.price * 0.9) {
-        let amountToBuy = Math.min(cheapestSeller.amount, biggestBuyer.amount);
+        let amountToBuy = Math.min(cheapestSeller.remainingAmount, biggestBuyer.remainingAmount);
         let leastCost = 100000000;
         let bestTerminal = undefined;
         for (let i = 0; i < terminalIDs.length; i++) {

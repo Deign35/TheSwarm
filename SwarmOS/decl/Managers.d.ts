@@ -30,11 +30,11 @@ declare interface RoomStateMemory extends MemBase {
 interface LabOrder {
   input_1: {
     lab_id: ObjectID;
-    mineral: MineralConstant | MineralCompoundConstant;
+    mineral: MineralConstant | MineralCompoundConstant | RESOURCE_ENERGY;
   },
   input_2: {
     lab_id: ObjectID;
-    mineral: MineralConstant | MineralCompoundConstant;
+    mineral: MineralConstant | MineralCompoundConstant | RESOURCE_ENERGY;
   }
 
   output_id: ObjectID;
