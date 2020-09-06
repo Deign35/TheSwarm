@@ -92,6 +92,7 @@ declare interface MarketManager_Memory extends MemBase {
     [id: string]: string
   }
   lastUpdate: number;
+  isEnabled: boolean;
 }
 
 /** MapManager */

@@ -22,7 +22,8 @@ class MarketManager extends BasicProcess<MarketManager_Memory> {
       this.log.warn(`Initializing MarketManager memory`);
       Memory.marketMemory = {
         terminals: {},
-        lastUpdate: 0
+        lastUpdate: 0,
+        isEnabled: false
       }
     }
     return Memory.marketMemory;
@@ -38,11 +39,10 @@ class MarketManager extends BasicProcess<MarketManager_Memory> {
     return ThreadState_Done;
   }
 
-  private MARKET_MANAGER_ENABLED = false;
   EndTick() {
     try {
-      if (!this.MARKET_MANAGER_ENABLED) return;
-      this.MARKET_MANAGER_ENABLED = false;
+      if (!this.memory.isEnabled) return;
+      this.memory.isEnabled = false;
       if (Game.rooms['sim'] || Game.cpu.getUsed() > (Game.cpu.limit * 0.75)) return;
       if (Game.time - this.memory.lastUpdate > 1000) {
         const roomIDs = Object.keys(Game.rooms);

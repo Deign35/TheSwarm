@@ -20,17 +20,18 @@ class RemoteProtector extends BattleSquad<RemoteProtector_Memory> {
       if (hostiles.length == 0) {
         return;
       }
-      
+
       const body = hostiles.length > 1 ? [TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH,
-        ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK,
-        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE] :
-        [TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, ATTACK, ATTACK, ATTACK,
-        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
+        ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, MOVE] :
+        [TOUGH, TOUGH, TOUGH, TOUGH, TOUGH,
+          MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
+          ATTACK, ATTACK, ATTACK, MOVE];
       return this.spawnManager.requestSpawn({
         body: body,
         creepName: this.memory.targetRoom + "_" + (Game.time + '_RP').slice(-6),
         owner_pid: this.pid
-      }, this.memory.targetRoom, Priority_High, {
+      }, this.memory.targetRoom, Priority_Medium, {
           parentPID: this.pid
         }, 3);
     } else {

@@ -22,7 +22,7 @@ class ControllerClaimer extends SoloJob<ControllerClaimer_Memory> {
       owner_pid: this.pid
     }, this.memory.targetRoom, Priority_Lowest, {
         parentPID: this.pid
-      }, 10);
+      }, this.memory.onlyReserve ? 3 : 10);
   }
 
   protected CreateCustomCreepActivity(creep: Creep): PID | undefined {

@@ -29,9 +29,11 @@ class RemoteManager extends BasicProcess<RemoteManager_Memory> {
 
     if (this.memory.invasion) {
       this.memory.invasion--;
-      const invaders = targetRoom.find(FIND_HOSTILE_CREEPS);
-      if (this.memory.invasion <= 0 || invaders.length == 0) {
-        delete this.memory.invasion;
+      if (targetRoom && Game.time % 11 == 0) {
+        const invaders = targetRoom.find(FIND_HOSTILE_CREEPS);
+        if (this.memory.invasion <= 0 || invaders.length == 0) {
+          delete this.memory.invasion;
+        }
       }
       const vis = new RoomVisual(this.memory.targetRoom);
       let pos = new RoomPosition(25, 25, this.memory.targetRoom);
