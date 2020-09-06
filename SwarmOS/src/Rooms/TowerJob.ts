@@ -17,7 +17,6 @@ class TowerJob extends BasicProcess<Tower_Memory> {
           const tower = Game.getObjectById<StructureTower>(roomData.structures[STRUCTURE_TOWER][j]);
           if (tower && tower.store[RESOURCE_ENERGY] > 800) {
             tower.repair(target);
-
           }
         }
       }

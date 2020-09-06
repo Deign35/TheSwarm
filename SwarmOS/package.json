@@ -27,6 +27,7 @@
         "typescript": "^2.9.2"
     },
     "dependencies": {
+        "@types/screeps": "^3.2.0",
         "lodash": "4.17.20",
         "source-map": "^0.6.1"
     }
