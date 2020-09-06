@@ -89,7 +89,7 @@ class RemoteProtector extends BattleSquad<RemoteProtector_Memory> {
           action: AT_MoveToPosition,
           creepID: creep.name,
           amount: Math.floor(bestDist / 2),
-          pos: bestTarget.pos
+          targetID: bestTarget.id
         }, this.pid)
       }
 
