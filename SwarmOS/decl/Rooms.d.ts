@@ -2,9 +2,9 @@ declare interface RoomMemory extends MemBase {
   homeRoom: RoomID;
 }
 
-declare interface TowerMemory extends RoomMemory { }
+declare interface Tower_Memory extends RoomMemory { }
 
-declare interface EnergyManagerMemory extends RoomMemory {
+declare interface EnergyManager_Memory extends RoomMemory {
   harvesterPIDs: IDictionary<ObjectID, PID>;
   refillerPID: PID;
   numWorkers: number;
@@ -22,4 +22,6 @@ declare interface RemoteManager_Memory extends RoomMemory {
   invasion?: number;
 }
 
-//CLI(CLI_Launch, RPKG_RemoteManager, { homeRoom: "W55S27", targetRoom: "W54S27", harvesterPIDs: {}, numRefillers: 3, refillerPIDs: [] })
+declare interface LabManager_Memory extends RoomMemory {
+  scientistPID: PID;
+}

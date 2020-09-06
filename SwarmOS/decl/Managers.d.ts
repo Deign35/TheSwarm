@@ -27,6 +27,19 @@ declare interface RoomStateMemory extends MemBase {
   }
 }
 
+interface LabOrder {
+  input_1: {
+    lab_id: ObjectID;
+    mineral: MineralConstant | MineralCompoundConstant;
+  },
+  input_2: {
+    lab_id: ObjectID;
+    mineral: MineralConstant | MineralCompoundConstant;
+  }
+
+  output_id: ObjectID;
+}
+
 interface RoomState extends MemBase {
   roomType: RoomType;
   lastUpdated: number;
@@ -34,9 +47,13 @@ interface RoomState extends MemBase {
   rampartStrength?: number;
   homeRoom?: RoomID;
 
+  labOrders: LabOrder[];
+
   activityPIDs: {
-    RPKG_EnergyManager: PID,
-    RPKG_Towers: PID
+    RPKG_EnergyManager?: PID,
+    RPKG_LabManager?: PID,
+    RPKG_RemoteManager?: PID,
+    RPKG_Towers?: PID
   }
   cSites: ObjectID[];
   mineralIDs: ObjectID[];
@@ -53,6 +70,7 @@ interface RoomState_StructureData {
   [STRUCTURE_CONTAINER]: ObjectID[];
   [STRUCTURE_EXTENSION]: ObjectID[];
   [STRUCTURE_EXTRACTOR]: ObjectID[];
+  [STRUCTURE_LAB]: ObjectID[];
   [STRUCTURE_SPAWN]: ObjectID[];
   [STRUCTURE_STORAGE]: ObjectID[];
   [STRUCTURE_TERMINAL]: ObjectID[];

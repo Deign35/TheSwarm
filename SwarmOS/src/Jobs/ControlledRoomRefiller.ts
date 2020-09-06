@@ -78,7 +78,11 @@ class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory> {
   protected CreateCustomCreepActivity(creep: Creep): string | undefined {
     if (creep.store.getUsedCapacity() < 0.10 &&
       (creep.ticksToLive || 1500) < 1500 - (600 / creep.body.length)) {
-      let spawn = creep.pos.findClosestByRange(FIND_MY_SPAWNS);
+      let spawn = creep.pos.findClosestByRange(FIND_MY_SPAWNS, {
+        filter: (spawn: StructureSpawn) => {
+          return !spawn.spawning;
+        }
+      });
       if (spawn && !spawn.spawning && spawn.store[RESOURCE_ENERGY] > (creep.bodyCost / 2.5) / creep.body.length) {
         return this.creepManager.CreateNewCreepActivity({
           targetID: spawn.id,
@@ -171,8 +175,7 @@ class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory> {
       }
 
       if (creep.room.storage) {
-        const targets = this.roomManager.GetRoomData(this.memory.homeRoom)!.structures[STRUCTURE_EXTENSION].concat(
-          this.roomManager.GetRoomData(this.memory.homeRoom)!.structures[STRUCTURE_SPAWN]);
+        const targets = roomData.structures[STRUCTURE_EXTENSION].concat(roomData.structures[STRUCTURE_SPAWN]);
         let shouldUseStorage = false;
         for (let i = 0; i < targets.length; i++) {
           let nextTarget = Game.getObjectById<ObjectTypeWithID>(targets[i]) as StructureExtension | StructureSpawn;
@@ -195,7 +198,7 @@ class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory> {
 
     if (actionType == AT_NoOp && creep.store[RESOURCE_ENERGY] > 0) {
       // Find a delivery target
-      let targets = this.roomManager.GetRoomData(this.memory.homeRoom)!.structures[STRUCTURE_TOWER];
+      let targets = roomData.structures[STRUCTURE_TOWER];
       for (let i = 0; i < targets.length; i++) {
         const nextTarget = Game.getObjectById<ObjectTypeWithID>(targets[i]) as StructureTower;
         if (!nextTarget) { continue; }
@@ -216,8 +219,7 @@ class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory> {
       }
 
       if (actionType == AT_NoOp) {
-        targets = this.roomManager.GetRoomData(this.memory.homeRoom)!.structures[STRUCTURE_EXTENSION].concat(
-          this.roomManager.GetRoomData(this.memory.homeRoom)!.structures[STRUCTURE_SPAWN]);
+        targets = roomData.structures[STRUCTURE_EXTENSION].concat(roomData.structures[STRUCTURE_SPAWN]);
         for (let i = 0; i < targets.length; i++) {
           const nextTarget = Game.getObjectById<ObjectTypeWithID>(targets[i]) as StructureExtension | StructureSpawn;
           if (!nextTarget) { continue; }
@@ -242,6 +244,16 @@ class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory> {
           if (target) {
             const targetWants = 50000 - target.store.getUsedCapacity(RESOURCE_ENERGY);
             if (targetWants > 0) {
+              bestTarget = target.id;
+              actionType = AT_Transfer;
+            }
+          }
+        }
+
+        if (actionType == AT_NoOp && roomData.structures[STRUCTURE_LAB].length > 0) {
+          for (let i = 0; i < roomData.structures[STRUCTURE_LAB].length; i++) {
+            const target = Game.getObjectById<StructureLab>(roomData.structures[STRUCTURE_LAB][i]);
+            if (target && target.store[RESOURCE_ENERGY] < LAB_ENERGY_CAPACITY) {
               bestTarget = target.id;
               actionType = AT_Transfer;
             }

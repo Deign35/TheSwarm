@@ -1,5 +1,6 @@
 declare var Memory: {
-  CLI: SwarmCLIMemory
+  CLI: SwarmCLIMemory;
+  kernel: KernelMemory;
 }
 
 export const OSPackage: IPackage = {
@@ -37,6 +38,14 @@ class CLIManager extends BasicProcess<SwarmCLIMemory> {
               this.Assimilate(cmd.args);
             }
             break;
+          case (CLI_CancelLabOrder):
+            if (cmd.args && cmd.args.length == 2) {
+              const roomData = this.roomManager.GetRoomData(cmd.args[0]);
+              if (roomData) {
+                roomData.labOrders.splice(cmd.args[1], 1);
+              }
+            }
+            break;
           case (CLI_ClearLog):
             this.kernel.clearErrorLog();
             break;
@@ -56,9 +65,51 @@ class CLIManager extends BasicProcess<SwarmCLIMemory> {
               this.KillProcess(cmd.args[0]);
             }
             break;
+          case (CLI_LabOrder):
+            if (cmd.args && cmd.args.length == 6) {
+              const roomData = this.roomManager.GetRoomData(cmd.args[0]);
+              if (roomData) {
+                const lab1 = Game.getObjectById<StructureLab>(cmd.args[1]);
+                if (!lab1 || lab1.structureType != STRUCTURE_LAB) {
+                  this.log.error(`Couldn't find lab ${cmd.args[1]}.`);
+                  break;
+                }
+                const lab2 = Game.getObjectById<StructureLab>(cmd.args[2]);
+                if (!lab2 || lab2.structureType != STRUCTURE_LAB) {
+                  this.log.error(`Couldn't find lab ${cmd.args[2]}.`);
+                  break;
+                }
+                const lab3 = Game.getObjectById<StructureLab>(cmd.args[3]);
+                if (!lab3 || lab3.structureType != STRUCTURE_LAB) {
+                  this.log.error(`Couldn't find lab ${cmd.args[3]}.`);
+                  break;
+                }
+
+                const mineral1 = cmd.args[4] as MineralConstant | MineralCompoundConstant;
+                const mineral2 = cmd.args[5] as MineralConstant | MineralCompoundConstant;
+
+                roomData.labOrders.push({
+                  input_1: {
+                    lab_id: cmd.args[1],
+                    mineral: mineral1
+                  },
+                  input_2: {
+                    lab_id: cmd.args[2],
+                    mineral: mineral2
+                  },
+                  output_id: cmd.args[3]
+                });
+              }
+            }
+            break;
           case (CLI_Launch):
             if (cmd.args && cmd.args.length == 2) {
               this.LaunchProcess(cmd.args[0], cmd.args[1]);
+            }
+            break;
+          case (CLI_SetNumWorkers):
+            if (cmd.args && cmd.args.length == 2) {
+              this.SetNumWorkers(cmd.args[0], cmd.args[1]);
             }
             break;
           case (CLI_SetWallStrength):
@@ -159,6 +210,15 @@ class CLIManager extends BasicProcess<SwarmCLIMemory> {
       this.log.error(ex);
     }
   }
+
+  SetNumWorkers(roomID: RoomID, numWorkers: number) {
+    let roomData = this.roomManager.GetRoomData(roomID);
+    if (roomData && roomData.activityPIDs[RPKG_EnergyManager]) {
+      (Memory.kernel.processMemory[roomData.activityPIDs[RPKG_EnergyManager]] as EnergyManager_Memory).numWorkers = numWorkers;
+    } else if (roomData && roomData.activityPIDs[RPKG_RemoteManager]) {
+      (Memory.kernel.processMemory[roomData.activityPIDs[RPKG_RemoteManager]] as RemoteManager_Memory).numRefillers = numWorkers;
+    }
+  }
 }
 
 global['CLI'] = function (command: CLI_Command, ...args: any[]) {
@@ -168,8 +228,12 @@ global['CLI'] = function (command: CLI_Command, ...args: any[]) {
 
 const help = function () {
   let msg = "SwarmOS 2.0 commands:\n";
-  msg += "CLI_Assimilate: Add the assimilated room to the Swarm.\n"
+  msg += "CLI_Assimilate: Add the assimilated room to the Swarm.\n";
   msg += "ex: CLI(CLI_Assimilate, \"W57S27\", RT_Home)\n\n";
+
+  msg += "CLI_CancelLabOrder: Cancels a lab order from executing anymore.\n";
+  msg += "ex: CLI(CLI_CancelLabOrder, \"W57S27\", 1)\n\n";
+  msg += "This will delete the lab order at index 1 of the lab orders array.\n";
 
   msg += "CLIChangeFlag: Changes the color for all flags.\n";
   msg += "ex: CLI(CLI_ChangeFlag, COLOR_RED, COLOR_BLUE, COLOR_PURPLE, COLOR_ORANGE)\n";
@@ -177,8 +241,14 @@ const help = function () {
 
   msg += "CLI_ClearLog: Clears the error log for the kernel.\n";
   msg += "CLI_Kill: Kills the provided process by PID.\n";
+  msg += "CLI_LabOrder: Sets up an order for the labs of the specified room.\n";
+  msg += "ex: CLI(CLI_LabOrder, \"sim\", 'b4963f6662d40cd168e27620', '106618ac400ab8a87fad9385', 'b66721e4563a947b63dd9b37', RESOURCE_HYDROGEN, RESOURCE_LEMERGIUM)\n\n"
+
   msg += "CLI_Launch: Launches a program.\n";
   msg += "ex: CLI(CLI_Launch, CPKG_Scout, { homeRoom: \"W57S27\", targetRoom: \"W57S26\" })\n\n";
+
+  msg += "CLI_SetNumWorkers: Sets the number of workers or refillers depending on room type.\n";
+  msg += "ex: CLI(CLI_SetNumWorkers, \"W57S27\", 3)\n\n";
 
   msg += "CLI_SetWallStrength: Sets the walls and ramparts strength for a room.\n";
   msg += "ex: CLI(CLI_SetWallStrength, \"W57S26\", 1000, 2000)\n";
@@ -192,8 +262,3 @@ global['help'] = help();
 global['qb'] = function () {
   CLI(CLI_Assimilate, 'sim', RT_Home);
 }
-
-/*
-global['rb'] = function () {
-  CLI(CLI_Assimilate, 'sim', RT_None);
-}*/

@@ -10,7 +10,7 @@ const RPKG_EnergyManager_LogContext: LogContext = {
   logLevel: LOG_TRACE
 }
 
-class EnergyManager extends BasicProcess<EnergyManagerMemory> {
+class EnergyManager extends BasicProcess<EnergyManager_Memory> {
   @extensionInterface(EXT_RoomManager)
   protected roomManager!: IRoomManagerExtension;
   protected get logID(): string {

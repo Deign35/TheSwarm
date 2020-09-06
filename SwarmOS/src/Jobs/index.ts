@@ -5,6 +5,7 @@ import { OSPackage as Harvester } from "./Harvester";
 import { OSPackage as MineralHarvester } from "./MineralHarvester";
 import { OSPackage as RemoteRefiller } from "./RemoteRefiller";
 import { OSPackage as RoomBooter } from "./RoomBooter";
+import { OSPackage as Scientist } from "./Scientist";
 import { OSPackage as Scout } from "./Scout";
 import { OSPackage as Worker } from "./Worker";
 
@@ -17,6 +18,7 @@ export const JobsPackage: IPackage = {
     MineralHarvester.install(processRegistry, extensionRegistry);
     RemoteRefiller.install(processRegistry, extensionRegistry);
     RoomBooter.install(processRegistry, extensionRegistry);
+    Scientist.install(processRegistry, extensionRegistry);
     Scout.install(processRegistry, extensionRegistry);
     Worker.install(processRegistry, extensionRegistry);
   }

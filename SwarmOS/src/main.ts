@@ -1,7 +1,6 @@
 ﻿declare var Memory: {
   VERSION: string;
   counter: number;
-  kernel: KernelMemory;
 }
 const startLoad = Game.cpu.getUsed(); // Will not use any prototype defined version of getUsed
 // Ensure all constants are initialized
@@ -29,7 +28,6 @@ if (!Memory.VERSION || Memory.VERSION != SWARM_VERSION_DATE) {
   try {
     let oldVersion = Memory.VERSION;
     if (oldVersion) {
-
     }
   } catch (ex) {
     console.log(`Failed to Update OS version ${ex}.`)

@@ -1,5 +1,5 @@
 declare var Memory: {
-  roomData: RoomStateMemory
+  roomData: RoomStateMemory;
 }
 
 import { ExtensionBase, BasicProcess } from "Core/BasicTypes";
@@ -65,8 +65,14 @@ class RoomManager extends BasicProcess<RoomStateMemory> {
         if (!data.activityPIDs[RPKG_Towers] || !this.kernel.getProcessByPID(data.activityPIDs[RPKG_Towers])) {
           data.activityPIDs[RPKG_Towers] = this.kernel.startProcess(RPKG_Towers, {
             homeRoom: roomID
-          } as TowerMemory);
+          } as Tower_Memory);
           this.kernel.setParent(data.activityPIDs[RPKG_Towers], this.pid);
+        }
+
+        if (!data.activityPIDs[RPKG_LabManager] || !this.kernel.getProcessByPID(data.activityPIDs[RPKG_LabManager])) {
+          data.activityPIDs[RPKG_LabManager] = this.kernel.startProcess(RPKG_LabManager, {
+            homeRoom: roomID,
+          } as LabManager_Memory);
         }
 
         if (!data.activityPIDs[RPKG_EnergyManager] || !this.kernel.getProcessByPID(data.activityPIDs[RPKG_EnergyManager])) {
@@ -77,7 +83,7 @@ class RoomManager extends BasicProcess<RoomStateMemory> {
             mineralHarvesterPID: '',
             homeRoom: roomID,
             numWorkers: 2
-          } as EnergyManagerMemory);
+          } as EnergyManager_Memory);
           this.kernel.setParent(data.activityPIDs[RPKG_EnergyManager], this.pid);
         }
       } else if (data.roomType == RT_RemoteHarvest) {
@@ -126,10 +132,8 @@ class RoomManagerExtension extends ExtensionBase implements IRoomManagerExtensio
           wallStrength: 0,
           rampartStrength: 0,
           lastUpdated: 0,
-          activityPIDs: {
-            RPKG_EnergyManager: '',
-            RPKG_Towers: ''
-          },
+          labOrders: [],
+          activityPIDs: {},
           mineralIDs: room.find(FIND_MINERALS)!.map((val: Mineral) => {
             return val.id;
           }),
@@ -143,6 +147,7 @@ class RoomManagerExtension extends ExtensionBase implements IRoomManagerExtensio
             controller: [],
             extension: [],
             extractor: [],
+            lab: [],
             spawn: [],
             storage: [],
             terminal: [],
@@ -179,6 +184,7 @@ class RoomManagerExtension extends ExtensionBase implements IRoomManagerExtensio
       controller: [],
       extension: [],
       extractor: [],
+      lab: [],
       spawn: [],
       storage: [],
       terminal: [],

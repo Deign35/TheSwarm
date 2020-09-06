@@ -72,6 +72,7 @@
                 "MineralHarvester": "mineralHarvester",
                 "RemoteRefiller": "remoteRefiller",
                 "RoomBooter": "roomBooter",
+                "Scientist": "scientist",
                 "Scout": "scout",
                 "Worker": "worker"
             }
@@ -84,6 +85,7 @@
             "combinedType": "RoomPackages",
             "entries": {
                 "EnergyManager": "energyManager",
+                "LabManager": "labManager",
                 "RemoteManager": "remoteManager",
                 "Towers": "towers"
             }
@@ -96,10 +98,13 @@
             "string": true,
             "entries": {
                 "Assimilate": "assimilate",
+                "CancelLabOrder": "cancelLabOrder",
                 "ChangeFlag": "flagColor",
                 "ClearLog": "clearLog",
                 "Kill": "kill",
                 "Launch": "launch",
+                "LabOrder": "labOrder",
+                "SetNumWorkers": "setNumWorkers",
                 "SetWallStrength": "setWallStrength"
             }
         },

@@ -1,5 +1,5 @@
 declare var Memory: {
-  kernel: KernelMemory
+  kernel: KernelMemory;
 }
 
 const TS_Active = 1;

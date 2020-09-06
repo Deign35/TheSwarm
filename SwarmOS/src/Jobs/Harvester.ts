@@ -9,7 +9,7 @@ import { LookAtGround } from "Tools/TheFinder";
 class Harvester extends SoloJob<HarvesterMemory> {
   RunThread(): ThreadState {
     const creep = Game.creeps[this.memory.creepID!];
-    if (creep && !creep.spawning && creep.ticksToLive! < 80) {
+    if (!this.memory.remoteHarvester && creep && !creep.spawning && creep.ticksToLive! < 80) {
       delete this.memory.creepID;
       delete this.memory.activityPID;
     }

@@ -81,8 +81,8 @@ export abstract class SoloJob<T extends SoloJob_Memory> extends BasicProcess<T> 
   EndProcess() {
     if (this.memory.creepID) {
       this.creepManager.releaseCreep(this.memory.creepID, this.pid);
-      super.EndProcess(this.memory.creepID);
     }
+    super.EndProcess(this.memory.creepID);
   }
 
   MoveToRoom(creep: Creep, targetRoom: RoomID) {

@@ -147,7 +147,7 @@ class CreepManagerExtensions extends ExtensionBase implements ICreepManagerExten
       target = creep.pos;
     }
 
-    if (!target || !this.ValidateActionTarget(actionMem.action, target)) {
+    if (!target || !this.ValidateActionTarget(actionMem.action, target, actionMem.resourceType)) {
       return undefined;
     }
 
@@ -257,7 +257,7 @@ class CreepManagerExtensions extends ExtensionBase implements ICreepManagerExten
     }
   }
 
-  ValidateActionTarget(actionType: ActionType, target: any) {
+  ValidateActionTarget(actionType: ActionType, target: any, otherData?: any) {
     switch (actionType) {
       case (AT_Attack): return !!(target as Creep | Structure).hitsMax;
       case (AT_AttackController): return (target as Structure).structureType == STRUCTURE_CONTROLLER;
@@ -281,11 +281,11 @@ class CreepManagerExtensions extends ExtensionBase implements ICreepManagerExten
         }
 
         if ((target as Structure).structureType) {
-          if ((target as StructureStorage).store.getFreeCapacity(RESOURCE_ENERGY)) {
+          if ((target as StructureStorage).store.getFreeCapacity(otherData)) {
             return true;
           }
         } else {
-          if ((target as Creep).store.getUsedCapacity() < (target as Creep).store.getCapacity() * 0.8) {
+          if ((target as Creep).store.getUsedCapacity(otherData)! < (target as Creep).store.getCapacity() * 0.8) {
             return true;
           }
         }
