@@ -75,8 +75,7 @@ class RemoteManager extends BasicProcess<RemoteManager_Memory> {
       }
     }
 
-    const numWorkers = this.memory.numRefillers * sources.length;
-    while (this.memory.refillerPIDs.length < numWorkers) {
+    while (this.memory.refillerPIDs.length < this.memory.numRefillers) {
       this.memory.refillerPIDs.push(this.kernel.startProcess(CPKG_RemoteRefiller, {
         expires: true,
         homeRoom: this.memory.homeRoom,

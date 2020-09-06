@@ -82,7 +82,7 @@ class RoomManager extends BasicProcess<RoomStateMemory> {
             workerPIDs: [],
             mineralHarvesterPID: '',
             homeRoom: roomID,
-            numWorkers: 2
+            numWorkers: (data.sourceIDs.length * 2)
           } as EnergyManager_Memory);
           this.kernel.setParent(data.activityPIDs[RPKG_EnergyManager], this.pid);
         }

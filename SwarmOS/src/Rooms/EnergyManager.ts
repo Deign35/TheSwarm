@@ -56,23 +56,7 @@ class EnergyManager extends BasicProcess<EnergyManager_Memory> {
       }
     }
 
-    let numWorkers = this.memory.numWorkers || sourceIDs.length;
-    if (room.controller) {
-      if (room.controller.level == 1) {
-        numWorkers *= 4;
-      } else if (room.controller.level == 2) {
-        numWorkers *= 4;
-      } else if (room.controller.level == 3) {
-        numWorkers *= 4;
-      } else if (room.controller.level >= 4) {
-        numWorkers += 1;
-      }
-      if (room.controller.level <= 5 && roomData.cSites.length == 0) {
-        numWorkers *= 2;
-      }
-    }
-
-    while (this.memory.workerPIDs.length < numWorkers) {
+    while (this.memory.workerPIDs.length < this.memory.numWorkers) {
       this.memory.workerPIDs.push(this.kernel.startProcess(CPKG_Worker, {
         homeRoom: this.memory.homeRoom,
         targetRoom: this.memory.homeRoom,
