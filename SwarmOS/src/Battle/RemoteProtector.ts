@@ -74,6 +74,7 @@ class RemoteProtector extends BattleSquad<RemoteProtector_Memory, MemCache> {
       let bestDist = 1000000;
       for (let i = 0; i < hostiles.length; i++) {
         if (hostiles[i].getActiveBodyparts(HEAL)) {
+          bestDist = hostiles[i].pos.getRangeTo(creep.pos);
           bestTarget = hostiles[i];
           break;
         }
