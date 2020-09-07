@@ -23,6 +23,14 @@ class RemoteRefiller extends SoloJob<RemoteRefiller_Memory> {
       if (creep.room.name != this.memory.homeRoom) {
         return this.MoveToRoom(creep, this.memory.homeRoom);
       }
+      if (creep.room.terminal && creep.room.terminal.store[RESOURCE_ENERGY] < 50000) {
+        return this.creepManager.CreateNewCreepActivity({
+          action: AT_Transfer,
+          creepID: creep.name,
+          targetID: creep.room.terminal.id,
+          resourceType: RESOURCE_ENERGY
+        }, this.pid);
+      }
       if (creep.room.storage) {
         return this.creepManager.CreateNewCreepActivity({
           action: AT_Transfer,

@@ -33,7 +33,7 @@ export class Stopwatch {
       curLap = Game.cpu.getUsed() - this.startTime;
     }
 
-    let msg = "Total: " + (curLap + this.cummulativeTime) + 'cpu';
+    let msg = `Total: ${curLap + this.cummulativeTime}cpu`;
     for (let i = 0; i < this.laps.length; i++) {
       msg += `\n${i + 1}: ${this.laps[i]}cpu`;
     }
