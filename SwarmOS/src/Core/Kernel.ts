@@ -276,6 +276,7 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
       delete this.processTable[pid];
       delete this.processMemory[pid];
       delete this._processCache[pid];
+      delete this.cache[pid];
       return;
     }
   }
