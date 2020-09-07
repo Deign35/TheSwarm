@@ -1,6 +1,14 @@
 declare var Memory: {
   mapData: MapManager_Memory
 }
+
+declare var MemoryCache: {
+  mapCache: {
+    [roomID: string]: {
+      [roomID: string]: ({ exit: ExitConstant, room: string }[] | -2)
+    }
+  }
+}
 import { BasicProcess, ExtensionBase } from "Core/BasicTypes";
 
 export const OSPackage: IPackage = {
@@ -14,11 +22,7 @@ const PKG_MapManager_LogContext: LogContext = {
   logLevel: LOG_INFO
 }
 
-let MapCache: {
-  [roomID: string]: {
-    [roomID: string]: ({ exit: ExitConstant, room: string }[] | -2)
-  }
-} = {};
+MemoryCache.mapCache = {};
 class MapManager extends BasicProcess<MapManager_Memory, MemCache> {
   get memory(): MapManager_Memory {
     if (!Memory.mapData) {
@@ -49,6 +53,13 @@ class MapManagerExtensions extends ExtensionBase implements IMapManagerExtension
 
     return Memory.mapData;
   }
+  get cache() {
+    if (!MemoryCache.mapCache) {
+      MemoryCache.mapCache = {};
+    }
+
+    return MemoryCache.mapCache;
+  }
   protected get logID() {
     return PKG_MapManager_LogContext.logID;
   }
@@ -57,17 +68,17 @@ class MapManagerExtensions extends ExtensionBase implements IMapManagerExtension
   }
 
   GetRoute(from: RoomID, to: RoomID) {
-    if (!MapCache[from]) {
-      MapCache[from] = {};
+    if (!this.cache[from]) {
+      this.cache[from] = {};
     }
-    if (MapCache[from][to]) {
-      return MapCache[from][to];
+    if (this.cache[from][to]) {
+      return this.cache[from][to];
     }
 
     const route = Game.map.findRoute(from, to, {
       routeCallback: this.GetRoomWeight
     });
-    MapCache[from][to] = route;
+    this.cache[from][to] = route;
     return route;
   }
 

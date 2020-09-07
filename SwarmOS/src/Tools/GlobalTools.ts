@@ -51,3 +51,4 @@ global['ConstructBodyArray'] = GlobalTools.ConstructBodyArray;
 global['GetSUID'] = GlobalTools.GetSUID;
 global['GetRandomIndex'] = GlobalTools.GetRandomIndex;
 global['GetRandomID'] = GlobalTools.GetRandomID;
+global['MemoryCache'] = {};
