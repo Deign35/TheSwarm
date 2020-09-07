@@ -6,7 +6,7 @@ export const OSPackage: IPackage = {
 
 import { BasicProcess } from "Core/BasicTypes";
 
-class SpawnActivity extends BasicProcess<SpawnActivity_Memory> {
+class SpawnActivity extends BasicProcess<SpawnActivity_Memory, MemCache> {
   @extensionInterface(EXT_SpawnManager)
   protected spawnManager!: ISpawnManagerExtensions;
 

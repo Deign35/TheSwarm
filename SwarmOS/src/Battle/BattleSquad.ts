@@ -1,6 +1,6 @@
 import { BasicProcess } from "Core/BasicTypes";
 
-export abstract class BattleSquad<T extends BattleSquad_Memory> extends BasicProcess<T> {
+export abstract class BattleSquad<T extends BattleSquad_Memory, U extends MemCache> extends BasicProcess<T, U> {
   @extensionInterface(EXT_CreepManager)
   creepManager!: ICreepManagerExtensions;
   @extensionInterface(EXT_MapManager)

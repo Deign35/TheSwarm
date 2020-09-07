@@ -11,6 +11,8 @@ declare type TS_Waiting = 2;
 declare type TS_Done = 3;
 declare type TickState = TS_Active | TS_Waiting | TS_Done;
 
+const MemoryCache = {};
+
 export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension {
   constructor(private processRegistry: IProcessRegistry, private extensionRegistry: IExtensionRegistry,
     private _logger: IKernelLoggerExtensions) {
@@ -18,6 +20,7 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
   }
   private _processCache: IDictionary<PID, IProcess>;
   private _curTickState!: IDictionary<PID, TickState>;
+  private _memCache: IDictionary<PID, MemCache> = {};
 
   get log() {
     return this._logger;
@@ -60,6 +63,7 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
 
     this.processTable[pid] = pInfo;
     this.processMemory[pid] = startMemory || {};
+    this._memCache[pid] = {};
 
     this.PrepTick(pid);
     return pid;
@@ -73,6 +77,7 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
     }
 
     const kernelContext = this;
+    this._memCache[id] = {};
     const context: IProcessContext = {
       pid: pInfo.pid,
       pkgName: pInfo.PKG,
@@ -85,6 +90,9 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
       },
       get memory() {
         return kernelContext.processMemory[pInfo.pid];
+      },
+      get cache() {
+        return kernelContext._memCache[pInfo.pid];
       },
       getPackageInterface: kernelContext.extensionRegistry.get.bind(kernelContext.extensionRegistry)
     };

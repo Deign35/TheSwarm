@@ -25,7 +25,7 @@ const PKG_SpawnManager_LogContext: LogContext = {
   logLevel: LOG_INFO
 }
 
-class SpawnManager extends BasicProcess<SpawnManager_Memory> {
+class SpawnManager extends BasicProcess<SpawnManager_Memory, MemCache> {
   @extensionInterface(EXT_MapManager)
   mapManager!: IMapManagerExtensions;
   get memory() {

@@ -13,7 +13,7 @@ const PKG_MarketManager_LogContext: LogContext = {
   logLevel: LOG_INFO
 }
 
-class MarketManager extends BasicProcess<MarketManager_Memory> {
+class MarketManager extends BasicProcess<MarketManager_Memory, MemCache> {
   @extensionInterface(EXT_RoomManager)
   roomManager!: IRoomManagerExtension;
 

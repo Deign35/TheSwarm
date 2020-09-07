@@ -6,7 +6,7 @@ export const OSPackage: IPackage = {
 
 import { SquadJob } from "./SquadJob";
 
-class MineralHarvester extends SquadJob<MineralHarvester_Memory> {
+class MineralHarvester extends SquadJob<MineralHarvester_Memory, MemCache> {
   CreateSpawnActivity(squadID: number) {
     const roomData = this.roomManager.GetRoomData(this.memory.roomID)!;
     const mineral = Game.getObjectById<Mineral>(roomData.mineralIDs[0])!;

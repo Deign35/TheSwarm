@@ -5,7 +5,7 @@ export const OSPackage: IPackage = {
 }
 import { SoloJob } from "./SoloJob";
 
-class Scout extends SoloJob<Scout_Memory> {
+class Scout extends SoloJob<Scout_Memory, MemCache> {
   protected GetNewSpawnID(): string {
     return this.spawnManager.requestSpawn({
       body: [TOUGH, TOUGH, MOVE, MOVE],

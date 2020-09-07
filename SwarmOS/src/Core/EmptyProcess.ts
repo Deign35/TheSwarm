@@ -12,7 +12,7 @@ const PKG_EmptyProcess_LogContext: LogContext = {
 }
 
 const ENABLE_PROFILING = true;
-class EmptyProcess extends BasicProcess<MemBase> {
+class EmptyProcess extends BasicProcess<MemBase, MemCache> {
   protected get logID(): string {
     return PKG_EmptyProcess_LogContext.logID;
   }

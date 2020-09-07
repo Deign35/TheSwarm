@@ -5,7 +5,7 @@ export const OSPackage: IPackage = {
 }
 import { SoloJob } from "./SoloJob";
 
-class ControllerClaimer extends SoloJob<ControllerClaimer_Memory> {
+class ControllerClaimer extends SoloJob<ControllerClaimer_Memory, MemCache> {
   @extensionInterface(EXT_MapManager)
   mapManager!: IMapManagerExtensions;
   protected GetNewSpawnID(): string | undefined {

@@ -6,7 +6,7 @@ export const OSPackage: IPackage = {
 
 import { BattleSquad } from "./BattleSquad";
 
-class RemoteProtector extends BattleSquad<RemoteProtector_Memory> {
+class RemoteProtector extends BattleSquad<RemoteProtector_Memory, MemCache> {
   protected GetNewSpawnID(squadID: number): string | undefined {
     if (squadID == 0) {
       const room = Game.rooms[this.memory.targetRoom];

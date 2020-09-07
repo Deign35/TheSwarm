@@ -19,7 +19,7 @@ let MapCache: {
     [roomID: string]: ({ exit: ExitConstant, room: string }[] | -2)
   }
 } = {};
-class MapManager extends BasicProcess<MapManager_Memory> {
+class MapManager extends BasicProcess<MapManager_Memory, MemCache> {
   get memory(): MapManager_Memory {
     if (!Memory.mapData) {
       this.log.warn(`Initializing MapManager memory`);

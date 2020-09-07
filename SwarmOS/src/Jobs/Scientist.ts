@@ -5,7 +5,7 @@ export const OSPackage: IPackage = {
 }
 import { SoloJob } from "./SoloJob";
 
-class Scientist extends SoloJob<Scientist_Memory> {
+class Scientist extends SoloJob<Scientist_Memory, MemCache> {
   protected GetNewSpawnID(): string {
     return this.spawnManager.requestSpawn({
       body: [CARRY, CARRY, CARRY, CARRY, MOVE, MOVE],
@@ -112,6 +112,21 @@ class Scientist extends SoloJob<Scientist_Memory> {
       for (let resourceType in creep.store) {
         actionResource = resourceType as MineralCompoundConstant | MineralConstant;
         break;
+      }
+    }
+
+    if (actionResource == RESOURCE_ENERGY && creep.store.getUsedCapacity() == 0) {
+      for (let i = 0; i < roomData.tombstones.length; i++) {
+        const tombstone = Game.getObjectById<Tombstone>(roomData.tombstones[i]);
+        if (tombstone) {
+          for (let key in tombstone.store) {
+            if (key != RESOURCE_ENERGY) {
+              curAction = AT_Withdraw;
+              actionResource = key as ResourceConstant;
+              target = tombstone.id;
+            }
+          }
+        }
       }
     }
 

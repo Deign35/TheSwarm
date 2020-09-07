@@ -6,7 +6,7 @@ export const OSPackage: IPackage = {
 import { SoloJob } from "./SoloJob";
 import { LookAtGround } from "Tools/TheFinder";
 
-class Harvester extends SoloJob<HarvesterMemory> {
+class Harvester extends SoloJob<HarvesterMemory, MemCache> {
   RunThread(): ThreadState {
     const creep = Game.creeps[this.memory.creepID!];
     if (!this.memory.remoteHarvester && creep && !creep.spawning && creep.ticksToLive! < 80) {

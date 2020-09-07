@@ -1,4 +1,4 @@
-export abstract class BasicProcess<T extends MemBase> implements IProcess {
+export abstract class BasicProcess<T extends MemBase, U extends MemCache> implements IProcess {
   constructor(protected context: IProcessContext) {
     this._logger = context.getPackageInterface(EXT_Logger).CreateLogContext(this.logID, this.logLevel);
   }
@@ -10,6 +10,7 @@ export abstract class BasicProcess<T extends MemBase> implements IProcess {
   @extensionInterface(EXT_Sleep)
   protected sleeper!: IKernelSleepExtension;
 
+  get cache(): U { return this.context.cache as U };
   get memory(): T { return this.context.memory as T; }
   get pkgName(): string { return this.context.pkgName; }
   get pid(): PID { return this.context.pid; }
@@ -46,7 +47,7 @@ export abstract class BasicProcess<T extends MemBase> implements IProcess {
 }
 
 const SCAN_FREQUENCY = 15;
-export abstract class PackageProviderBase<T extends PackageProviderMemory> extends BasicProcess<T> {
+export abstract class PackageProviderBase<T extends PackageProviderMemory, U extends MemCache> extends BasicProcess<T, U> {
   protected abstract RequiredServices: SDictionary<ProviderService>;
 
   private addPKGService(serviceID: string, id: string, parentPID?: PID, startContext: any = {}) {

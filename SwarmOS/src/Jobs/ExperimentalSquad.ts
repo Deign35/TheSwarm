@@ -6,7 +6,7 @@
 
 import { SquadJob } from "./SquadJob";
 
-class ExperimentalSquad extends SquadJob<ExperimentalSquad_Memory> {
+class ExperimentalSquad extends SquadJob<ExperimentalSquad_Memory, MemCache> {
   @extensionInterface(EXT_MapManager)
   mapManager!: IMapManagerExtensions;
   RunThread() {

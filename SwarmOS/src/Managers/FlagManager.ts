@@ -13,7 +13,7 @@ const PKG_FlagManager_LogContext: LogContext = {
   logLevel: LOG_INFO
 }
 
-class FlagManager extends BasicProcess<FlagManagerMemory> {
+class FlagManager extends BasicProcess<FlagManagerMemory, MemCache> {
   get memory(): FlagManagerMemory {
     if (!Memory.flagData) {
       this.log.warn(`Initializing FlagManager memory`);

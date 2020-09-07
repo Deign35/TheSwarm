@@ -5,7 +5,7 @@ export const OSPackage: IPackage = {
 }
 import { BasicProcess } from "Core/BasicTypes";
 
-class RemoteManager extends BasicProcess<RemoteManager_Memory> {
+class RemoteManager extends BasicProcess<RemoteManager_Memory, MemCache> {
   @extensionInterface(EXT_RoomManager)
   protected roomManager!: IRoomManagerExtension;
   RunThread(): ThreadState {

@@ -16,7 +16,7 @@ const PKG_RoomManager_LogContext: LogContext = {
   logLevel: LOG_INFO
 }
 
-class RoomManager extends BasicProcess<RoomStateMemory> {
+class RoomManager extends BasicProcess<RoomStateMemory, MemCache> {
   @extensionInterface(EXT_RoomManager)
   roomManager!: IRoomManagerExtension;
 

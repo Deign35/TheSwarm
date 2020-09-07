@@ -2,6 +2,8 @@ declare interface MemBase {
   HC?: string; // (H)andle of the (C)allback function for informing the parent process that this process has died.
 }
 
+declare interface MemCache { }
+
 /** Core OS */
 declare interface KernelMemory extends MemBase {
   processTable: ProcessTable;
@@ -49,6 +51,7 @@ declare interface _ProcessConstructor {
 }
 declare interface IProcessContext {
   readonly memory: MemBase;
+  readonly cache: MemCache;
   readonly pkgName: string;
   readonly pid: PID;
   readonly pPID: PID;

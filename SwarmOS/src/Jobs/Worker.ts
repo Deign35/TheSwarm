@@ -5,7 +5,7 @@ export const OSPackage: IPackage = {
 }
 import { SoloJob } from "./SoloJob";
 
-class Worker extends SoloJob<Worker_Memory> {
+class Worker extends SoloJob<Worker_Memory, MemCache> {
 
   private hasRun!: boolean;
   PrepTick() {
@@ -39,7 +39,7 @@ class Worker extends SoloJob<Worker_Memory> {
       body: body,
       creepName: this.memory.targetRoom + '_' + (Game.time + '_WR').slice(-6),
       owner_pid: this.pid
-    }, this.memory.targetRoom, Priority_Low, {
+    }, this.memory.targetRoom, this.memory.targetRoom == this.memory.homeRoom ? Priority_Low : Priority_Lowest, {
         parentPID: this.pid
       }, 1);
   }

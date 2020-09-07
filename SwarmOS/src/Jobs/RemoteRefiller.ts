@@ -5,7 +5,7 @@ export const OSPackage: IPackage = {
 }
 import { SoloJob } from "./SoloJob";
 
-class RemoteRefiller extends SoloJob<RemoteRefiller_Memory> {
+class RemoteRefiller extends SoloJob<RemoteRefiller_Memory, MemCache> {
   protected GetNewSpawnID(): string {
     const body = [CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
       MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];

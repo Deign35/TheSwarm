@@ -5,7 +5,7 @@ export const OSPackage: IPackage = {
 }
 import { BasicProcess } from "Core/BasicTypes";
 
-class TowerJob extends BasicProcess<Tower_Memory> {
+class TowerJob extends BasicProcess<Tower_Memory, MemCache> {
   @extensionInterface(EXT_RoomManager)
   protected roomManager!: IRoomManagerExtension;
   RunThread(): ThreadState {

@@ -6,7 +6,7 @@ export const OSPackage: IPackage = {
 
 import { BasicProcess } from "Core/BasicTypes";
 
-class RepetitiveCreepActivity extends BasicProcess<RepetitiveCreepActivity_Memory> {
+class RepetitiveCreepActivity extends BasicProcess<RepetitiveCreepActivity_Memory, MemCache> {
   @extensionInterface(EXT_CreepManager)
   protected creepManager!: ICreepManagerExtensions;
 

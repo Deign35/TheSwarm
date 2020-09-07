@@ -17,7 +17,7 @@ const PKG_CreepManager_LogContext: LogContext = {
   logLevel: LOG_INFO
 }
 
-class CreepManager extends BasicProcess<CreepManager_Memory> {
+class CreepManager extends BasicProcess<CreepManager_Memory, MemCache> {
   @extensionInterface(EXT_CreepManager)
   creepExtensions!: ICreepManagerExtensions;
 

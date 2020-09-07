@@ -5,7 +5,7 @@ export const OSPackage: IPackage = {
 }
 import { SoloJob } from "./SoloJob";
 
-class RoomBooter extends SoloJob<RoomBooter_Memory> {
+class RoomBooter extends SoloJob<RoomBooter_Memory, MemCache> {
   @extensionInterface(EXT_MapManager)
   mapManager!: IMapManagerExtensions;
   protected GetNewSpawnID(): string | undefined {

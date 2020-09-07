@@ -1,6 +1,6 @@
 import { BasicProcess } from "Core/BasicTypes";
 
-export abstract class SoloJob<T extends SoloJob_Memory> extends BasicProcess<T> {
+export abstract class SoloJob<T extends SoloJob_Memory, U extends MemCache> extends BasicProcess<T, U> {
   @extensionInterface(EXT_CreepManager)
   creepManager!: ICreepManagerExtensions;
   @extensionInterface(EXT_MapManager)
@@ -66,7 +66,7 @@ export abstract class SoloJob<T extends SoloJob_Memory> extends BasicProcess<T> 
       this.HandleNoActivity();
     } else {
       this.kernel.setParent(this.memory.activityPID, this.pid);
-      const childActivity = this.kernel.getProcessByPID<SoloJob<T>>(this.memory.activityPID)!;
+      const childActivity = this.kernel.getProcessByPID(this.memory.activityPID)!;
       if (!childActivity.memory.HC) {
         childActivity.memory.HC = 'CreateActivityForCreep';
       }

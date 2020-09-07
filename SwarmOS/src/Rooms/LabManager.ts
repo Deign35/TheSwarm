@@ -5,7 +5,7 @@ export const OSPackage: IPackage = {
 }
 import { BasicProcess } from "Core/BasicTypes";
 
-class LabManager extends BasicProcess<LabManager_Memory> {
+class LabManager extends BasicProcess<LabManager_Memory, MemCache> {
   @extensionInterface(EXT_RoomManager)
   protected roomManager!: IRoomManagerExtension;
   RunThread(): ThreadState {

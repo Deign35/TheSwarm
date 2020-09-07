@@ -5,7 +5,7 @@ export const OSPackage: IPackage = {
 }
 import { SoloJob } from "./SoloJob";
 
-class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory> {
+class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory, MemCache> {
   RunThread() {
     const creep = Game.creeps[this.memory.creepID!];
     if (((creep && !creep.spawning && creep.ticksToLive! < 40) ||

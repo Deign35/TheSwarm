@@ -16,7 +16,7 @@ const PKG_CLIManager_LogContext: LogContext = {
 
 import { BasicProcess } from "Core/BasicTypes";
 
-class CLIManager extends BasicProcess<SwarmCLIMemory> {
+class CLIManager extends BasicProcess<SwarmCLIMemory, MemCache> {
   @extensionInterface(EXT_RoomManager)
   roomManager!: IRoomManagerExtension;
   get memory(): SwarmCLIMemory {

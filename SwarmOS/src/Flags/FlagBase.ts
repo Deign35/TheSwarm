@@ -41,7 +41,7 @@ export const OSPackage: IPackage = {
  * WHITE_ --
  * YELLOW_ --
  */
-class FlagBase extends BasicProcess<FlagProcess_Memory> {
+class FlagBase extends BasicProcess<FlagProcess_Memory, MemCache> {
   protected get flag(): Flag {
     return Game.flags[this.memory.flagID];
   }

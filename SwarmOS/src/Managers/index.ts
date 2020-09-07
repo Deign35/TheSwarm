@@ -8,7 +8,7 @@ import { OSPackage as MarketManager } from "./MarketManager";
 import { OSPackage as RoomManager } from "./RoomManager";
 import { OSPackage as SpawnManager } from "./SpawnManager";
 
-class SwarmManager extends PackageProviderBase<PackageProviderMemory> {
+class SwarmManager extends PackageProviderBase<PackageProviderMemory, MemCache> {
   protected get RequiredServices(): SDictionary<ProviderService> {
     return this._reqServices;
   }
