@@ -51,10 +51,20 @@ class ControllerClaimer extends SoloJob<ControllerClaimer_Memory, MemCache> {
     }
 
     if (creep.room.controller) {
+      if (!creep.room.controller.sign || creep.room.controller.sign.text != MY_SIGNATURE) {
+        return this.creepManager.CreateNewCreepActivity({
+          action: AT_SignController,
+          creepID: creep.name,
+          targetID: creep.room.controller.id,
+          message: MY_SIGNATURE
+        }, this.pid)
+      }
+
       if (!this.memory.onlyReserve && creep.room.controller.my) {
         this.log.info(`Controller already mine: ${creep.room.name}`);
         return;
       }
+
       return this.creepManager.CreateNewCreepActivity({
         action: this.memory.onlyReserve ? AT_ReserveController : AT_ClaimController,
         creepID: creep.name,

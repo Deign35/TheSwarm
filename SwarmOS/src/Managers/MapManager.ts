@@ -9,6 +9,7 @@ declare var MemoryCache: {
     }
   }
 }
+
 import { BasicProcess, ExtensionBase } from "Core/BasicTypes";
 
 export const OSPackage: IPackage = {
