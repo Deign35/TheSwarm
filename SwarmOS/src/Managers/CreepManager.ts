@@ -174,16 +174,23 @@ class CreepManagerExtensions extends ExtensionBase implements ICreepManagerExten
       case (AT_AttackController): actionResult = creep.attackController(target); break;
       case (AT_Build): actionResult = creep.build(target); break;
       case (AT_ClaimController): actionResult = creep.claimController(target); break;
-      case (AT_Dismantle): actionResult = creep.dismantle(target); break;
-      case (AT_GenerateSafeMode): actionResult = creep.generateSafeMode(target); break;
-      case (AT_Harvest):
-        const res = creep.harvest(target);
-        if (res == OK) {
+      case (AT_Dismantle):
+        actionResult = creep.dismantle(target);
+        if (actionResult == OK) {
           if (creep.store.getUsedCapacity() == creep.store.getCapacity()) {
             return ERR_FULL;
           }
         }
-        return res;
+        break;
+      case (AT_GenerateSafeMode): actionResult = creep.generateSafeMode(target); break;
+      case (AT_Harvest):
+        actionResult = creep.harvest(target);
+        if (actionResult == OK) {
+          if (creep.store.getUsedCapacity() == creep.store.getCapacity()) {
+            return ERR_FULL;
+          }
+        }
+        break;
       case (AT_Heal):
         actionResult = creep.heal(target);
         if (actionResult == OK) {

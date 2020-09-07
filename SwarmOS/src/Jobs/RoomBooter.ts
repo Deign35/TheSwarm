@@ -41,27 +41,7 @@ class RoomBooter extends SoloJob<RoomBooter_Memory> {
   }
   protected CreateCustomCreepActivity(creep: Creep): string | undefined {
     if (creep.room.name != this.memory.targetRoom) {
-      const route = this.mapManager.GetRoute(creep.room.name, this.memory.targetRoom);
-      if (route == -2) {
-        this.log.error(`Couldn't find a path to ${this.memory.targetRoom}`)
-        this.EndProcess();
-        return;
-      }
-
-      let exit = null;
-      if (route.length > 0) {
-        exit = creep.pos.findClosestByPath(route[0].exit);
-      }
-      if (!exit) {
-        this.log.error(`Couldn't find a path out of the room ${creep.room.name}`);
-        return;
-      }
-      return this.creepManager.CreateNewCreepActivity({
-        action: AT_MoveToPosition,
-        creepID: creep.name,
-        pos: exit,
-        amount: 0
-      }, this.pid);
+      return this.MoveToRoom(creep, this.memory.targetRoom);
     }
     const carryRatio = creep.store.getUsedCapacity() / creep.store.getCapacity();
     const roomData = this.roomManager.GetRoomData(creep.room.name)!;

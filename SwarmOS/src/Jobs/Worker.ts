@@ -121,7 +121,7 @@ class Worker extends SoloJob<Worker_Memory> {
       }
     }
 
-    if (actionType == AT_NoOp && creep.room.controller && !creep.room.controller.my && roomData.structures[STRUCTURE_CONTAINER].length > 0) {
+    if (actionType == AT_NoOp && (!creep.room.controller || !creep.room.controller.my) && roomData.structures[STRUCTURE_CONTAINER].length > 0) {
       for (let i = 0; i < roomData.structures[STRUCTURE_CONTAINER].length; i++) {
         const container = Game.getObjectById<StructureContainer>(roomData.structures[STRUCTURE_CONTAINER][i]);
         if (container && container.store.getUsedCapacity(RESOURCE_ENERGY) >= energyNeeded) {
@@ -131,6 +131,19 @@ class Worker extends SoloJob<Worker_Memory> {
             bestTarget = container.id;
             actionType = AT_Withdraw;
           }
+        }
+      }
+    }
+
+    if (actionType == AT_NoOp && (!creep.room.controller || !creep.room.controller.my)) {
+      const enemyStructures = creep.room.find(FIND_HOSTILE_STRUCTURES);
+      for (let i = 0; i < enemyStructures.length; i++) {
+        const enemyStructure = enemyStructures[i];
+        const dist = enemyStructure.pos.getRangeTo(creep.pos);
+        if (dist < closestDist) {
+          closestDist = dist;
+          bestTarget = enemyStructure.id;
+          actionType = AT_Dismantle;
         }
       }
     }
