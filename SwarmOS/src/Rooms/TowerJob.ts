@@ -26,8 +26,8 @@ class TowerJob extends BasicProcess<Tower_Memory, MemCache> {
     for (let i = 0; i < myCreeps.length; i++) {
       if (myCreeps[i].hits < myCreeps[i].hitsMax) {
         const towerIDs = roomData.structures[STRUCTURE_TOWER];
-        for (let i = 0; i < towerIDs.length; i++) {
-          const tower = Game.getObjectById<StructureTower>(towerIDs[i])!;
+        for (let j = 0; j < towerIDs.length; j++) {
+          const tower = Game.getObjectById<StructureTower>(towerIDs[j])!;
           if (tower.store[RESOURCE_ENERGY] > 500) {
             tower.heal(myCreeps[i]);
           }
