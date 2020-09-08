@@ -24,7 +24,7 @@ class Harvester extends SoloJob<HarvesterMemory, MemCache> {
     } else if (homeRoom.energyCapacityAvailable >= 550) {
       body = [WORK, WORK, WORK, WORK, WORK, MOVE];
     } else {
-      const source = Game.getObjectById(this.memory.source)! as Source;
+      const source = Game.getObjectById<Source>(this.memory.source)!;
       let count = 0;
 
       LookAtGround(this.memory.targetRoom, new RoomPosition(source.pos.x - 1, source.pos.y + 1, this.memory.targetRoom),
@@ -53,8 +53,17 @@ class Harvester extends SoloJob<HarvesterMemory, MemCache> {
     if (source.pos.getRangeTo(creep.pos) > 1) {
       let targetPos = source.pos;
       let dist = 1;
+      if (!this.memory.container) {
+        const containerIDs = this.roomManager.GetRoomData(creep.room.name)!.structures[STRUCTURE_CONTAINER];
+        for (let i = 0; i < containerIDs.length; i++) {
+          const container = Game.getObjectById<StructureContainer>(containerIDs[i]);
+          if (container && source.pos.isNearTo(container.pos)) {
+            this.memory.container = container.id;
+          }
+        }
+      }
       if (this.memory.container) {
-        let container = Game.getObjectById<StructureContainer>(this.memory.container);
+        const container = Game.getObjectById<StructureContainer>(this.memory.container);
         if (container) {
           targetPos = container.pos;
           dist = 0;
@@ -116,7 +125,7 @@ class Harvester extends SoloJob<HarvesterMemory, MemCache> {
 
     return;
   }
-  HandleNoActivity() {
+  HandleNoActivity(creep: Creep) {
     // Do Nothing;
   }
 

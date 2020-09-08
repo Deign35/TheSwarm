@@ -70,5 +70,5 @@ class Scout extends SoloJob<Scout_Memory, MemCache> {
     }, this.pid);
   }
 
-  HandleNoActivity() { }
+  HandleNoActivity(creep: Creep) { }
 }

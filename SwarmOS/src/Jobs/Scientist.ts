@@ -138,5 +138,5 @@ class Scientist extends SoloJob<Scientist_Memory, MemCache> {
     }, this.pid);
   }
 
-  HandleNoActivity() { }
+  HandleNoActivity(creep: Creep) { }
 }

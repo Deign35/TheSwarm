@@ -74,10 +74,19 @@ class RoomBooter extends SoloJob<RoomBooter_Memory, MemCache> {
 
     const sources = creep.room.find(FIND_SOURCES_ACTIVE);
     if (sources.length > 0) {
+      let closestDist = sources[0].pos.getRangeTo(creep.pos);
+      let closestIndex = 0;
+      for (let i = 1; i < sources.length; i++) {
+        const dist = sources[i].pos.getRangeTo(creep.pos);
+        if (dist < closestDist) {
+          closestDist = dist;
+          closestIndex = i;
+        }
+      }
       return this.creepManager.CreateNewCreepActivity({
         action: AT_Harvest,
         creepID: creep.name,
-        targetID: sources[0].id
+        targetID: sources[closestIndex].id
       }, this.pid)
     }
 
@@ -85,5 +94,5 @@ class RoomBooter extends SoloJob<RoomBooter_Memory, MemCache> {
     return;
   }
 
-  HandleNoActivity() { }
+  HandleNoActivity(creep: Creep) { }
 }

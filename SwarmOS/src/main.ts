@@ -53,7 +53,7 @@ export function loop() {
     kernel.loop();
   } finally {
     kernel.log.DumpLogToConsole();
-    if (Game.cpu.bucket == 10000) {
+    if (Game.cpu.bucket >= 9500) {
       if (Game.cpu.generatePixel() == OK) {
         console.log(`Ticks between pixels: ${Game.time - gameTimeOfLastGeneratePixel}`);
         gameTimeOfLastGeneratePixel = Game.time;

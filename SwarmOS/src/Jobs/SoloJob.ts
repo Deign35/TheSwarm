@@ -63,7 +63,7 @@ export abstract class SoloJob<T extends SoloJob_Memory, U extends MemCache> exte
 
     this.memory.activityPID = this.CreateCustomCreepActivity(creep);
     if (!this.memory.activityPID) {
-      this.HandleNoActivity();
+      this.HandleNoActivity(creep);
     } else {
       this.kernel.setParent(this.memory.activityPID, this.pid);
       const childActivity = this.kernel.getProcessByPID(this.memory.activityPID)!;
@@ -74,7 +74,7 @@ export abstract class SoloJob<T extends SoloJob_Memory, U extends MemCache> exte
   }
 
   protected abstract CreateCustomCreepActivity(creep: Creep): PID | undefined;
-  protected HandleNoActivity() {
+  protected HandleNoActivity(creep: Creep) {
     this.EndProcess();
   }
 

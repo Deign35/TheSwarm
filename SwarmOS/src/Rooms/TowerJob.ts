@@ -22,19 +22,34 @@ class TowerJob extends BasicProcess<Tower_Memory, MemCache> {
       }
     }
 
+    const myCreeps = Game.rooms[this.memory.homeRoom].find(FIND_MY_CREEPS);
+    for (let i = 0; i < myCreeps.length; i++) {
+      if (myCreeps[i].hits < myCreeps[i].hitsMax) {
+        const towerIDs = roomData.structures[STRUCTURE_TOWER];
+        for (let i = 0; i < towerIDs.length; i++) {
+          const tower = Game.getObjectById<StructureTower>(towerIDs[i])!;
+          if (tower.store[RESOURCE_ENERGY] > 500) {
+            tower.heal(myCreeps[i]);
+          }
+        }
+
+        return ThreadState_Done;
+      }
+    }
+
     const otherCreeps = Game.rooms[this.memory.homeRoom].find(FIND_HOSTILE_CREEPS);
     if (otherCreeps.length == 0) {
-      this.sleeper.sleep(this.pid, 6);
+      this.sleeper.sleep(this.pid, 8);
       return ThreadState_Done;
     }
 
     const hostiles = this.GetHostileTargets(otherCreeps);
     if (hostiles.length == 0) {
-      this.sleeper.sleep(this.pid, 6);
+      this.sleeper.sleep(this.pid, 8);
       return ThreadState_Done;
     }
 
-    const towerIDs = roomData.structures.tower;
+    const towerIDs = roomData.structures[STRUCTURE_TOWER];
     for (let i = 0; i < towerIDs.length; i++) {
       const tower = Game.getObjectById<StructureTower>(towerIDs[i])!;
       if (tower.store[RESOURCE_ENERGY] > 0) {

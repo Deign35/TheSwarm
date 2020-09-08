@@ -272,7 +272,7 @@ const help = function () {
   msg += "ex: CLI(CLI_LabOrder, \"sim\", 'b4963f6662d40cd168e27620', '106618ac400ab8a87fad9385', 'b66721e4563a947b63dd9b37', RESOURCE_HYDROGEN, RESOURCE_LEMERGIUM)\n\n"
 
   msg += "CLI_Launch: Launches a program.\n";
-  msg += "ex: CLI(CLI_Launch, CPKG_Scout, { homeRoom: \"W57S27\", targetRoom: \"W57S26\" })\n\n";
+  msg += "ex: CLI(CLI_Launch, CPKG_Scout, { homeRoom: \"W57S27\", targetRoom: \"W57S26\", expires: true })\n\n";
 
   msg += "CLI_GetNumWorkers: Gets the number of workers for a given room.\n";
   msg += "ex: CLI(CLI_GetNumWorkers, \"W57S27\")\n";
@@ -289,5 +289,9 @@ global['help'] = help();
 
 
 global['qb'] = function () {
-  CLI(CLI_Assimilate, 'sim', RT_Home);
+  for (let roomID in Game.rooms) {
+    if (Game.rooms[roomID].controller && Game.rooms[roomID].controller!.my) {
+      CLI(CLI_Assimilate, roomID, RT_Home);
+    }
+  }
 }

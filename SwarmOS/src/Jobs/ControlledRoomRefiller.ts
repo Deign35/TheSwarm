@@ -107,7 +107,7 @@ class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory, MemC
     }, this.pid);
   }
 
-  protected HandleNoActivity() { }
+  protected HandleNoActivity(creep: Creep) { }
 
   protected GetNewTarget(creep: Creep): { targetID: ObjectID, action: ActionType } {
     let actionType: ActionType = AT_NoOp;

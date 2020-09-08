@@ -75,5 +75,5 @@ class ControllerClaimer extends SoloJob<ControllerClaimer_Memory, MemCache> {
     this.log.info(`Controller doesn't exist: ${creep.room.name}`)
     return;
   }
-  protected HandleNoActivity() { }
+  protected HandleNoActivity(creep: Creep) { }
 }

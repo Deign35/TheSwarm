@@ -120,5 +120,5 @@ class MineralHarvester extends SquadJob<MineralHarvester_Memory, MemCache> {
     return undefined;
   }
 
-  HandleNoActivity(squadID: number) { }
+  HandleNoActivity(squadID: number, creep: Creep) { }
 }
