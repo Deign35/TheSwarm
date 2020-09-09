@@ -26,7 +26,17 @@ class Worker extends SoloJob<Worker_Memory, MemCache> {
     const homeRoom = Game.rooms[this.memory.homeRoom];
     const energyCapacity = homeRoom.energyCapacityAvailable;
     let body = [WORK, CARRY, CARRY, MOVE, MOVE];
-    if (energyCapacity >= 1100) {
+    if (energyCapacity >= 2200) {
+      body = [WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK,
+        CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
+        CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
+        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE]
+    } else if (energyCapacity >= 1650) {
+      body = [WORK, WORK, WORK, WORK, WORK, WORK,
+        CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
+        CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
+        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+    } else if (energyCapacity >= 1100) {
       body = [WORK, WORK, WORK, WORK,
         CARRY, CARRY, CARRY, CARRY,
         CARRY, CARRY, CARRY, CARRY,

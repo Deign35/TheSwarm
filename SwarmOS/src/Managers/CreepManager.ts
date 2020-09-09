@@ -226,7 +226,7 @@ class CreepManagerExtensions extends ExtensionBase implements ICreepManagerExten
         if ((target as Structure).pos) {
           target = (target as Structure).pos;
         }
-        const result = creep.moveTo(target);
+        const result = this.MoveCreep(creep, target);
         const dist = creep.pos.getRangeTo(target);
         if (dist == 1 && (target.x == 0 || target.x == 49 || target.y == 0 || target.y == 49)) {
           return OK;
@@ -252,7 +252,14 @@ class CreepManagerExtensions extends ExtensionBase implements ICreepManagerExten
   }
 
   MoveCreep(creep: Creep, pos: RoomPosition) {
-    return creep.moveTo(pos);
+    return creep.moveTo(pos, {
+      visualizePathStyle: {
+        lineStyle: "dashed",
+        opacity: 0.5,
+        stroke: "red",
+        strokeWidth: 0.2,
+      }
+    });
   }
 
   CreepIsInRange(actionType: ActionType, pos1: RoomPosition, pos2: RoomPosition) {

@@ -35,9 +35,9 @@ class RoomBooter extends SoloJob<RoomBooter_Memory, MemCache> {
       body: body,
       creepName: this.memory.targetRoom + '_' + (Game.time + '_RB').slice(-6),
       owner_pid: this.pid
-    }, this.memory.targetRoom, Priority_Lowest, {
+    }, this.memory.homeRoom, Priority_Lowest, {
         parentPID: this.pid
-      }, 10);
+      }, 3);
   }
   protected CreateCustomCreepActivity(creep: Creep): string | undefined {
     if (creep.room.name != this.memory.targetRoom) {

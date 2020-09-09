@@ -20,9 +20,9 @@ class ControllerClaimer extends SoloJob<ControllerClaimer_Memory, MemCache> {
       body: this.memory.onlyReserve ? [CLAIM, CLAIM, MOVE, MOVE] : [CLAIM, MOVE],
       creepName: this.memory.targetRoom + '_' + (Game.time + '_CL').slice(-6),
       owner_pid: this.pid
-    }, this.memory.targetRoom, Priority_Lowest, {
+    }, this.memory.homeRoom, Priority_Lowest, {
         parentPID: this.pid
-      }, this.memory.onlyReserve ? 3 : 10);
+      }, 3);
   }
 
   protected CreateCustomCreepActivity(creep: Creep): PID | undefined {
