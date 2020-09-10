@@ -11,3 +11,10 @@ interface Creep {
   bodyCost: number;
   SwarmOS: boolean;
 }
+
+interface RoomPosition {
+  SwarmOS: boolean;
+  isEdge: () => boolean;
+  isExit: () => boolean;
+  getTerrain: () => number;
+}

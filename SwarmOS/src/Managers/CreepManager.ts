@@ -228,7 +228,7 @@ class CreepManagerExtensions extends ExtensionBase implements ICreepManagerExten
         }
         const result = this.MoveCreep(creep, target);
         const dist = creep.pos.getRangeTo(target);
-        if (dist == 1 && (target.x == 0 || target.x == 49 || target.y == 0 || target.y == 49)) {
+        if (dist == 1 && (target as RoomPosition).isEdge()) {
           return OK;
         }
         if (dist <= (args.amount || 0)) {

@@ -42,3 +42,22 @@ if (!Creep.prototype.SwarmOS) {
     }
   });
 }
+
+if (!RoomPosition.prototype.SwarmOS) {
+  RoomPosition.prototype.isEdge = function () {
+    return this.x == 49 || this.x == 0 || this.y == 0 || this.y == 49;
+  }
+  RoomPosition.prototype.isExit = function () {
+    return this.isEdge() && this.getTerrain() != TERRAIN_MASK_WALL;
+  }
+  RoomPosition.prototype.getTerrain = function () {
+    return Game.map.getRoomTerrain(this.roomName).get(this.x, this.y);
+  }
+  Object.defineProperties(RoomPosition.prototype, {
+    SwarmOS: {
+      get() {
+        return true;
+      }
+    }
+  });
+}
