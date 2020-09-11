@@ -7,7 +7,6 @@ declare interface Tower_Memory extends RoomMemory { }
 declare interface EnergyManager_Memory extends RoomMemory {
   harvesterPIDs: IDictionary<ObjectID, PID>;
   refillerPID: PID;
-  numWorkers: number;
   workerPIDs: PID[];
   mineralHarvesterPID: PID;
 }
@@ -15,7 +14,6 @@ declare interface EnergyManager_Memory extends RoomMemory {
 declare interface RemoteManager_Memory extends RoomMemory {
   targetRoom: RoomID;
   harvesterPIDs: IDictionary<ObjectID, PID>;
-  numRefillers: number;
   refillerPIDs: PID[];
   workerPID?: PID;
   claimerPID?: PID;

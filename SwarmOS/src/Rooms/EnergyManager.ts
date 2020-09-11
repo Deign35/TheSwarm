@@ -55,7 +55,20 @@ class EnergyManager extends BasicProcess<EnergyManager_Memory, MemCache> {
       }
     }
 
-    while (this.memory.workerPIDs.length < this.memory.numWorkers) {
+    let numWorkers = roomData.sourceIDs.length;
+    const room = Game.rooms[this.memory.homeRoom];
+    if (room.controller!.level <= 2) {
+      numWorkers *= 4;
+    } else if (room.controller!.level == 3) {
+      numWorkers *= 3;
+    } else if (!room.storage) {
+      numWorkers *= 3;
+    } else {
+      let storageAmount = Math.floor(room.storage.store[RESOURCE_ENERGY] / 100000);
+      numWorkers += storageAmount;
+    }
+
+    while (this.memory.workerPIDs.length < numWorkers) {
       this.memory.workerPIDs.push(this.kernel.startProcess(CPKG_Worker, {
         homeRoom: this.memory.homeRoom,
         targetRoom: this.memory.homeRoom,

@@ -85,7 +85,8 @@ class RemoteManager extends BasicProcess<RemoteManager_Memory, MemCache> {
       }
     }
 
-    while (this.memory.refillerPIDs.length < this.memory.numRefillers) {
+    const roomData = this.roomManager.GetRoomData(this.memory.homeRoom);
+    while (this.memory.refillerPIDs.length < (3 * roomData!.sourceIDs.length)) {
       this.memory.refillerPIDs.push(this.kernel.startProcess(CPKG_RemoteRefiller, {
         expires: true,
         homeRoom: this.memory.homeRoom,
