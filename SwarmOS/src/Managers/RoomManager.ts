@@ -62,6 +62,10 @@ class RoomManager extends BasicProcess<RoomStateMemory, MemCache> {
       }
 
       if (data.roomType == RT_Home) {
+        if (data.activityPIDs[RPKG_RemoteManager] && this.kernel.getProcessByPID(data.activityPIDs[RPKG_RemoteManager])) {
+          this.kernel.killProcess(data.activityPIDs[RPKG_RemoteManager]);
+        }
+
         if (!data.activityPIDs[RPKG_Towers] || !this.kernel.getProcessByPID(data.activityPIDs[RPKG_Towers])) {
           data.activityPIDs[RPKG_Towers] = this.kernel.startProcess(RPKG_Towers, {
             homeRoom: roomID
@@ -87,6 +91,16 @@ class RoomManager extends BasicProcess<RoomStateMemory, MemCache> {
           this.kernel.setParent(data.activityPIDs[RPKG_EnergyManager], this.pid);
         }
       } else if (data.roomType == RT_RemoteHarvest) {
+        if (data.activityPIDs[RPKG_Towers] && this.kernel.getProcessByPID(data.activityPIDs[RPKG_Towers])) {
+          this.kernel.killProcess(data.activityPIDs[RPKG_Towers]);
+        }
+        if (data.activityPIDs[RPKG_LabManager] && this.kernel.getProcessByPID(data.activityPIDs[RPKG_LabManager])) {
+          this.kernel.killProcess(data.activityPIDs[RPKG_LabManager]);
+        }
+        if (data.activityPIDs[RPKG_EnergyManager] && this.kernel.getProcessByPID(data.activityPIDs[RPKG_EnergyManager])) {
+          this.kernel.killProcess(data.activityPIDs[RPKG_EnergyManager]);
+        }
+
         if (!data.activityPIDs[RPKG_RemoteManager] || !this.kernel.getProcessByPID(data.activityPIDs[RPKG_RemoteManager])) {
           data.activityPIDs[RPKG_RemoteManager] = this.kernel.startProcess(RPKG_RemoteManager, {
             harvesterPIDs: {},
@@ -96,6 +110,19 @@ class RoomManager extends BasicProcess<RoomStateMemory, MemCache> {
             homeRoom: data.homeRoom,
           } as RemoteManager_Memory);
           this.kernel.setParent(data.activityPIDs[RPKG_RemoteManager], this.pid);
+        }
+      } else if (data.roomType == RT_Nuetral) {
+        if (data.activityPIDs[RPKG_RemoteManager] && this.kernel.getProcessByPID(data.activityPIDs[RPKG_RemoteManager])) {
+          this.kernel.killProcess(data.activityPIDs[RPKG_RemoteManager]);
+        }
+        if (data.activityPIDs[RPKG_Towers] && this.kernel.getProcessByPID(data.activityPIDs[RPKG_Towers])) {
+          this.kernel.killProcess(data.activityPIDs[RPKG_Towers]);
+        }
+        if (data.activityPIDs[RPKG_LabManager] && this.kernel.getProcessByPID(data.activityPIDs[RPKG_LabManager])) {
+          this.kernel.killProcess(data.activityPIDs[RPKG_LabManager]);
+        }
+        if (data.activityPIDs[RPKG_EnergyManager] && this.kernel.getProcessByPID(data.activityPIDs[RPKG_EnergyManager])) {
+          this.kernel.killProcess(data.activityPIDs[RPKG_EnergyManager]);
         }
       }
     }

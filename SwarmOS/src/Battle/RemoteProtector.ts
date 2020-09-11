@@ -13,6 +13,7 @@ class RemoteProtector extends BattleSquad<RemoteProtector_Memory, MemCache> {
       if (!room) {
         // We have a problem.  We don't know if we should spawn an attacker or not.
         this.log.error(`Can't see room ${this.memory.targetRoom} -- RemoteProtector`);
+        this.kernel.killProcess(this.pid);
         return;
       }
 

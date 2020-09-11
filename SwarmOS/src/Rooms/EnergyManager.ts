@@ -21,7 +21,6 @@ class EnergyManager extends BasicProcess<EnergyManager_Memory, MemCache> {
   }
 
   RunThread(): ThreadState {
-    const room = Game.rooms[this.memory.homeRoom];
     const roomData = this.roomManager.GetRoomData(this.memory.homeRoom)!;
     const sourceIDs = roomData.sourceIDs;
     for (let i = 0; i < sourceIDs.length; i++) {
@@ -62,6 +61,7 @@ class EnergyManager extends BasicProcess<EnergyManager_Memory, MemCache> {
         targetRoom: this.memory.homeRoom,
         expires: true
       } as Worker_Memory))
+      this.kernel.setParent(this.memory.workerPIDs[this.memory.workerPIDs.length - 1], this.pid);
     }
 
     if (roomData.mineralIDs.length > 0 && roomData.structures[STRUCTURE_EXTRACTOR].length > 0 &&

@@ -22,6 +22,7 @@ class RemoteManager extends BasicProcess<RemoteManager_Memory, MemCache> {
               squad: [{}],
               targetRoom: this.memory.targetRoom
             } as RemoteProtector_Memory);
+            this.kernel.setParent(this.memory.remoteProtector, this.pid);
           }
         }
       }
@@ -52,6 +53,7 @@ class RemoteManager extends BasicProcess<RemoteManager_Memory, MemCache> {
         onlyReserve: true,
         targetRoom: this.memory.targetRoom
       } as ControllerClaimer_Memory);
+      this.kernel.setParent(this.memory.claimerPID, this.pid);
     }
 
     if (!this.memory.workerPID || !this.kernel.getProcessByPID(this.memory.workerPID)) {
@@ -60,6 +62,7 @@ class RemoteManager extends BasicProcess<RemoteManager_Memory, MemCache> {
         homeRoom: this.memory.homeRoom,
         targetRoom: this.memory.targetRoom
       } as Worker_Memory);
+      this.kernel.setParent(this.memory.workerPID, this.pid);
     }
 
     const sources = this.roomManager.GetRoomData(this.memory.targetRoom)!.sourceIDs;
@@ -72,6 +75,7 @@ class RemoteManager extends BasicProcess<RemoteManager_Memory, MemCache> {
           source: id,
           targetRoom: this.memory.targetRoom
         } as HarvesterMemory);
+        this.kernel.setParent(this.memory.harvesterPIDs[id], this.pid);
       }
     }
 
@@ -87,6 +91,7 @@ class RemoteManager extends BasicProcess<RemoteManager_Memory, MemCache> {
         homeRoom: this.memory.homeRoom,
         targetRoom: this.memory.targetRoom
       } as RemoteRefiller_Memory));
+      this.kernel.setParent(this.memory.refillerPIDs[this.memory.refillerPIDs.length - 1], this.pid);
     }
 
     this.sleeper.sleep(this.pid, 5);

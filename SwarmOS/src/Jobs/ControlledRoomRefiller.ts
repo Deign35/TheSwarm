@@ -271,7 +271,7 @@ class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory, MemC
         const nextTarget = Game.getObjectById<StructureStorage>(targets[0]);
         if (nextTarget) {
           bestTarget = nextTarget.id;
-          actionType = creep.store.getUsedCapacity() != creep.store.getCapacity() ? AT_Withdraw : AT_Transfer;
+          actionType = creep.store.getUsedCapacity() > 0 ? AT_Transfer : AT_Withdraw;
         }
       }
     }

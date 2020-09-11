@@ -68,6 +68,7 @@ class CreepManager extends BasicProcess<CreepManager_Memory, MemCache> {
       }
     }
 
+    this.sleeper.sleep(this.pid, 23);
     return ThreadState_Done;
   }
 }
