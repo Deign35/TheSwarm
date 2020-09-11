@@ -97,6 +97,7 @@
                 "EnergyManager": "energyManager",
                 "LabManager": "labManager",
                 "RemoteManager": "remoteManager",
+                "RoomController": "roomController",
                 "Towers": "towers"
             }
         },
@@ -111,11 +112,9 @@
                 "CancelLabOrder": "cancelLabOrder",
                 "ChangeFlag": "flagColor",
                 "ClearLog": "clearLog",
-                "GetNumWorkers": "getNumWorkers",
                 "Kill": "kill",
                 "Launch": "launch",
                 "LabOrder": "labOrder",
-                "SetNumWorkers": "setNumWorkers",
                 "SetWallStrength": "setWallStrength"
             }
         },
@@ -127,7 +126,10 @@
             "entries": {
                 "Nuetral": 0,
                 "Home": 1,
-                "RemoteHarvest": 2
+                "RemoteHarvest": 2,
+                "Highway": 3,
+                "Center": 4,
+                "SourceKeeper": 5
             }
         },
         "TT": {

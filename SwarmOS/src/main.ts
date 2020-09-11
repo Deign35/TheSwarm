@@ -40,12 +40,11 @@ import { kernel } from "Core/index";
 
 import { ActivitiesPackage } from "Activities/index";
 import { BattlePackage } from "Battle/index";
-import { FlagPackage } from "Flags/index";
 import { JobsPackage } from "Jobs/index";
 import { ManagersPackage } from "Managers/index";
 import { RoomsPackage } from "Rooms/index";
 
-kernel.installPackages([ActivitiesPackage, BattlePackage, FlagPackage, JobsPackage, ManagersPackage, RoomsPackage]);
+kernel.installPackages([ActivitiesPackage, BattlePackage, JobsPackage, ManagersPackage, RoomsPackage]);
 
 let gameTimeOfLastGeneratePixel = Game.time;
 export function loop() {

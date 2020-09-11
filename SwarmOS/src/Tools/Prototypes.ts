@@ -20,11 +20,35 @@ if (!Room.prototype.SwarmOS) {
         return this.name;
       }
     },
+    type: {
+      get() {
+        const res = /[EW](\d+)[NS](\d+)/.exec(this.name);
+        if (res && res.length > 2) {
+          const EW = +res[1];
+          const NS = +res[2];
+          const EWI = EW % 10, NSI = NS % 10;
+          if (EWI === 0 || NSI === 0) {
+            return RT_Highway;
+          } else if (EWI === 5 && NSI === 5) {
+            return RT_Center;
+          } else if (Math.abs(5 - EWI) <= 1 && Math.abs(5 - NSI) <= 1) {
+            return RT_SourceKeeper;
+          } else if (this.controller && this.controller.my) {
+            return RT_Home;
+          } else if (this.controller && this.controller.reservation &&
+            this.controller.reservation.username == MY_USERNAME) {
+            return RT_RemoteHarvest;
+          }
+        }
+
+        return RT_Nuetral;
+      }
+    },
     SwarmOS: {
       get() {
         return true;
       }
-    }
+    },
   });
 }
 

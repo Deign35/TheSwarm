@@ -49,12 +49,7 @@ interface RoomState extends MemBase {
 
   labOrders: LabOrder[];
 
-  activityPIDs: {
-    RPKG_EnergyManager?: PID,
-    RPKG_LabManager?: PID,
-    RPKG_RemoteManager?: PID,
-    RPKG_Towers?: PID
-  }
+  activityPID?: PID;
   cSites: ObjectID[];
   mineralIDs: ObjectID[];
   sourceIDs: ObjectID[];

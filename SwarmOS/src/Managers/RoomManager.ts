@@ -46,84 +46,20 @@ class RoomManager extends BasicProcess<RoomStateMemory, MemCache> {
         this.roomManager.ScanRoom(roomID);
       }
 
+      if (!data.activityPID || !this.kernel.getProcessByPID(data.activityPID!)) {
+        data.activityPID = this.kernel.startProcess(RPKG_RoomController, {
+          homeRoom: roomID,
+          activityPIDs: {}
+        } as RoomController_Memory);
+        this.kernel.setParent(data.activityPID!, this.pid);
+      }
+
       const room = Game.rooms[roomID];
       if (room && room.controller && room.controller.my) {
         const vis: RoomVisual = new RoomVisual(roomID);
 
         const headerStyle: TextStyle = { align: 'left', color: 'white', backgroundColor: 'black', opacity: 0.7 };
         vis.text(`Energy: ${room.energyAvailable}/${room.energyCapacityAvailable}`, 0, 2, headerStyle);
-      }
-    }
-
-    for (let roomID in this.memory.roomStateData) {
-      const data = this.roomManager.GetRoomData(roomID);
-      if (!data) {
-        continue;
-      }
-
-      if (data.roomType == RT_Home) {
-        if (data.activityPIDs[RPKG_RemoteManager] && this.kernel.getProcessByPID(data.activityPIDs[RPKG_RemoteManager])) {
-          this.kernel.killProcess(data.activityPIDs[RPKG_RemoteManager]);
-        }
-
-        if (!data.activityPIDs[RPKG_Towers] || !this.kernel.getProcessByPID(data.activityPIDs[RPKG_Towers])) {
-          data.activityPIDs[RPKG_Towers] = this.kernel.startProcess(RPKG_Towers, {
-            homeRoom: roomID
-          } as Tower_Memory);
-          this.kernel.setParent(data.activityPIDs[RPKG_Towers], this.pid);
-        }
-
-        if (!data.activityPIDs[RPKG_LabManager] || !this.kernel.getProcessByPID(data.activityPIDs[RPKG_LabManager])) {
-          data.activityPIDs[RPKG_LabManager] = this.kernel.startProcess(RPKG_LabManager, {
-            homeRoom: roomID,
-          } as LabManager_Memory);
-        }
-
-        if (!data.activityPIDs[RPKG_EnergyManager] || !this.kernel.getProcessByPID(data.activityPIDs[RPKG_EnergyManager])) {
-          data.activityPIDs[RPKG_EnergyManager] = this.kernel.startProcess(RPKG_EnergyManager, {
-            harvesterPIDs: {},
-            refillerPID: '',
-            workerPIDs: [],
-            mineralHarvesterPID: '',
-            homeRoom: roomID,
-            numWorkers: (data.sourceIDs.length * 2)
-          } as EnergyManager_Memory);
-          this.kernel.setParent(data.activityPIDs[RPKG_EnergyManager], this.pid);
-        }
-      } else if (data.roomType == RT_RemoteHarvest) {
-        if (data.activityPIDs[RPKG_Towers] && this.kernel.getProcessByPID(data.activityPIDs[RPKG_Towers])) {
-          this.kernel.killProcess(data.activityPIDs[RPKG_Towers]);
-        }
-        if (data.activityPIDs[RPKG_LabManager] && this.kernel.getProcessByPID(data.activityPIDs[RPKG_LabManager])) {
-          this.kernel.killProcess(data.activityPIDs[RPKG_LabManager]);
-        }
-        if (data.activityPIDs[RPKG_EnergyManager] && this.kernel.getProcessByPID(data.activityPIDs[RPKG_EnergyManager])) {
-          this.kernel.killProcess(data.activityPIDs[RPKG_EnergyManager]);
-        }
-
-        if (!data.activityPIDs[RPKG_RemoteManager] || !this.kernel.getProcessByPID(data.activityPIDs[RPKG_RemoteManager])) {
-          data.activityPIDs[RPKG_RemoteManager] = this.kernel.startProcess(RPKG_RemoteManager, {
-            harvesterPIDs: {},
-            numRefillers: 3,
-            refillerPIDs: [],
-            targetRoom: roomID,
-            homeRoom: data.homeRoom,
-          } as RemoteManager_Memory);
-          this.kernel.setParent(data.activityPIDs[RPKG_RemoteManager], this.pid);
-        }
-      } else if (data.roomType == RT_Nuetral) {
-        if (data.activityPIDs[RPKG_RemoteManager] && this.kernel.getProcessByPID(data.activityPIDs[RPKG_RemoteManager])) {
-          this.kernel.killProcess(data.activityPIDs[RPKG_RemoteManager]);
-        }
-        if (data.activityPIDs[RPKG_Towers] && this.kernel.getProcessByPID(data.activityPIDs[RPKG_Towers])) {
-          this.kernel.killProcess(data.activityPIDs[RPKG_Towers]);
-        }
-        if (data.activityPIDs[RPKG_LabManager] && this.kernel.getProcessByPID(data.activityPIDs[RPKG_LabManager])) {
-          this.kernel.killProcess(data.activityPIDs[RPKG_LabManager]);
-        }
-        if (data.activityPIDs[RPKG_EnergyManager] && this.kernel.getProcessByPID(data.activityPIDs[RPKG_EnergyManager])) {
-          this.kernel.killProcess(data.activityPIDs[RPKG_EnergyManager]);
-        }
       }
     }
 
@@ -160,7 +96,6 @@ class RoomManagerExtension extends ExtensionBase implements IRoomManagerExtensio
           rampartStrength: 0,
           lastUpdated: 0,
           labOrders: [],
-          activityPIDs: {},
           mineralIDs: room.find(FIND_MINERALS)!.map((val: Mineral) => {
             return val.id;
           }),

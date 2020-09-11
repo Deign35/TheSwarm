@@ -28,6 +28,8 @@ const PKG_SpawnManager_LogContext: LogContext = {
 class SpawnManager extends BasicProcess<SpawnManager_Memory, MemCache> {
   @extensionInterface(EXT_MapManager)
   mapManager!: IMapManagerExtensions;
+  @extensionInterface(EXT_SpawnManager)
+  spawnManager!: ISpawnManagerExtensions;
   get memory() {
     if (!Memory.spawnData) {
       this.log.warn(`Initializing SpawnManager memory`);

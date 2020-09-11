@@ -44,6 +44,8 @@ export abstract class BasicProcess<T extends MemBase, U extends MemCache> implem
     }
     this.kernel.killProcess(this.pid);
   }
+
+  OnEndProcess() { }
 }
 
 const SCAN_FREQUENCY = 15;

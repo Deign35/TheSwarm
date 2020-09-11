@@ -1,6 +1,7 @@
 import { OSPackage as EnergyManager } from "./EnergyManager";
 import { OSPackage as LabManager } from "./LabManager";
 import { OSPackage as RemoteManager } from "./RemoteManager";
+import { OSPackage as RoomController } from "./RoomController";
 import { OSPackage as TowerJob } from "./TowerJob";
 
 export const RoomsPackage: IPackage = {
@@ -8,6 +9,7 @@ export const RoomsPackage: IPackage = {
     EnergyManager.install(processRegistry, extensionRegistry);
     LabManager.install(processRegistry, extensionRegistry);
     RemoteManager.install(processRegistry, extensionRegistry);
+    RoomController.install(processRegistry, extensionRegistry);
     TowerJob.install(processRegistry, extensionRegistry);
   }
 }

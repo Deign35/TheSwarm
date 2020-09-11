@@ -45,6 +45,8 @@ declare interface IProcess {
   PrepTick?(): void;
   EndTick?(): void;
   RunThread(): ThreadState;
+
+  OnEndProcess(): void
 }
 declare interface _ProcessConstructor {
   new(context: IProcessContext): IProcess;

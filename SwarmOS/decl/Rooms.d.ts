@@ -26,3 +26,15 @@ declare interface RemoteManager_Memory extends RoomMemory {
 declare interface LabManager_Memory extends RoomMemory {
   scientistPID: PID;
 }
+
+declare interface RoomController_Memory extends RoomMemory {
+  activityPIDs: {
+    [RPKG_EnergyManager]?: PID,
+    [RPKG_LabManager]?: PID,
+    [RPKG_RemoteManager]?: PID,
+    [RPKG_Towers]?: PID
+  }
+}
+declare interface RoomController_Cache extends MemCache {
+
+}

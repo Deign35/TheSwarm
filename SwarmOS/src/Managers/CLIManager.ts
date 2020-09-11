@@ -71,11 +71,6 @@ class CLIManager extends BasicProcess<SwarmCLIMemory, MemCache> {
               this.ChangeFlagColors(cmd.args[0], cmd.args[1], cmd.args[2], cmd.args[3]);
             }
             break;
-          case (CLI_GetNumWorkers):
-            if (cmd.args && cmd.args.length == 1) {
-              this.GetNumWorkers(cmd.args[0]);
-            }
-            break;
           case (CLI_Kill):
             if (cmd.args && cmd.args.length == 1) {
               this.KillProcess(cmd.args[0]);
@@ -121,11 +116,6 @@ class CLIManager extends BasicProcess<SwarmCLIMemory, MemCache> {
           case (CLI_Launch):
             if (cmd.args && cmd.args.length == 2) {
               this.LaunchProcess(cmd.args[0], cmd.args[1]);
-            }
-            break;
-          case (CLI_SetNumWorkers):
-            if (cmd.args && cmd.args.length == 2) {
-              this.SetNumWorkers(cmd.args[0], cmd.args[1]);
             }
             break;
           case (CLI_SetWallStrength):
@@ -225,26 +215,6 @@ class CLIManager extends BasicProcess<SwarmCLIMemory, MemCache> {
       this.log.error(ex);
     }
   }
-
-  GetNumWorkers(roomID: RoomID) {
-    let roomData = this.roomManager.GetRoomData(roomID);
-    if (roomData) {
-      if (roomData.activityPIDs[RPKG_EnergyManager]) {
-        this.log.info(`Numworkers for ${roomID} -- ${(Memory.kernel.processMemory[roomData.activityPIDs[RPKG_EnergyManager]] as EnergyManager_Memory).numWorkers}`)
-      } else if (roomData.activityPIDs[RPKG_RemoteManager]) {
-        this.log.info(`Numworkers for ${roomID} -- ${(Memory.kernel.processMemory[roomData.activityPIDs[RPKG_RemoteManager]] as RemoteManager_Memory).numRefillers}`)
-      }
-    }
-  }
-
-  SetNumWorkers(roomID: RoomID, numWorkers: number) {
-    let roomData = this.roomManager.GetRoomData(roomID);
-    if (roomData && roomData.activityPIDs[RPKG_EnergyManager]) {
-      (Memory.kernel.processMemory[roomData.activityPIDs[RPKG_EnergyManager]] as EnergyManager_Memory).numWorkers = numWorkers;
-    } else if (roomData && roomData.activityPIDs[RPKG_RemoteManager]) {
-      (Memory.kernel.processMemory[roomData.activityPIDs[RPKG_RemoteManager]] as RemoteManager_Memory).numRefillers = numWorkers;
-    }
-  }
 }
 
 global['CLI'] = function (command: CLI_Command, ...args: any[]) {
@@ -272,11 +242,6 @@ const help = function () {
 
   msg += "CLI_Launch: Launches a program.\n";
   msg += "ex: CLI(CLI_Launch, CPKG_Scout, { homeRoom: \"W57S27\", targetRoom: \"W57S26\", expires: true })\n\n";
-
-  msg += "CLI_GetNumWorkers: Gets the number of workers for a given room.\n";
-  msg += "ex: CLI(CLI_GetNumWorkers, \"W57S27\")\n";
-  msg += "CLI_SetNumWorkers: Sets the number of workers or refillers depending on room type.\n";
-  msg += "ex: CLI(CLI_SetNumWorkers, \"W57S27\", 3)\n\n";
 
   msg += "CLI_SetWallStrength: Sets the walls and ramparts strength for a room.\n";
   msg += "ex: CLI(CLI_SetWallStrength, \"W57S26\", 1000, 2000)\n";

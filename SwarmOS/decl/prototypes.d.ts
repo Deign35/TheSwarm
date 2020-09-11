@@ -1,5 +1,6 @@
 interface Room {
   id: RoomID;
+  type: RoomType;
   SwarmOS: boolean;
 }
 interface Flag {

@@ -27,8 +27,7 @@ class SpawnActivity extends BasicProcess<SpawnActivity_Memory, MemCache> {
     return ThreadState_Done;
   }
 
-  protected EndProcess(creepName?: string) {
+  OnEndProcess() {
     this.spawnManager.cancelRequest(this.memory.spawnID);
-    super.EndProcess(creepName);
   }
 }
