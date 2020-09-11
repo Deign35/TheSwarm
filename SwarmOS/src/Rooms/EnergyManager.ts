@@ -66,6 +66,10 @@ class EnergyManager extends BasicProcess<EnergyManager_Memory, MemCache> {
     } else {
       let storageAmount = Math.floor(room.storage.store[RESOURCE_ENERGY] / 100000);
       numWorkers += storageAmount;
+
+      if (room.controller!.level >= 6) {
+        numWorkers = Math.floor(numWorkers / 2);
+      }
     }
 
     while (this.memory.workerPIDs.length < numWorkers) {
