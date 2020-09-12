@@ -17,6 +17,7 @@
             "type": true,
             "combinedType": "OSPackage",
             "entries": [
+                "BattleManager",
                 "CLIManager",
                 "CreepManager",
                 "EmptyProcess",
@@ -36,6 +37,7 @@
             "type": true,
             "combinedType": "OSExtension",
             "entries": {
+                "BattleManager": "battleManager",
                 "CreepManager": "creepManager",
                 "Logger": "logger",
                 "Kernel": "kernel",

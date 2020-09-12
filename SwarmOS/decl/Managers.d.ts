@@ -94,3 +94,28 @@ declare interface MarketManager_Memory extends MemBase {
 declare interface MapManager_Memory extends MemBase {
 
 }
+
+/** BattleManager */
+declare interface BattleManagerMemory extends MemBase {
+
+}
+
+declare interface BattleManagerCache extends MemCache {
+  rooms: {
+    [id: string]: {
+      lastUpdated: number;
+      creepContainer: IHostileCreepContainer;
+    }
+  }
+}
+
+declare interface IBattleManagerExtensions {
+  GetHostileCreepContainer(roomID: RoomID): IHostileCreepContainer | undefined;
+}
+
+declare interface IHostileCreepContainer {
+  GetNumHostiles(): number;
+  GetAttackCreeps(): Creep[];
+  GetHealCreeps(): Creep[];
+  GetNonBattleCreeps(): Creep[];
+}

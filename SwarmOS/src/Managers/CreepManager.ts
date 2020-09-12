@@ -328,4 +328,83 @@ class CreepManagerExtensions extends ExtensionBase implements ICreepManagerExten
         return target && !!(target as RoomPosition).isNearTo;
     }
   }
+
+  EvaluateCreep(creep: Creep) {
+    let attackPower = 0;
+    let healPower = 0;
+    let rangedAttackPower = 0;
+    let dismantlePower = 0;
+    let effectiveHitPoints = creep.body.length * 100;
+
+    for (let i = 0; i < creep.body.length; i++) {
+      const bodyPart = creep.body[i];
+      switch (bodyPart.type) {
+        case (HEAL):
+          if (bodyPart.boost) {
+            if (bodyPart.boost === RESOURCE_LEMERGIUM_OXIDE) {
+              healPower += 2;
+            } else if (bodyPart.boost === RESOURCE_LEMERGIUM_ALKALIDE) {
+              healPower += 3;
+            } else if (bodyPart.boost === RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE) {
+              healPower += 4;
+            }
+          } else {
+            healPower += 1;
+          }
+          break;
+        case (ATTACK):
+          if (bodyPart.boost) {
+            if (bodyPart.boost === RESOURCE_UTRIUM_HYDRIDE) {
+              attackPower += 2;
+            } else if (bodyPart.boost === RESOURCE_UTRIUM_ACID) {
+              attackPower += 3;
+            } else if (bodyPart.boost === RESOURCE_CATALYZED_UTRIUM_ACID) {
+              attackPower += 4;
+            }
+          } else {
+            attackPower += 1;
+          }
+          break;
+        case (RANGED_ATTACK):
+          if (bodyPart.boost) {
+            if (bodyPart.boost === RESOURCE_KEANIUM_OXIDE) {
+              rangedAttackPower += 2;
+            } else if (bodyPart.boost === RESOURCE_KEANIUM_ALKALIDE) {
+              rangedAttackPower += 3;
+            } else if (bodyPart.boost === RESOURCE_CATALYZED_KEANIUM_ALKALIDE) {
+              rangedAttackPower += 4;
+            }
+          } else {
+            rangedAttackPower += 1;
+          }
+          break;
+        case (WORK):
+          if (bodyPart.boost) {
+            if (bodyPart.boost === RESOURCE_ZYNTHIUM_HYDRIDE) {
+              dismantlePower += 2;
+            } else if (bodyPart.boost === RESOURCE_ZYNTHIUM_ACID) {
+              dismantlePower += 3;
+            } else if (bodyPart.boost === RESOURCE_CATALYZED_ZYNTHIUM_ACID) {
+              dismantlePower += 4;
+            }
+          } else {
+            dismantlePower += 1;
+          }
+          break;
+        case (TOUGH):
+          if (bodyPart.boost) {
+            if (bodyPart.boost === RESOURCE_GHODIUM_OXIDE) {
+              effectiveHitPoints += 43;
+            } else if (bodyPart.boost === RESOURCE_GHODIUM_ALKALIDE) {
+              effectiveHitPoints += 100;
+            } else if (bodyPart.boost === RESOURCE_CATALYZED_GHODIUM_ALKALIDE) {
+              effectiveHitPoints += 233;
+            }
+          }
+          break;
+      }
+    }
+
+    return { attackPower, healPower, rangedAttackPower, dismantlePower, effectiveHitPoints };
+  }
 }

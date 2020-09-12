@@ -106,6 +106,15 @@ declare interface ICreepManagerExtensions extends IPackageExtension {
   ValidateActionTarget(actionType: ActionType, target: any, resourceType?: ResourceConstant): boolean;
   CreepIsInRange(actionType: ActionType, pos1: RoomPosition, pos2: RoomPosition): boolean;
   MoveCreep(creep: Creep, pos: RoomPosition): ScreepsReturnCode;
+  EvaluateCreep(creep: Creep): CreepEvaluation;
+}
+
+declare interface CreepEvaluation {
+  attackPower: number,
+  healPower: number,
+  rangedAttackPower: number,
+  dismantlePower: number,
+  effectiveHitPoints: number
 }
 
 interface CreepActionArgs {
