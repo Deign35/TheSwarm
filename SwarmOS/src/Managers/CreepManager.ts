@@ -202,7 +202,14 @@ class CreepManagerExtensions extends ExtensionBase implements ICreepManagerExten
         break;
       case (AT_Pickup): actionResult = creep.pickup(target); break;
       case (AT_RangedAttack): actionResult = creep.rangedAttack(target); break;
-      case (AT_RangedHeal): actionResult = creep.rangedHeal(target); break;
+      case (AT_RangedHeal):
+        actionResult = creep.rangedHeal(target);
+        if (actionResult == OK) {
+          if (!this.ValidateActionTarget(AT_RangedHeal, target)) {
+            return ERR_FULL;
+          }
+        }
+        break;
       case (AT_Repair):
         if ((target as Structure).hits == (target as Structure).hitsMax) {
           return ERR_INVALID_TARGET;
@@ -211,7 +218,6 @@ class CreepManagerExtensions extends ExtensionBase implements ICreepManagerExten
         break;
       case (AT_ReserveController): actionResult = creep.reserveController(target); break;
       case (AT_Upgrade): actionResult = creep.upgradeController(target); break;
-
       case (AT_RequestTransfer):
         if (target.transfer) {
           actionResult = target.transfer(creep, args.resourceType || RESOURCE_ENERGY, args.amount || 0);
@@ -288,7 +294,7 @@ class CreepManagerExtensions extends ExtensionBase implements ICreepManagerExten
       case (AT_Heal): return !!(target as Creep).ticksToLive && ((target as Creep).hits < (target as Creep).hitsMax);
       case (AT_Pickup): return !!(target as Resource).resourceType;
       case (AT_RangedAttack): return !!(target as Creep | Structure).hitsMax
-      case (AT_RangedHeal): return !!(target as Creep | Structure).hitsMax
+      case (AT_RangedHeal): return !!(target as Creep).ticksToLive && ((target as Creep).hits < (target as Creep).hitsMax);
       case (AT_Repair): return (target as Structure).structureType && !!(target as Structure).hitsMax && (target as Structure).hits < (target as Structure).hitsMax;
       case (AT_RequestTransfer): return !!(target as Creep).ticksToLive;
       case (AT_ReserveController): return (target as Structure).structureType == STRUCTURE_CONTROLLER;
