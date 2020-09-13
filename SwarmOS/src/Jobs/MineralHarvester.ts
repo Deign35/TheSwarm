@@ -25,7 +25,7 @@ class MineralHarvester extends SquadJob<MineralHarvester_Memory, MemCache> {
         owner_pid: this.pid
       }, this.memory.roomID, Priority_Medium, {
           parentPID: this.pid
-        }, 1);
+        }, 0);
     } else if (squadID == 1) {
       const body = [CARRY, CARRY, CARRY, MOVE, MOVE, MOVE];
       return this.spawnManager.requestSpawn({
@@ -34,7 +34,7 @@ class MineralHarvester extends SquadJob<MineralHarvester_Memory, MemCache> {
         owner_pid: this.pid
       }, this.memory.roomID, Priority_Low, {
           parentPID: this.pid
-        }, 1)
+        }, 0)
     } else {
       throw new Error("Squad has too many units");
     }

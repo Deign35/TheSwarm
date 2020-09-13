@@ -57,10 +57,8 @@ class EnergyManager extends BasicProcess<EnergyManager_Memory, MemCache> {
 
     let numWorkers = roomData.sourceIDs.length;
     const room = Game.rooms[this.memory.homeRoom];
-    if (room.controller!.level <= 2) {
-      numWorkers *= 4;
-    } else if (room.controller!.level == 3) {
-      numWorkers *= 3;
+    if (room.controller!.level <= 3) {
+      numWorkers *= 5;
     } else if (!room.storage) {
       numWorkers *= 3;
     } else {

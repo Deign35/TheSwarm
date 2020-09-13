@@ -13,7 +13,7 @@ class Scientist extends SoloJob<Scientist_Memory, MemCache> {
       owner_pid: this.pid
     }, this.memory.homeRoom, Priority_Lowest, {
         parentPID: this.pid
-      }, 3);
+      }, 0);
   }
   protected CreateCustomCreepActivity(creep: Creep): PID | undefined {
     const roomData = this.roomManager.GetRoomData(this.memory.homeRoom)!;

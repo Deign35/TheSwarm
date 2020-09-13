@@ -40,9 +40,9 @@ class Harvester extends SoloJob<HarvesterMemory, MemCache> {
       body: body,
       creepName: this.memory.targetRoom + '_H_' + this.memory.source.slice(-1),
       owner_pid: this.pid
-    }, this.memory.targetRoom, this.memory.remoteHarvester ? Priority_Low : Priority_High, {
+    }, this.memory.homeRoom, this.memory.remoteHarvester ? Priority_Low : Priority_High, {
         parentPID: this.pid
-      }, 3);
+      }, 0);
   }
 
   protected CreateCustomCreepActivity(creep: Creep): string | undefined {

@@ -13,7 +13,7 @@ class Scout extends SoloJob<Scout_Memory, MemCache> {
       owner_pid: this.pid
     }, this.memory.homeRoom, Priority_Lowest, {
         parentPID: this.pid
-      }, 3);
+      }, 0);
   }
   protected CreateCustomCreepActivity(creep: Creep): string | undefined {
     if (creep.room.name != this.memory.targetRoom) {

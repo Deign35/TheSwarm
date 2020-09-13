@@ -13,9 +13,9 @@ class RemoteRefiller extends SoloJob<RemoteRefiller_Memory, MemCache> {
       body: body,
       creepName: this.memory.targetRoom + "_" + (Game.time + '_Ref').slice(-8),
       owner_pid: this.pid
-    }, this.memory.targetRoom, Priority_Lowest, {
+    }, this.memory.homeRoom, Priority_Lowest, {
         parentPID: this.pid
-      }, 3)
+      }, 0)
   }
 
   protected CreateCustomCreepActivity(creep: Creep): string | undefined {

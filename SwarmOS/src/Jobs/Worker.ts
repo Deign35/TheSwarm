@@ -43,7 +43,7 @@ class Worker extends SoloJob<Worker_Memory, MemCache> {
           CARRY, CARRY, CARRY, CARRY,
           MOVE, MOVE, MOVE, MOVE,
           MOVE, MOVE]
-      } else if (energyCapacity >= 600) {
+      } else if (energyCapacity >= 550) {
         body = [WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE];
       }
     } else {
@@ -53,9 +53,9 @@ class Worker extends SoloJob<Worker_Memory, MemCache> {
       body: body,
       creepName: this.memory.targetRoom + '_' + (Game.time + '_WR').slice(-6),
       owner_pid: this.pid
-    }, this.memory.targetRoom, this.memory.targetRoom == this.memory.homeRoom ? Priority_Low : Priority_Lowest, {
+    }, this.memory.homeRoom, this.memory.targetRoom == this.memory.homeRoom ? Priority_Low : Priority_Lowest, {
         parentPID: this.pid
-      }, 1);
+      }, 0);
   }
   protected CreateCustomCreepActivity(creep: Creep): string | undefined {
     if (creep.room.name != this.memory.targetRoom) {

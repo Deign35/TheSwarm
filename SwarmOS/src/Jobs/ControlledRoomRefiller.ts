@@ -71,7 +71,7 @@ class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory, MemC
       owner_pid: this.pid
     }, this.memory.homeRoom, Priority_High, {
         parentPID: this.pid
-      }, 1);
+      }, 0);
     return sID;
   }
 
@@ -207,7 +207,7 @@ class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory, MemC
         if (!nextTarget) { continue; }
 
         const targetWants = nextTarget.store.getFreeCapacity(RESOURCE_ENERGY);
-        if (targetWants == 0) {
+        if (targetWants < 300) {
           continue;
         }
 
