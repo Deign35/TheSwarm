@@ -28,7 +28,7 @@ class RoomBooter extends SoloJob<RoomBooter_Memory, MemCache> {
         CARRY, CARRY, CARRY, CARRY,
         MOVE, MOVE, MOVE, MOVE,
         MOVE, MOVE]
-    } else if (energyCapacity >= 600) {
+    } else if (energyCapacity >= 550) {
       body = [WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE];
     }
     return this.spawnManager.requestSpawn({

@@ -173,7 +173,7 @@ class CLIManager extends BasicProcess<SwarmCLIMemory, MemCache> {
         }
         const homeID: RoomID = args[2];
         const homeRoom = this.roomManager.GetRoomData(homeID);
-        if (!homeRoom) { // || homeRoom.IsHomeRoom
+        if (!homeRoom) {
           this.log.warn(`Cannot make ${roomID} into a harvest room for ${homeID}`);
           return;
         }
