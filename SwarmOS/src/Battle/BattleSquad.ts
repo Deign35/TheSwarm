@@ -91,14 +91,12 @@ export abstract class BattleSquad<T extends BattleSquad_Memory, U extends MemCac
     this.EndProcess();
   }
 
-  EndProcess() {
+  OnEndProcess() {
     for (let i = 0; i < this.memory.squad.length; i++) {
       if (this.memory.squad[i].creepID) {
         this.creepManager.releaseCreep(this.memory.squad[i].creepID!, this.pid);
       }
     }
-
-    super.EndProcess();
   }
 
   MoveToRoom(creep: Creep, targetRoom: RoomID) {
