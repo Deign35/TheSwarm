@@ -13,17 +13,16 @@ class RemoteManager extends BasicProcess<RemoteManager_Memory, MemCache> {
     if (!this.memory.invasion && targetRoom && Game.time % 11 == 0) {
       const invaders = targetRoom.find(FIND_HOSTILE_CREEPS);
       for (let i = 0; i < invaders.length; i++) {
-        if (invaders[i].owner.username == "Invader") {
-          this.log.alert(`Invasion detected: ${this.memory.targetRoom}`);
-          this.memory.invasion = invaders[i].ticksToLive!;
-          if (!this.memory.remoteProtector || !this.kernel.getProcessByPID(this.memory.remoteProtector)) {
-            this.memory.remoteProtector = this.kernel.startProcess(BPKG_RemoteProtector, {
-              homeRoom: this.memory.homeRoom,
-              squad: [{}],
-              targetRoom: this.memory.targetRoom
-            } as RemoteProtector_Memory);
-            this.kernel.setParent(this.memory.remoteProtector, this.pid);
-          }
+        this.log.alert(`Invasion detected: ${this.memory.targetRoom}`);
+        this.memory.invasion = invaders[i].ticksToLive!;
+        if (!this.memory.remoteProtector || !this.kernel.getProcessByPID(this.memory.remoteProtector)) {
+          this.memory.remoteProtector = this.kernel.startProcess(BPKG_RemoteProtector, {
+            homeRoom: this.memory.homeRoom,
+            squad: [{}],
+            targetRoom: this.memory.targetRoom,
+            expires: true
+          } as RemoteProtector_Memory);
+          this.kernel.setParent(this.memory.remoteProtector, this.pid);
         }
       }
     }
@@ -85,7 +84,7 @@ class RemoteManager extends BasicProcess<RemoteManager_Memory, MemCache> {
       }
     }
 
-    const roomData = this.roomManager.GetRoomData(this.memory.homeRoom);
+    const roomData = this.roomManager.GetRoomData(this.memory.targetRoom);
     while (this.memory.refillerPIDs.length < (3 * roomData!.sourceIDs.length)) {
       this.memory.refillerPIDs.push(this.kernel.startProcess(CPKG_RemoteRefiller, {
         expires: true,

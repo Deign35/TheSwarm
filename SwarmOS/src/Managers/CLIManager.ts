@@ -210,7 +210,8 @@ class CLIManager extends BasicProcess<SwarmCLIMemory, MemCache> {
   }
   LaunchProcess(pkg: ScreepsPackage, startMem: any) {
     try {
-      this.kernel.startProcess(pkg, startMem);
+      const pid = this.kernel.startProcess(pkg, startMem);
+      this.log.info(`New process(${pid}) created -- ${pkg}`)
     } catch (ex) {
       this.log.error(ex);
     }

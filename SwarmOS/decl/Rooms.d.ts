@@ -3,6 +3,11 @@ declare interface RoomMemory extends MemBase {
 }
 
 declare interface Tower_Memory extends RoomMemory { }
+declare interface WallWatcher_Memory extends RoomMemory { }
+declare interface WallWatcher_Cache extends MemCache {
+  wallCount: number;
+  rampartCount: number;
+}
 
 declare interface EnergyManager_Memory extends RoomMemory {
   harvesterPIDs: IDictionary<ObjectID, PID>;
@@ -27,10 +32,11 @@ declare interface LabManager_Memory extends RoomMemory {
 
 declare interface RoomController_Memory extends RoomMemory {
   activityPIDs: {
-    [RPKG_EnergyManager]?: PID,
-    [RPKG_LabManager]?: PID,
-    [RPKG_RemoteManager]?: PID,
-    [RPKG_Towers]?: PID
+    [RPKG_EnergyManager]?: PID;
+    [RPKG_LabManager]?: PID;
+    [RPKG_RemoteManager]?: PID;
+    [RPKG_Towers]?: PID;
+    [RPKG_WallWatcher]?: PID;
   }
 }
 declare interface RoomController_Cache extends MemCache {

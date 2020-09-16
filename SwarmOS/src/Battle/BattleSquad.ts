@@ -1,6 +1,8 @@
 import { BasicProcess } from "Core/BasicTypes";
 
 export abstract class BattleSquad<T extends BattleSquad_Memory, U extends MemCache> extends BasicProcess<T, U> {
+  @extensionInterface(EXT_BattleManager)
+  battleManager!: IBattleManagerExtensions;
   @extensionInterface(EXT_CreepManager)
   creepManager!: ICreepManagerExtensions;
   @extensionInterface(EXT_MapManager)
@@ -11,6 +13,22 @@ export abstract class BattleSquad<T extends BattleSquad_Memory, U extends MemCac
   spawnManager!: ISpawnManagerExtensions;
 
   RunThread(): ThreadState {
+    if (this.memory.expires) {
+      let count = 0;
+      for (let i = 0; i < this.memory.squad.length; i++) {
+        if (this.memory.squad[i].hasRun && (!this.memory.squad[i].activityPID ||
+          !this.kernel.getProcessByPID(this.memory.squad[i].activityPID!) &&
+          !this.creepManager.tryGetCreep(this.memory.squad[i].creepID!, this.pid))) {
+          count++;
+        }
+      }
+
+      if (count == this.memory.squad.length) {
+        this.EndProcess();
+        return ThreadState_Done;
+      }
+    }
+
     for (let i = 0; i < this.memory.squad.length; i++) {
       let creep: Creep | undefined = undefined;
       if (this.memory.squad[i].creepID) {
@@ -19,17 +37,15 @@ export abstract class BattleSquad<T extends BattleSquad_Memory, U extends MemCac
           if (!this.memory.squad[i].activityPID ||
             !this.kernel.getProcessByPID(this.memory.squad[i].activityPID!)) {
             this.CreateActivityForCreep(i, this.memory.squad[i].creepID!);
+            this.memory.squad[i].hasRun = true;
           }
         }
       }
 
       if (!creep) {
-        if (!this.memory.squad[i].activityPID) {
-          this.CreateSpawnActivity(i);
-        } else if (!this.kernel.getProcessByPID(this.memory.squad[i].activityPID!)) {
-          if (this.memory.expires) {
-            this.EndProcess();
-          } else {
+        if (!this.memory.expires || !this.memory.squad[i].hasRun) {
+          if (!this.memory.squad[i].activityPID ||
+            !this.kernel.getProcessByPID(this.memory.squad[i].activityPID!)) {
             this.CreateSpawnActivity(i);
           }
         }
@@ -68,9 +84,6 @@ export abstract class BattleSquad<T extends BattleSquad_Memory, U extends MemCac
     const creep = this.creepManager.tryGetCreep(creepID, this.pid);
     this.memory.squad[squadID].creepID = creepID;
     if (!creep) {
-      if (this.memory.expires) {
-        this.EndProcess();
-      }
       return;
     }
 
@@ -92,6 +105,7 @@ export abstract class BattleSquad<T extends BattleSquad_Memory, U extends MemCac
   }
 
   OnEndProcess() {
+    console.log("ENDING BATTLESQUAD PROCESS");
     for (let i = 0; i < this.memory.squad.length; i++) {
       if (this.memory.squad[i].creepID) {
         this.creepManager.releaseCreep(this.memory.squad[i].creepID!, this.pid);

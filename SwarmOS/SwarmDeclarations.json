@@ -86,7 +86,8 @@
             "type": true,
             "combinedType": "BattlePackages",
             "entries": {
-                "RemoteProtector": "remoteProtector"
+                "RemoteProtector": "remoteProtector",
+                "RoomAttacker": "roomAttacker"
             }
         },
         "RPKG": {
@@ -100,7 +101,8 @@
                 "LabManager": "labManager",
                 "RemoteManager": "remoteManager",
                 "RoomController": "roomController",
-                "Towers": "towers"
+                "Towers": "towers",
+                "WallWatcher": "wallWatcher"
             }
         },
         "CLI": {

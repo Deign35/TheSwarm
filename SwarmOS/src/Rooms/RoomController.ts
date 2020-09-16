@@ -9,7 +9,7 @@ import { BasicProcess } from "Core/BasicTypes";
 const AllRoomPackages = [RPKG_EnergyManager, RPKG_LabManager, RPKG_RemoteManager, RPKG_Towers];
 
 const RoomTypeToPackage: { [id: string]: string[] } = {
-  [RT_Home]: [RPKG_EnergyManager, RPKG_Towers, RPKG_LabManager],
+  [RT_Home]: [RPKG_EnergyManager, RPKG_Towers, RPKG_LabManager, RPKG_WallWatcher],
   [RT_RemoteHarvest]: [RPKG_RemoteManager],
   [RT_Center]: [],
   [RT_Highway]: [],
@@ -49,6 +49,14 @@ class RoomController extends BasicProcess<RoomController_Memory, RoomController_
         this.memory.activityPIDs[RPKG_LabManager] = this.kernel.startProcess(RPKG_LabManager, {
           homeRoom: this.memory.homeRoom,
         } as LabManager_Memory);
+        this.kernel.setParent(this.memory.activityPIDs[RPKG_LabManager]!, this.pid);
+      }
+
+      if (!this.memory.activityPIDs[RPKG_WallWatcher] || !this.kernel.getProcessByPID(this.memory.activityPIDs[RPKG_WallWatcher]!)) {
+        this.memory.activityPIDs[RPKG_WallWatcher] = this.kernel.startProcess(RPKG_WallWatcher, {
+          homeRoom: this.memory.homeRoom
+        } as WallWatcher_Memory);
+        this.kernel.setParent(this.memory.activityPIDs[RPKG_WallWatcher]!, this.pid);
       }
 
       if (!this.memory.activityPIDs[RPKG_EnergyManager] || !this.kernel.getProcessByPID(this.memory.activityPIDs[RPKG_EnergyManager]!)) {

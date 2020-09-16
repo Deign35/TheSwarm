@@ -244,8 +244,8 @@ class CreepManagerExtensions extends ExtensionBase implements ICreepManagerExten
             if (creeps.length > 0 && creeps[0].name != creep.name) {
               return ERR_NO_PATH;
             }
-            return result;
           }
+          return result;
         } else {
           return ERR_NOT_IN_RANGE;
         }
@@ -325,6 +325,9 @@ class CreepManagerExtensions extends ExtensionBase implements ICreepManagerExten
       case (AT_Suicide):
       case (AT_NoOp):
       default:
+        if ((target as Creep).pos) {
+          target = target.pos;
+        }
         return target && !!(target as RoomPosition).isNearTo;
     }
   }

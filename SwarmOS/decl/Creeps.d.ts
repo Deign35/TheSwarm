@@ -83,4 +83,6 @@ declare interface ExperimentalSquad_Memory extends SquadJob_Memory {
 }
 
 //CLI(CLI_Launch, CPKG_ExperimentalSquad, { homeRoom: "W57S27", targetRoom: "W57S26", sourceID: '59f19f7582100e1594f34ef7', container: '5f50c63989cd9d54bc834454', squad: [{}, {}, {}, {}, {}, {}]})
-//CLI(CLI_Launch, CPKG_RoomBooter, { homeRoom: "W55S27", targetRoom: "W52S26", expires: true })
+//CLI(CLI_Launch, CPKG_ControllerClaimer, { homeRoom: "E12S45", targetRoom: "E11S44", expires: true });
+//CLI(CLI_Launch, CPKG_RoomBooter, { homeRoom: "E12S45", targetRoom: "E11S44", expires: true })
+//CLI(CLI_Launch, CPKG_Worker, { homeRoom: "E12S45", targetRoom: "E12S45", expires: true })

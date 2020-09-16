@@ -1,6 +1,7 @@
 ﻿declare var Memory: {
   VERSION: string;
   counter: number;
+  lastPixel: number;
 }
 const startLoad = Game.cpu.getUsed(); // Will not use any prototype defined version of getUsed
 // Ensure all constants are initialized
@@ -46,7 +47,6 @@ import { RoomsPackage } from "Rooms/index";
 
 kernel.installPackages([ActivitiesPackage, BattlePackage, JobsPackage, ManagersPackage, RoomsPackage]);
 
-let gameTimeOfLastGeneratePixel = Game.time;
 export function loop() {
   try {
     kernel.loop();
@@ -54,8 +54,8 @@ export function loop() {
     kernel.log.DumpLogToConsole();
     if (Game.cpu.bucket >= 9500) {
       if (Game.cpu.generatePixel() == OK) {
-        console.log(`Ticks between pixels: ${Game.time - gameTimeOfLastGeneratePixel}`);
-        gameTimeOfLastGeneratePixel = Game.time;
+        console.log(`Ticks between pixels: ${Game.time - Memory.lastPixel}`);
+        Memory.lastPixel = Game.time;
       }
     }
   }

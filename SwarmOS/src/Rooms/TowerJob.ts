@@ -12,10 +12,10 @@ class TowerJob extends BasicProcess<Tower_Memory, MemCache> {
     let roomData = this.roomManager.GetRoomData(this.memory.homeRoom)!;
     for (let i = 0; i < roomData.needsRepair.length; i++) {
       const target = Game.getObjectById<Structure>(roomData.needsRepair[i]);
-      if (target && target.structureType == STRUCTURE_RAMPART && target.hits <= 300) {
+      if (target && target.structureType == STRUCTURE_RAMPART && target.hits <= 3000) {
         for (let j = 0; j < roomData.structures[STRUCTURE_TOWER].length; j++) {
           const tower = Game.getObjectById<StructureTower>(roomData.structures[STRUCTURE_TOWER][j]);
-          if (tower && tower.store[RESOURCE_ENERGY] > 800) {
+          if (tower && tower.store[RESOURCE_ENERGY] > 300) {
             tower.repair(target);
           }
         }
