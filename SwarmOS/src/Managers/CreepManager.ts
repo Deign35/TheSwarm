@@ -144,7 +144,9 @@ class CreepManagerExtensions extends ExtensionBase implements ICreepManagerExten
       actionMem.targetID ? Game.getObjectById<ObjectTypeWithID>(actionMem.targetID) : undefined;
     if (!target && actionMem.pos) {
       target = new RoomPosition(actionMem.pos.x || 25, actionMem.pos.y || 25, actionMem.pos.roomName);
-    } else if (!target) {
+    }
+
+    if (!target) {
       target = creep.pos;
     }
 

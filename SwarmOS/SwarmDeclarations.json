@@ -69,6 +69,7 @@
             "entries": {
                 "ControlledRoomRefiller": "controlledRoomRefiller",
                 "ControllerClaimer": "controllerClaimer",
+                "Dismantler": "dismantler",
                 "ExperimentalSquad": "experimentalSquad",
                 "Harvester": "harvester",
                 "MineralHarvester": "mineralHarvester",

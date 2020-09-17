@@ -66,7 +66,7 @@ class ControllerClaimer extends SoloJob<ControllerClaimer_Memory, MemCache> {
       }
 
       return this.creepManager.CreateNewCreepActivity({
-        action: this.memory.onlyReserve ? AT_ReserveController : AT_ClaimController,
+        action: this.memory.onlyReserve ? AT_ReserveController : (this.memory.onlyAttack ? AT_AttackController : AT_ClaimController),
         creepID: creep.name,
         targetID: creep.room.controller.id
       }, this.pid)

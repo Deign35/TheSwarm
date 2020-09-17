@@ -27,16 +27,35 @@ class RoomAttacker extends BattleSquad<RoomAttacker_Memory, RoomAttacker_Cache> 
     if (attacker) {
       let hostiles = attacker.room.find(FIND_HOSTILE_CREEPS);
       if (hostiles.length > 0) {
+        let count = 0;
         for (let i = 0; i < hostiles.length; i++) {
-          if (attacker.pos.getRangeTo(hostiles[i]) <= 1) {
-            attacker.attack(hostiles[i]);
+          if (attacker.pos.getRangeTo(hostiles[i]) <= 3) {
+            attacker.rangedAttack(hostiles[i]);
             this.cache.attackerAttacked = true;
-            break;
+            count++;
           }
         }
+
+        if (count >= 3) {
+          attacker.rangedMassAttack();
+        }
+      }
+
+      if (!this.cache.attackerAttacked) {
+        attacker.rangedMassAttack();
       }
     }
     return super.RunThread();
+  }
+
+  EndTick() {
+    if (Game.time % 11 == 0) {
+      for (let i = 0; i < this.memory.squad.length; i++) {
+        if (this.memory.squad[i].activityPID && this.kernel.getProcessByPID(this.memory.squad[i].activityPID!)) {
+          this.kernel.killProcess(this.memory.squad[i].activityPID);
+        }
+      }
+    }
   }
 
   protected GetNewSpawnID(squadID: number): string | undefined {
@@ -44,15 +63,15 @@ class RoomAttacker extends BattleSquad<RoomAttacker_Memory, RoomAttacker_Cache> 
     if (squadID == 0) {
       let body = [TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, // 50
         MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, // 500
-        ATTACK, ATTACK, ATTACK, ATTACK, ATTACK // 400
-      ]; // 950
+        RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK // 750
+      ]; // 1300
 
-      if (homeRoom.energyCapacityAvailable >= 1900) {
+      if (homeRoom.energyCapacityAvailable >= 2600) {
         body = [TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, // 100
           MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, // 500
-          MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, // 530
-          ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, MOVE // 770
-        ]; // 1900
+          MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, RANGED_ATTACK, // 600
+          RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, MOVE // 1400
+        ]; // 2600
       }
       return this.spawnManager.requestSpawn({
         body: body,
@@ -60,7 +79,7 @@ class RoomAttacker extends BattleSquad<RoomAttacker_Memory, RoomAttacker_Cache> 
         owner_pid: this.pid
       }, this.memory.homeRoom, Priority_High, {
           parentPID: this.pid
-        }, 3);
+        }, 0);
     } else if (squadID == 1) {
       let body = [TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, // 50
         MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, // 400
@@ -79,7 +98,7 @@ class RoomAttacker extends BattleSquad<RoomAttacker_Memory, RoomAttacker_Cache> 
         owner_pid: this.pid
       }, this.memory.homeRoom, Priority_High, {
           parentPID: this.pid
-        }, 3);
+        }, 0);
     } else {
       throw new Error("Too many in RoomAttackerSquad");
     }
@@ -176,9 +195,10 @@ class RoomAttacker extends BattleSquad<RoomAttacker_Memory, RoomAttacker_Cache> 
         for (let i = 0; i < pathToTarget.length; i++) {
           const inTheWays = creep.room.lookAt(pathToTarget[i].x, pathToTarget[i].y);
           for (let j = 0; j < inTheWays.length; j++) {
-            if (inTheWays[j].type == LOOK_STRUCTURES && inTheWays[j].structure!.structureType != STRUCTURE_ROAD) {
+            if (inTheWays[j].type == LOOK_STRUCTURES && inTheWays[j].structure!.structureType != STRUCTURE_ROAD &&
+              inTheWays[j].structure!.structureType != STRUCTURE_CONTAINER) {
               return this.creepManager.CreateNewCreepActivity({
-                action: AT_Attack,
+                action: AT_MoveToPosition,
                 creepID: creep.name,
                 targetID: inTheWays[j][LOOK_STRUCTURES]!.id
               }, this.pid);
@@ -186,8 +206,19 @@ class RoomAttacker extends BattleSquad<RoomAttacker_Memory, RoomAttacker_Cache> 
           }
         }
 
+        if (!target) {
+          const cSites = creep.room.find(FIND_HOSTILE_CONSTRUCTION_SITES);
+          for (let i = 0; i < cSites.length; i++) {
+            const dist = cSites[i].pos.getRangeTo(creep.pos);
+            if (dist < distToTarget) {
+              distToTarget = dist;
+              target = cSites[i];
+            }
+          }
+        }
+
         return this.creepManager.CreateNewCreepActivity({
-          action: AT_Attack,
+          action: AT_MoveToPosition,
           creepID: creep.name,
           targetID: target.id
         }, this.pid);

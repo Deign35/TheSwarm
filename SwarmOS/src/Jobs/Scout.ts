@@ -9,7 +9,7 @@ class Scout extends SoloJob<Scout_Memory, MemCache> {
   protected GetNewSpawnID(): string {
     return this.spawnManager.requestSpawn({
       body: [TOUGH, TOUGH, MOVE, MOVE],
-      creepName: this.memory.homeRoom + (Game.time + '_Sc').slice(-6),
+      creepName: this.memory.homeRoom + "_" + (Game.time + '_Sc').slice(-6),
       owner_pid: this.pid
     }, this.memory.homeRoom, Priority_Lowest, {
         parentPID: this.pid
