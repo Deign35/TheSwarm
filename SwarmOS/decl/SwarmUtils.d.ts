@@ -46,6 +46,7 @@ declare interface ILogger {
 }
 
 declare var ResourceToPart: IDictionary<MineralBoostConstant, BodyPartConstant>;
+declare var ReverseReactions: IDictionary<MineralBoostConstant, (MineralConstant | MineralBoostConstant | MineralBaseCompoundsConstant)[]>;
 
 declare function CopyObject<T>(obj: T): T;
 declare function GetSpawnCost(body: BodyPartConstant[]): number;
