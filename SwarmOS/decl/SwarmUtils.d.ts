@@ -45,6 +45,7 @@ declare interface ILogger {
   alert(message: (string | (() => string))): void;
 }
 
+declare var ResourceToPart: IDictionary<MineralBoostConstant, BodyPartConstant>;
 
 declare function CopyObject<T>(obj: T): T;
 declare function GetSpawnCost(body: BodyPartConstant[]): number;

@@ -105,7 +105,6 @@ export abstract class BattleSquad<T extends BattleSquad_Memory, U extends MemCac
   }
 
   OnEndProcess() {
-    console.log("ENDING BATTLESQUAD PROCESS");
     for (let i = 0; i < this.memory.squad.length; i++) {
       if (this.memory.squad[i].creepID) {
         this.creepManager.releaseCreep(this.memory.squad[i].creepID!, this.pid);
