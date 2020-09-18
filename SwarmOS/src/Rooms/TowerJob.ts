@@ -13,11 +13,17 @@ class TowerJob extends BasicProcess<Tower_Memory, MemCache> {
     for (let i = 0; i < roomData.needsRepair.length; i++) {
       const target = Game.getObjectById<Structure>(roomData.needsRepair[i]);
       if (target && target.structureType == STRUCTURE_RAMPART && target.hits <= 3000) {
+        let repaired = false;
         for (let j = 0; j < roomData.structures[STRUCTURE_TOWER].length; j++) {
           const tower = Game.getObjectById<StructureTower>(roomData.structures[STRUCTURE_TOWER][j]);
           if (tower && tower.store[RESOURCE_ENERGY] > 300) {
             tower.repair(target);
+            repaired = true;
           }
+        }
+
+        if (repaired) {
+          return ThreadState_Done;
         }
       }
     }
@@ -67,20 +73,6 @@ class TowerJob extends BasicProcess<Tower_Memory, MemCache> {
         }
 
         tower.attack(hostiles[closestCreep]);
-
-        if (hostiles.length > 0) { // This works only because we kill the healers one at a time.
-          let damage = TOWER_POWER_ATTACK;
-          if (distance > TOWER_OPTIMAL_RANGE) {
-            if (distance > TOWER_FALLOFF_RANGE) {
-              distance = TOWER_FALLOFF_RANGE
-            }
-            damage -= damage * TOWER_FALLOFF * (distance - TOWER_OPTIMAL_RANGE) / (TOWER_FALLOFF_RANGE - TOWER_OPTIMAL_RANGE)
-          }
-          const expectedDamage = Math.floor(damage);
-          if (expectedDamage > hostiles[closestCreep].hits) {
-            hostiles.splice(closestCreep);
-          }
-        }
       }
     }
 
