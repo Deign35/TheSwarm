@@ -52,9 +52,7 @@ declare interface ControllerClaimer_Memory extends SoloJob_Memory {
   onlyAttack: boolean;
 }
 declare interface RemoteRefiller_Memory extends SoloJob_Memory { }
-declare interface Scientist_Memory extends SoloJob_Memory {
-  cur_order?: LabOrder;
-}
+declare interface Scientist_Memory extends SoloJob_Memory { }
 
 declare interface SquadJob_Memory extends MemBase {
   expires?: boolean;

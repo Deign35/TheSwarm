@@ -27,7 +27,7 @@ declare interface RoomStateMemory extends MemBase {
   }
 }
 
-interface LabOrder {
+interface LabReactionOrder {
   input_1: {
     lab_id: ObjectID;
     mineral: MineralConstant | MineralCompoundConstant | RESOURCE_ENERGY;
@@ -47,7 +47,7 @@ interface RoomState extends MemBase {
   rampartStrength?: number;
   homeRoom?: RoomID;
 
-  labOrders: LabOrder[];
+  labOrders: LabReactionOrder[];
 
   activityPID?: PID;
   cSites: ObjectID[];
