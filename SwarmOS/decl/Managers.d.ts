@@ -40,6 +40,26 @@ interface LabReactionOrder {
   output_id: ObjectID;
 }
 
+declare interface LabOrder {
+  resourceType: MineralConstant | MineralCompoundConstant | RESOURCE_ENERGY;
+  amount: number;
+  isOutput?: boolean;
+  isForBoost?: boolean;
+  isReverse?: boolean;
+
+  creepID?: CreepID;
+  lab_2?: ObjectID;
+  lab_3?: ObjectID;
+}
+
+declare interface LabRequest {
+  resourceType: MineralConstant | MineralCompoundConstant;
+  amount: number;
+  forBoost?: boolean;
+  reverseReaction?: boolean;
+  creepID?: CreepID;
+}
+
 interface RoomState extends MemBase {
   roomType: RoomType;
   lastUpdated: number;
@@ -47,7 +67,8 @@ interface RoomState extends MemBase {
   rampartStrength?: number;
   homeRoom?: RoomID;
 
-  labOrders: LabReactionOrder[];
+  labOrders: IDictionary<ObjectID, LabOrder>;
+  labRequests: LabRequest[];
 
   activityPID?: PID;
   cSites: ObjectID[];

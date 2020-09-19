@@ -95,7 +95,8 @@ class RoomManagerExtension extends ExtensionBase implements IRoomManagerExtensio
           wallStrength: 0,
           rampartStrength: 0,
           lastUpdated: 0,
-          labOrders: [],
+          labOrders: {},
+          labRequests: [],
           mineralIDs: room.find(FIND_MINERALS)!.map((val: Mineral) => {
             return val.id;
           }),

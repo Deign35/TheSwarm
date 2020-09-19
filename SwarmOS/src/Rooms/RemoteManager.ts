@@ -46,25 +46,31 @@ class RemoteManager extends BasicProcess<RemoteManager_Memory, MemCache> {
     }
 
     if (!this.memory.claimerPID || !this.kernel.getProcessByPID(this.memory.claimerPID)) {
-      this.memory.claimerPID = this.kernel.startProcess(CPKG_ControllerClaimer, {
-        expires: true,
-        homeRoom: this.memory.homeRoom,
-        onlyReserve: true,
-        targetRoom: this.memory.targetRoom
-      } as ControllerClaimer_Memory);
-      this.kernel.setParent(this.memory.claimerPID, this.pid);
+      if (targetRoom && targetRoom.controller &&
+        (!targetRoom.controller.reservation || targetRoom.controller.reservation.ticksToEnd < 4500)) {
+        this.memory.claimerPID = this.kernel.startProcess(CPKG_ControllerClaimer, {
+          expires: true,
+          homeRoom: this.memory.homeRoom,
+          onlyReserve: true,
+          targetRoom: this.memory.targetRoom
+        } as ControllerClaimer_Memory);
+        this.kernel.setParent(this.memory.claimerPID, this.pid);
+      }
     }
 
+    const roomData = this.roomManager.GetRoomData(this.memory.targetRoom);
     if (!this.memory.workerPID || !this.kernel.getProcessByPID(this.memory.workerPID)) {
-      this.memory.workerPID = this.kernel.startProcess(CPKG_Worker, {
-        expires: true,
-        homeRoom: this.memory.homeRoom,
-        targetRoom: this.memory.targetRoom
-      } as Worker_Memory);
-      this.kernel.setParent(this.memory.workerPID, this.pid);
+      if (roomData && (roomData.cSites.length > 0 || roomData.needsRepair.length > 0)) {
+        this.memory.workerPID = this.kernel.startProcess(CPKG_Worker, {
+          expires: true,
+          homeRoom: this.memory.homeRoom,
+          targetRoom: this.memory.targetRoom
+        } as Worker_Memory);
+        this.kernel.setParent(this.memory.workerPID, this.pid);
+      }
     }
 
-    const sources = this.roomManager.GetRoomData(this.memory.targetRoom)!.sourceIDs;
+    const sources = roomData ? roomData.sourceIDs : [];
     for (const id of sources) {
       if (!this.memory.harvesterPIDs[id] || !this.kernel.getProcessByPID(this.memory.harvesterPIDs[id])) {
         this.memory.harvesterPIDs[id] = this.kernel.startProcess(CPKG_Harvester, {
@@ -84,8 +90,7 @@ class RemoteManager extends BasicProcess<RemoteManager_Memory, MemCache> {
       }
     }
 
-    const roomData = this.roomManager.GetRoomData(this.memory.targetRoom);
-    while (this.memory.refillerPIDs.length < (3 * roomData!.sourceIDs.length)) {
+    while (this.memory.refillerPIDs.length < (3 * sources.length)) {
       this.memory.refillerPIDs.push(this.kernel.startProcess(CPKG_RemoteRefiller, {
         expires: true,
         homeRoom: this.memory.homeRoom,

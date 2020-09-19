@@ -53,7 +53,10 @@ class CLIManager extends BasicProcess<SwarmCLIMemory, MemCache> {
             if (cmd.args && cmd.args.length == 2) {
               const roomData = this.roomManager.GetRoomData(cmd.args[0]);
               if (roomData) {
-                roomData.labOrders.splice(cmd.args[1], 1);
+                roomData.labOrders[cmd.args[1]] = {
+                  amount: 0,
+                  resourceType: RESOURCE_ENERGY
+                }
               }
             }
             break;
@@ -77,38 +80,13 @@ class CLIManager extends BasicProcess<SwarmCLIMemory, MemCache> {
             }
             break;
           case (CLI_LabOrder):
-            if (cmd.args && cmd.args.length == 6) {
+            if (cmd.args && cmd.args.length >= 3) {
               const roomData = this.roomManager.GetRoomData(cmd.args[0]);
               if (roomData) {
-                const lab1 = Game.getObjectById<StructureLab>(cmd.args[1]);
-                if (!lab1 || lab1.structureType != STRUCTURE_LAB) {
-                  this.log.error(`Couldn't find lab ${cmd.args[1]}.`);
-                  break;
-                }
-                const lab2 = Game.getObjectById<StructureLab>(cmd.args[2]);
-                if (!lab2 || lab2.structureType != STRUCTURE_LAB) {
-                  this.log.error(`Couldn't find lab ${cmd.args[2]}.`);
-                  break;
-                }
-                const lab3 = Game.getObjectById<StructureLab>(cmd.args[3]);
-                if (!lab3 || lab3.structureType != STRUCTURE_LAB) {
-                  this.log.error(`Couldn't find lab ${cmd.args[3]}.`);
-                  break;
-                }
-
-                const mineral1 = cmd.args[4] as MineralConstant | MineralCompoundConstant;
-                const mineral2 = cmd.args[5] as MineralConstant | MineralCompoundConstant;
-
-                roomData.labOrders.push({
-                  input_1: {
-                    lab_id: cmd.args[1],
-                    mineral: mineral1
-                  },
-                  input_2: {
-                    lab_id: cmd.args[2],
-                    mineral: mineral2
-                  },
-                  output_id: cmd.args[3]
+                roomData.labRequests.push({
+                  amount: cmd.args[2],
+                  resourceType: cmd.args[1],
+                  reverseReaction: cmd.args.length == 4 ? cmd.args[3] : false
                 });
               }
             }
@@ -229,8 +207,8 @@ const help = function () {
   msg += "ex: CLI(CLI_Assimilate, \"W57S27\", RT_Home)\n\n";
 
   msg += "CLI_CancelLabOrder: Cancels a lab order from executing anymore.\n";
-  msg += "ex: CLI(CLI_CancelLabOrder, \"W57S27\", 1)\n\n";
-  msg += "This will delete the lab order at index 1 of the lab orders array.\n";
+  msg += "ex: CLI(CLI_CancelLabOrder, \"W57S27\", \"5f656c1592b2f35a3b3e4c73\")\n";
+  msg += "This will delete the lab order for the specified lab.\n\n";
 
   msg += "CLIChangeFlag: Changes the color for all flags.\n";
   msg += "ex: CLI(CLI_ChangeFlag, COLOR_RED, COLOR_BLUE, COLOR_PURPLE, COLOR_ORANGE)\n";
@@ -239,7 +217,8 @@ const help = function () {
   msg += "CLI_ClearLog: Clears the error log for the kernel.\n";
   msg += "CLI_Kill: Kills the provided process by PID.\n";
   msg += "CLI_LabOrder: Sets up an order for the labs of the specified room.\n";
-  msg += "ex: CLI(CLI_LabOrder, \"sim\", 'b4963f6662d40cd168e27620', '106618ac400ab8a87fad9385', 'b66721e4563a947b63dd9b37', RESOURCE_HYDROGEN, RESOURCE_LEMERGIUM)\n\n"
+  msg += "ex: CLI(CLI_LabOrder, \"sim\", RESOURCE_GHODIUM_OXIDE, 500, false)\n";
+  msg += "This will set up a lab order to create 500 ghodium oxide.\n\n";
 
   msg += "CLI_Launch: Launches a program.\n";
   msg += "ex: CLI(CLI_Launch, CPKG_Scout, { homeRoom: \"W57S27\", targetRoom: \"W57S26\", expires: true })\n\n";

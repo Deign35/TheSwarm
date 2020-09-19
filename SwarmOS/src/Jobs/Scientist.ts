@@ -26,106 +26,68 @@ class Scientist extends SoloJob<Scientist_Memory, MemCache> {
     let curAction: ActionType = AT_NoOp;
     let actionResource: ResourceConstant = RESOURCE_ENERGY;
     let target: ObjectID = terminal.id;
+    let amount: number = creep.store.getCapacity();
     const creepCapacity = creep.store.getCapacity();
     const halfCapacity = creepCapacity / 2;
-    for (let order of roomData.labOrders) {
-      if (creep.store.getUsedCapacity() > 0) {
-        if (creep.store[order.input_1.mineral] > 0) {
-          let lab = Game.getObjectById<StructureLab>(order.input_1.lab_id);
-          if (!lab) { continue; }
-          if (lab.mineralType != undefined && lab.mineralType != order.input_1.mineral) {
-            curAction = AT_Transfer;
-            actionResource = order.input_1.mineral;
-            target = terminal.id;
-            break;
-          }
-          if (lab.mineralType == undefined || lab.store[order.input_1.mineral] <= halfCapacity) {
-            curAction = AT_Transfer;
-            actionResource = order.input_1.mineral;
-            target = lab.id;
-            break;
-          }
-        } else if (creep.store[order.input_2.mineral] > 0) {
-          let lab = Game.getObjectById<StructureLab>(order.input_2.lab_id);
-          if (!lab) { continue; }
-          if (lab.mineralType != undefined && lab.mineralType != order.input_2.mineral) {
-            curAction = AT_Transfer;
-            actionResource = order.input_2.mineral;
-            target = terminal.id;
-            break;
-          }
-          if (lab.mineralType == undefined || lab.store[order.input_2.mineral] <= halfCapacity) {
-            curAction = AT_Transfer;
-            actionResource = order.input_2.mineral;
-            target = lab.id;
-            break;
-          }
-        }
-      } else {
-        let lab1 = Game.getObjectById<StructureLab>(order.input_1.lab_id);
-        if (!lab1) { continue; }
-        if (lab1.mineralType && lab1.mineralType != order.input_1.mineral) {
-          curAction = AT_Withdraw;
-          target = lab1.id;
-          actionResource = lab1.mineralType;
-          break;
-        }
-        let lab2 = Game.getObjectById<StructureLab>(order.input_2.lab_id);
-        if (!lab2) { continue; }
-        if (lab2.mineralType && lab2.mineralType != order.input_2.mineral) {
-          curAction = AT_Withdraw;
-          target = lab2.id;
-          actionResource = lab2.mineralType;
-          break;
-        }
-        let lab3 = Game.getObjectById<StructureLab>(order.output_id);
-        if (!lab3) { continue; }
-        if (lab3.mineralType && (order.input_1.mineral == RESOURCE_ENERGY ||
-          order.input_2.mineral == RESOURCE_ENERGY ||
-          lab3.mineralType != REACTIONS[order.input_1.mineral][order.input_2.mineral] ||
-          lab3.store.getUsedCapacity(lab3.mineralType) > halfCapacity)) {
 
-          curAction = AT_Withdraw;
-          target = lab3.id;
-          actionResource = lab3.mineralType;
-          break;
-        }
+    if (creep.store.getUsedCapacity() > 0) {
+      // Find a place to dump it
+      for (let labID in roomData.labOrders) {
+        const order = roomData.labOrders[labID];
+        const lab = Game.getObjectById<StructureLab>(labID);
+        if (!lab) { continue; }
 
-        if (lab1.store[order.input_1.mineral] < halfCapacity && terminal.store[order.input_1.mineral] > 0) {
-          curAction = AT_Withdraw;
-          target = terminal.id;
-          actionResource = order.input_1.mineral;
-          break;
-        }
-        if (lab2.store[order.input_2.mineral] < halfCapacity && terminal.store[order.input_2.mineral] > 0) {
-          curAction = AT_Withdraw;
-          target = terminal.id;
-          actionResource = order.input_2.mineral;
+        // If the creep has resources, find a place to deposit
+        if (creep.store[order.resourceType] > 0 && order.resourceType != RESOURCE_ENERGY &&
+          !order.isOutput && order.amount > 0) {
+          curAction = AT_Transfer;
+          actionResource = order.resourceType;
+          target = labID;
+          amount = creep.store.getUsedCapacity(actionResource);
+          order.amount -= amount;
           break;
         }
       }
-    }
 
-    if (actionResource == RESOURCE_ENERGY && creep.store.getUsedCapacity() > 0) {
-      curAction = AT_Transfer;
-      target = terminal.id;
-      for (let resourceType in creep.store) {
-        actionResource = resourceType as MineralCompoundConstant | MineralConstant;
-        break;
+      // If no place to deposit, then put it in the terminal
+      if (curAction == AT_NoOp) {
+        curAction = AT_Transfer;
+        actionResource = Object.keys(creep.store)[0] as ResourceConstant;
+        target = terminal.id;
+        amount = creep.store.getUsedCapacity(actionResource);
       }
-    }
+    } else {
+      for (let labID in roomData.labOrders) {
+        const order = roomData.labOrders[labID];
+        const lab = Game.getObjectById<StructureLab>(labID);
+        if (!lab) { continue; }
 
-    if (actionResource == RESOURCE_ENERGY && creep.store.getUsedCapacity() == 0) {
-      for (let i = 0; i < roomData.tombstones.length; i++) {
-        const tombstone = Game.getObjectById<Tombstone>(roomData.tombstones[i]);
-        if (tombstone) {
-          for (let key in tombstone.store) {
-            if (key != RESOURCE_ENERGY) {
-              curAction = AT_Withdraw;
-              actionResource = key as ResourceConstant;
-              target = tombstone.id;
-            }
-          }
+        // Check that if a lab has a mineralType that does not match the order, then empty it.
+        if (lab.mineralType && (order.resourceType == RESOURCE_ENERGY || order.resourceType != lab.mineralType)) {
+          curAction = AT_Withdraw;
+          actionResource = lab.mineralType;
+          target = labID;
+          amount = Math.min(lab.store.getUsedCapacity(lab.mineralType), creep.store.getFreeCapacity());
+          break;
+        }
+
+        // If the order is an output, then see if we can dump some of it out to make room for more.
+        if (order.isOutput && lab.mineralType && lab.store.getUsedCapacity(lab.mineralType) >= halfCapacity) {
+          curAction = AT_Withdraw;
+          actionResource = lab.mineralType;
+          target = labID;
+          amount = Math.min(lab.store.getUsedCapacity(lab.mineralType), creepCapacity);
+          order.amount -= amount;
+          break;
+        }
+
+        // If the order is an input, then see if we can and should deposit more resources.
+        if (!order.isOutput && order.amount > 0 && lab.store.getFreeCapacity(order.resourceType) >= creepCapacity &&
+          terminal.store.getUsedCapacity(order.resourceType) > 0) {
+          curAction = AT_Withdraw;
+          actionResource = order.resourceType;
+          target = terminal.id;
+          amount = Math.min(order.amount, terminal.store.getUsedCapacity(order.resourceType), creepCapacity);
         }
       }
     }
@@ -134,7 +96,8 @@ class Scientist extends SoloJob<Scientist_Memory, MemCache> {
       action: curAction,
       creepID: creep.name,
       resourceType: actionResource,
-      targetID: target
+      targetID: target,
+      amount: amount
     }, this.pid);
   }
 
