@@ -11,7 +11,7 @@ class Scientist extends SoloJob<Scientist_Memory, MemCache> {
       body: [CARRY, CARRY, CARRY, CARRY, MOVE, MOVE],
       creepName: this.memory.homeRoom + (Game.time + '_Sci').slice(-7),
       owner_pid: this.pid
-    }, this.memory.homeRoom, Priority_Lowest, {
+    }, this.memory.homeRoom, Priority_Medium, {
         parentPID: this.pid
       }, 0);
   }
@@ -83,7 +83,7 @@ class Scientist extends SoloJob<Scientist_Memory, MemCache> {
 
         // If the order is an input, then see if we can and should deposit more resources.
         if (!order.isOutput && order.amount > 0 && lab.store.getFreeCapacity(order.resourceType) >= creepCapacity &&
-          terminal.store.getUsedCapacity(order.resourceType) > 0) {
+          terminal.store.getUsedCapacity(order.resourceType) > 0 && lab.store.getUsedCapacity(order.resourceType) < 2000) {
           curAction = AT_Withdraw;
           actionResource = order.resourceType;
           target = terminal.id;

@@ -53,9 +53,25 @@ class CLIManager extends BasicProcess<SwarmCLIMemory, MemCache> {
             if (cmd.args && cmd.args.length == 2) {
               const roomData = this.roomManager.GetRoomData(cmd.args[0]);
               if (roomData) {
+                const lab2 = roomData.labOrders[cmd.args[1]].lab_2;
+                const lab3 = roomData.labOrders[cmd.args[1]].lab_3;
                 roomData.labOrders[cmd.args[1]] = {
                   amount: 0,
                   resourceType: RESOURCE_ENERGY
+                }
+
+                if (lab2) {
+                  roomData.labOrders[lab2] = {
+                    amount: 0,
+                    resourceType: RESOURCE_ENERGY
+                  }
+                }
+
+                if (lab3) {
+                  roomData.labOrders[lab3] = {
+                    amount: 0,
+                    resourceType: RESOURCE_ENERGY
+                  }
                 }
               }
             }

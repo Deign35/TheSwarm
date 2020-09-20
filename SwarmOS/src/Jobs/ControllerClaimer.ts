@@ -16,8 +16,16 @@ class ControllerClaimer extends SoloJob<ControllerClaimer_Memory, MemCache> {
       return;
     }
 
+    let body = [CLAIM, MOVE];
+    if (this.memory.onlyReserve) {
+      if (Game.rooms[this.memory.homeRoom].energyCapacityAvailable > 2000) {
+        body = [CLAIM, CLAIM, CLAIM, MOVE, MOVE, MOVE];
+      } else {
+        body = [CLAIM, CLAIM, MOVE, MOVE];
+      }
+    }
     return this.spawnManager.requestSpawn({
-      body: this.memory.onlyReserve ? [CLAIM, CLAIM, MOVE, MOVE] : [CLAIM, MOVE],
+      body: body,
       creepName: this.memory.targetRoom + '_' + (Game.time + '_CL').slice(-6),
       owner_pid: this.pid
     }, this.memory.homeRoom, Priority_Lowest, {
@@ -62,6 +70,11 @@ class ControllerClaimer extends SoloJob<ControllerClaimer_Memory, MemCache> {
 
       if (!this.memory.onlyReserve && creep.room.controller.my) {
         this.log.info(`Controller already mine: ${creep.room.name}`);
+        this.creepManager.CreateNewCreepActivity({
+          action: AT_Suicide,
+          creepID: creep.name,
+          pos: creep.pos
+        }, this.pid);
         return;
       }
 

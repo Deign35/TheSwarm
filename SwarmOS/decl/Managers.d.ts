@@ -47,7 +47,7 @@ declare interface LabOrder {
   isForBoost?: boolean;
   isReverse?: boolean;
 
-  creepID?: CreepID;
+  creepIDs?: CreepID[];
   lab_2?: ObjectID;
   lab_3?: ObjectID;
 }

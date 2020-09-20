@@ -47,7 +47,7 @@ class RemoteManager extends BasicProcess<RemoteManager_Memory, MemCache> {
 
     if (!this.memory.claimerPID || !this.kernel.getProcessByPID(this.memory.claimerPID)) {
       if (targetRoom && targetRoom.controller &&
-        (!targetRoom.controller.reservation || targetRoom.controller.reservation.ticksToEnd < 4500)) {
+        (!targetRoom.controller.reservation || targetRoom.controller.reservation.ticksToEnd < 4000)) {
         this.memory.claimerPID = this.kernel.startProcess(CPKG_ControllerClaimer, {
           expires: true,
           homeRoom: this.memory.homeRoom,

@@ -83,6 +83,7 @@ class TowerJob extends BasicProcess<Tower_Memory, MemCache> {
     const hostiles: Creep[] = [];
     const workers: Creep[] = [];
     const claimers: Creep[] = [];
+    const others: Creep[] = [];
     for (let i = 0; i < possibleTargets.length; i++) {
       const creep = possibleTargets[i];
       if (creep.getActiveBodyparts(HEAL) > 0) {
@@ -96,6 +97,8 @@ class TowerJob extends BasicProcess<Tower_Memory, MemCache> {
         hostiles.push(creep);
       } else if (creep.getActiveBodyparts(CLAIM) > 0) {
         claimers.push(creep);
+      } else {
+        others.push(creep);
       }
     }
 
@@ -103,7 +106,10 @@ class TowerJob extends BasicProcess<Tower_Memory, MemCache> {
       return claimers;
     } else if (workers.length > 0) {
       return workers;
+    } else if (hostiles.length > 0) {
+      return hostiles;
+    } else {
+      return others;
     }
-    return hostiles;
   }
 }
