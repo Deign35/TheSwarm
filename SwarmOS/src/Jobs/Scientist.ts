@@ -9,7 +9,7 @@ class Scientist extends SoloJob<Scientist_Memory, MemCache> {
   protected GetNewSpawnID(): string {
     return this.spawnManager.requestSpawn({
       body: [CARRY, CARRY, CARRY, CARRY, MOVE, MOVE],
-      creepName: this.memory.homeRoom + (Game.time + '_Sci').slice(-7),
+      creepName: this.memory.homeRoom + "_" + (Game.time + '_Sci').slice(-7),
       owner_pid: this.pid
     }, this.memory.homeRoom, Priority_Medium, {
         parentPID: this.pid
@@ -39,11 +39,11 @@ class Scientist extends SoloJob<Scientist_Memory, MemCache> {
 
         // If the creep has resources, find a place to deposit
         if (creep.store[order.resourceType] > 0 && order.resourceType != RESOURCE_ENERGY &&
-          !order.isOutput && order.amount > 0) {
+          !order.isOutput && order.amount > 0 && (!lab.mineralType || lab.mineralType == order.resourceType)) {
           curAction = AT_Transfer;
           actionResource = order.resourceType;
           target = labID;
-          amount = creep.store.getUsedCapacity(actionResource);
+          amount = Math.min(creep.store.getUsedCapacity(actionResource), order.amount);
           order.amount -= amount;
           break;
         }
