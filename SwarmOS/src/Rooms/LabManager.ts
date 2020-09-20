@@ -28,10 +28,14 @@ class LabManager extends BasicProcess<LabManager_Memory, MemCache> {
         }
         const order = roomData.labOrders[id];
 
-        if (order.isForBoost && order.amount <= 0) {
+        if (order.resourceType == RESOURCE_ENERGY) {
           freeLabs.push(lab);
-        } else if (order.resourceType == RESOURCE_ENERGY) {
+        } else if (order.isForBoost && order.amount <= 0) {
           freeLabs.push(lab);
+          roomData.labOrders[id] = {
+            amount: 0,
+            resourceType: RESOURCE_ENERGY
+          }
         } else if (order.lab_2 && order.lab_3 && order.amount <= 0) {
           freeLabs.push(lab);
           const lab2 = Game.getObjectById<StructureLab>(order.lab_2);
@@ -42,6 +46,14 @@ class LabManager extends BasicProcess<LabManager_Memory, MemCache> {
 
           freeLabs.push(lab2);
           freeLabs.push(lab3);
+          roomData.labOrders[order.lab_2] = {
+            amount: 0,
+            resourceType: RESOURCE_ENERGY
+          }
+          roomData.labOrders[order.lab_3] = {
+            amount: 0,
+            resourceType: RESOURCE_ENERGY
+          }
         }
       }
 

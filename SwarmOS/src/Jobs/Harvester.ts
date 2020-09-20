@@ -40,7 +40,7 @@ class Harvester extends SoloJob<HarvesterMemory, MemCache> {
       body: body,
       creepName: this.memory.targetRoom + '_H_' + this.memory.source.slice(-1),
       owner_pid: this.pid
-    }, this.memory.homeRoom, this.memory.remoteHarvester ? Priority_Low : Priority_High, {
+    }, this.memory.homeRoom, this.memory.remoteHarvester ? Priority_Medium : Priority_High, {
         parentPID: this.pid
       }, 0);
   }
