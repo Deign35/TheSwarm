@@ -39,11 +39,11 @@ class CreepActivity extends BasicProcess<SingleCreepAction_Memory, MemCache> {
       return ThreadState_Done;
     }
 
-    if (!this.creepManager.CreepIsInRange(this.memory.action, this.AssignedCreep.pos, this.TargetPos || this.Target!.pos)) {
-      this.creepManager.MoveCreep(this.AssignedCreep, this.TargetPos || this.Target!.pos);
-    } else if (!this.creepManager.ValidateActionTarget(this.memory.action, this.Target || this.TargetPos, this.memory.resourceType)) {
+    if (!this.creepManager.ValidateActionTarget(this.memory.action, this.Target || this.TargetPos, this.memory.resourceType)) {
       this.EndProcess();
       return ThreadState_Done;
+    } else if (!this.creepManager.CreepIsInRange(this.memory.action, this.AssignedCreep.pos, this.TargetPos || this.Target!.pos)) {
+      this.creepManager.MoveCreep(this.AssignedCreep, this.TargetPos || this.Target!.pos);
     } else {
       const result = this.creepManager.RunCreepAction(this.CreateActivityArgs());
       switch (this.memory.action) {
