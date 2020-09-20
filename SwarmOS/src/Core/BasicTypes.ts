@@ -64,24 +64,28 @@ export abstract class PackageProviderBase<T extends PackageProviderMemory, U ext
   }
 
   RunThread(): ThreadState {
-    const ids = Object.keys(this.RequiredServices)
-    for (let i = 0, length = ids.length; i < length; i++) {
-      let service = this.memory.services[ids[i]];
-      let process = (service && service.pid) ? this.kernel.getProcessByPID(service.pid) : undefined;
-
-      if (!service || !process) {
-        this.log.info(() => `Initializing package service ${ids[i]}`);
-
-        const initData = this.RequiredServices[ids[i]];
-        this.addPKGService(ids[i], initData.processName, initData.startContext);
-        service = this.memory.services[ids[i]];
-        process = (service && service.pid) ? this.kernel.getProcessByPID(service.pid) : undefined;
+    try {
+      const ids = Object.keys(this.RequiredServices)
+      for (let i = 0, length = ids.length; i < length; i++) {
+        let service = this.memory.services[ids[i]];
+        let process = (service && service.pid) ? this.kernel.getProcessByPID(service.pid) : undefined;
 
         if (!service || !process) {
-          this.kernel.killProcess(this.pid, `Failed to restart package service ${ids[i]}`);
-          continue;
+          this.log.info(() => `Initializing package service ${ids[i]}`);
+
+          const initData = this.RequiredServices[ids[i]];
+          this.addPKGService(ids[i], initData.processName, initData.startContext);
+          service = this.memory.services[ids[i]];
+          process = (service && service.pid) ? this.kernel.getProcessByPID(service.pid) : undefined;
+
+          if (!service || !process) {
+            this.kernel.killProcess(this.pid, `Failed to restart package service ${ids[i]}`);
+            continue;
+          }
         }
       }
+    } catch (e) {
+      this.log.error("PackageProviderBase error: " + e);
     }
 
     this.sleeper.sleep(this.pid, SCAN_FREQUENCY);
