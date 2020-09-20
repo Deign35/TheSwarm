@@ -23,6 +23,14 @@ class Scientist extends SoloJob<Scientist_Memory, MemCache> {
       return;
     }
 
+    if (creep.ticksToLive && creep.ticksToLive < 50 && creep.store.getUsedCapacity() == 0) {
+      return this.creepManager.CreateNewCreepActivity({
+        action: AT_Suicide,
+        creepID: creep.name,
+        pos: creep.pos
+      }, this.pid);
+    }
+
     let curAction: ActionType = AT_NoOp;
     let actionResource: ResourceConstant = RESOURCE_ENERGY;
     let target: ObjectID = terminal.id;
