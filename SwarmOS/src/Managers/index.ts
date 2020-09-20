@@ -8,6 +8,7 @@ import { OSPackage as MapManager } from "./MapManager";
 import { OSPackage as MarketManager } from "./MarketManager";
 import { OSPackage as RoomManager } from "./RoomManager";
 import { OSPackage as SpawnManager } from "./SpawnManager";
+import { OSPackage as TerminalNetwork } from "./TerminalNetwork";
 
 class SwarmManager extends PackageProviderBase<PackageProviderMemory, MemCache> {
   protected get RequiredServices(): SDictionary<ProviderService> {
@@ -38,6 +39,9 @@ class SwarmManager extends PackageProviderBase<PackageProviderMemory, MemCache> 
     spawnManager: {
       processName: PKG_SpawnManager
     },
+    terminalNetwork: {
+      processName: PKG_TerminalNetwork
+    }
   }
 }
 
@@ -51,6 +55,7 @@ export const ManagersPackage: IPackage = {
     MarketManager.install(processRegistry, extensionRegistry);
     RoomManager.install(processRegistry, extensionRegistry);
     SpawnManager.install(processRegistry, extensionRegistry);
+    TerminalNetwork.install(processRegistry, extensionRegistry);
 
     processRegistry.register(PKG_SwarmManager, SwarmManager);
   },

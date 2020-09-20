@@ -52,11 +52,15 @@ const SCAN_FREQUENCY = 15;
 export abstract class PackageProviderBase<T extends PackageProviderMemory, U extends MemCache> extends BasicProcess<T, U> {
   protected abstract RequiredServices: SDictionary<ProviderService>;
 
-  private addPKGService(serviceID: string, id: string, parentPID?: PID, startContext: any = {}) {
-    this.log.info(() => `Adding service ${id}`);
-    let pid = this.kernel.startProcess(id, Object.assign({}, startContext));
-    this.kernel.setParent(pid, parentPID);
-    this.memory.services[serviceID] = { pid, serviceID };
+  private addPKGService(serviceID: string, id: string, startContext: any = {}) {
+    try {
+      this.log.info(() => `Adding service ${id}`);
+      let pid = this.kernel.startProcess(id, Object.assign({}, startContext));
+      this.kernel.setParent(pid, this.pid);
+      this.memory.services[serviceID] = { pid, serviceID };
+    } catch (e) {
+      this.log.error(`Failed to start up process ${serviceID} -- ${e}`);
+    }
   }
 
   RunThread(): ThreadState {

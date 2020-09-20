@@ -1,7 +1,7 @@
 declare var Memory: {
   battleData: BattleManagerMemory
 }
-declare var MemCache: {
+declare var MemoryCache: {
   battleData: BattleManagerCache;
 }
 
@@ -28,12 +28,12 @@ class BattleManager extends BasicProcess<BattleManagerMemory, BattleManagerCache
     return Memory.battleData;
   }
   get cache(): BattleManagerCache {
-    if (!MemCache.battleData) {
-      MemCache.battleData = {
+    if (!MemoryCache.battleData) {
+      MemoryCache.battleData = {
         rooms: {}
       };
     }
-    return MemCache.battleData;
+    return MemoryCache.battleData;
   }
   protected get logID() {
     return PKG_BattleManager_LogContext.logID;
@@ -71,12 +71,12 @@ class BattleManagerExtensions extends ExtensionBase implements IBattleManagerExt
     return Memory.battleData;
   }
   get cache(): BattleManagerCache {
-    if (!MemCache.battleData) {
-      MemCache.battleData = {
+    if (!MemoryCache.battleData) {
+      MemoryCache.battleData = {
         rooms: {}
       };
     }
-    return MemCache.battleData;
+    return MemoryCache.battleData;
   }
   protected get logID() {
     return PKG_BattleManager_LogContext.logID;

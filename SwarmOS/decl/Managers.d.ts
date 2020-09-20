@@ -140,3 +140,18 @@ declare interface IHostileCreepContainer {
   GetHealCreeps(): Creep[];
   GetNonBattleCreeps(): Creep[];
 }
+
+declare interface TerminalNetworkRequest {
+  roomID: RoomID;
+  resourceType: ResourceConstant;
+  amount: number;
+}
+declare interface TerminalNetwork_Memory extends MemBase {
+  requests: TerminalNetworkRequest[];
+}
+declare interface TerminalNetwork_Cache extends MemCache {
+  roomsWithTerminal?: ObjectID[];
+}
+declare interface ITerminalNetworkExtensions {
+  RequestResources(request: TerminalNetworkRequest): void;
+}

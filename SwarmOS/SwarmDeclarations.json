@@ -27,7 +27,8 @@
                 "MarketManager",
                 "RoomManager",
                 "SpawnManager",
-                "SwarmManager"
+                "SwarmManager",
+                "TerminalNetwork"
             ]
         },
         "EXT": {
@@ -45,7 +46,8 @@
                 "Registry": "extRegistry",
                 "RoomManager": "roomManager",
                 "Sleep": "sleep",
-                "SpawnManager": "spawnManager"
+                "SpawnManager": "spawnManager",
+                "TerminalNetwork": "terminalNetwork"
             }
         },
         "APKG": {

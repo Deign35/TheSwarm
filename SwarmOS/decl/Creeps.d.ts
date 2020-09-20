@@ -70,19 +70,6 @@ declare interface MineralHarvester_Memory extends SquadJob_Memory {
     { activityPID?: PID, creepID?: CreepID }]
 }
 
-declare interface ExperimentalSquad_Memory extends SquadJob_Memory {
-  invasion: number;
-  container: ObjectID;
-  sourceID: ObjectID;
-  squad: [{ activityPID?: PID, creepID?: CreepID }, // Harvester
-    { activityPID?: PID, creepID?: CreepID },       // Collecter
-    { activityPID?: PID, creepID?: CreepID },       // Builder
-    { activityPID?: PID, creepID?: CreepID },       // Claimer
-    { activityPID?: PID, creepID?: CreepID },       // Collector 2
-    { activityPID?: PID, creepID?: CreepID }]       // Collector 3
-}
-
-//CLI(CLI_Launch, CPKG_ExperimentalSquad, { homeRoom: "W57S27", targetRoom: "W57S26", sourceID: '59f19f7582100e1594f34ef7', container: '5f50c63989cd9d54bc834454', squad: [{}, {}, {}, {}, {}, {}]})
 //CLI(CLI_Launch, CPKG_ControllerClaimer, { homeRoom: "E15S41", targetRoom: "E15S43", expires: true });
 //CLI(CLI_Launch, CPKG_RoomBooter, { homeRoom: "E15S41", targetRoom: "E15S43", expires: true })
 //CLI(CLI_Launch, CPKG_Worker, { homeRoom: "E12S42", targetRoom: "E13S42", expires: true })
