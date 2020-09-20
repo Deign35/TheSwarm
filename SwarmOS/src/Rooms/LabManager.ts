@@ -59,7 +59,7 @@ class LabManager extends BasicProcess<LabManager_Memory, MemCache> {
                 foundExistingOrder = true;
                 break;
               }
-            } else {
+            } else if (order.lab_2 && order.lab_3 && order.isReverse == request.reverseReaction) {
               order.amount += request.amount;
               foundExistingOrder = true;
               const order2 = roomData.labOrders[order.lab_2!];
