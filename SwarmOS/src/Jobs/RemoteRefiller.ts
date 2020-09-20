@@ -78,6 +78,20 @@ class RemoteRefiller extends SoloJob<RemoteRefiller_Memory, MemCache> {
       }, this.pid);
     }
 
+    for (let i = 0; i < roomData.tombstones.length; i++) {
+      const tombstone = Game.getObjectById<Tombstone>(roomData.tombstones[i]);
+      if (!tombstone || tombstone.store.getUsedCapacity(RESOURCE_ENERGY) < (creep.store.getFreeCapacity() / 2)) {
+        continue;
+      }
+
+      return this.creepManager.CreateNewCreepActivity({
+        action: AT_Withdraw,
+        creepID: creep.name,
+        targetID: tombstone.id,
+        resourceType: RESOURCE_ENERGY
+      }, this.pid);
+    }
+
     let bestDist = 1000;
     let bestTarget = undefined;
     for (let i = 0; i < roomData.structures[STRUCTURE_CONTAINER].length; i++) {

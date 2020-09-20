@@ -63,7 +63,7 @@ class Worker extends SoloJob<Worker_Memory, MemCache> {
     }
     const carryRatio = creep.store.getUsedCapacity() / creep.store.getCapacity();
     const roomData = this.roomManager.GetRoomData(creep.room.name)!;
-    if (carryRatio > 0.50) {
+    if (carryRatio >= 0.50) {
       for (let i = 0; i < roomData.needsRepair.length; i++) {
         const repairTarget = Game.getObjectById<Structure>(roomData.needsRepair[i]);
         if (repairTarget && repairTarget.hitsMax > repairTarget.hits) {
@@ -98,11 +98,12 @@ class Worker extends SoloJob<Worker_Memory, MemCache> {
     let bestTarget = '';
     let closestDist = 1000;
     const energyNeeded = creep.store.getFreeCapacity();
+    const halfEnergyNeeded = energyNeeded / 2;
 
     if (actionType == AT_NoOp && roomData.tombstones.length > 0) {
       for (let i = 0; i < roomData.tombstones.length; i++) {
         const tombstone = Game.getObjectById<Tombstone>(roomData.tombstones[i]);
-        if (tombstone && (tombstone.store[RESOURCE_ENERGY] || -1) >= energyNeeded) {
+        if (tombstone && (tombstone.store[RESOURCE_ENERGY] || -1) >= halfEnergyNeeded) {
           const dist = tombstone.pos.getRangeTo(creep.pos);
           if (dist < closestDist) {
             closestDist = dist;
@@ -116,7 +117,7 @@ class Worker extends SoloJob<Worker_Memory, MemCache> {
     if (actionType == AT_NoOp && roomData.resources.length > 0) {
       for (let i = 0; i < roomData.resources.length; i++) {
         const resource = Game.getObjectById<Resource>(roomData.resources[i]);
-        if (resource && resource.resourceType == RESOURCE_ENERGY && (resource.amount || -1) >= energyNeeded) {
+        if (resource && resource.resourceType == RESOURCE_ENERGY && (resource.amount || -1) >= halfEnergyNeeded) {
           const dist = resource.pos.getRangeTo(creep.pos);
           if (dist < closestDist) {
             closestDist = dist;
@@ -165,7 +166,8 @@ class Worker extends SoloJob<Worker_Memory, MemCache> {
     return this.creepManager.CreateNewCreepActivity({
       targetID: bestTarget,
       action: actionType,
-      creepID: creep.name
+      creepID: creep.name,
+      resourceType: RESOURCE_ENERGY
     }, this.pid);
   }
 

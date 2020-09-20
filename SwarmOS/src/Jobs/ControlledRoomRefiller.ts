@@ -86,7 +86,7 @@ class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory, MemC
           return !spawn.spawning;
         }
       });
-      if (spawn && !spawn.spawning && spawn.store[RESOURCE_ENERGY] > (creep.bodyCost / 2.5) / creep.body.length) {
+      if (spawn && !spawn.spawning && creep.room.energyAvailable > (creep.bodyCost / 2.5) / creep.body.length) {
         return this.creepManager.CreateNewCreepActivity({
           targetID: spawn.id,
           action: AT_RenewCreep,
@@ -95,7 +95,11 @@ class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory, MemC
       }
     }
     if ((creep.ticksToLive || 0) < 60 && creep.store.getUsedCapacity() < 0.10) {
-      return;
+      return this.creepManager.CreateNewCreepActivity({
+        action: AT_Suicide,
+        creepID: creep.name,
+        pos: creep.pos
+      }, this.pid);
     }
     const nextTask = this.GetNewTarget(creep);
     if (!nextTask) {
@@ -117,6 +121,7 @@ class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory, MemC
     let bestTarget = '';
     const roomData = this.roomManager.GetRoomData(creep.room.name)!;
     const energyNeeded = creep.store.getCapacity() - (creep.store.getUsedCapacity() || 0);
+    const halfEnergyNeeded = energyNeeded / 2;
     const carryRatio = creep.store.getUsedCapacity() / creep.store.getCapacity();
 
     let closestDist = 1000;
@@ -124,7 +129,7 @@ class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory, MemC
       if (actionType == AT_NoOp && roomData.tombstones.length > 0) {
         for (let i = 0; i < roomData.tombstones.length; i++) {
           const tombstone = Game.getObjectById<Tombstone>(roomData.tombstones[i]);
-          if (tombstone && (tombstone.store[RESOURCE_ENERGY] || -1) >= energyNeeded) {
+          if (tombstone && (tombstone.store[RESOURCE_ENERGY] || -1) >= halfEnergyNeeded) {
             const dist = tombstone.pos.getRangeTo(creep.pos);
             if (dist < closestDist) {
               closestDist = dist;
@@ -138,7 +143,7 @@ class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory, MemC
       if (actionType == AT_NoOp && roomData.ruins.length > 0) {
         for (let i = 0; i < roomData.ruins.length; i++) {
           const ruins = Game.getObjectById<Ruin>(roomData.ruins[i]);
-          if (ruins && (ruins.store[RESOURCE_ENERGY] || -1) >= energyNeeded) {
+          if (ruins && (ruins.store[RESOURCE_ENERGY] || -1) >= halfEnergyNeeded) {
             const dist = ruins.pos.getRangeTo(creep.pos);
             if (dist < closestDist) {
               closestDist = dist;
@@ -152,7 +157,7 @@ class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory, MemC
       if (actionType == AT_NoOp && roomData.resources.length > 0) {
         for (let i = 0; i < roomData.resources.length; i++) {
           const resource = Game.getObjectById<Resource>(roomData.resources[i]);
-          if (resource && resource.resourceType == RESOURCE_ENERGY && (resource.amount || -1) >= energyNeeded) {
+          if (resource && resource.resourceType == RESOURCE_ENERGY && (resource.amount || -1) >= halfEnergyNeeded) {
             const dist = resource.pos.getRangeTo(creep.pos);
             if (dist < closestDist) {
               closestDist = dist;

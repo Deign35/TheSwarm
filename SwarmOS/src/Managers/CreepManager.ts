@@ -317,7 +317,9 @@ class CreepManagerExtensions extends ExtensionBase implements ICreepManagerExten
           }
         }
         return false;
-      case (AT_Withdraw): return ((target as Structure).structureType || (target as Ruin).structure || (target as Tombstone).deathTime) && !!(target as StructureContainer).store;
+      case (AT_Withdraw):
+        return ((target as Structure).structureType || (target as Ruin).structure || (target as Tombstone).deathTime)
+        && !!(target as StructureContainer).store && (target as StructureContainer).store.getUsedCapacity(resourceType) > 0;
       case (AT_RenewCreep): return ((target as StructureSpawn).structureType && (target as StructureSpawn).structureType == STRUCTURE_SPAWN && !(target as StructureSpawn).spawning);
 
       case (AT_Drop):
