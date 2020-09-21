@@ -79,7 +79,7 @@ class LabManager extends BasicProcess<LabManager_Memory, MemCache> {
                 this.RequestResourcesIfNeeded(labOrders[j], order.resourceType, order.amount);
                 break;
               }
-            } else if (order.lab_2 && order.lab_3 && order.isReverse == request.reverseReaction) {
+            } else if (order.lab_2 && order.lab_3 && !!order.isReverse == !!request.reverseReaction) {
               foundExistingOrder = true;
               order.amount += request.amount;
 
