@@ -85,7 +85,7 @@ export abstract class PackageProviderBase<T extends PackageProviderMemory, U ext
         }
       }
     } catch (e) {
-      this.log.error("PackageProviderBase error: " + e);
+      this.log.error(`${this.context.pkgName} error: ${e}`);
     }
 
     this.sleeper.sleep(this.pid, SCAN_FREQUENCY);

@@ -39,7 +39,7 @@ class TerminalNetwork extends BasicProcess<TerminalNetwork_Memory, TerminalNetwo
       this.cache.roomsWithTerminal = [];
       for (const roomID in Game.rooms) {
         const room = Game.rooms[roomID];
-        if (room.terminal) {
+        if (room.controller && room.controller.my && room.terminal) {
           this.cache.roomsWithTerminal.push(roomID);
         }
       }

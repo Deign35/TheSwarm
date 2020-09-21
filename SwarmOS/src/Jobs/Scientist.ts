@@ -85,7 +85,6 @@ class Scientist extends SoloJob<Scientist_Memory, MemCache> {
           actionResource = lab.mineralType;
           target = labID;
           amount = Math.min(lab.store.getUsedCapacity(lab.mineralType), creepCapacity);
-          order.amount -= amount;
           break;
         }
 

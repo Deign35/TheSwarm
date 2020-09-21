@@ -59,8 +59,9 @@ class RemoteManager extends BasicProcess<RemoteManager_Memory, MemCache> {
     }
 
     const roomData = this.roomManager.GetRoomData(this.memory.targetRoom);
+    if (!roomData) { return ThreadState_Done; }
     if (!this.memory.workerPID || !this.kernel.getProcessByPID(this.memory.workerPID)) {
-      if (roomData && (roomData.cSites.length > 0 || roomData.needsRepair.length > 0)) {
+      if ((roomData.cSites.length > 0 || roomData.needsRepair.length > 0)) {
         this.memory.workerPID = this.kernel.startProcess(CPKG_Worker, {
           expires: true,
           homeRoom: this.memory.homeRoom,
@@ -70,7 +71,7 @@ class RemoteManager extends BasicProcess<RemoteManager_Memory, MemCache> {
       }
     }
 
-    const sources = roomData ? roomData.sourceIDs : [];
+    const sources = roomData.sourceIDs;
     for (const id of sources) {
       if (!this.memory.harvesterPIDs[id] || !this.kernel.getProcessByPID(this.memory.harvesterPIDs[id])) {
         this.memory.harvesterPIDs[id] = this.kernel.startProcess(CPKG_Harvester, {
@@ -90,7 +91,16 @@ class RemoteManager extends BasicProcess<RemoteManager_Memory, MemCache> {
       }
     }
 
-    while (this.memory.refillerPIDs.length < (3 * sources.length)) {
+    let totalGroundResources = 0;
+    for (let i = 0; i < roomData.resources.length; i++) {
+      const resource = Game.getObjectById<Resource>(roomData.resources[i]);
+      if (resource && resource.resourceType == RESOURCE_ENERGY) {
+        totalGroundResources += resource.amount;
+      }
+    }
+
+    let numWorkers = 2 * sources.length + Math.floor(totalGroundResources / 1000);
+    while (this.memory.refillerPIDs.length < numWorkers) {
       this.memory.refillerPIDs.push(this.kernel.startProcess(CPKG_RemoteRefiller, {
         expires: true,
         homeRoom: this.memory.homeRoom,

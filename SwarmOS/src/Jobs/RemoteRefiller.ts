@@ -53,13 +53,13 @@ class RemoteRefiller extends SoloJob<RemoteRefiller_Memory, MemCache> {
   protected HandleNoActivity(creep: Creep) {
     if (creep.room.name == this.memory.targetRoom) {
       // We're in the room, but can't find anything to do.
-      if (creep.pos.x == 0) {
+      if (creep.pos.x <= 1) {
         creep.move(RIGHT);
-      } else if (creep.pos.x == 49) {
+      } else if (creep.pos.x >= 48) {
         creep.move(LEFT);
-      } else if (creep.pos.y == 0) {
+      } else if (creep.pos.y <= 1) {
         creep.move(BOTTOM);
-      } else if (creep.pos.y == 49) {
+      } else if (creep.pos.y >= 48) {
         creep.move(TOP);
       }
     }
