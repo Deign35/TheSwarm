@@ -80,7 +80,7 @@ class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory, MemC
       return this.MoveToRoom(creep, this.memory.targetRoom);
     }
     if (creep.store.getUsedCapacity() < 0.10 &&
-      (creep.ticksToLive || 1500) < 1500 - (600 / creep.body.length)) {
+      (creep.ticksToLive || 1500) < 1500 - ((600 / creep.body.length) * 2)) {
       let spawn = creep.pos.findClosestByRange(FIND_MY_SPAWNS, {
         filter: (spawn: StructureSpawn) => {
           return !spawn.spawning;

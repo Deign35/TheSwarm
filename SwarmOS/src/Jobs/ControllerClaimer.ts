@@ -18,7 +18,7 @@ class ControllerClaimer extends SoloJob<ControllerClaimer_Memory, MemCache> {
 
     let body = [CLAIM, MOVE];
     if (this.memory.onlyReserve) {
-      if (Game.rooms[this.memory.homeRoom].energyCapacityAvailable > 2000) {
+      if (Game.rooms[this.memory.homeRoom].energyCapacityAvailable >= 2000) {
         body = [CLAIM, CLAIM, CLAIM, MOVE, MOVE, MOVE];
       } else {
         body = [CLAIM, CLAIM, MOVE, MOVE];
