@@ -79,6 +79,7 @@
                 "RoomBooter": "roomBooter",
                 "Scientist": "scientist",
                 "Scout": "scout",
+                "Upgrader": "upgrader",
                 "Worker": "worker"
             }
         },

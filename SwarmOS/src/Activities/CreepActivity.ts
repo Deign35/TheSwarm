@@ -30,6 +30,9 @@ class CreepActivity extends BasicProcess<SingleCreepAction_Memory, MemCache> {
       } else if (result == OK) {
         this.EndProcess();
       } else if (result == ERR_NO_PATH) {
+        if (this.Target) {
+          this.TargetPos = this.Target.pos;
+        }
         const hasCreep = this.TargetPos!.lookFor(LOOK_CREEPS);
         if (hasCreep && hasCreep.length > 0) {
           const otherCreep = hasCreep[0];

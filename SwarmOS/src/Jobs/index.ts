@@ -7,6 +7,7 @@ import { OSPackage as RemoteRefiller } from "./RemoteRefiller";
 import { OSPackage as RoomBooter } from "./RoomBooter";
 import { OSPackage as Scientist } from "./Scientist";
 import { OSPackage as Scout } from "./Scout";
+import { OSPackage as Upgrader } from "./Upgrader";
 import { OSPackage as Worker } from "./Worker";
 
 export const JobsPackage: IPackage = {
@@ -20,6 +21,7 @@ export const JobsPackage: IPackage = {
     RoomBooter.install(processRegistry, extensionRegistry);
     Scientist.install(processRegistry, extensionRegistry);
     Scout.install(processRegistry, extensionRegistry);
+    Upgrader.install(processRegistry, extensionRegistry);
     Worker.install(processRegistry, extensionRegistry);
   }
 }

@@ -47,6 +47,10 @@ declare interface Dismantler_Memory extends SoloJob_Memory { }
 declare interface Worker_Memory extends SoloJob_Memory { }
 declare interface Scout_Memory extends SoloJob_Memory { }
 declare interface RoomBooter_Memory extends SoloJob_Memory { }
+declare interface Upgrader_Memory extends SoloJob_Memory {
+  needsBoost: boolean;
+  hasRequestedBoost: boolean;
+}
 declare interface ControllerClaimer_Memory extends SoloJob_Memory {
   onlyReserve: boolean;
   onlyAttack: boolean;

@@ -1,28 +1,13 @@
 export const OSPackage: IPackage = {
   install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
-    processRegistry.register(CPKG_Worker, Worker);
+    processRegistry.register(CPKG_Upgrader, Upgrader);
   }
 }
 import { SoloJob } from "./SoloJob";
 
-class Worker extends SoloJob<Worker_Memory, MemCache> {
-
-  private hasRun!: boolean;
-  PrepTick() {
-    this.hasRun = false;
-  }
-  RunThread(): ThreadState {
-    this.hasRun = true;
-    super.RunThread();
-    if (this.hasRun) {
-      return ThreadState_Done;
-    }
-
-    this.hasRun = false;
-    return ThreadState_Waiting;
-  }
-
+class Upgrader extends SoloJob<Upgrader_Memory, MemCache> {
   protected GetNewSpawnID(): string {
+    this.memory.hasRequestedBoost = false;
     const homeRoom = Game.rooms[this.memory.homeRoom];
     const energyCapacity = homeRoom.energyCapacityAvailable;
     let body = [WORK, CARRY, CARRY, MOVE, MOVE];
@@ -51,40 +36,47 @@ class Worker extends SoloJob<Worker_Memory, MemCache> {
     }
     return this.spawnManager.requestSpawn({
       body: body,
-      creepName: this.memory.targetRoom + '_' + (Game.time + '_WR').slice(-6),
+      creepName: this.memory.targetRoom + '_' + (Game.time + '_Up').slice(-6),
       owner_pid: this.pid
-    }, this.memory.homeRoom, this.memory.targetRoom == this.memory.homeRoom ? Priority_Low : Priority_Lowest, {
+    }, this.memory.homeRoom, Priority_Lowest, {
         parentPID: this.pid
       }, 0);
   }
   protected CreateCustomCreepActivity(creep: Creep): string | undefined {
-    if (creep.room.name != this.memory.targetRoom) {
-      return this.MoveToRoom(creep, this.memory.targetRoom);
-    }
-    const carryRatio = creep.store.getUsedCapacity() / creep.store.getCapacity();
     const roomData = this.roomManager.GetRoomData(creep.room.name)!;
-    if (carryRatio >= 0.50) {
-      for (let i = 0; i < roomData.needsRepair.length; i++) {
-        const repairTarget = Game.getObjectById<Structure>(roomData.needsRepair[i]);
-        if (repairTarget && repairTarget.hitsMax > repairTarget.hits) {
+    if (this.memory.needsBoost) {
+      const labIDs = Object.keys(roomData.labOrders);
+      for (let i = 0; i < labIDs.length; i++) {
+        const order = roomData.labOrders[labIDs[i]];
+        if (order.creepIDs && order.creepIDs.includes(creep.name) && order.amount > 0) {
           return this.creepManager.CreateNewCreepActivity({
-            action: AT_Repair,
+            action: AT_MoveToPosition,
             creepID: creep.name,
-            targetID: roomData.needsRepair[i]
+            amount: 1,
+            targetID: labIDs[i]
           }, this.pid);
         }
       }
-      for (let i = 0; i < roomData.cSites.length; i++) {
-        const buildTarget = Game.getObjectById(roomData.cSites[i]);
-        if (buildTarget) {
-          return this.creepManager.CreateNewCreepActivity({
-            action: AT_Build,
-            creepID: creep.name,
-            targetID: roomData.cSites[i]
-          }, this.pid);
-        }
-      }
+      // If we're here then no boost orders are present
+      this.memory.needsBoost = false;
+    }
 
+    if (!this.memory.hasRequestedBoost && (creep.spawning || creep.ticksToLive! > 1480)) {
+      const numResourceRequired = creep.getActiveBodyparts(WORK) * 30;
+      if (creep.room.terminal && creep.room.terminal.store.getUsedCapacity(RESOURCE_GHODIUM_HYDRIDE) >= numResourceRequired) {
+        roomData.labRequests.push({
+          amount: numResourceRequired,
+          creepID: creep.name,
+          forBoost: true,
+          resourceType: RESOURCE_GHODIUM_HYDRIDE
+        });
+        this.memory.hasRequestedBoost = true;
+        this.memory.needsBoost = true;
+      }
+    }
+
+    const carryRatio = creep.store.getUsedCapacity() / creep.store.getCapacity();
+    if (carryRatio >= 0.50) {
       if (creep.room.controller && creep.room.controller.my) {
         return this.creepManager.CreateNewCreepActivity({
           action: AT_Upgrade,
@@ -171,7 +163,5 @@ class Worker extends SoloJob<Worker_Memory, MemCache> {
     }, this.pid);
   }
 
-  HandleNoActivity(creep: Creep) {
-    this.hasRun = false;
-  }
+  HandleNoActivity(creep: Creep) { }
 }

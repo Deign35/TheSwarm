@@ -115,7 +115,7 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
 
   killProcess(id: PID, msg: string = ''): void {
     const pinfo = this.processTable[id];
-    if (!pinfo) return;
+    if (!pinfo || pinfo.end) return;
     if (msg) {
       this.log.info(`${id} killed - ${msg}`);
     }

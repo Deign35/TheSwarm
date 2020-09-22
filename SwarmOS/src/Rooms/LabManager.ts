@@ -116,7 +116,7 @@ class LabManager extends BasicProcess<LabManager_Memory, MemCache> {
             resourceType: request.resourceType
           };
           this.RequestResourcesIfNeeded(lab.id, request.resourceType, request.amount);
-          roomData.labRequests.splice(0, 1);
+          roomData.labRequests.splice(i--, 1);
           continue;
         }
 
@@ -181,24 +181,26 @@ class LabManager extends BasicProcess<LabManager_Memory, MemCache> {
           }
           this.RequestResourcesIfNeeded(lab3ID, reactionComponents[1], request.amount);
         }
-        roomData.labRequests.splice(0, 1);
+        roomData.labRequests.splice(i--, 1);
         break;
       }
     }
 
-    let hasOrders = false;
+    let hasOtherOrders = false;
+    let hasBoostOrders = false;
     for (const labID in roomData.labOrders) {
       const order = roomData.labOrders[labID];
       const lab = Game.getObjectById<StructureLab>(labID);
       if (!lab) { continue; }
 
       if (order.isForBoost && order.creepIDs) {
-        hasOrders = true;
+        hasBoostOrders = true;
         for (let i = 0; i < order.creepIDs.length; i++) {
           const creep = Game.creeps[order.creepIDs[i]!];
           if (!creep || creep.pos.getRangeTo(lab) > 1) { continue; }
           if (lab.boostCreep(creep) == OK) {
             order.amount -= creep.getActiveBodyparts(ResourceToPart[lab.mineralType!]) * 30;
+            order.creepIDs.splice(order.creepIDs.indexOf(creep.name), 1);
           }
         }
       } else if (order.lab_2 && order.lab_3) {
@@ -206,7 +208,7 @@ class LabManager extends BasicProcess<LabManager_Memory, MemCache> {
         const lab3 = Game.getObjectById<StructureLab>(order.lab_3);
 
         if (!lab2 || !lab3) { continue; }
-        hasOrders = true;
+        hasOtherOrders = true;
         if (order.isReverse) {
           if (lab.reverseReaction(lab2, lab3) == OK) {
             order.amount -= 5;
@@ -219,7 +221,7 @@ class LabManager extends BasicProcess<LabManager_Memory, MemCache> {
       }
     }
 
-    if (hasOrders && roomData.structures[STRUCTURE_TERMINAL].length > 0 && roomData.structures[STRUCTURE_LAB].length > 0) {
+    if ((hasOtherOrders || hasBoostOrders) && roomData.structures[STRUCTURE_TERMINAL].length > 0 && roomData.structures[STRUCTURE_LAB].length > 0) {
       if (!this.memory.scientistPID || !this.kernel.getProcessByPID(this.memory.scientistPID)) {
         this.memory.scientistPID = this.kernel.startProcess(CPKG_Scientist, {
           expires: true,
@@ -230,7 +232,9 @@ class LabManager extends BasicProcess<LabManager_Memory, MemCache> {
       }
     }
 
-    this.sleeper.sleep(this.pid, 5);
+    if (!hasBoostOrders) {
+      this.sleeper.sleep(this.pid, 5);
+    }
     return ThreadState_Done;
   }
 

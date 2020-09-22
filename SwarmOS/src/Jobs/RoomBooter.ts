@@ -68,7 +68,7 @@ class RoomBooter extends SoloJob<RoomBooter_Memory, MemCache> {
       return this.creepManager.CreateNewCreepActivity({
         action: AT_Upgrade,
         creepID: creep.name,
-        targetID: roomData.structures[STRUCTURE_CONTROLLER][0]
+        targetID: creep.room.controller!.id
       }, this.pid)
     }
 

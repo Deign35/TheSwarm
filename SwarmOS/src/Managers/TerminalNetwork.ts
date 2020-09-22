@@ -45,13 +45,15 @@ class TerminalNetwork extends BasicProcess<TerminalNetwork_Memory, TerminalNetwo
       }
     }
 
+    const usedTerminals: string[] = [];
     for (let i = 0; i < this.memory.requests.length; i++) {
       const request = this.memory.requests[i];
       for (let j = 0; j < this.cache.roomsWithTerminal.length; j++) {
         const room = Game.rooms[this.cache.roomsWithTerminal[j]];
-        if (room.name == request.roomID || !room.terminal) { continue; }
+        if (room.name == request.roomID || !room.terminal || usedTerminals.includes(room.name)) { continue; }
         if (room.terminal.store.getUsedCapacity(request.resourceType) >= request.amount) {
           if (room.terminal.send(request.resourceType, request.amount, request.roomID) == OK) {
+            usedTerminals.push(room.name);
             this.memory.requests.splice(i--, 1);
             break;
           }

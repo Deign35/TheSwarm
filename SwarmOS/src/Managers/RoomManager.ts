@@ -107,7 +107,6 @@ class RoomManagerExtension extends ExtensionBase implements IRoomManagerExtensio
           needsRepair: [],
           structures: {
             container: [],
-            controller: [],
             extension: [],
             extractor: [],
             lab: [],
@@ -144,7 +143,6 @@ class RoomManagerExtension extends ExtensionBase implements IRoomManagerExtensio
 
     roomState.structures = {
       container: [],
-      controller: [],
       extension: [],
       extractor: [],
       lab: [],

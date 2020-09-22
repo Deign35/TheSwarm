@@ -52,7 +52,9 @@ class Scientist extends SoloJob<Scientist_Memory, MemCache> {
           actionResource = order.resourceType;
           target = labID;
           amount = Math.min(creep.store.getUsedCapacity(actionResource), order.amount);
-          order.amount -= amount;
+          if (!order.isForBoost) {
+            order.amount -= amount;
+          }
           break;
         }
       }
@@ -99,6 +101,14 @@ class Scientist extends SoloJob<Scientist_Memory, MemCache> {
       }
     }
 
+    if (curAction == AT_NoOp) {
+      return this.creepManager.CreateNewCreepActivity({
+        action: AT_MoveToPosition,
+        amount: 1,
+        creepID: creep.name,
+        targetID: terminal.id
+      }, this.pid);
+    }
     return this.creepManager.CreateNewCreepActivity({
       action: curAction,
       creepID: creep.name,
