@@ -77,15 +77,6 @@ class Harvester extends SoloJob<HarvesterMemory, MemCache> {
       }, this.pid);
     }
 
-    if (source.energy > 0) {
-      return this.creepManager.CreateNewCreepActivity({
-        targetID: source.id,
-        action: AT_Harvest,
-        creepID: creep.name,
-        exemptedFailures: [ERR_FULL]
-      }, this.pid);
-    }
-
     const container = Game.getObjectById<StructureContainer | ConstructionSite>(this.memory.container);
     if (creep.store[RESOURCE_ENERGY] > 0) {
       if (container) {
@@ -121,6 +112,23 @@ class Harvester extends SoloJob<HarvesterMemory, MemCache> {
           }
         }
       }
+    }
+
+    if (source.energy > 0) {
+      if (container && (container as StructureContainer).hitsMax &&
+        (container as StructureContainer).hits < (container as StructureContainer).hitsMax) {
+        return this.creepManager.CreateNewCreepActivity({
+          targetID: source.id,
+          action: AT_Harvest,
+          creepID: creep.name
+        }, this.pid);
+      }
+      return this.creepManager.CreateNewCreepActivity({
+        targetID: source.id,
+        action: AT_Harvest,
+        creepID: creep.name,
+        exemptedFailures: [ERR_FULL]
+      }, this.pid);
     }
 
     return;

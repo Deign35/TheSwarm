@@ -21,7 +21,7 @@ class MineralHarvester extends SquadJob<MineralHarvester_Memory, MemCache> {
       const body = [WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, MOVE, MOVE, MOVE, MOVE, MOVE];
       return this.spawnManager.requestSpawn({
         body: body,
-        creepName: this.memory.roomID + (Game.time + '_HM').slice(-6),
+        creepName: this.memory.roomID + "_" + (Game.time + '_HM').slice(-6),
         owner_pid: this.pid
       }, this.memory.roomID, Priority_Medium, {
           parentPID: this.pid
@@ -30,7 +30,7 @@ class MineralHarvester extends SquadJob<MineralHarvester_Memory, MemCache> {
       const body = [CARRY, CARRY, CARRY, MOVE, MOVE, MOVE];
       return this.spawnManager.requestSpawn({
         body: body,
-        creepName: this.memory.roomID + (Game.time + '_HMR').slice(-7),
+        creepName: this.memory.roomID + "_" + (Game.time + '_HMR').slice(-7),
         owner_pid: this.pid
       }, this.memory.roomID, Priority_Low, {
           parentPID: this.pid
@@ -42,6 +42,18 @@ class MineralHarvester extends SquadJob<MineralHarvester_Memory, MemCache> {
   protected CreateCustomCreepActivity(squadID: number, creep: Creep): string | undefined {
     const roomData = this.roomManager.GetRoomData(this.memory.roomID)!;
     const mineral = Game.getObjectById<Mineral>(roomData.mineralIDs[0])!;
+    if (!this.memory.container) {
+      const container = mineral.pos.findClosestByRange(FIND_STRUCTURES, {
+        filter: (struct) => {
+          return struct.structureType == STRUCTURE_CONTAINER;
+        }
+      });
+
+      if (container && container.pos.getRangeTo(mineral) == 1) {
+        this.memory.container = container.id;
+      }
+    }
+
     if (squadID == 0) {
       if (mineral.pos.getRangeTo(creep.pos) > 1) {
         let targetPos = mineral.pos;
@@ -61,14 +73,6 @@ class MineralHarvester extends SquadJob<MineralHarvester_Memory, MemCache> {
         }, this.pid);
       }
 
-      if (!this.memory.container) {
-        const structs = creep.pos.lookFor(LOOK_STRUCTURES);
-        for (let i = 0; i < structs.length; i++) {
-          if (structs[i].structureType == STRUCTURE_CONTAINER) {
-            this.memory.container = structs[0].id;
-          }
-        }
-      }
       if (roomData.structures[STRUCTURE_EXTRACTOR].length > 0) {
         return this.creepManager.CreateNewCreepActivity({
           action: AT_Harvest,
@@ -77,7 +81,14 @@ class MineralHarvester extends SquadJob<MineralHarvester_Memory, MemCache> {
         }, this.pid);
       }
     } else if (squadID == 1) {
-      if (creep.store.getUsedCapacity() > creep.store.getFreeCapacity()) {
+      if (creep.ticksToLive && creep.ticksToLive < 50 && creep.store.getUsedCapacity() == 0) {
+        return this.creepManager.CreateNewCreepActivity({
+          action: AT_Suicide,
+          creepID: creep.name,
+          pos: creep.pos
+        }, this.pid);
+      }
+      if (creep.store.getUsedCapacity() > creep.store.getFreeCapacity() || (creep.ticksToLive && creep.ticksToLive < 50)) {
         // Deposit to the terminal
         if (roomData.structures[STRUCTURE_TERMINAL].length > 0) {
           const terminal = Game.getObjectById<StructureTerminal>(roomData.structures[STRUCTURE_TERMINAL][0]);

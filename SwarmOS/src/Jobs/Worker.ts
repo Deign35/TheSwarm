@@ -64,15 +64,25 @@ class Worker extends SoloJob<Worker_Memory, MemCache> {
     const carryRatio = creep.store.getUsedCapacity() / creep.store.getCapacity();
     const roomData = this.roomManager.GetRoomData(creep.room.name)!;
     if (carryRatio >= 0.50) {
+      let target: Structure | undefined = undefined;
+      let closest: number = 100000;
       for (let i = 0; i < roomData.needsRepair.length; i++) {
         const repairTarget = Game.getObjectById<Structure>(roomData.needsRepair[i]);
         if (repairTarget && repairTarget.hitsMax > repairTarget.hits) {
-          return this.creepManager.CreateNewCreepActivity({
-            action: AT_Repair,
-            creepID: creep.name,
-            targetID: roomData.needsRepair[i]
-          }, this.pid);
+          const dist = creep.pos.getRangeTo(repairTarget);
+          if (dist < closest) {
+            closest = dist;
+            target = repairTarget;
+          }
         }
+      }
+
+      if (target) {
+        return this.creepManager.CreateNewCreepActivity({
+          action: AT_Repair,
+          creepID: creep.name,
+          targetID: target.id
+        }, this.pid);
       }
       for (let i = 0; i < roomData.cSites.length; i++) {
         const buildTarget = Game.getObjectById(roomData.cSites[i]);

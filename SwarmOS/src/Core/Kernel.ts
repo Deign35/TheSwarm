@@ -244,7 +244,7 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
     }
     try {
       const proc = this.getProcessByPID(pid)!;
-      if (proc.PrepTick) {
+      if (proc && proc.PrepTick) {
         proc.PrepTick();
       }
       this._curTickState[pid] = TS_Active;
