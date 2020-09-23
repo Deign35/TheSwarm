@@ -31,13 +31,6 @@ if (!Memory.VERSION || Memory.VERSION != SWARM_VERSION_DATE) {
   try {
     let oldVersion = Memory.VERSION;
     if (oldVersion) {
-      const roomIDs = Object.keys(Memory.roomData.roomStateData);
-      for (let i = 0; i < roomIDs.length; i++) {
-        if(!Memory.roomData.roomStateData[roomIDs[i]].terminalRequests) {
-          Memory.roomData.roomStateData[roomIDs[i]].terminalRequests = [];
-        }
-      }
-      
     }
   } catch (ex) {
     console.log(`Failed to Update OS version ${ex}.`)
