@@ -102,6 +102,20 @@ class Scientist extends SoloJob<Scientist_Memory, MemCache> {
     }
 
     if (curAction == AT_NoOp) {
+      if (roomData.terminalRequests.length > 0) {
+        const request = roomData.terminalRequests.pop()!;
+        curAction = AT_Withdraw;
+        target = creep.room.storage!.id;
+        actionResource = request.resourceType;
+        amount = Math.min(request.amount, creep.store.getFreeCapacity());
+        if (amount < request.amount) {
+          request.amount -= amount;
+          roomData.terminalRequests.push(request);
+        }
+      }
+    }
+
+    if (curAction == AT_NoOp) {
       return this.creepManager.CreateNewCreepActivity({
         action: AT_MoveToPosition,
         amount: 1,

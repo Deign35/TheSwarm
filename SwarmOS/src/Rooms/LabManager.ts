@@ -142,14 +142,19 @@ class LabManager extends BasicProcess<LabManager_Memory, MemCache> {
 
         const reactionComponents = ReverseReactions[request.resourceType];
         if (request.reverseReaction) {
+          let requestedAmount = request.amount;
+          const lab = Game.getObjectById<StructureLab>(lab1ID)!;
+          if (lab.mineralType == request.resourceType && lab.store.getUsedCapacity(request.resourceType) > 0) {
+            requestedAmount -= lab.store.getUsedCapacity(request.resourceType);
+          }
           roomData.labOrders[lab1ID] = {
-            amount: request.amount,
+            amount: requestedAmount,
             isReverse: true,
             lab_2: lab2ID,
             lab_3: lab3ID,
             resourceType: request.resourceType
           }
-          this.RequestResourcesIfNeeded(lab1ID, request.resourceType, request.amount);
+          this.RequestResourcesIfNeeded(lab1ID, request.resourceType, requestedAmount);
 
           roomData.labOrders[lab2ID] = {
             amount: request.amount,
@@ -170,16 +175,27 @@ class LabManager extends BasicProcess<LabManager_Memory, MemCache> {
             resourceType: request.resourceType
           }
 
+          let requestedAmount2 = request.amount;
+          const lab2 = Game.getObjectById<StructureLab>(lab2ID)!;
+          if (lab2.mineralType == reactionComponents[0] && lab2.store.getUsedCapacity(reactionComponents[0])! > 0) {
+            requestedAmount2 -= lab2.store.getUsedCapacity(reactionComponents[0])!;
+          }
           roomData.labOrders[lab2ID] = {
-            amount: request.amount,
+            amount: requestedAmount2,
             resourceType: reactionComponents[0]
           }
-          this.RequestResourcesIfNeeded(lab2ID, reactionComponents[0], request.amount);
+          this.RequestResourcesIfNeeded(lab2ID, reactionComponents[0], requestedAmount2);
+
+          let requestedAmount3 = request.amount;
+          const lab3 = Game.getObjectById<StructureLab>(lab3ID)!;
+          if (lab3.mineralType == reactionComponents[1] && lab3.store.getUsedCapacity(reactionComponents[1])! > 0) {
+            requestedAmount3 -= lab3.store.getUsedCapacity(reactionComponents[1])!;
+          }
           roomData.labOrders[lab3ID] = {
-            amount: request.amount,
+            amount: requestedAmount3,
             resourceType: reactionComponents[1]
           }
-          this.RequestResourcesIfNeeded(lab3ID, reactionComponents[1], request.amount);
+          this.RequestResourcesIfNeeded(lab3ID, reactionComponents[1], requestedAmount3);
         }
         roomData.labRequests.splice(i--, 1);
         break;
@@ -204,11 +220,13 @@ class LabManager extends BasicProcess<LabManager_Memory, MemCache> {
           }
         }
       } else if (order.lab_2 && order.lab_3) {
+        hasOtherOrders = true;
         const lab2 = Game.getObjectById<StructureLab>(order.lab_2);
         const lab3 = Game.getObjectById<StructureLab>(order.lab_3);
+        if (!lab2 || !lab3 ||
+          lab2.mineralType != roomData.labOrders[order.lab_2].resourceType ||
+          lab3.mineralType != roomData.labOrders[order.lab_3].resourceType) { continue; }
 
-        if (!lab2 || !lab3) { continue; }
-        hasOtherOrders = true;
         if (order.isReverse) {
           if (lab.reverseReaction(lab2, lab3) == OK) {
             order.amount -= 5;

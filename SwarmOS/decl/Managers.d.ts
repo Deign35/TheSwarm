@@ -60,6 +60,11 @@ declare interface LabRequest {
   creepID?: CreepID;
 }
 
+declare interface TerminalRequest {
+  resourceType: ResourceConstant;
+  amount: number;
+}
+
 interface RoomState extends MemBase {
   roomType: RoomType;
   lastUpdated: number;
@@ -69,6 +74,7 @@ interface RoomState extends MemBase {
 
   labOrders: IDictionary<ObjectID, LabOrder>;
   labRequests: LabRequest[];
+  terminalRequests: TerminalRequest[];
 
   activityPID?: PID;
   cSites: ObjectID[];
@@ -144,12 +150,14 @@ declare interface TerminalNetworkRequest {
   roomID: RoomID;
   resourceType: ResourceConstant;
   amount: number;
+  transferingFromStorage?: boolean;
 }
 declare interface TerminalNetwork_Memory extends MemBase {
   requests: TerminalNetworkRequest[];
 }
 declare interface TerminalNetwork_Cache extends MemCache {
   roomsWithTerminal?: ObjectID[];
+  roomsWithStorage?: ObjectID[];
 }
 declare interface ITerminalNetworkExtensions {
   RequestResources(request: TerminalNetworkRequest): void;
