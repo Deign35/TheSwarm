@@ -153,4 +153,5 @@ declare interface TerminalNetwork_Cache extends MemCache {
 }
 declare interface ITerminalNetworkExtensions {
   RequestResources(request: TerminalNetworkRequest): void;
+  HasResourceInNetwork(resourceType: ResourceConstant, amount: number): boolean;
 }

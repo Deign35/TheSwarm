@@ -86,4 +86,16 @@ class TerminalNetworkExtensions extends ExtensionBase implements ITerminalNetwor
   RequestResources(request: TerminalNetworkRequest): void {
     this.memory.requests.push(request);
   }
+
+  HasResourceInNetwork(resourceType: ResourceConstant, amount: number): boolean {
+    for (const roomID in Game.rooms) {
+      const room = Game.rooms[roomID];
+      if (room.terminal && room.terminal.my) {
+        if (room.terminal.store.getUsedCapacity(resourceType) >= amount) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
 }

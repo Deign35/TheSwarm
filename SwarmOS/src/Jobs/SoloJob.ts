@@ -9,6 +9,8 @@ export abstract class SoloJob<T extends SoloJob_Memory, U extends MemCache> exte
   roomManager!: IRoomManagerExtension;
   @extensionInterface(EXT_SpawnManager)
   spawnManager!: ISpawnManagerExtensions;
+  @extensionInterface(EXT_TerminalNetwork)
+  terminalNetwork!: ITerminalNetworkExtensions;
 
   RunThread(): ThreadState {
     let creep: Creep | undefined = undefined;

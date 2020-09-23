@@ -1,9 +1,1 @@
-Input vs Output statistics for resources to measure everything else off of
-Terrain meshes
-Tower/Room D
-Creep lifetime (?)
-pathfinding
-multi-room harvesting
-statisticsconsole commands
-visual tool
-flag commands
+Labs don't currently check if they have the right mineral before performing reactions.

@@ -57,6 +57,10 @@ declare interface ControllerClaimer_Memory extends SoloJob_Memory {
 }
 declare interface RemoteRefiller_Memory extends SoloJob_Memory { }
 declare interface Scientist_Memory extends SoloJob_Memory { }
+declare interface RoomDefender_Memory extends SoloJob_Memory {
+  needsBoost: boolean;
+  hasRequestedBoost: boolean;
+}
 
 declare interface SquadJob_Memory extends MemBase {
   expires?: boolean;

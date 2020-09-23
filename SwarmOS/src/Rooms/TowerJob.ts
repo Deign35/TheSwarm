@@ -33,8 +33,8 @@ class TowerJob extends BasicProcess<Tower_Memory, MemCache> {
       if (myCreeps[i].hits < myCreeps[i].hitsMax) {
         const towerIDs = roomData.structures[STRUCTURE_TOWER];
         for (let j = 0; j < towerIDs.length; j++) {
-          const tower = Game.getObjectById<StructureTower>(towerIDs[j])!;
-          if (tower.store[RESOURCE_ENERGY] > 500) {
+          const tower = Game.getObjectById<StructureTower>(towerIDs[j]);
+          if (tower && tower.store[RESOURCE_ENERGY] > 500) {
             tower.heal(myCreeps[i]);
           }
         }
@@ -57,8 +57,8 @@ class TowerJob extends BasicProcess<Tower_Memory, MemCache> {
 
     const towerIDs = roomData.structures[STRUCTURE_TOWER];
     for (let i = 0; i < towerIDs.length; i++) {
-      const tower = Game.getObjectById<StructureTower>(towerIDs[i])!;
-      if (tower.store[RESOURCE_ENERGY] > 0) {
+      const tower = Game.getObjectById<StructureTower>(towerIDs[i]);
+      if (tower && tower.store[RESOURCE_ENERGY] > 0) {
         let closestCreep = 0
         let distance = tower.pos.getRangeTo(hostiles[closestCreep]);
         for (let j = 1; j < hostiles.length; j++) {
