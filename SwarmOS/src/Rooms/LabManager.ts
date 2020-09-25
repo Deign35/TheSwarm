@@ -142,19 +142,14 @@ class LabManager extends BasicProcess<LabManager_Memory, MemCache> {
 
         const reactionComponents = ReverseReactions[request.resourceType];
         if (request.reverseReaction) {
-          let requestedAmount = request.amount;
-          const lab = Game.getObjectById<StructureLab>(lab1ID)!;
-          if (lab.mineralType == request.resourceType && lab.store.getUsedCapacity(request.resourceType) > 0) {
-            requestedAmount -= lab.store.getUsedCapacity(request.resourceType);
-          }
           roomData.labOrders[lab1ID] = {
-            amount: requestedAmount,
+            amount: request.amount,
             isReverse: true,
             lab_2: lab2ID,
             lab_3: lab3ID,
             resourceType: request.resourceType
           }
-          this.RequestResourcesIfNeeded(lab1ID, request.resourceType, requestedAmount);
+          this.RequestResourcesIfNeeded(lab1ID, request.resourceType, request.amount);
 
           roomData.labOrders[lab2ID] = {
             amount: request.amount,
@@ -175,27 +170,17 @@ class LabManager extends BasicProcess<LabManager_Memory, MemCache> {
             resourceType: request.resourceType
           }
 
-          let requestedAmount2 = request.amount;
-          const lab2 = Game.getObjectById<StructureLab>(lab2ID)!;
-          if (lab2.mineralType == reactionComponents[0] && lab2.store.getUsedCapacity(reactionComponents[0])! > 0) {
-            requestedAmount2 -= lab2.store.getUsedCapacity(reactionComponents[0])!;
-          }
           roomData.labOrders[lab2ID] = {
-            amount: requestedAmount2,
+            amount: request.amount,
             resourceType: reactionComponents[0]
           }
-          this.RequestResourcesIfNeeded(lab2ID, reactionComponents[0], requestedAmount2);
+          this.RequestResourcesIfNeeded(lab2ID, reactionComponents[0], request.amount);
 
-          let requestedAmount3 = request.amount;
-          const lab3 = Game.getObjectById<StructureLab>(lab3ID)!;
-          if (lab3.mineralType == reactionComponents[1] && lab3.store.getUsedCapacity(reactionComponents[1])! > 0) {
-            requestedAmount3 -= lab3.store.getUsedCapacity(reactionComponents[1])!;
-          }
           roomData.labOrders[lab3ID] = {
-            amount: requestedAmount3,
+            amount: request.amount,
             resourceType: reactionComponents[1]
           }
-          this.RequestResourcesIfNeeded(lab3ID, reactionComponents[1], requestedAmount3);
+          this.RequestResourcesIfNeeded(lab3ID, reactionComponents[1], request.amount);
         }
         roomData.labRequests.splice(i--, 1);
         break;
