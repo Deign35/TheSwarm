@@ -137,7 +137,9 @@ class RoomDefender extends SoloJob<RoomDefender_Memory, MemCache> {
       }, this.pid);
     }
 
-    const pathToTarget = creep.pos.findPathTo(target);
+    const pathToTarget = creep.pos.findPathTo(target, {
+      range: 3
+    });
     for (let i = 0; i < pathToTarget.length; i++) {
       const lookResult = creep.room.lookForAt(LOOK_STRUCTURES, pathToTarget[i].x, pathToTarget[i].y);
       for (let j = 0; j < lookResult.length; j++) {
