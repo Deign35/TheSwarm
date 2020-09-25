@@ -94,7 +94,7 @@ class RoomDefender extends SoloJob<RoomDefender_Memory, MemCache> {
             resourceType: RESOURCE_CATALYZED_KEANIUM_ALKALIDE
           });
         }
-        if (this.terminalNetwork.HasResourceInNetwork(RESOURCE_GHODIUM_ALKALIDE, numCGARequired)) {
+        if (this.terminalNetwork.HasResourceInNetwork(RESOURCE_CATALYZED_GHODIUM_ALKALIDE, numCGARequired)) {
           roomData.labRequests.push({
             amount: numCGARequired,
             creepID: creep.name,
@@ -120,13 +120,18 @@ class RoomDefender extends SoloJob<RoomDefender_Memory, MemCache> {
 
     // Find a target
     let target: ObjectTypeWithID | undefined = undefined;
+    let distToTarget = 10000;
     const hostiles = creep.room.find(FIND_HOSTILE_CREEPS);
     for (let i = 0; i < hostiles.length; i++) {
       if (hostiles[i].getActiveBodyparts(HEAL) > 0) {
         target = hostiles[i];
         break;
-      } else if (!target) {
+      }
+
+      const dist = creep.pos.getRangeTo(hostiles[i]);
+      if (dist < distToTarget) {
         target = hostiles[i];
+        distToTarget = dist;
       }
     }
 
@@ -167,7 +172,8 @@ class RoomDefender extends SoloJob<RoomDefender_Memory, MemCache> {
     return this.creepManager.CreateNewCreepActivity({
       action: AT_RangedAttack,
       creepID: creep.name,
-      targetID: target.id
+      targetID: target.id,
+      amount: 3
     }, this.pid);
   }
 
