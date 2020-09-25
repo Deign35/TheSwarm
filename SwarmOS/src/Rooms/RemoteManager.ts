@@ -13,11 +13,7 @@ class RemoteManager extends BasicProcess<RemoteManager_Memory, MemCache> {
     if (!this.memory.invasion && targetRoom && Game.time % 11 == 0) {
       const invaders = targetRoom.find(FIND_HOSTILE_CREEPS);
       for (let i = 0; i < invaders.length; i++) {
-        try {
-          this.log.alert(`Invasion detected: ${targetRoom.link}`);
-        } catch (e) {
-          this.log.fatal('Room.link failed');
-        }
+        this.log.alert(`Invasion detected: ${targetRoom.link}`);
         this.memory.invasion = invaders[i].ticksToLive!;
         if (!this.memory.remoteProtector || !this.kernel.getProcessByPID(this.memory.remoteProtector)) {
           this.memory.remoteProtector = this.kernel.startProcess(BPKG_RemoteProtector, {
