@@ -99,7 +99,7 @@ class RemoteManager extends BasicProcess<RemoteManager_Memory, MemCache> {
       }
     }
 
-    let numWorkers = 2 * sources.length + Math.floor(totalGroundResources / 1000);
+    let numWorkers = 2 * sources.length + Math.max(3, Math.floor(totalGroundResources / 1000));
     while (this.memory.refillerPIDs.length < numWorkers) {
       this.memory.refillerPIDs.push(this.kernel.startProcess(CPKG_RemoteRefiller, {
         expires: true,

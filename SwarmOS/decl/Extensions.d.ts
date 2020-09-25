@@ -105,7 +105,7 @@ declare interface ICreepManagerExtensions extends IPackageExtension {
   RunCreepAction(args: CreepActionArgs): ScreepsReturnCode;
   ValidateActionTarget(actionType: ActionType, target: any, resourceType?: ResourceConstant): boolean;
   CreepIsInRange(actionType: ActionType, pos1: RoomPosition, pos2: RoomPosition): boolean;
-  MoveCreep(creep: Creep, pos: RoomPosition): ScreepsReturnCode;
+  MoveCreep(creep: Creep, pos: RoomPosition, range?: number): ScreepsReturnCode;
   EvaluateCreep(creep: Creep): CreepEvaluation;
 }
 
