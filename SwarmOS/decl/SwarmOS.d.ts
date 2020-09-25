@@ -39,7 +39,6 @@ declare interface IProcess {
   pkgName: string;
   pid: PID;
   parentPID?: PID;
-  rngSeed?: number;
   memory: MemBase
 
   PrepTick?(): void;
@@ -57,8 +56,6 @@ declare interface IProcessContext {
   readonly pkgName: string;
   readonly pid: PID;
   readonly pPID: PID;
-  readonly isActive: boolean;
-  readonly rngSeed: number;
 }
 
 declare interface ProcInfo {

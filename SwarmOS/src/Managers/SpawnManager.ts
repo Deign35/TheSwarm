@@ -57,7 +57,7 @@ class SpawnManager extends BasicProcess<SpawnManager_Memory, MemCache> {
     const activeSpawns = {};
     for (let i = 0, length = spawnIDs.length; i < length; i++) {
       const spawn = Game.spawns[spawnIDs[i]];
-      if (spawn.isActive() && !spawn.spawning) {
+      if (!spawn.spawning) {
         activeSpawns[spawnIDs[i]] = spawn;
       }
     }

@@ -23,7 +23,6 @@ export abstract class BasicProcess<T extends MemBase, U extends MemCache> implem
   protected get log() { return this._logger; }
   protected get logID() { return DEFAULT_LOG_ID; }
   protected get logLevel(): LogLevel { return DEFAULT_LOG_LEVEL; }
-  get rngSeed(): number { return this.context.rngSeed; }
 
   PrepTick?(): void;
   abstract RunThread(): ThreadState;

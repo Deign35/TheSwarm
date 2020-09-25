@@ -35,27 +35,7 @@ class ControllerClaimer extends SoloJob<ControllerClaimer_Memory, MemCache> {
 
   protected CreateCustomCreepActivity(creep: Creep): PID | undefined {
     if (creep.room.name != this.memory.targetRoom) {
-      const route = this.mapManager.GetRoute(creep.room.name, this.memory.targetRoom);
-      if (route == -2) {
-        this.log.error(`Couldn't find a path to ${this.memory.targetRoom}`)
-        this.EndProcess();
-        return;
-      }
-
-      let exit = null;
-      if (route.length > 0) {
-        exit = creep.pos.findClosestByPath(route[0].exit);
-      }
-      if (!exit) {
-        this.log.error(`Couldn't find path to exit: ${creep.room.name}`);
-        return;
-      }
-      return this.creepManager.CreateNewCreepActivity({
-        action: AT_MoveToPosition,
-        creepID: creep.name,
-        pos: exit,
-        amount: 0
-      }, this.pid);
+      return this.MoveToRoom(creep, this.memory.targetRoom);
     }
 
     if (creep.room.controller) {

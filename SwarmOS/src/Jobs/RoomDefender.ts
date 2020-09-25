@@ -46,7 +46,7 @@ class RoomDefender extends SoloJob<RoomDefender_Memory, MemCache> {
         RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK,  // 750
         RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK,  // 750
         RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK   // 750
-      ];
+      ]; // 5100
     } else if (Game.rooms[this.memory.homeRoom].energyCapacityAvailable >= 1850) {
       body = [TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, // 100
         MOVE, MOVE, MOVE, MOVE, MOVE,                                               // 250
@@ -55,7 +55,7 @@ class RoomDefender extends SoloJob<RoomDefender_Memory, MemCache> {
       ]; // 1850
     }
     return this.spawnManager.requestSpawn({
-      body: body, // 5100
+      body: body,
       creepName: this.memory.homeRoom + "_" + (Game.time + '_RD').slice(-6),
       owner_pid: this.pid
     }, this.memory.homeRoom, Priority_Highest, {

@@ -89,10 +89,6 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
     const context: IProcessContext = {
       pid: pInfo.pid,
       pkgName: pInfo.PKG,
-      rngSeed: GetRandomIndex(primes_3000),
-      get isActive() {
-        return kernelContext.processTable[id] && !kernelContext.processTable[id].end;
-      },
       get pPID() {
         return kernelContext.processTable[id] && kernelContext.processTable[id].pP || "";
       },
