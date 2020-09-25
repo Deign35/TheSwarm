@@ -61,6 +61,10 @@ declare interface RoomDefender_Memory extends SoloJob_Memory {
   needsBoost: boolean;
   hasRequestedBoost: boolean;
 }
+declare interface RoomDefender_2_Memory extends SoloJob_Memory {
+  needsBoost: boolean;
+  hasRequestedBoost: boolean;
+}
 
 declare interface SquadJob_Memory extends MemBase {
   expires?: boolean;

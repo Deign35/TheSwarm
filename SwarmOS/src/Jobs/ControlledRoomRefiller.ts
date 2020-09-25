@@ -20,7 +20,11 @@ class ControlledRoomRefiller extends SoloJob<ControlledRoomRefiller_Memory, MemC
 
     if (!this.memory.creepID && Game.time - this.memory.lastTime > 200 && !this.memory.expires) {
       this.memory.lastTime = Game.time;
-      this.log.alert("Spawning an emergency refiller for room: " + this.memory.homeRoom);
+      try {
+        this.log.alert("Spawning an emergency refiller for room: " + Game.rooms[this.memory.homeRoom].link);
+      } catch (e) {
+        this.log.fatal("Failed to link for emergency refiller");
+      }
       const sID = this.spawnManager.requestSpawn({
         body: [CARRY, CARRY, CARRY, MOVE, MOVE, MOVE],
         creepName: this.memory.homeRoom + "_Ref_Emergency",

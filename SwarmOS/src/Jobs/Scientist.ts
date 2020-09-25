@@ -116,6 +116,25 @@ class Scientist extends SoloJob<Scientist_Memory, MemCache> {
     }
 
     if (curAction == AT_NoOp) {
+      for (let i = 0; i < roomData.tombstones.length; i++) {
+        const tombstone = Game.getObjectById<Tombstone>(roomData.tombstones[i]);
+        if (tombstone) {
+          for (let key in tombstone.store) {
+            if (key != RESOURCE_ENERGY) {
+              curAction = AT_Withdraw;
+              actionResource = key as ResourceConstant;
+              target = tombstone.id;
+              amount = tombstone.store.getUsedCapacity(actionResource);
+              break;
+            }
+          }
+        }
+
+        if (curAction != AT_NoOp) { break; }
+      }
+    }
+
+    if (curAction == AT_NoOp) {
       return this.creepManager.CreateNewCreepActivity({
         action: AT_MoveToPosition,
         amount: 1,

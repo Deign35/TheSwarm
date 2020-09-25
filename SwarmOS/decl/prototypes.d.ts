@@ -1,4 +1,5 @@
 interface Room {
+  link: string;
   id: RoomID;
   type: RoomType;
   SwarmOS: boolean;

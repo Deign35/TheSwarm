@@ -13,7 +13,11 @@ class RemoteManager extends BasicProcess<RemoteManager_Memory, MemCache> {
     if (!this.memory.invasion && targetRoom && Game.time % 11 == 0) {
       const invaders = targetRoom.find(FIND_HOSTILE_CREEPS);
       for (let i = 0; i < invaders.length; i++) {
-        this.log.alert(`Invasion detected: <a href="#!/room/${Game.shard.name}/${this.memory.targetRoom}">${this.memory.targetRoom}</a>`);
+        try {
+          this.log.alert(`Invasion detected: ${targetRoom.link}`);
+        } catch (e) {
+          this.log.fatal('Room.link failed');
+        }
         this.memory.invasion = invaders[i].ticksToLive!;
         if (!this.memory.remoteProtector || !this.kernel.getProcessByPID(this.memory.remoteProtector)) {
           this.memory.remoteProtector = this.kernel.startProcess(BPKG_RemoteProtector, {
@@ -99,7 +103,7 @@ class RemoteManager extends BasicProcess<RemoteManager_Memory, MemCache> {
       }
     }
 
-    let numWorkers = 2 * sources.length + Math.max(3, Math.floor(totalGroundResources / 1000));
+    let numWorkers = 2 * sources.length + Math.min(3, Math.floor(totalGroundResources / 1000));
     while (this.memory.refillerPIDs.length < numWorkers) {
       this.memory.refillerPIDs.push(this.kernel.startProcess(CPKG_RemoteRefiller, {
         expires: true,

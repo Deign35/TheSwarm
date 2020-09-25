@@ -78,6 +78,7 @@
                 "RemoteRefiller": "remoteRefiller",
                 "RoomBooter": "roomBooter",
                 "RoomDefender": "roomDefender",
+                "RoomDefender_2": "roomDefender_2",
                 "Scientist": "scientist",
                 "Scout": "scout",
                 "Upgrader": "upgrader",
