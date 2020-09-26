@@ -136,7 +136,15 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
     }
 
     if (!this._processCache[pid]) {
-      this.createProcess(pid);
+      try {
+        this.createProcess(pid);
+      } catch {
+        if (this.processTable[pid]) {
+          this.processTable[pid].end = Game.time;
+        }
+        this.log.error(`Attempted to create a process of type ${this.processTable[pid].PKG}, but failed.`);
+        return;
+      }
     }
     return this._processCache[pid] as T;
   }
@@ -189,7 +197,6 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
       }
 
       if (protectionValue == activeThreadIDs.length) {
-        // (TODO): Find out how to fix this, essentially this means threading isn't working.
         //this.log.alert(`A full cycle has occurred and no threads completed`);
         break;
       }
