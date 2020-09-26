@@ -16,7 +16,7 @@ declare type RoomID = string;
 declare type PlayerID = string;
 declare type PID = string;
 
-declare type ScreepsPackage = OSPackage | RoomPackages | CreepPackages
+declare type ScreepsPackage = OSPackage | RoomPackages | CreepPackages | ActivitiesPackage | BattlePackages;
 
 declare type ObjectTypeWithID = Structure | Creep | Source | ConstructionSite | Mineral | Nuke | Resource | Tombstone;
 

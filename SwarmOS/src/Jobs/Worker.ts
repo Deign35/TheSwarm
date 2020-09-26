@@ -58,11 +58,45 @@ class Worker extends SoloJob<Worker_Memory, MemCache> {
       }, 0);
   }
   protected CreateCustomCreepActivity(creep: Creep): string | undefined {
+    const roomData = this.roomManager.GetRoomData(creep.room.name)!;
+    if (this.memory.needsBoost) {
+      const labIDs = Object.keys(roomData.labOrders);
+      for (let i = 0; i < labIDs.length; i++) {
+        const order = roomData.labOrders[labIDs[i]];
+        if (order.creepIDs && order.creepIDs.includes(creep.name) && order.amount > 0) {
+          return this.creepManager.CreateNewCreepActivity({
+            action: AT_MoveToPosition,
+            creepID: creep.name,
+            amount: 1,
+            targetID: labIDs[i]
+          }, this.pid);
+        }
+      }
+      // If we're here then no boost orders are present
+      this.memory.needsBoost = false;
+    }
+
+    if (!this.memory.hasRequestedBoost && (creep.spawning || creep.ticksToLive! > 1480) && roomData.boostAssignments[this.pkgName]) {
+      for (let i = 0; i < roomData.boostAssignments[this.pkgName].length; i++) {
+        const resourceType = roomData.boostAssignments[this.pkgName][i];
+        const numResourceRequired = creep.getActiveBodyparts(ResourceToPart[resourceType]) * 30;
+        if (creep.room.terminal && this.terminalNetwork.HasResourceInNetwork(resourceType, numResourceRequired)) {
+          roomData.labRequests.push({
+            amount: numResourceRequired,
+            creepID: creep.name,
+            forBoost: true,
+            resourceType: resourceType
+          });
+        }
+      }
+      this.memory.hasRequestedBoost = true;
+      this.memory.needsBoost = true;
+    }
     if (creep.room.name != this.memory.targetRoom) {
       return this.MoveToRoom(creep, this.memory.targetRoom);
     }
+
     const carryRatio = creep.store.getUsedCapacity() / creep.store.getCapacity();
-    const roomData = this.roomManager.GetRoomData(creep.room.name)!;
     if (carryRatio >= 0.50) {
       let target: Structure | undefined = undefined;
       let closest: number = 100000;

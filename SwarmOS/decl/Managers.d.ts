@@ -75,6 +75,7 @@ interface RoomState extends MemBase {
   labOrders: IDictionary<ObjectID, LabOrder>;
   labRequests: LabRequest[];
   terminalRequests: TerminalRequest[];
+  boostAssignments: { [id: string]: (MineralConstant | MineralCompoundConstant)[] };
 
   activityPID?: PID;
   cSites: ObjectID[];

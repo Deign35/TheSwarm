@@ -116,6 +116,28 @@ class CLIManager extends BasicProcess<SwarmCLIMemory, MemCache> {
               this.LaunchProcess(cmd.args[0], cmd.args[1]);
             }
             break;
+          case (CLI_RemoveBoostAssignemnt):
+            if (cmd.args && cmd.args.length == 2) {
+              const roomData = this.roomManager.GetRoomData(cmd.args[0]);
+              if (roomData) {
+                const pkg = cmd.args[1];
+                delete roomData.boostAssignments[pkg];
+              }
+            }
+            break;
+          case (CLI_SetBoostAssignment):
+            if (cmd.args && cmd.args.length == 3) {
+              const roomData = this.roomManager.GetRoomData(cmd.args[0]);
+              if (roomData) {
+                const pkg = cmd.args[1];
+                const boost = cmd.args[2];
+                if (!roomData.boostAssignments[pkg]) {
+                  roomData.boostAssignments[pkg] = [];
+                }
+                roomData.boostAssignments[pkg].push(boost);
+              }
+            }
+            break;
           case (CLI_SetWallStrength):
             if (cmd.args && cmd.args.length == 3) {
               let roomData = this.roomManager.GetRoomData(cmd.args[0]);

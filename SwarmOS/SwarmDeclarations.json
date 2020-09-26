@@ -125,6 +125,8 @@
                 "Kill": "kill",
                 "Launch": "launch",
                 "LabOrder": "labOrder",
+                "RemoveBoostAssignemnt": "removeBoostAssignemtn",
+                "SetBoostAssignment": "setBoostAssignment",
                 "SetWallStrength": "setWallStrength"
             }
         },
