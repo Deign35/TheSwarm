@@ -47,7 +47,7 @@ class BattleManager extends BasicProcess<BattleManagerMemory, BattleManagerCache
       this.cache.rooms = {};
     }
     for (const roomID in Game.rooms) {
-      if (!this.cache.rooms[roomID] || this.cache.rooms[roomID].lastUpdated <= (Game.time + 13) ||
+      if (!this.cache.rooms[roomID] || (this.cache.rooms[roomID].lastUpdated + 13) <= Game.time ||
         this.cache.rooms[roomID].creepContainer.GetNumHostiles() > 0) {
         this.cache.rooms[roomID] = {
           lastUpdated: Game.time,

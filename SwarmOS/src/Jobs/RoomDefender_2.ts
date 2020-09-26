@@ -10,7 +10,7 @@ class RoomDefender_2 extends SoloJob<RoomDefender_2_Memory, MemCache> {
     if (this.memory.creepID) {
       const creep = Game.creeps[this.memory.creepID];
       if (!creep) { return super.RunThread(); }
-      const hostiles = creep.pos.findInRange(FIND_HOSTILE_CREEPS, 1);//creep.room.find(FIND_HOSTILE_CREEPS);
+      const hostiles = creep.pos.findInRange(FIND_HOSTILE_CREEPS, 1);
       let target: ObjectTypeWithID | undefined = undefined;
       for (let i = 0; i < hostiles.length; i++) {
         if (hostiles[i].getActiveBodyparts(HEAL) > 0) {
