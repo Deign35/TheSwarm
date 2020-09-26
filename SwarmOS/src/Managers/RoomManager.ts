@@ -118,7 +118,8 @@ class RoomManagerExtension extends ExtensionBase implements IRoomManagerExtensio
           },
           resources: [],
           tombstones: [],
-          ruins: []
+          ruins: [],
+          boostAssignments: {}
         }
         this.memory.roomStateData[roomID] = roomState;
       }

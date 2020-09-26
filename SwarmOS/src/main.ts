@@ -2,7 +2,7 @@
   VERSION: string;
   counter: number;
   lastPixel: number;
-  
+
   roomData: RoomStateMemory;
 }
 const startLoad = Game.cpu.getUsed(); // Will not use any prototype defined version of getUsed
@@ -31,10 +31,6 @@ if (!Memory.VERSION || Memory.VERSION != SWARM_VERSION_DATE) {
   try {
     let oldVersion = Memory.VERSION;
     if (oldVersion) {
-      for (let roomID in Memory.roomData.roomStateData) {
-        const roomData = Memory.roomData.roomStateData[roomID];
-        roomData.boostAssignments = {};
-      }
     }
   } catch (ex) {
     console.log(`Failed to Update OS version ${ex}.`)
