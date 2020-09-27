@@ -138,7 +138,7 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
     if (!this._processCache[pid]) {
       try {
         this.createProcess(pid);
-      } catch {
+      } catch (e) {
         if (this.processTable[pid]) {
           this.processTable[pid].end = Game.time;
         }

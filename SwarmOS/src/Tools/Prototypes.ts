@@ -17,7 +17,7 @@ if (!Room.prototype.SwarmOS) {
   Object.defineProperties(Room.prototype, {
     link: {
       get() {
-        return `<a href="#!/room/${Game.shard.name}/${this.name}" > ${this.name} </a>`
+        return `<a href="#!/room/${Game.shard.name}/${this.name}" >${this.name}</a>`
       }
     },
     id: {

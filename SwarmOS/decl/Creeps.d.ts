@@ -88,3 +88,5 @@ declare interface MineralHarvester_Memory extends SquadJob_Memory {
 //CLI(CLI_Launch, CPKG_ControllerClaimer, { homeRoom: "E15S41", targetRoom: "E15S43", expires: true });
 //CLI(CLI_Launch, CPKG_RoomBooter, { homeRoom: "E15S41", targetRoom: "E15S43", expires: true })
 //CLI(CLI_Launch, CPKG_Worker, { homeRoom: "E15S41", targetRoom: "E14S41", expires: true })
+
+// Game.market.createOrder({ type: ORDER_SELL, resourceType: RESOURCE_ZYNTHIUM, price: 0.08, totalAmount: 20000, roomName: "E11S44" })
