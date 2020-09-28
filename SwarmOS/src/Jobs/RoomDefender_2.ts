@@ -61,7 +61,7 @@ class RoomDefender_2 extends SoloJob<RoomDefender_2_Memory, MemCache> {
     }
     return this.spawnManager.requestSpawn({
       body: body,
-      creepName: this.memory.homeRoom + "_" + (Game.time + '_RD2').slice(-7),
+      creepName: this.memory.targetRoom + "_" + (Game.time + '_RD2').slice(-7),
       owner_pid: this.pid
     }, this.memory.homeRoom, Priority_Highest, {
         parentPID: this.pid

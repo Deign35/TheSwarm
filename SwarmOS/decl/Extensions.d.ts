@@ -123,6 +123,7 @@ interface CreepActionArgs {
 
   target?: any;
   amount?: number;
+  distance?: number;
   message?: string;
   resourceType?: ResourceConstant;
 }

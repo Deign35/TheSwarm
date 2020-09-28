@@ -10,13 +10,6 @@ declare interface SingleCreepAction_Memory extends MemBase {
   targetID?: ObjectID;   // (t)arget
 }
 
-declare interface MoveToRoomActivity_Memory extends MemBase {
-  creepID: CreepID;
-  targetRoom: RoomID;
-  moveTarget: RoomPosition;
-  route: { exit: ExitConstant, room: string }[];
-}
-
 declare interface RepetitiveCreepActivity_Memory extends MemBase {
   actions: SingleCreepAction_Memory[];    // (a)ctions
   creepID: CreepID;
@@ -83,6 +76,45 @@ declare interface MineralHarvester_Memory extends SquadJob_Memory {
   container: ObjectID;
   squad: [{ activityPID?: PID, creepID?: CreepID },
     { activityPID?: PID, creepID?: CreepID }]
+}
+
+/** REFACTOR SOLOJOB TO SOLOCREEP */
+
+declare interface SoloCreep_Memory extends MemBase {
+  spawnID?: SpawnID;
+  creepID?: CreepID;
+  hasRun?: boolean;
+  expires?: boolean;
+  homeRoom: RoomID;
+  targetRoom: RoomID;
+  needsBoost?: boolean;
+}
+
+declare interface SoloCreepAction {
+  action: ActionType;
+  amount?: number;     // (a)mount for resource transfers
+  exemptedFailures?: ScreepsReturnCode[];    // (e)xempted failures
+  message?: string;     // (m)essage to write to a say or signcontroller
+  pos?: { x?: number, y?: number, roomName: string };  // (p)osition to move to
+  resourceType?: ResourceConstant // (r)esource type to withdraw or transfer
+  targetID?: ObjectID;   // (t)arget
+  distance?: number;
+}
+
+declare interface SoloCreep_Cache extends MemCache {
+  curAction?: SoloCreepAction;
+  lastAction?: SoloCreepAction;
+}
+
+declare interface SoloCreepActionArgs {
+  creep: Creep;
+  actionType: ActionType;
+
+  target?: any;
+  amount?: number;
+  distance?: number;
+  message?: string;
+  resourceType?: ResourceConstant;
 }
 
 //CLI(CLI_Launch, CPKG_ControllerClaimer, { homeRoom: "E15S41", targetRoom: "E15S43", expires: true });
