@@ -19,7 +19,7 @@ class Scientist extends SoloJob<Scientist_Memory, MemCache> {
     const roomData = this.roomManager.GetRoomData(this.memory.homeRoom)!;
     const terminal = creep.room.terminal;
     if (!terminal) {
-      this.log.error(`Room(${creep.room.name}) doesn't have a terminal.`)
+      this.log.error(`Room(${creep.room.link}) doesn't have a terminal.`)
       return;
     }
 
