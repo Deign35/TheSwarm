@@ -47,6 +47,9 @@ import { JobsPackage } from "Jobs/index";
 import { ManagersPackage } from "Managers/index";
 import { RoomsPackage } from "Rooms/index";
 
+//import { CreepsPackage } from "Creeps/index";
+//kernel.installPackage(CreepsPackage);
+
 kernel.installPackages([ActivitiesPackage, BattlePackage, JobsPackage, ManagersPackage, RoomsPackage]);
 
 export function loop() {

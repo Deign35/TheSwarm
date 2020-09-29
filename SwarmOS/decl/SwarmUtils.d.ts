@@ -18,7 +18,7 @@ declare type PID = string;
 
 declare type ScreepsPackage = OSPackage | RoomPackages | CreepPackages | ActivitiesPackage | BattlePackages;
 
-declare type ObjectTypeWithID = Structure | Creep | Source | ConstructionSite | Mineral | Nuke | Resource | Tombstone;
+declare type ObjectTypeWithID = Structure | Creep | Source | ConstructionSite | Mineral | Nuke | Resource | Tombstone | Ruin;
 
 declare function extensionInterface(interfaceId: string): (target: any, propertyKey: string) => any
 

@@ -34,6 +34,11 @@ export abstract class SoloCreep<T extends SoloCreep_Memory, U extends SoloCreep_
             target = creep.pos;
           }
 
+          if (!target) {
+            this.EndCurrentAction();
+            return ThreadState_Waiting;
+          }
+
           if (this.cache.curAction.action === AT_MoveToPosition) {
             const moveResult = this.RunCreepAction({
               actionType: AT_MoveToPosition,
@@ -52,7 +57,7 @@ export abstract class SoloCreep<T extends SoloCreep_Memory, U extends SoloCreep_
               this.EndCurrentAction();
               return ThreadState_Waiting;
             } else if (!this.CreepIsInRange(this.cache.curAction.action, creep.pos, target as RoomPosition)) {
-              this.MoveCreep(creep, target as RoomPosition);
+              this.MoveCreep(creep, target as RoomPosition, this.cache.curAction.distance);
             } else {
               const result = this.RunCreepAction({
                 actionType: this.cache.curAction.action,
@@ -104,6 +109,7 @@ export abstract class SoloCreep<T extends SoloCreep_Memory, U extends SoloCreep_
     }
 
     if (!creep) {
+      delete this.memory.creepID;
       if (!this.memory.spawnID) {
         if (this.memory.expires && this.memory.hasRun) {
           this.EndProcess();
@@ -131,16 +137,16 @@ export abstract class SoloCreep<T extends SoloCreep_Memory, U extends SoloCreep_
   protected abstract GetNewSpawnID(): string | undefined;
 
   protected OnCreepSpawn(creepID: CreepID) {
-    this.spawnManager.cancelRequest(this.memory.spawnID!);
-    this.memory.spawnID = undefined;
-    this.memory.hasRun = true;
-    this.memory.creepID = creepID;
     this.creepManager.tryReserveCreep(creepID, this.pid);
     const creep = this.creepManager.tryGetCreep(creepID, this.pid);
     if (!creep) {
       this.log.error(`Creep spawned but couldn't register`);
       return;
     }
+    this.spawnManager.cancelRequest(this.memory.spawnID!);
+    this.memory.spawnID = undefined;
+    this.memory.hasRun = true;
+    this.memory.creepID = creepID;
 
     delete this.memory.needsBoost;
     if (this.RequestBoost(creep)) {
