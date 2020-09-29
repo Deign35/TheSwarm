@@ -85,7 +85,9 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
     }
 
     const kernelContext = this;
-    this.cache[id] = {};
+    //if (!this.cache[id]) {
+      this.cache[id] = {};
+    //}
     const context: IProcessContext = {
       pid: pInfo.pid,
       pkgName: pInfo.PKG,

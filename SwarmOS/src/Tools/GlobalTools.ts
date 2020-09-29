@@ -1,5 +1,6 @@
 declare var Memory: {
-  counter: number,
+  counter: number;
+  FakeCache: any;
 }
 import { Stopwatch } from "./Stopwatch";
 global['Stopwatch'] = Stopwatch;
@@ -132,4 +133,7 @@ global['ConstructBodyArray'] = GlobalTools.ConstructBodyArray;
 global['GetSUID'] = GlobalTools.GetSUID;
 global['GetRandomIndex'] = GlobalTools.GetRandomIndex;
 global['GetRandomID'] = GlobalTools.GetRandomID;
-global['MemoryCache'] = {};
+//if (!Memory.FakeCache) {
+//Memory.FakeCache = {};
+//}
+global['MemoryCache'] = {}; //Memory.FakeCache;// {};

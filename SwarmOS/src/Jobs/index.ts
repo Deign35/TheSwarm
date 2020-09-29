@@ -14,10 +14,10 @@ import { OSPackage as Worker } from "./Worker";
 
 export const JobsPackage: IPackage = {
   install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
-    ControlledRoomRefiller.install(processRegistry, extensionRegistry);
+    //ControlledRoomRefiller.install(processRegistry, extensionRegistry);
     ControllerClaimer.install(processRegistry, extensionRegistry);
     Dismantler.install(processRegistry, extensionRegistry);
-    Harvester.install(processRegistry, extensionRegistry);
+    //Harvester.install(processRegistry, extensionRegistry);
     MineralHarvester.install(processRegistry, extensionRegistry);
     RemoteRefiller.install(processRegistry, extensionRegistry);
     RoomBooter.install(processRegistry, extensionRegistry);
@@ -26,6 +26,6 @@ export const JobsPackage: IPackage = {
     Scientist.install(processRegistry, extensionRegistry);
     Scout.install(processRegistry, extensionRegistry);
     Upgrader.install(processRegistry, extensionRegistry);
-    Worker.install(processRegistry, extensionRegistry);
+    //Worker.install(processRegistry, extensionRegistry);
   }
 }

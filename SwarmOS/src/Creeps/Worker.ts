@@ -50,8 +50,42 @@ class Worker extends SoloCreep<Worker_Memory, SoloCreep_Cache> {
     }
 
     const roomData = this.roomManager.GetRoomData(creep.room.name)!;
-    const carryRatio = creep.store.getUsedCapacity() / creep.store.getCapacity();
-    if (carryRatio >= 0.50) {
+    let creepCapacity = creep.store.getUsedCapacity();
+    if (this.cache.lastAction) {
+      if (this.cache.lastAction.action == AT_Withdraw) {
+        const target = Game.getObjectById<ObjectTypeWithID>(this.cache.lastAction.targetID!);
+        if (target) {
+          if ((target as Tombstone).store) {
+            creepCapacity = Math.min(creep.store.getCapacity(), creepCapacity + (target as Tombstone).store.getUsedCapacity(RESOURCE_ENERGY));
+          } else {
+            this.log.error(`AT_Withdraw on something without a store property: ${JSON.stringify(target)}`);
+          }
+        }
+      } else if (this.cache.lastAction.action == AT_Transfer) {
+        const target = Game.getObjectById<ObjectTypeWithID>(this.cache.lastAction.targetID!);
+        if (target) {
+          if ((target as StructureExtension).store) {
+            creepCapacity -= (target as StructureExtension).store.getFreeCapacity(RESOURCE_ENERGY);
+          } else {
+            this.log.error(`AT_Transfer on something without a store property: ${JSON.stringify(target)}`);
+          }
+        }
+      } else if (this.cache.lastAction.action == AT_Pickup) {
+        const target = Game.getObjectById<Resource>(this.cache.lastAction.targetID!);
+        if (target) {
+          if ((target as Resource).amount > 0) {
+            creepCapacity = Math.min(creep.store.getCapacity(), creepCapacity + (target as Resource).amount);
+          }
+        }
+      } else if (this.cache.lastAction.action == AT_Build) {
+        creepCapacity -= (creep.getActiveBodyparts(WORK) * 5);
+      } else if (this.cache.lastAction.action == AT_Repair || this.cache.lastAction.action == AT_Upgrade) {
+        creepCapacity -= creep.getActiveBodyparts(WORK);
+      }
+    }
+
+    const carryRatio = creepCapacity / creep.store.getCapacity();
+    if (carryRatio >= 0.25) {
       let target: Structure | undefined = undefined;
       let closest: number = 100000;
       for (let i = 0; i < roomData.needsRepair.length; i++) {
@@ -97,7 +131,7 @@ class Worker extends SoloCreep<Worker_Memory, SoloCreep_Cache> {
     let actionType: ActionType = AT_NoOp;
     let bestTarget = '';
     let closestDist = 1000;
-    const energyNeeded = creep.store.getFreeCapacity();
+    const energyNeeded = creep.store.getCapacity() - creepCapacity;
     const halfEnergyNeeded = energyNeeded / 2;
 
     if (actionType == AT_NoOp && roomData.tombstones.length > 0) {

@@ -12,6 +12,10 @@ export abstract class SoloCreep<T extends SoloCreep_Memory, U extends SoloCreep_
   @extensionInterface(EXT_TerminalNetwork)
   terminalNetwork!: ITerminalNetworkExtensions;
 
+  PrepTick() {
+    delete this.cache.lastAction;
+  }
+
   RunThread(): ThreadState {
     let creep: Creep | undefined = undefined;
     if (this.memory.creepID) {
@@ -78,8 +82,24 @@ export abstract class SoloCreep<T extends SoloCreep_Memory, U extends SoloCreep_
                 case (AT_Suicide):
                 case (AT_Transfer):
                 case (AT_Withdraw):
+                case (AT_NoOp):
                   this.EndCurrentAction();
                   return ThreadState_Waiting;
+                case (AT_Build):
+                  let build_creepCapacity = creep.store.getUsedCapacity(RESOURCE_ENERGY);
+                  build_creepCapacity -= creep.getActiveBodyparts(WORK) * 5;
+                  if (build_creepCapacity <= 0) {
+                    this.EndCurrentAction();
+                    return ThreadState_Waiting;
+                  }
+                case (AT_Repair):
+                case (AT_Upgrade):
+                  let creepCapacity = creep.store.getUsedCapacity(RESOURCE_ENERGY);
+                  creepCapacity -= creep.getActiveBodyparts(WORK);
+                  if (creepCapacity <= 0) {
+                    this.EndCurrentAction();
+                    return ThreadState_Waiting;
+                  }
                 case (AT_RenewCreep):
                   if (result == ERR_BUSY) {
                     this.EndCurrentAction();
