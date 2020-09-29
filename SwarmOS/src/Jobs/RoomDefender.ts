@@ -11,7 +11,7 @@ class RoomDefender extends SoloJob<RoomDefender_Memory, MemCache> {
       let hasAttacked = false;
       const creep = Game.creeps[this.memory.creepID];
       if (!creep) { return super.RunThread(); }
-      const hostiles = creep.room.find(FIND_HOSTILE_CREEPS);
+      const hostiles = creep.pos.findInRange(FIND_HOSTILE_CREEPS, 3);
       let target: ObjectTypeWithID | undefined = undefined;
       for (let i = 0; i < hostiles.length; i++) {
         if (hostiles[i].getActiveBodyparts(HEAL) > 0) {
@@ -23,10 +23,12 @@ class RoomDefender extends SoloJob<RoomDefender_Memory, MemCache> {
       }
 
       if (target) {
-        if (creep.pos.inRangeTo(target, 3)) {
+        if (creep.pos.getRangeTo(target) == 1) {
+          creep.rangedMassAttack();
+        } else {
           creep.rangedAttack(target);
-          hasAttacked = true;
         }
+        hasAttacked = true;
       }
 
       if (!hasAttacked) {
@@ -56,7 +58,7 @@ class RoomDefender extends SoloJob<RoomDefender_Memory, MemCache> {
     }
     return this.spawnManager.requestSpawn({
       body: body,
-      creepName: this.memory.homeRoom + "_" + (Game.time + '_RD').slice(-6),
+      creepName: this.memory.targetRoom + "_" + (Game.time + '_RD').slice(-6),
       owner_pid: this.pid
     }, this.memory.homeRoom, Priority_Highest, {
         parentPID: this.pid

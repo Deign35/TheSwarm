@@ -9,7 +9,7 @@ class Dismantler extends SoloJob<Dismantler_Memory, MemCache> {
   protected GetNewSpawnID(): string {
     return this.spawnManager.requestSpawn({
       body: [WORK, WORK, MOVE, MOVE],
-      creepName: this.memory.homeRoom + "_" + (Game.time + '_Di').slice(-6),
+      creepName: this.memory.targetRoom + "_" + (Game.time + '_Di').slice(-6),
       owner_pid: this.pid
     }, this.memory.homeRoom, Priority_Lowest, {
         parentPID: this.pid

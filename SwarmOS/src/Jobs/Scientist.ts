@@ -9,7 +9,7 @@ class Scientist extends SoloJob<Scientist_Memory, MemCache> {
   protected GetNewSpawnID(): string {
     return this.spawnManager.requestSpawn({
       body: [CARRY, CARRY, CARRY, CARRY, MOVE, MOVE],
-      creepName: this.memory.homeRoom + "_" + (Game.time + '_Sci').slice(-7),
+      creepName: this.memory.targetRoom + "_" + (Game.time + '_Sci').slice(-7),
       owner_pid: this.pid
     }, this.memory.homeRoom, Priority_Medium, {
         parentPID: this.pid
@@ -19,7 +19,7 @@ class Scientist extends SoloJob<Scientist_Memory, MemCache> {
     const roomData = this.roomManager.GetRoomData(this.memory.homeRoom)!;
     const terminal = creep.room.terminal;
     if (!terminal) {
-      this.log.error(`Room(${creep.room.name}) doesn't have a terminal.`)
+      this.log.error(`Room(${creep.room.link}) doesn't have a terminal.`)
       return;
     }
 
