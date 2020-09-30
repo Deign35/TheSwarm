@@ -167,7 +167,9 @@ class CreepManagerExtensions extends ExtensionBase implements ICreepManagerExten
     return xDiff > yDiff ? xDiff : yDiff;
   }
 
-  RunCreepAction(args: CreepActionArgs) {
+
+
+  RunCreepAction(args: SoloCreepActionArgs): ScreepsReturnCode {
     const creep = args.creep;
     const actionType = args.actionType;
     let target = args.target;
@@ -235,12 +237,12 @@ class CreepManagerExtensions extends ExtensionBase implements ICreepManagerExten
         if ((target as Structure).pos) {
           target = (target as Structure).pos;
         }
-        const result = this.MoveCreep(creep, target, args.amount || 0);
+        const result = this.MoveCreep(creep, target, args.distance || 0);
         const dist = creep.pos.getRangeTo(target);
         if (dist == 1 && (target as RoomPosition).isEdge()) {
           return OK;
         }
-        if (dist <= (args.amount || 0)) {
+        if (dist <= (args.distance || 0)) {
           if (creep.pos.isNearTo(target)) {
             const creeps = (target as RoomPosition).lookFor(LOOK_CREEPS);
             if (creeps.length > 0 && creeps[0].name != creep.name) {
@@ -273,7 +275,7 @@ class CreepManagerExtensions extends ExtensionBase implements ICreepManagerExten
   }
 
   CreepIsInRange(actionType: ActionType, pos1: RoomPosition, pos2: RoomPosition) {
-    const distance = this.GetLinearDistance(pos1, pos2);
+    const distance = pos1.getRangeTo(pos2);
     if (actionType == AT_Build || actionType == AT_RangedAttack ||
       actionType == AT_RangedHeal || actionType == AT_Repair ||
       actionType == AT_Upgrade) {
@@ -288,7 +290,7 @@ class CreepManagerExtensions extends ExtensionBase implements ICreepManagerExten
   ValidateActionTarget(actionType: ActionType, target: any, resourceType?: ResourceConstant) {
     switch (actionType) {
       case (AT_Attack): return !!(target as Creep | Structure).hitsMax;
-      case (AT_AttackController): return (target as Structure).structureType == STRUCTURE_CONTROLLER;
+      case (AT_AttackController): return (target as Structure).structureType == STRUCTURE_CONTROLLER && !(target as StructureController).upgradeBlocked;
       case (AT_Build): return (target as ConstructionSite).structureType && !(target as Structure).hitsMax;
       case (AT_ClaimController): return (target as Structure).structureType == STRUCTURE_CONTROLLER;
       case (AT_Dismantle): return (target as Structure).structureType && !!(target as Structure).hitsMax;

@@ -37,7 +37,7 @@ declare interface LabManager_Memory extends RoomMemory {
 
 declare interface RoomController_Memory extends RoomMemory {
   activityPIDs: {
-    [RPKG_EnergyManager]?: PID;
+    [RPKG_HomeRoomManager]?: PID;
     [RPKG_LabManager]?: PID;
     [RPKG_RemoteManager]?: PID;
     [RPKG_Towers]?: PID;
