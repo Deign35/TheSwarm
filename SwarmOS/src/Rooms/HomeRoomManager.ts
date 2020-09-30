@@ -1,16 +1,16 @@
 export const OSPackage: IPackage = {
   install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
-    processRegistry.register(RPKG_EnergyManager, EnergyManager);
+    processRegistry.register(RPKG_HomeRoomManager, HomeRoomManager);
   }
 }
 import { BasicProcess } from "Core/BasicTypes";
 
 const RPKG_EnergyManager_LogContext: LogContext = {
-  logID: RPKG_EnergyManager,
+  logID: RPKG_HomeRoomManager,
   logLevel: LOG_TRACE
 }
 
-class EnergyManager extends BasicProcess<EnergyManager_Memory, EnergyManager_Cache> {
+class HomeRoomManager extends BasicProcess<HomeRoomManager_Memory, HomeRoomManager_Cache> {
   @extensionInterface(EXT_RoomManager)
   protected roomManager!: IRoomManagerExtension;
   protected get logID(): string {

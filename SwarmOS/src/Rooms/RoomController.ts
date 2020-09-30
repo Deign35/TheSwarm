@@ -6,10 +6,10 @@ export const OSPackage: IPackage = {
 
 import { BasicProcess } from "Core/BasicTypes";
 
-const AllRoomPackages = [RPKG_EnergyManager, RPKG_LabManager, RPKG_RemoteManager, RPKG_Towers];
+const AllRoomPackages = [RPKG_HomeRoomManager, RPKG_LabManager, RPKG_RemoteManager, RPKG_Towers, RPKG_WallWatcher];
 
 const RoomTypeToPackage: { [id: string]: string[] } = {
-  [RT_Home]: [RPKG_EnergyManager, RPKG_Towers, RPKG_LabManager, RPKG_WallWatcher],
+  [RT_Home]: [RPKG_HomeRoomManager, RPKG_Towers, RPKG_LabManager, RPKG_WallWatcher],
   [RT_RemoteHarvest]: [RPKG_RemoteManager],
   [RT_Center]: [],
   [RT_Highway]: [],
@@ -59,8 +59,8 @@ class RoomController extends BasicProcess<RoomController_Memory, RoomController_
         this.kernel.setParent(this.memory.activityPIDs[RPKG_WallWatcher]!, this.pid);
       }
 
-      if (!this.memory.activityPIDs[RPKG_EnergyManager] || !this.kernel.getProcessByPID(this.memory.activityPIDs[RPKG_EnergyManager]!)) {
-        this.memory.activityPIDs[RPKG_EnergyManager] = this.kernel.startProcess(RPKG_EnergyManager, {
+      if (!this.memory.activityPIDs[RPKG_HomeRoomManager] || !this.kernel.getProcessByPID(this.memory.activityPIDs[RPKG_HomeRoomManager]!)) {
+        this.memory.activityPIDs[RPKG_HomeRoomManager] = this.kernel.startProcess(RPKG_HomeRoomManager, {
           harvesterPIDs: {},
           refillerPID: '',
           workerPIDs: [],
@@ -68,8 +68,8 @@ class RoomController extends BasicProcess<RoomController_Memory, RoomController_
           largeHarvester: '',
           homeRoom: this.memory.homeRoom,
           numWorkers: (data.sourceIDs.length * 2)
-        } as EnergyManager_Memory);
-        this.kernel.setParent(this.memory.activityPIDs[RPKG_EnergyManager]!, this.pid);
+        } as HomeRoomManager_Memory);
+        this.kernel.setParent(this.memory.activityPIDs[RPKG_HomeRoomManager]!, this.pid);
       }
     } else if (data.roomType == RT_RemoteHarvest) {
       if (!this.memory.activityPIDs[RPKG_RemoteManager] || !this.kernel.getProcessByPID(this.memory.activityPIDs[RPKG_RemoteManager]!)) {

@@ -9,7 +9,7 @@ declare interface WallWatcher_Cache extends MemCache {
   rampartCount: number;
 }
 
-declare interface EnergyManager_Memory extends RoomMemory {
+declare interface HomeRoomManager_Memory extends RoomMemory {
   harvesterPIDs: IDictionary<ObjectID, PID>;
   largeHarvester: PID;
   refillerPID: PID;
@@ -17,7 +17,7 @@ declare interface EnergyManager_Memory extends RoomMemory {
   mineralHarvesterPID: PID;
 }
 
-declare interface EnergyManager_Cache extends MemCache {
+declare interface HomeRoomManager_Cache extends MemCache {
   primaryLink: ObjectID;
 }
 

@@ -104,7 +104,7 @@
             "type": true,
             "combinedType": "RoomPackages",
             "entries": {
-                "EnergyManager": "energyManager",
+                "HomeRoomManager": "homeRoomManager",
                 "LabManager": "labManager",
                 "RemoteManager": "remoteManager",
                 "RoomController": "roomController",
