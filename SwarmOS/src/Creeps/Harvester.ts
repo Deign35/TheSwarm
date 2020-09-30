@@ -26,7 +26,13 @@ class Harvester extends SoloCreep<HarvesterMemory, MemCache> {
           new RoomPosition(source.pos.x + 1, source.pos.y - 1, this.memory.targetRoom), (x, y, terrain) => {
             if (terrain != TERRAIN_MASK_WALL) {
               if (count < 3 && count++ > 0) {
-                this.SpawnSupportHarvester();
+                this.kernel.startProcess(this.pkgName, {
+                  homeRoom: this.memory.homeRoom,
+                  targetRoom: this.memory.targetRoom,
+                  expires: true,
+                  source: this.memory.source,
+                  supportHarvester: true
+                } as HarvesterMemory);
               }
             }
           });
@@ -145,7 +151,7 @@ class Harvester extends SoloCreep<HarvesterMemory, MemCache> {
     }
 
     if (source.energy > 0) {
-      if (container  && !this.memory.link && (container as StructureContainer).hitsMax &&
+      if (container && !this.memory.link && (container as StructureContainer).hitsMax &&
         (container as StructureContainer).hits < (container as StructureContainer).hitsMax) {
         return {
           targetID: source.id,
@@ -163,16 +169,5 @@ class Harvester extends SoloCreep<HarvesterMemory, MemCache> {
   }
   HandleNoActivity(creep: Creep) {
     // Do Nothing;
-  }
-
-  SpawnSupportHarvester() {
-    const newPID = this.kernel.startProcess(this.pkgName, {
-      homeRoom: this.memory.homeRoom,
-      targetRoom: this.memory.targetRoom,
-      expires: true,
-      source: this.memory.source,
-      supportHarvester: true
-    } as HarvesterMemory);
-    this.kernel.setParent(newPID, this.pid);
   }
 }

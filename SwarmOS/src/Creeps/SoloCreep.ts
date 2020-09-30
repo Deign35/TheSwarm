@@ -130,11 +130,11 @@ export abstract class SoloCreep<T extends SoloCreep_Memory, U extends SoloCreep_
     }
 
     if (!creep) {
-      delete this.memory.creepID;
       if (!this.memory.spawnID) {
         if (this.memory.expires && this.memory.hasRun) {
           this.EndProcess();
         } else {
+          delete this.memory.creepID;
           this.memory.spawnID = this.GetNewSpawnID();
         }
       } else {

@@ -159,16 +159,6 @@ class CreepManagerExtensions extends ExtensionBase implements ICreepManagerExten
     return newPID;
   }
 
-  protected GetLinearDistance(pos1: { x: number, y: number }, pos2: { x: number, y: number }) {
-    let xDiff = pos1.x - pos2.x;
-    xDiff *= xDiff < 0 ? -1 : 1;
-    let yDiff = pos1.y - pos2.y;
-    yDiff *= yDiff < 0 ? -1 : 1;
-    return xDiff > yDiff ? xDiff : yDiff;
-  }
-
-
-
   RunCreepAction(args: SoloCreepActionArgs): ScreepsReturnCode {
     const creep = args.creep;
     const actionType = args.actionType;
@@ -266,9 +256,9 @@ class CreepManagerExtensions extends ExtensionBase implements ICreepManagerExten
     return creep.moveTo(pos, {
       visualizePathStyle: {
         lineStyle: "dashed",
-        opacity: 0.5,
+        opacity: 0.35,
         stroke: "red",
-        strokeWidth: 0.2,
+        strokeWidth: 0.15,
       },
       range: range
     });
