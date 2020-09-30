@@ -93,6 +93,7 @@ interface RoomState_StructureData {
   [STRUCTURE_EXTENSION]: ObjectID[];
   [STRUCTURE_EXTRACTOR]: ObjectID[];
   [STRUCTURE_LAB]: ObjectID[];
+  [STRUCTURE_LINK]: ObjectID[];
   [STRUCTURE_SPAWN]: ObjectID[];
   [STRUCTURE_STORAGE]: ObjectID[];
   [STRUCTURE_TERMINAL]: ObjectID[];

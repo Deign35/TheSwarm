@@ -10,7 +10,7 @@ const RPKG_EnergyManager_LogContext: LogContext = {
   logLevel: LOG_TRACE
 }
 
-class EnergyManager extends BasicProcess<EnergyManager_Memory, MemCache> {
+class EnergyManager extends BasicProcess<EnergyManager_Memory, EnergyManager_Cache> {
   @extensionInterface(EXT_RoomManager)
   protected roomManager!: IRoomManagerExtension;
   protected get logID(): string {
@@ -22,19 +22,33 @@ class EnergyManager extends BasicProcess<EnergyManager_Memory, MemCache> {
 
   RunThread(): ThreadState {
     const roomData = this.roomManager.GetRoomData(this.memory.homeRoom)!;
-    const sourceIDs = roomData.sourceIDs;
-    for (let i = 0; i < sourceIDs.length; i++) {
-      if (!this.memory.harvesterPIDs[sourceIDs[i]] ||
-        !this.kernel.getProcessByPID(this.memory.harvesterPIDs[sourceIDs[i]])) {
-        const pid = this.kernel.startProcess(CPKG_Harvester, {
-          homeRoom: this.memory.homeRoom,
-          source: sourceIDs[i],
-          targetRoom: this.memory.homeRoom,
-        } as HarvesterMemory);
+    if (Game.rooms[this.memory.homeRoom].energyCapacityAvailable < 2100) {
+      const sourceIDs = roomData.sourceIDs;
+      for (let i = 0; i < sourceIDs.length; i++) {
+        if (!this.memory.harvesterPIDs[sourceIDs[i]] ||
+          !this.kernel.getProcessByPID(this.memory.harvesterPIDs[sourceIDs[i]])) {
+          const pid = this.kernel.startProcess(CPKG_Harvester, {
+            homeRoom: this.memory.homeRoom,
+            source: sourceIDs[i],
+            targetRoom: this.memory.homeRoom,
+            expires: true
+          } as HarvesterMemory);
 
-        this.memory.harvesterPIDs[sourceIDs[i]] = pid;
-        this.kernel.setParent(pid, this.pid);
+          this.memory.harvesterPIDs[sourceIDs[i]] = pid;
+          this.kernel.setParent(pid, this.pid);
+        }
       }
+    } else {
+      if (!this.memory.largeHarvester ||
+        !this.kernel.getProcessByPID(this.memory.largeHarvester)) {
+          const pid = this.kernel.startProcess(CPKG_LargeHarvester, {
+            homeRoom: this.memory.homeRoom,
+            targetRoom: this.memory.homeRoom,
+            expires: true,
+          } as LargeHarvester_Memory);
+          this.memory.largeHarvester = pid;
+          this.kernel.setParent(pid, this.pid);
+        }
     }
 
     if (!this.memory.refillerPID ||
@@ -91,6 +105,38 @@ class EnergyManager extends BasicProcess<EnergyManager_Memory, MemCache> {
         } as MineralHarvester_Memory);
         this.memory.mineralHarvesterPID = pid;
         this.kernel.setParent(pid, this.pid);
+      }
+    }
+
+    const linkIDs = roomData.structures[STRUCTURE_LINK];
+    if (!this.cache.primaryLink) {
+      for (let i = 0; i < linkIDs.length; i++) {
+        const link = Game.getObjectById<StructureLink>(linkIDs[i]);
+        if (!link) { continue; }
+        if (link.pos.x == 1 || link.pos.x == 48 || link.pos.y == 1 || link.pos.y == 48) {
+          continue;
+        }
+        const closeSources = link.pos.findInRange(FIND_SOURCES, 2);
+        if (closeSources.length > 0) {
+          continue;
+        }
+        this.cache.primaryLink = linkIDs[i];
+      }
+    }
+
+    if (this.cache.primaryLink) {
+      const primaryLink = Game.getObjectById<StructureLink>(this.cache.primaryLink);
+      if (!primaryLink) {
+        delete this.cache.primaryLink;
+      } else {
+        for (let i = 0; i < linkIDs.length; i++) {
+          if (linkIDs[i] == this.cache.primaryLink) { continue; }
+          const link = Game.getObjectById<StructureLink>(linkIDs[i]);
+          if (!link) { continue; }
+          if (link.cooldown <= 0 && link.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
+            link.transferEnergy(primaryLink);
+          }
+        }
       }
     }
 

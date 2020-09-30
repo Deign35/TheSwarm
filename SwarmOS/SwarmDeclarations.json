@@ -74,6 +74,7 @@
                 "Dismantler": "dismantler",
                 "ExperimentalSquad": "experimentalSquad",
                 "Harvester": "harvester",
+                "LargeHarvester": "largeHarvester",
                 "MineralHarvester": "mineralHarvester",
                 "RemoteRefiller": "remoteRefiller",
                 "RoomBooter": "roomBooter",

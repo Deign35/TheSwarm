@@ -19,16 +19,18 @@ class Harvester extends SoloCreep<HarvesterMemory, MemCache> {
       body = [WORK, WORK, WORK, WORK, WORK, MOVE];
     } else {
       const source = Game.getObjectById<Source>(this.memory.source)!;
-      let count = 0;
+      if (!this.memory.supportHarvester) {
+        let count = 0;
 
-      LookAtGround(this.memory.targetRoom, new RoomPosition(source.pos.x - 1, source.pos.y + 1, this.memory.targetRoom),
-        new RoomPosition(source.pos.x + 1, source.pos.y - 1, this.memory.targetRoom), (x, y, terrain) => {
-          if (terrain != TERRAIN_MASK_WALL) {
-            if (count < 3 && count++ > 0) {
-              this.SpawnSupportHarvester();
+        LookAtGround(this.memory.targetRoom, new RoomPosition(source.pos.x - 1, source.pos.y + 1, this.memory.targetRoom),
+          new RoomPosition(source.pos.x + 1, source.pos.y - 1, this.memory.targetRoom), (x, y, terrain) => {
+            if (terrain != TERRAIN_MASK_WALL) {
+              if (count < 3 && count++ > 0) {
+                this.SpawnSupportHarvester();
+              }
             }
-          }
-        });
+          });
+      }
     }
     return this.spawnManager.requestSpawn({
       body: body,
@@ -40,27 +42,37 @@ class Harvester extends SoloCreep<HarvesterMemory, MemCache> {
   }
 
   protected CreateCustomCreepAction(creep: Creep): SoloCreepAction | undefined {
-    if (creep.room.name != this.memory.targetRoom) {
-      return this.MoveToRoom(creep, this.memory.targetRoom);
+    const source = Game.getObjectById<Source>(this.memory.source);
+    if (!source) {
+      if (creep.room.name != this.memory.targetRoom) {
+        return this.MoveToRoom(creep, this.memory.targetRoom);
+      }
+
+      this.log.error(`Harvester(${creep.name}) couldn't find target source(${this.memory.source})`);
+      return {
+        action: AT_NoOp,
+      };
     }
-    const source = Game.getObjectById<Source>(this.memory.source)!;
+
     if (source.pos.getRangeTo(creep.pos) > 1) {
       let targetPos = source.pos;
       let dist = 1;
-      if (!this.memory.container) {
-        const containerIDs = this.roomManager.GetRoomData(creep.room.name)!.structures[STRUCTURE_CONTAINER];
-        for (let i = 0; i < containerIDs.length; i++) {
-          const container = Game.getObjectById<StructureContainer>(containerIDs[i]);
-          if (container && source.pos.isNearTo(container.pos)) {
-            this.memory.container = container.id;
+      if (!this.memory.supportHarvester) {
+        if (!this.memory.container) {
+          const containerIDs = this.roomManager.GetRoomData(source.room.name)!.structures[STRUCTURE_CONTAINER];
+          for (let i = 0; i < containerIDs.length; i++) {
+            const container = Game.getObjectById<StructureContainer>(containerIDs[i]);
+            if (container && source.pos.isNearTo(container.pos)) {
+              this.memory.container = container.id;
+            }
           }
         }
-      }
-      if (this.memory.container) {
-        const container = Game.getObjectById<StructureContainer>(this.memory.container);
-        if (container) {
-          targetPos = container.pos;
-          dist = 0;
+        if (this.memory.container) {
+          const container = Game.getObjectById<StructureContainer>(this.memory.container);
+          if (container) {
+            targetPos = container.pos;
+            dist = 0;
+          }
         }
       }
 
@@ -75,7 +87,7 @@ class Harvester extends SoloCreep<HarvesterMemory, MemCache> {
     if (creep.store[RESOURCE_ENERGY] > 0) {
       if (container) {
         if ((container as StructureContainer).hitsMax) {
-          if (((container as StructureContainer).hits + (REPAIR_POWER * creep.getActiveBodyparts(WORK))) <= (container as StructureContainer).hitsMax) {
+          if ((container as StructureContainer).hits < (container as StructureContainer).hitsMax) {
             return {
               action: AT_Repair,
               targetID: container.id
@@ -104,10 +116,36 @@ class Harvester extends SoloCreep<HarvesterMemory, MemCache> {
           }
         }
       }
+
+      if (!this.memory.link) {
+        const roomData = this.roomManager.GetRoomData(creep.room.name)!;
+        const linkIDs = roomData.structures[STRUCTURE_LINK];
+        for (let i = 0; i < linkIDs.length; i++) {
+          const link = Game.getObjectById<StructureLink>(linkIDs[i]);
+          if (!link) { continue; }
+          if (link.pos.isNearTo(creep)) {
+            this.memory.link = link.id;
+            break;
+          }
+        }
+      }
+
+      if (this.memory.link) {
+        const link = Game.getObjectById<StructureLink>(this.memory.link);
+        if (!link) {
+          delete this.memory.link
+        } else if (link.store.getFreeCapacity(RESOURCE_ENERGY) >= creep.store[RESOURCE_ENERGY]) {
+          return {
+            action: AT_Transfer,
+            targetID: link.id,
+            resourceType: RESOURCE_ENERGY
+          }
+        }
+      }
     }
 
     if (source.energy > 0) {
-      if (container && (container as StructureContainer).hitsMax &&
+      if (container  && !this.memory.link && (container as StructureContainer).hitsMax &&
         (container as StructureContainer).hits < (container as StructureContainer).hitsMax) {
         return {
           targetID: source.id,
@@ -128,34 +166,13 @@ class Harvester extends SoloCreep<HarvesterMemory, MemCache> {
   }
 
   SpawnSupportHarvester() {
-    const sID = this.spawnManager.requestSpawn({
-      body: [WORK, WORK, MOVE],
-      creepName: 'SH' + GetRandomIndex(primes_100),
-      owner_pid: this.pid
-    }, this.memory.homeRoom, Priority_Medium, {
-        parentPID: this.pid
-      }, 1);
-
-    const newSpawnActivityMem: SpawnActivity_Memory = {
-      spawnID: sID,
-      HC: 'SupportHarvesterHC'
-    }
-    const newPID = this.kernel.startProcess(APKG_SpawnActivity, newSpawnActivityMem);
-    this.kernel.setParent(newPID, this.pid);
-  }
-
-  SupportHarvesterHC(creepID: CreepID) {
-    const newMem: RepetitiveCreepActivity_Memory = {
-      actions: [{
-        action: AT_Harvest,
-        exemptedFailures: [ERR_FULL, ERR_NOT_ENOUGH_ENERGY],
-        targetID: this.memory.source,
-        creepID: creepID
-      }],
-      creepID: creepID,
-    }
-
-    const newPID = this.kernel.startProcess(APKG_RepetitiveCreepActivity, newMem);
+    const newPID = this.kernel.startProcess(this.pkgName, {
+      homeRoom: this.memory.homeRoom,
+      targetRoom: this.memory.targetRoom,
+      expires: true,
+      source: this.memory.source,
+      supportHarvester: true
+    } as HarvesterMemory);
     this.kernel.setParent(newPID, this.pid);
   }
 }

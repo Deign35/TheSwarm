@@ -5,7 +5,7 @@ export const OSPackage: IPackage = {
 }
 import { SoloCreep } from "./SoloCreep";
 
-class ControlledRoomRefiller extends SoloCreep<ControlledRoomRefiller_Memory, SoloCreep_Cache> {
+class ControlledRoomRefiller extends SoloCreep<ControlledRoomRefiller_Memory, ControlledRoomRefiller_Cache> {
   protected RequestBoost(creep: Creep): boolean {
     return false;
   }
@@ -18,10 +18,10 @@ class ControlledRoomRefiller extends SoloCreep<ControlledRoomRefiller_Memory, So
         CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
         MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
         MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
-    } else if (homeRoom.energyCapacityAvailable >= 1200) {
+    } else if (homeRoom.energyCapacityAvailable >= 800) {
       body = [CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
         MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
-    } else if (homeRoom.energyCapacityAvailable >= 800) {
+    } else if (homeRoom.energyCapacityAvailable >= 600) {
       body = [CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
         MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
     } else if (homeRoom.energyCapacityAvailable >= 400) {
@@ -87,7 +87,7 @@ class ControlledRoomRefiller extends SoloCreep<ControlledRoomRefiller_Memory, So
         }
       }
     }
-    if ((creep.ticksToLive || 0) < 60 && creepUsedCapacity < 0.10) {
+    if ((creep.ticksToLive || 0) < 30 && creepUsedCapacity < 0.10) {
       return {
         action: AT_Suicide,
         pos: creep.pos
@@ -116,7 +116,58 @@ class ControlledRoomRefiller extends SoloCreep<ControlledRoomRefiller_Memory, So
     const carryRatio = creepUsedCapacity / creep.store.getCapacity();
 
     let closestDist = 1000;
-    if (carryRatio < 0.10) {
+    if (carryRatio <= 0) {
+      if (!this.cache.link) {
+        const linkIDs = roomData.structures[STRUCTURE_LINK];
+        for (let i = 0; i < linkIDs.length; i++) {
+          const link = Game.getObjectById<StructureLink>(linkIDs[i]);
+          if (!link) { continue; }
+          if (link.pos.x == 1 || link.pos.x == 48 || link.pos.y == 1 || link.pos.y == 48) {
+            continue;
+          }
+          const closeSources = link.pos.findInRange(FIND_SOURCES, 2);
+          if (closeSources.length > 0) {
+            continue;
+          }
+
+          this.cache.link = link.id;
+          break;
+        }
+      }
+
+      if (this.cache.link) {
+        const link = Game.getObjectById<StructureLink>(this.cache.link);
+        if (!link) {
+          delete this.cache.link;
+        } else {
+          if (link.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
+            closestDist = 0;
+            bestTarget = link.id;
+            actionType = AT_Withdraw;
+          }
+        }
+      }
+      if (actionType == AT_NoOp && creep.room.storage) {
+        const targets = roomData.structures[STRUCTURE_EXTENSION].concat(roomData.structures[STRUCTURE_SPAWN]);
+        let shouldUseStorage = false;
+        for (let i = 0; i < targets.length; i++) {
+          let nextTarget = Game.getObjectById<ObjectTypeWithID>(targets[i]) as StructureExtension | StructureSpawn;
+          if (!nextTarget) { continue; }
+          if ((nextTarget.store.getFreeCapacity(RESOURCE_ENERGY) || 0) > 0) {
+            shouldUseStorage = true;
+            break;
+          }
+        }
+        if (shouldUseStorage) {
+          const storage = creep.room.storage;
+          if ((storage.store[RESOURCE_ENERGY] || -1) >= energyNeeded) {
+            closestDist = 0;
+            bestTarget = storage.id;
+            actionType = AT_Withdraw;
+          }
+        }
+      }
+
       if (actionType == AT_NoOp && roomData.tombstones.length > 0) {
         for (let i = 0; i < roomData.tombstones.length; i++) {
           if (this.cache.lastAction && this.cache.lastAction.targetID === roomData.tombstones[i]) { continue; }
@@ -173,27 +224,6 @@ class ControlledRoomRefiller extends SoloCreep<ControlledRoomRefiller_Memory, So
               bestTarget = container.id;
               actionType = AT_Withdraw;
             }
-          }
-        }
-      }
-
-      if (creep.room.storage) {
-        const targets = roomData.structures[STRUCTURE_EXTENSION].concat(roomData.structures[STRUCTURE_SPAWN]);
-        let shouldUseStorage = false;
-        for (let i = 0; i < targets.length; i++) {
-          let nextTarget = Game.getObjectById<ObjectTypeWithID>(targets[i]) as StructureExtension | StructureSpawn;
-          if (!nextTarget) { continue; }
-          if ((nextTarget.store.getFreeCapacity(RESOURCE_ENERGY) || 0) > 0) {
-            shouldUseStorage = true;
-            break;
-          }
-        }
-        if (actionType == AT_NoOp || shouldUseStorage) {
-          const storage = creep.room.storage;
-          if ((storage.store[RESOURCE_ENERGY] || -1) >= energyNeeded) {
-            closestDist = 0;
-            bestTarget = storage.id;
-            actionType = AT_Withdraw;
           }
         }
       }

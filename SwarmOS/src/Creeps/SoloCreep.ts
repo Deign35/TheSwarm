@@ -47,7 +47,8 @@ export abstract class SoloCreep<T extends SoloCreep_Memory, U extends SoloCreep_
             const moveResult = this.RunCreepAction({
               actionType: AT_MoveToPosition,
               creep: creep,
-              target: target
+              target: target,
+              distance: this.cache.curAction.distance
             });
             if (moveResult == ERR_NOT_IN_RANGE || moveResult == ERR_BUSY || moveResult == ERR_TIRED) {
               // Not yet there

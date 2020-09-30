@@ -32,6 +32,8 @@ declare interface HarvesterMemory extends SoloJob_Memory {
   source: ObjectID;
   container: ObjectID;
   remoteHarvester?: boolean;
+  link?: ObjectID;
+  supportHarvester?: boolean;
 }
 declare interface ControlledRoomRefiller_Memory extends SoloJob_Memory {
   lastTime: number;
@@ -115,6 +117,19 @@ declare interface SoloCreepActionArgs {
   distance?: number;
   message?: string;
   resourceType?: ResourceConstant;
+}
+
+declare interface ControlledRoomRefiller_Cache extends SoloCreep_Cache {
+  link: ObjectID;
+}
+
+declare interface LargeHarvester_Memory  extends SoloCreep_Memory {
+  remoteHarvester?: boolean;
+}
+declare interface LargeHarvester_Cache extends SoloCreep_Cache {
+  curSource?: ObjectID;
+  curContainer?: ObjectID;
+  curLink?: ObjectID;
 }
 
 //CLI(CLI_Launch, CPKG_ControllerClaimer, { homeRoom: "E15S41", targetRoom: "E15S43", expires: true });

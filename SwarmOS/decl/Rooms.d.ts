@@ -11,9 +11,14 @@ declare interface WallWatcher_Cache extends MemCache {
 
 declare interface EnergyManager_Memory extends RoomMemory {
   harvesterPIDs: IDictionary<ObjectID, PID>;
+  largeHarvester: PID;
   refillerPID: PID;
   workerPIDs: PID[];
   mineralHarvesterPID: PID;
+}
+
+declare interface EnergyManager_Cache extends MemCache {
+  primaryLink: ObjectID;
 }
 
 declare interface RemoteManager_Memory extends RoomMemory {

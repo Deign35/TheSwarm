@@ -65,6 +65,7 @@ class RoomController extends BasicProcess<RoomController_Memory, RoomController_
           refillerPID: '',
           workerPIDs: [],
           mineralHarvesterPID: '',
+          largeHarvester: '',
           homeRoom: this.memory.homeRoom,
           numWorkers: (data.sourceIDs.length * 2)
         } as EnergyManager_Memory);
