@@ -6,7 +6,6 @@ import { OSPackage as RoomDefender } from "./RoomDefender";
 import { OSPackage as RoomDefender_2 } from "./RoomDefender_2";
 import { OSPackage as Scientist } from "./Scientist";
 import { OSPackage as Scout } from "./Scout";
-import { OSPackage as Upgrader } from "./Upgrader";
 
 export const JobsPackage: IPackage = {
   install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
@@ -18,6 +17,5 @@ export const JobsPackage: IPackage = {
     RoomDefender_2.install(processRegistry, extensionRegistry);
     Scientist.install(processRegistry, extensionRegistry);
     Scout.install(processRegistry, extensionRegistry);
-    Upgrader.install(processRegistry, extensionRegistry);
   }
 }

@@ -3,6 +3,7 @@ import { OSPackage as ControllerClaimer } from "./ControllerClaimer";
 import { OSPackage as Harvester } from "./Harvester";
 import { OSPackage as LargeHarvester } from "./LargeHarvester";
 import { OSPackage as Worker } from "./Worker";
+import { OSPackage as Upgrader } from "./Upgrader";
 
 export const CreepsPackage: IPackage = {
   install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
@@ -10,6 +11,7 @@ export const CreepsPackage: IPackage = {
     ControllerClaimer.install(processRegistry, extensionRegistry);
     Harvester.install(processRegistry, extensionRegistry);
     LargeHarvester.install(processRegistry, extensionRegistry);
+    Upgrader.install(processRegistry, extensionRegistry);
     Worker.install(processRegistry, extensionRegistry);
   }
 }

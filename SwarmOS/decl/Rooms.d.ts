@@ -15,6 +15,7 @@ declare interface HomeRoomManager_Memory extends RoomMemory {
   refillerPIDs: PID[];
   workerPIDs: PID[];
   mineralHarvesterPID: PID;
+  upgraderPID: PID;
 }
 
 declare interface HomeRoomManager_Cache extends MemCache {

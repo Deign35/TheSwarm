@@ -67,7 +67,7 @@ class RoomController extends BasicProcess<RoomController_Memory, RoomController_
           mineralHarvesterPID: '',
           largeHarvester: '',
           homeRoom: this.memory.homeRoom,
-          numWorkers: (data.sourceIDs.length * 2)
+          upgraderPID: ''
         } as HomeRoomManager_Memory);
         this.kernel.setParent(this.memory.activityPIDs[RPKG_HomeRoomManager]!, this.pid);
       }
@@ -75,7 +75,6 @@ class RoomController extends BasicProcess<RoomController_Memory, RoomController_
       if (!this.memory.activityPIDs[RPKG_RemoteManager] || !this.kernel.getProcessByPID(this.memory.activityPIDs[RPKG_RemoteManager]!)) {
         this.memory.activityPIDs[RPKG_RemoteManager] = this.kernel.startProcess(RPKG_RemoteManager, {
           harvesterPIDs: {},
-          numRefillers: 3,
           refillerPIDs: [],
           targetRoom: this.memory.homeRoom,
           homeRoom: data.homeRoom,

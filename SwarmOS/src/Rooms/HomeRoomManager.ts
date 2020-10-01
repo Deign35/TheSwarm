@@ -76,19 +76,20 @@ class HomeRoomManager extends BasicProcess<HomeRoomManager_Memory, HomeRoomManag
 
     let numWorkers = roomData.sourceIDs.length;
     const room = Game.rooms[this.memory.homeRoom];
-    if (room.controller!.level <= 2) {
+    if (room.energyCapacityAvailable <= 550) {
       numWorkers *= 5;
-    } else if (room.controller!.level <= 3) {
+    } else if (room.energyCapacityAvailable <= 800) {
       numWorkers *= 4;
     } else if (!room.storage) {
       numWorkers *= 3;
     } else {
       let storageAmount = Math.ceil(room.storage.store[RESOURCE_ENERGY] / 100000);
-      if (room.controller!.level >= 6) {
+      if (room.energyCapacityAvailable >= 2300) {
         storageAmount = Math.floor(storageAmount / 2);
       }
       numWorkers += storageAmount;
     }
+    numWorkers -= 1;
 
     while (this.memory.workerPIDs.length < numWorkers) {
       this.memory.workerPIDs.push(this.kernel.startProcess(CPKG_Worker, {
@@ -97,6 +98,14 @@ class HomeRoomManager extends BasicProcess<HomeRoomManager_Memory, HomeRoomManag
         expires: true
       } as Worker_Memory))
       this.kernel.setParent(this.memory.workerPIDs[this.memory.workerPIDs.length - 1], this.pid);
+    }
+
+    if (!this.memory.upgraderPID || !this.kernel.getProcessByPID(this.memory.upgraderPID)) {
+      this.memory.upgraderPID = this.kernel.startProcess(CPKG_Upgrader, {
+        homeRoom: this.memory.homeRoom,
+        targetRoom: this.memory.homeRoom,
+        expires: true,
+      } as Upgrader_Memory);
     }
 
     if (roomData.mineralIDs.length > 0 && roomData.structures[STRUCTURE_EXTRACTOR].length > 0 &&

@@ -3,9 +3,12 @@ export const OSPackage: IPackage = {
     processRegistry.register(CPKG_Upgrader, Upgrader);
   }
 }
-import { SoloJob } from "./SoloJob";
+import { SoloCreep } from "./SoloCreep";
 
-class Upgrader extends SoloJob<Upgrader_Memory, MemCache> {
+class Upgrader extends SoloCreep<Upgrader_Memory, SoloCreep_Cache> {
+  protected RequestBoost(creep: Creep): boolean {
+    return false;
+  }
   protected GetNewSpawnID(): string {
     this.memory.hasRequestedBoost = false;
     const homeRoom = Game.rooms[this.memory.homeRoom];
@@ -42,54 +45,44 @@ class Upgrader extends SoloJob<Upgrader_Memory, MemCache> {
         parentPID: this.pid
       }, 0);
   }
-  protected CreateCustomCreepActivity(creep: Creep): string | undefined {
+  protected CreateCustomCreepAction(creep: Creep): SoloCreepAction | undefined {
     const roomData = this.roomManager.GetRoomData(creep.room.name)!;
-    if (this.memory.needsBoost) {
-      const labIDs = Object.keys(roomData.labOrders);
-      for (let i = 0; i < labIDs.length; i++) {
-        const order = roomData.labOrders[labIDs[i]];
-        if (order.creepIDs && order.creepIDs.includes(creep.name) && order.amount > 0) {
-          return this.creepManager.CreateNewCreepActivity({
-            action: AT_MoveToPosition,
-            creepID: creep.name,
-            amount: 1,
-            targetID: labIDs[i]
-          }, this.pid);
+    let carryUsedCapacity = creep.store.getUsedCapacity(RESOURCE_ENERGY);
+    if (this.cache.lastAction) {
+      if (this.cache.lastAction.action == AT_Withdraw) {
+        const target = Game.getObjectById<ObjectTypeWithID>(this.cache.lastAction.targetID!);
+        if (target) {
+          if ((target as Tombstone).store) {
+            carryUsedCapacity = Math.min(creep.store.getCapacity(), carryUsedCapacity + (target as Tombstone).store.getUsedCapacity(RESOURCE_ENERGY));
+          } else {
+            this.log.error(`AT_Withdraw on something without a store property: ${JSON.stringify(target)}`);
+          }
         }
-      }
-      // If we're here then no boost orders are present
-      this.memory.needsBoost = false;
-    }
-
-    if (!this.memory.hasRequestedBoost && (creep.spawning || creep.ticksToLive! > 1480)) {
-      const numResourceRequired = creep.getActiveBodyparts(WORK) * 30;
-      if (creep.room.terminal && creep.room.terminal.store.getUsedCapacity(RESOURCE_GHODIUM_HYDRIDE) >= numResourceRequired) {
-        roomData.labRequests.push({
-          amount: numResourceRequired,
-          creepID: creep.name,
-          forBoost: true,
-          resourceType: RESOURCE_GHODIUM_HYDRIDE
-        });
-        this.memory.hasRequestedBoost = true;
-        this.memory.needsBoost = true;
+      } else if (this.cache.lastAction.action == AT_Pickup) {
+        const target = Game.getObjectById<Resource>(this.cache.lastAction.targetID!);
+        if (target) {
+          if ((target as Resource).amount > 0) {
+            carryUsedCapacity = Math.min(creep.store.getCapacity(), carryUsedCapacity + (target as Resource).amount);
+          }
+        }
+      } else if (this.cache.lastAction.action == AT_Upgrade) {
+        carryUsedCapacity -= creep.getActiveBodyparts(WORK);
       }
     }
-
-    const carryRatio = creep.store.getUsedCapacity() / creep.store.getCapacity();
+    const carryRatio = carryUsedCapacity / creep.store.getCapacity();
     if (carryRatio >= 0.50) {
       if (creep.room.controller && creep.room.controller.my) {
-        return this.creepManager.CreateNewCreepActivity({
+        return {
           action: AT_Upgrade,
-          creepID: creep.name,
           targetID: creep.room.controller.id
-        }, this.pid)
+        }
       }
     }
 
     let actionType: ActionType = AT_NoOp;
     let bestTarget = '';
     let closestDist = 1000;
-    const energyNeeded = creep.store.getFreeCapacity();
+    const energyNeeded = creep.store.getCapacity() - carryUsedCapacity;
     const halfEnergyNeeded = energyNeeded / 2;
 
     if (actionType == AT_NoOp && roomData.tombstones.length > 0) {
@@ -127,39 +120,11 @@ class Upgrader extends SoloJob<Upgrader_Memory, MemCache> {
       }
     }
 
-    if (actionType == AT_NoOp && (!creep.room.controller || !creep.room.controller.my) && roomData.structures[STRUCTURE_CONTAINER].length > 0) {
-      for (let i = 0; i < roomData.structures[STRUCTURE_CONTAINER].length; i++) {
-        const container = Game.getObjectById<StructureContainer>(roomData.structures[STRUCTURE_CONTAINER][i]);
-        if (container && container.store.getUsedCapacity(RESOURCE_ENERGY) >= energyNeeded) {
-          const dist = container.pos.getRangeTo(creep.pos);
-          if (dist < closestDist) {
-            closestDist = dist;
-            bestTarget = container.id;
-            actionType = AT_Withdraw;
-          }
-        }
-      }
-    }
-
-    if (actionType == AT_NoOp && (!creep.room.controller || !creep.room.controller.my)) {
-      const enemyStructures = creep.room.find(FIND_HOSTILE_STRUCTURES);
-      for (let i = 0; i < enemyStructures.length; i++) {
-        const enemyStructure = enemyStructures[i];
-        const dist = enemyStructure.pos.getRangeTo(creep.pos);
-        if (dist < closestDist) {
-          closestDist = dist;
-          bestTarget = enemyStructure.id;
-          actionType = AT_Dismantle;
-        }
-      }
-    }
-
-    return this.creepManager.CreateNewCreepActivity({
+    return {
       targetID: bestTarget,
       action: actionType,
-      creepID: creep.name,
       resourceType: RESOURCE_ENERGY
-    }, this.pid);
+    }
   }
 
   HandleNoActivity(creep: Creep) { }
