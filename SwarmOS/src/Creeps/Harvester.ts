@@ -6,7 +6,7 @@ export const OSPackage: IPackage = {
 import { SoloCreep } from "./SoloCreep";
 import { LookAtGround } from "Tools/TheFinder";
 
-class Harvester extends SoloCreep<HarvesterMemory, MemCache> {
+class Harvester extends SoloCreep<HarvesterMemory, SoloCreep_Cache> {
   protected RequestBoost(creep: Creep): boolean {
     return false;
   }
@@ -90,7 +90,7 @@ class Harvester extends SoloCreep<HarvesterMemory, MemCache> {
     }
 
     const container = Game.getObjectById<StructureContainer | ConstructionSite>(this.memory.container);
-    if (creep.store[RESOURCE_ENERGY] > 0) {
+    if (creep.store[RESOURCE_ENERGY] > 0 && !this.cache.lastAction) {
       if (container) {
         if ((container as StructureContainer).hitsMax) {
           if ((container as StructureContainer).hits < (container as StructureContainer).hitsMax) {

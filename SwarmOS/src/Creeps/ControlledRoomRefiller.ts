@@ -21,9 +21,6 @@ class ControlledRoomRefiller extends SoloCreep<ControlledRoomRefiller_Memory, Co
     } else if (homeRoom.energyCapacityAvailable >= 800) {
       body = [CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
         MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
-    } else if (homeRoom.energyCapacityAvailable >= 600) {
-      body = [CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
-        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
     } else if (homeRoom.energyCapacityAvailable >= 400) {
       body = [CARRY, CARRY, CARRY, CARRY,
         MOVE, MOVE, MOVE, MOVE];
@@ -59,7 +56,7 @@ class ControlledRoomRefiller extends SoloCreep<ControlledRoomRefiller_Memory, Co
         const target = Game.getObjectById<ObjectTypeWithID>(this.cache.lastAction.targetID!);
         if (target) {
           if ((target as StructureExtension).store) {
-            creepUsedCapacity -= (target as StructureExtension).store.getFreeCapacity(RESOURCE_ENERGY);
+            creepUsedCapacity = Math.max(creepUsedCapacity - (target as StructureExtension).store.getFreeCapacity(RESOURCE_ENERGY), 0);
           } else {
             this.log.error(`AT_Transfer on something without a store property: ${JSON.stringify(target)}`);
           }
@@ -112,7 +109,6 @@ class ControlledRoomRefiller extends SoloCreep<ControlledRoomRefiller_Memory, Co
       const carryParts = creep.getActiveBodyparts(CARRY);
       if ((room.energyCapacityAvailable >= 1600 && carryParts < 16) ||
           (room.energyCapacityAvailable >= 800 && carryParts < 8) ||
-          (room.energyCapacityAvailable >= 600 && carryParts < 6) ||
           (room.energyCapacityAvailable >= 400 && carryParts < 4)) {
         const newPID = this.kernel.startProcess(this.pkgName, {
           homeRoom: this.memory.homeRoom,

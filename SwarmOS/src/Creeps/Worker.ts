@@ -65,7 +65,7 @@ class Worker extends SoloCreep<Worker_Memory, SoloCreep_Cache> {
         const target = Game.getObjectById<ObjectTypeWithID>(this.cache.lastAction.targetID!);
         if (target) {
           if ((target as StructureExtension).store) {
-            creepCapacity -= (target as StructureExtension).store.getFreeCapacity(RESOURCE_ENERGY);
+            creepCapacity = Math.max(creepCapacity - (target as StructureExtension).store.getFreeCapacity(RESOURCE_ENERGY), 0);
           } else {
             this.log.error(`AT_Transfer on something without a store property: ${JSON.stringify(target)}`);
           }

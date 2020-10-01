@@ -1,4 +1,3 @@
-import { OSPackage as ControllerClaimer } from "./ControllerClaimer";
 import { OSPackage as Dismantler } from "./Dismantler";
 import { OSPackage as MineralHarvester } from "./MineralHarvester";
 import { OSPackage as RemoteRefiller } from "./RemoteRefiller";
@@ -11,7 +10,6 @@ import { OSPackage as Upgrader } from "./Upgrader";
 
 export const JobsPackage: IPackage = {
   install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
-    ControllerClaimer.install(processRegistry, extensionRegistry);
     Dismantler.install(processRegistry, extensionRegistry);
     MineralHarvester.install(processRegistry, extensionRegistry);
     RemoteRefiller.install(processRegistry, extensionRegistry);

@@ -22,7 +22,7 @@ class HomeRoomManager extends BasicProcess<HomeRoomManager_Memory, HomeRoomManag
 
   RunThread(): ThreadState {
     const roomData = this.roomManager.GetRoomData(this.memory.homeRoom)!;
-    if (Game.rooms[this.memory.homeRoom].energyCapacityAvailable < 2100) {
+    if (roomData.sourceIDs.length == 1 || Game.rooms[this.memory.homeRoom].energyCapacityAvailable < 2100) {
       const sourceIDs = roomData.sourceIDs;
       for (let i = 0; i < sourceIDs.length; i++) {
         if (!this.memory.harvesterPIDs[sourceIDs[i]] ||
