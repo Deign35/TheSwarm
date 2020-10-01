@@ -57,7 +57,7 @@ class HomeRoomManager extends BasicProcess<HomeRoomManager_Memory, HomeRoomManag
       }
     }
 
-    while (this.memory.refillerPIDs.length < 2) {
+    while (this.memory.refillerPIDs.length < roomData.sourceIDs.length) {
       const pid = this.kernel.startProcess(CPKG_ControlledRoomRefiller, {
         homeRoom: this.memory.homeRoom,
         targetRoom: this.memory.homeRoom,

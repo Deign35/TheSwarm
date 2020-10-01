@@ -41,7 +41,7 @@ export class GlobalTools {
   }
 
   static GetRandomID<T>(dictionaryObject: SDictionary<T>): T | undefined {
-    const index = this.GetRandomIndex(Object.keys(dictionaryObject));
+    const index = GetRandomIndex(Object.keys(dictionaryObject));
     return (dictionaryObject && dictionaryObject[index]) || undefined;
   }
 }

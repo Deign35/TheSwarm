@@ -159,7 +159,7 @@ class SpawnManager extends BasicProcess<SpawnManager_Memory, MemCache> {
           return false;
         case (ERR_NAME_EXISTS):
           req.spawnContext.creepName += `_` +
-            (Game.time % GetRandomIndex(primes_100));
+            (Game.time % GetRandomID(primes_100)!);
         case (OK):
           break;
         default:
