@@ -113,7 +113,6 @@ class RoomManagerExtension extends ExtensionBase implements IRoomManagerExtensio
             lab: [],
             link: [],
             spawn: [],
-            storage: [],
             terminal: [],
             tower: []
           },
@@ -151,7 +150,6 @@ class RoomManagerExtension extends ExtensionBase implements IRoomManagerExtensio
       lab: [],
       link: [],
       spawn: [],
-      storage: [],
       terminal: [],
       tower: []
     }

@@ -133,7 +133,4 @@ global['ConstructBodyArray'] = GlobalTools.ConstructBodyArray;
 global['GetSUID'] = GlobalTools.GetSUID;
 global['GetRandomIndex'] = GlobalTools.GetRandomIndex;
 global['GetRandomID'] = GlobalTools.GetRandomID;
-//if (!Memory.FakeCache) {
-//Memory.FakeCache = {};
-//}
-global['MemoryCache'] = {}; //Memory.FakeCache;// {};
+global['MemoryCache'] = {};

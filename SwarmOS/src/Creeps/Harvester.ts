@@ -170,4 +170,27 @@ class Harvester extends SoloCreep<HarvesterMemory, MemCache> {
   HandleNoActivity(creep: Creep) {
     // Do Nothing;
   }
+  OnTick(creep?: Creep) {
+    if (!this.memory.isZombie && !this.memory.supportHarvester && creep && creep.ticksToLive) {
+      if ((this.memory.remoteHarvester && creep.ticksToLive < 150) ||
+      creep.ticksToLive < 50) {
+        const newPID = this.kernel.startProcess(this.pkgName, {
+          container: this.memory.container,
+          homeRoom: this.memory.homeRoom,
+          source: this.memory.source,
+          targetRoom: this.memory.targetRoom,
+          creepID: this.memory.creepID,
+          expires: true,
+          hasRun: true,
+          isZombie: true,
+          link: this.memory.link,
+          remoteHarvester: this.memory.remoteHarvester,
+        } as HarvesterMemory);
+
+        this.creepManager.releaseCreep(this.memory.creepID!, this.pid);
+        this.creepManager.tryReserveCreep(this.memory.creepID!, newPID);
+        this.EndProcess();
+      }
+    }
+  }
 }

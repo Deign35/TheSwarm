@@ -62,7 +62,7 @@ class RoomController extends BasicProcess<RoomController_Memory, RoomController_
       if (!this.memory.activityPIDs[RPKG_HomeRoomManager] || !this.kernel.getProcessByPID(this.memory.activityPIDs[RPKG_HomeRoomManager]!)) {
         this.memory.activityPIDs[RPKG_HomeRoomManager] = this.kernel.startProcess(RPKG_HomeRoomManager, {
           harvesterPIDs: {},
-          refillerPID: '',
+          refillerPIDs: [],
           workerPIDs: [],
           mineralHarvesterPID: '',
           largeHarvester: '',

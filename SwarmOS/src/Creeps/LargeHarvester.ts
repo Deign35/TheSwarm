@@ -16,6 +16,10 @@ class LargetHarvester extends SoloCreep<LargeHarvester_Memory, LargeHarvester_Ca
       WORK, WORK, WORK, WORK, WORK, WORK,
       CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
       MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+    if (this.memory.remoteHarvester) {
+      body = [WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK,
+      MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+    }
     return this.spawnManager.requestSpawn({
       body: body,
       creepName: this.memory.targetRoom + "_" + (Game.time + "_LH").slice(-6),
@@ -151,5 +155,25 @@ class LargetHarvester extends SoloCreep<LargeHarvester_Memory, LargeHarvester_Ca
   }
   HandleNoActivity(creep: Creep) {
     // Do Nothing;
+  }
+  OnTick(creep?: Creep) {
+    if (!this.memory.isZombie && creep && creep.ticksToLive) {
+      if ((this.memory.remoteHarvester && creep.ticksToLive < 200) ||
+      creep.ticksToLive < 120) {
+        const newPID = this.kernel.startProcess(this.pkgName, {
+          homeRoom: this.memory.homeRoom,
+          targetRoom: this.memory.targetRoom,
+          creepID: this.memory.creepID,
+          expires: true,
+          hasRun: true,
+          isZombie: true,
+          remoteHarvester: this.memory.remoteHarvester,
+        } as LargeHarvester_Memory);
+
+        this.creepManager.releaseCreep(this.memory.creepID!, this.pid);
+        this.creepManager.tryReserveCreep(this.memory.creepID!, newPID);
+        this.EndProcess();
+      }
+    }
   }
 }

@@ -120,10 +120,9 @@ class Upgrader extends SoloJob<Upgrader_Memory, MemCache> {
       }
     }
 
-    if (actionType == AT_NoOp && roomData.structures[STRUCTURE_STORAGE].length > 0) {
-      const storage = Game.getObjectById<StructureStorage>(roomData.structures[STRUCTURE_STORAGE][0]);
-      if (storage && (storage.store[RESOURCE_ENERGY] || -1) >= energyNeeded) {
-        bestTarget = storage.id;
+    if (actionType == AT_NoOp && creep.room.storage) {
+      if ((creep.room.storage.store[RESOURCE_ENERGY] || -1) >= energyNeeded) {
+        bestTarget = creep.room.storage.id;
         actionType = AT_Withdraw;
       }
     }

@@ -97,9 +97,9 @@ declare interface IRoomManagerExtension extends IPackageExtension {
  */
 declare interface ICreepManagerExtensions extends IPackageExtension {
   tryRegisterCreep(creepID: CreepID): boolean;
-  tryGetCreep(id: CreepID, requestingPID: PID): Creep | undefined;
-  tryReserveCreep(id: CreepID, requestingPID: PID): boolean;
-  releaseCreep(id: CreepID, requestingPID: PID): void;
+  tryGetCreep(creepID: CreepID, requestingPID: PID): Creep | undefined;
+  tryReserveCreep(creepID: CreepID, requestingPID: PID): boolean;
+  releaseCreep(creepID: CreepID, requestingPID: PID): void;
 
   CreateNewCreepActivity(actionMem: SingleCreepAction_Memory, parentPID: PID): PID | undefined;
   RunCreepAction(args: CreepActionArgs): ScreepsReturnCode;

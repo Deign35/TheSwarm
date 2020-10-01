@@ -21,6 +21,7 @@ export abstract class SoloCreep<T extends SoloCreep_Memory, U extends SoloCreep_
     if (this.memory.creepID) {
       creep = this.creepManager.tryGetCreep(this.memory.creepID, this.pid);
       if (creep && !creep.spawning) {
+        this.OnTick(creep);
         if (!this.cache.curAction) {
           this.CreateActionForCreep(this.memory.creepID!);
         }
@@ -130,6 +131,7 @@ export abstract class SoloCreep<T extends SoloCreep_Memory, U extends SoloCreep_
     }
 
     if (!creep) {
+      this.OnTick();
       if (!this.memory.spawnID) {
         if (this.memory.expires && this.memory.hasRun) {
           this.EndProcess();
@@ -214,6 +216,7 @@ export abstract class SoloCreep<T extends SoloCreep_Memory, U extends SoloCreep_
   protected HandleNoActivity(creep: Creep) {
     this.EndProcess();
   }
+  protected OnTick(creep?: Creep) { }
 
   OnEndProcess() {
     if (this.memory.creepID) {

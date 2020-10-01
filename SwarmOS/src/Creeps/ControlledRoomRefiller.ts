@@ -73,7 +73,7 @@ class ControlledRoomRefiller extends SoloCreep<ControlledRoomRefiller_Memory, Co
         }
       }
     }
-    if (creepUsedCapacity <= 0 &&
+    if (!this.memory.isZombie && creepUsedCapacity <= 0 &&
       (creep.ticksToLive || 1500) < 1500 - ((600 / creep.body.length) * 4)) {
       let spawn = creep.pos.findClosestByRange(FIND_MY_SPAWNS, {
         filter: (spawn: StructureSpawn) => {
@@ -87,7 +87,7 @@ class ControlledRoomRefiller extends SoloCreep<ControlledRoomRefiller_Memory, Co
         }
       }
     }
-    if ((creep.ticksToLive || 0) < 30 && creepUsedCapacity < 0.10) {
+    if ((creep.ticksToLive || 0) < 30 && creepUsedCapacity <= 0) {
       return {
         action: AT_Suicide,
         pos: creep.pos
@@ -106,6 +106,29 @@ class ControlledRoomRefiller extends SoloCreep<ControlledRoomRefiller_Memory, Co
   }
 
   protected HandleNoActivity(creep: Creep) { }
+  OnTick(creep?: Creep) {
+    if (creep && !this.memory.isZombie) {
+      const room = Game.rooms[this.memory.homeRoom];
+      const carryParts = creep.getActiveBodyparts(CARRY);
+      if ((room.energyCapacityAvailable >= 1600 && carryParts < 16) ||
+          (room.energyCapacityAvailable >= 800 && carryParts < 8) ||
+          (room.energyCapacityAvailable >= 600 && carryParts < 6) ||
+          (room.energyCapacityAvailable >= 400 && carryParts < 4)) {
+        const newPID = this.kernel.startProcess(this.pkgName, {
+          homeRoom: this.memory.homeRoom,
+          targetRoom: this.memory.targetRoom,
+          creepID: this.memory.creepID,
+          expires: true,
+          hasRun: true,
+          isZombie: true
+        } as ControlledRoomRefiller_Memory);
+
+        this.creepManager.releaseCreep(creep.name, this.pid);
+        this.creepManager.tryReserveCreep(creep.name, newPID);
+        this.EndProcess();
+      }
+    }
+  }
 
   protected GetNewTarget(creep: Creep, creepUsedCapacity: number): { targetID: ObjectID, action: ActionType } {
     let actionType: ActionType = AT_NoOp;
@@ -293,14 +316,11 @@ class ControlledRoomRefiller extends SoloCreep<ControlledRoomRefiller_Memory, Co
       }
     }
 
-    if (actionType == AT_NoOp) {
-      const targets = this.roomManager.GetRoomData(this.memory.homeRoom)!.structures[STRUCTURE_STORAGE];
-      if (targets.length > 0) {
-        const nextTarget = Game.getObjectById<StructureStorage>(targets[0]);
-        if (nextTarget) {
-          bestTarget = nextTarget.id;
-          actionType = creepUsedCapacity > 0 ? AT_Transfer : AT_Withdraw;
-        }
+    if (actionType == AT_NoOp && creepUsedCapacity > 0) {
+      const storage = creep.room.storage;
+      if (storage && (!this.cache.lastAction || this.cache.lastAction.targetID != storage.id)) {
+        bestTarget = storage.id;
+        actionType = AT_Transfer;
       }
     }
 

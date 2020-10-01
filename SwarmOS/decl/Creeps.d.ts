@@ -28,16 +28,6 @@ declare interface SoloJob_Memory extends MemBase {
   homeRoom: RoomID;    // (h)ome room
   targetRoom: RoomID;     // (t)arget (r)oom
 }
-declare interface HarvesterMemory extends SoloJob_Memory {
-  source: ObjectID;
-  container: ObjectID;
-  remoteHarvester?: boolean;
-  link?: ObjectID;
-  supportHarvester?: boolean;
-}
-declare interface ControlledRoomRefiller_Memory extends SoloJob_Memory {
-  lastTime: number;
-}
 declare interface Dismantler_Memory extends SoloJob_Memory { }
 declare interface Worker_Memory extends SoloJob_Memory {
   needsBoost: boolean;
@@ -125,11 +115,23 @@ declare interface ControlledRoomRefiller_Cache extends SoloCreep_Cache {
 
 declare interface LargeHarvester_Memory  extends SoloCreep_Memory {
   remoteHarvester?: boolean;
+  isZombie?: boolean;
 }
 declare interface LargeHarvester_Cache extends SoloCreep_Cache {
   curSource?: ObjectID;
   curContainer?: ObjectID;
   curLink?: ObjectID;
+}
+declare interface HarvesterMemory extends SoloCreep_Memory {
+  source: ObjectID;
+  container: ObjectID;
+  remoteHarvester?: boolean;
+  link?: ObjectID;
+  supportHarvester?: boolean;
+  isZombie?: boolean;
+}
+declare interface ControlledRoomRefiller_Memory extends SoloJob_Memory {
+  isZombie?: boolean;
 }
 
 //CLI(CLI_Launch, CPKG_ControllerClaimer, { homeRoom: "E15S41", targetRoom: "E15S43", expires: true });

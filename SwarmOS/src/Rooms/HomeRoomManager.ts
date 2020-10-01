@@ -51,15 +51,20 @@ class HomeRoomManager extends BasicProcess<HomeRoomManager_Memory, HomeRoomManag
         }
     }
 
-    if (!this.memory.refillerPID ||
-      !this.kernel.getProcessByPID(this.memory.refillerPID)) {
+    for (let i = 0; i < this.memory.refillerPIDs.length; i++) {
+      if (!this.kernel.getProcessByPID(this.memory.refillerPIDs[i])) {
+        this.memory.refillerPIDs.splice(i--, 1);
+      }
+    }
+
+    while (this.memory.refillerPIDs.length < 2) {
       const pid = this.kernel.startProcess(CPKG_ControlledRoomRefiller, {
         homeRoom: this.memory.homeRoom,
         targetRoom: this.memory.homeRoom,
-        lastTime: Game.time
+        expires: true
       } as ControlledRoomRefiller_Memory);
 
-      this.memory.refillerPID = pid;
+      this.memory.refillerPIDs.push(pid);
       this.kernel.setParent(pid, this.pid);
     }
 
