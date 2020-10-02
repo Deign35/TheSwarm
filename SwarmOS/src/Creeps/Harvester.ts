@@ -136,7 +136,7 @@ class Harvester extends SoloCreep<HarvesterMemory, SoloCreep_Cache> {
         }
       }
 
-      if (this.memory.link) {
+      if (this.memory.link && !this.cache.lastAction) {
         const link = Game.getObjectById<StructureLink>(this.memory.link);
         if (!link) {
           delete this.memory.link

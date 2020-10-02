@@ -3,9 +3,12 @@ export const OSPackage: IPackage = {
     processRegistry.register(CPKG_RemoteRefiller, RemoteRefiller);
   }
 }
-import { SoloJob } from "./SoloJob";
+import { SoloCreep } from "./SoloCreep";
 
-class RemoteRefiller extends SoloJob<RemoteRefiller_Memory, MemCache> {
+class RemoteRefiller extends SoloCreep<RemoteRefiller_Memory, MemCache> {
+  protected RequestBoost(creep: Creep): boolean {
+    return false;
+  }
   protected GetNewSpawnID(): string {
     const body = [CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
       MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
@@ -18,26 +21,47 @@ class RemoteRefiller extends SoloJob<RemoteRefiller_Memory, MemCache> {
       }, 0)
   }
 
-  protected CreateCustomCreepActivity(creep: Creep): string | undefined {
+  protected CreateCustomCreepAction(creep: Creep): SoloCreepAction | undefined {
     if (creep.store.getUsedCapacity() > creep.store.getFreeCapacity()) {
       if (creep.room.name != this.memory.homeRoom) {
         return this.MoveToRoom(creep, this.memory.homeRoom);
       }
+
+      if (!this.memory.link) {
+        const roomData = this.roomManager.GetRoomData(this.memory.homeRoom)!;
+        for (let i = 0; i < roomData.structures[STRUCTURE_LINK].length; i++) {
+          const link = Game.getObjectById<StructureLink>(roomData.structures[STRUCTURE_LINK][i]);
+          if (!link) { continue; }
+          if (creep.pos.getRangeTo(link) <= 3) {
+            this.memory.link = link.id;
+            break;
+          }
+        }
+      }
+
+      if (this.memory.link) {
+        const link = Game.getObjectById<StructureLink>(this.memory.link);
+        if (link && link.store.getFreeCapacity(RESOURCE_ENERGY) >= creep.store[RESOURCE_ENERGY]) {
+          return {
+            action: AT_Transfer,
+            targetID: link.id,
+            resourceType: RESOURCE_ENERGY
+          }
+        }
+      }
       if (creep.room.terminal && creep.room.terminal.store[RESOURCE_ENERGY] < 50000) {
-        return this.creepManager.CreateNewCreepActivity({
+        return {
           action: AT_Transfer,
-          creepID: creep.name,
           targetID: creep.room.terminal.id,
           resourceType: RESOURCE_ENERGY
-        }, this.pid);
+        }
       }
       if (creep.room.storage) {
-        return this.creepManager.CreateNewCreepActivity({
+        return {
           action: AT_Transfer,
-          creepID: creep.name,
           targetID: creep.room.storage.id,
           resourceType: RESOURCE_ENERGY
-        }, this.pid);
+        }
       } else {
         return; // Need to deposit somewhere... a container?
       }
@@ -65,17 +89,16 @@ class RemoteRefiller extends SoloJob<RemoteRefiller_Memory, MemCache> {
     }
   }
 
-  GoGetEnergy(creep: Creep) {
+  GoGetEnergy(creep: Creep): SoloCreepAction | undefined {
     const roomData = this.roomManager.GetRoomData(creep.room.name)!;
     for (let i = 0; i < roomData.resources.length; i++) {
       const resource = Game.getObjectById<Resource>(roomData.resources[i]);
       if (!resource || resource.amount < creep.store.getFreeCapacity()) continue;
 
-      return this.creepManager.CreateNewCreepActivity({
+      return {
         action: AT_Pickup,
-        creepID: creep.name,
         targetID: resource.id
-      }, this.pid);
+      }
     }
 
     for (let i = 0; i < roomData.tombstones.length; i++) {
@@ -84,12 +107,11 @@ class RemoteRefiller extends SoloJob<RemoteRefiller_Memory, MemCache> {
         continue;
       }
 
-      return this.creepManager.CreateNewCreepActivity({
+      return {
         action: AT_Withdraw,
-        creepID: creep.name,
         targetID: tombstone.id,
         resourceType: RESOURCE_ENERGY
-      }, this.pid);
+      }
     }
 
     let bestDist = 1000;
@@ -97,7 +119,7 @@ class RemoteRefiller extends SoloJob<RemoteRefiller_Memory, MemCache> {
     for (let i = 0; i < roomData.structures[STRUCTURE_CONTAINER].length; i++) {
       const container = Game.getObjectById<StructureContainer>(roomData.structures[STRUCTURE_CONTAINER][i]);
       if (container) {
-        if (container.store[RESOURCE_ENERGY] > creep.store.getFreeCapacity()) {
+        if (container.store[RESOURCE_ENERGY] >= creep.store.getFreeCapacity()) {
           const dist = container.pos.getRangeTo(creep);
           if (dist < bestDist) {
             bestDist = dist;
@@ -108,11 +130,11 @@ class RemoteRefiller extends SoloJob<RemoteRefiller_Memory, MemCache> {
     }
 
     if (bestTarget) {
-      return this.creepManager.CreateNewCreepActivity({
+      return {
         action: AT_Withdraw,
-        creepID: creep.name,
-        targetID: bestTarget
-      }, this.pid);
+        targetID: bestTarget,
+        resourceType: RESOURCE_ENERGY
+      }
     } else {
       return;
     }

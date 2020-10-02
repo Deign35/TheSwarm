@@ -103,6 +103,7 @@ class ControlledRoomRefiller extends SoloCreep<ControlledRoomRefiller_Memory, Co
   }
 
   protected HandleNoActivity(creep: Creep) { }
+
   OnTick(creep?: Creep) {
     if (creep && !this.memory.isZombie) {
       const room = Game.rooms[this.memory.homeRoom];
@@ -141,7 +142,8 @@ class ControlledRoomRefiller extends SoloCreep<ControlledRoomRefiller_Memory, Co
         for (let i = 0; i < linkIDs.length; i++) {
           const link = Game.getObjectById<StructureLink>(linkIDs[i]);
           if (!link) { continue; }
-          if (link.pos.x == 1 || link.pos.x == 48 || link.pos.y == 1 || link.pos.y == 48) {
+          const closeExits = link.pos.findInRange(FIND_EXIT, 3);
+          if (closeExits.length > 0) {
             continue;
           }
           const closeSources = link.pos.findInRange(FIND_SOURCES, 2);
@@ -183,6 +185,13 @@ class ControlledRoomRefiller extends SoloCreep<ControlledRoomRefiller_Memory, Co
             closestDist = 0;
             bestTarget = storage.id;
             actionType = AT_Withdraw;
+          } else {
+            const terminal = creep.room.terminal;
+            if (terminal && (terminal.store[RESOURCE_ENERGY] || -1) >= energyNeeded) {
+              closestDist = 0;
+              bestTarget = terminal.id;
+              actionType = AT_Withdraw;
+            }
           }
         }
       }
@@ -254,12 +263,8 @@ class ControlledRoomRefiller extends SoloCreep<ControlledRoomRefiller_Memory, Co
       for (let i = 0; i < targets.length; i++) {
         if (this.cache.lastAction && this.cache.lastAction.targetID === targets[i]) { continue; }
         const nextTarget = Game.getObjectById<ObjectTypeWithID>(targets[i]) as StructureTower;
-        if (!nextTarget) { continue; }
+        if (!nextTarget || nextTarget.store.getFreeCapacity(RESOURCE_ENERGY) < 300) { continue; }
 
-        const targetWants = nextTarget.store.getFreeCapacity(RESOURCE_ENERGY);
-        if (targetWants < 300) {
-          continue;
-        }
         const dist = nextTarget.pos.getRangeTo(creep.pos);
         if (dist < closestDist) {
           closestDist = dist;
@@ -313,9 +318,13 @@ class ControlledRoomRefiller extends SoloCreep<ControlledRoomRefiller_Memory, Co
     }
 
     if (actionType == AT_NoOp && creepUsedCapacity > 0) {
-      const storage = creep.room.storage;
-      if (storage && (!this.cache.lastAction || this.cache.lastAction.targetID != storage.id)) {
-        bestTarget = storage.id;
+      const terminal = creep.room.terminal;
+      if (terminal && (!this.cache.lastAction || this.cache.lastAction.targetID != terminal.id) &&
+          terminal.store[RESOURCE_ENERGY] < 50000) {
+        bestTarget = terminal.id;
+        actionType = AT_Transfer;
+      } else if (creep.room.storage && (!this.cache.lastAction || this.cache.lastAction.targetID != creep.room.storage.id)) {
+        bestTarget = creep.room.storage.id;
         actionType = AT_Transfer;
       }
     }

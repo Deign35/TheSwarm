@@ -43,7 +43,6 @@ declare interface ControllerClaimer_Memory extends SoloJob_Memory {
   onlyReserve: boolean;
   onlyAttack: boolean;
 }
-declare interface RemoteRefiller_Memory extends SoloJob_Memory { }
 declare interface Scientist_Memory extends SoloJob_Memory { }
 declare interface RoomDefender_Memory extends SoloJob_Memory {
   needsBoost: boolean;
@@ -130,8 +129,11 @@ declare interface HarvesterMemory extends SoloCreep_Memory {
   supportHarvester?: boolean;
   isZombie?: boolean;
 }
-declare interface ControlledRoomRefiller_Memory extends SoloJob_Memory {
+declare interface ControlledRoomRefiller_Memory extends SoloCreep_Memory {
   isZombie?: boolean;
+}
+declare interface RemoteRefiller_Memory extends SoloCreep_Memory {
+  link?: ObjectID;
 }
 
 //CLI(CLI_Launch, CPKG_ControllerClaimer, { homeRoom: "E15S41", targetRoom: "E15S43", expires: true });
