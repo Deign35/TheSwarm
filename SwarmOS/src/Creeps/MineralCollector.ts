@@ -91,5 +91,11 @@ class MineralCollector extends SoloCreep<MineralCollector_Memory, MineralCollect
 
     return;
   }
+
+  OnTick(creep?: Creep) {
+    if (creep && creep.ticksToLive && creep.ticksToLive < 60 && creep.store.getUsedCapacity() == 0) {
+      creep.suicide();
+    }
+  }
   protected HandleNoActivity(creep: Creep) { }
 }

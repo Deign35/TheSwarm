@@ -109,8 +109,9 @@ class HomeRoomManager extends BasicProcess<HomeRoomManager_Memory, HomeRoomManag
     }
 
     if (roomData.mineralIDs.length > 0 && roomData.structures[STRUCTURE_EXTRACTOR].length > 0) {
+      const mineral = Game.getObjectById<Mineral>(roomData.mineralIDs[0]);
       const extractor = Game.getObjectById<StructureExtractor>(roomData.structures[STRUCTURE_EXTRACTOR][0]);
-      if (extractor) {
+      if (mineral && !mineral.ticksToRegeneration && extractor) {
         if (!this.memory.mineralHarvesterPID || !this.kernel.getProcessByPID(this.memory.mineralHarvesterPID)) {
           const pid = this.kernel.startProcess(CPKG_MineralHarvester, {
             homeRoom: this.memory.homeRoom,
