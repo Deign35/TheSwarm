@@ -135,6 +135,11 @@ declare interface ControlledRoomRefiller_Memory extends SoloCreep_Memory {
 declare interface RemoteRefiller_Memory extends SoloCreep_Memory {
   link?: ObjectID;
 }
+declare interface MineralHarvester_Memory extends SoloCreep_Memory { }
+declare interface MineralCollector_Memory extends SoloCreep_Memory { }
+declare interface MineralCollector_Cache extends SoloCreep_Cache {
+  container?: ObjectID;
+}
 
 //CLI(CLI_Launch, CPKG_ControllerClaimer, { homeRoom: "E15S41", targetRoom: "E15S43", expires: true });
 //CLI(CLI_Launch, CPKG_RoomBooter, { homeRoom: "E15S41", targetRoom: "E15S43", expires: true })

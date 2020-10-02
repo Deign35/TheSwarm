@@ -75,6 +75,7 @@
                 "ExperimentalSquad": "experimentalSquad",
                 "Harvester": "harvester",
                 "LargeHarvester": "largeHarvester",
+                "MineralCollector": "mineralCollector",
                 "MineralHarvester": "mineralHarvester",
                 "RemoteRefiller": "remoteRefiller",
                 "RoomBooter": "roomBooter",

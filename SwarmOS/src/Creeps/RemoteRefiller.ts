@@ -5,7 +5,7 @@ export const OSPackage: IPackage = {
 }
 import { SoloCreep } from "./SoloCreep";
 
-class RemoteRefiller extends SoloCreep<RemoteRefiller_Memory, MemCache> {
+class RemoteRefiller extends SoloCreep<RemoteRefiller_Memory, SoloCreep_Cache> {
   protected RequestBoost(creep: Creep): boolean {
     return false;
   }

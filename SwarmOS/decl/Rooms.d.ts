@@ -14,6 +14,7 @@ declare interface HomeRoomManager_Memory extends RoomMemory {
   largeHarvester: PID;
   refillerPIDs: PID[];
   workerPIDs: PID[];
+  mineralCollectorPID: PID;
   mineralHarvesterPID: PID;
   upgraderPID: PID;
 }

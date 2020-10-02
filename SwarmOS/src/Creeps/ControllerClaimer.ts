@@ -5,7 +5,7 @@ export const OSPackage: IPackage = {
 }
 import { SoloCreep } from "./SoloCreep";
 
-class ControllerClaimer extends SoloCreep<ControllerClaimer_Memory, MemCache> {
+class ControllerClaimer extends SoloCreep<ControllerClaimer_Memory, SoloCreep_Cache> {
   protected RequestBoost(creep: Creep): boolean {
     return false;
   }

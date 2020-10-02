@@ -3,9 +3,12 @@ export const OSPackage: IPackage = {
     processRegistry.register(CPKG_Scientist, Scientist);
   }
 }
-import { SoloJob } from "./SoloJob";
+import { SoloCreep } from "./SoloCreep";
 
-class Scientist extends SoloJob<Scientist_Memory, MemCache> {
+class Scientist extends SoloCreep<Scientist_Memory, SoloCreep_Cache> {
+  protected RequestBoost(creep: Creep): boolean {
+    return false;
+  }
   protected GetNewSpawnID(): string {
     return this.spawnManager.requestSpawn({
       body: [CARRY, CARRY, CARRY, CARRY, MOVE, MOVE],
@@ -15,7 +18,7 @@ class Scientist extends SoloJob<Scientist_Memory, MemCache> {
         parentPID: this.pid
       }, 0);
   }
-  protected CreateCustomCreepActivity(creep: Creep): PID | undefined {
+  protected CreateCustomCreepAction(creep: Creep): SoloCreepAction | undefined {
     const roomData = this.roomManager.GetRoomData(this.memory.homeRoom)!;
     const terminal = creep.room.terminal;
     if (!terminal) {
@@ -24,11 +27,10 @@ class Scientist extends SoloJob<Scientist_Memory, MemCache> {
     }
 
     if (creep.ticksToLive && creep.ticksToLive < 50 && creep.store.getUsedCapacity() == 0) {
-      return this.creepManager.CreateNewCreepActivity({
+      return {
         action: AT_Suicide,
-        creepID: creep.name,
         pos: creep.pos
-      }, this.pid);
+      }
     }
 
     let curAction: ActionType = AT_NoOp;
@@ -135,20 +137,18 @@ class Scientist extends SoloJob<Scientist_Memory, MemCache> {
     }
 
     if (curAction == AT_NoOp) {
-      return this.creepManager.CreateNewCreepActivity({
+      return {
         action: AT_MoveToPosition,
-        amount: 1,
-        creepID: creep.name,
+        distance: 1,
         targetID: terminal.id
-      }, this.pid);
+      }
     }
-    return this.creepManager.CreateNewCreepActivity({
+    return {
       action: curAction,
-      creepID: creep.name,
       resourceType: actionResource,
       targetID: target,
       amount: amount
-    }, this.pid);
+    }
   }
 
   HandleNoActivity(creep: Creep) { }

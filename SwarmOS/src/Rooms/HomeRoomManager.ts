@@ -108,17 +108,26 @@ class HomeRoomManager extends BasicProcess<HomeRoomManager_Memory, HomeRoomManag
       } as Upgrader_Memory);
     }
 
-    if (roomData.mineralIDs.length > 0 && roomData.structures[STRUCTURE_EXTRACTOR].length > 0 &&
-      (!this.memory.mineralHarvesterPID || !this.kernel.getProcessByPID(this.memory.mineralHarvesterPID))) {
+    if (roomData.mineralIDs.length > 0 && roomData.structures[STRUCTURE_EXTRACTOR].length > 0) {
       const extractor = Game.getObjectById<StructureExtractor>(roomData.structures[STRUCTURE_EXTRACTOR][0]);
       if (extractor) {
-        const pid = this.kernel.startProcess(CPKG_MineralHarvester, {
-          roomID: this.memory.homeRoom,
-          squad: [{}, {}],
-          targetRoom: this.memory.homeRoom,
-        } as MineralHarvester_Memory);
-        this.memory.mineralHarvesterPID = pid;
-        this.kernel.setParent(pid, this.pid);
+        if (!this.memory.mineralHarvesterPID || !this.kernel.getProcessByPID(this.memory.mineralHarvesterPID)) {
+          const pid = this.kernel.startProcess(CPKG_MineralHarvester, {
+            homeRoom: this.memory.homeRoom,
+            targetRoom: this.memory.homeRoom
+          } as MineralHarvester_Memory);
+          this.memory.mineralHarvesterPID = pid;
+          this.kernel.setParent(pid, this.pid);
+        }
+
+        if (!this.memory.mineralCollectorPID || !this.kernel.getProcessByPID(this.memory.mineralCollectorPID)) {
+          const pid = this.kernel.startProcess(CPKG_MineralCollector, {
+            homeRoom: this.memory.homeRoom,
+            targetRoom: this.memory.homeRoom
+          } as MineralCollector_Memory);
+          this.memory.mineralCollectorPID = pid;
+          this.kernel.setParent(pid, this.pid);
+        }
       }
     }
 
