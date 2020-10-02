@@ -1,4 +1,4 @@
-import { BasicProcess } from "Core/BasicTypes";
+/*import { BasicProcess } from "Core/BasicTypes";
 
 export abstract class SoloJob<T extends SoloJob_Memory, U extends MemCache> extends BasicProcess<T, U> {
   @extensionInterface(EXT_CreepManager)
@@ -101,4 +101,4 @@ export abstract class SoloJob<T extends SoloJob_Memory, U extends MemCache> exte
       amount: 0
     }, this.pid);
   }
-}
+}*/

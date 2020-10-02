@@ -43,14 +43,11 @@ import { kernel } from "Core/index";
 
 import { ActivitiesPackage } from "Activities/index";
 import { BattlePackage } from "Battle/index";
-import { JobsPackage } from "Jobs/index";
+import { CreepsPackage } from "Creeps/index";
 import { ManagersPackage } from "Managers/index";
 import { RoomsPackage } from "Rooms/index";
 
-import { CreepsPackage } from "Creeps/index";
-kernel.installPackage(CreepsPackage);
-
-kernel.installPackages([ActivitiesPackage, BattlePackage, JobsPackage, ManagersPackage, RoomsPackage]);
+kernel.installPackages([ActivitiesPackage, BattlePackage, CreepsPackage, ManagersPackage, RoomsPackage]);
 
 export function loop() {
   try {

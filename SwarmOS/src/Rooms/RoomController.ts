@@ -64,6 +64,7 @@ class RoomController extends BasicProcess<RoomController_Memory, RoomController_
           harvesterPIDs: {},
           refillerPIDs: [],
           workerPIDs: [],
+          mineralCollectorPID: '',
           mineralHarvesterPID: '',
           largeHarvester: '',
           homeRoom: this.memory.homeRoom,

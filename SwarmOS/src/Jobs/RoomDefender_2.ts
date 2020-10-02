@@ -1,4 +1,4 @@
-export const OSPackage: IPackage = {
+/*export const OSPackage: IPackage = {
   install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
     processRegistry.register(CPKG_RoomDefender_2, RoomDefender_2);
   }
@@ -155,4 +155,4 @@ class RoomDefender_2 extends SoloJob<RoomDefender_2_Memory, MemCache> {
   }
 
   HandleNoActivity(creep: Creep) { }
-}
+}*/

@@ -3,11 +3,12 @@ export const OSPackage: IPackage = {
     processRegistry.register(CPKG_RoomBooter, RoomBooter);
   }
 }
-import { SoloJob } from "./SoloJob";
+import { SoloCreep } from "./SoloCreep";
 
-class RoomBooter extends SoloJob<RoomBooter_Memory, MemCache> {
-  @extensionInterface(EXT_MapManager)
-  mapManager!: IMapManagerExtensions;
+class RoomBooter extends SoloCreep<RoomBooter_Memory, SoloCreep_Cache> {
+  protected RequestBoost(creep: Creep): boolean {
+    return false;
+  }
   protected GetNewSpawnID(): string | undefined {
     const targetRoom = Game.rooms[this.memory.targetRoom];
     if (targetRoom) {
@@ -39,7 +40,7 @@ class RoomBooter extends SoloJob<RoomBooter_Memory, MemCache> {
         parentPID: this.pid
       }, 0);
   }
-  protected CreateCustomCreepActivity(creep: Creep): string | undefined {
+  protected CreateCustomCreepAction(creep: Creep): SoloCreepAction | undefined {
     if (creep.room.name != this.memory.targetRoom) {
       return this.MoveToRoom(creep, this.memory.targetRoom);
     }
@@ -49,27 +50,24 @@ class RoomBooter extends SoloJob<RoomBooter_Memory, MemCache> {
       const constructionSites = Game.rooms[creep.room.name].find(FIND_CONSTRUCTION_SITES);
       for (let i = 0, length = constructionSites.length; i < length; i++) {
         if (constructionSites[i].structureType == STRUCTURE_SPAWN) {
-          return this.creepManager.CreateNewCreepActivity({
+          return {
             action: AT_Build,
-            creepID: creep.name,
             targetID: constructionSites[i].id
-          }, this.pid);
+          }
         }
       }
 
       if (constructionSites.length > 0) {
-        return this.creepManager.CreateNewCreepActivity({
+        return {
           action: AT_Build,
-          creepID: creep.name,
           targetID: constructionSites[0].id
-        }, this.pid);
+        }
       }
 
-      return this.creepManager.CreateNewCreepActivity({
+      return {
         action: AT_Upgrade,
-        creepID: creep.name,
         targetID: creep.room.controller!.id
-      }, this.pid)
+      }
     }
 
     const sources = creep.room.find(FIND_SOURCES_ACTIVE);
@@ -83,11 +81,10 @@ class RoomBooter extends SoloJob<RoomBooter_Memory, MemCache> {
           closestIndex = i;
         }
       }
-      return this.creepManager.CreateNewCreepActivity({
+      return {
         action: AT_Harvest,
-        creepID: creep.name,
         targetID: sources[closestIndex].id
-      }, this.pid)
+      }
     }
 
     this.log.info(`Couldn't find anything to do`);

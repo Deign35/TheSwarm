@@ -3,9 +3,12 @@ export const OSPackage: IPackage = {
     processRegistry.register(CPKG_Scout, Scout);
   }
 }
-import { SoloJob } from "./SoloJob";
+import { SoloCreep } from "./SoloCreep";
 
-class Scout extends SoloJob<Scout_Memory, MemCache> {
+class Scout extends SoloCreep<Scout_Memory, SoloCreep_Cache> {
+  protected RequestBoost(creep: Creep): boolean {
+    return false;
+  }
   protected GetNewSpawnID(): string {
     return this.spawnManager.requestSpawn({
       body: [TOUGH, TOUGH, MOVE, MOVE],
@@ -15,7 +18,7 @@ class Scout extends SoloJob<Scout_Memory, MemCache> {
         parentPID: this.pid
       }, 0);
   }
-  protected CreateCustomCreepActivity(creep: Creep): string | undefined {
+  protected CreateCustomCreepAction(creep: Creep): SoloCreepAction | undefined {
     if (creep.room.name != this.memory.targetRoom) {
       return this.MoveToRoom(creep, this.memory.targetRoom);
     }
@@ -23,12 +26,11 @@ class Scout extends SoloJob<Scout_Memory, MemCache> {
     if (creep.room.name == this.memory.targetRoom) {
       if (creep.room.controller && (!creep.room.controller.sign ||
         creep.room.controller.sign.text != MY_SIGNATURE)) {
-        return this.creepManager.CreateNewCreepActivity({
+        return {
           action: AT_SignController,
           message: MY_SIGNATURE,
-          creepID: creep.name,
           targetID: creep.room.controller.id
-        }, this.pid)
+        }
       }
       let targetRoom: RoomID | undefined = creep.room.name;
       do {
@@ -62,12 +64,11 @@ class Scout extends SoloJob<Scout_Memory, MemCache> {
       this.memory.targetRoom = targetRoom;
     }
 
-    return this.creepManager.CreateNewCreepActivity({
+    return {
       action: AT_MoveToPosition,
-      amount: 0,
+      distance: 0,
       pos: movePosition,
-      creepID: creep.name
-    }, this.pid);
+    }
   }
 
   HandleNoActivity(creep: Creep) { }
