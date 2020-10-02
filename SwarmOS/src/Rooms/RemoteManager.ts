@@ -16,7 +16,7 @@ class RemoteManager extends BasicProcess<RemoteManager_Memory, MemCache> {
         this.log.alert(`Invasion detected: ${targetRoom.link}`);
         this.memory.invasion = invaders[i].ticksToLive!;
         if (!this.memory.remoteProtector || !this.kernel.getProcessByPID(this.memory.remoteProtector)) {
-          this.memory.remoteProtector = this.kernel.startProcess(BPKG_RemoteProtector, {
+          this.memory.remoteProtector = this.kernel.startProcess(CPKG_RemoteProtector, {
             homeRoom: this.memory.homeRoom,
             squad: [{}],
             targetRoom: this.memory.targetRoom,
