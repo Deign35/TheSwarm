@@ -31,7 +31,6 @@ class HomeRoomManager extends BasicProcess<HomeRoomManager_Memory, HomeRoomManag
             homeRoom: this.memory.homeRoom,
             source: sourceIDs[i],
             targetRoom: this.memory.homeRoom,
-            expires: true
           } as HarvesterMemory);
 
           this.memory.harvesterPIDs[sourceIDs[i]] = pid;
@@ -44,7 +43,6 @@ class HomeRoomManager extends BasicProcess<HomeRoomManager_Memory, HomeRoomManag
           const pid = this.kernel.startProcess(CPKG_LargeHarvester, {
             homeRoom: this.memory.homeRoom,
             targetRoom: this.memory.homeRoom,
-            expires: true,
           } as LargeHarvester_Memory);
           this.memory.largeHarvester = pid;
           this.kernel.setParent(pid, this.pid);
@@ -61,7 +59,6 @@ class HomeRoomManager extends BasicProcess<HomeRoomManager_Memory, HomeRoomManag
       const pid = this.kernel.startProcess(CPKG_ControlledRoomRefiller, {
         homeRoom: this.memory.homeRoom,
         targetRoom: this.memory.homeRoom,
-        expires: true
       } as ControlledRoomRefiller_Memory);
 
       this.memory.refillerPIDs.push(pid);
@@ -90,21 +87,22 @@ class HomeRoomManager extends BasicProcess<HomeRoomManager_Memory, HomeRoomManag
       numWorkers += storageAmount;
     }
     numWorkers -= 1;
+    if (numWorkers == 0) {
+      numWorkers = 1;
+    }
 
     while (this.memory.workerPIDs.length < numWorkers) {
       this.memory.workerPIDs.push(this.kernel.startProcess(CPKG_Worker, {
         homeRoom: this.memory.homeRoom,
         targetRoom: this.memory.homeRoom,
-        expires: true
       } as Worker_Memory))
       this.kernel.setParent(this.memory.workerPIDs[this.memory.workerPIDs.length - 1], this.pid);
     }
 
-    if (!this.memory.upgraderPID || !this.kernel.getProcessByPID(this.memory.upgraderPID)) {
+    if (numWorkers > 1 && !this.memory.upgraderPID || !this.kernel.getProcessByPID(this.memory.upgraderPID)) {
       this.memory.upgraderPID = this.kernel.startProcess(CPKG_Upgrader, {
         homeRoom: this.memory.homeRoom,
         targetRoom: this.memory.homeRoom,
-        expires: true,
       } as Upgrader_Memory);
     }
 

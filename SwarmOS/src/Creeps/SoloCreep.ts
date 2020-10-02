@@ -133,16 +133,22 @@ export abstract class SoloCreep<T extends SoloCreep_Memory, U extends SoloCreep_
     if (!creep) {
       this.OnTick();
       if (!this.memory.spawnID) {
-        if (this.memory.expires && this.memory.hasRun) {
+        if (this.memory.hasRun) {
           this.EndProcess();
         } else {
           delete this.memory.creepID;
           this.memory.spawnID = this.GetNewSpawnID();
+          if (this.memory.spawnID) {
+            this.memory.spawnTimer = Game.time;
+          }
         }
       } else {
         const status = this.spawnManager.getRequestStatus(this.memory.spawnID);
         switch (status) {
           case (SP_QUEUED):
+            if (this.memory.spawnTimer! + 500 >= Game.time) {
+              this.EndProcess();
+            }
             break;
           case (SP_COMPLETE):
           case (SP_SPAWNING):
@@ -167,7 +173,8 @@ export abstract class SoloCreep<T extends SoloCreep_Memory, U extends SoloCreep_
       return;
     }
     this.spawnManager.cancelRequest(this.memory.spawnID!);
-    this.memory.spawnID = undefined;
+    delete this.memory.spawnID;
+    delete this.memory.spawnTimer;
     this.memory.hasRun = true;
     this.memory.creepID = creepID;
 
@@ -187,9 +194,7 @@ export abstract class SoloCreep<T extends SoloCreep_Memory, U extends SoloCreep_
     const creep = this.creepManager.tryGetCreep(creepID, this.pid);
     this.memory.creepID = creepID;
     if (!creep) {
-      if (this.memory.expires) {
-        this.EndProcess();
-      }
+      this.EndProcess();
       return;
     }
 

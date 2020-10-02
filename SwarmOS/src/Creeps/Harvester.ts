@@ -29,7 +29,6 @@ class Harvester extends SoloCreep<HarvesterMemory, SoloCreep_Cache> {
                 this.kernel.startProcess(this.pkgName, {
                   homeRoom: this.memory.homeRoom,
                   targetRoom: this.memory.targetRoom,
-                  expires: true,
                   source: this.memory.source,
                   supportHarvester: true
                 } as HarvesterMemory);
@@ -180,7 +179,6 @@ class Harvester extends SoloCreep<HarvesterMemory, SoloCreep_Cache> {
           source: this.memory.source,
           targetRoom: this.memory.targetRoom,
           creepID: this.memory.creepID,
-          expires: true,
           hasRun: true,
           isZombie: true,
           link: this.memory.link,

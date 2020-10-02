@@ -46,7 +46,23 @@ class LargetHarvester extends SoloCreep<LargeHarvester_Memory, LargeHarvester_Ca
         delete this.cache.curLink;
         source = closestSource;
       } else {
-        return;
+        const roomData = this.roomManager.GetRoomData(creep.room.name)!;
+        let refreshTimer = 3000;
+        let targetSource = undefined;
+        for (let i = 0; i < roomData.sourceIDs.length; i++) {
+          const source = Game.getObjectById<Source>(roomData.sourceIDs[i])!;
+          if (source.ticksToRegeneration && source.ticksToRegeneration < refreshTimer) {
+            refreshTimer = source.ticksToRegeneration;
+            targetSource = source.id;
+          }
+        }
+        
+        if (!targetSource) { return; }
+        return {
+          action: AT_MoveToPosition,
+          distance: 3,
+          targetID: targetSource
+        }
       }
     }
 
@@ -88,6 +104,21 @@ class LargetHarvester extends SoloCreep<LargeHarvester_Memory, LargeHarvester_Ca
     }
 
     if (creep.store[RESOURCE_ENERGY] > 0) {
+      if (!this.cache.curContainer) {        
+        const sites = creep.pos.lookFor(LOOK_CONSTRUCTION_SITES);
+        if (sites && sites.length > 0) {
+          if (sites[0].structureType == STRUCTURE_CONTAINER) {
+            this.cache.curContainer = sites[0].id;
+          }
+        } else {
+          const structs = creep.pos.lookFor(LOOK_STRUCTURES);
+          for (let i = 0; i < structs.length; i++) {
+            if (structs[i].structureType == STRUCTURE_CONTAINER) {
+              this.cache.curContainer = structs[0].id;
+            }
+          }
+        }
+      }
       const container = Game.getObjectById<StructureContainer | ConstructionSite>(this.cache.curContainer!);
       if (container) {
         if ((container as StructureContainer).hitsMax) {
@@ -104,20 +135,6 @@ class LargetHarvester extends SoloCreep<LargeHarvester_Memory, LargeHarvester_Ca
           }
         } else {
           delete this.cache.curContainer;
-        }
-      } else {
-        const sites = creep.pos.lookFor(LOOK_CONSTRUCTION_SITES);
-        if (sites && sites.length > 0) {
-          if (sites[0].structureType == STRUCTURE_CONTAINER) {
-            this.cache.curContainer = sites[0].id;
-          }
-        } else {
-          const structs = creep.pos.lookFor(LOOK_STRUCTURES);
-          for (let i = 0; i < structs.length; i++) {
-            if (structs[i].structureType == STRUCTURE_CONTAINER) {
-              this.cache.curContainer = structs[0].id;
-            }
-          }
         }
       }
 
@@ -164,7 +181,6 @@ class LargetHarvester extends SoloCreep<LargeHarvester_Memory, LargeHarvester_Ca
           homeRoom: this.memory.homeRoom,
           targetRoom: this.memory.targetRoom,
           creepID: this.memory.creepID,
-          expires: true,
           hasRun: true,
           isZombie: true,
           remoteHarvester: this.memory.remoteHarvester,

@@ -10,7 +10,6 @@ class Upgrader extends SoloCreep<Upgrader_Memory, SoloCreep_Cache> {
     return false;
   }
   protected GetNewSpawnID(): string {
-    this.memory.hasRequestedBoost = false;
     const homeRoom = Game.rooms[this.memory.homeRoom];
     const energyCapacity = homeRoom.energyCapacityAvailable;
     let body = [WORK, CARRY, CARRY, MOVE, MOVE];

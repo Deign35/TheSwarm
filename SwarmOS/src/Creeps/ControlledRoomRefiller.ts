@@ -115,7 +115,6 @@ class ControlledRoomRefiller extends SoloCreep<ControlledRoomRefiller_Memory, Co
           homeRoom: this.memory.homeRoom,
           targetRoom: this.memory.targetRoom,
           creepID: this.memory.creepID,
-          expires: true,
           hasRun: true,
           isZombie: true
         } as ControlledRoomRefiller_Memory);

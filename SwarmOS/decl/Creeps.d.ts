@@ -9,73 +9,15 @@ declare interface SingleCreepAction_Memory extends MemBase {
   resourceType?: ResourceConstant // (r)esource type to withdraw or transfer
   targetID?: ObjectID;   // (t)arget
 }
-
-declare interface RepetitiveCreepActivity_Memory extends MemBase {
-  actions: SingleCreepAction_Memory[];    // (a)ctions
-  creepID: CreepID;
-  childPID?: PID;
-}
-
 declare interface SpawnActivity_Memory extends MemBase {
   spawnID: SpawnRequestID;
 }
 
-declare interface SoloJob_Memory extends MemBase {
-  activityPID?: PID;        // (a)ctivity
-  creepID?: CreepID;    // (c)reep
-  hasRun?: boolean;
-  expires?: boolean;  // (exp)pires -- Kill the process when the creep dies
-  homeRoom: RoomID;    // (h)ome room
-  targetRoom: RoomID;     // (t)arget (r)oom
-}
-declare interface Dismantler_Memory extends SoloJob_Memory { }
-declare interface Worker_Memory extends SoloJob_Memory {
-  needsBoost: boolean;
-  hasRequestedBoost: boolean;
-}
-declare interface Scout_Memory extends SoloJob_Memory { }
-declare interface RoomBooter_Memory extends SoloJob_Memory { }
-declare interface Upgrader_Memory extends SoloJob_Memory {
-  needsBoost: boolean;
-  hasRequestedBoost: boolean;
-}
-declare interface ControllerClaimer_Memory extends SoloJob_Memory {
-  onlyReserve: boolean;
-  onlyAttack: boolean;
-}
-declare interface Scientist_Memory extends SoloJob_Memory { }
-declare interface RoomDefender_Memory extends SoloJob_Memory {
-  needsBoost: boolean;
-  hasRequestedBoost: boolean;
-}
-declare interface RoomDefender_2_Memory extends SoloJob_Memory {
-  needsBoost: boolean;
-  hasRequestedBoost: boolean;
-}
-
-declare interface SquadJob_Memory extends MemBase {
-  expires?: boolean;
-  roomID: RoomID;
-  targetRoom: RoomID;
-  squad: {
-    activityPID?: PID;
-    creepID?: CreepID;
-  }[];
-}
-
-declare interface MineralHarvester_Memory extends SquadJob_Memory {
-  container: ObjectID;
-  squad: [{ activityPID?: PID, creepID?: CreepID },
-    { activityPID?: PID, creepID?: CreepID }]
-}
-
-/** REFACTOR SOLOJOB TO SOLOCREEP */
-
 declare interface SoloCreep_Memory extends MemBase {
   spawnID?: SpawnID;
+  spawnTimer?: number;
   creepID?: CreepID;
   hasRun?: boolean;
-  expires?: boolean;
   homeRoom: RoomID;
   targetRoom: RoomID;
   needsBoost?: boolean;
@@ -141,8 +83,18 @@ declare interface MineralCollector_Cache extends SoloCreep_Cache {
   container?: ObjectID;
 }
 
-//CLI(CLI_Launch, CPKG_ControllerClaimer, { homeRoom: "E15S41", targetRoom: "E15S43", expires: true });
-//CLI(CLI_Launch, CPKG_RoomBooter, { homeRoom: "E15S41", targetRoom: "E15S43", expires: true })
-//CLI(CLI_Launch, CPKG_Worker, { homeRoom: "E15S41", targetRoom: "E14S41", expires: true })
+declare interface Scientist_Memory extends SoloCreep_Memory { }
+declare interface Worker_Memory extends SoloCreep_Memory { }
+declare interface Scout_Memory extends SoloCreep_Memory { }
+declare interface RoomBooter_Memory extends SoloCreep_Memory { }
+declare interface Upgrader_Memory extends SoloCreep_Memory { }
+declare interface ControllerClaimer_Memory extends SoloCreep_Memory {
+  onlyReserve: boolean;
+  onlyAttack: boolean;
+}
+
+//CLI(CLI_Launch, CPKG_ControllerClaimer, { homeRoom: "E15S41", targetRoom: "E15S43" });
+//CLI(CLI_Launch, CPKG_RoomBooter, { homeRoom: "E15S41", targetRoom: "E15S43" })
+//CLI(CLI_Launch, CPKG_Worker, { homeRoom: "E15S41", targetRoom: "E14S41" })
 
 // Game.market.createOrder({ type: ORDER_SELL, resourceType: RESOURCE_ZYNTHIUM, price: 0.08, totalAmount: 20000, roomName: "E11S44" })

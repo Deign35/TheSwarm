@@ -227,7 +227,6 @@ class LabManager extends BasicProcess<LabManager_Memory, MemCache> {
     if ((hasOtherOrders || hasBoostOrders) && roomData.structures[STRUCTURE_TERMINAL].length > 0 && roomData.structures[STRUCTURE_LAB].length > 0) {
       if (!this.memory.scientistPID || !this.kernel.getProcessByPID(this.memory.scientistPID)) {
         this.memory.scientistPID = this.kernel.startProcess(CPKG_Scientist, {
-          expires: true,
           homeRoom: this.memory.homeRoom,
           targetRoom: this.memory.homeRoom
         } as Scientist_Memory);

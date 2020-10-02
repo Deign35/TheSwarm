@@ -263,7 +263,7 @@ const help = function () {
   msg += "This will set up a lab order to create 500 ghodium oxide.\n\n";
 
   msg += "CLI_Launch: Launches a program.\n";
-  msg += "ex: CLI(CLI_Launch, CPKG_Scout, { homeRoom: \"W57S27\", targetRoom: \"W57S26\", expires: true })\n\n";
+  msg += "ex: CLI(CLI_Launch, CPKG_Scout, { homeRoom: \"W57S27\", targetRoom: \"W57S26\" })\n\n";
 
   msg += "CLI_SetWallStrength: Sets the walls and ramparts strength for a room.\n";
   msg += "ex: CLI(CLI_SetWallStrength, \"W57S26\", 1000, 2000)\n";

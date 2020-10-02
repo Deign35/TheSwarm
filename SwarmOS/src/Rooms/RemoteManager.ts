@@ -18,9 +18,7 @@ class RemoteManager extends BasicProcess<RemoteManager_Memory, MemCache> {
         if (!this.memory.remoteProtector || !this.kernel.getProcessByPID(this.memory.remoteProtector)) {
           this.memory.remoteProtector = this.kernel.startProcess(CPKG_RemoteProtector, {
             homeRoom: this.memory.homeRoom,
-            squad: [{}],
             targetRoom: this.memory.targetRoom,
-            expires: true
           } as RemoteProtector_Memory);
           this.kernel.setParent(this.memory.remoteProtector, this.pid);
         }
@@ -49,7 +47,6 @@ class RemoteManager extends BasicProcess<RemoteManager_Memory, MemCache> {
       if (targetRoom && targetRoom.controller &&
         (!targetRoom.controller.reservation || targetRoom.controller.reservation.ticksToEnd < 4000)) {
         this.memory.claimerPID = this.kernel.startProcess(CPKG_ControllerClaimer, {
-          expires: true,
           homeRoom: this.memory.homeRoom,
           onlyReserve: true,
           targetRoom: this.memory.targetRoom
@@ -63,7 +60,6 @@ class RemoteManager extends BasicProcess<RemoteManager_Memory, MemCache> {
     if (!this.memory.workerPID || !this.kernel.getProcessByPID(this.memory.workerPID)) {
       if ((roomData.cSites.length > 0 || roomData.needsRepair.length > 0)) {
         this.memory.workerPID = this.kernel.startProcess(CPKG_Worker, {
-          expires: true,
           homeRoom: this.memory.homeRoom,
           targetRoom: this.memory.targetRoom
         } as Worker_Memory);
@@ -75,7 +71,6 @@ class RemoteManager extends BasicProcess<RemoteManager_Memory, MemCache> {
     for (const id of sources) {
       if (!this.memory.harvesterPIDs[id] || !this.kernel.getProcessByPID(this.memory.harvesterPIDs[id])) {
         this.memory.harvesterPIDs[id] = this.kernel.startProcess(CPKG_Harvester, {
-          expires: true,
           homeRoom: this.memory.homeRoom,
           remoteHarvester: true,
           source: id,
@@ -102,7 +97,6 @@ class RemoteManager extends BasicProcess<RemoteManager_Memory, MemCache> {
     let numWorkers = 2 * sources.length + Math.min(3, Math.floor(totalGroundResources / 1000));
     while (this.memory.refillerPIDs.length < numWorkers) {
       this.memory.refillerPIDs.push(this.kernel.startProcess(CPKG_RemoteRefiller, {
-        expires: true,
         homeRoom: this.memory.homeRoom,
         targetRoom: this.memory.targetRoom
       } as RemoteRefiller_Memory));
