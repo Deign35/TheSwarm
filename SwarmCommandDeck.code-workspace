@@ -12,7 +12,7 @@
       "**/.vs": true,
       "**/.vscode": true,
       "**/node_modules": true,
-      "**/screeps.json": false,
+      "**/screeps.json": true,
       "**/*.sln": true,
       "**/*.njsproj*": true,
       "**/npm*/": true,

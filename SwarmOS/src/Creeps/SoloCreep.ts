@@ -178,7 +178,10 @@ export abstract class SoloCreep<T extends SoloCreep_Memory, U extends SoloCreep_
   protected abstract RequestBoost(creep: Creep): boolean;
 
   EndCurrentAction(): ThreadState {
-    if (this.cache.lastAction) { return ThreadState_Done; }
+    if (this.cache.lastAction) {
+      delete this.cache.curAction;
+      return ThreadState_Done;
+    }
     this.cache.lastAction = this.cache.curAction;
     delete this.cache.curAction;
 

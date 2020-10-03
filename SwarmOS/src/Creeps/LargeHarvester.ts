@@ -26,6 +26,7 @@ class LargetHarvester extends SoloCreep<LargeHarvester_Memory, LargeHarvester_Ca
         const path = targetRoom.findPath(sources[0].pos, sources[1].pos);
         if (path.length > 24) {
           body.unshift(WORK);
+          body.push(MOVE);
         }
       }
     }

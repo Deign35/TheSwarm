@@ -48,10 +48,16 @@ class MineralCollector extends SoloCreep<MineralCollector_Memory, MineralCollect
           }
         }
 
-        return {
-          action: AT_Withdraw,
-          targetID: container.id,
-          resourceType: mineral.mineralType
+        if (container.store.getUsedCapacity(mineral.mineralType) >= creep.store.getCapacity() / 2) {
+          return {
+            action: AT_Withdraw,
+            targetID: container.id,
+            resourceType: mineral.mineralType
+          }
+        } else {
+          return {
+            action: AT_NoOp
+          }
         }
       }
 
