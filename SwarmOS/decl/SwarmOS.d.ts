@@ -92,7 +92,7 @@ declare interface CreepBodiesReference {
   lvl: number
 }
 
-declare interface ProviderService extends IProcess {
+declare interface ProviderService {
   processName: string,
   startContext?: any
 }

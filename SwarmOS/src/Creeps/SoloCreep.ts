@@ -138,7 +138,7 @@ export abstract class SoloCreep<T extends SoloCreep_Memory, U extends SoloCreep_
         const status = this.spawnManager.getRequestStatus(this.memory.spawnID);
         switch (status) {
           case (SP_QUEUED):
-            if (this.memory.spawnTimer! + 500 >= Game.time) {
+            if (this.memory.spawnTimer! + 1000 < Game.time) {
               this.EndProcess();
             }
             break;

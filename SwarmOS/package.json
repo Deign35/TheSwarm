@@ -1,7 +1,7 @@
 {
     "$schema": "http://json.schemastore.org/tslint",
     "name": "SwarmOS",
-    "version": "0.1.0",
+    "version": "2.1.0",
     "description": "Screeps OS made in typescript",
     "private": true,
     "license": "(MIT OR Apache-2.0)",
@@ -23,8 +23,7 @@
         "grunt-screeps": "^1.4.0",
         "grunt-ts": "^6.0.0-beta.22",
         "npm": "^6.14.6",
-        "typed-screeps": "^2.5.3",
-        "typescript": "^2.9.2"
+        "typed-screeps": "^2.5.3"
     },
     "dependencies": {
         "@types/screeps": "^3.2.0",

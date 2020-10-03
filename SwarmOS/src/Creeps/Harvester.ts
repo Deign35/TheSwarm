@@ -88,7 +88,7 @@ class Harvester extends SoloCreep<HarvesterMemory, SoloCreep_Cache> {
       };
     }
 
-    const container = Game.getObjectById<StructureContainer | ConstructionSite>(this.memory.container);
+    const container = Game.getObjectById<StructureContainer | ConstructionSite>(this.memory.container!);
     if (creep.store[RESOURCE_ENERGY] > 0 && !this.cache.lastAction) {
       if (container) {
         if ((container as StructureContainer).hitsMax) {

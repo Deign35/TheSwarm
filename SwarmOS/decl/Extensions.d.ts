@@ -23,7 +23,7 @@ declare interface IPackageInterfaces {
  * A process can access the registry via this function.
  */
 declare interface IProcessContext {
-  getPackageInterface<T extends keyof IPackageInterfaces>(interfaceId: T): IPackageInterfaces[T];
+  getPackageInterface(interfaceId: string): any;
 }
 
 /**

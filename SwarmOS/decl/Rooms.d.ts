@@ -20,7 +20,7 @@ declare interface HomeRoomManager_Memory extends RoomMemory {
 }
 
 declare interface HomeRoomManager_Cache extends MemCache {
-  primaryLink: ObjectID;
+  primaryLink?: ObjectID;
 }
 
 declare interface RemoteManager_Memory extends RoomMemory {

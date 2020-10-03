@@ -51,7 +51,7 @@ declare interface SoloCreepActionArgs {
 }
 
 declare interface ControlledRoomRefiller_Cache extends SoloCreep_Cache {
-  link: ObjectID;
+  link?: ObjectID;
 }
 
 declare interface LargeHarvester_Memory  extends SoloCreep_Memory {
@@ -65,7 +65,7 @@ declare interface LargeHarvester_Cache extends SoloCreep_Cache {
 }
 declare interface HarvesterMemory extends SoloCreep_Memory {
   source: ObjectID;
-  container: ObjectID;
+  container?: ObjectID;
   remoteHarvester?: boolean;
   link?: ObjectID;
   supportHarvester?: boolean;
