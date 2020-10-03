@@ -11,7 +11,6 @@ class LargetHarvester extends SoloCreep<LargeHarvester_Memory, LargeHarvester_Ca
     return false;
   }
   protected GetNewSpawnID(): string {
-    const homeRoom = Game.rooms[this.memory.homeRoom];
     let body: BodyPartConstant[] = [WORK, WORK, WORK, WORK, WORK, WORK,
       WORK, WORK, WORK, WORK, WORK, WORK,
       CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
@@ -19,6 +18,16 @@ class LargetHarvester extends SoloCreep<LargeHarvester_Memory, LargeHarvester_Ca
     if (this.memory.remoteHarvester) {
       body = [WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK,
       MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+    }
+    const targetRoom = Game.rooms[this.memory.targetRoom];
+    if (targetRoom) {
+      const sources = targetRoom.find(FIND_SOURCES);
+      if (sources.length == 2) {
+        const path = targetRoom.findPath(sources[0].pos, sources[1].pos);
+        if (path.length > 24) {
+          body.unshift(WORK);
+        }
+      }
     }
     return this.spawnManager.requestSpawn({
       body: body,

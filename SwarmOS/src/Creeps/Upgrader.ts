@@ -7,35 +7,53 @@ import { SoloCreep } from "./SoloCreep";
 
 class Upgrader extends SoloCreep<Upgrader_Memory, SoloCreep_Cache> {
   protected RequestBoost(creep: Creep): boolean {
+    const room = Game.rooms[this.memory.homeRoom];
+    if (room && room.terminal) {
+      const numCGARequired = creep.getActiveBodyparts(WORK) * 30;
+      const roomData = this.roomManager.GetRoomData(room.name)!;
+      if (this.terminalNetwork.HasResourceInNetwork(RESOURCE_CATALYZED_GHODIUM_ACID, numCGARequired)) {
+        roomData.labRequests.push({
+          amount: numCGARequired,
+          creepID: creep.name,
+          forBoost: true,
+          resourceType: RESOURCE_CATALYZED_GHODIUM_ACID
+        });
+        return true;
+      }
+    }
     return false;
   }
   protected GetNewSpawnID(): string {
     const homeRoom = Game.rooms[this.memory.homeRoom];
     const energyCapacity = homeRoom.energyCapacityAvailable;
     let body = [WORK, CARRY, CARRY, MOVE, MOVE];
-    if (this.memory.targetRoom == this.memory.homeRoom) {
-      if (energyCapacity >= 2200) {
-        body = [WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK,
-          CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
-          CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
-          MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE]
-      } else if (energyCapacity >= 1650) {
-        body = [WORK, WORK, WORK, WORK, WORK, WORK,
-          CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
-          CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
-          MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
-      } else if (energyCapacity >= 1100) {
-        body = [WORK, WORK, WORK, WORK,
-          CARRY, CARRY, CARRY, CARRY,
-          CARRY, CARRY, CARRY, CARRY,
-          MOVE, MOVE, MOVE, MOVE,
-          MOVE, MOVE]
-      } else if (energyCapacity >= 550) {
-        body = [WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE];
-      }
-    } else {
-      body = [WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+    if (energyCapacity >= 3100) {
+      body = [WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK,
+      WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY,
+      CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, 
+      CARRY,
+      MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, 
+      MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+    } else if (energyCapacity >= 2200) {
+      body = [WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK,
+        CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
+        CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
+        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+    } else if (energyCapacity >= 1650) {
+      body = [WORK, WORK, WORK, WORK, WORK, WORK,
+        CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
+        CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
+        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+    } else if (energyCapacity >= 1100) {
+      body = [WORK, WORK, WORK, WORK,
+        CARRY, CARRY, CARRY, CARRY,
+        CARRY, CARRY, CARRY, CARRY,
+        MOVE, MOVE, MOVE, MOVE,
+        MOVE, MOVE]
+    } else if (energyCapacity >= 550) {
+      body = [WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE];
     }
+
     return this.spawnManager.requestSpawn({
       body: body,
       creepName: this.memory.targetRoom + '_' + (Game.time + '_Up').slice(-6),

@@ -54,7 +54,7 @@ class MineralCollector extends SoloCreep<MineralCollector_Memory, MineralCollect
           resourceType: mineral.mineralType
         }
       }
-      
+
       for (let i = 0; i < roomData.resources.length; i++) {
         const resource = Game.getObjectById<Resource>(roomData.resources[i]);
         if (!resource) { continue; }

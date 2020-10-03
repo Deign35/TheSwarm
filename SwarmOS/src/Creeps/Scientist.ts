@@ -5,7 +5,7 @@ export const OSPackage: IPackage = {
 }
 import { SoloCreep } from "./SoloCreep";
 
-class Scientist extends SoloCreep<Scientist_Memory, SoloCreep_Cache> {
+class Scientist extends SoloCreep<Scientist_Memory, Scientist_Cache> {
   protected RequestBoost(creep: Creep): boolean {
     return false;
   }
@@ -24,6 +24,27 @@ class Scientist extends SoloCreep<Scientist_Memory, SoloCreep_Cache> {
     if (!terminal) {
       this.log.error(`Room(${creep.room.link}) doesn't have a terminal.`)
       return;
+    }
+    if (this.cache.lastAction) {
+      if (this.cache.curOrder && this.cache.lastAction.action == AT_Transfer) {
+        const order = roomData.labOrders[this.cache.curOrder];
+        if (!order.isForBoost) {
+          order.amount -= creep.store.getUsedCapacity(order.resourceType);
+        }
+        delete this.cache.curOrder;
+        return {
+          action: AT_MoveToPosition,
+          targetID: terminal.id,
+          distance: 1
+        }
+      } else if (this.cache.curOrder && this.cache.lastAction.action == AT_Withdraw) {
+        delete this.cache.curOrder;
+        return {
+          action: AT_MoveToPosition,
+          targetID: this.cache.curOrder,
+          distance: 1
+        }
+      }
     }
 
     if (creep.ticksToLive && creep.ticksToLive < 50 && creep.store.getUsedCapacity() == 0) {
@@ -54,9 +75,7 @@ class Scientist extends SoloCreep<Scientist_Memory, SoloCreep_Cache> {
           actionResource = order.resourceType;
           target = labID;
           amount = Math.min(creep.store.getUsedCapacity(actionResource), order.amount);
-          if (!order.isForBoost) {
-            order.amount -= amount;
-          }
+          this.cache.curOrder = labID;
           break;
         }
       }
@@ -80,6 +99,7 @@ class Scientist extends SoloCreep<Scientist_Memory, SoloCreep_Cache> {
           actionResource = lab.mineralType;
           target = labID;
           amount = Math.min(lab.store.getUsedCapacity(lab.mineralType), creep.store.getFreeCapacity());
+          this.cache.curOrder = labID;
           break;
         }
 
@@ -89,6 +109,7 @@ class Scientist extends SoloCreep<Scientist_Memory, SoloCreep_Cache> {
           actionResource = lab.mineralType;
           target = labID;
           amount = Math.min(lab.store.getUsedCapacity(lab.mineralType), creepCapacity);
+          this.cache.curOrder = labID;
           break;
         }
 
@@ -99,6 +120,8 @@ class Scientist extends SoloCreep<Scientist_Memory, SoloCreep_Cache> {
           actionResource = order.resourceType;
           target = terminal.id;
           amount = Math.min(order.amount, terminal.store.getUsedCapacity(order.resourceType), creepCapacity);
+          this.cache.curOrder = labID;
+          break;
         }
       }
     }

@@ -84,6 +84,9 @@ declare interface MineralCollector_Cache extends SoloCreep_Cache {
 }
 
 declare interface Scientist_Memory extends SoloCreep_Memory { }
+declare interface Scientist_Cache extends SoloCreep_Cache {
+  curOrder?: ObjectID;
+}
 declare interface Worker_Memory extends SoloCreep_Memory { }
 declare interface Scout_Memory extends SoloCreep_Memory { }
 declare interface RoomBooter_Memory extends SoloCreep_Memory { }

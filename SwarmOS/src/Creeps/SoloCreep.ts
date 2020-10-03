@@ -40,8 +40,7 @@ export abstract class SoloCreep<T extends SoloCreep_Memory, U extends SoloCreep_
           }
 
           if (!target) {
-            this.EndCurrentAction();
-            return ThreadState_Waiting;
+            return this.EndCurrentAction();
           }
 
           if (this.cache.curAction.action === AT_MoveToPosition) {
@@ -54,14 +53,12 @@ export abstract class SoloCreep<T extends SoloCreep_Memory, U extends SoloCreep_
             if (moveResult == ERR_NOT_IN_RANGE || moveResult == ERR_BUSY || moveResult == ERR_TIRED) {
               // Not yet there
             } else if (moveResult == OK || moveResult === ERR_NO_PATH) {
-              this.EndCurrentAction();
-              return ThreadState_Waiting;
+              return this.EndCurrentAction();
             }
             return ThreadState_Done;
           } else {
             if (!this.creepManager.ValidateActionTarget(this.cache.curAction.action, target, this.cache.curAction.resourceType)) {
-              this.EndCurrentAction();
-              return ThreadState_Waiting;
+              return this.EndCurrentAction();
             } else if (!this.creepManager.CreepIsInRange(this.cache.curAction.action, creep.pos, target as RoomPosition)) {
               this.creepManager.MoveCreep(creep, target as RoomPosition, this.cache.curAction.distance);
             } else {
@@ -85,27 +82,23 @@ export abstract class SoloCreep<T extends SoloCreep_Memory, U extends SoloCreep_
                 case (AT_Transfer):
                 case (AT_Withdraw):
                 case (AT_NoOp):
-                  this.EndCurrentAction();
-                  return ThreadState_Waiting;
+                  return this.EndCurrentAction();
                 case (AT_Build):
                   let build_creepCapacity = creep.store.getUsedCapacity(RESOURCE_ENERGY);
                   build_creepCapacity -= creep.getActiveBodyparts(WORK) * 5;
                   if (build_creepCapacity <= 0) {
-                    this.EndCurrentAction();
-                    return ThreadState_Waiting;
+                    return this.EndCurrentAction();
                   }
                 case (AT_Repair):
                 case (AT_Upgrade):
                   let creepCapacity = creep.store.getUsedCapacity(RESOURCE_ENERGY);
                   creepCapacity -= creep.getActiveBodyparts(WORK);
                   if (creepCapacity <= 0) {
-                    this.EndCurrentAction();
-                    return ThreadState_Waiting;
+                    return this.EndCurrentAction();
                   }
                 case (AT_RenewCreep):
                   if (result == ERR_BUSY) {
-                    this.EndCurrentAction();
-                    return ThreadState_Waiting;
+                    return this.EndCurrentAction();
                   }
                 default:
                   break;
@@ -122,8 +115,7 @@ export abstract class SoloCreep<T extends SoloCreep_Memory, U extends SoloCreep_
                 }
               }
 
-              this.EndCurrentAction();
-              return ThreadState_Waiting;
+              return this.EndCurrentAction();
             }
           }
         }
@@ -185,10 +177,14 @@ export abstract class SoloCreep<T extends SoloCreep_Memory, U extends SoloCreep_
   }
   protected abstract RequestBoost(creep: Creep): boolean;
 
-  EndCurrentAction() {
+  EndCurrentAction(): ThreadState {
+    if (this.cache.lastAction) { return ThreadState_Done; }
     this.cache.lastAction = this.cache.curAction;
     delete this.cache.curAction;
+
+    return ThreadState_Waiting;
   }
+
   CreateActionForCreep(creepID: CreepID) {
     this.creepManager.tryReserveCreep(creepID, this.pid);
     const creep = this.creepManager.tryGetCreep(creepID, this.pid);
@@ -209,6 +205,7 @@ export abstract class SoloCreep<T extends SoloCreep_Memory, U extends SoloCreep_
             distance: 1,
             targetID: labIDs[i]
           }
+          return;
         }
       }
       // If we're here then no boost orders are present
