@@ -109,6 +109,7 @@
                 "LabManager": "labManager",
                 "RemoteManager": "remoteManager",
                 "RoomController": "roomController",
+                "RoomPlanner": "roomPlanner",
                 "Towers": "towers",
                 "WallWatcher": "wallWatcher"
             }
