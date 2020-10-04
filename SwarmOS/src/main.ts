@@ -49,7 +49,7 @@ import { RoomsPackage } from "Rooms/index";
 
 kernel.installPackages([ActivitiesPackage, BattlePackage, CreepsPackage, ManagersPackage, RoomsPackage]);
 
-import { GenerateWallDistanceMatrix, GetPeaks, ShrinkRoom } from "Tools/RoomAlgorithms";
+import { GenerateWallDistanceMatrix, GetPeaks, ShrinkRoom, GenerateDistanceMatrix } from "Tools/RoomAlgorithms";
 
 let acc = 0;
 let num = 0;
@@ -60,9 +60,11 @@ export function loop() {
     if (Game.rooms[testRoom]) {
       const terrain = new Room.Terrain(testRoom);
       const start = performance.now();
-      const matrix = GenerateWallDistanceMatrix(terrain);
-      ShrinkRoom(matrix, 3);
-      const peaks = GetPeaks(matrix);
+      //const matrix = GenerateWallDistanceMatrix(terrain);
+      //ShrinkRoom(matrix, 3);
+      //const peaks = GetPeaks(matrix);
+      const matrix = GenerateDistanceMatrix(terrain, Game.rooms[testRoom].find(FIND_SOURCES)[0].pos);
+      const peaks: number[] = [];
       const roomVisual = Game.rooms[testRoom].visual;
       for (let i = 0; i < matrix.length; i++) {
         if (matrix[i] == Infinity) { continue; }

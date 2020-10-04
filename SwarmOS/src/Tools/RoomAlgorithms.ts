@@ -1,4 +1,29 @@
 const UNSET = 255;
+export function GenerateDistanceMatrix(roomTerrain: RoomTerrain, pos: RoomPosition) {
+  const matrix = new Array(2500).fill(UNSET);
+  const nodeQueue: number[] = [pos.x * 50 + pos.y];
+  matrix[nodeQueue[0]] = 0;
+
+  while (nodeQueue.length > 0) {
+    const node = nodeQueue.shift()!;
+    const nodeX = Math.floor(node / 50);
+    const nodeY = node % 50;
+    OperateOnNeighbors(nodeX, nodeY, (x, y) => {
+      const terrain = roomTerrain.get(x, y);
+      const arrayPos = x * 50 + y;
+      if (matrix[arrayPos] != UNSET) { return; }
+      if (terrain === TERRAIN_MASK_WALL) {
+        matrix[arrayPos] = Infinity;
+      } else {
+        matrix[arrayPos] = matrix[node] + 1;
+        nodeQueue.push(arrayPos);
+      }
+    });
+  }
+
+  return matrix;
+}
+
 export function GenerateWallDistanceMatrix(roomTerrain: RoomTerrain) {
   const matrix = new Array(2500).fill(UNSET);
   const floorQueue: number[] = [];
