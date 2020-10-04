@@ -53,19 +53,20 @@ import { GenerateWallDistanceMatrix, GetDistancePeaks, ShrinkRoom, GenerateDista
 
 let acc = 0;
 let num = 0;
-const testRoom = 'off';
+const testRoom = 'test';
 export function loop() {
   try {
     kernel.loop();
     if (Game.rooms[testRoom]) {
-      const terrain = new Room.Terrain(testRoom);
+      const room = Game.rooms[testRoom];
+      const terrain = new Room.Terrain(room.name);
       const start = performance.now();
       //const matrix = GenerateWallDistanceMatrix(terrain);
       //ShrinkRoom(matrix, 3);
       //const peaks = GetDistancePeaks(matrix);
-      const matrix = GenerateDistanceMatrix(terrain, Game.rooms[testRoom].find(FIND_SOURCES)[0].pos);
+      const matrix = GenerateDistanceMatrix(terrain, room.find(FIND_SOURCES)[0].pos);
       const peaks: number[] = [];
-      const roomVisual = Game.rooms[testRoom].visual;
+      const roomVisual = room.visual;
       for (let i = 0; i < matrix.length; i++) {
         if (matrix[i] == Infinity) { continue; }
         const x = Math.floor(i / 50);
