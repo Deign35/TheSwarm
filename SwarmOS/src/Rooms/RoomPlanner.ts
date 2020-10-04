@@ -77,6 +77,12 @@ class RoomPlanner extends BasicProcess<RoomPlanner_Memory, MemCache> {
 }
 
 const Flower: { [id: string]: { x: number, y: number }[] } = {
+  [STRUCTURE_TOWER]: [
+    { x: 25, y: 22 }, { x: 24, y: 23 }, { x: 22, y: 25 }, { x: 28, y: 25 }, { x: 27, y: 26 }, { x: 25, y: 28 }
+  ],
+  [STRUCTURE_SPAWN]: [
+    { x: 29, y: 25 }, { x: 25, y: 21 }, { x: 25, y: 29 }
+  ],
   [STRUCTURE_EXTENSION]: [
     { x: 19, y: 19 }, { x: 20, y: 19 }, { x: 21, y: 19 }, { x: 29, y: 19 }, { x: 30, y: 19 }, { x: 31, y: 19 },
     { x: 19, y: 20 }, { x: 21, y: 20 }, { x: 22, y: 20 }, { x: 28, y: 20 }, { x: 29, y: 20 }, { x: 31, y: 20 },
@@ -98,12 +104,6 @@ const Flower: { [id: string]: { x: number, y: number }[] } = {
   ],
   [STRUCTURE_STORAGE]: [{ x: 23, y: 24 }],
   [STRUCTURE_LINK]: [{ x: 21, y: 25 }],
-  [STRUCTURE_SPAWN]: [
-    { x: 25, y: 21 }, { x: 29, y: 25 }, { x: 25, y: 29 }
-  ],
-  [STRUCTURE_TOWER]: [
-    { x: 25, y: 22 }, { x: 24, y: 23 }, { x: 22, y: 25 }, { x: 28, y: 25 }, { x: 27, y: 26 }, { x: 25, y: 28 }
-  ],
   [STRUCTURE_POWER_SPAWN]: [{ x: 25, y: 23 }],
   [STRUCTURE_TERMINAL]: [{ x: 26, y: 27 }],
   [STRUCTURE_FACTORY]: [{ x: 27, y: 25 }],
