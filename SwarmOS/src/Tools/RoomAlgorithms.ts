@@ -9,10 +9,9 @@ export function GenerateDistanceMatrix(roomTerrain: RoomTerrain, pos: RoomPositi
     const nodeX = Math.floor(node / 50);
     const nodeY = node % 50;
     OperateOnNeighbors(nodeX, nodeY, (x, y) => {
-      const terrain = roomTerrain.get(x, y);
       const arrayPos = x * 50 + y;
       if (matrix[arrayPos] != UNSET) { return; }
-      if (terrain === TERRAIN_MASK_WALL) {
+      if (roomTerrain.get(x, y) === TERRAIN_MASK_WALL) {
         matrix[arrayPos] = Infinity;
       } else {
         matrix[arrayPos] = matrix[node] + 1;
