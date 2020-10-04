@@ -49,9 +49,39 @@ import { RoomsPackage } from "Rooms/index";
 
 kernel.installPackages([ActivitiesPackage, BattlePackage, CreepsPackage, ManagersPackage, RoomsPackage]);
 
+import { GenerateWallDistanceMatrix, GetPeaks, ShrinkRoom } from "Tools/RoomAlgorithms";
+
+let acc = 0;
+let num = 0;
+const testRoom = 'sim';
 export function loop() {
   try {
     kernel.loop();
+    if (Game.rooms[testRoom]) {
+      const terrain = new Room.Terrain(testRoom);
+      const start = performance.now();
+      const matrix = GenerateWallDistanceMatrix(terrain);
+      ShrinkRoom(matrix, 3);
+      const peaks = GetPeaks(matrix);
+      const roomVisual = Game.rooms[testRoom].visual;
+      for (let i = 0; i < matrix.length; i++) {
+        if (matrix[i] == Infinity) { continue; }
+        const x = Math.floor(i / 50);
+        const y = i % 50;
+        if (peaks.includes(i)) {
+          roomVisual.text(matrix[i], x, y + 0.25, {
+            color: "red"
+          });
+        } else {
+          roomVisual.text(matrix[i], x, y + 0.25);
+        }
+      }
+
+      const end = performance.now();
+      num++;
+      acc += (end - start);
+      console.log(`Perf: ${(end - start).toFixed(3)} -- Avg: ${(acc / num).toFixed(3)}`);
+    }
   } finally {
     kernel.log.DumpLogToConsole();
     if (Game.cpu.bucket >= 9500 && Game.cpu.generatePixel) {
@@ -66,4 +96,6 @@ export function loop() {
 if (!Game.rooms['sim']) {
   kernel.log.info(() => `SwarmOS reloaded - Begin: ${startLoad}cpu`);
   kernel.log.info(() => `SwarmOS reloaded - Used: ${Game.cpu.getUsed() - startLoad}cpu`);
+} else {
+  console.log("Sim reset");
 }

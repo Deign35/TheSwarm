@@ -55,6 +55,18 @@ class RemoteManager extends BasicProcess<RemoteManager_Memory, MemCache> {
       }
     }
 
+    this.sleeper.sleep(this.pid, 5);
+    if (targetRoom.controller && !targetRoom.controller.my) {
+      if (!this.memory.remoteProtector || !this.kernel.getProcessByPID(this.memory.remoteProtector)) {
+        this.memory.remoteProtector = this.kernel.startProcess(CPKG_RemoteProtector, {
+          homeRoom: this.memory.homeRoom,
+          targetRoom: this.memory.targetRoom,
+        } as RemoteProtector_Memory);
+        this.kernel.setParent(this.memory.remoteProtector, this.pid);
+      }
+      return ThreadState_Done;
+    }
+
     const roomData = this.roomManager.GetRoomData(this.memory.targetRoom);
     if (!roomData) { return ThreadState_Done; }
     if (!this.memory.workerPID || !this.kernel.getProcessByPID(this.memory.workerPID)) {
@@ -103,7 +115,6 @@ class RemoteManager extends BasicProcess<RemoteManager_Memory, MemCache> {
       this.kernel.setParent(this.memory.refillerPIDs[this.memory.refillerPIDs.length - 1], this.pid);
     }
 
-    this.sleeper.sleep(this.pid, 5);
     return ThreadState_Done;
   }
 }

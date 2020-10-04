@@ -54,7 +54,7 @@ declare interface ControlledRoomRefiller_Cache extends SoloCreep_Cache {
   link?: ObjectID;
 }
 
-declare interface LargeHarvester_Memory  extends SoloCreep_Memory {
+declare interface LargeHarvester_Memory extends SoloCreep_Memory {
   remoteHarvester?: boolean;
   isZombie?: boolean;
 }

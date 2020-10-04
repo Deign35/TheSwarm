@@ -11,32 +11,33 @@ class RemoteProtector extends SoloCreep<RemoteProtector_Memory, MemCache> {
     return false;
   }
   protected GetNewSpawnID(): string | undefined {
-      const room = Game.rooms[this.memory.targetRoom];
-      if (!room) {
-        // We have a problem.  We don't know if we should spawn an attacker or not.
-        this.log.error(`Can't see room ${this.memory.targetRoom} -- RemoteProtector`);
-        this.kernel.killProcess(this.pid);
-        return;
-      }
+    const room = Game.rooms[this.memory.targetRoom];
+    if (!room) {
+      // We have a problem.  We don't know if we should spawn an attacker or not.
+      this.log.error(`Can't see room ${this.memory.targetRoom} -- RemoteProtector`);
+      this.kernel.killProcess(this.pid);
+      return;
+    }
 
-      const hostiles = room.find(FIND_HOSTILE_CREEPS);
-      if (hostiles.length == 0) {
-        return;
-      }
+    const hostiles = room.find(FIND_HOSTILE_CREEPS);
+    const hostilesStructures = room.find(FIND_HOSTILE_STRUCTURES);
+    if (hostiles.length == 0 && hostilesStructures.length == 0) {
+      return;
+    }
 
-      const body = hostiles.length > 1 ? [TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH,
+    const body = hostiles.length > 1 ? [TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH,
+      MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
+      ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, HEAL, MOVE] :
+      [TOUGH, TOUGH, TOUGH, TOUGH, TOUGH,
         MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
-        ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, HEAL, MOVE] :
-        [TOUGH, TOUGH, TOUGH, TOUGH, TOUGH,
-          MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
-          ATTACK, ATTACK, ATTACK, HEAL, MOVE];
-      return this.spawnManager.requestSpawn({
-        body: body,
-        creepName: this.memory.targetRoom + "_" + (Game.time + '_RP').slice(-6),
-        owner_pid: this.pid
-      }, this.memory.targetRoom, Priority_Medium, {
-          parentPID: this.pid
-        }, 3);
+        ATTACK, ATTACK, ATTACK, HEAL, MOVE];
+    return this.spawnManager.requestSpawn({
+      body: body,
+      creepName: this.memory.targetRoom + "_" + (Game.time + '_RP').slice(-6),
+      owner_pid: this.pid
+    }, this.memory.targetRoom, Priority_Medium, {
+        parentPID: this.pid
+      }, 3);
   }
 
   protected CreateCustomCreepAction(creep: Creep): SoloCreepAction | undefined {
@@ -46,6 +47,13 @@ class RemoteProtector extends SoloCreep<RemoteProtector_Memory, MemCache> {
 
     const hostiles = creep.room.find(FIND_HOSTILE_CREEPS);
     if (hostiles.length == 0) {
+      const hostileStructures = creep.room.find(FIND_HOSTILE_STRUCTURES);
+      if (hostileStructures.length > 0) {
+        return {
+          action: AT_Attack,
+          targetID: hostileStructures[0].id
+        }
+      }
       const allies = creep.room.find(FIND_MY_CREEPS);
       for (let i = 0; i < allies.length; i++) {
         if (allies[i].hits < allies[i].hitsMax) {

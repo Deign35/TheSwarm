@@ -116,7 +116,11 @@ export class Kernel implements IKernel, IKernelExtensions, IKernelSleepExtension
       this.log.info(`${id} killed - ${msg}`);
     }
     const process = this.getProcessByPID(id)!;
-    process.OnEndProcess();
+    try {
+      process.OnEndProcess();
+    } catch (e) {
+      this.log.error(`${id} Failed OnEndProcess`);
+    }
     pinfo.end = Game.time;
     const ids = Object.keys(this.processTable);
     for (let i = 0; i < ids.length; i++) {
