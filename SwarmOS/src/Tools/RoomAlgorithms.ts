@@ -33,7 +33,7 @@ export function GenerateWallDistanceMatrix(roomTerrain: RoomTerrain) {
   return matrix;
 }
 
-export function GetPeaks(matrix: number[]): number[] {
+export function GetDistancePeaks(matrix: number[]): number[] {
   const maybePeaks: number[] = [];
   OperateOverMap((x, y) => {
     const curNode = matrix[x * 50 + y];

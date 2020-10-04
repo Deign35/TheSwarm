@@ -49,3 +49,8 @@ declare interface RoomController_Memory extends RoomMemory {
 declare interface RoomController_Cache extends MemCache {
 
 }
+
+declare interface RoomPlanner_Memory extends RoomMemory {
+  anchorPosX: number;
+  anchorPosY: number;
+}

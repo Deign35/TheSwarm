@@ -6,10 +6,10 @@ export const OSPackage: IPackage = {
 
 import { BasicProcess } from "Core/BasicTypes";
 
-const AllRoomPackages = [RPKG_HomeRoomManager, RPKG_LabManager, RPKG_RemoteManager, RPKG_Towers, RPKG_WallWatcher];
+const AllRoomPackages = [RPKG_HomeRoomManager, RPKG_LabManager, RPKG_RemoteManager, RPKG_RoomPlanner, RPKG_Towers, RPKG_WallWatcher];
 
 const RoomTypeToPackage: { [id: string]: string[] } = {
-  [RT_Home]: [RPKG_HomeRoomManager, RPKG_Towers, RPKG_LabManager, RPKG_WallWatcher],
+  [RT_Home]: [RPKG_HomeRoomManager, RPKG_Towers, RPKG_LabManager, RPKG_WallWatcher, RPKG_RoomPlanner],
   [RT_RemoteHarvest]: [RPKG_RemoteManager],
   [RT_Center]: [],
   [RT_Highway]: [],
@@ -71,6 +71,13 @@ class RoomController extends BasicProcess<RoomController_Memory, RoomController_
           upgraderPID: ''
         } as HomeRoomManager_Memory);
         this.kernel.setParent(this.memory.activityPIDs[RPKG_HomeRoomManager]!, this.pid);
+      }
+
+      if (!this.memory.activityPIDs[RPKG_RoomPlanner] || !this.kernel.getProcessByPID(this.memory.activityPIDs[RPKG_RoomPlanner]!)) {
+        this.memory.activityPIDs[RPKG_RoomPlanner] = this.kernel.startProcess(RPKG_RoomPlanner, {
+          homeRoom: this.memory.homeRoom
+        } as RoomPlanner_Memory);
+        this.kernel.setParent(this.memory.activityPIDs[RPKG_RoomPlanner]!, this.pid);
       }
     } else if (data.roomType == RT_RemoteHarvest) {
       if (!this.memory.activityPIDs[RPKG_RemoteManager] || !this.kernel.getProcessByPID(this.memory.activityPIDs[RPKG_RemoteManager]!)) {
