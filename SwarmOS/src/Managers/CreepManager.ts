@@ -3,6 +3,18 @@ declare var Memory: {
   creeps: SDictionary<CreepMemory>;
 }
 
+declare type CreepMoveCache = {
+  path?: PathStep[];
+  range: number;
+  targetPos: RoomPosition;
+  tick: number;
+  lastPos: RoomPosition;
+  gotStuck: number
+}
+declare var MemoryCache: {
+  creepManager: IDictionary<CreepID, CreepMoveCache>;
+}
+
 import { BasicProcess, ExtensionBase } from "Core/BasicTypes";
 
 export const OSPackage: IPackage = {
@@ -31,6 +43,12 @@ class CreepManager extends BasicProcess<CreepManager_Memory, MemCache> {
 
     return Memory.creepData;
   }
+  get cache(): IDictionary<CreepID, CreepMoveCache> {
+    if (!MemoryCache.creepManager) {
+      MemoryCache.creepManager = {};
+    }
+    return MemoryCache.creepManager;
+  }
   protected get logID(): string {
     return PKG_CreepManager_LogContext.logID;
   }
@@ -56,20 +74,156 @@ class CreepManager extends BasicProcess<CreepManager_Memory, MemCache> {
   }
 
   RunThread(): ThreadState {
-    const creepIDs = Object.keys(Game.creeps);
-    for (let i = 0, length = creepIDs.length; i < length; i++) {
-      const creep = Game.creeps[creepIDs[i]];
-      const context = this.registeredCreeps[creep.name];
-      if (!context) {
-        if (!this.creepExtensions.tryRegisterCreep(creep.name)) {
-          this.log.error(`Creep context doesnt exist and couldnt register the creep(${creep.name}).`);
-          continue;
+    if (Game.time % 23 == 0) {
+      const creepIDs = Object.keys(Game.creeps);
+      for (let i = 0, length = creepIDs.length; i < length; i++) {
+        const creep = Game.creeps[creepIDs[i]];
+        const context = this.registeredCreeps[creep.name];
+        if (!context) {
+          if (!this.creepExtensions.tryRegisterCreep(creep.name)) {
+            this.log.error(`Creep context doesnt exist and couldnt register the creep(${creep.name}).`);
+            continue;
+          }
         }
       }
     }
 
-    this.sleeper.sleep(this.pid, 23);
     return ThreadState_Done;
+  }
+
+  EndTick() {
+    for (const creepID in Game.creeps) {
+      if (!this.cache[creepID]) { continue; }
+      const creep = Game.creeps[creepID];
+      const moveData = this.cache[creepID];
+      if (moveData.tick != Game.time) { continue; }
+      const newPath = !moveData.path;
+      if (!moveData.path) {
+        moveData.path = creep.pos.findPathTo(moveData.targetPos, {
+          ignoreCreeps: moveData.gotStuck < 3,
+          ignoreDestructibleStructures: false,
+          ignoreRoads: false,
+          range: moveData.range,
+        });
+      }
+
+      let checkPos = creep.pos;
+      if (newPath && moveData.path.length > 0) {
+        checkPos = new RoomPosition(moveData.path[0].x, moveData.path[0].y, creep.room.name);
+      } else {
+        // Find the position that the creep is at and check the next pos.
+        for (let i = 0; i < moveData.path.length; i++) {
+          const nextPos = new RoomPosition(moveData.path[i].x, moveData.path[i].y, creep.room.name);
+          if (nextPos.isEqualTo(creep.pos) && moveData.path.length - 1 > i) {
+            checkPos = new RoomPosition(moveData.path[i + 1].x, moveData.path[i + 1].y, creep.room.name);
+          }
+        }
+      }
+
+      const blockingCreep = checkPos.lookFor(LOOK_CREEPS);
+      if (blockingCreep.length > 0) {
+        const otherCreep = blockingCreep[0];
+        if (otherCreep.name != creep.name && otherCreep.my && !(this.cache[otherCreep.name] && this.cache[otherCreep.name].tick == Game.time)) {
+          // Move the blocking creep.
+          const checkedLocations = new Array(8).fill(false);
+          let checked = 0;
+          let foundNewPosition = false;
+          while (!foundNewPosition) {
+            const toCheck: DirectionConstant = Math.floor(Math.random() * 8) + 1 as DirectionConstant;
+            if (checkedLocations[toCheck - 1]) {
+              if (checked == 8) { break; }
+              continue;
+            }
+            checkedLocations[toCheck - 1] = true;
+            checked++;
+            let dx = 0, dy = 0;
+            switch (toCheck) {
+              case (TOP):
+                dx = 0;
+                dy = -1;
+                break;
+              case (TOP_RIGHT):
+                dx = 1;
+                dy = -1;
+                break;
+              case (RIGHT):
+                dx = 1;
+                dy = 0;
+                break;
+              case (BOTTOM_RIGHT):
+                dx = 1;
+                dy = 1;
+                break;
+              case (BOTTOM):
+                dx = 0;
+                dy = 1;
+                break;
+              case (BOTTOM_LEFT):
+                dx = -1;
+                dy = 1;
+                break;
+              case (LEFT):
+                dx = -1;
+                dy = 0;
+                break;
+              case (TOP_LEFT):
+                dx = -1;
+                dy = -1;
+                break;
+            }
+
+            const nextPos = new RoomPosition(otherCreep.pos.x + dx, otherCreep.pos.y + dy, otherCreep.room.name);
+            let obstacleFound = false;
+            const nearbyTerrain = nextPos.lookFor(LOOK_TERRAIN);
+            if (nearbyTerrain.length > 0) {
+              if (nearbyTerrain[0] == "wall") {
+                obstacleFound = true;
+              }
+            }
+            if (obstacleFound) { continue; }
+
+            const nearbyCreep = nextPos.lookFor(LOOK_CREEPS);
+            if (nearbyCreep.length > 0) {
+              if (nearbyCreep[0].name == creep.name) {
+                // Go ahead and swap locations.
+                foundNewPosition = true;
+                otherCreep.move(toCheck);
+              } else {
+                obstacleFound = true;
+              }
+            }
+            if (obstacleFound) { continue; }
+
+            const nearbyStructures = nextPos.lookFor(LOOK_STRUCTURES);
+            for (let i = 0; i < nearbyStructures.length; i++) {
+              if ((OBSTACLE_OBJECT_TYPES as string[]).includes(nearbyStructures[i].structureType)) {
+                obstacleFound = true;
+                break;
+              }
+            }
+            if (obstacleFound) { continue; }
+
+            const nearbySites = nextPos.lookFor(LOOK_CONSTRUCTION_SITES);
+            if (nearbySites.length > 0) {
+              if ((OBSTACLE_OBJECT_TYPES as string[]).includes(nearbySites[0].structureType)) {
+                obstacleFound = true;
+              }
+            }
+            if (obstacleFound) { continue; }
+
+            const nearbyPowerCreeps = nextPos.lookFor(LOOK_POWER_CREEPS);
+            if (nearbyPowerCreeps.length > 0) {
+              obstacleFound = true;
+            }
+            if (obstacleFound) { continue; }
+
+            otherCreep.move(toCheck);
+            foundNewPosition = true;
+          }
+        }
+      }
+      creep.moveByPath(moveData.path!);
+    }
   }
 }
 
@@ -83,6 +237,12 @@ class CreepManagerExtensions extends ExtensionBase implements ICreepManagerExten
     }
 
     return Memory.creepData;
+  }
+  get cache(): IDictionary<CreepID, CreepMoveCache> {
+    if (!MemoryCache.creepManager) {
+      MemoryCache.creepManager = {};
+    }
+    return MemoryCache.creepManager;
   }
   protected get logID(): string {
     return PKG_CreepManager_LogContext.logID;
@@ -130,6 +290,38 @@ class CreepManagerExtensions extends ExtensionBase implements ICreepManagerExten
     if (this.registeredCreeps[id] && this.registeredCreeps[id].ownerPID == requestingPID) {
       this.registeredCreeps[id].ownerPID = undefined;
     }
+  }
+
+  MoveCreep(creep: Creep, pos: RoomPosition, range?: number) {
+    let resetCache = true;
+    let gotStuck = 0;
+    if (this.cache[creep.name] && pos.isEqualTo(this.cache[creep.name].targetPos)) {
+      resetCache = false;
+      this.cache[creep.name].tick = Game.time;
+      this.cache[creep.name].range = range || 0;
+      if (creep.pos.isEqualTo(this.cache[creep.name].lastPos)) {
+        this.cache[creep.name].gotStuck++;
+        if (this.cache[creep.name].gotStuck >= 3) {
+          resetCache = true;
+        }
+      } else {
+        this.cache[creep.name].gotStuck = 0;
+      }
+
+      gotStuck = this.cache[creep.name].gotStuck;
+    }
+
+    if (resetCache) {
+      this.cache[creep.name] = {
+        range: range || 0,
+        targetPos: pos,
+        tick: Game.time,
+        lastPos: creep.pos,
+        gotStuck: gotStuck
+      }
+    }
+
+    return OK;
   }
 
   CreateNewCreepActivity(actionMem: SingleCreepAction_Memory, parentPID: PID): PID | undefined {
@@ -250,18 +442,6 @@ class CreepManagerExtensions extends ExtensionBase implements ICreepManagerExten
     }
 
     return actionResult;
-  }
-
-  MoveCreep(creep: Creep, pos: RoomPosition, range?: number) {
-    return creep.moveTo(pos, {
-      visualizePathStyle: {
-        lineStyle: "dashed",
-        opacity: 0.35,
-        stroke: "red",
-        strokeWidth: 0.15,
-      },
-      range: range
-    });
   }
 
   CreepIsInRange(actionType: ActionType, pos1: RoomPosition, pos2: RoomPosition) {

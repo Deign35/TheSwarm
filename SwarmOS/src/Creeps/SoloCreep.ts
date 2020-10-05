@@ -60,7 +60,7 @@ export abstract class SoloCreep<T extends SoloCreep_Memory, U extends SoloCreep_
             if (!this.creepManager.ValidateActionTarget(this.cache.curAction.action, target, this.cache.curAction.resourceType)) {
               return this.EndCurrentAction();
             } else if (!this.creepManager.CreepIsInRange(this.cache.curAction.action, creep.pos, target as RoomPosition)) {
-              this.creepManager.MoveCreep(creep, target as RoomPosition, this.cache.curAction.distance);
+              this.creepManager.MoveCreep(creep, (target as RoomObject).pos ? (target as RoomObject).pos : target as RoomPosition, this.cache.curAction.distance);
             } else {
               const result = this.creepManager.RunCreepAction({
                 actionType: this.cache.curAction.action,
