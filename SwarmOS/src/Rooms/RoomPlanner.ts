@@ -74,25 +74,34 @@ class RoomPlanner extends BasicProcess<RoomPlanner_Memory, MemCache> {
     if (!this.memory.anchorPosX || !this.memory.anchorPosY) { return ThreadState_Done; }
     const adjX = 25 - this.memory.anchorPosX;
     const adjY = 25 - this.memory.anchorPosY;
+    let hasCreatedSites = false;
     for (let structType in Flower) {
       const numAllowed = CONTROLLER_STRUCTURES[structType][room.controller.level];
       const numTotal = Math.min(numAllowed, Flower[structType].length);
       for (let i = 0; i < numTotal; i++) {
-        room.createConstructionSite(Flower[structType][i].x - adjX, Flower[structType][i].y - adjY, structType as BuildableStructureConstant);
+        if (room.createConstructionSite(Flower[structType][i].x - adjX, Flower[structType][i].y - adjY, structType as BuildableStructureConstant) == OK) {
+          hasCreatedSites = true;
+        }
       }
+    }
+
+    if (hasCreatedSites) { return ThreadState_Done; }
+
+    const sources = room.find(FIND_SOURCES);
+    for (let i = 0; i < sources.length; i++) {
+      this.CreatePathToPosition(sources[i].pos, true);
     }
 
     this.CreatePathToPosition(room.controller.pos, false);
     const roomData = this.roomManager.GetRoomData(this.memory.homeRoom)!;
-    for (let i = 0; i < roomData.mineralIDs.length; i++) {
-      const mineral = Game.getObjectById<Mineral>(roomData.mineralIDs[i]);
-      if (mineral) {
-        this.CreatePathToPosition(mineral.pos, true);
+    if (room.controller.level >= 6) {
+      for (let i = 0; i < roomData.mineralIDs.length; i++) {
+        const mineral = Game.getObjectById<Mineral>(roomData.mineralIDs[i]);
+        if (mineral) {
+          this.CreatePathToPosition(mineral.pos, true);
+          room.createConstructionSite(mineral.pos.x, mineral.pos.y, STRUCTURE_EXTRACTOR);
+        }
       }
-    }
-    const sources = room.find(FIND_SOURCES);
-    for (let i = 0; i < sources.length; i++) {
-      this.CreatePathToPosition(sources[i].pos, true);
     }
 
     const numLinksAllowed = CONTROLLER_STRUCTURES[STRUCTURE_LINK][room.controller.level];
@@ -155,6 +164,9 @@ class RoomPlanner extends BasicProcess<RoomPlanner_Memory, MemCache> {
       swampCost: 1,
       plainCost: 1
     });
+    if (Object.keys(Game.constructionSites).length + path.length > 100) {
+      return;
+    }
     const room = Game.rooms[this.memory.homeRoom];
     for (let i = 0; i < path.length; i++) {
       if (i == 0 && createContainer) {
