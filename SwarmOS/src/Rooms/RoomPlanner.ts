@@ -175,7 +175,7 @@ class RoomPlanner extends BasicProcess<RoomPlanner_Memory, MemCache> {
         const foundAtPosition = room.lookAt(path[i].x, path[i].y);
         for (let j = 0; j < foundAtPosition.length; j++) {
           if (foundAtPosition[j].type == LOOK_CONSTRUCTION_SITES ||
-              foundAtPosition[j].type == LOOK_STRUCTURES) {
+            foundAtPosition[j].type == LOOK_STRUCTURES) {
             return;
           }
         }
@@ -207,18 +207,18 @@ const Flower: { [id: string]: { x: number, y: number }[] } = {
     { x: 20, y: 28 }, { x: 21, y: 28 }, { x: 23, y: 28 }, { x: 27, y: 28 }, { x: 29, y: 28 }, { x: 30, y: 28 },
     { x: 21, y: 27 }, { x: 22, y: 27 }, { x: 28, y: 27 }, { x: 29, y: 27 },
   ],
-  [STRUCTURE_LAB]: [
-    { x: 24, y: 24 }, { x: 25, y: 24 },
-    { x: 23, y: 25 }, { x: 24, y: 25 }, { x: 26, y: 25 },
-    { x: 23, y: 26 }, { x: 25, y: 26 }, { x: 26, y: 26 },
-    { x: 24, y: 27 }, { x: 25, y: 27 },
-  ],
   [STRUCTURE_STORAGE]: [{ x: 23, y: 24 }],
   [STRUCTURE_LINK]: [{ x: 21, y: 25 }],
   [STRUCTURE_POWER_SPAWN]: [{ x: 25, y: 23 }],
   [STRUCTURE_TERMINAL]: [{ x: 26, y: 27 }],
   [STRUCTURE_FACTORY]: [{ x: 27, y: 25 }],
   [STRUCTURE_OBSERVER]: [{ x: 27, y: 24 }],
+  [STRUCTURE_LAB]: [
+    { x: 24, y: 24 }, { x: 25, y: 24 },
+    { x: 23, y: 25 }, { x: 24, y: 25 }, { x: 26, y: 25 },
+    { x: 23, y: 26 }, { x: 25, y: 26 }, { x: 26, y: 26 },
+    { x: 24, y: 27 }, { x: 25, y: 27 },
+  ],
   [STRUCTURE_NUKER]: [{ x: 26, y: 23 }],
   [STRUCTURE_ROAD]: [
     { x: 20, y: 20 }, { x: 21, y: 21 }, { x: 22, y: 22 }, { x: 23, y: 23 },
@@ -239,7 +239,7 @@ const Flower: { [id: string]: { x: number, y: number }[] } = {
     { x: 18, y: 21 }, { x: 32, y: 21 },
     { x: 19, y: 22 }, { x: 31, y: 22 },
     { x: 20, y: 23 }, { x: 30, y: 23 },
-    
+
     { x: 20, y: 27 }, { x: 30, y: 27 },
     { x: 19, y: 28 }, { x: 31, y: 28 },
     { x: 18, y: 29 }, { x: 32, y: 29 },
