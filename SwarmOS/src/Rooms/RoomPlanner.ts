@@ -13,17 +13,23 @@ class RoomPlanner extends BasicProcess<RoomPlanner_Memory, MemCache> {
     if (!Game.rooms[this.memory.homeRoom]) { return ThreadState_Done; }
     const room = Game.rooms[this.memory.homeRoom];
     if (!room.controller || !room.controller.my) { return ThreadState_Done; }
+    if (this.memory.canFlower === false) { return ThreadState_Done; }
     if (!this.memory.anchorPosX || !this.memory.anchorPosY) {
+      const terrain = new Room.Terrain(this.memory.homeRoom);
+      const wallDist = GenerateWallDistanceMatrix(terrain);
       const spawns = room.find(FIND_MY_SPAWNS);
       if (spawns.length > 0) {
         // Already plopped down a spawn.
         this.memory.anchorPosX = spawns[0].pos.x - 4;
         this.memory.anchorPosY = spawns[0].pos.y;
+        if (wallDist[this.memory.anchorPosX * 50 + this.memory.anchorPosY] >= 8) {
+          this.memory.canFlower = true;
+        } else {
+          this.memory.canFlower = false;
+        }
         return ThreadState_Done;
       }
       // find a position for the anchor.
-      const terrain = new Room.Terrain(this.memory.homeRoom);
-      const wallDist = GenerateWallDistanceMatrix(terrain);
       const peaks = GetDistancePeaks(wallDist);
       const distanceMatrices: number[][] = [];
       distanceMatrices.push(GenerateDistanceMatrix(terrain, room.controller.pos));
@@ -54,9 +60,13 @@ class RoomPlanner extends BasicProcess<RoomPlanner_Memory, MemCache> {
         }
       }
 
-      if (peakIndex < 0) { return ThreadState_Done; }
+      if (peakIndex < 0) {
+        this.memory.canFlower = false;
+        return ThreadState_Done;
+      }
       this.memory.anchorPosX = Math.floor(peakIndex / 50);
       this.memory.anchorPosY = peakIndex % 50;
+      this.memory.canFlower = true;
 
       room.createFlag(this.memory.anchorPosX + 4, this.memory.anchorPosY);
     }
