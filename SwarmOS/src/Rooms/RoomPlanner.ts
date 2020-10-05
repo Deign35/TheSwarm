@@ -186,7 +186,7 @@ class RoomPlanner extends BasicProcess<RoomPlanner_Memory, MemCache> {
   }
 }
 
-// https://screeps.admon.dev/building-planner/?share=N4IgdghgtgpiBcIQBoQGcAWEBOATB6WeADCiNgMYA2CAHKgEYCuAllbi2AOZoKjYB7CPnigADgN7wA2qAAeCAEwBWVAE8lygL7J5SgCzqlANh174i40Yv6zIBRYDs1xQGY7Dty8ceTLxb4W9CAaNoGKwaGKAbr2SgCcLgCMga7ELsThViFKKbGeqjkWmfkGyeGGRdHhri7upRaKLrYN0f7hSeWt6VUl5oqdVS39PVHarYNRpq1NVdP9s1G0HS7x4aMIaRUuy62VUWuthaFbrdkHWTvhzlU+rZFKu-2JVYfmadan-Q8W83EWLymqQ2FnGz2agSSgIQSSe-0UINhKyKSJm1ihNQy1yx93Rb3h0PgqPeiLhDlckxhZM2ixh+PJtOKqUZA1SlMawLqnNubKuDVcLPpNM+fX+As+eXe7IF3JOMXBRRluMVkvhNxOos8tUVmqUjIp60+8v+UKNyLlkJ+BoasJFltWkMJEUNPO6XJtTuNDltVVV3p+CPtKLWAF0dCAqBAGHwQBIpLJ4dqga0k5ptlUwfD9gZwscc3tvLnC0cXH9POcTJcM1ow6gAC4CADuMGwMbjCATnnVlYLVXq-TzHOVY3CLMzBSutfQYggjbAbckHYVI5LvqLrxr4brLagnAgNFEscXMn6Facm9QADMIBQG9hQuJj52lN3QReQAIGGgWwA3FsL+N+lfRRbCnCRm2wABlGc5wApd4UHNx3zAJgAGt-0PdsT3hM8kKnKhOFQuDsM8dkVHfNA7wgLg4Ewp9+lTMIpxgORtzANAWAEec6MA+EWX7eEyIE0j2jdNcxKiL06S6cxTV6R08RdUIMQmRTVPktENIWGTEx0rVRKAgy1T0x4TKCHFlyUXUATUklbLFdkVKlCyHLMj5xLsqopJsrzwidYTTL7cIAzuSzz1aJ1qXgdylllBJeQ3flpWsikJTi6K-QSNKIrtYdNmsiIHVaYChScPkGPK3TEu06q+Ny-pkvNTZMuKbLZMJa12vqk0nVKhEipGSqRKqKKBmLGqoh8MMtC0IA
+// https://tinyurl.com/yxzu7w5c
 const Flower: { [id: string]: { x: number, y: number }[] } = {
   [STRUCTURE_TOWER]: [
     { x: 25, y: 22 }, { x: 24, y: 23 }, { x: 22, y: 25 }, { x: 28, y: 25 }, { x: 27, y: 26 }, { x: 25, y: 28 }
