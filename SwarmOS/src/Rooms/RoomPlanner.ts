@@ -142,10 +142,12 @@ class RoomPlanner extends BasicProcess<RoomPlanner_Memory, MemCache> {
               }
               if (look[k].type == LOOK_CONSTRUCTION_SITES || look[k].type == LOOK_STRUCTURES) { return; }
 
-              currentNum++;
-              room.createConstructionSite(x, y, STRUCTURE_LINK);
-              hasFoundLinkPos = true;
             }
+
+            // If we make it here, it means this is a good spot for a link
+            currentNum++;
+            room.createConstructionSite(x, y, STRUCTURE_LINK);
+            hasFoundLinkPos = true;
           });
           break;
         }

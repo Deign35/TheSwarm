@@ -40,13 +40,13 @@ class HomeRoomManager extends BasicProcess<HomeRoomManager_Memory, HomeRoomManag
     } else {
       if (!this.memory.largeHarvester ||
         !this.kernel.getProcessByPID(this.memory.largeHarvester)) {
-          const pid = this.kernel.startProcess(CPKG_LargeHarvester, {
-            homeRoom: this.memory.homeRoom,
-            targetRoom: this.memory.homeRoom,
-          } as LargeHarvester_Memory);
-          this.memory.largeHarvester = pid;
-          this.kernel.setParent(pid, this.pid);
-        }
+        const pid = this.kernel.startProcess(CPKG_LargeHarvester, {
+          homeRoom: this.memory.homeRoom,
+          targetRoom: this.memory.homeRoom,
+        } as LargeHarvester_Memory);
+        this.memory.largeHarvester = pid;
+        this.kernel.setParent(pid, this.pid);
+      }
     }
 
     for (let i = 0; i < this.memory.refillerPIDs.length; i++) {
@@ -90,6 +90,9 @@ class HomeRoomManager extends BasicProcess<HomeRoomManager_Memory, HomeRoomManag
     if (numWorkers == 0) {
       numWorkers = 1;
     }
+    if (room.controller!.level == 8) {
+      numWorkers = 1;
+    }
 
     while (this.memory.workerPIDs.length < numWorkers) {
       this.memory.workerPIDs.push(this.kernel.startProcess(CPKG_Worker, {
@@ -99,7 +102,7 @@ class HomeRoomManager extends BasicProcess<HomeRoomManager_Memory, HomeRoomManag
       this.kernel.setParent(this.memory.workerPIDs[this.memory.workerPIDs.length - 1], this.pid);
     }
 
-    if (numWorkers > 1 && !this.memory.upgraderPID || !this.kernel.getProcessByPID(this.memory.upgraderPID)) {
+    if ((numWorkers > 1 || room.controller!.level == 8) && !this.memory.upgraderPID || !this.kernel.getProcessByPID(this.memory.upgraderPID)) {
       this.memory.upgraderPID = this.kernel.startProcess(CPKG_Upgrader, {
         homeRoom: this.memory.homeRoom,
         targetRoom: this.memory.homeRoom,
