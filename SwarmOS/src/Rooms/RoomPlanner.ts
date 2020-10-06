@@ -76,6 +76,7 @@ class RoomPlanner extends BasicProcess<RoomPlanner_Memory, MemCache> {
     const adjY = 25 - this.memory.anchorPosY;
     let hasCreatedSites = false;
     for (let structType in Flower) {
+      if (structType === STRUCTURE_ROAD && room.controller.level < 3) { continue; }
       const numAllowed = CONTROLLER_STRUCTURES[structType][room.controller.level];
       const numTotal = Math.min(numAllowed, Flower[structType].length);
       for (let i = 0; i < numTotal; i++) {
@@ -88,19 +89,21 @@ class RoomPlanner extends BasicProcess<RoomPlanner_Memory, MemCache> {
     if (hasCreatedSites) { return ThreadState_Done; }
 
     const sources = room.find(FIND_SOURCES);
-    let numberOfSites = Object.keys(Game.constructionSites).length;
-    for (let i = 0; i < sources.length; i++) {
-      numberOfSites += this.CreatePathToPosition(sources[i].pos, true, numberOfSites);
-    }
-
-    numberOfSites += this.CreatePathToPosition(room.controller.pos, false, numberOfSites);
     const roomData = this.roomManager.GetRoomData(this.memory.homeRoom)!;
-    if (room.controller.level >= 6) {
-      for (let i = 0; i < roomData.mineralIDs.length; i++) {
-        const mineral = Game.getObjectById<Mineral>(roomData.mineralIDs[i]);
-        if (mineral) {
-          numberOfSites += this.CreatePathToPosition(mineral.pos, true, numberOfSites);
-          room.createConstructionSite(mineral.pos.x, mineral.pos.y, STRUCTURE_EXTRACTOR);
+    if (room.controller.level >= 3) {
+      let numberOfSites = Object.keys(Game.constructionSites).length;
+      for (let i = 0; i < sources.length; i++) {
+        numberOfSites += this.CreatePathToPosition(sources[i].pos, true, numberOfSites);
+      }
+
+      numberOfSites += this.CreatePathToPosition(room.controller.pos, false, numberOfSites);
+      if (room.controller.level >= 6) {
+        for (let i = 0; i < roomData.mineralIDs.length; i++) {
+          const mineral = Game.getObjectById<Mineral>(roomData.mineralIDs[i]);
+          if (mineral) {
+            numberOfSites += this.CreatePathToPosition(mineral.pos, true, numberOfSites);
+            room.createConstructionSite(mineral.pos.x, mineral.pos.y, STRUCTURE_EXTRACTOR);
+          }
         }
       }
     }
