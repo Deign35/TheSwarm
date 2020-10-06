@@ -80,6 +80,9 @@ class CreepManager extends BasicProcess<CreepManager_Memory, MemCache> {
         const creep = Game.creeps[creepIDs[i]];
         const context = this.registeredCreeps[creep.name];
         if (!context) {
+          if (!Memory.creeps[creep.name]) {
+            Memory.creeps[creep.name] = {}
+          }
           if (!this.creepExtensions.tryRegisterCreep(creep.name)) {
             this.log.error(`Creep context doesnt exist and couldnt register the creep(${creep.name}).`);
             continue;
