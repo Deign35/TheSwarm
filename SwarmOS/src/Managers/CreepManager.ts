@@ -223,7 +223,14 @@ class CreepManager extends BasicProcess<CreepManager_Memory, MemCache> {
         }
       }
       creep.moveByPath(moveData.path);
+      let dontDrawYet = true;
       for (let i = 0; i < moveData.path.length - 1; i++) {
+        if (dontDrawYet) {
+          if (creep.pos.isEqualTo(new RoomPosition(moveData.path[i].x, moveData.path[i].y, creep.room.name))) {
+            dontDrawYet = false;
+          }
+          continue;
+        }
         creep.room.visual.line(moveData.path[i].x, moveData.path[i].y, moveData.path[i + 1].x, moveData.path[i + 1].y, {
           lineStyle: "dashed",
           opacity: 0.35,

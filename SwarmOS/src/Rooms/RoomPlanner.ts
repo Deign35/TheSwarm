@@ -88,17 +88,18 @@ class RoomPlanner extends BasicProcess<RoomPlanner_Memory, MemCache> {
     if (hasCreatedSites) { return ThreadState_Done; }
 
     const sources = room.find(FIND_SOURCES);
+    let numberOfSites = Object.keys(Game.constructionSites).length;
     for (let i = 0; i < sources.length; i++) {
-      this.CreatePathToPosition(sources[i].pos, true);
+      numberOfSites += this.CreatePathToPosition(sources[i].pos, true, numberOfSites);
     }
 
-    this.CreatePathToPosition(room.controller.pos, false);
+    numberOfSites += this.CreatePathToPosition(room.controller.pos, false, numberOfSites);
     const roomData = this.roomManager.GetRoomData(this.memory.homeRoom)!;
     if (room.controller.level >= 6) {
       for (let i = 0; i < roomData.mineralIDs.length; i++) {
         const mineral = Game.getObjectById<Mineral>(roomData.mineralIDs[i]);
         if (mineral) {
-          this.CreatePathToPosition(mineral.pos, true);
+          numberOfSites += this.CreatePathToPosition(mineral.pos, true, numberOfSites);
           room.createConstructionSite(mineral.pos.x, mineral.pos.y, STRUCTURE_EXTRACTOR);
         }
       }
@@ -158,33 +159,39 @@ class RoomPlanner extends BasicProcess<RoomPlanner_Memory, MemCache> {
     return ThreadState_Done;
   }
 
-  CreatePathToPosition(pos: RoomPosition, createContainer: boolean) {
+  CreatePathToPosition(pos: RoomPosition, createContainer: boolean, numberOfSites: number) {
     const path = pos.findPathTo(this.memory.anchorPosX, this.memory.anchorPosY, {
       ignoreCreeps: true,
-      ignoreDestructibleStructures: true,
+      ignoreDestructibleStructures: false,
       ignoreRoads: false,
       swampCost: 1,
       plainCost: 1
     });
-    if (Object.keys(Game.constructionSites).length + path.length > 100) {
-      return;
+    if (numberOfSites + path.length > 100) {
+      return 0;
     }
+
     const room = Game.rooms[this.memory.homeRoom];
+    let numSitesCreated = 0;
     for (let i = 0; i < path.length; i++) {
       if (i == 0 && createContainer) {
         room.createConstructionSite(path[i].x, path[i].y, STRUCTURE_CONTAINER);
+        numSitesCreated++;
       } else {
         const foundAtPosition = room.lookAt(path[i].x, path[i].y);
         for (let j = 0; j < foundAtPosition.length; j++) {
           if (foundAtPosition[j].type == LOOK_CONSTRUCTION_SITES ||
             foundAtPosition[j].type == LOOK_STRUCTURES) {
-            return;
+            return numSitesCreated;
           }
         }
 
         room.createConstructionSite(path[i].x, path[i].y, STRUCTURE_ROAD);
+        numSitesCreated++;
       }
     }
+
+    return numSitesCreated;
   }
 }
 
