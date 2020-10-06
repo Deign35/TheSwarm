@@ -222,7 +222,15 @@ class CreepManager extends BasicProcess<CreepManager_Memory, MemCache> {
           }
         }
       }
-      creep.moveByPath(moveData.path!);
+      creep.moveByPath(moveData.path);
+      for (let i = 0; i < moveData.path.length - 1; i++) {
+        creep.room.visual.line(moveData.path[i].x, moveData.path[i].y, moveData.path[i + 1].x, moveData.path[i + 1].y, {
+          lineStyle: "dashed",
+          opacity: 0.35,
+          color: 'red',
+          width: 0.15
+        });
+      }
     }
   }
 }
