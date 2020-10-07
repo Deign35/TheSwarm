@@ -53,5 +53,5 @@ declare interface RoomController_Cache extends MemCache {
 declare interface RoomPlanner_Memory extends RoomMemory {
   anchorPosX: number;
   anchorPosY: number;
-  canFlower: boolean;
+  canBunker: boolean;
 }
