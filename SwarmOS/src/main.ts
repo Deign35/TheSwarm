@@ -61,7 +61,7 @@ export function loop() {
       const room = Game.rooms[testRoom];
       const terrain = new Room.Terrain(room.name);
       const start = performance.now();
-      //const matrix = GenerateWallDistanceMatrix(terrain);
+      //const matrix = GenerateWallDistanceMatrix(terrain, true);
       //ShrinkRoom(matrix, 3);
       //const peaks = GetDistancePeaks(matrix);
       const matrix = GenerateDistanceMatrix(terrain, room.find(FIND_SOURCES)[0].pos);

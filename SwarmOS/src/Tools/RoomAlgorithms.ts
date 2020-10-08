@@ -23,17 +23,19 @@ export function GenerateDistanceMatrix(roomTerrain: RoomTerrain, pos: RoomPositi
   return matrix;
 }
 
-export function GenerateWallDistanceMatrix(roomTerrain: RoomTerrain) {
+export function GenerateWallDistanceMatrix(roomTerrain: RoomTerrain, exitsAreWalls: boolean = false) {
   const matrix = new Array(2500).fill(UNSET);
   const floorQueue: number[] = [];
   OperateOverMap((x, y) => {
     const terrain = roomTerrain.get(x, y);
-    if (terrain == TERRAIN_MASK_WALL) {
+    const exit = x <= 0 || x >= 49 || y <= 0 || y >= 49;
+    if (terrain == TERRAIN_MASK_WALL || (exitsAreWalls && exit)) {
       matrix[x * 50 + y] = Infinity;
       OperateOnNeighbors(x, y, (x2, y2) => {
         const terrain2 = roomTerrain.get(x2, y2);
         const x2y2 = x2 * 50 + y2;
-        if (terrain2 != TERRAIN_MASK_WALL && matrix[x2y2] == UNSET) {
+        const exit2 = x2 <= 0 || x2 >= 49 || y2 <= 0 || y2 >= 49;
+        if (terrain2 != TERRAIN_MASK_WALL && (!exitsAreWalls || !exit2) && matrix[x2y2] == UNSET) {
           matrix[x2y2] = 1;
           floorQueue.push(x2y2);
         }

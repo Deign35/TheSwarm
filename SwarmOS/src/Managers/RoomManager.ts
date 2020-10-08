@@ -125,7 +125,7 @@ class RoomManagerExtension extends ExtensionBase implements IRoomManagerExtensio
         }
 
         const terrain = new Room.Terrain(roomID);
-        const wallDist = GenerateWallDistanceMatrix(terrain);
+        const wallDist = GenerateWallDistanceMatrix(terrain, true);
         const spawns = room.find(FIND_MY_SPAWNS);
         if (spawns.length > 0) {
           // Already plopped down a spawn.
