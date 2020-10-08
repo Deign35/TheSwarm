@@ -6,7 +6,7 @@ export const OSPackage: IPackage = {
 
 import { BasicProcess } from "Core/BasicTypes";
 
-const AllRoomPackages = [RPKG_HomeRoomManager, RPKG_LabManager, RPKG_RemoteManager, RPKG_RoomPlanner, RPKG_Towers, RPKG_WallWatcher];
+const AllRoomPackages = [RPKG_HomeRoomManager, RPKG_LabManager, RPKG_RemoteManager, RPKG_RoomPlanner, RPKG_Towers, RPKG_WallWatcher, RPKG_AssimilateRoomManager];
 
 const RoomTypeToPackage: { [id: string]: string[] } = {
   [RT_Home]: [RPKG_HomeRoomManager, RPKG_Towers, RPKG_LabManager, RPKG_WallWatcher, RPKG_RoomPlanner],
@@ -14,7 +14,8 @@ const RoomTypeToPackage: { [id: string]: string[] } = {
   [RT_Center]: [],
   [RT_Highway]: [],
   [RT_Nuetral]: [],
-  [RT_SourceKeeper]: []
+  [RT_SourceKeeper]: [],
+  [RT_InProgress]: [RPKG_AssimilateRoomManager]
 };
 
 class RoomController extends BasicProcess<RoomController_Memory, RoomController_Cache> {
@@ -73,7 +74,7 @@ class RoomController extends BasicProcess<RoomController_Memory, RoomController_
         this.kernel.setParent(this.memory.activityPIDs[RPKG_HomeRoomManager]!, this.pid);
       }
 
-      if (!this.memory.activityPIDs[RPKG_RoomPlanner] || !this.kernel.getProcessByPID(this.memory.activityPIDs[RPKG_RoomPlanner]!)) {
+      if (!this.memory.activityPIDs[RPKG_RoomPlanner] || !this.kernel.getProcessByPID(this.memory.activityPIDs[RPKG_RoomPlanner])) {
         this.memory.activityPIDs[RPKG_RoomPlanner] = this.kernel.startProcess(RPKG_RoomPlanner, {
           homeRoom: this.memory.homeRoom
         } as RoomPlanner_Memory);
@@ -88,6 +89,16 @@ class RoomController extends BasicProcess<RoomController_Memory, RoomController_
           homeRoom: data.homeRoom,
         } as RemoteManager_Memory);
         this.kernel.setParent(this.memory.activityPIDs[RPKG_RemoteManager]!, this.pid);
+      }
+    } else if (data.roomType == RT_InProgress) {
+      if (!this.memory.activityPIDs[RPKG_AssimilateRoomManager] || !this.kernel.getProcessByPID(this.memory.activityPIDs[RPKG_AssimilateRoomManager])) {
+        this.memory.activityPIDs[RPKG_AssimilateRoomManager] = this.kernel.startProcess(RPKG_AssimilateRoomManager, {
+          booterPIDs: [],
+          claimerPID: '',
+          homeRoom: this.memory.homeRoom,
+          numClaimers: 0
+        } as AssimilateRoomManager_Memory);
+        this.kernel.setParent(this.memory.activityPIDs[RPKG_AssimilateRoomManager], this.pid);
       }
     }
 

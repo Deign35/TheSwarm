@@ -1,3 +1,4 @@
+import { OSPackage as AssimilateRoomManager } from "./AssimilateRoomManager";
 import { OSPackage as HomeRoomManager } from "./HomeRoomManager";
 import { OSPackage as LabManager } from "./LabManager";
 import { OSPackage as RemoteManager } from "./RemoteManager";
@@ -8,6 +9,7 @@ import { OSPackage as WallWatcher } from "./WallWatcher";
 
 export const RoomsPackage: IPackage = {
   install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
+    AssimilateRoomManager.install(processRegistry, extensionRegistry);
     HomeRoomManager.install(processRegistry, extensionRegistry);
     LabManager.install(processRegistry, extensionRegistry);
     RemoteManager.install(processRegistry, extensionRegistry);
