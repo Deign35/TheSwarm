@@ -15,7 +15,7 @@ const RoomTypeToPackage: { [id: string]: string[] } = {
   [RT_Highway]: [],
   [RT_Nuetral]: [],
   [RT_SourceKeeper]: [],
-  [RT_InProgress]: [RPKG_AssimilateRoomManager]
+  [RT_InProgress]: [RPKG_AssimilateRoomManager, RPKG_RoomPlanner]
 };
 
 class RoomController extends BasicProcess<RoomController_Memory, RoomController_Cache> {
@@ -99,6 +99,13 @@ class RoomController extends BasicProcess<RoomController_Memory, RoomController_
           numClaimers: 0
         } as AssimilateRoomManager_Memory);
         this.kernel.setParent(this.memory.activityPIDs[RPKG_AssimilateRoomManager], this.pid);
+      }
+
+      if (!this.memory.activityPIDs[RPKG_RoomPlanner] || !this.kernel.getProcessByPID(this.memory.activityPIDs[RPKG_RoomPlanner])) {
+        this.memory.activityPIDs[RPKG_RoomPlanner] = this.kernel.startProcess(RPKG_RoomPlanner, {
+          homeRoom: this.memory.homeRoom
+        } as RoomPlanner_Memory);
+        this.kernel.setParent(this.memory.activityPIDs[RPKG_RoomPlanner]!, this.pid);
       }
     }
 
