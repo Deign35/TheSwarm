@@ -4,7 +4,7 @@ export const OSPackage: IPackage = {
   }
 }
 import { BasicProcess } from "Core/BasicTypes";
-import { GenerateWallDistanceMatrix, GetDistancePeaks, GenerateDistanceMatrix, OperateOnNeighbors } from "Tools/RoomAlgorithms";
+import { OperateOnNeighbors } from "Tools/RoomAlgorithms";
 
 class RoomPlanner extends BasicProcess<RoomPlanner_Memory, MemCache> {
   @extensionInterface(EXT_RoomManager)
@@ -13,67 +13,11 @@ class RoomPlanner extends BasicProcess<RoomPlanner_Memory, MemCache> {
     if (!Game.rooms[this.memory.homeRoom]) { return ThreadState_Done; }
     const room = Game.rooms[this.memory.homeRoom];
     if (!room.controller || !room.controller.my) { return ThreadState_Done; }
-    if (this.memory.canBunker === false) { return ThreadState_Done; }
-    if (!this.memory.anchorPosX || !this.memory.anchorPosY) {
-      const terrain = new Room.Terrain(this.memory.homeRoom);
-      const wallDist = GenerateWallDistanceMatrix(terrain);
-      const spawns = room.find(FIND_MY_SPAWNS);
-      if (spawns.length > 0) {
-        // Already plopped down a spawn.
-        this.memory.anchorPosX = spawns[0].pos.x - 4;
-        this.memory.anchorPosY = spawns[0].pos.y;
-        if (wallDist[this.memory.anchorPosX * 50 + this.memory.anchorPosY] >= 7) {
-          this.memory.canBunker = true;
-        } else {
-          this.memory.canBunker = false;
-        }
-        return ThreadState_Done;
-      }
-      // find a position for the anchor.
-      const peaks = GetDistancePeaks(wallDist);
-      const distanceMatrices: number[][] = [];
-      distanceMatrices.push(GenerateDistanceMatrix(terrain, room.controller.pos));
-      const sources = room.find(FIND_SOURCES);
-      for (let i = 0; i < sources.length; i++) {
-        distanceMatrices.push(GenerateDistanceMatrix(terrain, sources[i].pos));
-      }
-      const minerals = room.find(FIND_MINERALS);
-      for (let i = 0; i < minerals.length; i++) {
-        distanceMatrices.push(GenerateDistanceMatrix(terrain, minerals[i].pos));
-      }
+    const roomData = this.roomManager.GetRoomData(this.memory.homeRoom)!;
+    if (roomData.bunkerAnchor.x < 0 || roomData.bunkerAnchor.y < 0) { return ThreadState_Done; }
 
-      const combinedDistanceMatrix = new Array(2500).fill(0);
-      for (let i = 0; i < 2500; i++) {
-        for (let j = 0; j < distanceMatrices.length; j++) {
-          combinedDistanceMatrix[i] += distanceMatrices[j][i];
-        }
-      }
-
-      let lowestValley = Infinity;
-      let peakIndex = -1;
-      for (let i = 0; i < peaks.length; i++) {
-        if (wallDist[peaks[i]] >= 7) {
-          if (combinedDistanceMatrix[peaks[i]] < lowestValley) {
-            lowestValley = combinedDistanceMatrix[peaks[i]];
-            peakIndex = peaks[i];
-          }
-        }
-      }
-
-      if (peakIndex < 0) {
-        this.memory.canBunker = false;
-        return ThreadState_Done;
-      }
-      this.memory.anchorPosX = Math.floor(peakIndex / 50);
-      this.memory.anchorPosY = peakIndex % 50;
-      this.memory.canBunker = true;
-
-      room.createFlag(this.memory.anchorPosX + 4, this.memory.anchorPosY);
-    }
-
-    if (!this.memory.anchorPosX || !this.memory.anchorPosY) { return ThreadState_Done; }
-    const adjX = 25 - this.memory.anchorPosX;
-    const adjY = 25 - this.memory.anchorPosY;
+    const adjX = 25 - roomData.bunkerAnchor.x;
+    const adjY = 25 - roomData.bunkerAnchor.y;
     let hasCreatedSites = false;
     for (let structType in Bunker) {
       if (structType === STRUCTURE_ROAD && room.controller.level < 3) { continue; }
@@ -89,25 +33,35 @@ class RoomPlanner extends BasicProcess<RoomPlanner_Memory, MemCache> {
     if (hasCreatedSites) { return ThreadState_Done; }
 
     const sources = room.find(FIND_SOURCES);
-    const roomData = this.roomManager.GetRoomData(this.memory.homeRoom)!;
-    let numberOfSites = Object.keys(Game.constructionSites).length;
-    for (let i = 0; i < sources.length; i++) {
-      numberOfSites += this.CreatePathToPosition(sources[i].pos, true, numberOfSites, room.controller.level >= 3);
+    const costMatrix = new PathFinder.CostMatrix();
+    const sites = room.find(FIND_MY_CONSTRUCTION_SITES);
+    const numLinksAllowed = CONTROLLER_STRUCTURES[STRUCTURE_LINK][room.controller.level];
+    let currentNum = roomData.structures[STRUCTURE_LINK].length;
+    for (let i = 0; i < sites.length; i++) {
+      if (sites[i].structureType == STRUCTURE_ROAD) {
+        costMatrix.set(sites[i].pos.x, sites[i].pos.y, 1);
+      }
+      if (sites[i].structureType == STRUCTURE_LINK) {
+        currentNum++;
+      }
     }
 
-    numberOfSites += this.CreatePathToPosition(room.controller.pos, false, numberOfSites, room.controller.level >= 3);
+    let numberOfSites = Object.keys(Game.constructionSites).length;
+    for (let i = 0; i < sources.length; i++) {
+      numberOfSites += this.CreatePathToPosition(sources[i].pos, true, numberOfSites, room.controller.level >= 3, costMatrix);
+    }
+
+    numberOfSites += this.CreatePathToPosition(room.controller.pos, false, numberOfSites, room.controller.level >= 3, costMatrix);
     if (room.controller.level >= 6) {
       for (let i = 0; i < roomData.mineralIDs.length; i++) {
         const mineral = Game.getObjectById<Mineral>(roomData.mineralIDs[i]);
         if (mineral) {
-          numberOfSites += this.CreatePathToPosition(mineral.pos, true, numberOfSites, room.controller.level >= 3);
+          numberOfSites += this.CreatePathToPosition(mineral.pos, true, numberOfSites, room.controller.level >= 3, costMatrix);
           room.createConstructionSite(mineral.pos.x, mineral.pos.y, STRUCTURE_EXTRACTOR);
         }
       }
     }
 
-    const numLinksAllowed = CONTROLLER_STRUCTURES[STRUCTURE_LINK][room.controller.level];
-    let currentNum = roomData.structures[STRUCTURE_LINK].length;
     for (let i = 0; i < sources.length; i++) {
       if (currentNum >= numLinksAllowed) { break; }
       for (let j = 0; j < roomData.structures[STRUCTURE_CONTAINER].length; j++) {
@@ -160,13 +114,16 @@ class RoomPlanner extends BasicProcess<RoomPlanner_Memory, MemCache> {
     return ThreadState_Done;
   }
 
-  CreatePathToPosition(pos: RoomPosition, createContainer: boolean, numberOfSites: number, buildRoad: boolean) {
-    const path = pos.findPathTo(this.memory.anchorPosX, this.memory.anchorPosY, {
+  CreatePathToPosition(pos: RoomPosition, createContainer: boolean, numberOfSites: number, buildRoad: boolean, costMatrix: CostMatrix) {
+    const roomData = this.roomManager.GetRoomData(pos.roomName)!;
+    const path = pos.findPathTo(roomData.bunkerAnchor.x, roomData.bunkerAnchor.y, {
+      costCallback: function (roomName: string) { return costMatrix; },
       ignoreCreeps: true,
-      ignoreDestructibleStructures: false,
+      ignoreDestructibleStructures: true,
       ignoreRoads: false,
-      swampCost: 1,
-      plainCost: 1
+      swampCost: 5,
+      plainCost: 5,
+      range: 7
     });
     if (numberOfSites + path.length > 100) {
       return 0;
@@ -179,7 +136,7 @@ class RoomPlanner extends BasicProcess<RoomPlanner_Memory, MemCache> {
       numSitesCreated++;
     }
     if (buildRoad) {
-      for (let i = createContainer ? 1 : 0; i < path.length - 7; i++) {
+      for (let i = createContainer ? 1 : 0; i < path.length; i++) {
         room.createConstructionSite(path[i].x, path[i].y, STRUCTURE_ROAD);
         numSitesCreated++;
       }

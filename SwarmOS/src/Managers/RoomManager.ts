@@ -3,6 +3,7 @@ declare var Memory: {
 }
 
 import { ExtensionBase, BasicProcess } from "Core/BasicTypes";
+import { GenerateWallDistanceMatrix, GetDistancePeaks, GenerateDistanceMatrix } from "Tools/RoomAlgorithms";
 
 export const OSPackage: IPackage = {
   install(processRegistry: IProcessRegistry, extensionRegistry: IExtensionRegistry) {
@@ -119,7 +120,64 @@ class RoomManagerExtension extends ExtensionBase implements IRoomManagerExtensio
           resources: [],
           tombstones: [],
           ruins: [],
-          boostAssignments: {}
+          boostAssignments: {},
+          bunkerAnchor: { x: -1, y: -1 }
+        }
+
+        const terrain = new Room.Terrain(roomID);
+        const wallDist = GenerateWallDistanceMatrix(terrain);
+        const spawns = room.find(FIND_MY_SPAWNS);
+        if (spawns.length > 0) {
+          // Already plopped down a spawn.
+          roomState.bunkerAnchor.x = spawns[0].pos.x - 4;
+          roomState.bunkerAnchor.y = spawns[0].pos.y;
+          if (wallDist[roomState.bunkerAnchor.x * 50 + roomState.bunkerAnchor.y] < 7) {
+            roomState.bunkerAnchor = { x: -1, y: -1 }
+          }
+        } else {
+          // find a position for the anchor.
+          const peaks = GetDistancePeaks(wallDist);
+          const distanceMatrices: number[][] = [];
+          if (room.controller) {
+            distanceMatrices.push(GenerateDistanceMatrix(terrain, room.controller.pos));
+          }
+          const sources = room.find(FIND_SOURCES);
+          for (let i = 0; i < sources.length; i++) {
+            distanceMatrices.push(GenerateDistanceMatrix(terrain, sources[i].pos));
+          }
+          const minerals = room.find(FIND_MINERALS);
+          for (let i = 0; i < minerals.length; i++) {
+            distanceMatrices.push(GenerateDistanceMatrix(terrain, minerals[i].pos));
+          }
+
+          const combinedDistanceMatrix = new Array(2500).fill(0);
+          for (let i = 0; i < 2500; i++) {
+            for (let j = 0; j < distanceMatrices.length; j++) {
+              combinedDistanceMatrix[i] += distanceMatrices[j][i];
+            }
+          }
+
+          let lowestValley = Infinity;
+          let peakIndex = -1;
+          for (let i = 0; i < peaks.length; i++) {
+            if (wallDist[peaks[i]] >= 7) {
+              if (combinedDistanceMatrix[peaks[i]] < lowestValley) {
+                lowestValley = combinedDistanceMatrix[peaks[i]];
+                peakIndex = peaks[i];
+              }
+            }
+          }
+
+          if (peakIndex < 0) {
+            roomState.bunkerAnchor = { x: -1, y: -1 }
+          } else {
+            roomState.bunkerAnchor.x = Math.floor(peakIndex / 50);
+            roomState.bunkerAnchor.y = peakIndex % 50;
+          }
+        }
+
+        if (roomState.bunkerAnchor.x >= 0 && roomState.bunkerAnchor.y >= 0) {
+          room.createFlag(roomState.bunkerAnchor.x + 4, roomState.bunkerAnchor.y);
         }
         this.memory.roomStateData[roomID] = roomState;
       }

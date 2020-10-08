@@ -4,7 +4,7 @@ declare var Memory: {
 }
 
 declare type CreepMoveCache = {
-  path?: PathStep[];
+  path: PathStep[];
   range: number;
   targetPos: RoomPosition;
   tick: number;
@@ -99,19 +99,35 @@ class CreepManager extends BasicProcess<CreepManager_Memory, MemCache> {
       if (!this.cache[creepID]) { continue; }
       const creep = Game.creeps[creepID];
       const moveData = this.cache[creepID];
+      if (creep.fatigue) {
+        moveData.gotStuck--;
+        continue;
+      }
       if (moveData.tick != Game.time) { continue; }
-      const newPath = !moveData.path;
-      if (!moveData.path) {
+
+      let isDoneWithPath = moveData.path.length == 0;
+      if (!isDoneWithPath) {
+        const testPosition = new RoomPosition(moveData.path[moveData.path.length - 1].x, moveData.path[moveData.path.length - 1].y, creep.room.name);
+        const moveByPathResult = creep.moveByPath(moveData.path);
+        isDoneWithPath = creep.pos.isEqualTo(testPosition) || !(moveByPathResult == OK || moveByPathResult == ERR_TIRED);
+      }
+
+      if (isDoneWithPath) {
         moveData.path = creep.pos.findPathTo(moveData.targetPos, {
           ignoreCreeps: moveData.gotStuck < 3,
           ignoreDestructibleStructures: false,
           ignoreRoads: false,
           range: moveData.range,
         });
+        const moveByPathResult = creep.moveByPath(moveData.path);
+        if (moveByPathResult != OK && moveByPathResult != ERR_TIRED) {
+          debugger;
+          console.log(`MoveByPathResult: ${moveByPathResult}`);
+        }
       }
 
       let checkPos = creep.pos;
-      if (newPath && moveData.path.length > 0) {
+      if (isDoneWithPath && moveData.path.length > 0) {
         checkPos = new RoomPosition(moveData.path[0].x, moveData.path[0].y, creep.room.name);
       } else {
         // Find the position that the creep is at and check the next pos.
@@ -225,7 +241,6 @@ class CreepManager extends BasicProcess<CreepManager_Memory, MemCache> {
           }
         }
       }
-      creep.moveByPath(moveData.path);
       let dontDrawYet = true;
       for (let i = 0; i < moveData.path.length - 1; i++) {
         if (dontDrawYet) {
@@ -327,10 +342,12 @@ class CreepManagerExtensions extends ExtensionBase implements ICreepManagerExten
       }
 
       gotStuck = this.cache[creep.name].gotStuck;
+      this.cache[creep.name].lastPos = creep.pos;
     }
 
     if (resetCache) {
       this.cache[creep.name] = {
+        path: [],
         range: range || 0,
         targetPos: pos,
         tick: Game.time,

@@ -86,6 +86,8 @@ interface RoomState extends MemBase {
   resources: ObjectID[];
   tombstones: ObjectID[];
   ruins: ObjectID[];
+
+  bunkerAnchor: { x: number, y: number };
 }
 
 interface RoomState_StructureData {
