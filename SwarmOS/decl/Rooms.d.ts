@@ -51,3 +51,9 @@ declare interface RoomController_Cache extends MemCache {
 }
 
 declare interface RoomPlanner_Memory extends RoomMemory { }
+
+declare interface AssimilateRoomManager_Memory extends RoomMemory {
+  numClaimers: number;
+  claimerPID?: PID;
+  booterPIDs: PID[];
+}

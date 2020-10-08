@@ -181,12 +181,11 @@ class CLIManager extends BasicProcess<SwarmCLIMemory, MemCache> {
     }
     switch (roomType) {
       case (RT_Nuetral):
-        roomData.roomType = RT_Nuetral;
-        break;
-      case (RT_Home):
-        roomData.roomType = RT_Home;
+        case (RT_Home):
+        roomData.roomType = roomType;
         break;
       case (RT_RemoteHarvest):
+      case (RT_InProgress):
         if (args.length != 3) {
           this.log.warn(`Must provide a home room`);
           return;
@@ -194,11 +193,11 @@ class CLIManager extends BasicProcess<SwarmCLIMemory, MemCache> {
         const homeID: RoomID = args[2];
         const homeRoom = this.roomManager.GetRoomData(homeID);
         if (!homeRoom) {
-          this.log.warn(`Cannot make ${roomID} into a harvest room for ${homeID}`);
+          this.log.warn(`Couldn't find roomData for ${roomID}`);
           return;
         }
 
-        roomData.roomType = RT_RemoteHarvest;
+        roomData.roomType = roomType;
         roomData.homeRoom = homeID;
         break;
     }

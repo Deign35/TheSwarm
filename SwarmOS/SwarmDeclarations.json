@@ -105,6 +105,7 @@
             "type": true,
             "combinedType": "RoomPackages",
             "entries": {
+                "AssimilateRoomManager": "assimilateRoomManager",
                 "HomeRoomManager": "homeRoomManager",
                 "LabManager": "labManager",
                 "RemoteManager": "remoteManager",
@@ -144,7 +145,8 @@
                 "RemoteHarvest": 2,
                 "Highway": 3,
                 "Center": 4,
-                "SourceKeeper": 5
+                "SourceKeeper": 5,
+                "InProgress": 6
             }
         },
         "TT": {
