@@ -110,7 +110,7 @@ class RoomPlanner extends BasicProcess<RoomPlanner_Memory, MemCache> {
       }
     }
 
-    //this.sleeper.sleep(this.pid, 503);
+    this.sleeper.sleep(this.pid, 503);
     return ThreadState_Done;
   }
 

@@ -29,11 +29,11 @@ class Upgrader extends SoloCreep<Upgrader_Memory, SoloCreep_Cache> {
     let body = [WORK, CARRY, CARRY, MOVE, MOVE];
     if (energyCapacity >= 3100) {
       body = [WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK,
-      WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY,
-      CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, 
-      CARRY,
-      MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, 
-      MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+        WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY,
+        CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
+        CARRY,
+        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
+        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
     } else if (energyCapacity >= 2200) {
       body = [WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK,
         CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,

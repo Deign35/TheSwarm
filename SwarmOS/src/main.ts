@@ -39,6 +39,9 @@ if (!Memory.VERSION || Memory.VERSION != SWARM_VERSION_DATE) {
   console.log(`Updating OS complete`)
 }
 
+import * as Profiler from "Tools/Profiler";
+global["Profiler"] = Profiler.init();
+
 import { kernel } from "Core/index";
 
 import { ActivitiesPackage } from "Activities/index";
@@ -49,42 +52,9 @@ import { RoomsPackage } from "Rooms/index";
 
 kernel.installPackages([ActivitiesPackage, BattlePackage, CreepsPackage, ManagersPackage, RoomsPackage]);
 
-import { GenerateWallDistanceMatrix, GetDistancePeaks, ShrinkRoom, GenerateDistanceMatrix } from "Tools/RoomAlgorithms";
-
-let acc = 0;
-let num = 0;
-const testRoom = 'test';
 export function loop() {
   try {
     kernel.loop();
-    if (Game.rooms[testRoom]) {
-      const room = Game.rooms[testRoom];
-      const terrain = new Room.Terrain(room.name);
-      const start = performance.now();
-      //const matrix = GenerateWallDistanceMatrix(terrain, true);
-      //ShrinkRoom(matrix, 3);
-      //const peaks = GetDistancePeaks(matrix);
-      const matrix = GenerateDistanceMatrix(terrain, room.find(FIND_SOURCES)[0].pos);
-      const peaks: number[] = [];
-      const roomVisual = room.visual;
-      for (let i = 0; i < matrix.length; i++) {
-        if (matrix[i] == Infinity) { continue; }
-        const x = Math.floor(i / 50);
-        const y = i % 50;
-        if (peaks.includes(i)) {
-          roomVisual.text(matrix[i], x, y + 0.25, {
-            color: "red"
-          });
-        } else {
-          roomVisual.text(matrix[i], x, y + 0.25);
-        }
-      }
-
-      const end = performance.now();
-      num++;
-      acc += (end - start);
-      console.log(`Perf: ${(end - start).toFixed(3)} -- Avg: ${(acc / num).toFixed(3)}`);
-    }
   } finally {
     kernel.log.DumpLogToConsole();
     if (Game.cpu.bucket >= 9500 && Game.cpu.generatePixel) {
