@@ -17,6 +17,8 @@ declare interface HomeRoomManager_Memory extends RoomMemory {
   mineralCollectorPID: PID;
   mineralHarvesterPID: PID;
   upgraderPID: PID;
+
+  rebooterPID?: PID;
 }
 
 declare interface HomeRoomManager_Cache extends MemCache {

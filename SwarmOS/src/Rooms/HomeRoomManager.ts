@@ -22,6 +22,19 @@ class HomeRoomManager extends BasicProcess<HomeRoomManager_Memory, HomeRoomManag
 
   RunThread(): ThreadState {
     const roomData = this.roomManager.GetRoomData(this.memory.homeRoom)!;
+    if (Game.time % 461 == 0) {
+      const creeps = Game.rooms[this.memory.homeRoom].find(FIND_MY_CREEPS);
+      if (creeps.length <= roomData.sourceIDs.length) {
+        if (!this.memory.rebooterPID || !this.kernel.getProcessByPID(this.memory.rebooterPID)) {
+          const pid = this.kernel.startProcess(CPKG_RoomBooter, {
+            homeRoom: this.memory.homeRoom,
+            targetRoom: this.memory.homeRoom,
+          } as RoomBooter_Memory);
+          this.memory.rebooterPID = pid;
+          this.kernel.setParent(pid, this.pid);
+        }
+      }
+    }
     if (roomData.sourceIDs.length == 1 || Game.rooms[this.memory.homeRoom].energyCapacityAvailable < 2100) {
       const sourceIDs = roomData.sourceIDs;
       for (let i = 0; i < sourceIDs.length; i++) {

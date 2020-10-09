@@ -119,10 +119,7 @@ class CreepManager extends BasicProcess<CreepManager_Memory, MemCache> {
           ignoreRoads: false,
           range: moveData.range,
         });
-        const moveByPathResult = creep.moveByPath(moveData.path);
-        if (moveByPathResult != OK && moveByPathResult != ERR_TIRED) {
-          console.log(`MoveByPathResult: ${moveByPathResult}`);
-        }
+        creep.moveByPath(moveData.path);
       }
 
       let checkPos = creep.pos;
