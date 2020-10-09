@@ -1,4 +1,4 @@
-declare var Memory: {
+declare var MemoryCache: {
   profiler: ProfilerMemory
 }
 
@@ -32,14 +32,14 @@ export function init(): Profiler {
     total: 0,
   };
 
-  if (!Memory.profiler) { Memory.profiler = defaults; }
+  if (!MemoryCache.profiler) { MemoryCache.profiler = defaults; }
 
   const cli: Profiler = {
     clear() {
       const running = isEnabled();
-      Memory.profiler = defaults;
-      if (running) { Memory.profiler.start = Game.time; }
-      return "Profiler Memory cleared";
+      MemoryCache.profiler = defaults;
+      if (running) { MemoryCache.profiler.start = Game.time; }
+      return "Profiler MemoryCache cleared";
     },
 
     output() {
@@ -48,7 +48,7 @@ export function init(): Profiler {
     },
 
     start() {
-      Memory.profiler.start = Game.time;
+      MemoryCache.profiler.start = Game.time;
       return "Profiler started";
     },
 
@@ -61,9 +61,9 @@ export function init(): Profiler {
 
     stop() {
       if (!isEnabled()) { return; }
-      const timeRunning = Game.time - Memory.profiler.start!;
-      Memory.profiler.total += timeRunning;
-      delete Memory.profiler.start;
+      const timeRunning = Game.time - MemoryCache.profiler.start!;
+      MemoryCache.profiler.total += timeRunning;
+      delete MemoryCache.profiler.start;
       return "Profiler stopped";
     },
 
@@ -140,18 +140,18 @@ export function profile(
 }
 
 function isEnabled(): boolean {
-  return Memory.profiler.start !== undefined;
+  return MemoryCache.profiler.start !== undefined;
 }
 
 function record(key: string, time: number) {
-  if (!Memory.profiler.data[key]) {
-    Memory.profiler.data[key] = {
+  if (!MemoryCache.profiler.data[key]) {
+    MemoryCache.profiler.data[key] = {
       calls: 0,
       time: 0,
     };
   }
-  Memory.profiler.data[key].calls++;
-  Memory.profiler.data[key].time += time;
+  MemoryCache.profiler.data[key].calls++;
+  MemoryCache.profiler.data[key].time += time;
 }
 
 interface OutputData {
@@ -163,9 +163,9 @@ interface OutputData {
 }
 
 function outputProfilerData() {
-  let totalTicks = Memory.profiler.total;
-  if (Memory.profiler.start) {
-    totalTicks += Game.time - Memory.profiler.start;
+  let totalTicks = MemoryCache.profiler.total;
+  if (MemoryCache.profiler.start) {
+    totalTicks += Game.time - MemoryCache.profiler.start;
   }
 
   ///////
@@ -174,9 +174,9 @@ function outputProfilerData() {
   let calls: number;
   let time: number;
   let result: Partial<OutputData>;
-  const data = Reflect.ownKeys(Memory.profiler.data).map((key) => {
-    calls = Memory.profiler.data[key as string].calls;
-    time = Memory.profiler.data[key as string].time;
+  const data = Reflect.ownKeys(MemoryCache.profiler.data).map((key) => {
+    calls = MemoryCache.profiler.data[key as string].calls;
+    time = MemoryCache.profiler.data[key as string].time;
     result = {};
     result.name = `${key as string}`;
     result.calls = calls;
