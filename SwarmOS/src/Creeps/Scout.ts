@@ -11,7 +11,7 @@ class Scout extends SoloCreep<Scout_Memory, SoloCreep_Cache> {
   }
   protected GetNewSpawnID(): string {
     return this.spawnManager.requestSpawn({
-      body: [TOUGH, TOUGH, MOVE, MOVE],
+      body: [MOVE],
       creepName: this.memory.homeRoom + "_" + (Game.time + '_Sc').slice(-6),
       owner_pid: this.pid
     }, this.memory.homeRoom, Priority_Lowest, {

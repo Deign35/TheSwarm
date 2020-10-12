@@ -99,6 +99,6 @@ declare interface ControllerClaimer_Memory extends SoloCreep_Memory {
 //CLI(CLI_Launch, CPKG_ControllerClaimer, { homeRoom: "E15S41", targetRoom: "E15S43" });
 //CLI(CLI_Launch, CPKG_RoomBooter, { homeRoom: "E15S41", targetRoom: "E15S43" })
 //CLI(CLI_Launch, CPKG_Worker, { homeRoom: "E15S41", targetRoom: "E14S41" })
-//CLI(CLI_Launch, CPKG_Scout, { homeRoom: "W3N7", targetRoom: "W3N9" })
+//CLI(CLI_Launch, CPKG_Scout, { homeRoom: "W38S34", targetRoom: "W38S33" })
 
 // Game.market.createOrder({ type: ORDER_SELL, resourceType: RESOURCE_ZYNTHIUM, price: 0.08, totalAmount: 20000, roomName: "E11S44" })
