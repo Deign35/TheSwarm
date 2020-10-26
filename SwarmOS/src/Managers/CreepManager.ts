@@ -187,7 +187,9 @@ class CreepManager extends BasicProcess<CreepManager_Memory, MemCache> {
                 break;
             }
 
-            const nextPos = new RoomPosition(otherCreep.pos.x + dx, otherCreep.pos.y + dy, otherCreep.room.name);
+            const nextX = Math.min(49, Math.max(0, otherCreep.pos.x + dx));
+            const nextY = Math.min(49, Math.max(0, otherCreep.pos.y + dy));
+            const nextPos = new RoomPosition(nextX, nextY, otherCreep.room.name);
             let obstacleFound = false;
             const nearbyTerrain = nextPos.lookFor(LOOK_TERRAIN);
             if (nearbyTerrain.length > 0) {
