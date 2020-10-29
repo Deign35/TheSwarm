@@ -98,6 +98,11 @@ class MapManagerExtensions extends ExtensionBase implements IMapManagerExtension
       this.log.error("ERROR occured trying to parse the roomName\n" + ex);
     }
 
+    if (RoomsToAvoid.includes(roomName)) {
+      return 5;
+    }
     return 1;
   }
 }
+
+const RoomsToAvoid = [ "W34S37", ]

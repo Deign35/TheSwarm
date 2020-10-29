@@ -59,6 +59,16 @@ class Harvester extends SoloCreep<HarvesterMemory, SoloCreep_Cache> {
       };
     }
 
+    if (this.memory.container) {
+      const container = Game.getObjectById<StructureContainer>(this.memory.container);
+      if (container && !creep.pos.isEqualTo(container.pos)) {
+        return {
+          action: AT_MoveToPosition,
+          pos: container.pos,
+          distance: 0
+        }
+      }
+    }
     if (source.pos.getRangeTo(creep.pos) > 1) {
       let targetPos = source.pos;
       let dist = 1;

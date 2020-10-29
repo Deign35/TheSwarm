@@ -86,6 +86,16 @@ class LargetHarvester extends SoloCreep<LargeHarvester_Memory, LargeHarvester_Ca
       };
     }
 
+    if (this.cache.curContainer) {
+      const container = Game.getObjectById<StructureContainer>(this.cache.curContainer);
+      if (container && !creep.pos.isEqualTo(container.pos)) {
+        return {
+          action: AT_MoveToPosition,
+          distance: 0,
+          pos: container.pos
+        }
+      }
+    }
     if (source.pos.getRangeTo(creep.pos) > 1) {
       let targetPos = source.pos;
       let dist = 1;
@@ -114,7 +124,7 @@ class LargetHarvester extends SoloCreep<LargeHarvester_Memory, LargeHarvester_Ca
     }
 
     if (creep.store[RESOURCE_ENERGY] > 0) {
-      if (!this.cache.curContainer) {        
+      if (!this.cache.curContainer) {
         const sites = creep.pos.lookFor(LOOK_CONSTRUCTION_SITES);
         if (sites && sites.length > 0) {
           if (sites[0].structureType == STRUCTURE_CONTAINER) {
