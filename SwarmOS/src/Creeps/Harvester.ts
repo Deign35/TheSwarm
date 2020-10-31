@@ -22,19 +22,23 @@ class Harvester extends SoloCreep<HarvesterMemory, SoloCreep_Cache> {
       if (!this.memory.supportHarvester) {
         let count = 0;
 
-        LookAtGround(this.memory.targetRoom, new RoomPosition(source.pos.x - 1, source.pos.y + 1, this.memory.targetRoom),
-          new RoomPosition(source.pos.x + 1, source.pos.y - 1, this.memory.targetRoom), (x, y, terrain) => {
-            if (terrain != TERRAIN_MASK_WALL) {
-              if (count < 3 && count++ > 0) {
-                this.kernel.startProcess(this.pkgName, {
-                  homeRoom: this.memory.homeRoom,
-                  targetRoom: this.memory.targetRoom,
-                  source: this.memory.source,
-                  supportHarvester: true
-                } as HarvesterMemory);
+        if (source) {
+          LookAtGround(this.memory.targetRoom, new RoomPosition(source.pos.x - 1, source.pos.y + 1, this.memory.targetRoom),
+            new RoomPosition(source.pos.x + 1, source.pos.y - 1, this.memory.targetRoom), (x, y, terrain) => {
+              if (terrain != TERRAIN_MASK_WALL) {
+                if (count < 3 && count++ > 0) {
+                  this.kernel.startProcess(this.pkgName, {
+                    homeRoom: this.memory.homeRoom,
+                    targetRoom: this.memory.targetRoom,
+                    source: this.memory.source,
+                    supportHarvester: true
+                  } as HarvesterMemory);
+                }
               }
-            }
-          });
+            });
+        } else {
+          this.log.alert(`homeRoom: ${this.memory.homeRoom} -- source: ${this.memory.source} -- targetRoom: ${this.memory.targetRoom}\nThe source cannot be found`);
+        }
       }
     }
     return this.spawnManager.requestSpawn({
@@ -182,7 +186,7 @@ class Harvester extends SoloCreep<HarvesterMemory, SoloCreep_Cache> {
   OnTick(creep?: Creep) {
     if (!this.memory.isZombie && !this.memory.supportHarvester && creep && creep.ticksToLive) {
       if ((this.memory.remoteHarvester && creep.ticksToLive < 150) ||
-      creep.ticksToLive < 50) {
+        creep.ticksToLive < 50) {
         const newPID = this.kernel.startProcess(this.pkgName, {
           container: this.memory.container,
           homeRoom: this.memory.homeRoom,
