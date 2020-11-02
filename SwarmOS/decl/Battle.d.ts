@@ -20,4 +20,4 @@ declare interface RoomAttacker_Cache extends MemCache {
   attackerAttacked: boolean;
 }
 
-//CLI(CLI_Launch, BPKG_RemoteProtector, { expires: true, homeRoom: "E15S41", targetRoom: "E14S41", squad: [{}]});
+//CLI(CLI_Launch, BPKG_RoomAttacker, { expires: true, homeRoom: "W38S34", targetRoom: "W38S39", squad: [{}, {}]});
